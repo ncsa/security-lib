@@ -24,7 +24,7 @@ import java.util.Enumeration;
  * <p>Created by Jeff Gaynor<br>
  * on May 3, 2010 at  11:35:16 AM
  */
-public abstract class AbstractServlet extends HttpServlet implements Logable {
+public abstract class  AbstractServlet extends HttpServlet implements Logable {
     public static final String PING_PARAMETER = "ping";
 
     static ConfigurationLoader<? extends AbstractEnvironment> configurationLoader;
