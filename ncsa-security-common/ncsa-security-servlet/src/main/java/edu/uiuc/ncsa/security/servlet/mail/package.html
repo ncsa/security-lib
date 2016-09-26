@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+This package is used for adding email notification support to Tomcat servlets.
+Since Tomcat has a global facility for sending email, it is necessary to utilize that
+rather than just rolling our own (or there will be runtime issues). This is a wrapper
+for Java Mail.
+
+
+<H3>Configuring Tomcat</H3>
+<UL>
+    <LI>You <b>must</b> download a copy of the <a href="http://www.oracle.com/technetwork/java/javamail/index.html">JavaMail</a>
+        jar and drop it into the $CATALINA_HOME/lib directory.
+    </LI>
+    <LI>You must add the following line to $CATALINA_HOME/context.xml
+        <PRE>
+&lt;Resource name="mail/Session" type="javax.mail.Session" auth="Container"/&gt;
+</PRE>
+        Optionally, you made add the switch
+        <code>mail.debug="true"</code> to this if you want to see lots of information about sending messages in the log
+        file. You can also just put this switch in your properties file too (no quotes).
+    </LI>
+
+    <LI>
+        You must edit and setup your template files. This ensures that you have the ability to get the right
+        message as needed.
+    <LI>
+        Finally, in your deployment descriptor ("web.xml") file you must add the following section
+        (right before the final closing tag is fine):
+        <PRE>
+   &lt;resource-ref&gt;
+        &lt;description&gt;
+            Resource reference to a factory for javax.mail.Session
+            instances that may be used for sending electronic mail
+            messages, preconfigured to connect to the appropriate
+            SMTP server.
+        &lt;/description&gt;
+        &lt;res-ref-name>mail/Session&lt;/res-ref-name&gt;
+        &lt;res-type>javax.mail.Session&lt;/res-type&gt;
+        &lt;res-auth>Container&lt;/res-auth&gt;
+   &lt;/resource-ref&gt;
+        </PRE>
+    </LI>
+</UL>
+<p>One issue is that Tomcat uses multiple class loaders, so that if you include Java Mail in your
+    webapp you will ge very strange ClassCastExceptions, <i>e.g.</i>
+    <code>javax.mail.Session cannot be cast to javax.mail.Session</code><br>
+    This is because classes themselves exist as objects different class loaders
+    have different instances of them, hence they are not identical so cannot be cast
+    to each other. Rather than have a massive kludge to let you add the mail jar to your
+    webapp, we'll require that you use Tomcat's system for this.
+</body>
+</html>

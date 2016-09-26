@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+Classes that setup a specific type of correspondence between java objects and rows of an SQL table.
+
+<h3>What does this all do?</h3>
+One of the most commonly used constructs in Java is a map which associates keys and values (which are java objects).
+This is very simply modelled in SQL by having each row of a database correspond to the object and allows us
+to manage the data in tables as objects. This special case is pretty easy to manage and this package will
+do most all of the grunt work in setting up databases and object creation for you.
+
+<H3>How to implement your own example.</H3>
+<ol>
+    <li>Make your object implement the {@link edu.uiuc.ncsa.security.core.Identifiable} interface. This gives a
+        way to track objects by unique identifier. This identifier should be the primary key for your database.
+    </li>
+    <li>Make a class that extends {@link edu.uiuc.ncsa.security.storage.sql.Table} (or implements
+        {@link edu.uiuc.ncsa.security.storage.sql.TableInterface}, which is a bit harder). Assuming you
+        are extending Table, you need to implement one, single method called
+        {@link edu.uiuc.ncsa.security.storage.sql.TableInterface.createColumnDescriptors}. This tells the
+        system what columns it should create and what types they have.
+    </li>
+    <li>Extend {@link edu.uiuc.ncsa.security.storage.sql.SQLStore}. This has a couple of methods called
+        populate and depopulate. These methods tell how to take one of your objects and "populate"
+        it, i.e., set the values. "depopulate" tells how to get the values. read the documentation there.
+    </li>
+</ol>
+
+Once this is done,you should be able to just use one of the admin clients to create your database.
+</body>
+</html>

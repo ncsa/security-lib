@@ -1,0 +1,5 @@
+# Template file for an email message. Any line (like this) that starts with a # is omitted.
+# You will put your text here and include any text to be replaced with ${key}. A hashmap
+# is that kas key - value pairs. All keys are replaced with their value and the message is sent.
+
+This is the body of the message with a sample ${identifier}.
