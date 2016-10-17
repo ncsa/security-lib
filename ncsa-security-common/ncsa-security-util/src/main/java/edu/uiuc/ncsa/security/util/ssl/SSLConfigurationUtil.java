@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -18,6 +19,7 @@ public class SSLConfigurationUtil implements Serializable {
     public static final String SSL_KEYSTORE_TAG = "keystore";
     public static final String SSL_TAG = "ssl";
     public static final String SSL_DEBUG_TAG = "debug";
+    public static final String SSL_TLS_VERSION_TAG = "tlsVersion";
     public static final String SSL_KEYSTORE_PATH = "path";
     public static final String SSL_KEYSTORE_PASSWORD = "password";
     public static final String SSL_KEYSTORE_TYPE = "type";
@@ -29,6 +31,19 @@ public class SSLConfigurationUtil implements Serializable {
     public static final String SSL_TRUSTSTORE_PATH = "path";
     public static final String SSL_TRUSTSTORE_PASSWORD = "password";
     public static final String SSL_TRUSTSTORE_TYPE = "type";
+
+    public final static String TLS_VERSION_1_0 = "1.0";
+    public final static String TLS_VERSION_1_1 = "1.1";
+    public final static String TLS_VERSION_1_2 = "1.2";
+    /**
+     * The strings that are used in Java are standardized and listed
+     * <a href="https://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext">here</a>.
+     * The values in the configuration file are made to be more easily understood.
+     */
+    public final static String TLS_DEFAULT = "TLS";
+    public final static String TLS_1_0 = "TLSv1";
+    public final static String TLS_1_1 = "TLSv1.1";
+    public final static String TLS_1_2 = "TLSv1.2";
 
     /**
      * The old way of doing this. The node is called keystore and values are attributes.
@@ -72,14 +87,45 @@ public class SSLConfigurationUtil implements Serializable {
         if (logger != null) {
             logger.info("Loading an SSL configuration");
         }
-        SSLConfiguration sslKeystoreConfiguration = new SSLConfiguration();
+        SSLConfiguration sslConfiguration = new SSLConfiguration();
 
         if (node == null) {
             if (logger != null) {
                 logger.info("Using default Java trust store only.");
             }
-            sslKeystoreConfiguration.setUseDefaultJavaTrustStore(true); // default
+            sslConfiguration.setUseDefaultJavaTrustStore(true); // default
         } else {
+            // Process TLS version
+            // Fixes OAUTH-213
+            String tlsVersion = getFirstAttribute(node, SSL_TLS_VERSION_TAG);
+            DebugUtil.dbg(SSLConfigurationUtil.class, "Got TLS version =" + tlsVersion);
+            if (tlsVersion == null || tlsVersion.length() == 0) {
+                sslConfiguration.setTlsVersion(TLS_DEFAULT);
+            } else {
+                boolean gotOne = false;
+                if (tlsVersion.equals(TLS_VERSION_1_0)) {
+                    sslConfiguration.setTlsVersion(TLS_1_0);
+                    gotOne = true;
+                }
+
+                if (tlsVersion.equals(TLS_VERSION_1_1)) {
+                    sslConfiguration.setTlsVersion(TLS_1_1);
+                    gotOne = true;
+
+                }
+
+                if (tlsVersion.equals(TLS_VERSION_1_2)) {
+                    sslConfiguration.setTlsVersion(TLS_1_2);
+                    gotOne = true;
+
+                }
+
+                if (!gotOne) {
+                    // unrecognized string, use the default
+                    logger.warn("Got a TLS version number of \"" + tlsVersion + "\", which is unrecognized. Using the default version.");
+                    sslConfiguration.setTlsVersion(TLS_DEFAULT);
+                }
+            }
             // Process the debug attribute
             String debug = getFirstAttribute(node, SSL_DEBUG_TAG);
             if (debug != null) {
@@ -98,39 +144,40 @@ public class SSLConfigurationUtil implements Serializable {
                 } catch (Throwable t) {
                     // do nothing.
                 }
-                // Process the use java trust store attribute
-                String x = getFirstAttribute(node, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
-
-                if (x == null) {
-                    String y = getFirstAttribute(node, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE_OLD);
-                    if (y == null) {
-                        sslKeystoreConfiguration.setUseDefaultJavaTrustStore(true); //default
-                    } else {
-                        sslKeystoreConfiguration.setUseDefaultJavaTrustStore(Boolean.parseBoolean(y));
-                    }
-                } else {
-                    sslKeystoreConfiguration.setUseDefaultJavaTrustStore(Boolean.parseBoolean(x));
-                }
-
-                // Now get the trust store and keystore
-                ConfigurationNode keyStoreNode = getFirstNode(node, SSL_KEYSTORE_TAG);
-                if(keyStoreNode != null) {
-                    // keystore is optional. Only process if there is one.
-                    sslKeystoreConfiguration.setKeystore(getNodeValue(keyStoreNode, SSL_KEYSTORE_PATH));
-                    sslKeystoreConfiguration.setKeystorePassword(getNodeValue(keyStoreNode, SSL_KEYSTORE_PASSWORD));
-                    sslKeystoreConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
-                    sslKeystoreConfiguration.setKeystoreType(getNodeValue(keyStoreNode, SSL_KEYSTORE_TYPE));
-                }
-                ConfigurationNode trustStoreNode = getFirstNode(node, SSL_TRUSTSTORE_TAG);
-
-                if(trustStoreNode != null){
-                    sslKeystoreConfiguration.setTrustRootPath(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PATH));
-                    sslKeystoreConfiguration.setTrustRootPassword(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PASSWORD));
-                    //sslKeystoreConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
-                    sslKeystoreConfiguration.setTrustRootType(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_TYPE));
-
-                }
             }
+            // Process the use java trust store attribute
+            String x = getFirstAttribute(node, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE);
+
+            if (x == null) {
+                String y = getFirstAttribute(node, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE_OLD);
+                if (y == null) {
+                    sslConfiguration.setUseDefaultJavaTrustStore(true); //default
+                } else {
+                    sslConfiguration.setUseDefaultJavaTrustStore(Boolean.parseBoolean(y));
+                }
+            } else {
+                sslConfiguration.setUseDefaultJavaTrustStore(Boolean.parseBoolean(x));
+            }
+
+            // Now get the trust store and keystore
+            ConfigurationNode keyStoreNode = getFirstNode(node, SSL_KEYSTORE_TAG);
+            if (keyStoreNode != null) {
+                // keystore is optional. Only process if there is one.
+                sslConfiguration.setKeystore(getNodeValue(keyStoreNode, SSL_KEYSTORE_PATH));
+                sslConfiguration.setKeystorePassword(getNodeValue(keyStoreNode, SSL_KEYSTORE_PASSWORD));
+                sslConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
+                sslConfiguration.setKeystoreType(getNodeValue(keyStoreNode, SSL_KEYSTORE_TYPE));
+            }
+            ConfigurationNode trustStoreNode = getFirstNode(node, SSL_TRUSTSTORE_TAG);
+
+            if (trustStoreNode != null) {
+                sslConfiguration.setTrustRootPath(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PATH));
+                sslConfiguration.setTrustRootPassword(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PASSWORD));
+                //sslKeystoreConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
+                sslConfiguration.setTrustRootType(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_TYPE));
+
+            }
+
 
 
        /*     sslKeystoreConfiguration.setTrustRootPath(getNodeValue(node, SSL_TRUSTSTORE_PATH));
@@ -142,7 +189,7 @@ public class SSLConfigurationUtil implements Serializable {
                 logger.info("Done loading SSL configuration");
             }
         }
-        return sslKeystoreConfiguration;
+        return sslConfiguration;
     }
 
     public static SSLConfiguration getSSLConfiguration(MyLoggingFacade logger, ConfigurationNode node) {

@@ -242,7 +242,8 @@ public class VerifyingHTTPClientFactory implements Logable {
     protected SSLSocketFactory getSocketFactory(X509TrustManager tm) throws IOException, GeneralSecurityException {
         //if (socketFactory == null) {
         debug("creating socket factory");
-        SSLContext sc = SSLContext.getInstance("TLS");
+
+        SSLContext sc = SSLContext.getInstance(getSSLConfiguration().getTlsVersion());
         X509TrustManagerFacade tmf = new X509TrustManagerFacade();
         tmf.add(tm);
         debug("added trust manager = " + tm);

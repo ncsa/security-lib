@@ -35,6 +35,15 @@ public class SSLConfiguration extends SSLKeystoreConfiguration {
 
     String trustRootPath; // = "/etc/grid-security/certificates";
 
+    public String getTlsVersion() {
+        return tlsVersion;
+    }
+
+    public void setTlsVersion(String tlsVersion) {
+        this.tlsVersion = tlsVersion;
+    }
+
+    String tlsVersion = "TLS"; // This uses the default in Java.
 
 
 
