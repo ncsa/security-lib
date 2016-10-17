@@ -10,7 +10,7 @@
     </parent>
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>ncsa-security-all</artifactId>
-    <version>3.4-SNAPSHOT</version>
+    <version>3.3.0.2</version>
     <name>Parent module for everything of interest.</name>
     <packaging>pom</packaging>
     <description>Generic security code for delegation.</description>
@@ -97,7 +97,7 @@
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
                 <configuration>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>
