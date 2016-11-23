@@ -77,7 +77,7 @@ public class SSLConfigurationUtil implements Serializable {
 
     /**
      * The new way of doing it from an SSL node in the configuration file. All values are values of the node
-     * rather than as attrbiutes, mostly because string passwords can be put into CDATA elements.
+     * rather than as attributes, mostly because string passwords can be put into CDATA elements.
      *
      * @param logger
      * @param node
@@ -200,4 +200,6 @@ public class SSLConfigurationUtil implements Serializable {
         cfgNode = getFirstNode(node, SSL_TAG);
         return getNEWSSLConfiguration(logger, cfgNode);
     }
+
+
 }

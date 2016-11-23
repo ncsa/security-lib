@@ -71,7 +71,7 @@ public class BaseClient  extends IdentifiableImpl {
      @Override
      public boolean equals(Object obj) {
          if(!super.equals(obj)) return false;
-         Client c = (Client) obj;
+         BaseClient c = (BaseClient) obj;
          if (!checkEquals(getSecret(), c.getSecret())) return false;
          if (!checkEquals(getName(), c.getName())) return false;
          if (!checkEquals(getEmail(), c.getEmail())) return false;

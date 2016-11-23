@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
-import java.io.Serializable;
+import java.io.*;
+
+import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
 /**
  * A bean that holds the configuration for an keystore.  If you have a custom keystore, this will point to it.
@@ -34,7 +36,7 @@ import java.io.Serializable;
     javax.net.debug - To switch on logging for the SSL/TLS layer, set this property to ssl.
 
  */
-public class SSLKeystoreConfiguration implements Serializable{
+public class SSLKeystoreConfiguration implements Serializable {
     /**
      * This path is actually part of the java specification.
      */
@@ -63,7 +65,6 @@ public class SSLKeystoreConfiguration implements Serializable{
     String keystoreType = "jks";
     String keystorePassword;
     String keyManagerFactory = "SunX509";
-
 
 
     public void setKeyManagerFactory(String keyManagerFactory) {
@@ -118,6 +119,34 @@ public class SSLKeystoreConfiguration implements Serializable{
         return keystore;
     }
 
+    public byte[] getKeystoreBytes() {
+        return keystoreBytes;
+    }
+
+    public void setKeystoreBytes(byte[] keystoreBytes) {
+        this.keystoreBytes = keystoreBytes;
+    }
+
+
+    byte[] keystoreBytes;
+
+    public InputStream getKeystoreIS() throws FileNotFoundException {
+        InputStream is;
+        if (keystoreBytes != null) {
+            is = new ByteArrayInputStream(keystoreBytes);
+        } else {
+            File keystoreFile = new File(getKeystore());
+            if (!keystoreFile.exists()) {
+                throw new FileNotFoundException("Error: the keystore file \"" + keystoreFile + "\" does not exist");
+            }
+            is = new FileInputStream(keystoreFile);
+        }
+        if (is == null) {
+            throw new IllegalStateException("No keystore configured, Cannot convert to an input stream");
+        }
+
+        return is;
+    }
 
     public String getKeyManagerFactory() {
         return keyManagerFactory;
@@ -125,5 +154,25 @@ public class SSLKeystoreConfiguration implements Serializable{
 
     public String toString() {
         return getClass().getName() + "[keystore path=" + getKeystore() + ", pwd=" + getKeystorePassword() + ", type=" + getKeystoreType() + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (!(obj instanceof SSLKeystoreConfiguration)) return false;
+        SSLKeystoreConfiguration ks = (SSLKeystoreConfiguration) obj;
+        if (ks.isUseDefaultJavaTrustStore() != isUseDefaultJavaTrustStore()) return false;
+        if (!checkEquals(ks.getKeystoreType(), getKeystoreType())) return false;
+        if (!checkEquals(ks.getKeystorePassword(), getKeystorePassword())) return false;
+        if (!checkEquals(ks.getKeyManagerFactory(), getKeyManagerFactory())) return false;
+        if (!checkEquals(ks.getKeystore(), getKeystore())) return false;
+        if (keystoreBytes != null) {
+            if (ks.keystoreBytes == null) return false;
+            if (ks.keystoreBytes.length != keystoreBytes.length) return false;
+            for (int i = 0; i < keystoreBytes.length; i++) {
+                if (ks.keystoreBytes[i] != keystoreBytes[i]) return false;
+            }
+        }
+        return true;
     }
 }

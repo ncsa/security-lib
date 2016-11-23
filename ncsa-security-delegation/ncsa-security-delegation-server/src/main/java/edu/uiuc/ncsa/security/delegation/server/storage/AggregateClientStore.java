@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.server.storage;
 
+import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.storage.AggregateStore;
 
 /**
@@ -9,5 +11,15 @@ import edu.uiuc.ncsa.security.storage.AggregateStore;
 public class AggregateClientStore<V extends ClientStore> extends AggregateStore<V> implements ClientStore {
     public AggregateClientStore(V... stores) {
         super(stores);
+    }
+
+    @Override
+    public BaseClientConverter getACConverter() {
+        return null;
+    }
+
+    @Override
+    public IdentifiableProvider getACProvider() {
+        return null;
     }
 }

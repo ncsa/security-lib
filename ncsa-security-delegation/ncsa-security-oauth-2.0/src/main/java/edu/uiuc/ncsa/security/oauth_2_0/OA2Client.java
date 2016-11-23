@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 
 import java.util.Collection;
 
@@ -55,4 +56,23 @@ public class OA2Client extends Client {
         return rtLifetime != Long.MIN_VALUE;
     }
 
+    public Collection<String> getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(Collection<String> scopes) {
+        this.scopes = scopes;
+    }
+
+    Collection<String> scopes;
+
+    public Collection<LDAPConfiguration> getLdaps() {
+        return ldaps;
+    }
+
+    public void setLdaps(Collection<LDAPConfiguration> ldaps) {
+        this.ldaps = ldaps;
+    }
+
+    Collection<LDAPConfiguration> ldaps;
 }

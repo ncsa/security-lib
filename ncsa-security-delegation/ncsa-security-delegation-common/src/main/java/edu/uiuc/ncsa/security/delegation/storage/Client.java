@@ -83,7 +83,7 @@ public class Client extends BaseClient {
                 "\", homeUri=\"" + getHomeUri() +
                 "\", errorUri=\"" + getErrorUri() +
                 "\", email=\"" + getEmail() +
-                "\", secret=" + (getSecret()==null?"(none)":getSecret().substring(0,25)) +
+                "\", secret=" + (getSecret()==null?"(none)":getSecret().substring(0,Math.min(25, getSecret().length()))) +
                 "\", proxy limited=" + isProxyLimited() +
                 "]";
     }

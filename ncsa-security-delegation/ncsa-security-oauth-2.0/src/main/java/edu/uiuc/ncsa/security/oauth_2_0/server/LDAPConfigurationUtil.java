@@ -2,18 +2,11 @@ package edu.uiuc.ncsa.security.oauth_2_0.server;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.util.LinkedList;
-
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
-import static edu.uiuc.ncsa.security.core.configuration.Configurations.getNodeValue;
 
 /**
  * A utility that loads the configuration from a node and has the tags, etc. for it.
@@ -129,72 +122,12 @@ public class LDAPConfigurationUtil {
         }
         x = getFirstAttribute(ldapNode, LDAP_AUTH_TYPE);
         ldapConfiguration.setAuthType(getAuthType(x));
-/*
-        ldapConfiguration.setAuthType(LDAP_AUTH_UNSPECIFIED_KEY); // default
-        if (x != null) {
-            // If specified, figure out what they want.
-            if (x.equals(LDAP_AUTH_NONE)) {
-                ldapConfiguration.setAuthType(LDAP_AUTH_NONE_KEY);
-            }
-            if (x.equals(LDAP_AUTH_SIMPLE)) {
-                ldapConfiguration.setAuthType(LDAP_AUTH_SIMPLE_KEY);
-            }
-            if (x.equals(LDAP_AUTH_STRONG)) {
-                ldapConfiguration.setAuthType(LDAP_AUTH_STRONG_KEY);
-            }
-        }
-*/
+
         logger.info("LDAP configuration loaded.");
 
         return ldapConfiguration;
     }
 
-    public static JSONObject toJSON(LDAPConfiguration configuration) {
-        JSONUtil jsonUtil = getJSONUtil();
-        JSONObject ldap = new JSONObject();
-        JSONObject content = new JSONObject();
-        ldap.put(LDAP_TAG, content);
-
-        jsonUtil.setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
-        jsonUtil.setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
-        jsonUtil.setJSONValue(ldap, LDAP_ENABLED_TAG, configuration.isEnabled());
-        jsonUtil.setJSONValue(ldap, LDAP_ENABLED_TAG, configuration.isEnabled());
-        jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
-        jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
-        if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
-            // nothing to do
-        }
-        if (configuration.getAuthType() == LDAP_AUTH_SIMPLE_KEY) {
-            jsonUtil.setJSONValue(ldap, LDAP_PASSWORD_TAG, configuration.getPassword());
-            jsonUtil.setJSONValue(ldap, LDAP_SECURITY_PRINCIPAL_TAG, configuration.getSecurityPrincipal());
-        }
-
-        // Now for the search attributes
-        JSONArray searchAttributes = new JSONArray();
-        for (String key : configuration.getSearchAttributes().keySet()) {
-            AttributeEntry ae = configuration.getSearchAttributes().get(key);
-            JSONObject entry = new JSONObject();
-            entry.put("name", ae.sourceName);
-            entry.put(RETURN_AS_LIST, ae.isList);
-            entry.put(RETURN_NAME, ae.targetName);
-            searchAttributes.add(entry);
-        }
-        jsonUtil.setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);
-        jsonUtil.setJSONValue(ldap, LDAP_SEARCH_BASE_TAG, configuration.getSearchBase());
-        jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
-
-
-        return ldap;
-    }
-
-    static JSONUtil jsonUtil = null;
-
-    protected static JSONUtil getJSONUtil() {
-        if (jsonUtil == null) {
-            jsonUtil = new JSONUtil(LDAP_TAG);
-        }
-        return jsonUtil;
-    }
 
     protected static int getAuthType(String x) {
         int rc = LDAP_AUTH_UNSPECIFIED_KEY; // default
@@ -214,35 +147,5 @@ public class LDAPConfigurationUtil {
 
     }
 
-    public static LDAPConfiguration fromJSON(JSONObject json) {
-        JSONUtil jsonUtil = getJSONUtil();
-
-        LDAPConfiguration config = new LDAPConfiguration();
-        config.setContextName(jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG));
-        config.setEnabled(jsonUtil.getJSONValueBoolean(json, LDAP_ENABLED_TAG));
-        String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
-        config.setAuthType(getAuthType(x)); // default
-        config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
-        config.setPort(jsonUtil.getJSONValueInt(json, LDAP_ADDRESS_TAG));
-        Object se = jsonUtil.getJSONValue(json, LDAP_SEARCH_ATTRIBUTES_TAG);
-        if (se instanceof JSONArray) {
-            JSONArray searchAttributes = (JSONArray) se;
-            LinkedList<AttributeEntry> attributeEntries = new LinkedList<>();
-            for (int i = 0; i < searchAttributes.size(); i++) {
-                JSONObject current = searchAttributes.getJSONObject(i);
-                String name = current.getString("name");
-                String targetName = current.getString(RETURN_NAME);
-                boolean isList = current.getBoolean(RETURN_AS_LIST);
-                AttributeEntry attributeEntry = new AttributeEntry(name, targetName, isList);
-                config.getSearchAttributes().put(attributeEntry.sourceName, attributeEntry);
-            }
-
-            config.setSearchBase(jsonUtil.getJSONValueString(json, LDAP_SEARCH_BASE_TAG));
-            config.setSecurityPrincipal(jsonUtil.getJSONValueString(json, LDAP_SECURITY_PRINCIPAL_TAG));
-            config.setPassword(jsonUtil.getJSONValueString(json, LDAP_PASSWORD_TAG));
-
-        }
-        return config;
-    }
 
 }

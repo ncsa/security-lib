@@ -12,9 +12,6 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -306,13 +303,13 @@ public class VerifyingHTTPClientFactory implements Logable {
                 return null;
             }
             keyStore = KeyStore.getInstance(getSSLConfiguration().getKeystoreType());
-            File keystoreFile = new File(getSSLConfiguration().getKeystore());
+          /*  File keystoreFile = new File(getSSLConfiguration().getKeystore());
             if (!keystoreFile.exists()) {
                 throw new FileNotFoundException("Error: the keystore file \"" + keystoreFile + "\" does not exist");
             }
-            FileInputStream fis = new FileInputStream(keystoreFile);
-            keyStore.load(fis, getSSLConfiguration().getKeystorePasswordChars());
-            fis.close();
+            FileInputStream fis = new FileInputStream(keystoreFile);*/
+            keyStore.load(getSSLConfiguration().getKeystoreIS(), getSSLConfiguration().getKeystorePasswordChars());
+            getSSLConfiguration().getKeystoreIS().close();
         }
         return keyStore;
     }

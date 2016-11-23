@@ -29,4 +29,11 @@ public class OA2ClientKeys extends ClientKeys {
         return rtLifetime;
     }
 
+    String scopes ="scopes";
+
+    public String scopes(String... x) {
+        if (0 < x.length) scopes = x[0];
+        return scopes;
+    }
+
 }

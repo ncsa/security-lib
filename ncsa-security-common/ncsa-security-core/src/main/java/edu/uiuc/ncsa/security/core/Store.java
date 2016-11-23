@@ -48,4 +48,5 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @param value
      */
     public void save(V value);
+
 }

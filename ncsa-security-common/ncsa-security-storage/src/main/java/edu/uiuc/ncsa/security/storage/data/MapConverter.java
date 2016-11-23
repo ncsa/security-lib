@@ -12,6 +12,9 @@ public class MapConverter<V extends Identifiable> {
     public SerializationKeys keys;
     protected IdentifiableProvider<V> provider;
 
+    public SerializationKeys getKeys() {
+        return keys;
+    }
 
     public MapConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         this.keys = keys;
@@ -28,10 +31,14 @@ public class MapConverter<V extends Identifiable> {
         return fromMap(data, null);
     }
 
-    public V fromMap(ConversionMap<String, Object> map, V v)  {
+    public V createIfNeeded(V v){
         if (v == null) {
             v = provider.get(false);
         }
+       return v;
+    }
+    public V fromMap(ConversionMap<String, Object> map, V v)  {
+        v = createIfNeeded(v);
         v.setIdentifier(map.getIdentifier(keys.identifier()));
         return v;
 

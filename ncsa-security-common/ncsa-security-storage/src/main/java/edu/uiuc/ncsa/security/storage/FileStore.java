@@ -231,8 +231,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             fis = new FileInputStream(f);
             return loadStream(fis);
         } catch (Throwable e) {
-            String message = "Warning: the file named \"" + f.getAbsolutePath() + "\" could not be loaded. Skipping.";
-            throw new GeneralException(message, e);
+          //  String message = "Warning: the file named \"" + f.getAbsolutePath() + "\" could not be loaded. Skipping.";
+          //  throw new GeneralException(message, e);
+            return null;
         }
     }
 
@@ -287,7 +288,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                 V t = null;
                 if (!failures.contains(f.getAbsolutePath())) {
                     t = loadFile(f);
-                    ids.add(t.getIdentifier());
+                    if(t!= null) {
+                        ids.add(t.getIdentifier());
+                    }
                 }
             } catch (Throwable t) {
                 failures.add(f.getAbsolutePath());
@@ -306,7 +309,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         checkPermissions();
         Collection<V> allOfThem = new LinkedList<V>();
         for (File f : storageDirectory.listFiles()) {
-            allOfThem.add(loadFile(f));
+            V t = loadFile(f);
+            if(t!=null) {
+                allOfThem.add(t);
+            }
         }
         return allOfThem;
     }
@@ -316,7 +322,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         Set<Entry<Identifier, V>> entries = new HashSet<Entry<Identifier, V>>();
         for (File f : storageDirectory.listFiles()) {
             V t = loadFile(f);
-            entries.add(new SimpleEntryImpl<Identifier, V>(t.getIdentifier(), (V) t));
+            if (t != null)   {
+                entries.add(new SimpleEntryImpl<Identifier, V>(t.getIdentifier(), (V) t));
+        }
         }
         return entries;
     }

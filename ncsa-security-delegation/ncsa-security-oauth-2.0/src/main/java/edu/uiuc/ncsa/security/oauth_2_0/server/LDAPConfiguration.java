@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
-import edu.uiuc.ncsa.myproxy.oa4mp.oauth2.loader.LDAPConfigurationUtil.AttributeEntry;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 
 import javax.naming.Name;
@@ -9,13 +8,15 @@ import javax.naming.ldap.LdapContext;
 import java.util.HashMap;
 import java.util.Map;
 
+import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 5/3/16 at  11:17 AM
  */
 public class LDAPConfiguration {
     String server;
-    Integer port = null;
+    int port = -1;
     SSLConfiguration sslConfiguration;
 
 
@@ -39,18 +40,18 @@ public class LDAPConfiguration {
 
     String searchBase;
 
-    Map<String,AttributeEntry> searchAttributes = new HashMap<>();
+    Map<String,LDAPConfigurationUtil.AttributeEntry> searchAttributes = new HashMap<>();
 
     /**
      * Search attributes are recorded as a map. The key  is the search term in the LDAP query. The value
      * is the name that should be returned for this attribute in the claim.
      * @return
      */
-    public Map<String,AttributeEntry> getSearchAttributes() {
+    public Map<String,LDAPConfigurationUtil.AttributeEntry> getSearchAttributes() {
         return searchAttributes;
     }
 
-    public void setSearchAttributes(Map<String,AttributeEntry> searchAttributes) {
+    public void setSearchAttributes(Map<String,LDAPConfigurationUtil.AttributeEntry> searchAttributes) {
         this.searchAttributes = searchAttributes;
     }
 
@@ -79,11 +80,11 @@ public class LDAPConfiguration {
 
     String password;
 
-    public Integer getPort() {
+    public int getPort() {
         return port;
     }
 
-    public void setPort(Integer port) {
+    public void setPort(int  port) {
         this.port = port;
     }
 
@@ -130,5 +131,20 @@ public class LDAPConfiguration {
 
     public void setContextName(String contextName) {
         this.contextName = contextName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof LDAPConfiguration)) return false;
+        LDAPConfiguration ldap = (LDAPConfiguration) obj;
+        if(!checkEquals(ldap.getContextName(), getContextName())) return false;
+        if(!checkEquals(ldap.getPassword(), getPassword())) return false;
+        if(!checkEquals(ldap.getSecurityPrincipal(), getSecurityPrincipal())) return false;
+        if(!checkEquals(ldap.getSearchBase(), getSearchBase())) return false;
+        if(!checkEquals(ldap.getServer(), getServer())) return false;
+        if(ldap.getPort() != getPort()) return false;
+        if(ldap.getAuthType() != getAuthType()) return false;
+        if(!ldap.getSslConfiguration().equals(getSslConfiguration())) return false;
+        return true;
     }
 }
