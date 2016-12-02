@@ -21,13 +21,14 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
     public abstract String getJSONComponentName();
 
     public JSONUtil getJsonUtil() {
-        if(jsonUtil == null){
+        if (jsonUtil == null) {
             jsonUtil = new JSONUtil(getJSONComponentName());
         }
         return jsonUtil;
     }
 
     JSONUtil jsonUtil;
+
     public BaseClientConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         super(keys, provider);
     }
@@ -61,12 +62,12 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         v.setSecret(getJsonUtil().getJSONValueString(json, getBKK().secret()));
         v.setName(getJsonUtil().getJSONValueString(json, getBKK().name()));
         v.setEmail(getJsonUtil().getJSONValueString(json, getBKK().email()));
-        String rawDate = getJsonUtil().getJSONValueString(json,getBKK().creationTS());
-        if(rawDate != null) {
+        String rawDate = getJsonUtil().getJSONValueString(json, getBKK().creationTS());
+        if (rawDate != null) {
             try {
                 v.setCreationTS(Iso8601.string2Date(rawDate).getTime());
             } catch (ParseException e) {
-                 e.printStackTrace();
+                e.printStackTrace();
             }
         }
         return v;
@@ -83,7 +84,9 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         getJsonUtil().setJSONValue(json, getBKK().email(), client.getEmail());
         getJsonUtil().setJSONValue(json, getBKK().name(), client.getName());
         getJsonUtil().setJSONValue(json, getBKK().secret(), client.getSecret());
-        getJsonUtil().setJSONValue(json, getBKK().creationTS(), Iso8601.date2String(client.getCreationTS()));
+        if (client.getCreationTS() != null) {
+            getJsonUtil().setJSONValue(json, getBKK().creationTS(), Iso8601.date2String(client.getCreationTS()));
+        }
     }
 
 

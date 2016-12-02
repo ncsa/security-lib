@@ -75,4 +75,14 @@ public class OA2Client extends Client {
     }
 
     Collection<LDAPConfiguration> ldaps;
+
+    @Override
+    public String toString(){
+        String x = super.toString();
+        x = x.substring(0,x.lastIndexOf("]"));
+        x=x+"scopes="+ ((getScopes()==null)?"[]":getScopes().toString()) + ",";
+         x=x+"callbacks=" + (getCallbackURIs()==null?"[]":getCallbackURIs().toString()) + ",";
+        x=x+"refresh token lifetime=" + getRtLifetime();
+        return x + "]";
+    }
 }

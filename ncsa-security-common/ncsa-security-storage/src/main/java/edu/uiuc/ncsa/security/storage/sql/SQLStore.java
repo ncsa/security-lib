@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptors;
@@ -288,11 +287,18 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public boolean containsKey(Object key) {
+        //Fix for CIL-350: If a non-identifier is passed in, this returns null. It should only accept identifiers.
+        Identifier identifier = null;
+        try {
+            identifier = (Identifier) key;
+        } catch (ClassCastException c) {
+            throw new NFWException("Error casting object of type \"" + key.getClass().getName() + "\" to an Identifier.\nThis is an implementation error", c);
+        }
         Connection c = getConnection();
         boolean rc = false;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createSelectStatement());
-            stmt.setString(1, key.toString());
+            stmt.setString(1, identifier.toString());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             ResultSet rs = stmt.getResultSet();
             rc = rs.next();

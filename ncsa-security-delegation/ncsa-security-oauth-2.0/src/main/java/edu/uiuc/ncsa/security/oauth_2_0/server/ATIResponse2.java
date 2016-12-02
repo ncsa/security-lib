@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -145,9 +146,13 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         }
         JSONObject claims = null;
         if (getScopeHandler() != null) {
+            DebugUtil.dbg(this,"has scope handler=" + getScopeHandler().getClass().getSimpleName());
             UserInfo userInfo = new UserInfo();
             userInfo = getScopeHandler().process(userInfo, getServiceTransaction());
             claims = userInfo.toJSon();
+        }else{
+            DebugUtil.dbg(this,"NO scope handler" );
+
         }
         if (claims == null) {
             claims = new JSONObject();

@@ -71,6 +71,7 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
 
     @Override
     public Date getDate(String key) {
+        if(!containsKey(key)) return null;
         Object obj = get(key);
        if(obj instanceof Date){
         return (Date) get(key);

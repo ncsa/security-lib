@@ -64,12 +64,15 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
         map.put(getCK2().callbackUri(), callbacks.toString());
 
-        JSONArray scopes = new JSONArray();
-        for (String s : client.getScopes()) {
-            scopes.add(s);
-        }
+        if (client.getScopes() != null) {
+            JSONArray scopes = new JSONArray();
 
-        map.put(getCK2().scopes(), scopes.toString());
+            for (String s : client.getScopes()) {
+                scopes.add(s);
+            }
+
+            map.put(getCK2().scopes(), scopes.toString());
+        }
     }
 
     @Override
