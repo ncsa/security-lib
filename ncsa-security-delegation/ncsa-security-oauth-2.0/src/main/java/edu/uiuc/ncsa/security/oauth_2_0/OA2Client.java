@@ -1,10 +1,12 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * OAuth2 Open ID connect protocol requires that sites register callback uris and that incoming requests
@@ -16,16 +18,19 @@ public class OA2Client extends Client {
     @Override
     public OA2Client clone() {
         OA2Client client = new OA2Client(getIdentifier());
-        client.setName(getName());
-        client.setHomeUri(getHomeUri());
-        client.setErrorUri(getErrorUri());
-        client.setEmail(getEmail());
-        client.setProxyLimited(isProxyLimited());
+        populateClone(client);
+        return client;
+    }
+
+    @Override
+    protected void populateClone(BaseClient c) {
+        OA2Client client = (OA2Client) c;
+        super.populateClone(client);
         client.setRtLifetime(getRtLifetime());
         client.setCallbackURIs(getCallbackURIs());
-        client.setCreationTS(getCreationTS());
-        client.setSecret(getSecret());
-        return client;
+        client.setScopes(getScopes());
+        client.setLdaps(getLdaps());
+
     }
 
     public OA2Client(Identifier identifier) {
@@ -40,7 +45,7 @@ public class OA2Client extends Client {
         this.callbackURIs = callbackURIs;
     }
 
-    Collection<String> callbackURIs;
+    Collection<String> callbackURIs = new LinkedList<>();
 
     long rtLifetime = 0L;
 
@@ -64,7 +69,7 @@ public class OA2Client extends Client {
         this.scopes = scopes;
     }
 
-    Collection<String> scopes;
+    Collection<String> scopes = new LinkedList<>();
 
     public Collection<LDAPConfiguration> getLdaps() {
         return ldaps;
@@ -77,12 +82,12 @@ public class OA2Client extends Client {
     Collection<LDAPConfiguration> ldaps;
 
     @Override
-    public String toString(){
+    public String toString() {
         String x = super.toString();
-        x = x.substring(0,x.lastIndexOf("]"));
-        x=x+"scopes="+ ((getScopes()==null)?"[]":getScopes().toString()) + ",";
-         x=x+"callbacks=" + (getCallbackURIs()==null?"[]":getCallbackURIs().toString()) + ",";
-        x=x+"refresh token lifetime=" + getRtLifetime();
+        x = x.substring(0, x.lastIndexOf("]"));
+        x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString()) + ",";
+        x = x + "callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) + ",";
+        x = x + "refresh token lifetime=" + getRtLifetime();
         return x + "]";
     }
 }

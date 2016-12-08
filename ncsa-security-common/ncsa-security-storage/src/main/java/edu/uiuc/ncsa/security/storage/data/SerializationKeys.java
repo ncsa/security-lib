@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.security.storage.data;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A class containing keys for data serialization, e.g. by databases or to XML.
  * <p>Note that you might have to override the {@link #identifier} method if you want to specify
@@ -30,5 +33,9 @@ public class SerializationKeys {
         if (0 < x.length) identifier = x[0];
         return identifier;
     }
-
+     public List<String> allKeys(){
+         LinkedList<String> allKeys = new LinkedList<>();
+         allKeys.add(identifier());
+         return allKeys;
+     }
 }

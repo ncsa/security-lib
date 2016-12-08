@@ -16,14 +16,17 @@ public class Client extends BaseClient {
     @Override
     public Client clone() {
         Client c = new Client(getIdentifier());
-        c.setCreationTS(getCreationTS());
-        c.setEmail(getEmail());
+        populateClone(c);
+        return c;
+    }
+
+    @Override
+    protected void populateClone(BaseClient client) {
+        Client c = (Client)client;
+        super.populateClone(c);
         c.setErrorUri(getErrorUri());
         c.setHomeUri(getHomeUri());
-        c.setName(getName());
         c.setProxyLimited(isProxyLimited());
-        c.setSecret(getSecret());
-        return c;
     }
 
     public boolean isProxyLimited() {

@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.security.delegation.server.storage.support;
 
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransactionKeys;
 
+import java.util.List;
+
 /**
-* <p>Created by Jeff Gaynor<br>
-* on 4/25/12 at  3:09 PM
-*/
+ * <p>Created by Jeff Gaynor<br>
+ * on 4/25/12 at  3:09 PM
+ */
 public class ServiceTransactionKeys extends BasicTransactionKeys {
 
     protected String lifetime = "certlifetime";
@@ -35,8 +37,18 @@ public class ServiceTransactionKeys extends BasicTransactionKeys {
     }
 
     public String nonce(String... x) {
-        if (0 < x.length) nonce= x[0];
+        if (0 < x.length) nonce = x[0];
         return nonce;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(lifetime());
+        allKeys.add(callbackUri());
+        allKeys.add(tempCredValid());
+        allKeys.add(accessTokenValid());
+        allKeys.add(nonce());
+        return allKeys;
+    }
 }

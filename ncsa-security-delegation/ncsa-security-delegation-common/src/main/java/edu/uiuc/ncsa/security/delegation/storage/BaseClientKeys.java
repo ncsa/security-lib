@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.security.delegation.storage;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/20/16 at  12:57 PM
@@ -34,4 +36,13 @@ public class BaseClientKeys extends SerializationKeys {
         return secret;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(name());
+        allKeys.add(email());
+        allKeys.add(creationTS());
+        allKeys.add(secret());
+        return allKeys;
+    }
 }

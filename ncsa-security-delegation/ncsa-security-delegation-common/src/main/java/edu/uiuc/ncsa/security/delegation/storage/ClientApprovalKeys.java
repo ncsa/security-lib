@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.security.delegation.storage;
 
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 
+import java.util.List;
+
 /**
-* <p>Created by Jeff Gaynor<br>
-* on 4/25/12 at  3:07 PM
-*/
+ * <p>Created by Jeff Gaynor<br>
+ * on 4/25/12 at  3:07 PM
+ */
 public class ClientApprovalKeys extends SerializationKeys {
     public ClientApprovalKeys() {
         identifier("oauth_consumer_key");
@@ -28,5 +30,14 @@ public class ClientApprovalKeys extends SerializationKeys {
     public String approver(String... x) {
         if (0 < x.length) approver = x[0];
         return approver;
+    }
+
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(approved());
+        allKeys.add(approvalTS());
+        allKeys.add(approver());
+        return allKeys;
     }
 }

@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import java.util.List;
+
 /**
-* <p>Created by Jeff Gaynor<br>
-* on 4/25/12 at  3:06 PM
-*/
+ * <p>Created by Jeff Gaynor<br>
+ * on 4/25/12 at  3:06 PM
+ */
 public class ClientKeys extends BaseClientKeys {
     public ClientKeys() {
         identifier("oauth_consumer_key");
@@ -14,9 +16,9 @@ public class ClientKeys extends BaseClientKeys {
     String proxyLimited = "proxy_limited";
 
     public String proxyLimited(String... x) {
-          if (0 < x.length) proxyLimited = x[0];
-          return proxyLimited;
-      }
+        if (0 < x.length) proxyLimited = x[0];
+        return proxyLimited;
+    }
 
     public String homeURL(String... x) {
         if (0 < x.length) homeURL = x[0];
@@ -29,4 +31,12 @@ public class ClientKeys extends BaseClientKeys {
         return errorURL;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(proxyLimited());
+        allKeys.add(homeURL());
+        allKeys.add(errorURL());
+        return allKeys;
+    }
 }

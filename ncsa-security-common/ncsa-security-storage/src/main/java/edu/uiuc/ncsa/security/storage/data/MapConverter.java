@@ -2,6 +2,9 @@ package edu.uiuc.ncsa.security.storage.data;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
+
+import java.util.List;
 
 /**
  * A class that converts between objects and maps. You must supply some key.
@@ -54,5 +57,30 @@ public class MapConverter<V extends Identifiable> {
      */
     public void toMap(V value, ConversionMap<String, Object> data) {
         data.put(keys.identifier(), value.getIdentifierString());
+    }
+
+    /**
+     * Given a set of attributes, create a new object whose properties are restricted to the given list of
+     * attributes. Note the the {@link SerializationKeys} has a method {@link SerializationKeys#allKeys()}
+     * that allows you to get every key for this object so you can simply remove what you do not want or need.
+     *
+     * @param v
+     * @param attributes
+     * @return
+     */
+    public V subset(V v, List<String> attributes) {
+        ColumnMap map = new ColumnMap();
+
+        toMap(v, map);
+        ColumnMap reducedMap = new ColumnMap();
+
+        for (String key : attributes) {
+            reducedMap.put(key, map.get(key));
+        }
+        // Have to always include the identifier.
+        reducedMap.put(getKeys().identifier(), v.getIdentifierString());
+        V x =  fromMap(reducedMap, null);
+        return x;
+
     }
 }

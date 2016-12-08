@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.delegation.storage.ClientKeys;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/14/14 at  1:05 PM
@@ -29,11 +31,19 @@ public class OA2ClientKeys extends ClientKeys {
         return rtLifetime;
     }
 
-    String scopes ="scopes";
+    String scopes = "scopes";
 
     public String scopes(String... x) {
         if (0 < x.length) scopes = x[0];
         return scopes;
     }
 
+    @Override
+    public List<String> allKeys() {
+        List<String> allKeys = super.allKeys();
+        allKeys.add(callbackUri());
+        allKeys.add(rtLifetime());
+        allKeys.add(scopes());
+        return allKeys;
+    }
 }
