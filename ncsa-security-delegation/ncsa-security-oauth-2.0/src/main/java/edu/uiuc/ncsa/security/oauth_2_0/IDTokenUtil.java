@@ -1,8 +1,13 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
+
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 /**
  * Creates JWT tokens. This is for <b>unsigned</b> and <b>/b>unverified</b> tokens which
@@ -26,8 +31,16 @@ public class IDTokenUtil {
         JSONObject header = new JSONObject();
              header.put(TYPE, "JWT");
              header.put(ALGORITHM, "none");
+        KeyPair keyPair = null;
+        try {
+            keyPair = KeyUtil.generateKeyPair();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 
-             return Base64.encodeBase64URLSafeString(header.toString().getBytes()) + "." +
+        return Base64.encodeBase64URLSafeString(header.toString().getBytes()) + "." +
                      Base64.encodeBase64URLSafeString(payload.toString().getBytes()) + ".";
     }
 

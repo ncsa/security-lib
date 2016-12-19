@@ -36,4 +36,12 @@ public interface ScopeHandler {
      * @return
      */
     public Collection<String> getScopes();
+
+    /**
+     * in order to support server discovery, every plugin must enumerate whatever claims it may
+     * serve. This is not a guarantee that all of these claims will be delivered, just that they
+     * might be.
+     * @return
+     */
+    public Collection<String> getClaims();
 }

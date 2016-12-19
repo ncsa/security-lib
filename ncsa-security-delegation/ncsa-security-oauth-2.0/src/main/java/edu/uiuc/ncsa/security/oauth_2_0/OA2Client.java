@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
+
 /**
  * OAuth2 Open ID connect protocol requires that sites register callback uris and that incoming requests
  * must include a callback that matches one of the registered ones.
@@ -30,7 +32,17 @@ public class OA2Client extends Client {
         client.setCallbackURIs(getCallbackURIs());
         client.setScopes(getScopes());
         client.setLdaps(getLdaps());
+        client.setIssuer(getIssuer());
+    }
 
+    String issuer = null;
+
+    public String getIssuer() {
+        return issuer;
+    }
+
+    public void setIssuer(String issuer) {
+        this.issuer = issuer;
     }
 
     public OA2Client(Identifier identifier) {
@@ -89,5 +101,24 @@ public class OA2Client extends Client {
         x = x + "callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) + ",";
         x = x + "refresh token lifetime=" + getRtLifetime();
         return x + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof OA2Client)) return false;
+        OA2Client c = (OA2Client)obj;
+        if (getRtLifetime() != c.getRtLifetime()) return false;
+        if (!checkEquals(getIssuer(), c.getIssuer())) return false;
+
+        if (getScopes().size() != c.getScopes().size()) return false;
+        for(String x : getScopes()){
+            if(!c.getScopes().contains(x)) return false;
+        }
+
+        if(getCallbackURIs().size() != c.getCallbackURIs().size()) return false;
+        for(String x : getCallbackURIs()){
+            if(!c.getCallbackURIs().contains(x)) return false;
+        }
+        return super.equals(obj);
     }
 }

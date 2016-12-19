@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSON;
@@ -40,9 +42,19 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
+        if(map.containsKey(getCK2().issuer())){
+            otherV.setIssuer((String) map.get(getCK2().issuer()));
+        }
+        if(map.containsKey(getCK2().ldap())){
+            otherV.setLdaps(mapToLDAPS(map, getCK2().ldap()));
+        }
         return otherV;
     }
 
+    protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
+        JSON j =  JSONSerializer.toJSON(map.get(key));
+        return LDAPConfigurationUtil.fromJSON(j);
+    }
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {
         JSONArray json = (JSONArray) JSONSerializer.toJSON(map.get(key));
         Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(json);
@@ -63,7 +75,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
 
         map.put(getCK2().callbackUri(), callbacks.toString());
-
+        if(client.getIssuer()!= null){
+            map.put(getCK2().issuer(), client.getIssuer());
+        }
         if (client.getScopes() != null) {
             JSONArray scopes = new JSONArray();
 
@@ -73,12 +87,16 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
             map.put(getCK2().scopes(), scopes.toString());
         }
+        if(client.getLdaps()!= null && !client.getLdaps().isEmpty()){
+            map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
+        }
     }
 
     @Override
     public V fromJSON(JSONObject json) {
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
+        v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
         if (cbs != null && cbs instanceof JSONArray) {
             JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().callbackUri());
@@ -91,6 +109,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().scopes());
             Collection<String> zzz = (Collection<String>) JSONSerializer.toJava(array);
             v.setScopes(zzz);
+        }
+        JSON ldaps = (JSON) getJsonUtil().getJSONValue(json, getCK2().ldap());
+        if(ldaps!=null){
+                v.setLdaps(LDAPConfigurationUtil.fromJSON(ldaps));
         }
         return v;
     }
@@ -111,6 +133,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
 
         Collection<String> scopeList = client.getScopes();
 
+        if(client.getIssuer()!= null){
+            getJsonUtil().setJSONValue(json, getCK2().issuer(), client.getIssuer());
+        }
 
         for (String x : scopeList) {
             scopes.add(x);
@@ -119,6 +144,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             getJsonUtil().setJSONValue(json, getCK2().scopes(), scopes);
         }
 
+        if(client.getLdaps()!=null && !client.getLdaps().isEmpty()){
+            getJsonUtil().setJSONValue(json,getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
+        }
 
     }
 }

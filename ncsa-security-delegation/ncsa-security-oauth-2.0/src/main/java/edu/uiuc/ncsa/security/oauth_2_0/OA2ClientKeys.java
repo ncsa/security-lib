@@ -15,27 +15,39 @@ public class OA2ClientKeys extends ClientKeys {
         identifier("client_id");
         secret("public_key");
     }
-
-
+    String issuer = "issuer";
     String callback_uri = "callback_uri";
+    String rtLifetime = "rt_lifetime";
+    String scopes = "scopes";
+    String ldap = "ldap";
+
+     public String issuer(String... x) {
+         if (0 < x.length) issuer= x[0];
+         return issuer;
+     }
+
 
     public String callbackUri(String... x) {
         if (0 < x.length) callback_uri = x[0];
         return callback_uri;
     }
 
-    String rtLifetime = "rt_lifetime";
 
     public String rtLifetime(String... x) {
         if (0 < x.length) rtLifetime = x[0];
         return rtLifetime;
     }
 
-    String scopes = "scopes";
 
     public String scopes(String... x) {
         if (0 < x.length) scopes = x[0];
         return scopes;
+    }
+
+
+    public String ldap(String... x) {
+        if (0 < x.length) ldap = x[0];
+        return ldap;
     }
 
     @Override
@@ -44,6 +56,8 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(callbackUri());
         allKeys.add(rtLifetime());
         allKeys.add(scopes());
+        allKeys.add(issuer());
+        allKeys.add(ldap());
         return allKeys;
     }
 }

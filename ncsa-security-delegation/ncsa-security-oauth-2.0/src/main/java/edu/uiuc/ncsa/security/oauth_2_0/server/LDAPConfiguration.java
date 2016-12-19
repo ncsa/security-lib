@@ -19,7 +19,15 @@ public class LDAPConfiguration {
     int port = -1;
     SSLConfiguration sslConfiguration;
 
+    public String getSearchNameKey() {
+        return searchNameKey;
+    }
 
+    public void setSearchNameKey(String searchNameKey) {
+        this.searchNameKey = searchNameKey;
+    }
+
+    String searchNameKey;
     public String getSecurityPrincipal() {
         return securityPrincipal;
     }

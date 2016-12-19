@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.server;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 
 /**
@@ -9,9 +10,9 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
  * on 3/27/12 at  3:03 PM
  */
 public class UnapprovedClientException extends GeneralException {
-    Client client;
+    BaseClient client;
 
-    public Client getClient() {
+    public BaseClient getClient() {
         return client;
     }
 
@@ -20,7 +21,7 @@ public class UnapprovedClientException extends GeneralException {
     }
 
 
-    public UnapprovedClientException(String message, Client client) {
+    public UnapprovedClientException(String message, BaseClient client) {
         super(message);
         this.client = client;
     }

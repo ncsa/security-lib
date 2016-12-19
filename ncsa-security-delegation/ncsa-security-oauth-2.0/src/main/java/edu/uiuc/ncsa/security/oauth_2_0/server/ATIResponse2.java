@@ -32,6 +32,7 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         this.refreshToken = refreshToken;
     }
 
+    ScopeHandlerFactory scopeHandlerFactory;
     ServiceTransaction serviceTransaction;
 
     public ServiceTransaction getServiceTransaction() {
@@ -42,14 +43,14 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         this.serviceTransaction = serviceTransaction;
     }
 
-    ScopeHandler scopeHandler;
+    Collection<? extends ScopeHandler> scopeHandlers;
 
-    public ScopeHandler getScopeHandler() {
-        return scopeHandler;
+    public Collection<? extends ScopeHandler> getScopeHandlers() {
+        return scopeHandlers;
     }
 
-    public void setScopeHandler(ScopeHandler scopeHandler) {
-        this.scopeHandler = scopeHandler;
+    public void setScopeHandlers(Collection<? extends ScopeHandler> scopeHandler) {
+        this.scopeHandlers = scopeHandler;
     }
 
     /**
@@ -127,7 +128,7 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         HashMap m = new HashMap();
         m.put(ACCESS_TOKEN, accessToken.getToken());
         m.put(TOKEN_TYPE, "Bearer");
-        if(getRefreshToken()!= null && getRefreshToken().getToken()!= null){
+        if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
             m.put(REFRESH_TOKEN, getRefreshToken().getToken());
             m.put(EXPIRES_IN, (getRefreshToken().getExpiresIn() / 1000));
         }
@@ -144,20 +145,7 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
             }
             m.put(SCOPE, ss);
         }
-        JSONObject claims = null;
-        if (getScopeHandler() != null) {
-            DebugUtil.dbg(this,"has scope handler=" + getScopeHandler().getClass().getSimpleName());
-            UserInfo userInfo = new UserInfo();
-            userInfo = getScopeHandler().process(userInfo, getServiceTransaction());
-            claims = userInfo.toJSon();
-        }else{
-            DebugUtil.dbg(this,"NO scope handler" );
-
-        }
-        if (claims == null) {
-            claims = new JSONObject();
-        }
-
+        JSONObject claims = new JSONObject();
         // All of these are required.
         claims.put(ISSUER, parameters.get(ISSUER)); // Issuer - url of server
         claims.put(SUBJECT, parameters.get(SUBJECT)); // subject - unique user id, i.e., username
@@ -166,10 +154,26 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
         claims.put(NONCE, parameters.get(NONCE)); // nonce must match that in authz request.
 
-        // Optional claims
+        // Optional claims the handler may over-write the default claims as needed.
         if (parameters.containsKey(AUTHORIZATION_TIME)) {
             claims.put(AUTHORIZATION_TIME, parameters.get(AUTHORIZATION_TIME));
         }
+        if (getScopeHandlers() != null) {
+
+            DebugUtil.dbg(this, "has scope handler=" + getScopeHandlers().getClass().getSimpleName());
+            UserInfo userInfo = new UserInfo();
+            userInfo.setMap(claims);
+            if (getScopeHandlers() != null) {
+                for (ScopeHandler scopeHandler : getScopeHandlers()) {
+                    scopeHandler.process(userInfo, getServiceTransaction());
+                }
+            }
+            claims = userInfo.toJSon();
+        } else {
+            DebugUtil.dbg(this, "NO scope handler");
+        }
+
+
         m.put(ID_TOKEN, IDTokenUtil.createIDToken(claims));
 
         JSONObject json = JSONObject.fromObject(m);
