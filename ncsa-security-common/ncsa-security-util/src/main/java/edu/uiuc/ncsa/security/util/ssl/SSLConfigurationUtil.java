@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -98,7 +97,6 @@ public class SSLConfigurationUtil implements Serializable {
             // Process TLS version
             // Fixes OAUTH-213
             String tlsVersion = getFirstAttribute(node, SSL_TLS_VERSION_TAG);
-            DebugUtil.dbg(SSLConfigurationUtil.class, "Got TLS version =" + tlsVersion);
             if (tlsVersion == null || tlsVersion.length() == 0) {
                 sslConfiguration.setTlsVersion(TLS_DEFAULT);
             } else {

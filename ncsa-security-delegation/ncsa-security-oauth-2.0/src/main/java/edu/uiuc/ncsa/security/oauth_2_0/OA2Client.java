@@ -33,8 +33,18 @@ public class OA2Client extends Client {
         client.setScopes(getScopes());
         client.setLdaps(getLdaps());
         client.setIssuer(getIssuer());
+        client.setSignTokens(isSignTokens());
     }
 
+    public boolean isSignTokens() {
+        return signTokens;
+    }
+
+    public void setSignTokens(boolean signTokens) {
+        this.signTokens = signTokens;
+    }
+
+    boolean signTokens = false;
     String issuer = null;
 
     public String getIssuer() {
@@ -100,6 +110,7 @@ public class OA2Client extends Client {
         x = x + "scopes=" + ((getScopes() == null) ? "[]" : getScopes().toString()) + ",";
         x = x + "callbacks=" + (getCallbackURIs() == null ? "[]" : getCallbackURIs().toString()) + ",";
         x = x + "refresh token lifetime=" + getRtLifetime();
+        x = x + "sign ID tokens?=" + isSignTokens();
         return x + "]";
     }
 
@@ -119,6 +130,7 @@ public class OA2Client extends Client {
         for(String x : getCallbackURIs()){
             if(!c.getCallbackURIs().contains(x)) return false;
         }
+        if(isSignTokens() != c.isSignTokens()) return false;
         return super.equals(obj);
     }
 }

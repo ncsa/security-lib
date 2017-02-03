@@ -45,6 +45,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if(map.containsKey(getCK2().issuer())){
             otherV.setIssuer((String) map.get(getCK2().issuer()));
         }
+        if(map.containsKey(getCK2().signTokens()) && map.get(getCK2().signTokens())!=null){
+            otherV.setSignTokens((Boolean) map.get(getCK2().signTokens()));
+        }
         if(map.containsKey(getCK2().ldap())){
             otherV.setLdaps(mapToLDAPS(map, getCK2().ldap()));
         }
@@ -78,6 +81,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if(client.getIssuer()!= null){
             map.put(getCK2().issuer(), client.getIssuer());
         }
+        map.put(getCK2().signTokens(), client.isSignTokens());
         if (client.getScopes() != null) {
             JSONArray scopes = new JSONArray();
 
@@ -97,6 +101,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         V v = super.fromJSON(json);
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
+        v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
         if (cbs != null && cbs instanceof JSONArray) {
             JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().callbackUri());
@@ -137,6 +142,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             getJsonUtil().setJSONValue(json, getCK2().issuer(), client.getIssuer());
         }
 
+        getJsonUtil().setJSONValue(json, getCK2().signTokens(), client.isSignTokens());
         for (String x : scopeList) {
             scopes.add(x);
         }

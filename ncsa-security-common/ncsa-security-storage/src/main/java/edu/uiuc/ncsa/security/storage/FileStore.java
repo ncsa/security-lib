@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.*;
@@ -227,10 +228,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     protected V loadFile(File f) {
         FileInputStream fis = null;
         checkPermissions();
+        DebugUtil.dbg(this, "can read?" + f.canRead());
+        DebugUtil.dbg(this, "can write?" + f.canWrite());
         try {
             fis = new FileInputStream(f);
             return loadStream(fis);
         } catch (Throwable e) {
+            e.printStackTrace();
           //  String message = "Warning: the file named \"" + f.getAbsolutePath() + "\" could not be loaded. Skipping.";
           //  throw new GeneralException(message, e);
             return null;
@@ -279,15 +283,21 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     public Set<Identifier> keySet() {
+        DebugUtil.dbg(this, "checking permissions");
         checkPermissions();
         HashSet<Identifier> ids = new HashSet<Identifier>(); // have to work with a copy or get concurrent modification exceptions
         String[] filenames = storageDirectory.list();
+        DebugUtil.dbg(this,"storage directory = " + storageDirectory.getAbsolutePath());
+        DebugUtil.dbg(this,"file names size = " + filenames.length);
         for (String filename : filenames) {
+            DebugUtil.dbg(this,   "name=" + filename);
+
             File f = new File(storageDirectory, filename);
             try {
                 V t = null;
                 if (!failures.contains(f.getAbsolutePath())) {
                     t = loadFile(f);
+                    DebugUtil.dbg(this,"loaded file = " + t);
                     if(t!= null) {
                         ids.add(t.getIdentifier());
                     }

@@ -20,11 +20,17 @@ public class OA2ClientKeys extends ClientKeys {
     String rtLifetime = "rt_lifetime";
     String scopes = "scopes";
     String ldap = "ldap";
+    String signTokens="sign_tokens";
 
      public String issuer(String... x) {
          if (0 < x.length) issuer= x[0];
          return issuer;
      }
+
+    public String signTokens(String... x) {
+        if (0 < x.length) signTokens= x[0];
+        return signTokens;
+    }
 
 
     public String callbackUri(String... x) {
@@ -58,6 +64,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(scopes());
         allKeys.add(issuer());
         allKeys.add(ldap());
+        allKeys.add(signTokens());
         return allKeys;
     }
 }
