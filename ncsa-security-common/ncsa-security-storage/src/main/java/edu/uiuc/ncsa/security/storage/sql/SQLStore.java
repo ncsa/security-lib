@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptors;
@@ -513,7 +514,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         for (ColumnDescriptorEntry cde : cds) {
             if (!foundCols.containsKey(cde.getName().toLowerCase())) {
                 // create the column
-                System.err.println("Adding column " + cde.getName() + " of type " + cde.getType());
+                DebugUtil.dbg(this, "Adding column " + cde.getName() + " of type " + cde.getType());
                 String rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType());
                 stmt.executeUpdate(rawStmt);
             }

@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
 
 /**
  * Very straightforward servlet wrapper. This sets up logging and debug. All posts and gets
@@ -24,7 +22,7 @@ import java.util.Enumeration;
  * <p>Created by Jeff Gaynor<br>
  * on May 3, 2010 at  11:35:16 AM
  */
-public abstract class  AbstractServlet extends HttpServlet implements Logable {
+public abstract class AbstractServlet extends HttpServlet implements Logable {
     public static final String PING_PARAMETER = "ping";
 
     static ConfigurationLoader<? extends AbstractEnvironment> configurationLoader;
@@ -85,7 +83,7 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
     }
 
     public void debug(String x) {
-      getMyLogger().debug(x);
+        getMyLogger().debug(x);
     }
 
     public void error(String x) {
@@ -178,6 +176,7 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
 
     /**
      * This returns true or false for
+     *
      * @param req
      * @param resp
      * @return
@@ -268,52 +267,11 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
     /**
      * This will print all parameters to standard err. It is a low-level debugging tool
      * and should never be used in production. It gives in effect a report on what is
-     * actually being passed in.
+     * actually being passed in, which will generally include sensitive information like the client's secret.
      *
      * @param request
      */
     protected void printAllParameters(HttpServletRequest request) {
-        String reqUrl = request.getRequestURL().toString();
-        String queryString = request.getQueryString();   // d=789
-        if (queryString != null) {
-            reqUrl += "?" + queryString;
-        }
-        System.err.println("\n" + getClass().getSimpleName() + " at " + (new Date()));
-        System.err.println("Request parameters for " + reqUrl + "");
-
-        if (request.getParameterMap() == null || request.getParameterMap().isEmpty()) {
-            System.err.println("  (none)");
-        } else {
-            for (Object key : request.getParameterMap().keySet()) {
-                String[] values = request.getParameterValues(key.toString());
-                System.err.println(" " + key + ":");
-                if (values == null || values.length == 0) {
-                    System.err.println("   (no values)");
-                } else {
-                    for (String x : values) {
-                        System.err.println("   " + x);
-                    }
-                }
-            }
-        }
-        System.err.println("Cookies:");
-        if (request.getCookies() == null) {
-            System.err.println(" (none)");
-        } else {
-            for (javax.servlet.http.Cookie c : request.getCookies()) {
-                System.err.println(" " + c.getName() + "=" + c.getValue());
-            }
-        }
-        System.err.println("Headers:");
-        Enumeration e = request.getHeaderNames();
-        if (!e.hasMoreElements()) {
-            System.err.println(" (none)");
-        } else {
-            while (e.hasMoreElements()) {
-                String name = e.nextElement().toString();
-                System.err.println(" " + name);
-                System.err.println("   " + request.getHeader(name));
-            }
-        }
+        ServletDebugUtil.printAllParameters(this.getClass(), request);
     }
 }
