@@ -224,7 +224,15 @@ public class LDAPConfigurationUtil {
         }
         jsonUtil.setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);
         jsonUtil.setJSONValue(ldap, LDAP_SEARCH_BASE_TAG, configuration.getSearchBase());
-        jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
+        if(configuration.getSearchNameKey() != null){
+            jsonUtil.setJSONValue(ldap, SEARCH_NAME_KEY, configuration.getSearchNameKey());
+        }
+        if(configuration.getContextName() == null){
+            jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, "");
+
+        }else {
+            jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
+        }
         if (configuration.getSslConfiguration() != null) {
             JSONObject jsonSSL = SSLConfigurationUtil2.toJSON(configuration.getSslConfiguration());
             jsonUtil.setJSONValue(ldap, SSLConfigurationUtil2.SSL_TAG, jsonSSL.getJSONObject(SSLConfigurationUtil2.SSL_TAG));
@@ -293,6 +301,7 @@ public class LDAPConfigurationUtil {
             }
 
             config.setSearchBase(jsonUtil.getJSONValueString(json, LDAP_SEARCH_BASE_TAG));
+            config.setSearchNameKey(jsonUtil.getJSONValueString(json, SEARCH_NAME_KEY));
             config.setSecurityPrincipal(jsonUtil.getJSONValueString(json, LDAP_SECURITY_PRINCIPAL_TAG));
             config.setPassword(jsonUtil.getJSONValueString(json, LDAP_PASSWORD_TAG));
             JSONObject jsonSSL = new JSONObject();
@@ -301,5 +310,42 @@ public class LDAPConfigurationUtil {
             config.setSslConfiguration(sslConfiguration);
         }
         return config;
+    }
+    public static void main(String[] args){
+        String raw=" <ldap enabled=\"true\" authorizationType=\"simple\"><address>registry-beta.cilogon.org</address>" +
+                "<port>636</port>" +
+                "<password><![CDATA[plhrZjK3RtTRXAIbC1L6]]></password>" +
+                "<principal><![CDATA[uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org]]></principal>" +
+                "<searchBase><![CDATA[ou=people,o=NANOGrav,dc=cilogon,dc=org]]></searchBase><searchName>email</searchName>" +
+                "<searchAttributes>" +
+                "<attribute returnName=\"sub\">employeeNumber</attribute>" +
+                "<attribute returnName=\"name\">sn</attribute>" +
+                "<attribute returnName=\"given_name\">givenName</attribute>" +
+                "<attribute returnName=\"family_name\">sn</attribute>" +
+                "<attribute returnName=\"email\">email</attribute>" +
+                "<attribute returnName=\"preferred_username\">NANOGravPersonMediaWikiUsername</attribute></searchAttributes></ldap>";
+        LDAPConfiguration ldap = new LDAPConfiguration();
+        ldap.setEnabled(true);
+        ldap.setAuthType(getAuthType("simple"));
+        ldap.setServer("registry-beta.cilogon.org");
+        ldap.setPort(636);
+        ldap.setPassword("plhrZjK3RtTRXAIbC1L6");
+        ldap.setSecurityPrincipal("uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org");
+        ldap.setSearchBase("ou=people,o=NANOGrav,dc=cilogon,dc=org");
+        ldap.setSearchNameKey("email");
+        ldap.setContextName("");
+        ldap.getSearchAttributes().put("employeeNumber", new AttributeEntry("employeeNumber", "sub", false));
+        ldap.getSearchAttributes().put("sn", new AttributeEntry("sn", "name", false));
+        ldap.getSearchAttributes().put("sn", new AttributeEntry("sn","name", false));
+        ldap.getSearchAttributes().put("givenName", new AttributeEntry("givenName","given_name", false));
+        ldap.getSearchAttributes().put("email", new AttributeEntry("email","email", false));
+        ldap.getSearchAttributes().put("NANOGravPersonMediaWikiUsername", new AttributeEntry("NANOGravPersonMediaWikiUsername","preferred_username", false));
+
+        try{
+           JSONObject json= toJSON(ldap);
+            System.out.println(json);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }

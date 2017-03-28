@@ -16,66 +16,70 @@ import java.io.InputStream;
  */
 public class SSLConfigurationUtil2 extends SSLConfigurationUtil {
     public static JSONObject toJSON(SSLConfiguration sslConfiguration) {
-           JSONObject ssl = new JSONObject();
-           JSONUtil jsonUtil = getJSONUtil();
-           JSONObject content = new JSONObject();
-           JSONObject keyStore = new JSONObject();
-           content.put(SSL_KEYSTORE_TAG, keyStore);
-           ssl.put(SSL_TAG, content);
+        JSONObject ssl = new JSONObject();
+        JSONUtil jsonUtil = getJSONUtil();
+        JSONObject content = new JSONObject();
+        JSONObject keyStore = new JSONObject();
+        content.put(SSL_KEYSTORE_TAG, keyStore);
+        ssl.put(SSL_TAG, content);
 
-           jsonUtil.setJSONValue(ssl, SSL_TLS_VERSION_TAG, sslConfiguration.getTlsVersion());
-           jsonUtil.setJSONValue(ssl, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE, sslConfiguration.isUseDefaultJavaTrustStore());
-           jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_PASSWORD, sslConfiguration.getKeystorePassword());
-           jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TYPE, sslConfiguration.getKeystoreType());
-           byte[] keystore = null;
-           try {
-               InputStream is = sslConfiguration.getKeystoreIS();
-               ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        jsonUtil.setJSONValue(ssl, SSL_TLS_VERSION_TAG, sslConfiguration.getTlsVersion());
+        jsonUtil.setJSONValue(ssl, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE, sslConfiguration.isUseDefaultJavaTrustStore());
+        jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_PASSWORD, sslConfiguration.getKeystorePassword());
+        jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TYPE, sslConfiguration.getKeystoreType());
+        byte[] keystore = null;
+        try {
+            InputStream is = sslConfiguration.getKeystoreIS();
 
-               int nRead;
-               byte[] data = new byte[16384];
+            if (is != null) {
 
-               while ((nRead = is.read(data, 0, data.length)) != -1) {
-                   baos.write(data, 0, nRead);
-               }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-               baos.flush();
-               keystore = baos.toByteArray();
-           } catch (FileNotFoundException e) {
-               e.printStackTrace();
-           } catch (IOException e) {
-               e.printStackTrace();
-           }
+                int nRead;
+                byte[] data = new byte[16384];
 
-           if(keystore != null){
-              jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TAG, org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(keystore));
-           }
-           return ssl;
-       }
+                while ((nRead = is.read(data, 0, data.length)) != -1) {
+                    baos.write(data, 0, nRead);
+                }
 
-       public static SSLConfiguration fromJSON(JSONObject json) {
-           SSLConfiguration ssl = new SSLConfiguration();
-           JSONUtil jsonUtil = getJSONUtil();
-           ssl.setTlsVersion(jsonUtil.getJSONValueString(json, SSL_TLS_VERSION_TAG));
-           ssl.setKeystoreType(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TYPE));
-           ssl.setKeystorePassword(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_PASSWORD));
-           ssl.setUseDefaultJavaTrustStore(jsonUtil.getJSONValueBoolean(json,SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
-           ssl.setKeystoreBytes(org.apache.commons.codec.binary.Base64.decodeBase64(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TAG)));
-           // JSON does not have a concept of a path to a local file. The keystore value is the base 64 encoding of a file
-           // to be used. The SSLConfig object, however, puts in a default value for the keystore path if the
-           // use java option is enabled.
-           if(!ssl.isUseDefaultJavaTrustStore()) {
-               ssl.setKeystore(null);
-           }
-           return ssl;
-       }
+                baos.flush();
+                keystore = baos.toByteArray();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-       public static JSONUtil getJSONUtil() {
-           if (jsonUtil == null) {
-               jsonUtil = new JSONUtil(SSL_TAG);
-           }
-           return jsonUtil;
-       }
+        if (keystore != null) {
+            jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TAG, org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(keystore));
+        }
+        return ssl;
+    }
 
-       static JSONUtil jsonUtil = null;
+    public static SSLConfiguration fromJSON(JSONObject json) {
+        SSLConfiguration ssl = new SSLConfiguration();
+        JSONUtil jsonUtil = getJSONUtil();
+        ssl.setTlsVersion(jsonUtil.getJSONValueString(json, SSL_TLS_VERSION_TAG));
+        ssl.setKeystoreType(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TYPE));
+        ssl.setKeystorePassword(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_PASSWORD));
+        ssl.setUseDefaultJavaTrustStore(jsonUtil.getJSONValueBoolean(json, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
+        ssl.setKeystoreBytes(org.apache.commons.codec.binary.Base64.decodeBase64(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TAG)));
+        // JSON does not have a concept of a path to a local file. The keystore value is the base 64 encoding of a file
+        // to be used. The SSLConfig object, however, puts in a default value for the keystore path if the
+        // use java option is enabled.
+        if (!ssl.isUseDefaultJavaTrustStore()) {
+            ssl.setKeystore(null);
+        }
+        return ssl;
+    }
+
+    public static JSONUtil getJSONUtil() {
+        if (jsonUtil == null) {
+            jsonUtil = new JSONUtil(SSL_TAG);
+        }
+        return jsonUtil;
+    }
+
+    static JSONUtil jsonUtil = null;
 }

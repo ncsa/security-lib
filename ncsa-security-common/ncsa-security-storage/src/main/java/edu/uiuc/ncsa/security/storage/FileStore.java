@@ -140,21 +140,13 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
             fos = new FileOutputStream(f);
             if (converter != null) {
-                try {
                     XMLMap map = new XMLMap();
                     converter.toMap(t, map);
                     map.toXML(fos);
                     fos.flush();
                     fos.close();
-                } catch (Throwable z) {
-                    //      System.out.println(getClass().getSimpleName() + ": could not property serialize object");
-                    z.printStackTrace();
-                    serializeObject(t, fos);
-
-                    // if this fails, fail. Do not catch any exception.
-                }
             } else {
-                serializeObject(t, fos);
+                throw new IllegalStateException("Error: no converter");
             }
         } catch (FileNotFoundException e) {
             try {

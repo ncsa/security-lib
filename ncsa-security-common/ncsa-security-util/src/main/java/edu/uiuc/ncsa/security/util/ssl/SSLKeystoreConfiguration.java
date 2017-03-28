@@ -135,6 +135,9 @@ public class SSLKeystoreConfiguration implements Serializable {
         if (keystoreBytes != null) {
             is = new ByteArrayInputStream(keystoreBytes);
         } else {
+            if(getKeystore() == null){
+                return null;
+            }
             File keystoreFile = new File(getKeystore());
             if (!keystoreFile.exists()) {
                 throw new FileNotFoundException("Error: the keystore file \"" + keystoreFile + "\" does not exist");

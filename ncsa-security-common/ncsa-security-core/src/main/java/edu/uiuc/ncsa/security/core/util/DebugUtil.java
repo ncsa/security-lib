@@ -8,7 +8,7 @@ import java.util.Date;
  * on 7/27/16 at  2:55 PM
  */
 public class DebugUtil {
-    static boolean isEnabled = true; // Disable all debugging out put if true
+    static protected boolean isEnabled = true; // Disable all debugging out put if true
 
     /**
      * This will print out a message from a class that includes the class name and current timestamp.
@@ -25,4 +25,6 @@ public class DebugUtil {
             System.err.println(callingClass.getSimpleName() + " (" + (new Date()) + "): " + message);
         }
     }
+
+
 }

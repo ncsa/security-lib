@@ -76,37 +76,19 @@ public abstract class IndexedStreamStore<V extends Identifiable> implements Stor
     }
 
 
-    protected void serializeObject(V obj, OutputStream outputStream) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(outputStream);
-        oos.writeObject(obj);
-        oos.flush();
-        oos.close();
-    }
-
-    protected V objectDeserialize(InputStream is) throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(is);
-        V t = (V) ois.readObject();
-        ois.close();
-        return t;
-
-    }
 
     protected V loadStream(InputStream fis) {
         V t = null;
 
         try {
             if (converter != null) {
-                try {
                     XMLMap map = new XMLMap();
                     map.fromXML(fis);
                     t = identifiableProvider.get(false);
                     converter.fromMap(map, t);
                     fis.close();
-                } catch (Throwable zzz) {
-                    t = objectDeserialize(fis);
-                }
             } else {
-                t = objectDeserialize(fis);
+                throw new IllegalStateException("Error: no converter");
             }
             return t;
         } catch (StreamCorruptedException q) {
@@ -115,8 +97,6 @@ public abstract class IndexedStreamStore<V extends Identifiable> implements Stor
                     "the something (e.g. a file). Is your file store configured correctly?", q);
         } catch (IOException x) {
             throw new GeneralException("Error: Could not load the stream. Is your store configured correctly?", x);
-        } catch (ClassNotFoundException e) {
-            throw new GeneralException("Error: Cannot find the item's class");
         }
     }
 

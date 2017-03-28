@@ -174,8 +174,8 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         claims.put(AUDIENCE, parameters.get(CLIENT_ID)); // audience = client id.
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
         claims.put(NONCE, parameters.get(NONCE)); // nonce must match that in authz request.
-/*        DebugUtil.dbg(this,"REMOVE EPPN from claims");
-        claims.put("email","gaynor@illinois.edu");*/
+        DebugUtil.dbg(this,"REMOVE email from claims");
+        claims.put("email","gaynor@illinois.edu");
         // Optional claims the handler may over-write the default claims as needed.
         if (parameters.containsKey(AUTHORIZATION_TIME)) {
             claims.put(AUTHORIZATION_TIME, parameters.get(AUTHORIZATION_TIME));
