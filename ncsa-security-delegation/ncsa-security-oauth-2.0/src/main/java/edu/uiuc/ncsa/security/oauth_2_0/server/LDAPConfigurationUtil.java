@@ -26,8 +26,8 @@ public class LDAPConfigurationUtil {
     public static final String LDAP_PASSWORD_TAG = "password";
     public static final String LDAP_ADDRESS_TAG = "address";
     public static final String LDAP_SEARCH_BASE_TAG = "searchBase";
-    public static final String SEARCH_NAME_USERNAME ="username";
-    public static final String SEARCH_NAME_KEY="searchName";
+    public static final String SEARCH_NAME_USERNAME = "username";
+    public static final String SEARCH_NAME_KEY = "searchName";
 
     public static final String LDAP_SEARCH_ATTRIBUTES_TAG = "searchAttributes";
     public static final String LDAP_SEARCH_ATTRIBUTE_TAG = "attribute";
@@ -35,6 +35,8 @@ public class LDAPConfigurationUtil {
     public static final String LDAP_PORT_TAG = "port";
     public static final String LDAP_CONTEXT_NAME_TAG = "contextName";
     public static final String LDAP_ENABLED_TAG = "enabled";
+    public static final String LDAP_FAIL_ON_ERROR_TAG = "failOnError";
+    public static final String LDAP_NOTIFY_ON_FAIL_TAG = "notifyOnFail";
     public static final int DEFAULT_PORT = 636;
     public static final String LDAP_AUTH_TYPE = "authorizationType";
     public static final String LDAP_AUTH_NONE = "none";
@@ -63,6 +65,7 @@ public class LDAPConfigurationUtil {
     /**
      * Converts an XML configuration into an configuration. This is used at bootstrap time if there
      * is a default configuration for the server.
+     *
      * @param logger
      * @param node
      * @return
@@ -82,15 +85,24 @@ public class LDAPConfigurationUtil {
         ldapConfiguration.setEnabled(true);
         SSLConfiguration sslConfiguration = SSLConfigurationUtil.getSSLConfiguration(logger, ldapNode);
         ldapConfiguration.setSslConfiguration(sslConfiguration);
+        String errs = getNodeValue(ldapNode, LDAP_FAIL_ON_ERROR_TAG);
+        if(!(errs == null || errs.length()==0)){
+            ldapConfiguration.setFailOnError(Boolean.getBoolean(errs));
+        }
+        errs = getNodeValue(ldapNode, LDAP_NOTIFY_ON_FAIL_TAG);
+        if(!(errs == null || errs.length()==0)){
+            ldapConfiguration.setNotifyOnFail(Boolean.getBoolean(errs));
+        }
+
 
         ldapConfiguration.setServer(getNodeValue(ldapNode, LDAP_ADDRESS_TAG));
         String x = getNodeValue(ldapNode, LDAP_CONTEXT_NAME_TAG);
 
         ldapConfiguration.setContextName(x == null ? "" : x); // set to empty string if missing.
         String searchNameKey = getNodeValue(ldapNode, SEARCH_NAME_KEY);
-        if(searchNameKey != null){
+        if (searchNameKey != null) {
             ldapConfiguration.setSearchNameKey(searchNameKey);
-        }else{
+        } else {
             ldapConfiguration.setSearchNameKey(SEARCH_NAME_USERNAME); //default
         }
         ldapConfiguration.setSecurityPrincipal(getNodeValue(ldapNode, LDAP_SECURITY_PRINCIPAL_TAG));
@@ -174,6 +186,7 @@ public class LDAPConfigurationUtil {
 
     /**
      * Converts a collection of configuration to a {@link JSONArray} of objects.
+     *
      * @param configurations
      * @return
      */
@@ -187,6 +200,7 @@ public class LDAPConfigurationUtil {
 
     /**
      * Convert a single configuration to a {@link JSONObject}.
+     *
      * @param configuration
      * @return
      */
@@ -200,6 +214,8 @@ public class LDAPConfigurationUtil {
         jsonUtil.setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
         jsonUtil.setJSONValue(ldap, LDAP_ENABLED_TAG, configuration.isEnabled());
         jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
+        jsonUtil.setJSONValue(ldap, LDAP_FAIL_ON_ERROR_TAG, configuration.isFailOnError());
+        jsonUtil.setJSONValue(ldap, LDAP_NOTIFY_ON_FAIL_TAG, configuration.isNotifyOnFail());
         if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
             jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);
 
@@ -224,13 +240,13 @@ public class LDAPConfigurationUtil {
         }
         jsonUtil.setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);
         jsonUtil.setJSONValue(ldap, LDAP_SEARCH_BASE_TAG, configuration.getSearchBase());
-        if(configuration.getSearchNameKey() != null){
+        if (configuration.getSearchNameKey() != null) {
             jsonUtil.setJSONValue(ldap, SEARCH_NAME_KEY, configuration.getSearchNameKey());
         }
-        if(configuration.getContextName() == null){
+        if (configuration.getContextName() == null) {
             jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, "");
 
-        }else {
+        } else {
             jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
         }
         if (configuration.getSslConfiguration() != null) {
@@ -252,20 +268,21 @@ public class LDAPConfigurationUtil {
     /**
      * Takes a generic {@link JSON} object and disambiguates it, returning a collection of LDAP
      * configurations.
+     *
      * @param json
      * @return
      */
     public static Collection<LDAPConfiguration> fromJSON(JSON json) {
-    if(json instanceof JSONArray){
-        return fromJSON((JSONArray) json);
-    }
+        if (json instanceof JSONArray) {
+            return fromJSON((JSONArray) json);
+        }
         LinkedList<LDAPConfiguration> ldaps = new LinkedList<>();
 
-        if(json instanceof JSONNull){
+        if (json instanceof JSONNull) {
             // in this case, there is no content and JSONNull is a place holder.
-           return ldaps;
+            return ldaps;
         }
-        ldaps.add(fromJSON((JSONObject)json));
+        ldaps.add(fromJSON((JSONObject) json));
         return ldaps;
     }
 
@@ -287,6 +304,12 @@ public class LDAPConfigurationUtil {
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
         config.setPort(jsonUtil.getJSONValueInt(json, LDAP_PORT_TAG));
+        if (jsonUtil.hasKey(json, LDAP_FAIL_ON_ERROR_TAG)) {
+            config.setFailOnError(jsonUtil.getJSONValueBoolean(json, LDAP_FAIL_ON_ERROR_TAG));
+        }
+        if (jsonUtil.hasKey(json, LDAP_NOTIFY_ON_FAIL_TAG)) {
+            config.setFailOnError(jsonUtil.getJSONValueBoolean(json, LDAP_NOTIFY_ON_FAIL_TAG));
+        }
         Object se = jsonUtil.getJSONValue(json, LDAP_SEARCH_ATTRIBUTES_TAG);
         if (se instanceof JSONArray) {
             JSONArray searchAttributes = (JSONArray) se;
@@ -311,41 +334,5 @@ public class LDAPConfigurationUtil {
         }
         return config;
     }
-    public static void main(String[] args){
-        String raw=" <ldap enabled=\"true\" authorizationType=\"simple\"><address>registry-beta.cilogon.org</address>" +
-                "<port>636</port>" +
-                "<password><![CDATA[plhrZjK3RtTRXAIbC1L6]]></password>" +
-                "<principal><![CDATA[uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org]]></principal>" +
-                "<searchBase><![CDATA[ou=people,o=NANOGrav,dc=cilogon,dc=org]]></searchBase><searchName>email</searchName>" +
-                "<searchAttributes>" +
-                "<attribute returnName=\"sub\">employeeNumber</attribute>" +
-                "<attribute returnName=\"name\">sn</attribute>" +
-                "<attribute returnName=\"given_name\">givenName</attribute>" +
-                "<attribute returnName=\"family_name\">sn</attribute>" +
-                "<attribute returnName=\"email\">email</attribute>" +
-                "<attribute returnName=\"preferred_username\">NANOGravPersonMediaWikiUsername</attribute></searchAttributes></ldap>";
-        LDAPConfiguration ldap = new LDAPConfiguration();
-        ldap.setEnabled(true);
-        ldap.setAuthType(getAuthType("simple"));
-        ldap.setServer("registry-beta.cilogon.org");
-        ldap.setPort(636);
-        ldap.setPassword("plhrZjK3RtTRXAIbC1L6");
-        ldap.setSecurityPrincipal("uid=registry_user,ou=system,o=NANOGrav,dc=cilogon,dc=org");
-        ldap.setSearchBase("ou=people,o=NANOGrav,dc=cilogon,dc=org");
-        ldap.setSearchNameKey("email");
-        ldap.setContextName("");
-        ldap.getSearchAttributes().put("employeeNumber", new AttributeEntry("employeeNumber", "sub", false));
-        ldap.getSearchAttributes().put("sn", new AttributeEntry("sn", "name", false));
-        ldap.getSearchAttributes().put("sn", new AttributeEntry("sn","name", false));
-        ldap.getSearchAttributes().put("givenName", new AttributeEntry("givenName","given_name", false));
-        ldap.getSearchAttributes().put("email", new AttributeEntry("email","email", false));
-        ldap.getSearchAttributes().put("NANOGravPersonMediaWikiUsername", new AttributeEntry("NANOGravPersonMediaWikiUsername","preferred_username", false));
 
-        try{
-           JSONObject json= toJSON(ldap);
-            System.out.println(json);
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
 }

@@ -36,7 +36,7 @@ public class JSONUtil {
         return object.toString();
     }
 
-    protected boolean hasKey(JSONObject json, String key){
+    public boolean hasKey(JSONObject json, String key){
         return json.getJSONObject(getComponentName()).containsKey(key);
     }
     public boolean getJSONValueBoolean(JSONObject json, String key){

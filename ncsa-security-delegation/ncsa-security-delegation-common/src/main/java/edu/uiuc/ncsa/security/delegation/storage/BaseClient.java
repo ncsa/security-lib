@@ -42,7 +42,7 @@ public class BaseClient extends IdentifiableImpl {
     String secret;
 
     String name;
-    Date creationTS;
+    Date creationTS = new java.sql.Timestamp(new Date().getTime());
     String email;
 
 

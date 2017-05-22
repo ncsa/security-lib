@@ -141,6 +141,25 @@ public class LDAPConfiguration {
         this.contextName = contextName;
     }
 
+    boolean failOnError = false;
+    boolean notifyOnFail = false;
+
+    public boolean isFailOnError() {
+        return failOnError;
+    }
+
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
+    public boolean isNotifyOnFail() {
+        return notifyOnFail;
+    }
+
+    public void setNotifyOnFail(boolean notifyOnFail) {
+        this.notifyOnFail = notifyOnFail;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof LDAPConfiguration)) return false;

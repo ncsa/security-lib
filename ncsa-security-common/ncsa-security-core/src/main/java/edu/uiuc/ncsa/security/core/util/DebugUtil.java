@@ -8,6 +8,14 @@ import java.util.Date;
  * on 7/27/16 at  2:55 PM
  */
 public class DebugUtil {
+    public static boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public static void setIsEnabled(boolean isEnabled) {
+        DebugUtil.isEnabled = isEnabled;
+    }
+
     static protected boolean isEnabled = true; // Disable all debugging out put if true
 
     /**
