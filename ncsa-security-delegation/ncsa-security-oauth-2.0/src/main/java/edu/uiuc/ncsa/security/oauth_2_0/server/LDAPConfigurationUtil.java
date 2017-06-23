@@ -218,8 +218,6 @@ public class LDAPConfigurationUtil {
         jsonUtil.setJSONValue(ldap, LDAP_NOTIFY_ON_FAIL_TAG, configuration.isNotifyOnFail());
         if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
             jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);
-
-            // nothing to do
         }
         if (configuration.getAuthType() == LDAP_AUTH_SIMPLE_KEY) {
             jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_SIMPLE);
@@ -308,7 +306,7 @@ public class LDAPConfigurationUtil {
             config.setFailOnError(jsonUtil.getJSONValueBoolean(json, LDAP_FAIL_ON_ERROR_TAG));
         }
         if (jsonUtil.hasKey(json, LDAP_NOTIFY_ON_FAIL_TAG)) {
-            config.setFailOnError(jsonUtil.getJSONValueBoolean(json, LDAP_NOTIFY_ON_FAIL_TAG));
+            config.setNotifyOnFail(jsonUtil.getJSONValueBoolean(json, LDAP_NOTIFY_ON_FAIL_TAG));
         }
         Object se = jsonUtil.getJSONValue(json, LDAP_SEARCH_ATTRIBUTES_TAG);
         if (se instanceof JSONArray) {

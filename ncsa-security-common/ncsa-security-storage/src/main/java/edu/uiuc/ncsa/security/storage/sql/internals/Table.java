@@ -49,6 +49,10 @@ public abstract class Table  {
         return columnDescriptor;
     }
 
+    public String getCreateTableStatement(){
+        ColumnDescriptorEntry cde = getColumnDescriptor().getPrimaryKey();
+        return "CREATE TABLE " + getFQTablename() + "(" + cde.getName() + " VARCHAR(255) PRIMARY KEY);";
+    }
 
     /**
      * The schema and prefix are not part of the table's information, actually, but are needed to
@@ -204,4 +208,6 @@ public abstract class Table  {
     public String toString() {
         return getClass().getSimpleName() + "[schema=" + getSchema() + ", prefix=" + getTablenamePrefix() + ", name=" + getTablename()  +"]";
     }
+
+
 }

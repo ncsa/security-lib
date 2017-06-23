@@ -5,6 +5,11 @@ package edu.uiuc.ncsa.security.oauth_2_0;
  * on 3/28/14 at  10:37 AM
  */
 public interface OA2ConfigTags {
+    /**
+     * This overrides the discovery for the servlet and will be used globally. It may be overridden
+     * on a per client basis as well.
+     */
+    public String ISSUER = "issuer";
     public String MAX_CLIENT_REFRESH_TOKEN_LIFETIME = "maxClientRefreshTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_LIFETIME = "refreshTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_ENABLED = "refreshTokenEnabled"; // Enable or disable refresh tokens for this server.

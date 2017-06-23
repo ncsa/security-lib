@@ -80,7 +80,7 @@ public class OA2Client extends Client {
     }
 
     public boolean isRTLifetimeEnabled() {
-        return rtLifetime != Long.MIN_VALUE;
+        return 0 < rtLifetime ;
     }
 
     public Collection<String> getScopes() {

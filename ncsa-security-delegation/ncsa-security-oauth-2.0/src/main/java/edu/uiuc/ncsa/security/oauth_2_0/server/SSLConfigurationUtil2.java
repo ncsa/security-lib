@@ -27,33 +27,39 @@ public class SSLConfigurationUtil2 extends SSLConfigurationUtil {
         jsonUtil.setJSONValue(ssl, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE, sslConfiguration.isUseDefaultJavaTrustStore());
         jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_PASSWORD, sslConfiguration.getKeystorePassword());
         jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TYPE, sslConfiguration.getKeystoreType());
-        byte[] keystore = null;
-        try {
-            InputStream is = sslConfiguration.getKeystoreIS();
+        // If using the default java keystore, do NOT serialize the whole thing since it will be massive
+        // and probably fail to store in any SQL backend.
+        if (!sslConfiguration.isUseDefaultJavaTrustStore()) {
+            byte[] keystore = null;
 
-            if (is != null) {
+            try {
+                InputStream is = sslConfiguration.getKeystoreIS();
 
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                if (is != null) {
 
-                int nRead;
-                byte[] data = new byte[16384];
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-                while ((nRead = is.read(data, 0, data.length)) != -1) {
-                    baos.write(data, 0, nRead);
+                    int nRead;
+                    byte[] data = new byte[16384];
+
+                    while ((nRead = is.read(data, 0, data.length)) != -1) {
+                        baos.write(data, 0, nRead);
+                    }
+
+                    baos.flush();
+                    keystore = baos.toByteArray();
                 }
-
-                baos.flush();
-                keystore = baos.toByteArray();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (keystore != null) {
+                jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TAG, org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(keystore));
+            }
+
         }
 
-        if (keystore != null) {
-            jsonUtil.setJSONValue(ssl, SSL_KEYSTORE_TAG, org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(keystore));
-        }
         return ssl;
     }
 

@@ -59,7 +59,6 @@ public class JSONWebKeyUtil {
     public static JSONWebKeys fromJSON(String x) throws NoSuchAlgorithmException, InvalidKeySpecException {
         JSONObject json = (JSONObject) JSONSerializer.toJSON(x);
 
-        System.err.println(json.toString());
         JSONArray array = json.getJSONArray(KEYS);
         JSONWebKeys keys = new JSONWebKeys(null);
         for (int i = 0; i < array.size(); i++) {

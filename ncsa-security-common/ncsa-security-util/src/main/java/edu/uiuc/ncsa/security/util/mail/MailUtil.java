@@ -178,17 +178,16 @@ public class MailUtil implements Logable {
     MailEnvironment mailEnvironment;
 
     /**
-     * This takes a map of replacements for the templates and sends the message.
-     * <p>This will return a true if the message succeeded and a false otherwise.
-     * It will <b>not</b> cause a failure outright, since a failed notification should not
-     * bring down your server.</p>
-     *
+     * This allows for sending with a specific subject and message template. This is useful for
+     * internally generated messages that may need a lot of customization on the fly. Remember that
+     * a template has string delimited with ${KEY} which the replacements map (KEY, VALUE pairs) will
+     * render into VALUES.
+     * @param subjectTemplate
+     * @param messageTemplate
      * @param replacements
      * @return
      */
-    // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
-    // This looks like a synchronization issue, so this method is now synchronized.
-   synchronized public boolean sendMessage(Map replacements) {
+    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
         Transport tr = null;
 
         try {
@@ -230,8 +229,8 @@ public class MailUtil implements Logable {
             Message message = new MimeMessage(session);
             message.setFrom(getMailEnvironment().from);
             message.setRecipients(Message.RecipientType.TO, getMailEnvironment().recipients);
-            message.setSubject(replaceAll(getSubjectTemplate(), replacements));
-            message.setContent(replaceAll(getMessageTemplate(), replacements), "text/plain");
+            message.setSubject(replaceAll(subjectTemplate, replacements));
+            message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
 
             tr.sendMessage(message, getMailEnvironment().recipients);
             info("Mail notification sent to " + Arrays.toString(getMailEnvironment().recipients));
@@ -253,6 +252,32 @@ public class MailUtil implements Logable {
                     throw new GeneralException("Error: could not close java mail transport", e);
                 }
             }
+        }
+    }
+
+
+    /**
+     * This takes a map of replacements for the templates and sends the message.
+     * <p>This will return a true if the message succeeded and a false otherwise.
+     * It will <b>not</b> cause a failure outright, since a failed notification should not
+     * bring down your server.</p>
+     *
+     * @param replacements
+     * @return
+     */
+    // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
+    // This looks like a synchronization issue, so this method is now synchronized.
+    synchronized public boolean sendMessage(Map replacements) {
+        try {
+            return sendMessage(getSubjectTemplate(), getMessageTemplate(), replacements);
+        } catch (IOException e) {
+            info("got exception sending message:");
+            for (Object key : replacements.keySet()) {
+                info("(" + key + "," + replacements.get(key.toString()) + ")");
+            }
+            e.printStackTrace();
+            error("Sending mail failed. Continuing & message reads \"" + e.getMessage() + "\"");
+            return false;
         }
     }
 
@@ -303,7 +328,7 @@ public class MailUtil implements Logable {
             if (replacements.containsKey(key) && (replacements.get(key) != null)) {
                 out = out.replaceAll(newKey, replacements.get(key).toString());
             }
-    }
+        }
         debug("made " + count + " replacements in the template");
         return out;
     }

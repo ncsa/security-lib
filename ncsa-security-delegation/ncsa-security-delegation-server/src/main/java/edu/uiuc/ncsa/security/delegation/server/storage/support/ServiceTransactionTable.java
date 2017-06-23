@@ -9,7 +9,7 @@ import static java.sql.Types.*;
  * <p>Created by Jeff Gaynor<br>
  * on Apr 13, 2010 at  2:08:12 PM
  */
-public class ServiceTransactionTable extends BasicTransactionTable {
+public abstract class ServiceTransactionTable extends BasicTransactionTable {
 
     /**
      * The schema and prefix are not part of the table's information, actually, but are needed to

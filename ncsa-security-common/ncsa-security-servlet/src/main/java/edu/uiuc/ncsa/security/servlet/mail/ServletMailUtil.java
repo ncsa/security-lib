@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.servlet.mail;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.mail.MailUtil;
 
@@ -27,12 +28,28 @@ public class ServletMailUtil extends MailUtil {
 
     @Override
     public Session getSession(Properties props) throws NamingException {
-         // next bit gets the right session object from Tomcat and ensures it is set up
-         // right in this environment.
-         Context initCtx = new InitialContext();
-         Context envCtx = (Context) initCtx.lookup("java:comp/env");
-         Object obj = envCtx.lookup("mail/Session");
+        getMyLogger().info("Starting");
+        DebugUtil.dbg(this, "Starting to get the mail session");
+        // next bit gets the right session object from Tomcat and ensures it is set up
+        // right in this environment.
+        Context initCtx = new InitialContext();
+        Object obj = null;
+        try {
+            DebugUtil.dbg(this, "Getting mail session");
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            obj = envCtx.lookup("mail/Session");
+        } catch (Throwable t) {
+            t.printStackTrace();
+            DebugUtil.dbg(this, "Getting mail session #2, msg=" + t.getMessage());
 
+            try {
+                obj = initCtx.lookup("java:/comp/env/mail/Session");
+            } catch (Throwable tt) {
+                tt.printStackTrace();
+                DebugUtil.dbg(this, "Completely failed to get mail session. msg=" + tt.getMessage());
+            }
+
+        }
             /*
             If you get an exception here like
             ClassCastException: cannot cast javax.mail.Session to javax.mail.Session
@@ -45,8 +62,8 @@ public class ServletMailUtil extends MailUtil {
             You will need to include in your compile classpath when compiling though. This is done in maven
             by specifying the java mail jar as a dependency with scope "provided"
              */
-         Session session = (Session) obj; // cast to intercept nasty tomcat issue. Don't need to do this per se.
-         return super.getSession(props);
-     }
+        Session session = (Session) obj; // cast to intercept nasty tomcat issue. Don't need to do this per se.
+        return super.getSession(props);
+    }
 
 }

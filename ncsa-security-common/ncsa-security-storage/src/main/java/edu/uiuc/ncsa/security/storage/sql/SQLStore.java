@@ -522,4 +522,29 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         stmt.close();
         releaseConnection(connection);
     }
+
+    public void checkTable() throws SQLException{
+        DatabaseMetaData md = getConnection().getMetaData();
+        ResultSet tables = md.getTables(null, getTable().getSchema(), getTable().getTablename(), new String[]{"TABLE"});
+        if(tables.next()){
+            // table exists
+        }else{
+            // table does not exist.
+            // At issue is that the user that access the database may not have create permissions to make the table.
+            // So we will try this and just log how it works out.
+            System.err.println("Table " + getTable().getTablename() + " does not exist. Attempting to create");
+            Statement stmt = null;
+            try {
+                stmt = getConnection().createStatement();
+                boolean rc = stmt.execute(getTable().getCreateTableStatement());
+            }catch(SQLException x){
+                System.err.println("failed to create " + getTable().getTablename() + " msg=" +  x.getMessage());
+            }finally{
+                if(stmt != null){
+                    stmt.close();
+                }
+            }
+
+        }
+    }
 }

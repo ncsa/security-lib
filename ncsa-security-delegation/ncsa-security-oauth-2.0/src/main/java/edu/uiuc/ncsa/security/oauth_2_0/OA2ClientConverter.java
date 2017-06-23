@@ -46,7 +46,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             otherV.setIssuer((String) map.get(getCK2().issuer()));
         }
         if(map.containsKey(getCK2().signTokens()) && map.get(getCK2().signTokens())!=null){
-            otherV.setSignTokens((Boolean) map.get(getCK2().signTokens()));
+            otherV.setSignTokens(map.getBoolean(getCK2().signTokens()));
         }
         if(map.containsKey(getCK2().ldap())){
             otherV.setLdaps(mapToLDAPS(map, getCK2().ldap()));
@@ -92,7 +92,8 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             map.put(getCK2().scopes(), scopes.toString());
         }
         if(client.getLdaps()!= null && !client.getLdaps().isEmpty()){
-            map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
+   //         map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
+            map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()).toString());
         }
     }
 

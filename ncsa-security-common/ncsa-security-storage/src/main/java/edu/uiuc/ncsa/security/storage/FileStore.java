@@ -220,13 +220,11 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     protected V loadFile(File f) {
         FileInputStream fis = null;
         checkPermissions();
-        DebugUtil.dbg(this, "can read?" + f.canRead());
-        DebugUtil.dbg(this, "can write?" + f.canWrite());
         try {
             fis = new FileInputStream(f);
             return loadStream(fis);
         } catch (Throwable e) {
-            e.printStackTrace();
+            if(DebugUtil.isEnabled()){e.printStackTrace();}
           //  String message = "Warning: the file named \"" + f.getAbsolutePath() + "\" could not be loaded. Skipping.";
           //  throw new GeneralException(message, e);
             return null;
