@@ -55,7 +55,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
     }
 
     protected Collection<LDAPConfiguration> mapToLDAPS(ConversionMap<String, Object> map, String key) {
+        JSONObject json = new JSONObject();
         JSON j =  JSONSerializer.toJSON(map.get(key));
+        json.put("ldap", j);
         return LDAPConfigurationUtil.fromJSON(j);
     }
     protected Collection<String> jsonArrayToCollection(ConversionMap<String, Object> map, String key) {

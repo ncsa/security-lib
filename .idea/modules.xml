@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ProjectModuleManager">
-    <modules />
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-all.iml" filepath="$PROJECT_DIR$/ncsa-security-all.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-common.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/ncsa-security-core.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/ncsa-security-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/ncsa-security-delegation-client.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/ncsa-security-delegation-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/ncsa-security-delegation-common.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/ncsa-security-delegation-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/ncsa-security-delegation-server.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/ncsa-security-delegation-server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/ncsa-security-oauth-1.0a.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/ncsa-security-oauth-1.0a.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/ncsa-security-oauth-2.0.iml" filepath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/ncsa-security-oauth-2.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/ncsa-security-servlet.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/ncsa-security-servlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/ncsa-security-storage.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/ncsa-security-storage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/ncsa-security-util.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/ncsa-security-util.iml" />
+    </modules>
   </component>
 </project>

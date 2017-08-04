@@ -150,7 +150,12 @@ public class ServiceClient {
         HttpResponse response = null;
         try {
             response = client.execute(httpGet);
+            if(response.getEntity() != null && response.getEntity().getContentType()!=null) {
+                ServletDebugUtil.dbg(this, "Raw response, content type:" + response.getEntity().getContentType());
+            }else{
+                ServletDebugUtil.dbg(this, "No response entity or no content type.");
 
+            }
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT){
                 clientPool.push(client);
                 return "";

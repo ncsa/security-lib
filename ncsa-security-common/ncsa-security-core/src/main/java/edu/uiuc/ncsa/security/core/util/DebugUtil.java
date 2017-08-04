@@ -16,7 +16,7 @@ public class DebugUtil {
         DebugUtil.isEnabled = isEnabled;
     }
 
-    static protected boolean isEnabled = true; // Disable all debugging out put if true
+    static protected boolean isEnabled = false; // Disable all debugging out put if true
 
     /**
      * This will print out a message from a class that includes the class name and current timestamp.

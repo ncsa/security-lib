@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
@@ -60,6 +61,14 @@ public class LDAPConfigurationUtil {
         public String targetName;
         public boolean isList = false;
 
+        @Override
+        public String toString() {
+            return "AttributeEntry{" +
+                    "isList=" + isList +
+                    ", sourceName='" + sourceName + '\'' +
+                    ", targetName='" + targetName + '\'' +
+                    '}';
+        }
     }
 
     /**
@@ -86,11 +95,11 @@ public class LDAPConfigurationUtil {
         SSLConfiguration sslConfiguration = SSLConfigurationUtil.getSSLConfiguration(logger, ldapNode);
         ldapConfiguration.setSslConfiguration(sslConfiguration);
         String errs = getNodeValue(ldapNode, LDAP_FAIL_ON_ERROR_TAG);
-        if(!(errs == null || errs.length()==0)){
+        if (!(errs == null || errs.length() == 0)) {
             ldapConfiguration.setFailOnError(Boolean.getBoolean(errs));
         }
         errs = getNodeValue(ldapNode, LDAP_NOTIFY_ON_FAIL_TAG);
-        if(!(errs == null || errs.length()==0)){
+        if (!(errs == null || errs.length() == 0)) {
             ldapConfiguration.setNotifyOnFail(Boolean.getBoolean(errs));
         }
 
@@ -296,8 +305,16 @@ public class LDAPConfigurationUtil {
         JSONUtil jsonUtil = getJSONUtil();
 
         LDAPConfiguration config = new LDAPConfiguration();
-        config.setContextName(jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG));
+        String contextName = jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG);
+        if (contextName == null) {
+            config.setContextName("");
+        } else {
+            config.setContextName(contextName);
+        }
+
+
         config.setEnabled(jsonUtil.getJSONValueBoolean(json, LDAP_ENABLED_TAG));
+        DebugUtil.dbg(LDAPConfigurationUtil.class, "value after set =" + config.isEnabled());
         String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
@@ -330,7 +347,16 @@ public class LDAPConfigurationUtil {
             SSLConfiguration sslConfiguration = SSLConfigurationUtil2.fromJSON(jsonSSL);
             config.setSslConfiguration(sslConfiguration);
         }
+        DebugUtil.dbg(LDAPConfigurationUtil.class, "Final configuration=" + config);
         return config;
     }
 
+    public static void main(String[] args) {
+        try {
+
+            //LDAPConfigurationUtil.fr
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
 }

@@ -38,6 +38,7 @@ public class UIIResponse2 implements IssuerResponse {
     @Override
     public void write(HttpServletResponse response) throws IOException {
         Writer writer = response.getWriter();
+        response.setContentType("application/json");
         createJSON().write(writer);
         writer.flush();
         writer.close();

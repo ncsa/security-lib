@@ -44,7 +44,7 @@ public class OA2Client extends Client {
         this.signTokens = signTokens;
     }
 
-    boolean signTokens = false;
+    boolean signTokens = true; // new default as of version 3.4. Fixes CIL-405
     String issuer = null;
 
     public String getIssuer() {

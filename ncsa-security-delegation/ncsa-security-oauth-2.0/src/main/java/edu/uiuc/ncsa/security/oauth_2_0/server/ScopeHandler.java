@@ -44,4 +44,6 @@ public interface ScopeHandler {
      * @return
      */
     public Collection<String> getClaims();
+
+    public boolean isEnabled();
 }

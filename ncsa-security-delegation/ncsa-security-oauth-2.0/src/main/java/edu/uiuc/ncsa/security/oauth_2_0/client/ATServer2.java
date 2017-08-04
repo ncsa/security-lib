@@ -146,7 +146,7 @@ public class ATServer2 extends ASImpl implements ATServer {
             if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
                     !host.getHost().equals(remoteHost.getHost()) ||
                     host.getPort() != remoteHost.getPort()) {
-                throw new GeneralException("Error: Issuer is incorrect. Got \"" + remoteHost + "\"");
+                throw new GeneralException("Error: Issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();

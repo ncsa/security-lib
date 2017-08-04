@@ -174,4 +174,23 @@ public class LDAPConfiguration {
         if(!ldap.getSslConfiguration().equals(getSslConfiguration())) return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "LDAPConfiguration{" +
+                "authType=" + authType +
+                ", server='" + server + '\'' +
+                ", port=" + port +
+                ", sslConfiguration=" + sslConfiguration +
+                ", searchNameKey='" + searchNameKey + '\'' +
+                ", securityPrincipal='" + securityPrincipal + '\'' +
+                ", searchBase='" + searchBase + '\'' +
+                ", searchAttributes=" + searchAttributes +
+                ", enabled=" + enabled +
+                ", password='" + password + '\'' +
+                ", contextName='" + contextName + '\'' +
+                ", failOnError=" + failOnError +
+                ", notifyOnFail=" + notifyOnFail +
+                '}';
+    }
 }

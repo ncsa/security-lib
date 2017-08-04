@@ -69,7 +69,11 @@ public class SSLConfigurationUtil2 extends SSLConfigurationUtil {
         ssl.setTlsVersion(jsonUtil.getJSONValueString(json, SSL_TLS_VERSION_TAG));
         ssl.setKeystoreType(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TYPE));
         ssl.setKeystorePassword(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_PASSWORD));
-        ssl.setUseDefaultJavaTrustStore(jsonUtil.getJSONValueBoolean(json, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
+        if(jsonUtil.hasKey(json,SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE)) {
+            ssl.setUseDefaultJavaTrustStore(jsonUtil.getJSONValueBoolean(json, SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE));
+        }else{
+            ssl.setUseDefaultJavaTrustStore(true); // default should be to use the default trust store for java.
+        }
         ssl.setKeystoreBytes(org.apache.commons.codec.binary.Base64.decodeBase64(jsonUtil.getJSONValueString(json, SSL_KEYSTORE_TAG)));
         // JSON does not have a concept of a path to a local file. The keystore value is the base 64 encoding of a file
         // to be used. The SSLConfig object, however, puts in a default value for the keystore path if the

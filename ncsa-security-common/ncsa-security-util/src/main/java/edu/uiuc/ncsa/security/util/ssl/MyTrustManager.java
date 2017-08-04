@@ -5,32 +5,53 @@ package edu.uiuc.ncsa.security.util.ssl;
  */
 
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MyTrustManager implements X509TrustManager {
-    boolean debugOn = false; // set to false for release
+    public SSLConfiguration getSslConfiguration() {
+        return sslConfiguration;
+    }
+
+    SSLConfiguration sslConfiguration = null;
+
+    boolean debugOn = DebugUtil.isEnabled(); // set to false for release
     boolean stackTracesOn = false; // set to false for use as a library, true for standalone release
 
     public MyTrustManager(MyLoggingFacade logger, String trustRootPath) {
-        this(logger, trustRootPath, null);
+        this(logger, null, trustRootPath);
+    }
+
+
+    public MyTrustManager(MyLoggingFacade logger, SSLConfiguration sslConfiguration) {
+        this(logger, null, sslConfiguration);
+    }
+
+    public MyTrustManager(MyLoggingFacade logger, String serverDN, SSLConfiguration sslConfiguration) {
+        this.logger = logger;
+        this.serverDN = serverDN;
+        this.sslConfiguration = sslConfiguration;
+        this.trustRootPath = sslConfiguration.getTrustrootPath();
     }
 
     public MyTrustManager(MyLoggingFacade logger, String trustRootPath, String serverDN) {
-        this.trustRootPath = trustRootPath;
         this.logger = logger;
         this.serverDN = serverDN;
+        this.trustRootPath = trustRootPath;
     }
 
     public boolean hasServerDN() {
@@ -58,6 +79,9 @@ public class MyTrustManager implements X509TrustManager {
     }
 
 
+    protected boolean hasSSLConfiguration(){
+        return sslConfiguration != null;
+    }
     public final String DEFAULT_TRUST_ROOT_PATH = "/etc/grid-security/certificates";
 
     String trustRootPath = DEFAULT_TRUST_ROOT_PATH;
@@ -66,9 +90,11 @@ public class MyTrustManager implements X509TrustManager {
         return trustRootPath;
     }
 
+
     public void setTrustRootPath(String trustRootPath) {
         this.trustRootPath = trustRootPath;
     }
+
 
     public boolean isRequestTrustRoots() {
         return requestTrustRoots;
@@ -97,21 +123,19 @@ public class MyTrustManager implements X509TrustManager {
 
     String host;
 
-    public X509Certificate[] getAcceptedIssuers() {
+    /**
+     * Try to read the key store certs from a directory of certificates.
+     *
+     * @return
+     */
+    protected X509Certificate[] getIssuersFromDirectory(File dir) {
         X509Certificate[] issuers = null;
         String certDirPath = getTrustRootPath();
+
         // Comment: This might fail for any number of reasons, such as having the
         // trust root path not exist. Throwing exceptions will not work here since
         // they will be intercepted by the SSL layer and not propagated to the caller...
-        if (certDirPath == null) {
-            dbg("cert dir path null. Aborting");
-            return null;
-        }
-        File dir = new File(certDirPath);
-        if (!dir.isDirectory()) {
-            dbg(" cert dir path is not a directory. Aborting.");
-            return null;
-        }
+
         String[] certFilenames = dir.list();
         String[] certData = new String[certFilenames.length];
         for (int i = 0; i < certFilenames.length; i++) {
@@ -135,6 +159,56 @@ public class MyTrustManager implements X509TrustManager {
             dbg("Exception getting issuers. Returning null. " + e.getMessage());
         }
         return issuers;
+    }
+
+    /**
+     * Read the certs for the key store from a JKS file
+     *
+     * @return
+     */
+    protected X509Certificate[] getIssuersFromFile(File certFile) {
+        ArrayList<X509Certificate> issuerList = new ArrayList<>();
+        try {
+
+            FileInputStream fis = new FileInputStream(certFile);
+            KeyStore keystore = KeyStore.getInstance(getSslConfiguration().getTrustRootType());
+            keystore.load(fis, getSslConfiguration().getTrustRootPassword().toCharArray());
+            Enumeration e = keystore.aliases();
+            while (e.hasMoreElements()) {
+                Certificate cert = keystore.getCertificate((String) e.nextElement());
+                    if (cert instanceof X509Certificate) {
+                        issuerList.add((X509Certificate) cert);
+                }
+            }
+            fis.close();
+            return issuerList.toArray(new X509Certificate[]{});
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public X509Certificate[] getAcceptedIssuers() {
+        String certDirPath = getTrustRootPath();
+
+        if (certDirPath == null) {
+              dbg("cert dir path null. Aborting");
+              return null;
+          }
+          File dir = new File(certDirPath);
+          if (dir.isDirectory()) {
+              dbg(" cert dir path is not a directory. Getting from file.");
+              return getIssuersFromDirectory(dir);
+          }
+        return getIssuersFromFile(dir);
     }
 
     public void checkClientTrusted(X509Certificate[] certs, String authType)
@@ -235,12 +309,12 @@ public class MyTrustManager implements X509TrustManager {
         String CN = getCommonName(cert.getSubjectX500Principal().getName());
         //System.err.println(getClass().getSimpleName() + ".checkServerDN: CN on cert = " + CN);
         if (hasServerDN()) {
-                        // Fixes OAUTH-176: server DN can be overridden
+            // Fixes OAUTH-176: server DN can be overridden
             String configuredCN = getCommonName(getServerDN());
             dbg(".checkServerDN: Configured serverDN has CN = " + configuredCN);
 
-            if(CN.equals(configuredCN)){
-                 return;
+            if (CN.equals(configuredCN)) {
+                return;
             }
             dbg(".checkServerDN: Configured serverDN check failed.");
 

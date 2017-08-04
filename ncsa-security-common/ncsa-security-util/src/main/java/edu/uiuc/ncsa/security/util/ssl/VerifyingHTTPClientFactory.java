@@ -193,7 +193,7 @@ public class VerifyingHTTPClientFactory implements Logable {
         debug("my trust manager: trust root path+" + myTrustManager.getTrustRootPath());
 
         //myTrustManager.setTrustRootPath("/etc/grid-security/certificates");
-        myTrustManager.setTrustRootPath(getSSLConfiguration().getTrustrootPath());
+      //  myTrustManager.setTrustRootPath(getSSLConfiguration().getTrustrootPath());
         return getClient(myTrustManager, connectionTimeout, socketTimeout);
     }
 
@@ -283,7 +283,7 @@ public class VerifyingHTTPClientFactory implements Logable {
      * @throws IOException
      */
     public MyTrustManager newMyTrustManager() throws IOException {
-        return new MyTrustManager(logger, getSSLConfiguration().getTrustrootPath());
+        return new MyTrustManager(logger, "CN=ashigaru.ncsa.illinois.edu", getSSLConfiguration());
     }
 
 

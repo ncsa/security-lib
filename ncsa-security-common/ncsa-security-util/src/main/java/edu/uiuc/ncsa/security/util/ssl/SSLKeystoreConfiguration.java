@@ -37,6 +37,8 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
  */
 public class SSLKeystoreConfiguration implements Serializable {
+    public static final  String KEYSTORE_TYPE_JKS = "jks";
+    public static final String KEYSTORE_TYPE_PKCS12 = "pkcs12";
     /**
      * This path is actually part of the java specification.
      */
@@ -49,7 +51,7 @@ public class SSLKeystoreConfiguration implements Serializable {
      * The default type for the built in java keystore.
      * {@value}
      */
-    public final static String JAVA_DEFAULT_KEYSTORE_TYPE = "jks";
+    public final static String JAVA_DEFAULT_KEYSTORE_TYPE = KEYSTORE_TYPE_JKS;
 
     public boolean isUseDefaultJavaTrustStore() {
         return useDefaultJavaTrustStore;

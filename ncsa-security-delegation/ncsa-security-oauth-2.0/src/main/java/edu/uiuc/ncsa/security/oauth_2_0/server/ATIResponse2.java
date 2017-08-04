@@ -174,22 +174,33 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         claims.put(AUDIENCE, parameters.get(CLIENT_ID)); // audience = client id.
         claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
         claims.put(NONCE, parameters.get(NONCE)); // nonce must match that in authz request.
-        DebugUtil.dbg(this,"REMOVE email from claims");
-        claims.put("email","gaynor@illinois.edu");
+        DebugUtil.dbg(this, "REMOVE email from claims");
+        if (DebugUtil.isEnabled()) {
+            claims.put("email", "gaynor@illinois.edu");
+        }
         // Optional claims the handler may over-write the default claims as needed.
         if (parameters.containsKey(AUTHORIZATION_TIME)) {
             claims.put(AUTHORIZATION_TIME, parameters.get(AUTHORIZATION_TIME));
         }
-        if (getScopeHandlers() != null) {
+        DebugUtil.dbg(this,"\n\n********");
 
+        DebugUtil.dbg(this,"starting to run scope handlers. There are " + (getScopeHandlers()==null?"no":Integer.toString(getScopeHandlers().size())) + " handlers");
+
+
+        if (getScopeHandlers() != null) {
             UserInfo userInfo = new UserInfo();
             userInfo.setMap(claims);
             if (getScopeHandlers() != null) {
                 for (ScopeHandler scopeHandler : getScopeHandlers()) {
+                    DebugUtil.dbg(this,"\n*** ");
+                    DebugUtil.dbg(this, "   starting to process handler, " + scopeHandler +  Integer.toString(userInfo.getMap().size()) + " entries before" );
                     scopeHandler.process(userInfo, getServiceTransaction());
+                    DebugUtil.dbg(this, "   processed handler, " + Integer.toString(userInfo.getMap().size()) + " entries after");
                 }
             }
             claims = userInfo.toJSon();
+            DebugUtil.dbg(this, "final claims= " + claims );
+
         } else {
             DebugUtil.dbg(this, "NO scope handler");
         }
@@ -197,9 +208,9 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
 
         try {
             String idTokken = null;
-            if(isSignToken()) {
+            if (isSignToken()) {
                 idTokken = IDTokenUtil.createIDToken(claims, getJsonWebKey());
-            }else{
+            } else {
                 idTokken = IDTokenUtil.createIDToken(claims);
             }
             m.put(ID_TOKEN, idTokken);
@@ -208,6 +219,7 @@ public class ATIResponse2 extends IResponse2 implements ATResponse {
         }
 
         JSONObject json = JSONObject.fromObject(m);
+        response.setContentType("application/json");
         json.write(osw);
         osw.flush();
         osw.close();
