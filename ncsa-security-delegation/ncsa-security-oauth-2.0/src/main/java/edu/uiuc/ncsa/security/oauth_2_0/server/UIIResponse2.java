@@ -54,7 +54,6 @@ public class UIIResponse2 implements IssuerResponse {
         if (userInfo != null) {
             json.putAll(userInfo.getMap());
         }
-       // System.out.println(getClass().getSimpleName() + ".write: json=" + json);
         return json;
     }
 

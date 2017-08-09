@@ -28,6 +28,17 @@ public class DebugUtil {
         dbg(callingObject.getClass(), message);
     }
 
+
+    public static void dbg(Object callingObject, String message, Throwable throwable) {
+        dbg(callingObject.getClass(), message, throwable);
+    }
+    public static void dbg(Class callingClass, String message, Throwable throwable) {
+       if(isEnabled()){
+           throwable.printStackTrace();
+       }
+        dbg(callingClass, message);
+    }
+
     public static void dbg(Class callingClass, String message) {
         if (isEnabled) {
             System.err.println(callingClass.getSimpleName() + " (" + (new Date()) + "): " + message);
