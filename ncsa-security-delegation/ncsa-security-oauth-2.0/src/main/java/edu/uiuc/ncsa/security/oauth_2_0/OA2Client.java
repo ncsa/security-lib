@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -35,6 +35,13 @@ public class OA2Client extends Client {
         client.setIssuer(getIssuer());
         client.setSignTokens(isSignTokens());
     }
+    public boolean isPublicClient(){
+       return publicClient;
+    }
+    public void setPublicClient(boolean publicClient){
+        this.publicClient = publicClient;
+    }
+    protected boolean publicClient = false;
 
     public boolean isSignTokens() {
         return signTokens;

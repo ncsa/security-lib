@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.client;
 
-import edu.uiuc.ncsa.security.delegation.client.request.ATResponse;
+import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 
@@ -10,19 +10,11 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/14 at  12:05 PM
  */
-public class ATResponse2 extends ATResponse {
+public class ATResponse2 extends RTResponse {
     public ATResponse2(AccessToken accessToken, RefreshToken refreshToken) {
-        super(accessToken);
-        this.refreshToken = refreshToken;
+        super(accessToken,refreshToken);
     }
-
-    RefreshToken refreshToken;
-
-    public RefreshToken getRefreshToken() {
-        return refreshToken;
-    }
-
-    public void setRefreshToken(RefreshToken refreshToken) {
-        this.refreshToken = refreshToken;
-    }
+   // Note this is now mostly legacy since access tokens and refresh tokens may be returned
+    // from a server. Unfortunately, Java package and inheritance restrictions make it hard
+    // to simply dispose of this class.
 }

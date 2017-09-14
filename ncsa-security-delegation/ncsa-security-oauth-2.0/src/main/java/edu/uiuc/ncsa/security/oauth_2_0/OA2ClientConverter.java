@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfiguration;
-import edu.uiuc.ncsa.security.oauth_2_0.server.LDAPConfigurationUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfigurationUtil;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
 import net.sf.json.JSON;
@@ -27,7 +27,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         super(keys, identifiableProvider);
     }
 
-    OA2ClientKeys getCK2() {
+    public OA2ClientKeys getCK2() {
         return (OA2ClientKeys) keys;
     }
 
@@ -39,7 +39,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
         if (map.get(getCK2().scopes()) != null) {
             otherV.setScopes(jsonArrayToCollection(map, getCK2().scopes()));
-
+        }
+        if(map.get(getCK2().publicClient()) != null){
+            otherV.setPublicClient(map.getBoolean(getCK2().publicClient()));
         }
         otherV.setRtLifetime(map.getLong(getCK2().rtLifetime()));
         if(map.containsKey(getCK2().issuer())){
@@ -74,6 +76,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if (client.getCallbackURIs() == null) {
             return;
         }
+        map.put(getCK2().publicClient(), client.isPublicClient());
         JSONArray callbacks = new JSONArray();
         for (String s : client.getCallbackURIs()) {
             callbacks.add(s);
@@ -105,6 +108,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         v.setRtLifetime(getJsonUtil().getJSONValueLong(json, getCK2().rtLifetime()));
         v.setIssuer(getJsonUtil().getJSONValueString(json, getCK2().issuer()));
         v.setSignTokens(getJsonUtil().getJSONValueBoolean(json, getCK2().signTokens()));
+        v.setPublicClient(getJsonUtil().getJSONValueBoolean(json, getCK2().publicClient())); // JSON util returns false if missing key
         JSON cbs = (JSON) getJsonUtil().getJSONValue(json, getCK2().callbackUri());
         if (cbs != null && cbs instanceof JSONArray) {
             JSONArray array = (JSONArray) json.getJSONObject(getJSONComponentName()).get(getCK2().callbackUri());
@@ -146,6 +150,7 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         }
 
         getJsonUtil().setJSONValue(json, getCK2().signTokens(), client.isSignTokens());
+        getJsonUtil().setJSONValue(json, getCK2().publicClient(), client.isPublicClient());
         for (String x : scopeList) {
             scopes.add(x);
         }

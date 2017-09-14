@@ -125,7 +125,7 @@ public class CLIDriver {
                     // This intercepts quitting so we don't have to jump through hoops to exit.
                     return SHUTDOWN_RC;
                 }
-                if (cmdS.toLowerCase().equals("help")) {
+                if (cmdS.toLowerCase().equals("help") || cmdS.toLowerCase().equals("--help")) {
                     //    commands[0].help();
                     return HELP_RC;
                 }

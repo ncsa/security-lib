@@ -176,7 +176,7 @@ public class IDTokenUtil {
      * @param idToken
      * @return
      */
-    protected static String[] decat(String idToken) {
+    public static String[] decat(String idToken) {
         int firstPeriod = idToken.indexOf(".");
         int lastPeriod = idToken.lastIndexOf(".");
         String header = idToken.substring(0, firstPeriod);
@@ -221,17 +221,21 @@ public class IDTokenUtil {
     }
 
 
-    // Strictly for testing.
+    /** Strictly for testing.
+     * This will take two arguments, a file name containing the keys, the word decode|encode and a string.
+     * If the word decode is used, then the string is decoded against the
+     * @param args
+     */
     public static void main(String[] args) {
         try {
-            //firstTest();
-            //firstTestB();
-            //  otherTest();
-            //testSigning();
+           // firstTest();
+         //   firstTestB();
+          //    otherTest();
+            testSigning();
             //  testSigningDirectly();
             //testJWT_IO();
-            //printKeys();
-            generateAndSign();
+           // printKeys();
+           // generateAndSign();
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -252,13 +256,16 @@ public class IDTokenUtil {
         JSONObject payload = JSONObject.fromObject(p);
         System.out.println("payload=" + payload);
         System.out.println("base 64=" + concat(header, payload));
-        String keyID = "9k0HPG3moXENne";
-        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
+        //String keyID = "9k0HPG3moXENne";
+        String keyID = "244B235F6B28E34108D101EAC7362C4E";
+        JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/polo-keys.jwk"));
 
         String idTokken = createIDToken(payload, keys.get(keyID));
         System.out.println(idTokken);
         JSONObject claims = verifyAndReadIDToken(idTokken, keys);
         System.out.println("claims = " + claims);
+        JSONWebKey webKey = keys.get(keyID);
+        System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
     }
 
     public static void firstTest() throws Exception {

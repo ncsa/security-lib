@@ -21,11 +21,18 @@ public class OA2ClientKeys extends ClientKeys {
     String scopes = "scopes";
     String ldap = "ldap";
     String signTokens="sign_tokens";
+    String publicClient="public_client";
 
      public String issuer(String... x) {
          if (0 < x.length) issuer= x[0];
          return issuer;
      }
+
+    public String publicClient(String... x) {
+        if (0 < x.length) publicClient= x[0];
+        return publicClient;
+    }
+
 
     public String signTokens(String... x) {
         if (0 < x.length) signTokens= x[0];

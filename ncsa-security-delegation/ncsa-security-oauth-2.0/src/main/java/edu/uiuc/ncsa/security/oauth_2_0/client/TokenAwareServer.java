@@ -1,0 +1,116 @@
+package edu.uiuc.ncsa.security.oauth_2_0.client;
+
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.delegation.client.request.BasicRequest;
+import edu.uiuc.ncsa.security.oauth_2_0.IDTokenUtil;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
+
+/**
+ * Since the processing of claims is to be supported for refresh tokens as well, the machinery for it should be
+ * available generally to access adn refresh token servers.
+ * <p>Created by Jeff Gaynor<br>
+ * on 9/13/17 at  2:37 PM
+ */
+public abstract class TokenAwareServer extends ASImpl {
+
+    ServiceClient serviceClient;
+
+    public ServiceClient getServiceClient() {
+        return serviceClient;
+    }
+
+
+    public TokenAwareServer(ServiceClient serviceClient, String wellKnown) {
+        super(serviceClient.host());
+        this.serviceClient = serviceClient;
+        this.wellKnown = wellKnown;
+    }
+
+    String wellKnown = null;
+
+
+    protected JSONWebKeys getJsonWebKeys() {
+        // Fix for OAUTH-164, id_token support follows.
+        if (wellKnown == null) {
+            throw new NFWException("Error: no well-known URI has been configured. Please add this to the configuration file.");
+        }
+        String rawResponse = getServiceClient().getRawResponse(wellKnown);
+        JSON rawJSON = JSONSerializer.toJSON(rawResponse);
+
+        if (!(rawJSON instanceof JSONObject)) {
+            throw new IllegalStateException("Error: Attempted to get JSON Object but returned result is not JSON");
+        }
+        JSONObject json = (JSONObject) rawJSON;
+        String rawKeys = getServiceClient().getRawResponse(json.getString("jwks_uri"));
+        JSONWebKeys keys = null;
+        JSONObject claims = null;
+        try {
+            keys = JSONWebKeyUtil.fromJSON(rawKeys);
+        } catch (Throwable e) {
+            throw new GeneralException("Error getting keys", e);
+        }
+        return keys;
+    }
+
+    protected JSONObject getAndCheckResponse(String response) {
+        if (response.startsWith("<") || response.startsWith("\n")) {
+            // this is actually HTML
+            //    System.out.println(getClass().getSimpleName() + ".getAccessToken: response from server is " + response);
+            throw new GeneralException("Error: Response from server was html: " + response);
+        }
+        JSONObject jsonObject = JSONObject.fromObject(response);
+
+        if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {
+            throw new GeneralException("Error: incorrect token type");
+        }
+        return jsonObject;
+    }
+
+    protected JSONObject getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
+        JSONWebKeys keys = getJsonWebKeys();
+
+        JSONObject claims;
+        if (!jsonObject.containsKey(ID_TOKEN)) {
+            throw new GeneralException("Error: Missing id token.");
+        }
+        claims = IDTokenUtil.verifyAndReadIDToken(jsonObject.getString(ID_TOKEN), keys);
+
+        // Now we have to check claims.
+        if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
+            throw new GeneralException("Error: Audience is incorrect");
+        }
+
+        try {
+            URL host = getAddress().toURL();
+            URL remoteHost = new URL(claims.getString(ISSUER));
+            if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
+                    !host.getHost().equals(remoteHost.getHost()) ||
+                    host.getPort() != remoteHost.getPort()) {
+                throw new GeneralException("Error: Issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        if (!claims.containsKey(EXPIRATION)) {
+            throw new GeneralException("Error: Claims failed to have required expiration");
+        }
+        long exp = Long.parseLong(claims.getString(EXPIRATION)) * 1000L; // convert to ms.
+        if (exp <= System.currentTimeMillis()) {
+            throw new GeneralException("Error: expired claim.");
+        }
+        return claims;
+    }
+}

@@ -1,7 +1,6 @@
-package edu.uiuc.ncsa.security.oauth_2_0.server;
+package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
@@ -314,7 +313,6 @@ public class LDAPConfigurationUtil {
 
 
         config.setEnabled(jsonUtil.getJSONValueBoolean(json, LDAP_ENABLED_TAG));
-        DebugUtil.dbg(LDAPConfigurationUtil.class, "value after set =" + config.isEnabled());
         String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
@@ -347,7 +345,6 @@ public class LDAPConfigurationUtil {
             SSLConfiguration sslConfiguration = SSLConfigurationUtil2.fromJSON(jsonSSL);
             config.setSslConfiguration(sslConfiguration);
         }
-        DebugUtil.dbg(LDAPConfigurationUtil.class, "Final configuration=" + config);
         return config;
     }
 
