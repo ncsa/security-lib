@@ -239,7 +239,7 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
      * @param key
      * @return
      */
-    protected static String CONST(String key) {
+    public static String CONST(String key) {
         return getEnvironment().getConstants().get(key);
     }
 

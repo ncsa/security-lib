@@ -23,26 +23,12 @@ public class OA2TokenForge implements TokenForge {
 
     public OA2TokenForge(String server) {
         this.server = server;
-        setup();
-    }
-
-    protected void setup() {
-        if (server == null) return;
-        // Basically run it through the URI checks so it blows up if an illegal server string is given.
-        URI serverUri = URI.create(server);
-        atIdProvider = new IdentifierProvider<Identifier>(serverUri, accessToken(), true) {
-        };
-        agIdProvider = new IdentifierProvider<Identifier>(serverUri, authzGrant(), true) {
-        };
-        refreshTokenProvider = new IdentifierProvider<Identifier>(serverUri, refreshToken(), true) {
-        };
-        verifierTokenProvider = new IdentifierProvider<Identifier>(serverUri, verifierToken(), true) {
-        };
+       // setup();
     }
 
     /**
      * This and similarly named methods are provided so you can override the specific path components and enforce
-     * your own semantics on the tokens. Note that these are called once in {@link #setup()} and are immutable
+     * your own semantics on the tokens. Note that these are called once in  and are immutable
      * after that. If you need something really exotic you should override the setup() method.
      *
      * @return
@@ -66,6 +52,10 @@ public class OA2TokenForge implements TokenForge {
     protected String verifierToken(String... x) {
         if (1 == x.length) verifierToken = x[0];
         return verifierToken;
+    }
+
+    public String getServer() {
+        return server;
     }
 
     String server;
@@ -112,7 +102,7 @@ public class OA2TokenForge implements TokenForge {
     public AuthorizationGrant getAuthorizationGrant(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new AuthorizationGrantImpl(agIdProvider.get().getUri());
+                return new AuthorizationGrantImpl(getAgIdProvider().get().getUri());
 
             default:
                 return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]));
@@ -128,10 +118,58 @@ public class OA2TokenForge implements TokenForge {
         }
     }
 
+    public IdentifierProvider<Identifier> getAgIdProvider() {
+        if(agIdProvider == null){
+            agIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), authzGrant(), true) {
+        };
+        }
+        return agIdProvider;
+    }
+
+    public void setAgIdProvider(IdentifierProvider<Identifier> agIdProvider) {
+        this.agIdProvider = agIdProvider;
+    }
+
+    public IdentifierProvider<Identifier> getAtIdProvider() {
+        if(atIdProvider == null){
+            atIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), accessToken(), true) {
+                   };
+        }
+        return atIdProvider;
+    }
+
+    public void setAtIdProvider(IdentifierProvider<Identifier> atIdProvider) {
+        this.atIdProvider = atIdProvider;
+    }
+
+    public IdentifierProvider<Identifier> getRefreshTokenProvider() {
+        if(refreshTokenProvider == null){
+            refreshTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), refreshToken(), true) {
+        };
+        }
+        return refreshTokenProvider;
+    }
+
+    public void setRefreshTokenProvider(IdentifierProvider<Identifier> refreshTokenProvider) {
+        this.refreshTokenProvider = refreshTokenProvider;
+    }
+
+    public IdentifierProvider<Identifier> getVerifierTokenProvider() {
+        if(verifierTokenProvider == null){
+            verifierTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), verifierToken(), true) {
+        };
+        }
+        return verifierTokenProvider;
+    }
+
+    public void setVerifierTokenProvider(IdentifierProvider<Identifier> verifierTokenProvider) {
+        this.verifierTokenProvider = verifierTokenProvider;
+    }
+
     /*
-   Note that our specification dictates that grants, verifiers  and access tokens conform to the
-   semantics of identifiers. We have to provide these.
-    */
+       Note that our specification dictates that grants, verifiers  and access tokens conform to the
+       semantics of identifiers. We have to provide these.
+        */
     IdentifierProvider<Identifier> atIdProvider;
     IdentifierProvider<Identifier> agIdProvider;
     IdentifierProvider<Identifier> refreshTokenProvider;
@@ -147,7 +185,7 @@ public class OA2TokenForge implements TokenForge {
     public RefreshToken getRefreshToken(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new OA2RefreshTokenImpl(refreshTokenProvider.get().getUri());
+                return new OA2RefreshTokenImpl(getRefreshTokenProvider().get().getUri());
 
             default:
                 return new OA2RefreshTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]));
@@ -159,7 +197,7 @@ public class OA2TokenForge implements TokenForge {
     public AccessToken getAccessToken(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new AccessTokenImpl(atIdProvider.get().getUri());
+                return new AccessTokenImpl(getAtIdProvider().get().getUri());
 
             default:
                 return new AccessTokenImpl(URI.create(tokens[0]));
@@ -183,7 +221,7 @@ public class OA2TokenForge implements TokenForge {
     public Verifier getVerifier(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new VerifierImpl(verifierTokenProvider.get().getUri());
+                return new VerifierImpl(getVerifierTokenProvider().get().getUri());
 
             default:
                 return new VerifierImpl(URI.create(tokens[0]));

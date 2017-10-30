@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.sciTokens;
 
-import edu.uiuc.ncsa.security.oauth_2_0.IDTokenUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
@@ -14,7 +14,7 @@ import java.io.File;
  * <p>Created by Jeff Gaynor<br>
  * on 8/31/17 at  12:04 PM
  */
-public class SciTokenUtil extends IDTokenUtil {
+public class SciTokenUtil extends JWTUtil {
     public static void main(String[] args) {
         try {
             // firstTest();
@@ -49,9 +49,9 @@ public class SciTokenUtil extends IDTokenUtil {
         String keyID = "244B235F6B28E34108D101EAC7362C4E";
         JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/polo-keys.jwk"));
 
-        String idTokken = createIDToken(payload, keys.get(keyID));
+        String idTokken = createJWT(payload, keys.get(keyID));
         System.out.println(idTokken);
-        JSONObject claims = verifyAndReadIDToken(idTokken, keys);
+        JSONObject claims = verifyAndReadJWT(idTokken, keys);
         System.out.println("claims = " + claims);
         JSONWebKey webKey = keys.get(keyID);
         System.out.println(KeyUtil.toX509PEM(webKey.publicKey));

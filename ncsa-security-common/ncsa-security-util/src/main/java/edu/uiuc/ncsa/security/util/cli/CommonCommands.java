@@ -16,6 +16,25 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 10/30/13 at  4:14 PM
  */
 public abstract class CommonCommands implements Commands {
+    boolean batchMode = false;
+
+    /**
+     * If this is invoked from the command line with the batch mode flag, then this should process
+     * commands strictly without user intervention, failing if, for instance, some parameters are missing
+     * rather than prompting for them. Typically, the {@link CLIDriver} instance sets this at the time of
+     * invocation.
+     * @return
+     */
+    public boolean isBatchMode() {
+        return batchMode;
+    }
+
+    public void setBatchMode(boolean batchMode) {
+        this.batchMode = batchMode;
+    }
+
+    public static String BATCH_MODE_FLAG = "-batch";
+
     protected CommonCommands(MyLoggingFacade logger) {
         this.logger = logger;
     }

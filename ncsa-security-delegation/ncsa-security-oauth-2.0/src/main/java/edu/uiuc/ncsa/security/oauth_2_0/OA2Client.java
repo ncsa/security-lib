@@ -138,6 +138,7 @@ public class OA2Client extends Client {
             if(!c.getCallbackURIs().contains(x)) return false;
         }
         if(isSignTokens() != c.isSignTokens()) return false;
+        if(isPublicClient() != c.isPublicClient()) return false;
         return super.equals(obj);
     }
 }

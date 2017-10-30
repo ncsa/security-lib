@@ -3,13 +3,10 @@ package edu.uiuc.ncsa.security.oauth_2_0.client;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.delegation.client.request.BasicRequest;
-import edu.uiuc.ncsa.security.oauth_2_0.IDTokenUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
-import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
-import net.sf.json.JSON;
 import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,7 +16,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
 
 /**
  * Since the processing of claims is to be supported for refresh tokens as well, the machinery for it should be
- * available generally to access adn refresh token servers.
+ * available generally to access and refresh token servers.
  * <p>Created by Jeff Gaynor<br>
  * on 9/13/17 at  2:37 PM
  */
@@ -41,11 +38,14 @@ public abstract class TokenAwareServer extends ASImpl {
     String wellKnown = null;
 
 
-    protected JSONWebKeys getJsonWebKeys() {
+    public JSONWebKeys getJsonWebKeys() {
         // Fix for OAUTH-164, id_token support follows.
         if (wellKnown == null) {
             throw new NFWException("Error: no well-known URI has been configured. Please add this to the configuration file.");
         }
+
+        return JWTUtil.getJsonWebKeys(getServiceClient(), wellKnown);
+/*
         String rawResponse = getServiceClient().getRawResponse(wellKnown);
         JSON rawJSON = JSONSerializer.toJSON(rawResponse);
 
@@ -62,6 +62,7 @@ public abstract class TokenAwareServer extends ASImpl {
             throw new GeneralException("Error getting keys", e);
         }
         return keys;
+*/
     }
 
     protected JSONObject getAndCheckResponse(String response) {
@@ -85,7 +86,7 @@ public abstract class TokenAwareServer extends ASImpl {
         if (!jsonObject.containsKey(ID_TOKEN)) {
             throw new GeneralException("Error: Missing id token.");
         }
-        claims = IDTokenUtil.verifyAndReadIDToken(jsonObject.getString(ID_TOKEN), keys);
+        claims = JWTUtil.verifyAndReadJWT(jsonObject.getString(ID_TOKEN), keys);
 
         // Now we have to check claims.
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {

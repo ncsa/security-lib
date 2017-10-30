@@ -273,21 +273,16 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     public Set<Identifier> keySet() {
-        DebugUtil.dbg(this, "checking permissions");
         checkPermissions();
         HashSet<Identifier> ids = new HashSet<Identifier>(); // have to work with a copy or get concurrent modification exceptions
         String[] filenames = storageDirectory.list();
-        DebugUtil.dbg(this,"storage directory = " + storageDirectory.getAbsolutePath());
-        DebugUtil.dbg(this,"file names size = " + filenames.length);
         for (String filename : filenames) {
-            DebugUtil.dbg(this,   "name=" + filename);
 
             File f = new File(storageDirectory, filename);
             try {
                 V t = null;
                 if (!failures.contains(f.getAbsolutePath())) {
                     t = loadFile(f);
-                    DebugUtil.dbg(this,"loaded file = " + t);
                     if(t!= null) {
                         ids.add(t.getIdentifier());
                     }

@@ -2,15 +2,19 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeys;
 import edu.uiuc.ncsa.security.util.pkcs.KeyUtil;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -32,7 +36,7 @@ import java.security.spec.X509EncodedKeySpec;
  */
 
 // Fixes OAUTH-164, adding id_token support.
-public class IDTokenUtil {
+public class JWTUtil {
     public static String TYPE = "typ";
     public static String KEY_ID = "kid";
     public static String ALGORITHM = "alg";
@@ -43,14 +47,14 @@ public class IDTokenUtil {
      * @param payload
      * @return
      */
-    public static String createIDToken(JSONObject payload) {
+    public static String createJWT(JSONObject payload) {
         JSONObject header = new JSONObject();
         header.put(TYPE, "JWT");
         header.put(ALGORITHM, NONE_JWT);
         return concat(header, payload) + "."; // as per spec.
     }
 
-    public static String createIDToken(JSONObject payload, JSONWebKey jsonWebKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeySpecException, InvalidKeyException, IOException {
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeySpecException, InvalidKeyException, IOException {
         JSONObject header = new JSONObject();
         header.put(TYPE, "JWT");
         header.put(KEY_ID, jsonWebKey.id);
@@ -62,7 +66,7 @@ public class IDTokenUtil {
             signature = ""; // as per spec
 
         } else {
-            DebugUtil.dbg(IDTokenUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
+            DebugUtil.dbg(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
             signature = sign(header, payload, jsonWebKey);
         }
         String x = concat(header, payload);
@@ -152,7 +156,7 @@ public class IDTokenUtil {
             throw new IllegalStateException("Unknown algorithm");
         }
         String algorithm = (String) alg;
-        DebugUtil.dbg(IDTokenUtil.class, "Verifying ID token with algorithm =" + algorithm);
+        DebugUtil.dbg(JWTUtil.class, "Verifying ID token with algorithm =" + algorithm);
         Signature signature = null;
         if (algorithm.equals(NONE_JWT)) {
             return true;
@@ -166,7 +170,7 @@ public class IDTokenUtil {
         signature.initVerify(pubKey);
         signature.update(concat(header, payload).getBytes());
         boolean rc = signature.verify(Base64.decodeBase64(sig));
-        DebugUtil.dbg(IDTokenUtil.class, "Verification ok?" + rc);
+        DebugUtil.dbg(JWTUtil.class, "Verification ok?" + rc);
         return rc;
     }
 
@@ -182,35 +186,42 @@ public class IDTokenUtil {
         String header = idToken.substring(0, firstPeriod);
         String payload = idToken.substring(firstPeriod + 1, lastPeriod);
         String signature = idToken.substring(lastPeriod + 1);
-        return new String[]{header, payload, signature};
+        // make sure these end up in tjhe right places
+        String[] output = new String[3];
+        output[HEADER_INDEX] = header;
+        output[PAYLOAD_INDEX] = payload;
+        output[SIGNATURE_INDEX] = signature;
+        return output;
     }
+   public static final int HEADER_INDEX = 0;
+   public static final int PAYLOAD_INDEX = 1;
+   public static final int SIGNATURE_INDEX = 2;
 
-
-    public static JSONObject verifyAndReadIDToken(String idToken, JSONWebKeys webKeys) {
-        String[] x = decat(idToken);
-        JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[0])));
-        JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[1])));
-        DebugUtil.dbg(IDTokenUtil.class, "header=" + h);
-        DebugUtil.dbg(IDTokenUtil.class, "payload=" + p);
+    public static JSONObject verifyAndReadJWT(String jwt, JSONWebKeys webKeys) {
+        String[] x = decat(jwt);
+        JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
+        JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
+        DebugUtil.dbg(JWTUtil.class, "header=" + h);
+        DebugUtil.dbg(JWTUtil.class, "payload=" + p);
         if (h.get(ALGORITHM) == null) {
             throw new IllegalArgumentException("Error: no algorithm.");
         } else {
             if (h.get(ALGORITHM).equals(NONE_JWT)) {
-                DebugUtil.dbg(IDTokenUtil.class, "unsigned id token. Returning payload");
+                DebugUtil.dbg(JWTUtil.class, "unsigned id token. Returning payload");
 
                 return p;
             }
         }
         if (!h.get(TYPE).equals("JWT")) throw new GeneralException("Unsupported token type.");
         Object keyID = h.get(KEY_ID);
-        DebugUtil.dbg(IDTokenUtil.class, "key_id=" + keyID);
+        DebugUtil.dbg(JWTUtil.class, "key_id=" + keyID);
 
         if (keyID == null || !(keyID instanceof String)) {
             throw new IllegalArgumentException("Error: Unknown algorithm");
         }
         boolean isOK = false;
         try {
-            isOK = verify(h, p, x[2], webKeys.get(h.getString(KEY_ID)));
+            isOK = verify(h, p, x[SIGNATURE_INDEX], webKeys.get(h.getString(KEY_ID)));
         } catch (Throwable t) {
             throw new IllegalStateException("Error: could not verify signature", t);
         }
@@ -221,6 +232,31 @@ public class IDTokenUtil {
     }
 
 
+
+    public static JSONWebKeys getJsonWebKeys(String wellKnown) {
+        ServiceClient serviceClient = new ServiceClient(URI.create(wellKnown));
+        return getJsonWebKeys(serviceClient, wellKnown);
+    }
+
+    public static JSONWebKeys getJsonWebKeys(ServiceClient serviceClient, String wellKnown) {
+        // Fix for OAUTH-164, id_token support follows.
+        String rawResponse = serviceClient.getRawResponse(wellKnown);
+        JSON rawJSON = JSONSerializer.toJSON(rawResponse);
+
+        if (!(rawJSON instanceof JSONObject)) {
+            throw new IllegalStateException("Error: Attempted to get JSON Object but returned result is not JSON");
+        }
+        JSONObject json = (JSONObject) rawJSON;
+        String rawKeys = serviceClient.getRawResponse(json.getString("jwks_uri"));
+        JSONWebKeys keys = null;
+        JSONObject claims = null;
+        try {
+            keys = JSONWebKeyUtil.fromJSON(rawKeys);
+        } catch (Throwable e) {
+            throw new GeneralException("Error getting keys", e);
+        }
+        return keys;
+    }
     /** Strictly for testing.
      * This will take two arguments, a file name containing the keys, the word decode|encode and a string.
      * If the word decode is used, then the string is decoded against the
@@ -243,7 +279,7 @@ public class IDTokenUtil {
 
     public static void otherTest() throws Exception {
         JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/keys.jwk"));
-        JSONObject claims = verifyAndReadIDToken(ID_TOKKEN, keys);
+        JSONObject claims = verifyAndReadJWT(ID_TOKKEN, keys);
         System.out.println("claims=" + claims);
 
     }
@@ -260,9 +296,9 @@ public class IDTokenUtil {
         String keyID = "244B235F6B28E34108D101EAC7362C4E";
         JSONWebKeys keys = JSONWebKeyUtil.fromJSON(new File("/home/ncsa/dev/csd/config/polo-keys.jwk"));
 
-        String idTokken = createIDToken(payload, keys.get(keyID));
+        String idTokken = createJWT(payload, keys.get(keyID));
         System.out.println(idTokken);
-        JSONObject claims = verifyAndReadIDToken(idTokken, keys);
+        JSONObject claims = verifyAndReadJWT(idTokken, keys);
         System.out.println("claims = " + claims);
         JSONWebKey webKey = keys.get(keyID);
         System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
@@ -284,12 +320,12 @@ public class IDTokenUtil {
         payload.put("id", "sukjfhusdfsdjkfh");
         payload.put("other_claim", "skjdf93489ghiovs 98sd89wehi ws");
         payload.put("another_claim", "l;kfg8934789dfio9v 92w89 98wer");
-        String tokken = createIDToken(payload, webKey);
+        String tokken = createJWT(payload, webKey);
 
         System.out.println("JWT=" + tokken);
         JSONWebKeys keys = new JSONWebKeys(null);
         keys.put(webKey.id, webKey);
-        System.out.println("claims=" + verifyAndReadIDToken(tokken, keys));
+        System.out.println("claims=" + verifyAndReadJWT(tokken, keys));
         System.out.println("-----");
         // note that if the this last call
         // works it is because the verification works too.
@@ -403,10 +439,10 @@ public class IDTokenUtil {
         System.out.println(KeyUtil.toX509PEM(webKey.publicKey));
         System.out.println(KeyUtil.toPKCS1PEM(privateKey));
         System.out.println(KeyUtil.toPKCS8PEM(privateKey));
-        String tokken = createIDToken(payload, keys.get(keyID));
+        String tokken = createJWT(payload, keys.get(keyID));
 
         System.out.println("JWT=" + tokken);
-        System.out.println("claims=" + verifyAndReadIDToken(tokken, keys));
+        System.out.println("claims=" + verifyAndReadJWT(tokken, keys));
         System.out.println("-----");
 
         // note that if the this last call

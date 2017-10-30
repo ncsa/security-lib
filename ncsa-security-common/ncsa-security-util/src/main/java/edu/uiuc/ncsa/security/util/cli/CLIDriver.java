@@ -115,7 +115,7 @@ public class CLIDriver {
      * @return
      */
 
-    protected int execute(String cmdLine) {
+    public int execute(String cmdLine) {
         try {
             Vector cmdV = CLT.tokenize(cmdLine);
             if (cmdV.size() > 0) {

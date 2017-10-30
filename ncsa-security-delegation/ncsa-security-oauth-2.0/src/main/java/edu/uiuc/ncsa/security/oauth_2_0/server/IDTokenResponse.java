@@ -4,9 +4,10 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
-import edu.uiuc.ncsa.security.oauth_2_0.IDTokenUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Client;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
@@ -142,6 +143,7 @@ public abstract class IDTokenResponse extends IResponse2 {
          claims.put(AUDIENCE, parameters.get(CLIENT_ID)); // audience = client id.
          claims.put(ISSUED_AT, System.currentTimeMillis() / 1000); // issued at = current time in seconds.
          claims.put(NONCE, parameters.get(NONCE)); // nonce must match that in authz request.
+
          DebugUtil.dbg(this, "REMOVE email from claims");
 
          // Optional claims the handler may over-write the default claims as needed.
@@ -149,6 +151,7 @@ public abstract class IDTokenResponse extends IResponse2 {
              claims.put(AUTHORIZATION_TIME, parameters.get(AUTHORIZATION_TIME));
          }
          DebugUtil.dbg(this,"\n\n********");
+         ServletDebugUtil.dbg(this, "All basic claims:" + claims);
 
          DebugUtil.dbg(this,"starting to run scope handlers. There are " + (getScopeHandlers()==null?"no":Integer.toString(getScopeHandlers().size())) + " handlers");
          // only run scope handlers if this is not a public client.
@@ -176,9 +179,9 @@ public abstract class IDTokenResponse extends IResponse2 {
              try {
                  String idTokken = null;
                  if (isSignToken()) {
-                     idTokken = IDTokenUtil.createIDToken(claims, getJsonWebKey());
+                     idTokken = JWTUtil.createJWT(claims, getJsonWebKey());
                  } else {
-                     idTokken = IDTokenUtil.createIDToken(claims);
+                     idTokken = JWTUtil.createJWT(claims);
                  }
                  m.put(ID_TOKEN, idTokken);
              } catch (Throwable e) {

@@ -80,7 +80,7 @@
                             <goal>jar-no-fork</goal>
 
                             <!-- produce source artifact for project test sources -->
-                            <goal>test-jar-no-fork</goal>
+                            <goal>test-jar</goal>
                         </goals>
                     </execution>
                     <execution>
