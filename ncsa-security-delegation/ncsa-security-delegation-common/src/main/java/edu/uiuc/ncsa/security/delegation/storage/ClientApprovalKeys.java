@@ -16,10 +16,16 @@ public class ClientApprovalKeys extends SerializationKeys {
     String approved = "approved";
     String approvalTS = "approval_ts";
     String approver = "approver";
+    String status = "status";
 
     public String approved(String... x) {
         if (0 < x.length) approved = x[0];
         return approved;
+    }
+
+    public String status(String... x) {
+        if (0 < x.length) status = x[0];
+        return status;
     }
 
     public String approvalTS(String... x) {

@@ -25,7 +25,16 @@ public class AggregateCAStore<V extends ClientApprovalStore> extends AggregateSt
     public int getUnapprovedCount() {
         int count = 0;
         for (ClientApprovalStore s : stores) {
-            count = s.getUnapprovedCount();
+            count = count + s.getUnapprovedCount();
+        }
+        return count;
+    }
+
+    @Override
+    public int getPendingCount() {
+        int count = 0;
+        for (ClientApprovalStore s : stores) {
+            count = count + s.getPendingCount();
         }
         return count;
     }

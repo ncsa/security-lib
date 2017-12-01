@@ -320,7 +320,9 @@ public class MailUtil implements Logable {
             warn("Empty email template found, no message body or subject.");
         }
         int count = 0;
-
+        if(replacements == null || replacements.isEmpty()){
+            return out;
+        }
         for (Object key : replacements.keySet()) {
             // Have to properly escape the regex here.
             count++;

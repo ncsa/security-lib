@@ -16,22 +16,22 @@ import java.io.File;
  */
 public abstract class FSClientApprovalStore<V extends ClientApproval> extends FileStore<V> implements ClientApprovalStore<V> {
     protected FSClientApprovalStore(File storeDirectory, File indexDirectory,
-                                 IdentifiableProviderImpl<V> idp,
-                                 MapConverter<V> cp) {
+                                    IdentifiableProviderImpl<V> idp,
+                                    MapConverter<V> cp) {
         super(storeDirectory, indexDirectory, idp, cp);
     }
 
     protected FSClientApprovalStore(File file,
-                                 IdentifiableProviderImpl<V> idp,
-                                 MapConverter<V> cp) {
+                                    IdentifiableProviderImpl<V> idp,
+                                    MapConverter<V> cp) {
         super(new File(file, "cas"), idp, cp);
     }
 
 
     @Override
     public boolean isApproved(Identifier identifier) {
-        ClientApproval  ca = get(identifier);
-        if(ca == null){
+        ClientApproval ca = get(identifier);
+        if (ca == null) {
             return false;
         }
 
@@ -41,11 +41,24 @@ public abstract class FSClientApprovalStore<V extends ClientApproval> extends Fi
     @Override
     public int getUnapprovedCount() {
         int count = 0;
-             for(Identifier key: keySet()){
-                if(!isApproved(key)){
-                    count++;
-                }
-             }
-             return count;
+        for (Identifier key : keySet()) {
+            if (!isApproved(key)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
+    public int getPendingCount() {
+        int count = 0;
+        for (Identifier key : keySet()) {
+            ClientApproval approval = get(key);
+
+            if (approval==null || (approval.getStatus() == ClientApproval.Status.PENDING)) {
+                count++;
+            }
+        }
+        return count;
     }
 }

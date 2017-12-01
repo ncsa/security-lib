@@ -21,4 +21,5 @@ public interface ClientApprovalStore<V extends ClientApproval> extends Store<V> 
      * @return
      */
     int getUnapprovedCount();
+    int getPendingCount();
 }
