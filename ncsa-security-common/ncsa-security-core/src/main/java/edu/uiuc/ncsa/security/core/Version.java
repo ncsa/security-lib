@@ -6,5 +6,5 @@ package edu.uiuc.ncsa.security.core;
  * on 4/9/15 at  9:50 AM
  */
 public interface Version {
-    public String VERSION_NUMBER="3.5";
+    public String VERSION_NUMBER="3.5.1";
 }
