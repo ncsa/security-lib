@@ -35,6 +35,15 @@ public class JSONWebKeyUtil {
     public static final String KEY_TYPE = "kty";
     public static final String KEYS = "keys";
 
+
+    /**
+     * Read a set of keys from a file. The format of the file is that of the spec.
+     * @param file
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     * @throws IOException
+     */
     public static JSONWebKeys fromJSON(File file) throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
         FileReader fileReader = new FileReader(file);
         BufferedReader br = new BufferedReader(fileReader);
@@ -51,7 +60,7 @@ public class JSONWebKeyUtil {
     }
 
     /**
-     * Take a map of key pairs (keyed by a
+     * Take a raw string of text that is the JSON for the keys and convert it into a set of keys.
      *
      * @param x
      * @return
@@ -98,6 +107,12 @@ public class JSONWebKeyUtil {
     protected static String bigIntToString(BigInteger bigInteger){
         return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
     }
+
+    /**
+     * Serialize a set of keys (as a java object) to JSON.
+     * @param webKeys
+     * @return
+     */
     public static JSONObject toJSON(JSONWebKeys webKeys){
         JSONObject json = new JSONObject();
         JSONArray array = new JSONArray();
@@ -122,6 +137,13 @@ public class JSONWebKeyUtil {
         json.put("keys", array);
         return json;
     }
+
+    /**
+     * Very useful utility to take a set of keys and return another set of keys that are only the public parts.
+     * This set, for instance, can be returned as a response to public requests.
+     * @param keys
+     * @return
+     */
     public static JSONWebKeys makePublic(JSONWebKeys keys){
         JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID()) ;
         for(String key:keys.keySet()){
@@ -136,16 +158,5 @@ public class JSONWebKeyUtil {
         // now we have a clone with no private keys, we need to c
         return newKeys;
     }
-    public static void main(String[] args) {
-        try {
-            System.out.println("Generate a new set of keys for the server");
 
-            File file = new File("/home/ncsa/dev/csd/config/keys.jwk");
-            JSONWebKeys keys = fromJSON(file);
-            System.out.println("size = " + keys.size());
-
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
 }

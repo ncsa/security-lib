@@ -3,13 +3,21 @@ package edu.uiuc.ncsa.security.util.ssl;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import org.apache.http.HttpHost;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -191,9 +199,6 @@ public class VerifyingHTTPClientFactory implements Logable {
 
         myTrustManager.setHost(host); //varies per request.
         debug("my trust manager: trust root path+" + myTrustManager.getTrustRootPath());
-
-        //myTrustManager.setTrustRootPath("/etc/grid-security/certificates");
-      //  myTrustManager.setTrustRootPath(getSSLConfiguration().getTrustrootPath());
         return getClient(myTrustManager, connectionTimeout, socketTimeout);
     }
 
@@ -263,10 +268,12 @@ public class VerifyingHTTPClientFactory implements Logable {
         SSLSocketFactory socketFactory = new SSLSocketFactory(sc);
         if (isStrictHostnames()) {
             socketFactory.setHostnameVerifier(SSLSocketFactory.STRICT_HOSTNAME_VERIFIER);
+            debug("enabled strict hostname verification");
+
         } else {
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            debug("disabled strict hostname verification.");
         }
-        debug("enabled strict hostname verification");
         return socketFactory;
     }
 
@@ -283,7 +290,7 @@ public class VerifyingHTTPClientFactory implements Logable {
      * @throws IOException
      */
     public MyTrustManager newMyTrustManager() throws IOException {
-        return new MyTrustManager(logger, "CN=ashigaru.ncsa.illinois.edu", getSSLConfiguration());
+        return new MyTrustManager(logger, "CN=dummy.fake.cn", getSSLConfiguration());
     }
 
 
@@ -343,4 +350,6 @@ public class VerifyingHTTPClientFactory implements Logable {
     }
 
     SSLConfiguration sslConfiguration;
+
+
 }

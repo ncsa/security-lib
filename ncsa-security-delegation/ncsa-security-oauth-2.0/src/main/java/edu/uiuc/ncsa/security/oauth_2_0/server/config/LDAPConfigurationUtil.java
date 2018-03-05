@@ -48,25 +48,29 @@ public class LDAPConfigurationUtil {
     public static final int LDAP_AUTH_STRONG_KEY = 100;
     public static final String RETURN_NAME = "returnName"; // attribute for the attribute tag.E.g. <attribute returnName="foo">bar</attributte>
     public static final String RETURN_AS_LIST = "returnAsList"; // attribute for the attribute tag.E.g. <attribute returnAsList="true">bar</attributte>
+    public static final String IS_GROUP = "isGroup"; // attribute telling that this is the group information.
 
     public static class AttributeEntry {
-        public AttributeEntry(String sourceName, String targetName, boolean isList) {
+        public AttributeEntry(String sourceName, String targetName, boolean isList, boolean isGroup) {
             this.isList = isList;
             this.sourceName = sourceName;
             this.targetName = targetName;
+            this.isGroup = isGroup;
         }
 
         public String sourceName;
         public String targetName;
         public boolean isList = false;
+        public boolean isGroup = false;
 
         @Override
         public String toString() {
-            return "AttributeEntry{" +
+            return "AttributeEntry[" +
                     "isList=" + isList +
+                    "isGroup=" + isGroup +
                     ", sourceName='" + sourceName + '\'' +
                     ", targetName='" + targetName + '\'' +
-                    '}';
+                    "]";
         }
     }
 
@@ -137,7 +141,16 @@ public class LDAPConfigurationUtil {
                                 // Rock on.
                             }
                         }
-                        AttributeEntry attributeEntry = new AttributeEntry(kid.toString(), returnName, returnAsList);
+                        x = getFirstAttribute(attributeNode.getChild(i), IS_GROUP);
+                        boolean isGroup = false;
+                        if(x!= null){
+                            try{
+                                isGroup = Boolean.parseBoolean(x);
+                            }catch(Throwable t){
+                                // accept default
+                            }
+                        }
+                        AttributeEntry attributeEntry = new AttributeEntry(kid.toString(), returnName, returnAsList, isGroup);
                         ldapConfiguration.getSearchAttributes().put(attributeEntry.sourceName, attributeEntry);
                     }
                 }
@@ -332,7 +345,8 @@ public class LDAPConfigurationUtil {
                 String name = current.getString("name");
                 String targetName = current.getString(RETURN_NAME);
                 boolean isList = current.getBoolean(RETURN_AS_LIST);
-                AttributeEntry attributeEntry = new AttributeEntry(name, targetName, isList);
+                boolean isGroup= current.getBoolean(IS_GROUP);
+                AttributeEntry attributeEntry = new AttributeEntry(name, targetName, isList,isGroup);
                 config.getSearchAttributes().put(attributeEntry.sourceName, attributeEntry);
             }
 

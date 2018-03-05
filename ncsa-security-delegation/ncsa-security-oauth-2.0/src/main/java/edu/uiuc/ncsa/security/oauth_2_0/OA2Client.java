@@ -86,6 +86,10 @@ public class OA2Client extends Client {
         this.rtLifetime = rtLifetime;
     }
 
+    /**
+     * This returns whether or not this client is configured to return refresh tokens.
+     * @return
+     */
     public boolean isRTLifetimeEnabled() {
         return 0 < rtLifetime ;
     }

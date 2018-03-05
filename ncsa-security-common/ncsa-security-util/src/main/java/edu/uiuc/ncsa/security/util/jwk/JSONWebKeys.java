@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.util.jwk;
 import java.util.HashMap;
 
 /**
+ * A collection of {@link JSONWebKey} objects. This also allows specifying an identifier as the
+ * default to be used for all signing.
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/17 at  10:37 AM
  */
@@ -14,9 +16,18 @@ public class JSONWebKeys extends HashMap<String, JSONWebKey> {
         return get(defaultKeyID);
     }
 
+    /**
+     * test if a default key id has been set for this set.
+     * @return
+     */
     public boolean hasDefaultKey(){
         return defaultKeyID != null;
     }
+
+    /**
+     * Get the default key id for this set.
+     * @return
+     */
     public String getDefaultKeyID() {
         return defaultKeyID;
     }
@@ -31,6 +42,11 @@ public class JSONWebKeys extends HashMap<String, JSONWebKey> {
         this.defaultKeyID = defaultKeyID;
     }
 
+    /**
+     * Add a key to this set. Since the hash is on the identifier, the key is checked for having one before
+     * being added and adding a key will fail if there is no identifier set.
+     * @param webKey
+     */
     public void put(JSONWebKey webKey){
         if(webKey.id == null){
             throw new IllegalStateException("Error: no key id for this webkey");

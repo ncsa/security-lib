@@ -183,6 +183,9 @@ public abstract class IDTokenResponse extends IResponse2 {
                  } else {
                      idTokken = JWTUtil.createJWT(claims);
                  }
+                 if(ServletDebugUtil.isEnabled()){
+                     ServletDebugUtil.dbg(this,"raw ID_Token=" + idTokken);
+                 }
                  m.put(ID_TOKEN, idTokken);
              } catch (Throwable e) {
                  throw new IllegalStateException("Error: cannot create token", e);

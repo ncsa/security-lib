@@ -84,6 +84,9 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             }
         }
         JSONObject claims = getAndCheckIDToken(jsonObject, atRequest);
+        if(jsonObject.containsKey(ID_TOKEN)){
+            params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
+        }
         // and now the specific checks for ID tokens returned by the AT server.
         if (!claims.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
             throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");

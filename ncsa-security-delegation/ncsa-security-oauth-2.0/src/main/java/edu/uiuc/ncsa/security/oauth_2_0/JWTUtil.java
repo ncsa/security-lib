@@ -23,14 +23,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Creates JWT tokens. This is for <b>unsigned</b> and <b>/b>unverified</b> tokens which
- * can be sent over a secure connection. The format is to have a header that describes the
+ * Creates JWT tokens. This will create both signed and unsigned tokens
+ * if requested. The format is to have a header that describes the
  * content, including algorithm (fixed at "none" here) and a payload of claims. Both of these
  * are in JSON. The token then consists of based64 encoding both of these and <br/><br>
- * encoded header + "."   + encoded payload + "."<br/><br>
- * The last period is manadatory and must end this. Normally if there is signing or verification
- * used, this last field would contain information pertaining to that. It must be omitted because we
- * do neither of these.
+ * encoded header + "."   + encoded payload + "." + signature<br/><br>
+ * If the token is unsigned, the last period is still manadatory and must end this.
+ *
  * <p>Created by Jeff Gaynor<br>
  * on 2/9/15 at  10:45 AM
  */
@@ -198,6 +197,9 @@ public class JWTUtil {
    public static final int SIGNATURE_INDEX = 2;
 
     public static JSONObject verifyAndReadJWT(String jwt, JSONWebKeys webKeys) {
+        if(jwt == null || jwt.isEmpty()){
+            throw new GeneralException("Error: missing or empty token");
+        }
         String[] x = decat(jwt);
         JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
@@ -232,13 +234,47 @@ public class JWTUtil {
     }
 
 
-
+    /**
+     * Create a basic {@link ServiceClient} to get the keys from the well known page. If you require a special
+     * setup (e.g. your own SSL certs), you will need to create your own ServiceClient and supply that in the
+     * related call getJSONWebKeys(ServiceClient, String wellKnown).
+     * @param wellKnown
+     * @return
+     */
     public static JSONWebKeys getJsonWebKeys(String wellKnown) {
+        if(wellKnown == null || wellKnown.isEmpty()){
+            throw new GeneralException("Error: missing well known URI. Cannot get keys");
+        }
         ServiceClient serviceClient = new ServiceClient(URI.create(wellKnown));
         return getJsonWebKeys(serviceClient, wellKnown);
     }
 
+    public static JSONWebKeys getJsonWebKeys(URI wellKnown) {
+        if(wellKnown == null){
+            throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
+        }
+
+        return getJsonWebKeys(wellKnown.toString());
+    }
+
+    public static JSONObject verifyAndReadJWT(String jwt, URI wellKnown) {
+         if(wellKnown == null){
+             throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
+         }
+         if(jwt == null || jwt.isEmpty()){
+             throw new GeneralException("Error: Missing or empty token.");
+         }
+         return verifyAndReadJWT(jwt, JWTUtil.getJsonWebKeys(wellKnown.toString()));
+     }
+
     public static JSONWebKeys getJsonWebKeys(ServiceClient serviceClient, String wellKnown) {
+        if(serviceClient == null){
+            throw new GeneralException("Error: Missing service client.");
+        }
+        if(wellKnown == null || wellKnown.isEmpty()){
+            throw new GeneralException("Error: missing well known URI. Cannot get keys");
+        }
+
         // Fix for OAUTH-164, id_token support follows.
         String rawResponse = serviceClient.getRawResponse(wellKnown);
         JSON rawJSON = JSONSerializer.toJSON(rawResponse);
@@ -268,6 +304,8 @@ public class JWTUtil {
          //   firstTestB();
           //    otherTest();
             testSigning();
+            JSONWebKeys keys = getJsonWebKeys("https://test.cilogon.org/oauth2/.well-known");
+            System.out.println("Detected " + keys.size() + " keys on test.cilogon.org");
             //  testSigningDirectly();
             //testJWT_IO();
            // printKeys();

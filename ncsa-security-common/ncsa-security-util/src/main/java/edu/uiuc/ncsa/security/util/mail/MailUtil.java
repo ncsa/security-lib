@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -25,7 +26,7 @@ import java.util.Properties;
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/11 at  1:18 PM
  */
-public class MailUtil implements Logable {
+public class MailUtil extends TemplateUtil implements Logable {
     public Session getSession(Properties props) throws NamingException {
         return Session.getDefaultInstance(props);
     }
@@ -39,13 +40,11 @@ public class MailUtil implements Logable {
      * key and right-hand delimiter.
      */
     public static String LEFT_DELIMITER = "${";
-    public static String REGEX_LEFT_DELIMITER = "\\$\\{";
     /**
      * The right-hand delimiter for replacements in templates. Must make a valid regex when combined with the
      * left-hand delimiter and key.
      */
     public static String RIGHT_DELIMITER = "}";
-    public static String REGEX_RIGHT_DELIMITER = "\\}";
     /**
      * The separator between email addresses. The default is a semi-colon.
      */
@@ -306,34 +305,6 @@ public class MailUtil implements Logable {
     }
 
     String subjectTemplate;
-
-    /**
-     * Simple-minded template replacement. This works well for small, simple  arguments.
-     *
-     * @param template
-     * @param replacements
-     * @return
-     */
-    protected String replaceAll(String template, Map replacements) {
-        String out = template;
-        if (out == null || out.length() == 0) {
-            warn("Empty email template found, no message body or subject.");
-        }
-        int count = 0;
-        if(replacements == null || replacements.isEmpty()){
-            return out;
-        }
-        for (Object key : replacements.keySet()) {
-            // Have to properly escape the regex here.
-            count++;
-            String newKey = REGEX_LEFT_DELIMITER + key.toString() + REGEX_RIGHT_DELIMITER; // makes a reg ex.
-            if (replacements.containsKey(key) && (replacements.get(key) != null)) {
-                out = out.replaceAll(newKey, replacements.get(key).toString());
-            }
-        }
-        debug("made " + count + " replacements in the template");
-        return out;
-    }
 
     protected String readTemplate(String fileName) throws IOException {
         debug("reading in template file \"" + fileName + "\"");
