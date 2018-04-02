@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.CONTAINS;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  10:43 AM
  */
 public class jContains extends jStringComparisons {
     public jContains() {
-        super("$contains");
+        super(CONTAINS);
     }
 
     @Override

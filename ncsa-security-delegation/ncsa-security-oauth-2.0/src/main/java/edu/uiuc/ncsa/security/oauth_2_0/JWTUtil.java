@@ -109,6 +109,14 @@ public class JWTUtil {
         return sign(concat(header, payload), webkey);
     }
 
+    /*
+     To do -- implement the support for elliptic curves signatures:
+     SHA256withECDSA
+     SHA384withECDSA
+     SHA512withECDSA
+
+     The default is RSA so we need a way to disambigute which is wanted.
+     */
     protected static String sign(String x, JSONWebKey webkey) throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException {
        /*
        JWT alg name             Java name

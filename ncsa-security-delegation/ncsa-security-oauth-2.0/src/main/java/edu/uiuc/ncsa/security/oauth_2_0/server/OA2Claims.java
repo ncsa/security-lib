@@ -11,6 +11,7 @@ public interface OA2Claims {
       public static String AUDIENCE = "aud";
       public static String EXPIRATION = "exp";
       public static String ISSUED_AT = "iat";
+      public static String NOT_VALID_BEFORE = "nbf";
 
     /**
      * End-User's full name in displayable form including all name parts, possibly including titles and
@@ -62,7 +63,7 @@ public interface OA2Claims {
      */
     public static String EMAIL="email";
     /**
-     *  True if the End-User's e-mail address has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent
+     *  True if the End-User's e-mail address has been verified; otherwise false. When this Claim FunctorType is true, this means that the OP took affirmative steps to ensure that this e-mail address was controlled by the End-User at the time the verification was performed. The means by which an e-mail address is verified is context-specific, and dependent
      *  upon the trust framework or contractual agreements within which the parties are operating.
      */
     public static String EMAIL_VERIFIED="email_verified";
@@ -92,7 +93,7 @@ public interface OA2Claims {
      */
     public static String PHONE_NUMBER="phone_number";
     /**
-     * True if the End-User's phone number has been verified; otherwise false. When this Claim Value is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in
+     * True if the End-User's phone number has been verified; otherwise false. When this Claim FunctorType is true, this means that the OP took affirmative steps to ensure that this phone number was controlled by the End-User at the time the verification was performed. The means by which a phone number is verified is context-specific, and dependent upon the trust framework or contractual agreements within which the parties are operating. When true, the phone_number Claim MUST be in
      * E.164 format and any extensions MUST be represented in RFC 3966 format.
      */
     public static String PHONE_NUMBER_VERIFIED="phone_number_verified";

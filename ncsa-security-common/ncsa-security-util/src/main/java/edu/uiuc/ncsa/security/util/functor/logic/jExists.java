@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.EXISTS;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  1:09 PM
  */
 public class jExists extends jStringComparisons {
     public jExists() {
-        super("$exists");
+        super(EXISTS);
     }
 
     @Override

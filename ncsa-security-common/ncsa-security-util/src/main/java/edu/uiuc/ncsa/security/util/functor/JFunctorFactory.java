@@ -7,6 +7,11 @@ import edu.uiuc.ncsa.security.util.functor.strings.jToUpperCase;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
+
 /**
  * This factory will take JSON and convert it into a set of functors. This supplies basic logic and a few other
  * things, so if you need more, be sure to extends this factory.
@@ -14,30 +19,108 @@ import net.sf.json.JSONObject;
  * on 2/27/18 at  9:07 AM
  */
 public class JFunctorFactory {
-    public static JFunctorFactory getFactory() {
-        if (factory == null) {
-            factory = new JFunctorFactory();
-        }
-        return factory;
-    }
-
-    public static void setFactory(JFunctorFactory factory) {
-        JFunctorFactory.factory = factory;
-    }
-
-    protected static JFunctorFactory factory;
 
     /**
-     * Static factory method. This uses whatever the default factory unless that has been set.
-     * If you need dynamic functor creation, consider using the {@link #fromJSON(JSONObject)}
+     * This will create a single functor from the object. If you have a full configuration
+     * file, use the {@link #createLogicBlock(JSONArray)}
      * method instead.
      *
      * @param jsonObject
      * @return
      */
-    public static JFunctor create(JSONObject jsonObject) {
-        return getFactory().fromJSON(jsonObject);
+    public JFunctor create(JSONObject jsonObject) {
+        return fromJSON(jsonObject);
     }
+
+    /**
+     * This creates a list of logic blocks from a JSONArray. There are a few cases for this. The basic format is
+     * assumed to be
+     * <pre>
+     *     [{"$if":[..],
+     *        "$then":[...],
+     *        "$else":[...]},
+     *      {"$if":[..],
+     *        "$then":[...],
+     *        "$else":[...]},...
+     *     ]
+     * </pre>
+     * Or a simple list of commands like
+     * <pre>
+     *     [{"$functor_1":[args]},{"$functor_2":[args]},...]
+     * </pre>
+     * which is converted to the logical block of
+     * <pre>
+     *     [{"$if":["$true"],"$then":[commands]}]
+     * </pre>
+     * I.e it is effectively always evaluated. A Third case that is handled is having these of the form
+     * <pre>
+     *     [{"$if":...},[COMMANDS]]
+     * </pre>
+     *
+     * @param array
+     * @return
+     */
+    public List<LogicBlock> createLogicBlock(JSONArray array) {
+        ArrayList<LogicBlock> bloxx = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            Object currentObj = array.get(i);
+            if (currentObj instanceof JSONObject) {
+                LogicBlock logicBlock = doLBObject((JSONObject) currentObj);
+                if (logicBlock != null) {
+                    // only add it if it is recognized as a logic block.
+                    bloxx.add(logicBlock);
+                }
+            }
+            if (currentObj instanceof JSONArray) {
+                bloxx.add(doLBArray((JSONArray) currentObj));
+            }
+        }
+        if (bloxx.size() == 0) {
+            // assume final case, whole thing is a list of commands to be executed at all times
+            bloxx.add(doLBArray(array));
+        }
+        return bloxx;
+    }
+
+    protected LogicBlock doLBObject(JSONObject json) {
+        if (json.containsKey("$if")) {
+            return new LogicBlock(this, json);
+        }
+        return null;
+    }
+
+    protected LogicBlock doLBArray(JSONArray array) {
+        JSONObject json = new JSONObject();
+        JSONArray array2 = new JSONArray();
+        array2.add("$true");
+        json.put(FunctorTypeImpl.IF.getValue(), array2);
+        json.put(FunctorTypeImpl.THEN.getValue(), array);
+        return new LogicBlock(this, json);
+
+    }
+
+    /**
+     * This takes an JSONArray of JSONObjects and turns it into a list of {@link JFunctor}s.
+     *
+     * @param array
+     * @return
+     */
+    public List<JFunctor> create(JSONArray array) {
+        ArrayList<JFunctor> bloxx = new ArrayList<>();
+        for (int i = 0; i < array.size(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            if (isFunctor(obj)) {
+                bloxx.add(fromJSON(obj));
+            }
+        }
+
+        return bloxx;
+    }
+
+    protected boolean hasEnum(JSONObject rawJson, FunctorType type) {
+        return rawJson.containsKey(type.getValue());
+    }
+
 
     /**
      * This figures out which functor to create based on the key of the raw JSON object. Override
@@ -48,51 +131,56 @@ public class JFunctorFactory {
      * @return
      */
     protected JFunctor figureOutFunctor(JSONObject rawJson) {
-        JFunctor ff = null;
-        if (rawJson.containsKey("$and")) {
-            ff = new jAnd();
+        if (hasEnum(rawJson, AND)) {
+            return new jAnd();
         }
-        if (rawJson.containsKey("$or")) {
-            ff = new jOr();
+        if (hasEnum(rawJson, OR)) {
+            return new jOr();
         }
-        if (rawJson.containsKey("$not")) {
-            ff = new jNot();
-        }
-
-        if (rawJson.containsKey("$exists")) {
-            ff = new jExists();
-        }
-        if (rawJson.containsKey("$match")) {
-            ff = new jMatch();
-        }
-        if (rawJson.containsKey("$contains")) {
-            ff = new jContains();
+        if (hasEnum(rawJson, NOT)) {
+            return new jNot();
         }
 
-        if (rawJson.containsKey("$endsWith")) {
-            ff = new jEndsWith();
+        if (hasEnum(rawJson, EXISTS)) {
+            return new jExists();
         }
-        if (rawJson.containsKey("$startWith")) {
-            ff = new jStartsWith();
+        if (hasEnum(rawJson, MATCH)) {
+            return new jMatch();
+        }
+        if (hasEnum(rawJson, CONTAINS)) {
+            return new jContains();
         }
 
-        if (rawJson.containsKey("$if")) {
-            ff = new jIf();
+        if (hasEnum(rawJson, ENDS_WITH)) {
+            return new jEndsWith();
+        }
+        if (hasEnum(rawJson, STARTS_WITH)) {
+            return new jStartsWith();
         }
 
-        if (rawJson.containsKey("$then")) {
-            ff = new jThen();
+        if (hasEnum(rawJson, IF)) {
+            return new jIf();
         }
-        if (rawJson.containsKey("$else")) {
-            ff = new jElse();
+
+        if (hasEnum(rawJson, THEN)) {
+            return new jThen();
         }
-        if (rawJson.containsKey("$toLowerCase")) {
-            ff = new jToLowerCase();
+        if (hasEnum(rawJson, TRUE)) {
+            return new jTrue();
         }
-        if (rawJson.containsKey("$toUpperCase")) {
-            ff = new jToUpperCase();
+        if (hasEnum(rawJson, FALSE)) {
+            return new jFalse();
         }
-        return ff;
+        if (hasEnum(rawJson, ELSE)) {
+            return new jElse();
+        }
+        if (hasEnum(rawJson, TO_LOWER_CASE)) {
+            return new jToLowerCase();
+        }
+        if (hasEnum(rawJson, TO_UPPER_CASE)) {
+            return new jToUpperCase();
+        }
+        return null;
 
     }
 
@@ -125,10 +213,24 @@ public class JFunctorFactory {
         JSONArray jsonArray = getArray(jsonObject);
         for (int i = 0; i < jsonArray.size(); i++) {
             Object obj = jsonArray.get(i);
+
             if ((obj instanceof JSONObject)) {
                 ff.addArg(fromJSON((JSONObject) obj));
             } else {
-                ff.addArg(preprocess(obj.toString()));
+                boolean isDone = false;
+                // Special case short hand for logical constants
+                if ((obj instanceof String) && (obj).equals("$true")) {
+                    ff.addArg(new jTrue());
+                    isDone = true;
+                }
+                if ((obj instanceof String) && (obj).equals("$false")) {
+                    ff.addArg(new jFalse());
+                    isDone = true;
+                }
+                if (!isDone) {
+                    // so if this argument is not $true or $false, then it's jsut a string and add it.
+                    ff.addArg(preprocess(obj.toString()));
+                }
             }
         }
     }

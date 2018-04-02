@@ -20,6 +20,7 @@ public class OA2ClientKeys extends ClientKeys {
     String rtLifetime = "rt_lifetime";
     String scopes = "scopes";
     String ldap = "ldap";
+    String config = "cfg";
     String signTokens="sign_tokens";
     String publicClient="public_client";
 
@@ -63,6 +64,12 @@ public class OA2ClientKeys extends ClientKeys {
         return ldap;
     }
 
+
+    public String cfg(String... x) {
+        if (0 < x.length) config = x[0];
+        return config;
+    }
+
     @Override
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
@@ -72,6 +79,7 @@ public class OA2ClientKeys extends ClientKeys {
         allKeys.add(issuer());
         allKeys.add(ldap());
         allKeys.add(signTokens());
+        allKeys.add(cfg());
         return allKeys;
     }
 }

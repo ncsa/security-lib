@@ -2,13 +2,15 @@ package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.AND;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  8:57 AM
  */
 public class jAnd extends JFunctorImpl {
     public jAnd() {
-        super("$and");
+        super(AND);
     }
 
     @Override

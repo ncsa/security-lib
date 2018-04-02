@@ -52,7 +52,7 @@ public abstract class IDTokenResponse extends IResponse2 {
     }
 
 
-    ScopeHandlerFactory scopeHandlerFactory;
+    ClaimSourceFactory claimSourceFactory;
     ServiceTransaction serviceTransaction;
 
     public ServiceTransaction getServiceTransaction() {
@@ -83,13 +83,13 @@ public abstract class IDTokenResponse extends IResponse2 {
 
     boolean signToken = false;
 
-    Collection<? extends ScopeHandler> scopeHandlers;
+    Collection<? extends ClaimSource> scopeHandlers;
 
-    public Collection<? extends ScopeHandler> getScopeHandlers() {
+    public Collection<? extends ClaimSource> getScopeHandlers() {
         return scopeHandlers;
     }
 
-    public void setScopeHandlers(Collection<? extends ScopeHandler> scopeHandler) {
+    public void setScopeHandlers(Collection<? extends ClaimSource> scopeHandler) {
         this.scopeHandlers = scopeHandler;
     }
 
@@ -160,10 +160,10 @@ public abstract class IDTokenResponse extends IResponse2 {
                  UserInfo userInfo = new UserInfo();
                  userInfo.setMap(claims);
                  if (getScopeHandlers() != null) {
-                     for (ScopeHandler scopeHandler : getScopeHandlers()) {
+                     for (ClaimSource claimSource : getScopeHandlers()) {
                          DebugUtil.dbg(this, "\n*** ");
-                         DebugUtil.dbg(this, "   starting to process handler, " + scopeHandler + Integer.toString(userInfo.getMap().size()) + " entries before");
-                         scopeHandler.process(userInfo, getServiceTransaction());
+                         DebugUtil.dbg(this, "   starting to process handler, " + claimSource + Integer.toString(userInfo.getMap().size()) + " entries before");
+                         claimSource.process(userInfo, getServiceTransaction());
                          DebugUtil.dbg(this, "   processed handler, " + Integer.toString(userInfo.getMap().size()) + " entries after");
                      }
                  }

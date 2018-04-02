@@ -7,12 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
 /**
- * This is charged with handling all scopes. Note that the contractof the standard implementation is to
+ * This is charged with modelling the source ofor sets of claims. Note that the contract
+ * of the standard implementation is to
  * have a no argument constructor that has the scopes you set in the configuration file injected.
+ * Scopes are then used internally to determine which claims are returned.
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  2:28 PM
  */
-public interface ScopeHandler {
+public interface ClaimSource {
     /**
      * A {@link UserInfo} object and the current service transaction are supplied. The contract is that
      * this handler will receive a UserInfo object with standard information in place for

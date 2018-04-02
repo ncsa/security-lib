@@ -9,6 +9,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
  * on 8/30/17 at  3:37 PM
  */
 public class ClientConfigurationUtil {
+    public static final String CONFIG_KEY="config";
+
     public static AdminClientConfig getAdminClientConfig(ConfigurationNode node){
         return new AdminClientConfig();
     }

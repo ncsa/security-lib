@@ -15,8 +15,19 @@ import java.util.Date;
  * on 4/3/12 at  1:54 PM
  */
 public abstract class IdentifierProvider<V extends Identifier> implements Provider<V> {
-    public final static String SCHEME = "myproxy";
-    public final static String SCHEME_SPECIFIC_PART = "oa4mp,2012:"; // NB trailing colon is needed by us
+    public static String SCHEME = "myproxy";
+    public static String SCHEME_SPECIFIC_PART = "oa4mp,2012:"; // NB trailing colon is needed by us
+
+    public static void setScheme(String SCHEME) {
+        IdentifierProvider.SCHEME = SCHEME;
+    }
+
+    public static void setSchemeSpecificPart(String SCHEME_SPECIFIC_PART) {
+        if(!SCHEME_SPECIFIC_PART.endsWith(":")){
+            SCHEME_SPECIFIC_PART = SCHEME_SPECIFIC_PART + ":";
+        }
+        IdentifierProvider.SCHEME_SPECIFIC_PART = SCHEME_SPECIFIC_PART;
+    }
 
     protected IdentifierProvider(URI uri, String component, boolean useTimestamps) {
         uriScheme = uri.getScheme();
@@ -26,7 +37,11 @@ public abstract class IdentifierProvider<V extends Identifier> implements Provid
     }
 
     protected IdentifierProvider(String component) {
-        this(SCHEME, SCHEME_SPECIFIC_PART, component, true);
+        this(component, true);
+    }
+
+    protected IdentifierProvider(String component, boolean useTimestamps) {
+        this(SCHEME, SCHEME_SPECIFIC_PART, component, useTimestamps);
     }
 
     /**

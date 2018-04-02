@@ -4,14 +4,17 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  8:53 AM
  */
 public abstract class JFunctorImpl implements JFunctor {
-    protected JFunctorImpl(String name) {
-        this.name = name;
+    FunctorType type;
+    protected JFunctorImpl(FunctorType type){
+
+        this.type = type;
     }
     protected boolean executed = false;
 
@@ -25,6 +28,10 @@ public abstract class JFunctorImpl implements JFunctor {
         args = new ArrayList<>();
     }
 
+    /**
+     * This will check that there are args (assumes that the functor <b>requires</b> arguments and that each
+     * argument in turn is a functor. This is used in various functors.
+     */
     protected void checkArgs() {
         if (args.isEmpty()) {
             throw new IllegalStateException("Error: no arguments");
@@ -34,6 +41,11 @@ public abstract class JFunctorImpl implements JFunctor {
                 throw new IllegalStateException("Error: argument is not a functor");
             }
         }
+    }
+
+    @Override
+    public void addArg(List<JFunctor> functors) {
+        args.addAll(functors);
     }
 
     protected Object result;
@@ -93,11 +105,10 @@ public abstract class JFunctorImpl implements JFunctor {
         getArgs().add(x);
     }
 
-    protected String name;
 
     @Override
     public String getName() {
-        return name;
+        return type.getValue();
     }
 
     public JSONObject toJSON(){
@@ -114,5 +125,11 @@ public abstract class JFunctorImpl implements JFunctor {
         }
         json.put(getName(), jsonArray);
         return json;
+    }
+
+    @Override
+    public String toString() {
+       String out = toJSON().toString();
+        return out;
     }
 }

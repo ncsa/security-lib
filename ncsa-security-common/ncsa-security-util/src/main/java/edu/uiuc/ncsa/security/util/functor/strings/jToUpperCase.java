@@ -3,13 +3,15 @@ package edu.uiuc.ncsa.security.util.functor.strings;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.TO_UPPER_CASE;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/18 at  1:35 PM
  */
 public class jToUpperCase extends JFunctorImpl {
     public jToUpperCase() {
-        super("$toUpperCase");
+        super(TO_UPPER_CASE);
     }
 
     @Override

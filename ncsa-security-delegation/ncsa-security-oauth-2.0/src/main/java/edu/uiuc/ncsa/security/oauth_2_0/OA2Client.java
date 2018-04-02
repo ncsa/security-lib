@@ -4,11 +4,13 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_2_0.server.config.LDAPConfiguration;
+import net.sf.json.JSONObject;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
+import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 
 /**
  * OAuth2 Open ID connect protocol requires that sites register callback uris and that incoming requests
@@ -32,6 +34,7 @@ public class OA2Client extends Client {
         client.setCallbackURIs(getCallbackURIs());
         client.setScopes(getScopes());
         client.setLdaps(getLdaps());
+        client.setConfig(getConfig());
         client.setIssuer(getIssuer());
         client.setSignTokens(isSignTokens());
     }
@@ -114,6 +117,42 @@ public class OA2Client extends Client {
 
     Collection<LDAPConfiguration> ldaps;
 
+    /**
+     * The JSON configuration object.
+     * The format is as follows:
+     * <pre>
+     * {
+     *   "config":"comment",
+     *   "id_token":JSON,
+     * }
+     * </pre>
+     *
+     * JSON may be either a single JSON object or an array of them. If a single, it is
+     * converted to an array of a single object before processing.
+     *
+     * JSON may be a logic block  (which consists of various JSON functors.
+     *
+     * <pre>
+     * {
+     *   "$if":conditionals,
+     *   "$then":"actions",
+     *   "$else":"other actions"
+     * }
+     * </pre>
+     *
+     * conditionals, actions and other actions are JSON objects or arrays of them as well. Note that the conditional must be a functor that evaluates to a logical value.
+     * @return
+     */
+    public JSONObject getConfig() {
+        return config;
+    }
+
+    public void setConfig(JSONObject config) {
+        this.config = config;
+    }
+
+    protected JSONObject config;
+
     @Override
     public String toString() {
         String x = super.toString();
@@ -143,6 +182,16 @@ public class OA2Client extends Client {
         }
         if(isSignTokens() != c.isSignTokens()) return false;
         if(isPublicClient() != c.isPublicClient()) return false;
+        // note that at this point neither the LDAP ro configuration are checked for equality since there
+        // is no well defined way to tell when two JSON object describe the same information.
         return super.equals(obj);
     }
+
+    public JSONObject getClaimsConfig(){
+        if(config == null || config.isEmpty() || !config.containsKey(ID_TOKEN)){
+            return new JSONObject();
+        }
+        return config.getJSONObject(ID_TOKEN);
+    }
+
 }

@@ -143,10 +143,10 @@ public class LDAPConfigurationUtil {
                         }
                         x = getFirstAttribute(attributeNode.getChild(i), IS_GROUP);
                         boolean isGroup = false;
-                        if(x!= null){
-                            try{
+                        if (x != null) {
+                            try {
                                 isGroup = Boolean.parseBoolean(x);
-                            }catch(Throwable t){
+                            } catch (Throwable t) {
                                 // accept default
                             }
                         }
@@ -345,8 +345,11 @@ public class LDAPConfigurationUtil {
                 String name = current.getString("name");
                 String targetName = current.getString(RETURN_NAME);
                 boolean isList = current.getBoolean(RETURN_AS_LIST);
-                boolean isGroup= current.getBoolean(IS_GROUP);
-                AttributeEntry attributeEntry = new AttributeEntry(name, targetName, isList,isGroup);
+                boolean isGroup = false;
+                if (current.containsKey(IS_GROUP)) {
+                    isGroup = current.getBoolean(IS_GROUP);
+                }
+                AttributeEntry attributeEntry = new AttributeEntry(name, targetName, isList, isGroup);
                 config.getSearchAttributes().put(attributeEntry.sourceName, attributeEntry);
             }
 

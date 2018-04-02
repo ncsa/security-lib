@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -14,4 +15,5 @@ public interface JFunctor {
     void addArg(String x);
     void addArg(Integer x);
     void addArg(JFunctor x);
+    void addArg(List<JFunctor> functors);
 }

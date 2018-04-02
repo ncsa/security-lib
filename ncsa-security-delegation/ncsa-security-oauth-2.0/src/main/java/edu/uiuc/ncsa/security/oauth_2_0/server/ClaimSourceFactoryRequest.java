@@ -8,7 +8,7 @@ import java.util.Collection;
  * <p>Created by Jeff Gaynor<br>
  * on 12/19/16 at  11:26 AM
  */
-public class ScopeHandlerFactoryRequest {
+public class ClaimSourceFactoryRequest {
     public Collection<String> getScopes() {
         return scopes;
     }
@@ -29,7 +29,7 @@ public class ScopeHandlerFactoryRequest {
     MyLoggingFacade logger;
 
 
-    public ScopeHandlerFactoryRequest(MyLoggingFacade logger, Collection<String> scopes) {
+    public ClaimSourceFactoryRequest(MyLoggingFacade logger, Collection<String> scopes) {
         this.logger = logger;
         this.scopes = scopes;
     }

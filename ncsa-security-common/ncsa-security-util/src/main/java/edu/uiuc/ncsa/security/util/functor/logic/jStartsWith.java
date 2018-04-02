@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.STARTS_WITH;
+
 /**
  * A functor for checking if one string starts with another. <br/>
  * $starstWith[target, head]<br/>
@@ -11,7 +13,7 @@ package edu.uiuc.ncsa.security.util.functor.logic;
  */
 public class jStartsWith extends jStringComparisons {
     public jStartsWith() {
-        super("$startWith");
+        super(STARTS_WITH);
     }
 
     @Override

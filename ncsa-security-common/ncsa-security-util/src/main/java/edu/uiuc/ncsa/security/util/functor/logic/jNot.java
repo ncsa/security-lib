@@ -2,13 +2,15 @@ package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.NOT;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  9:13 AM
  */
 public class jNot extends JFunctorImpl {
     public jNot() {
-        super("$not");
+        super(NOT);
     }
 
     @Override

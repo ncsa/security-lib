@@ -176,6 +176,25 @@ public class LDAPConfiguration {
     }
 
     @Override
+    public LDAPConfiguration clone() throws CloneNotSupportedException {
+        LDAPConfiguration ldap2 = new LDAPConfiguration();
+        ldap2.setAuthType(getAuthType());
+        ldap2.setContextName(getContextName());
+        ldap2.setEnabled(isEnabled());
+        ldap2.setFailOnError(isFailOnError());
+        ldap2.setNotifyOnFail(isNotifyOnFail());
+        ldap2.setPassword(getPassword());
+        ldap2.setPort(getPort());
+        ldap2.setSearchAttributes(getSearchAttributes());
+        ldap2.setSearchNameKey(getSearchNameKey());
+        ldap2.setSecurityPrincipal(getSecurityPrincipal());
+        ldap2.setServer(getServer());
+        ldap2.setSslConfiguration(getSslConfiguration());
+        ldap2.setSearchBase(getSearchBase());
+        return ldap2;
+    }
+
+    @Override
     public String toString() {
         return "LDAPConfiguration{" +
                 "authType=" + authType +

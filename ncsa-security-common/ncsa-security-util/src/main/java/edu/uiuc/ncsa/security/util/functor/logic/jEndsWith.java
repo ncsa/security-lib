@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.ENDS_WITH;
+
 /**
  * A functor for checking if one string ends with another. <br/>
  * $endsWith[target, tail]<br/>
@@ -11,7 +13,7 @@ package edu.uiuc.ncsa.security.util.functor.logic;
  */
 public class jEndsWith extends jStringComparisons {
     public jEndsWith() {
-        super("$endsWith");
+        super(ENDS_WITH);
     }
 
     @Override

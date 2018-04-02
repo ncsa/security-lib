@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
 /**
@@ -8,7 +9,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
  */
 public class jIf extends JFunctorImpl {
     public jIf() {
-        super("$if");
+        super(FunctorTypeImpl.IF);
     }
 
     @Override
@@ -26,4 +27,6 @@ public class jIf extends JFunctorImpl {
         executed = true;
         return result;
     }
+
+
 }

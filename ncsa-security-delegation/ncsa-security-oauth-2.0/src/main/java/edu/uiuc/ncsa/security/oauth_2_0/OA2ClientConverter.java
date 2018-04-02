@@ -53,6 +53,9 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if(map.containsKey(getCK2().ldap())){
             otherV.setLdaps(mapToLDAPS(map, getCK2().ldap()));
         }
+        if(map.containsKey(getCK2().cfg())){
+            otherV.setConfig(JSONObject.fromObject(map.getString(getCK2().cfg())));
+        }
         return otherV;
     }
 
@@ -97,8 +100,10 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
             map.put(getCK2().scopes(), scopes.toString());
         }
         if(client.getLdaps()!= null && !client.getLdaps().isEmpty()){
-   //         map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()));
             map.put(getCK2().ldap(), LDAPConfigurationUtil.toJSON(client.getLdaps()).toString());
+        }
+        if(client.getConfig() != null && !client.getConfig().isEmpty()){
+                      map.put(getCK2().cfg(), client.getConfig().toString());
         }
     }
 
@@ -126,6 +131,11 @@ public class OA2ClientConverter<V extends OA2Client> extends ClientConverter<V> 
         if(ldaps!=null){
                 v.setLdaps(LDAPConfigurationUtil.fromJSON(ldaps));
         }
+        JSONObject config = (JSONObject) getJsonUtil().getJSONValue(json, getCK2().cfg());
+        if(config != null){
+            v.setConfig(config);
+        }
+
         return v;
     }
 
