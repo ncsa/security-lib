@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  * <p>Created by Jeff Gaynor<br>
  * on May 13, 2011 at  11:57:57 AM
  */
-public class IssuerRequest implements Request {
+public abstract class IssuerRequest implements Request {
     public IssuerRequest(Client client) {
         this.client = client;
     }

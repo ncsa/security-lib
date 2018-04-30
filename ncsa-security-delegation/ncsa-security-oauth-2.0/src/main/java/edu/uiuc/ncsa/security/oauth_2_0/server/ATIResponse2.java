@@ -11,17 +11,11 @@ import edu.uiuc.ncsa.security.delegation.token.Verifier;
  * on 6/4/13 at  5:10 PM
  */
 public class ATIResponse2 extends IDTokenResponse implements ATResponse {
-
-    public ATIResponse2(AccessToken accessToken, RefreshToken refreshToken) {
+    public ATIResponse2(AccessToken accessToken,
+                        RefreshToken refreshToken) {
         super(accessToken,refreshToken);
     }
-
-
-
-
-
     Verifier verifier;
-
 
     /**
      * Getter for verifier
@@ -43,7 +37,4 @@ public class ATIResponse2 extends IDTokenResponse implements ATResponse {
     public void setVerifier(Verifier verifier) {
         this.verifier = verifier;
     }
-
-
-
 }

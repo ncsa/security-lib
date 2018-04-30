@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.security.oauth_2_0.server;
+package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -12,6 +12,10 @@ public interface OA2Claims {
       public static String EXPIRATION = "exp";
       public static String ISSUED_AT = "iat";
       public static String NOT_VALID_BEFORE = "nbf";
+    /**
+     * OA4MP specific claim for group memberships that may come from e.g. LDAP.
+     */
+      public static String IS_MEMBER_OF = "isMemberOf";
 
     /**
      * End-User's full name in displayable form including all name parts, possibly including titles and

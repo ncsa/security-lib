@@ -3,13 +3,12 @@ package edu.uiuc.ncsa.security.util;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
+import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import edu.uiuc.ncsa.security.util.functor.logic.jAnd;
 import edu.uiuc.ncsa.security.util.functor.logic.jTrue;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -81,12 +80,12 @@ public class JFunctorFactoryTests extends TestBase {
         jTrue jt = new jTrue();
                 array.add(jt.toJSON());
         JFunctorFactory ff = new JFunctorFactory();
-        List<LogicBlock>  lbs = ff.createLogicBlock(array);
+        LogicBlocks<? extends LogicBlock> lbs = ff.createLogicBlock(array);
         assert lbs.size() == 1;
-        LogicBlock lb = lbs.get(0);
-        lb.execute();
+        lbs.execute();
         System.out.println(lbs.get(0).toString());
+        LogicBlock lb = lbs.get(0);
         assert lb.isIfTrue();
-        assert lb.getThenBlock().getFunctorMap().containsKey(jt.getName());
+        assert lb.getThenBlock().getFunctorMap().containsKey(jt);
     }
 }

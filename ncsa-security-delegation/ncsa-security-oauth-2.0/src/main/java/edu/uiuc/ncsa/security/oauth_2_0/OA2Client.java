@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
-import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.ID_TOKEN;
 
 /**
  * OAuth2 Open ID connect protocol requires that sites register callback uris and that incoming requests
@@ -123,7 +122,10 @@ public class OA2Client extends Client {
      * <pre>
      * {
      *   "config":"comment",
-     *   "id_token":JSON,
+     *   "claims":{"sources":[JSON],
+     *             "logic":[JSON],
+     *             "source_config":[JSON],
+     *             "processing":[JSON]}
      * }
      * </pre>
      *
@@ -187,11 +189,5 @@ public class OA2Client extends Client {
         return super.equals(obj);
     }
 
-    public JSONObject getClaimsConfig(){
-        if(config == null || config.isEmpty() || !config.containsKey(ID_TOKEN)){
-            return new JSONObject();
-        }
-        return config.getJSONObject(ID_TOKEN);
-    }
 
 }

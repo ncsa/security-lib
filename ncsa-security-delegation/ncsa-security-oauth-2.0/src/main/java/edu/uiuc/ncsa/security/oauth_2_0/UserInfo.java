@@ -5,7 +5,7 @@ import net.sf.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
  * This class manages information related to the UserInfo OIDC query.

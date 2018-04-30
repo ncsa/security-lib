@@ -20,7 +20,9 @@ public enum FunctorTypeImpl implements FunctorType {
     STARTS_WITH("$startsWith"),
     ENDS_WITH("$endsWith"),
     TO_LOWER_CASE("$toLowerCase"),
-    TO_UPPER_CASE("$toUpperCase");
+    TO_UPPER_CASE("$toUpperCase"),
+    CONCAT("$concat"),
+    DROP("$drop");
 
     private String value;
 

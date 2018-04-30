@@ -22,6 +22,20 @@ public abstract class JFunctorImpl implements JFunctor {
         return executed;
     }
 
+    public void clearState(){
+        executed = false;
+        result = null;
+        for(int i = 0; i < getArgs().size(); i++){
+            Object obj = getArgs().get(i);
+            if(obj instanceof JFunctorImpl){
+                ((JFunctorImpl)obj).clearState();
+            }
+        }
+    }
+    /**
+     * This resets the entire state of the functor <b>including erasing the argument list.</b>
+     * If you need to clear the executed state and re-run everything, consider invoking {@link #clearState()}.
+     */
     public void reset(){
         executed = false;
         result = null;

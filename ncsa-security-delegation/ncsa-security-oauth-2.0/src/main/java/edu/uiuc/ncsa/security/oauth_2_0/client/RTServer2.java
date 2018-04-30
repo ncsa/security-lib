@@ -49,7 +49,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         OA2RefreshTokenImpl refreshTokenImpl2 = new OA2RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
         AccessToken newAT = new AccessTokenImpl(URI.create(returnedAT));
         refreshTokenImpl2.setExpiresIn(expiresIn);
-        RTResponse rtResponse = new RTResponse(newAT, refreshTokenImpl2);
+        RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2);
         rtResponse.setParameters(claims);
         return rtResponse;
     }
@@ -63,5 +63,9 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         map.put(OA2Constants.SCOPE, "edu.uiuc.ncsa.myproxy");
         String response = getServiceClient().getRawResponse(map);
         return response;
+    }
+
+    public RTResponse createResponse(AccessToken at, RefreshToken rt){
+        return new RTResponse(at, rt);
     }
 }

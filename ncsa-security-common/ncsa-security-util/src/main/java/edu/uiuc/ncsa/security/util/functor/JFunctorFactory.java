@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.util.functor;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
+import edu.uiuc.ncsa.security.util.functor.strings.jDrop;
 import edu.uiuc.ncsa.security.util.functor.strings.jToLowerCase;
 import edu.uiuc.ncsa.security.util.functor.strings.jToUpperCase;
 import net.sf.json.JSONArray;
@@ -60,8 +61,8 @@ public class JFunctorFactory {
      * @param array
      * @return
      */
-    public List<LogicBlock> createLogicBlock(JSONArray array) {
-        ArrayList<LogicBlock> bloxx = new ArrayList<>();
+    public LogicBlocks<? extends LogicBlock> createLogicBlock(JSONArray array) {
+        LogicBlocks<LogicBlock> bloxx = new LogicBlocks<>();
         for (int i = 0; i < array.size(); i++) {
             Object currentObj = array.get(i);
             if (currentObj instanceof JSONObject) {
@@ -180,6 +181,9 @@ public class JFunctorFactory {
         if (hasEnum(rawJson, TO_UPPER_CASE)) {
             return new jToUpperCase();
         }
+        if (hasEnum(rawJson, DROP)) {
+                    return new jDrop();
+                }
         return null;
 
     }

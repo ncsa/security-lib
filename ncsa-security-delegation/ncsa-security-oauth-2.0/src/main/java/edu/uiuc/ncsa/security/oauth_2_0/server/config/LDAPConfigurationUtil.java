@@ -28,6 +28,7 @@ public class LDAPConfigurationUtil {
     public static final String LDAP_SEARCH_BASE_TAG = "searchBase";
     public static final String SEARCH_NAME_USERNAME = "username";
     public static final String SEARCH_NAME_KEY = "searchName";
+    public static final String CONFIGURATION_NAME_KEY = "name";
 
     public static final String LDAP_SEARCH_ATTRIBUTES_TAG = "searchAttributes";
     public static final String LDAP_SEARCH_ATTRIBUTE_TAG = "attribute";
@@ -230,7 +231,7 @@ public class LDAPConfigurationUtil {
         JSONObject ldap = new JSONObject();
         JSONObject content = new JSONObject();
         ldap.put(LDAP_TAG, content);
-
+        jsonUtil.setJSONValue(ldap, CONFIGURATION_NAME_KEY, configuration.getName());
         jsonUtil.setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
         jsonUtil.setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
         jsonUtil.setJSONValue(ldap, LDAP_ENABLED_TAG, configuration.isEnabled());
@@ -313,10 +314,19 @@ public class LDAPConfigurationUtil {
         return ldaps;
     }
 
-    public static LDAPConfiguration fromJSON(JSONObject json) {
+    public static boolean isLDAPCOnfig(JSONObject json){
+        return json.containsKey(LDAP_TAG);
+    }
+
+    /**
+     * Populate an existing LDAPConfiguration from the JSON.
+     * @param config
+     * @param json
+     * @return
+     */
+    public static LDAPConfiguration fromJSON(LDAPConfiguration config , JSONObject json) {
         JSONUtil jsonUtil = getJSONUtil();
 
-        LDAPConfiguration config = new LDAPConfiguration();
         String contextName = jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG);
         if (contextName == null) {
             config.setContextName("");
@@ -326,6 +336,7 @@ public class LDAPConfigurationUtil {
 
 
         config.setEnabled(jsonUtil.getJSONValueBoolean(json, LDAP_ENABLED_TAG));
+        config.setName(jsonUtil.getJSONValueString(json, CONFIGURATION_NAME_KEY));
         String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
@@ -363,6 +374,11 @@ public class LDAPConfigurationUtil {
             config.setSslConfiguration(sslConfiguration);
         }
         return config;
+
+    }
+    public static LDAPConfiguration fromJSON(JSONObject json) {
+        LDAPConfiguration config = new LDAPConfiguration();
+        return fromJSON(config, json);
     }
 
     public static void main(String[] args) {

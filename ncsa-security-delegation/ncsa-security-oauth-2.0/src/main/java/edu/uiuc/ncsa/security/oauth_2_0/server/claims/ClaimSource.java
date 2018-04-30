@@ -1,20 +1,28 @@
-package edu.uiuc.ncsa.security.oauth_2_0.server;
+package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
+import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
+import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONConfig;
+import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 
 /**
- * This is charged with modelling the source ofor sets of claims. Note that the contract
+ * This is charged with modelling the source for sets of claims. Note that the contract
  * of the standard implementation is to
- * have a no argument constructor that has the scopes you set in the configuration file injected.
- * Scopes are then used internally to determine which claims are returned.
+ * have a no argument constructor that has a JSON object injected as the configuration.
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  2:28 PM
  */
 public interface ClaimSource {
+    /**
+     * This passes in a {@link JSONObject} that is in turn used to configure the source. It is up to the implementaton
+     * to make sense of this.
+     * @param configuration
+     */
+    public void setConfiguration(JSONConfig configuration);
     /**
      * A {@link UserInfo} object and the current service transaction are supplied. The contract is that
      * this handler will receive a UserInfo object with standard information in place for

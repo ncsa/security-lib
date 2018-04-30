@@ -6,5 +6,11 @@ package edu.uiuc.ncsa.security.delegation.services;
  * on Apr 13, 2011 at  3:32:38 PM
  */
 public interface Request {
+    /**
+     * Process the request
+     * @param server
+     * @return
+     */
     Response process(Server server);
+
 }

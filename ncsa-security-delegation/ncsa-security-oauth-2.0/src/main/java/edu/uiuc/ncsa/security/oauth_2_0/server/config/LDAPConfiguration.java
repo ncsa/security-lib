@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
+import net.sf.json.JSONObject;
 
 import javax.naming.Name;
 import javax.naming.directory.Attributes;
@@ -14,10 +15,27 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 5/3/16 at  11:17 AM
  */
-public class LDAPConfiguration {
+public class LDAPConfiguration extends JSONConfig{
+    /*
+      This acts like a JSONConfig object, but is not backed by a JSONObject.
+     */
+    public LDAPConfiguration() {
+        super(null);
+    }
+
     String server;
     int port = -1;
     SSLConfiguration sslConfiguration;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    String name = "";
 
     public String getSearchNameKey() {
         return searchNameKey;
@@ -211,5 +229,20 @@ public class LDAPConfiguration {
                 ", failOnError=" + failOnError +
                 ", notifyOnFail=" + notifyOnFail +
                 '}';
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        LDAPConfigurationUtil.fromJSON(this, json);
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        return LDAPConfigurationUtil.toJSON(this);
+    }
+
+    @Override
+    public boolean hasJSONObject() {
+        return true;
     }
 }

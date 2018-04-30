@@ -11,13 +11,35 @@ import java.util.List;
  * on 3/22/18 at  2:16 PM
  */
 public class FunctorMap extends HashMap<String, List<JFunctor>> {
-    public void put(JFunctor functor){
-         if(containsKey(functor.getName())){
-             get(functor.getName()).add(functor);
-         }else{
-             ArrayList<JFunctor> x = new ArrayList<>();
-             x.add(functor);
-             put(functor.getName(), x);
-         }
+    public void put(JFunctor functor) {
+        if (containsKey(functor.getName())) {
+            get(functor.getName()).add(functor);
+        } else {
+            ArrayList<JFunctor> x = new ArrayList<>();
+            x.add(functor);
+            put(functor.getName(), x);
+        }
+    }
+
+
+    public boolean containsKey(JFunctor jFunctor) {
+        return super.containsKey(jFunctor.getName());
+    }
+
+    /**
+     * Add all of the funtors in the argument to this map.
+     *
+     * @param functorMap
+     * @return
+     */
+    public void addAll(FunctorMap functorMap) {
+        for (String key : functorMap.keySet()) {
+            List<JFunctor> functors = functorMap.get(key);
+            if (containsKey(key)) {
+                get(key).addAll(functors);
+            } else {
+                put(key, functors);
+            }
+        }
     }
 }

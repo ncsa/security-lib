@@ -12,7 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
 
 /**
  * Since the processing of claims is to be supported for refresh tokens as well, the machinery for it should be

@@ -22,6 +22,20 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.ELSE;
 public class LogicBlock {
     jIf ifBlock;
 
+    /**
+     * The consequent is either the hten or else block, depending on the antecedent (the if block). If this has not
+     * executed, then null is returned.
+     * @return
+     */
+    public jThen getConsequent(){
+        if(!isExecuted()){
+            return null;
+        }
+        if(isIfTrue()){
+            return thenBlock;
+        }
+        return elseBlock;
+    }
     public jElse getElseBlock() {
         return elseBlock;
     }
@@ -44,48 +58,50 @@ public class LogicBlock {
     /**
      * A jIf functor is a functor with the agreement that the argument in text may consists of a functor (rather than
      * an array with a single functor). This method will enclose the argument in an array if need be.
+     *
      * @return
      */
     protected jIf createIfBlock() {
         JSONObject tempJ = new JSONObject();
         Object obj = json.get("$if");
-        if(obj instanceof JSONArray){
+        if (obj instanceof JSONArray) {
             tempJ.put("$if", obj); // convert it to a functor
         }
-        if(obj instanceof JSONObject){
+        if (obj instanceof JSONObject) {
             // float it to an array
             JSONArray array = new JSONArray();
             array.add(obj);
             tempJ.put("$if", array); // convert it to a functor
         }
-        jIf jIf  = (jIf) factory.fromJSON(tempJ);
+        jIf jIf = (jIf) factory.fromJSON(tempJ);
         return jIf;
     }
 
-    public boolean isIfTrue(){
-        if(ifBlock == null) return false;
+    public boolean isIfTrue() {
+        if (ifBlock == null) return false;
         return ifBlock.getBooleanResult();
     }
+
     protected JFunctor createThenOrElseBlock(FunctorTypeImpl type) {
         JFunctor ff = null;
-        switch(type){
+        switch (type) {
             case ELSE:
-           ff = new jElse();
+                ff = new jElse();
 
                 break;
             case THEN:
                 ff = new jThen();
                 break;
         }
-        if(ff== null){
-               throw new NFWException("Error: Unknown logical type");
+        if (ff == null) {
+            throw new NFWException("Error: Unknown logical type");
         }
 
         Object obj = json.get(type.getValue());
         JSONArray jsonArray = null;
-        if(obj instanceof JSONArray){
+        if (obj instanceof JSONArray) {
             jsonArray = json.getJSONArray(type.getValue());
-        }else{
+        } else {
             jsonArray = new JSONArray();
             jsonArray.add(obj);
         }
@@ -96,12 +112,32 @@ public class LogicBlock {
         return ff;
     }
 
+    public boolean isExecuted() {
+        return executed;
+    }
+
+    /**
+     * This clears every executed functor in the antecedent and any consequents.
+     */
+    public void clearState() {
+        if (ifBlock != null) {
+            ifBlock.clearState();
+            if (thenBlock != null) {
+                thenBlock.clearState();
+            }
+            if (elseBlock != null) {
+                elseBlock.clearState();
+            }
+        }
+        executed = false;
+        results = new ArrayList<>();
+    }
 
     protected void initialize() {
         // the assumption is that this object has three elements for if, then and else, plus possibly others.
         if (json.containsKey(FunctorTypeImpl.IF.getValue())) {
             ifBlock = createIfBlock();
-        }else{
+        } else {
             throw new IllegalStateException("Error: cannot find if block. Invalid logic block.");
         }
         if (json.containsKey(FunctorTypeImpl.THEN.getValue())) {
@@ -112,10 +148,10 @@ public class LogicBlock {
         }
     }
 
-    protected void addResults(Object obj){
-        if(obj instanceof Collection){
+    protected void addResults(Object obj) {
+        if (obj instanceof Collection) {
             results.addAll((Collection<?>) obj);
-        }else{
+        } else {
             results.add(obj);
         }
 
@@ -126,8 +162,11 @@ public class LogicBlock {
     }
 
     ArrayList<Object> results = new ArrayList<>();
+
+    boolean executed = false;
     public void execute() {
         initialize();
+
         ifBlock.execute();
         if (ifBlock.getBooleanResult()) {
             thenBlock.execute();
@@ -138,6 +177,8 @@ public class LogicBlock {
                 addResults(elseBlock.getResult());
             }
         }
+        executed = true;
+
     }
 
     @Override

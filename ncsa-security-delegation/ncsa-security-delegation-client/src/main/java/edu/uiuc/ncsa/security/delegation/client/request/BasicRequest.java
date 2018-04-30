@@ -17,7 +17,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on Apr 26, 2011 at  1:58:56 PM
  */
-public class BasicRequest implements Request {
+public abstract class BasicRequest implements Request {
     /**
      * The client that is making this request.
      *
@@ -40,7 +40,6 @@ public class BasicRequest implements Request {
         this.client = client;
         this.parameters = parameters;
     }
-
 
     public Response process(Server server) {
         // Default is to blow up in case someone gets one of these by accident.

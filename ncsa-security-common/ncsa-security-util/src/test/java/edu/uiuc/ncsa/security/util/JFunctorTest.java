@@ -2,14 +2,15 @@ package edu.uiuc.ncsa.security.util;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
+import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
+import edu.uiuc.ncsa.security.util.functor.strings.jConcat;
+import edu.uiuc.ncsa.security.util.functor.strings.jDrop;
 import edu.uiuc.ncsa.security.util.functor.strings.jToLowerCase;
 import edu.uiuc.ncsa.security.util.functor.strings.jToUpperCase;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -18,21 +19,21 @@ import java.util.List;
 public class JFunctorTest extends TestBase {
 
     @Test
-     public void testTrue() throws Exception{
-        jTrue jTrue= new jTrue();
+    public void testTrue() throws Exception {
+        jTrue jTrue = new jTrue();
         assert !jTrue.isExecuted();
         jTrue.execute();
         assert jTrue.getBooleanResult() : "jTrue test fails";
 
-     }
+    }
 
     @Test
-     public void testFalse() throws Exception{
+    public void testFalse() throws Exception {
         jFalse jFalse = new jFalse();
         assert !jFalse.isExecuted();
         jFalse.execute();
         assert !jFalse.getBooleanResult();
-     }
+    }
 
     @Test
     public void testContains() throws Exception {
@@ -108,6 +109,28 @@ public class JFunctorTest extends TestBase {
         ff.execute();
 
         assert ff.getBooleanResult();
+    }
+
+    /**
+     * Note that this tests concatenation and it does so by passing in another concatenation functor, showing that
+     * functors can be used with this as well.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testConcat() throws Exception {
+        jConcat jc = new jConcat();
+        jConcat jc2 = new jConcat();
+        jc.addArg("the");
+        jc.addArg(" ");
+        jc.addArg("quick");
+        jc.addArg(" ");
+        jc2.addArg("brown");
+        jc2.addArg(" ");
+        jc2.addArg("fox");
+        jc.addArg(jc2);
+        jc.execute();
+        assert jc.getStringResult().equals("the quick brown fox");
     }
 
     @Test
@@ -247,7 +270,7 @@ public class JFunctorTest extends TestBase {
         jContains jContains = new jContains();
         jContains.addArg("foo");
         jContains.addArg("zfoo");
-        ifBlock.put("$if", jContains.toJSON() );
+        ifBlock.put("$if", jContains.toJSON());
 
 
         jToLowerCase jToLowerCase = new jToLowerCase();
@@ -258,10 +281,46 @@ public class JFunctorTest extends TestBase {
 
         ifBlock.put("$then", jToLowerCase.toJSON());
         array.add(ifBlock);
-        List<LogicBlock> bloxx = functorFactory.createLogicBlock(array);
+        LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(array);
         assert bloxx.size() == 1;
-        bloxx.get(0).execute();
-        System.out.println(bloxx.get(0).getResults());
-        assert testString.toLowerCase().equals(bloxx.get(0).getResults().get(0));
+        LogicBlock logicBlock = bloxx.get(0);
+        logicBlock.execute();
+        System.out.println(logicBlock.getResults());
+        assert testString.toLowerCase().equals(logicBlock.getResults().get(0));
+
+        // Check that clearing state works as it should.
+        logicBlock.clearState();
+        assert !logicBlock.isExecuted();
+        assert logicBlock.getResults().isEmpty();
+        assert !logicBlock.getThenBlock().isExecuted();
+
+        logicBlock.execute();
+        System.out.println(logicBlock.getResults());
+        assert testString.toLowerCase().equals(logicBlock.getResults().get(0));
+
+
+    }
+
+    @Test
+    public void testDrop() throws Exception {
+        jDrop jDrop = new jDrop();
+        jDrop.addArg("ab");
+        jDrop.addArg("abc");
+        jDrop.execute();
+        assert jDrop.getResult().equals("c");
+
+
+        jDrop = new jDrop();
+        jDrop.addArg("ab");
+        jDrop.addArg("abcancdeabab");
+        jDrop.execute();
+        assert jDrop.getResult().equals("cancde");
+
+
+        jDrop = new jDrop();
+        jDrop.addArg("@bigstate.edu");
+        jDrop.addArg("bob.smith@bigstate.edu");
+        jDrop.execute();
+        assert jDrop.getResult().equals("bob.smith");
     }
 }

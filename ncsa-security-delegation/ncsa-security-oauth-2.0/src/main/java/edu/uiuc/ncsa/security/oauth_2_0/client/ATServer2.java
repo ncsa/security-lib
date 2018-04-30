@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.client.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.client.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -15,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.ISSUED_AT;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.OA2Claims.SUBJECT;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.ISSUED_AT;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
 
 
 /**
@@ -96,10 +98,12 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         params.put(SUBJECT, claims.getString(SUBJECT));
         params.put(AUTHORIZATION_TIME, claims.getLong(AUTHORIZATION_TIME));
         params.put(ID_TOKEN, claims);
-        ATResponse2 atr = new ATResponse2(at, rt);
+        ATResponse2 atr = createResponse(at, rt);
         atr.setParameters(params);
         return atr;
     }
-
+    protected ATResponse2 createResponse(AccessToken at, RefreshToken rt){
+        return new ATResponse2(at, rt);
+    }
 
 }

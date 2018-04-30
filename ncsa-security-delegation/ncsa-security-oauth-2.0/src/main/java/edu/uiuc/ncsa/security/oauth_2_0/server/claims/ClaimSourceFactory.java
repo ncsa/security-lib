@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.security.oauth_2_0.server;
+package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 
 /**
  * <p>Created by Jeff Gaynor<br>
