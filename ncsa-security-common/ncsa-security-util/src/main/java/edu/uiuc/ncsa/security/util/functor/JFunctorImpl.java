@@ -12,31 +12,34 @@ import java.util.List;
  */
 public abstract class JFunctorImpl implements JFunctor {
     FunctorType type;
-    protected JFunctorImpl(FunctorType type){
+
+    protected JFunctorImpl(FunctorType type) {
 
         this.type = type;
     }
+
     protected boolean executed = false;
 
     public boolean isExecuted() {
         return executed;
     }
 
-    public void clearState(){
+    public void clearState() {
         executed = false;
         result = null;
-        for(int i = 0; i < getArgs().size(); i++){
+        for (int i = 0; i < getArgs().size(); i++) {
             Object obj = getArgs().get(i);
-            if(obj instanceof JFunctorImpl){
-                ((JFunctorImpl)obj).clearState();
+            if (obj instanceof JFunctorImpl) {
+                ((JFunctorImpl) obj).clearState();
             }
         }
     }
+
     /**
      * This resets the entire state of the functor <b>including erasing the argument list.</b>
      * If you need to clear the executed state and re-run everything, consider invoking {@link #clearState()}.
      */
-    public void reset(){
+    public void reset() {
         executed = false;
         result = null;
         args = new ArrayList<>();
@@ -47,7 +50,11 @@ public abstract class JFunctorImpl implements JFunctor {
      * argument in turn is a functor. This is used in various functors.
      */
     protected void checkArgs() {
-        if (args.isEmpty()) {
+        checkArgs(false);
+    }
+
+    protected void checkArgs(boolean allowEmptyList) {
+        if (!allowEmptyList && args.isEmpty()) {
             throw new IllegalStateException("Error: no arguments");
         }
         for (int i = 0; i < args.size(); i++) {
@@ -55,6 +62,7 @@ public abstract class JFunctorImpl implements JFunctor {
                 throw new IllegalStateException("Error: argument is not a functor");
             }
         }
+
     }
 
     @Override
@@ -63,7 +71,7 @@ public abstract class JFunctorImpl implements JFunctor {
     }
 
     protected Object result;
-    protected ArrayList<Object>args = new ArrayList<Object>();
+    protected ArrayList<Object> args = new ArrayList<Object>();
 
     @Override
     public Object getResult() {
@@ -125,15 +133,15 @@ public abstract class JFunctorImpl implements JFunctor {
         return type.getValue();
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         JSONArray jsonArray = new JSONArray();
-        for(int i = 0; i < args.size(); i++){
+        for (int i = 0; i < args.size(); i++) {
             Object obj = args.get(i);
-            if(obj instanceof JFunctorImpl){
+            if (obj instanceof JFunctorImpl) {
                 JFunctorImpl ff = (JFunctorImpl) obj;
                 jsonArray.add(ff.toJSON());
-            }else{
+            } else {
                 jsonArray.add(obj);
             }
         }
@@ -143,7 +151,7 @@ public abstract class JFunctorImpl implements JFunctor {
 
     @Override
     public String toString() {
-       String out = toJSON().toString();
+        String out = toJSON().toString();
         return out;
     }
 }

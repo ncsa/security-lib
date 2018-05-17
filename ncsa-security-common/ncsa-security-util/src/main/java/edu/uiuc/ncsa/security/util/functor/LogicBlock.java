@@ -43,6 +43,9 @@ public class LogicBlock {
     public jThen getThenBlock() {
         return thenBlock;
     }
+    public jIf getIfBlock(){
+        return ifBlock;
+    }
 
     jElse elseBlock;
     jThen thenBlock;

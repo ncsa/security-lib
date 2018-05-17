@@ -30,7 +30,8 @@ public class jThen extends JFunctorImpl {
         if (executed) {
                return result;
            }
-        checkArgs();
+        // Allow for an empty list as an edge case for "do nothing"
+        checkArgs(true);
         ArrayList<Object> results = new ArrayList<>();
         for (int i = 0; i < args.size(); i++) {
             JFunctorImpl ff = (JFunctorImpl) args.get(i);

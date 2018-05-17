@@ -148,8 +148,18 @@ public class ServiceClient {
         HttpGet httpGet = new HttpGet(requestString);
         HttpClient client = clientPool.pop();
         HttpResponse response = null;
-        try {
+        try{
+
             response = client.execute(httpGet);
+        }catch(Throwable t){
+            ServletDebugUtil.dbg(this, "Error  invoking execute for client", t);
+            if(ServletDebugUtil.isEnabled()){
+                t.printStackTrace();
+            }
+            throw new GeneralException("Error invoking client", t);
+        }
+        try {
+
             if(response.getEntity() != null && response.getEntity().getContentType()!=null) {
                 ServletDebugUtil.dbg(this, "Raw response, content type:" + response.getEntity().getContentType());
             }else{
