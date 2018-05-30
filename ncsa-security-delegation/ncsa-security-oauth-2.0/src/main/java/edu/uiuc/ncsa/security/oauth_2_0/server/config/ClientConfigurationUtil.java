@@ -11,14 +11,14 @@ import net.sf.json.JSONObject;
  * on 8/30/17 at  3:37 PM
  */
 public class ClientConfigurationUtil {
-    public static final String RUNTIME_LOGIC_KEY = "runtime";
+    public static final String RUNTIME_KEY = "runtime";
     public static void setRuntime(JSONObject config, JSONArray runtime){
-             config.put(RUNTIME_LOGIC_KEY, runtime);
+             config.put(RUNTIME_KEY, runtime);
       }
 
       public static JSONArray getRuntime(JSONObject config){
-          if(config.containsKey(RUNTIME_LOGIC_KEY)){
-              Object obj = config.get(RUNTIME_LOGIC_KEY);
+          if(config.containsKey(RUNTIME_KEY)){
+              Object obj = config.get(RUNTIME_KEY);
               if(obj instanceof JSONArray){
                   return (JSONArray) obj;
               }

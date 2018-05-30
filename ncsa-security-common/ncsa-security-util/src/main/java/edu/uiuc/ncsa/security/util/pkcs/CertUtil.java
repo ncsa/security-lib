@@ -42,7 +42,6 @@ public class CertUtil {
     public static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
     public static final String DEFAULT_PKCS10_SIGNATURE_ALGORITHM = "SHA1withRSA";
     public static final String DEFAULT_PKCS10_PROVIDER = "SunRsaSign";
-    //  public static final String DEFAULT_PKCS10_DISTINGUISHED_NAME = "CN=ignore";
     public static final String DEFAULT_PKCS10_DISTINGUISHED_NAME = "ignore";
 
 

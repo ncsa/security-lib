@@ -23,7 +23,11 @@ public abstract class IdentifierProvider<V extends Identifier> implements Provid
     }
 
     public static void setSchemeSpecificPart(String SCHEME_SPECIFIC_PART) {
-        if(!SCHEME_SPECIFIC_PART.endsWith(":")){
+        if (SCHEME_SPECIFIC_PART == null || SCHEME_SPECIFIC_PART.isEmpty()) {
+            IdentifierProvider.SCHEME_SPECIFIC_PART = null;
+            return;
+        }
+        if (!SCHEME_SPECIFIC_PART.endsWith(":")) {
             SCHEME_SPECIFIC_PART = SCHEME_SPECIFIC_PART + ":";
         }
         IdentifierProvider.SCHEME_SPECIFIC_PART = SCHEME_SPECIFIC_PART;
@@ -78,13 +82,22 @@ public abstract class IdentifierProvider<V extends Identifier> implements Provid
      * </UL>
      * then the caput is myproxy:oa4mp,2012:
      *
+     * <p>Note that this does allow for empty scheme specific parts vs. null ones. In the former, it is assumed the user is
+     * actively suppressing this component, where as in the null case the default is used.</p>
      * @return
      */
     protected String getCaput() {
         if (caput == null) {
             URI x = null;
             try {
-                x = new URI(uriScheme, schemeSpecificPart, null);
+                if(schemeSpecificPart == null){
+                    if(uriScheme.endsWith(":")){
+                        return uriScheme;
+                    }
+                   return uriScheme + ":";
+                }else {
+                    x = new URI(uriScheme, schemeSpecificPart, null);
+                }
             } catch (URISyntaxException e) {
                 e.printStackTrace();
                 throw new GeneralException("Error: Could not create uri for identifiers.", e);
