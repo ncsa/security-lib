@@ -194,7 +194,7 @@ public class JFunctorFactory {
         }
         JFunctor ff = figureOutFunctor(rawJson);
         if (ff == null) {
-            throw new NotImplementedException("Error: not an implemented functor");
+            throw new NotImplementedException("Error: \"" + rawJson + "\" is not an implemented functor");
         }
         addArgs(ff, rawJson);
         return ff;

@@ -25,7 +25,11 @@ public class LogicBlocks<V extends LogicBlock> extends LinkedList<V> {
         }
         for (LogicBlock lb : this) {
             lb.execute();
-            getFunctorMap().putAll(lb.getConsequent().getFunctorMap());
+            // It is possible to have a null consequent, e.g. in the case that the conditional
+            // is false and there is no else clause. Only do something if something happened.
+            if(lb.getConsequent() != null) {
+                getFunctorMap().putAll(lb.getConsequent().getFunctorMap());
+            }
         }
         executed = true;
         return executed;

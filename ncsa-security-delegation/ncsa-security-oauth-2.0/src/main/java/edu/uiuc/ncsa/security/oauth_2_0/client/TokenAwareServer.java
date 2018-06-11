@@ -87,7 +87,11 @@ public abstract class TokenAwareServer extends ASImpl {
             throw new GeneralException("Error: Missing id token.");
         }
         claims = JWTUtil.verifyAndReadJWT(jsonObject.getString(ID_TOKEN), keys);
-
+        if(claims.isNullObject()){
+            // the response may be a null object. At this point it means that there was a null
+            // object and that the resulting signature was valid for it, so that is indeed the server response.
+            return new JSONObject();
+        }
         // Now we have to check claims.
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
             throw new GeneralException("Error: Audience is incorrect");

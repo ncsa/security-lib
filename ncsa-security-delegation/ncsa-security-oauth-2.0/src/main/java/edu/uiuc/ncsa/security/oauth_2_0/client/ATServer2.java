@@ -86,7 +86,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             }
         }
         JSONObject claims = getAndCheckIDToken(jsonObject, atRequest);
-        if(jsonObject.containsKey(ID_TOKEN)){
+        if (jsonObject.containsKey(ID_TOKEN)) {
             params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
         }
         // and now the specific checks for ID tokens returned by the AT server.
@@ -96,13 +96,17 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
 
         params.put(ISSUED_AT, new Date(claims.getLong(ISSUED_AT) * 1000L));
         params.put(SUBJECT, claims.getString(SUBJECT));
-        params.put(AUTHORIZATION_TIME, claims.getLong(AUTHORIZATION_TIME));
+        if (claims.containsKey(AUTHORIZATION_TIME)) {
+            // auth_time claim is optional (unless max_age is returned). At this point we do not do max_age.
+            params.put(AUTHORIZATION_TIME, claims.getLong(AUTHORIZATION_TIME));
+        }
         params.put(ID_TOKEN, claims);
         ATResponse2 atr = createResponse(at, rt);
         atr.setParameters(params);
         return atr;
     }
-    protected ATResponse2 createResponse(AccessToken at, RefreshToken rt){
+
+    protected ATResponse2 createResponse(AccessToken at, RefreshToken rt) {
         return new ATResponse2(at, rt);
     }
 

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import javax.naming.Name;
@@ -15,9 +16,9 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 5/3/16 at  11:17 AM
  */
-public class LDAPConfiguration extends JSONConfig{
+public class LDAPConfiguration extends JSONClaimSourceConfig {
     /*
-      This acts like a JSONConfig object, but is not backed by a JSONObject.
+      This acts like a JSONClaimSourceConfig object, but is not backed by a JSONObject.
      */
     public LDAPConfiguration() {
         super(null);
@@ -209,6 +210,8 @@ public class LDAPConfiguration extends JSONConfig{
         ldap2.setServer(getServer());
         ldap2.setSslConfiguration(getSslConfiguration());
         ldap2.setSearchBase(getSearchBase());
+        ldap2.setPreProcessing(getPreProcessing());
+        ldap2.setPostProcessing(getPostProcessing());
         return ldap2;
     }
 
@@ -245,4 +248,29 @@ public class LDAPConfiguration extends JSONConfig{
     public boolean hasJSONObject() {
         return true;
     }
+    JSONArray preProcessing = null;
+
+    public JSONArray getPostProcessing() {
+        return postProcessing;
+    }
+
+    public void setPostProcessing(JSONArray postProcessing) {
+        this.postProcessing = postProcessing;
+    }
+
+    /**
+     * The <b>raw json</b> for the pre-processing directives. This has to be done this way since the directives
+     * rely on being constructed with the claims at runtime (e.g. for replacement templates).
+     * @return
+     */
+    public JSONArray getPreProcessing() {
+        return preProcessing;
+    }
+
+    public void setPreProcessing(JSONArray preProcessing) {
+        this.preProcessing = preProcessing;
+    }
+
+    JSONArray postProcessing = null;
+
 }

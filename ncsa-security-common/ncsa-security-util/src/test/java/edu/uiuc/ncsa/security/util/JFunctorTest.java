@@ -178,6 +178,19 @@ public class JFunctorTest extends TestBase {
     }
 
     @Test
+      public void testNot() throws Exception {
+          jNot ff = new jNot();
+
+          jContains jContains = new jContains();
+          jContains.addArg("foo");
+          jContains.addArg("zfoo");
+
+          ff.addArg(jContains);
+          ff.execute();
+          assert !ff.getBooleanResult();
+      }
+
+    @Test
     public void testOr() throws Exception {
         jOr ff = new jOr();
         jEndsWith jEndsWith = new jEndsWith();
@@ -300,6 +313,9 @@ public class JFunctorTest extends TestBase {
 
 
     }
+
+
+
 
     @Test
     public void testDrop() throws Exception {

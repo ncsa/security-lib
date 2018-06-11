@@ -15,27 +15,36 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.ELSE;
 
 /**
  * This class contains a {@link JFunctor} if-then-else block. You supply a JSONObject, this parses it
- * into its correct elements at runtime.
+ * into its correct elements at runtime. You may also use this as a utility to create such blocks by creating the
+ * if then else blcks, setting them and invoking the {@link #toJSON()} method.
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  4:33 PM
  */
 public class LogicBlock {
+    public LogicBlock(jIf ifBlock, jThen thenBlock, jElse elseBlock) {
+        this.ifBlock = ifBlock;
+        this.thenBlock = thenBlock;
+        this.elseBlock = elseBlock;
+    }
+
     jIf ifBlock;
 
     /**
      * The consequent is either the hten or else block, depending on the antecedent (the if block). If this has not
      * executed, then null is returned.
+     *
      * @return
      */
-    public jThen getConsequent(){
-        if(!isExecuted()){
+    public jThen getConsequent() {
+        if (!isExecuted()) {
             return null;
         }
-        if(isIfTrue()){
+        if (isIfTrue()) {
             return thenBlock;
         }
         return elseBlock;
     }
+
     public jElse getElseBlock() {
         return elseBlock;
     }
@@ -43,7 +52,8 @@ public class LogicBlock {
     public jThen getThenBlock() {
         return thenBlock;
     }
-    public jIf getIfBlock(){
+
+    public jIf getIfBlock() {
         return ifBlock;
     }
 
@@ -167,6 +177,7 @@ public class LogicBlock {
     ArrayList<Object> results = new ArrayList<>();
 
     boolean executed = false;
+
     public void execute() {
         initialize();
 
@@ -188,5 +199,41 @@ public class LogicBlock {
     public String toString() {
         return json.toString();
 
+    }
+
+    public void setIfBlock(jIf ifBlock) {
+        this.ifBlock = ifBlock;
+    }
+
+    public void setThenBlock(jThen thenBlock) {
+        this.thenBlock = thenBlock;
+    }
+
+    public void setElseBlock(jElse elseBlock) {
+        this.elseBlock = elseBlock;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject jsonObject = new JSONObject();
+        if (ifBlock == null && json!= null) {
+            initialize();
+        }
+        // If it's still null. then there is nothing to do
+        if (ifBlock == null) {
+            return jsonObject;
+        }
+        JSONObject tempIf = ifBlock.toJSON();
+        System.out.println(tempIf);
+        if (thenBlock != null) {
+            JSONObject tempThen = thenBlock.toJSON();
+            System.out.println(tempThen);
+        }
+
+        if (elseBlock != null) {
+            JSONObject tempElse = elseBlock.toJSON();
+            System.out.println(tempElse);
+        }
+
+        return jsonObject;
     }
 }

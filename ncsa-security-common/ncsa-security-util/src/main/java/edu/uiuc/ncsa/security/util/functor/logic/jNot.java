@@ -24,7 +24,7 @@ public class jNot extends JFunctorImpl {
         }
         JFunctorImpl ff = (JFunctorImpl) args.get(0);
         ff.execute();
-        boolean rc = getBooleanResult();
+        boolean rc = ff.getBooleanResult();
         rc = !rc;
         result = new Boolean(rc);
         executed = true;

@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil.CLAIM_POST_PROCESSING_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil.CLAIM_PRE_PROCESSING_KEY;
 
 /**
  * A utility that loads the configuration from a node and has the tags, etc. for it.
@@ -238,6 +240,9 @@ public class LDAPConfigurationUtil {
         jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
         jsonUtil.setJSONValue(ldap, LDAP_FAIL_ON_ERROR_TAG, configuration.isFailOnError());
         jsonUtil.setJSONValue(ldap, LDAP_NOTIFY_ON_FAIL_TAG, configuration.isNotifyOnFail());
+        jsonUtil.setJSONValue(ldap, CLAIM_PRE_PROCESSING_KEY, configuration.getPreProcessing());
+        jsonUtil.setJSONValue(ldap, CLAIM_POST_PROCESSING_KEY, configuration.getPostProcessing());
+
         if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
             jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);
         }
@@ -314,17 +319,18 @@ public class LDAPConfigurationUtil {
         return ldaps;
     }
 
-    public static boolean isLDAPCOnfig(JSONObject json){
+    public static boolean isLDAPCOnfig(JSONObject json) {
         return json.containsKey(LDAP_TAG);
     }
 
     /**
      * Populate an existing LDAPConfiguration from the JSON.
+     *
      * @param config
      * @param json
      * @return
      */
-    public static LDAPConfiguration fromJSON(LDAPConfiguration config , JSONObject json) {
+    public static LDAPConfiguration fromJSON(LDAPConfiguration config, JSONObject json) {
         JSONUtil jsonUtil = getJSONUtil();
 
         String contextName = jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG);
@@ -372,10 +378,36 @@ public class LDAPConfigurationUtil {
             jsonSSL.put(SSLConfigurationUtil2.SSL_TAG, jsonUtil.getJSONValue(json, SSLConfigurationUtil2.SSL_TAG));
             SSLConfiguration sslConfiguration = SSLConfigurationUtil2.fromJSON(jsonSSL);
             config.setSslConfiguration(sslConfiguration);
+            config.setPreProcessing(makeProcessor(json, CLAIM_PRE_PROCESSING_KEY));
+            config.setPostProcessing(makeProcessor(json, CLAIM_POST_PROCESSING_KEY));
         }
         return config;
 
     }
+
+    protected static JSONArray makeProcessor(JSONObject json, String key) {
+        String x = jsonUtil.getJSONValueString(json, key);
+        if(x!= null && !x.isEmpty()){
+            JSONArray array = null;
+            try{
+                array = JSONArray.fromObject(x);
+                return array;
+            }catch(Throwable t){
+                  // do nothing
+            }
+            // So it's not an array. See if it's a JSONObject
+            try{
+                JSONObject obj = JSONObject.fromObject(x);
+                array = new JSONArray();
+                array.add(obj);
+                return array;
+            }catch(Throwable t){
+            }
+        }
+        // do nothing if it is not JSON
+        return null;
+    }
+
     public static LDAPConfiguration fromJSON(JSONObject json) {
         LDAPConfiguration config = new LDAPConfiguration();
         return fromJSON(config, json);
@@ -383,10 +415,9 @@ public class LDAPConfigurationUtil {
 
     public static void main(String[] args) {
         try {
-
-            //LDAPConfigurationUtil.fr
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
+
 }
