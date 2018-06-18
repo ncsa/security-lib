@@ -2,9 +2,7 @@ package edu.uiuc.ncsa.security.util.functor;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
-import edu.uiuc.ncsa.security.util.functor.strings.jDrop;
-import edu.uiuc.ncsa.security.util.functor.strings.jToLowerCase;
-import edu.uiuc.ncsa.security.util.functor.strings.jToUpperCase;
+import edu.uiuc.ncsa.security.util.functor.strings.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -31,6 +29,34 @@ public class JFunctorFactory {
      */
     public JFunctor create(JSONObject jsonObject) {
         return fromJSON(jsonObject);
+    }
+
+    public JFunctor create(String rawJSON) {
+        try {
+            JSONObject jj = JSONObject.fromObject(rawJSON);
+            return create(jj);
+        } catch (Throwable t) {
+            // ok, see if it's an array
+        }
+        return null;
+    }
+
+    /**
+     * Convenience to create logic blocks from a string. This assumes that the string represents a JSON array.
+     * If this fails to resolve, this call returns null;
+     *
+     * @param rawJSON
+     * @return
+     */
+    public LogicBlocks createLogicBlocks(String rawJSON) {
+        try {
+
+            JSONArray array = JSONArray.fromObject(rawJSON);
+            return createLogicBlock(array);
+        } catch (Throwable t) {
+            // do nix
+        }
+        return null;
     }
 
     /**
@@ -138,12 +164,25 @@ public class JFunctorFactory {
         if (hasEnum(rawJson, OR)) {
             return new jOr();
         }
+        if (hasEnum(rawJson, XOR)) {
+            return new jXOr();
+        }
         if (hasEnum(rawJson, NOT)) {
             return new jNot();
+        }
+        if (hasEnum(rawJson, REPLACE)) {
+            return new jReplace();
+        }
+
+        if (hasEnum(rawJson, CONCAT)) {
+            return new jConcat();
         }
 
         if (hasEnum(rawJson, EXISTS)) {
             return new jExists();
+        }
+        if (hasEnum(rawJson, EQUALS)) {
+            return new jEquals();
         }
         if (hasEnum(rawJson, MATCH)) {
             return new jMatch();
@@ -182,8 +221,8 @@ public class JFunctorFactory {
             return new jToUpperCase();
         }
         if (hasEnum(rawJson, DROP)) {
-                    return new jDrop();
-                }
+            return new jDrop();
+        }
         return null;
 
     }

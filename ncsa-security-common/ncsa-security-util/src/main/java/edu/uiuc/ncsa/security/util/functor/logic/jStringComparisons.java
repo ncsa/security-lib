@@ -19,15 +19,25 @@ public abstract class jStringComparisons extends JFunctorImpl {
      * @return
      */
     protected String processArg(Object obj) {
-        String needle;
+        String needle = null;
+        boolean isString = false;
         if(obj instanceof String){
              needle = (String) obj;
-        } else if(obj instanceof JFunctorImpl){
+            isString = true;
+        }
+        boolean isFunctor = false;
+        if(obj instanceof JFunctorImpl){
             JFunctorImpl ff = (JFunctorImpl) obj;
             ff.execute();
             needle = ff.getStringResult();
-        } else{
-            throw new IllegalArgumentException("Error: unknown argument \"" + obj + "\"");
+            isFunctor = true;
+        }
+
+        if(!isString && !isFunctor){
+            needle = String.valueOf(obj); // um, whatever it is, return it as a string...
+
+
+
         }
         return needle;
     }

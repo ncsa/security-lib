@@ -27,7 +27,7 @@ import java.util.Date;
  * storage and a {@link MapConverter} that allows you to turn a java object's properties into
  * a map -- then you should be in business for using an SQL backend.
  * All of these statements are SQL 2003 compliant and should work without change for all major vendors.
- * This class also maintains a connection pool to a database.
+ * This class also maintains a  {@link ConnectionPool}to a database.
  * <p>Created by Jeff Gaynor<br>
  * on Mar 12, 2010 at  12:58:14 PM
  */
@@ -94,12 +94,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.setString(i++, value.getIdentifierString());
             stmt.executeUpdate();
             stmt.close();
+            releaseConnection(c);
 
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error updating approval with identifier = \"" + value.getIdentifierString(), e);
-        } finally {
-            releaseConnection(c);
         }
     }
 
@@ -160,11 +159,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not register object with id \"" + value.getIdentifierString() + "\"", e);
         } finally {
-            releaseConnection(c);
         }
     }
 
@@ -207,14 +207,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             ColumnMap map = rsToMap(rs);
             rs.close();
             stmt.close();
-
             t = create();
             populate(map, t);
+            releaseConnection(c);
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
-        } finally {
-            releaseConnection(c);
         }
         return t;
     }
@@ -272,12 +270,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
+            releaseConnection(c);
 
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting the size.", e);
-        } finally {
-            releaseConnection(c);
         }
         return rowCount;
     }
@@ -304,12 +301,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rc = rs.next();
             rs.close();
             stmt.close();
+            releaseConnection(c);
 
         } catch (SQLException e) {
             destroyConnection(c);
             e.printStackTrace();
-        } finally {
-            releaseConnection(c);
         }
         return rc;
 
@@ -349,11 +345,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.setString(1, key.toString());
             stmt.execute();
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting identity providers", e);
-        } finally {
-            releaseConnection(c);
         }
         return oldObject;
     }
@@ -378,11 +374,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting identity providers", e);
-        } finally {
-            releaseConnection(c);
         }
     }
 
@@ -402,11 +398,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting the user ids", e);
-        } finally {
-            releaseConnection(c);
         }
         return keys;
     }
@@ -434,11 +430,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not get database object", e);
-        } finally {
-            releaseConnection(c);
         }
         return allOfThem;
     }
@@ -459,11 +455,11 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
+            releaseConnection(c);
+
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not get database object", e);
-        } finally {
-            releaseConnection(c);
         }
         return entries;
     }
@@ -523,28 +519,31 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         releaseConnection(connection);
     }
 
-    public void checkTable() throws SQLException{
-        DatabaseMetaData md = getConnection().getMetaData();
-        ResultSet tables = md.getTables(null, getTable().getSchema(), getTable().getTablename(), new String[]{"TABLE"});
-        if(tables.next()){
-            // table exists
-        }else{
-            // table does not exist.
-            // At issue is that the user that access the database may not have create permissions to make the table.
-            // So we will try this and just log how it works out.
-            System.err.println("Table " + getTable().getTablename() + " does not exist. Attempting to create");
+    public void checkTable() {
+        Connection c = getConnection();
+
+        try {
+            DatabaseMetaData md = c.getMetaData();
+            ResultSet tables = md.getTables(null, getTable().getSchema(), getTable().getTablename(), new String[]{"TABLE"});
             Statement stmt = null;
-            try {
-                stmt = getConnection().createStatement();
+            if (tables.next()) {
+                // table exists
+            } else {
+                // table does not exist.
+                // At issue is that the user that access the database may not have create permissions to make the table.
+                // So we will try this and just log how it works out.
+                System.err.println("Table " + getTable().getTablename() + " does not exist. Attempting to create");
+                stmt = c.createStatement();
                 boolean rc = stmt.execute(getTable().getCreateTableStatement());
-            }catch(SQLException x){
-                System.err.println("failed to create " + getTable().getTablename() + " msg=" +  x.getMessage());
-            }finally{
-                if(stmt != null){
+                if (stmt != null) {
                     stmt.close();
                 }
-            }
 
+            }
+            releaseConnection(c);
+
+        } catch (SQLException x) {
+            System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
         }
     }
 }

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.ServerRedirectException;
 import edu.uiuc.ncsa.security.core.exceptions.ServerSideException;
 import edu.uiuc.ncsa.security.core.exceptions.UnknownClientException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MapUtilities;
 import edu.uiuc.ncsa.security.delegation.client.request.AGRequest;
 import edu.uiuc.ncsa.security.delegation.client.request.AGResponse;
@@ -158,6 +159,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
             agr.setParameters(m);
             return agr;
         } catch (Throwable e) {
+            DebugUtil.dbg(this, "Error getting auth grant", e);
             handleException(e);
             return null;
         }
@@ -167,7 +169,12 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
         if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
         }
-
+        Throwable ttt = t;
+        while(ttt != null){
+            System.err.println("==================");
+            ttt.printStackTrace();
+            ttt = ttt.getCause();
+        }
         if (t instanceof OAuthProblemException) {
             // If debugging is enabled, any server-side exceptions will be
             // returned in a B64 encoding. OAuth does support this as part of
@@ -196,7 +203,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
                 String message = "Server Error -- unknown cause"; //default
                 for(String key: opx.getParameters().keySet()){
                      if(key.toLowerCase().startsWith("<html>")){
-                         message = opx.getParameters().get(key).toString();
+                         message = String.valueOf(opx.getParameters().get(key));
                          if(message.contains(UnknownClientException.class.getCanonicalName())){
                              throw new UnknownClientException("Unknown client. Be sure to register your client.  Is your client id correct?");
                          }

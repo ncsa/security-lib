@@ -118,6 +118,9 @@ public abstract class JFunctorImpl implements JFunctor {
     public void addArg(JFunctor x) {
         getArgs().add(x);
     }
+    public void addArg(JMetaFunctor x) {
+        getArgs().add(x);
+    }
 
     public void addArg(Integer x) {
         getArgs().add(x);
@@ -138,11 +141,17 @@ public abstract class JFunctorImpl implements JFunctor {
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < args.size(); i++) {
             Object obj = args.get(i);
-            if (obj instanceof JFunctorImpl) {
-                JFunctorImpl ff = (JFunctorImpl) obj;
-                jsonArray.add(ff.toJSON());
-            } else {
-                jsonArray.add(obj);
+            if(obj == null) {
+
+            }else{
+                // null objects are possible. intercept it here or it will be rendered as the string "null" by the
+                // JSON library.
+                if (obj instanceof JMetaFunctor) {
+                    JMetaFunctor ff = (JMetaFunctor) obj;
+                    jsonArray.add(ff.toJSON());
+                } else {
+                    jsonArray.add(obj);
+                }
             }
         }
         json.put(getName(), jsonArray);

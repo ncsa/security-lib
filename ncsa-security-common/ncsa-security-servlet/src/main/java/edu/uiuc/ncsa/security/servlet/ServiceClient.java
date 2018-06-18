@@ -64,6 +64,7 @@ public class ServiceClient {
 
 
     protected Pool<HttpClient> clientPool = new Pool<HttpClient>() {
+
         VerifyingHTTPClientFactory f;
 
         public VerifyingHTTPClientFactory getF() {
@@ -180,7 +181,7 @@ public class ServiceClient {
                 ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " + response.getStatusLine().getStatusCode());
                 xx.setContent(x);
                 xx.setStatus(response.getStatusLine().getStatusCode());
-                clientPool.realDestroy(client);
+                clientPool.destroy(client);
                 throw xx;
             }
             clientPool.push(client);

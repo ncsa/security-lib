@@ -13,12 +13,6 @@ import java.sql.SQLException;
  * on Mar 12, 2010 at  4:06:15 PM
  */
 public class ConnectionPool extends Pool<Connection> {
-
-    /**
-     * If this number of connections is exceeded, the pool will throw an exception.
-     * This is a way to determine if the pool is leaking connections.
-     */
-
     public ConnectionParameters getConnectionParameters() {
         return connectionParameters;
     }
@@ -47,6 +41,15 @@ public class ConnectionPool extends Pool<Connection> {
             }
         } catch (SQLException x) {
             throw new PoolException(x);
+        }
+    }
+
+    @Override
+    public boolean isValid(Connection object) throws PoolException {
+        try {
+            return object.isValid(0);
+        } catch (SQLException e) {
+            throw new PoolException("Invalid object", e);
         }
     }
 }

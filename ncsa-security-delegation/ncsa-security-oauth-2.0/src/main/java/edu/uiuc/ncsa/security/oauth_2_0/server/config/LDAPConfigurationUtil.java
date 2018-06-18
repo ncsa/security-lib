@@ -261,6 +261,10 @@ public class LDAPConfigurationUtil {
             entry.put("name", ae.sourceName);
             entry.put(RETURN_AS_LIST, ae.isList);
             entry.put(RETURN_NAME, ae.targetName);
+            if(ae.isGroup) {
+                // only serialize this really if it is true. Implicitly this is false.
+                entry.put(IS_GROUP, ae.isGroup);
+            }
             searchAttributes.add(entry);
         }
         jsonUtil.setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);

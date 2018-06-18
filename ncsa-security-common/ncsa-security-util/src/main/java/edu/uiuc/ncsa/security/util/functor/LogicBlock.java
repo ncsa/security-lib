@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.ELSE;
+import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
 
 /**
  * This class contains a {@link JFunctor} if-then-else block. You supply a JSONObject, this parses it
@@ -20,11 +20,30 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.ELSE;
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  4:33 PM
  */
-public class LogicBlock {
-    public LogicBlock(jIf ifBlock, jThen thenBlock, jElse elseBlock) {
+public class LogicBlock implements JMetaFunctor {
+    Boolean result = null;
+
+    @Override
+    public Object getResult() {
+        return result;
+    }
+
+    public LogicBlock(JFunctorFactory factory, jIf ifBlock, jThen thenBlock, jElse elseBlock) {
+        this.factory = factory;
         this.ifBlock = ifBlock;
         this.thenBlock = thenBlock;
         this.elseBlock = elseBlock;
+        initialized = true;
+    }
+
+    /**
+     * Constructor for case of no else clause.
+     *
+     * @param ifBlock
+     * @param thenBlock
+     */
+    public LogicBlock(JFunctorFactory factory, jIf ifBlock, jThen thenBlock) {
+        this(factory, ifBlock, thenBlock, null);
     }
 
     jIf ifBlock;
@@ -146,19 +165,25 @@ public class LogicBlock {
         results = new ArrayList<>();
     }
 
+    boolean initialized = false;
+
     protected void initialize() {
+        if (initialized) {
+            return;
+        }
         // the assumption is that this object has three elements for if, then and else, plus possibly others.
-        if (json.containsKey(FunctorTypeImpl.IF.getValue())) {
+        if (json.containsKey(IF.getValue())) {
             ifBlock = createIfBlock();
         } else {
             throw new IllegalStateException("Error: cannot find if block. Invalid logic block.");
         }
-        if (json.containsKey(FunctorTypeImpl.THEN.getValue())) {
-            thenBlock = (jThen) createThenOrElseBlock(FunctorTypeImpl.THEN);
+        if (json.containsKey(THEN.getValue())) {
+            thenBlock = (jThen) createThenOrElseBlock(THEN);
         }
         if (json.containsKey(ELSE.getValue())) {
             elseBlock = (jElse) createThenOrElseBlock(ELSE);
         }
+        initialized = true;
     }
 
     protected void addResults(Object obj) {
@@ -178,7 +203,7 @@ public class LogicBlock {
 
     boolean executed = false;
 
-    public void execute() {
+    public Object execute() {
         initialize();
 
         ifBlock.execute();
@@ -192,13 +217,16 @@ public class LogicBlock {
             }
         }
         executed = true;
-
+        result = ifBlock.getBooleanResult();
+        return result;
     }
 
     @Override
     public String toString() {
-        return json.toString();
-
+        if(json != null) {
+            return json.toString();
+        }
+        return toJSON().toString();
     }
 
     public void setIfBlock(jIf ifBlock) {
@@ -215,7 +243,7 @@ public class LogicBlock {
 
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
-        if (ifBlock == null && json!= null) {
+        if (ifBlock == null && json != null) {
             initialize();
         }
         // If it's still null. then there is nothing to do
@@ -223,15 +251,15 @@ public class LogicBlock {
             return jsonObject;
         }
         JSONObject tempIf = ifBlock.toJSON();
-        System.out.println(tempIf);
+        jsonObject.put(IF.getValue(), tempIf.getJSONArray(IF.getValue()));
         if (thenBlock != null) {
             JSONObject tempThen = thenBlock.toJSON();
-            System.out.println(tempThen);
+            jsonObject.put(THEN.getValue(), tempThen.getJSONArray(THEN.getValue()));
         }
 
         if (elseBlock != null) {
             JSONObject tempElse = elseBlock.toJSON();
-            System.out.println(tempElse);
+            jsonObject.put(ELSE.getValue(), tempElse.getJSONArray(ELSE.getValue()));
         }
 
         return jsonObject;

@@ -19,6 +19,7 @@ public class CLIDriver {
      * is thrown.
      */
     public static final String EXIT_COMMAND = "/exit";
+    public static final String CLEAR_COMMAND = "/clear";
 
     public static final int OK_RC = 0;
     public static final int ABNORMAL_RC = -1;

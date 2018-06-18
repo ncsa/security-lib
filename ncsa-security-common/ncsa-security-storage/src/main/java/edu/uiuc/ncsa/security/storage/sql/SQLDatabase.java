@@ -1,7 +1,8 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
+import edu.uiuc.ncsa.security.core.util.PoolException;
+
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * /**
@@ -30,29 +31,17 @@ public class SQLDatabase {
      * @param c
      */
     public void releaseConnection(Connection c) {
-        boolean  skipIt = false;
+        getConnectionPool().push(c);
+    }
+
+
+    protected void destroyConnection(Connection c)  {
         try {
-            skipIt = c.isClosed();
-        } catch (SQLException x) {
-
-        }
-        if(!skipIt){
-            getConnectionPool().push(c);
+            connectionPool.doDestroy(c);
+        } catch(PoolException x) {
+            throw new PoolException("pool failed to destroy connection",x);
         }
     }
-
-    /**
-     * Actually destroy the connection. This is normally called if an {@link java.sql.SQLException}
-     * is encountered since it will be unclear in general if the exception is caused by a stale connection
-     * or an SQL error.
-     *
-     * @param c
-     */
-    protected void destroyConnection(Connection c) {
-        getConnectionPool().realDestroy(c);
-
-    }
-
     public void setConnectionPool(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
     }

@@ -22,7 +22,7 @@ public class ClientConfiguration {
      */
     public boolean executeRuntime(){
         if(runtime != null){
-            return runtime.execute();
+            return (Boolean)runtime.execute();
         }
         return false;
     }

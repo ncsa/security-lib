@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
+import edu.uiuc.ncsa.security.util.functor.JMetaFunctor;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.AND;
 
@@ -21,9 +22,9 @@ public class jAnd extends JFunctorImpl {
         checkArgs();
         boolean rc = true;
         for (int i = 0; i < args.size(); i++) {
-            JFunctorImpl ff = (JFunctorImpl) args.get(i);
+            JMetaFunctor ff = (JMetaFunctor) args.get(i);
             ff.execute();
-            rc = rc && ff.getBooleanResult();
+            rc = rc && (boolean) ff.getResult();
         }
         result = new Boolean(rc);
 
