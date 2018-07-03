@@ -248,13 +248,13 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
     public boolean hasJSONObject() {
         return true;
     }
-    JSONArray preProcessing = null;
+    JSONObject preProcessing = null;
 
-    public JSONArray getPostProcessing() {
+    public JSONObject getPostProcessing() {
         return postProcessing;
     }
 
-    public void setPostProcessing(JSONArray postProcessing) {
+    public void setPostProcessing(JSONObject postProcessing) {
         this.postProcessing = postProcessing;
     }
 
@@ -263,14 +263,14 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
      * rely on being constructed with the claims at runtime (e.g. for replacement templates).
      * @return
      */
-    public JSONArray getPreProcessing() {
+    public JSONObject getPreProcessing() {
         return preProcessing;
     }
 
-    public void setPreProcessing(JSONArray preProcessing) {
+    public void setPreProcessing(JSONObject preProcessing) {
         this.preProcessing = preProcessing;
     }
 
-    JSONArray postProcessing = null;
+    JSONObject postProcessing = null;
 
 }

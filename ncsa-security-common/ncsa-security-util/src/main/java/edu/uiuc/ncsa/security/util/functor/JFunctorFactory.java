@@ -21,7 +21,7 @@ public class JFunctorFactory {
 
     /**
      * This will create a single functor from the object. If you have a full configuration
-     * file, use the {@link #createLogicBlock(JSONArray)}
+     * file, use the {@link #createLogicBlock(JSONObject)}
      * method instead.
      *
      * @param jsonObject
@@ -52,7 +52,16 @@ public class JFunctorFactory {
         try {
 
             JSONArray array = JSONArray.fromObject(rawJSON);
-            return createLogicBlock(array);
+            JSONObject j = new JSONObject();
+            j.put(FunctorTypeImpl.OR.getValue(), array);
+            return createLogicBlock(j);
+        } catch (Throwable t) {
+            // do nix
+        }
+        try {
+            JSONObject j = JSONObject.fromObject(rawJSON);
+            return createLogicBlock(j);
+
         } catch (Throwable t) {
             // do nix
         }
@@ -60,8 +69,8 @@ public class JFunctorFactory {
     }
 
     /**
-     * This creates a list of logic blocks from a JSONArray. There are a few cases for this. The basic format is
-     * assumed to be
+     * This creates a list of logic blocks from a JSONArray. There are a few cases for this. The basic format of the blocks
+     * is assumed to be
      * <pre>
      *     [{"$if":[..],
      *        "$then":[...],
@@ -83,12 +92,39 @@ public class JFunctorFactory {
      * <pre>
      *     [{"$if":...},[COMMANDS]]
      * </pre>
+     * Now, the full format is a functor of the form
+     * <pre>
+     *     {"connector":[array]}
+     * </pre>
+     * where connector is $or, $xor or $and. In the case of or or and, the entire set of blocks will evaluate
+     * and the final result will be available. In the case of xor, evaluation will cease when the first if block is
+     * found to be false. If there is simply an array and no connector, logical or is supplied as the default.
      *
-     * @param array
+     * @param jsonObject
      * @return
      */
-    public LogicBlocks<? extends LogicBlock> createLogicBlock(JSONArray array) {
-        LogicBlocks<LogicBlock> bloxx = new LogicBlocks<>();
+    public LogicBlocks<? extends LogicBlock> createLogicBlock(JSONObject jsonObject) {
+        LogicBlocks<LogicBlock> bloxx = null;
+        if(jsonObject.isEmpty()){
+            return new ORLogicBlocks(); // default
+        }
+        JSONArray array = null;
+        if (jsonObject.containsKey(FunctorTypeImpl.OR.getValue())) {
+            bloxx = new ORLogicBlocks();
+            array = jsonObject.getJSONArray(FunctorTypeImpl.OR.getValue());
+        }
+        if (jsonObject.containsKey(FunctorTypeImpl.XOR.getValue())) {
+            bloxx = new XORLogicBlocks();
+            array = jsonObject.getJSONArray(FunctorTypeImpl.XOR.getValue());
+        }
+        if (jsonObject.containsKey(FunctorTypeImpl.AND.getValue())) {
+            bloxx = new ANDLogicBlocks();
+            array = jsonObject.getJSONArray(FunctorTypeImpl.AND.getValue());
+        }
+
+        if (bloxx == null) {
+            throw new IllegalArgumentException("Error: No recognized functor type associated with this logic block collection");
+        }
         for (int i = 0; i < array.size(); i++) {
             Object currentObj = array.get(i);
             if (currentObj instanceof JSONObject) {

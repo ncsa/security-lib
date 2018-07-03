@@ -55,6 +55,36 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     protected MapConverter<V> converter;
 
+    /**
+     * This will get every entry in the database. For sparing use since this may be a huge load.
+     *
+     * @return
+     */
+    public List<V> getAll() {
+        LinkedList<V> allEntries = new LinkedList<>();
+        Connection c = getConnection();
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(getTable().createSelectAllStatement());
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                allEntries.add(t);
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(c);
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new GeneralException("Error getting all entries.", e);
+        }
+        return allEntries;
+    }
 
     /**
      * For an existing entry in the store. This will select it based on the primary key
@@ -95,7 +125,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.executeUpdate();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error updating approval with identifier = \"" + value.getIdentifierString(), e);
@@ -160,7 +189,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not register object with id \"" + value.getIdentifierString() + "\"", e);
@@ -201,6 +229,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
+                releaseConnection(c);
                 return null;   // returning a null fulfills contract for this being a map.
             }
 
@@ -271,7 +300,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rs.close();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting the size.", e);
@@ -302,7 +330,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rs.close();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             e.printStackTrace();
@@ -346,7 +373,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.execute();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting identity providers", e);
@@ -375,7 +401,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.execute();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error getting identity providers", e);
@@ -431,7 +456,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rs.close();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not get database object", e);
@@ -456,7 +480,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rs.close();
             stmt.close();
             releaseConnection(c);
-
         } catch (SQLException e) {
             destroyConnection(c);
             throw new GeneralException("Error: could not get database object", e);
@@ -545,5 +568,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         } catch (SQLException x) {
             System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
         }
+    }
+    public MapConverter<V> getConverter(){
+        return converter;
     }
 }

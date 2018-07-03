@@ -14,7 +14,7 @@ public class AggregateClientStore<V extends ClientStore> extends AggregateStore<
     }
 
     @Override
-    public BaseClientConverter getACConverter() {
+    public BaseClientConverter getConverter() {
         return null;
     }
 

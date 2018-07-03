@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.security.delegation.server.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.AggregateStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * An aggregate client approval store.
@@ -37,5 +39,10 @@ public class AggregateCAStore<V extends ClientApprovalStore> extends AggregateSt
             count = count + s.getPendingCount();
         }
         return count;
+    }
+
+    @Override
+    public MapConverter getConverter() {
+        throw new NotImplementedException("Error: Cannot have a single converter for an aggregate store.");
     }
 }

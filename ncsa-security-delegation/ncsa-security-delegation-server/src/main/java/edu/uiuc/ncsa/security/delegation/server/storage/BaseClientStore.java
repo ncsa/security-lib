@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.delegation.server.storage;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
-import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -12,5 +12,5 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 public interface BaseClientStore<V extends BaseClient> extends Store<V> {
 
     IdentifiableProvider getACProvider();
-    BaseClientConverter getACConverter();
+    MapConverter getConverter();
 }

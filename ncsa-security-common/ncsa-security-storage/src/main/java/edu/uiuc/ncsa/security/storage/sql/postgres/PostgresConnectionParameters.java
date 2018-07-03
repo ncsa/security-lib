@@ -16,9 +16,10 @@ public class PostgresConnectionParameters extends SQLConnectionImpl {
             String host,
             int port,
             String jdbcDriver,
-            boolean useSSL
+            boolean useSSL,
+            String parameters
     ) {
-        super(username, password, databaseName, schema,  host, port,jdbcDriver, useSSL );
+        super(username, password, databaseName, schema,  host, port,jdbcDriver, useSSL, parameters );
     }
 
     /**
@@ -28,10 +29,12 @@ public class PostgresConnectionParameters extends SQLConnectionImpl {
      */
     public String getJdbcUrl() {
         if (username == null) {
+            // note that use SSL is ignored if there is no username, since it makes no sense in that case.
             return String.format("jdbc:postgresql://%s:%d/%s", host, port, databaseName);
         }
-        return String.format("jdbc:postgresql://%s:%d/%s?user=%s&password=%s" + (useSSL?"&ssl=true":""),
-                host, port, databaseName, username, password);
+        String jdbcURL = "jdbc:postgresql://%s:%d/%s?user=%s&password=%s" + (useSSL?"&ssl=true":"");
+        jdbcURL = addParameters(jdbcURL);
+        return String.format(jdbcURL,host, port, databaseName, username, password);
     }
 
 

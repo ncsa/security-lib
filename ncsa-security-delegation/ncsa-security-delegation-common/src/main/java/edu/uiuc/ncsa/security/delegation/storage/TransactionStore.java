@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * A store for delegation transactions.
@@ -18,5 +19,6 @@ public interface TransactionStore<V extends BasicTransaction> extends Store<V> {
     V get(AccessToken accessToken);
 
     V get(Verifier verifier);
+    MapConverter<V> getConverter();
 
 }

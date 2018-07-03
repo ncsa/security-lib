@@ -12,7 +12,6 @@ public class H2ConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
     /**
      * the default port is 8084 for localhost connections. Non-local-host connections should specify port 8085
      * (for a standard install) and use ssl.
-     *
      */
 
     public H2ConnectionPoolProvider(String database, String schema, String host, int port, String driver, boolean useSSL) {
@@ -40,15 +39,16 @@ public class H2ConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
     @Override
     public ConnectionPool get() {
         H2ConnectionParameters x = new H2ConnectionParameters(
-                  checkValue(USERNAME),
-                  checkValue(PASSWORD),
-                  checkValue(DATABASE, database),
-                  checkValue(SCHEMA, schema),
-                  checkValue(HOST, host),
-                  checkValue(PORT, port),
-                  checkValue(DRIVER, driver),
-                checkValue(USE_SSL, useSSL)
-          );
-          return  new ConnectionPool(x);
+                checkValue(USERNAME),
+                checkValue(PASSWORD),
+                checkValue(DATABASE, database),
+                checkValue(SCHEMA, schema),
+                checkValue(HOST, host),
+                checkValue(PORT, port),
+                checkValue(DRIVER, driver),
+                checkValue(USE_SSL, useSSL),
+                checkValue(PARAMETERS, "")
+        );
+        return new ConnectionPool(x);
     }
 }

@@ -10,7 +10,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 
 /**
- * Configurations that deal with storage should extend this.
+ * Configurations that deal with storage should extend this. Note that this is used extensively in OA4MP
+ * though not in this module.
  * <p>Created by Jeff Gaynor<br>
  * on 1/31/13 at  3:16 PM
  */
@@ -36,17 +37,27 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
     }
 
 
+    MySQLConnectionPoolProvider mySQLConnectionPoolProvider;
+
     // ALWAYS return a new connection provider or you will only get the same connection repeatedly (and if there
     // are multiple stores with multiple users you will get authentication errors!)
     // ALSO, these get no configuration here since this will be determined later and set by
     // the store provider. At this point which mysql instance is being used is undecidable!
     public MySQLConnectionPoolProvider getMySQLConnectionPoolProvider() {
-        return getMySQLConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default
+        if (mySQLConnectionPoolProvider == null) {
+            mySQLConnectionPoolProvider = getMySQLConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default
+        }
+        return mySQLConnectionPoolProvider;
     }
 
+    MariaDBConnectionPoolProvider mariaDBConnectionPoolProvider;
+
     public MariaDBConnectionPoolProvider getMariaDBConnectionPoolProvider() {
-         return getMariaDBConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default
-     }
+        if (mariaDBConnectionPoolProvider == null) {
+            mariaDBConnectionPoolProvider = getMariaDBConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default
+        }
+        return mariaDBConnectionPoolProvider;
+    }
 
     public PGConnectionPoolProvider getPgConnectionPoolProvider() {
         return getPgConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default

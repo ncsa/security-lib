@@ -3,9 +3,9 @@ package edu.uiuc.ncsa.security.delegation.server.storage.impl;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**  Abstract class that gets the inheritance and generics right.
  * <p>Created by Jeff Gaynor<br>
@@ -17,7 +17,7 @@ public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> impleme
     }
 
     @Override
-    public BaseClientConverter getACConverter() {
+    public MapConverter<V> getConverter() {
         return new ClientConverter(this.identifiableProvider);
     }
 

@@ -41,9 +41,11 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
         return null;
     }
 
+    MariaDBConnectionPool pool;
     @Override
     public MariaDBConnectionPool get() {
-          MariaDBConnectionParameters x = new MariaDBConnectionParameters(
+        if(pool == null) {
+            MariaDBConnectionParameters x = new MariaDBConnectionParameters(
                     checkValue(USERNAME),
                     checkValue(PASSWORD),
                     checkValue(DATABASE, database),
@@ -51,9 +53,12 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
                     checkValue(HOST, host),
                     checkValue(PORT, port),
                     checkValue(DRIVER, driver),
-                  checkValue(USE_SSL, useSSL)
+                    checkValue(USE_SSL, useSSL),
+                    checkValue(PARAMETERS,"")
             );
-            return  new MariaDBConnectionPool(x);
+            pool = new MariaDBConnectionPool(x);
+        }
+        return pool;
     }
 
     @Override

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
+import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
 import net.sf.json.JSON;
@@ -389,22 +390,21 @@ public class LDAPConfigurationUtil {
 
     }
 
-    protected static JSONArray makeProcessor(JSONObject json, String key) {
+    protected static JSONObject makeProcessor(JSONObject json, String key) {
         String x = jsonUtil.getJSONValueString(json, key);
         if(x!= null && !x.isEmpty()){
             JSONArray array = null;
             try{
                 array = JSONArray.fromObject(x);
-                return array;
+                JSONObject j = new JSONObject();
+                j.put(FunctorTypeImpl.OR.getValue(), array);
+                return j;
             }catch(Throwable t){
                   // do nothing
             }
             // So it's not an array. See if it's a JSONObject
             try{
-                JSONObject obj = JSONObject.fromObject(x);
-                array = new JSONArray();
-                array.add(obj);
-                return array;
+                return JSONObject.fromObject(x);
             }catch(Throwable t){
             }
         }

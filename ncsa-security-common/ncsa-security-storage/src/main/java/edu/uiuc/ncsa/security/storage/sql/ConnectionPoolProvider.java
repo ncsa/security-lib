@@ -24,6 +24,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     public static final String DRIVER = "driver";
     public static final String USE_SSL = "useSSL";
     public static final String DATABASE = "database";
+    public static final String PARAMETERS = "parameters";
     public static final String SCHEMA = SQLStoreProvider.SCHEMA; // since this is shared, really.
 
 

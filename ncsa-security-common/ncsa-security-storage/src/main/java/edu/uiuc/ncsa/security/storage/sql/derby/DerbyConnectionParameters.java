@@ -29,9 +29,10 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
                                      int port,
                                      String jdbcDriver,
                                      boolean useSSL,
-                                     boolean inMemory
+                                     boolean inMemory,
+                                     String parameters
     ) {
-        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL);
+        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL, parameters);
         this.inMemory = inMemory;
     }
 

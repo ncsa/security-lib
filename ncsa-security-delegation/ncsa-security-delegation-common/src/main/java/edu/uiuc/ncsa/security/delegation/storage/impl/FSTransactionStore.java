@@ -74,22 +74,6 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
         }
         return thingie;
     }
-/*
-    @Override
-    public boolean delete(String identifier) {
-        V t = (V) loadByIdentifier(identifier);
-        boolean rc = super.delete(identifier);
-        if (t.hasAuthorizationGrant()) {
-            removeIndexEntry(t.getAuthorizationGrant().getToken());
-        }
-        if (t.hasAccessToken()) {
-            removeIndexEntry(t.getAccessToken().getToken());
-        }
-        if (t.hasVerifier()) {
-            removeIndexEntry(t.getVerifier().getToken());
-        }
-        return rc;
-    }*/
 
     public V get(AuthorizationGrant authorizationGrant) {
         return getIndexEntry(authorizationGrant.getToken());
@@ -102,5 +86,6 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
     public V get(Verifier verifier) {
         return getIndexEntry(verifier.getToken());
     }
+
 
 }

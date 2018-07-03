@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.HashMap;
 
@@ -141,6 +143,9 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
         }
         return item;
     }
-
+    @Override
+    public MapConverter getConverter() {
+        throw new NotImplementedException("Error: there is no single converter possible for an aggreate store. Method not implemented");
+    }
 
 }

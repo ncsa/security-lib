@@ -41,9 +41,11 @@ public class MySQLConnectionPoolProvider extends ConnectionPoolProvider<MySQLCon
         return null;
     }
 
+    MySQLConnectionPool pool = null;
     @Override
     public MySQLConnectionPool get() {
-          MySQLConnectionParameters x = new MySQLConnectionParameters(
+        if(pool == null) {
+            MySQLConnectionParameters x = new MySQLConnectionParameters(
                     checkValue(USERNAME),
                     checkValue(PASSWORD),
                     checkValue(DATABASE, database),
@@ -51,9 +53,12 @@ public class MySQLConnectionPoolProvider extends ConnectionPoolProvider<MySQLCon
                     checkValue(HOST, host),
                     checkValue(PORT, port),
                     checkValue(DRIVER, driver),
-                  checkValue(USE_SSL, useSSL)
+                    checkValue(USE_SSL, useSSL),
+                    checkValue(PARAMETERS,"")
             );
-            return  new MySQLConnectionPool(x);
+            pool =  new MySQLConnectionPool(x);
+        }
+        return pool;
     }
 
     @Override

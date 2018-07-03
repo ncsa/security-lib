@@ -43,7 +43,8 @@ public class PGConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
                     checkValue(HOST, host),
                     checkValue(PORT, port),
                     checkValue(DRIVER, driver),
-                    checkValue(USE_SSL, useSSL));
+                    checkValue(USE_SSL, useSSL),
+                    checkValue(PARAMETERS,""));
             cp = new ConnectionPool(x);
         }
         return cp;

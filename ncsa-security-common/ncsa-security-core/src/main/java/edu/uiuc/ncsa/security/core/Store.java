@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,5 +49,12 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @param value
      */
     public void save(V value);
+
+    /**
+     * Method to get every element in the store. This is useful for command line interfaces. Note
+     * that this might be very expensive.
+     * @return
+     */
+    public List<V> getAll();
 
 }

@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import javax.inject.Provider;
@@ -24,8 +23,8 @@ public class ClientConfigurationFactory<V extends ClientConfiguration> implement
      */
     public V newInstance(JSONObject json) {
         V cc = get();
-        JSONArray array = ClientConfigurationUtil.getRuntime(json);
-        cc.setRuntime(functorFactory.createLogicBlock(array));
+        JSONObject j = ClientConfigurationUtil.getRuntime(json);
+        cc.setRuntime(functorFactory.createLogicBlock(j));
         return cc;
     }
 

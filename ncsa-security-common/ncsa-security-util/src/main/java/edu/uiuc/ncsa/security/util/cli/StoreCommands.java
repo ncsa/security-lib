@@ -8,7 +8,6 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This also has the machinery for parsing configurations since the user should be able
@@ -72,8 +71,31 @@ public abstract class StoreCommands extends CommonCommands {
         say("Syntax:\n");
         say("update index\n");
         say("where the index is the index in the list command.");
-
     }
+
+
+    protected void showSerializeHelp() {
+        say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
+        say("serialize  [-file path] index");
+        say("Serializes the object with the given index. (Note that the index must be the last argument!) " +
+                "It will print it to the command line or save it to the given file,");
+        say("overwriting the contents of the file.");
+    }
+
+    protected void showDeserializeHelp() {
+        say("Deserializes an object into the currnet store overwriting the contents. Cf. serialize.");
+        say("deserialize  [-new] -file path");
+        say("Deserializes the object in the given file. This replaces the object with the given index in the store.");
+        say("The response will give the identifier of the object created.");
+        say("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
+        say("with that identifier the operation will fail. If there is no identifier, one will be created.");
+        say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
+    }
+
+    public abstract void serialize(InputLine inputLine);
+
+    public abstract void deserialize(InputLine inputLine);
+
 
     public void update(InputLine inputLine) {
         if (showHelp(inputLine)) {
@@ -84,6 +106,7 @@ public abstract class StoreCommands extends CommonCommands {
             say("You must supply the index or id of the item to update");
             return;
         }
+
         Identifiable identifiable = findItem(inputLine);
         if (identifiable != null) {
             // Note that the contract should be that a clone is passed in and that is saved if the user
@@ -148,20 +171,13 @@ public abstract class StoreCommands extends CommonCommands {
         return allEntries == null || allEntries.isEmpty();
     }
 
-    protected List<Identifiable> loadAllEntries() {
-        Set keys = getStore().keySet();
-        allEntries = new LinkedList<Identifiable>();
-        int i = 0;
-        for (Object key : keys) {
-            if (key == null) {
-                // Fix for OAUTH-119.
-                System.out.println("Warning, skipping null identifier. Cannot resolve object...");
-            } else {
-                Identifiable x = (Identifiable) getStore().get(key);
-                allEntries.add(x);
-            }
 
-        }
+    protected List<Identifiable> loadAllEntries() {
+        // There WAS a fix for Fix for OAUTH-119, skipping null identifiers, but the store should
+        // now take care of this edge case. I am keeping the JIRA issue number here for future reference.
+
+        allEntries = getStore().getAll();
+
         return allEntries;
     }
 

@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 public abstract class Pool<T> {
     public static final int INFINITE = -1;
     int maxSize = INFINITE;
-    protected int inUse = 0;
+    protected  int inUse = 0;
     List<T> stack = new LinkedList<T>();
 
     /**

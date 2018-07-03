@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
-import edu.uiuc.ncsa.security.util.functor.JFunctor;
-import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import edu.uiuc.ncsa.security.util.functor.LogicBlock;
-import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import edu.uiuc.ncsa.security.util.functor.*;
 import edu.uiuc.ncsa.security.util.functor.logic.jAnd;
 import edu.uiuc.ncsa.security.util.functor.logic.jTrue;
 import net.sf.json.JSONArray;
@@ -16,7 +13,7 @@ import org.junit.Test;
  */
 public class JFunctorFactoryTests extends TestBase {
     @Test
-    public void testAnd() throws Exception{
+    public void testAnd() throws Exception {
         String rawJSON = "{\"$and\": [\n" +
                 "  {\"$endsWith\":   [\n" +
                 "    \"the quick brown fox\",\n" +
@@ -35,8 +32,9 @@ public class JFunctorFactoryTests extends TestBase {
         ff.execute();
         assert ((jAnd) ff).getBooleanResult();
     }
+
     @Test
-    public void testConstants() throws Exception{
+    public void testConstants() throws Exception {
         String rawJSON = "{\"$and\": [\n" +
                 "  {\"$endsWith\":   [\n" +
                 "    \"the quick brown fox\",\n" +
@@ -53,12 +51,12 @@ public class JFunctorFactoryTests extends TestBase {
         // And again with a logical value of false.
 
         rawJSON = "{\"$and\": [\n" +
-                       "  {\"$endsWith\":   [\n" +
-                       "    \"the quick brown fox\",\n" +
-                       "    \"fox\"\n" +
-                       "  ]},\n" +
-                       "  \"$false\"\n" +
-                       "]}";
+                "  {\"$endsWith\":   [\n" +
+                "    \"the quick brown fox\",\n" +
+                "    \"fox\"\n" +
+                "  ]},\n" +
+                "  \"$false\"\n" +
+                "]}";
         json = JSONObject.fromObject(rawJSON);
         ff = functorFactory.create(json);
         assert ff instanceof jAnd;
@@ -69,18 +67,21 @@ public class JFunctorFactoryTests extends TestBase {
     /**
      * The argument is a list of commands (in this case the trivial $true functor). The point of the
      * test is that this is converted internally to a logic block that has a conditional of true and that
-     *  the resulting executable then block of commands can be queried for the functor. This permits
-     *  for instance, introducing variables (as functors that are true or false) into the runtime and checking if they are
-     *  set.
+     * the resulting executable then block of commands can be queried for the functor. This permits
+     * for instance, introducing variables (as functors that are true or false) into the runtime and checking if they are
+     * set.
+     *
      * @throws Exception
      */
     @Test
-    public void testCommndsOnlyLogicBlock() throws Exception{
+    public void testCommndsOnlyLogicBlock() throws Exception {
+        JSONObject j = new JSONObject();
         JSONArray array = new JSONArray();
         jTrue jt = new jTrue();
-                array.add(jt.toJSON());
+        array.add(jt.toJSON());
         JFunctorFactory ff = new JFunctorFactory();
-        LogicBlocks<? extends LogicBlock> lbs = ff.createLogicBlock(array);
+        j.put(FunctorTypeImpl.OR.getValue(), array);
+        LogicBlocks<? extends LogicBlock> lbs = ff.createLogicBlock(j);
         assert lbs.size() == 1;
         lbs.execute();
         System.out.println(lbs.get(0).toString());

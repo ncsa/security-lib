@@ -123,7 +123,7 @@ public class InputLine {
      * @return
      */
     public int indexOf(String arg) {
-        int index = 0;
+        int index = 1; // zero-th argument is the name of the method, so getArgs start at index 1.
         for (String x : getArgs()) {
             if (x.equals(arg)) return index;
             index++;

@@ -40,12 +40,12 @@ public class AggregateStore<V extends Store> implements Store {
      * Caveat! This does not check if the store has already been added! This is because store comparison
      * is probably too expensive and in some cases almost impossible to do. It is up to the application not
      * to add multiple copies of the same store.
+     *
      * @param store
      */
     public void addStore(V store) {
-            stores.add(store);
+        stores.add(store);
     }
-
 
 
     protected void checkValid() {
@@ -88,12 +88,12 @@ public class AggregateStore<V extends Store> implements Store {
     public void save(Identifiable value) {
         for (Store s : stores) {
             // try to get it to the right store.
-            try{
-            if (s.containsKey(value.getIdentifier())) {
-                s.save(value);
-                return;
-            }
-            }catch(Throwable t){
+            try {
+                if (s.containsKey(value.getIdentifier())) {
+                    s.save(value);
+                    return;
+                }
+            } catch (Throwable t) {
                 t.printStackTrace();
             }
         }
@@ -231,6 +231,15 @@ public class AggregateStore<V extends Store> implements Store {
             set.addAll(s.entrySet());
         }
         return set;
+    }
+
+    @Override
+    public List getAll() {
+        LinkedList<V> allEntries = new LinkedList<>();
+        for (Object object : values()) {
+            allEntries.add((V) object);
+        }
+        return allEntries;
     }
 }
 

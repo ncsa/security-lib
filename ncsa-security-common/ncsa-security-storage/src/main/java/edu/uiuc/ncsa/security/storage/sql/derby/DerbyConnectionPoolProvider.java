@@ -54,7 +54,8 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
                 checkValue(PORT, port),
                 checkValue(DRIVER, driver),
                 checkValue(USE_SSL, useSSL),
-                checkValue("inMemory", inMemory)
+                checkValue("inMemory", inMemory),
+                checkValue(PARAMETERS, "")
         );
         return new ConnectionPool(x);
     }

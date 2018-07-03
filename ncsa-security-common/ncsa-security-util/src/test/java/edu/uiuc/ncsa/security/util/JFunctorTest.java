@@ -412,7 +412,10 @@ public class JFunctorTest extends TestBase {
 
         ifBlock.put("$then", jToLowerCase.toJSON());
         array.add(ifBlock);
-        LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(array);
+        JSONObject j = new JSONObject();
+        j.put(FunctorTypeImpl.OR.getValue(), array);
+        LogicBlocks<? extends LogicBlock> bloxx = functorFactory.createLogicBlock(j);
+        assert bloxx instanceof ORLogicBlocks;
         assert bloxx.size() == 1;
         LogicBlock logicBlock = bloxx.get(0);
         logicBlock.execute();

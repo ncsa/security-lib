@@ -105,15 +105,12 @@ public abstract class DBInitializer extends SQLDatabase implements Initializable
     protected void init2() throws SQLException {
         Connection c = getConnection();
         Statement s = c.createStatement();
-        try {
-            createSchema(s);
-            createTables(s);
-            setPermissions(s);
-
-        } finally {
-            s.close();
-            c.close();
-        }
+        createSchema(s);
+        createTables(s);
+        setPermissions(s);
+        s.close();
+        c.close();
+        releaseConnection(c);
     }
 
     public boolean init() {
@@ -133,13 +130,11 @@ public abstract class DBInitializer extends SQLDatabase implements Initializable
     protected void destroy2() throws SQLException {
         Connection c = getConnection();
         Statement s = c.createStatement();
-        try {
-            dropTables(s);
-            dropSchema(s);
-        } finally {
-            s.close();
-            c.close();
-        }
+        dropTables(s);
+        dropSchema(s);
+        s.close();
+        c.close();
+        releaseConnection(c);
 
     }
 

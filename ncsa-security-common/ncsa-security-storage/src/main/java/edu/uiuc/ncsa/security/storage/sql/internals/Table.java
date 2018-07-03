@@ -111,6 +111,14 @@ public abstract class Table  {
         return "SELECT * from " + getFQTablename() + " where " + getPrimaryKeyColumnName() + " =?";
     }
 
+    /**
+     * Returns the select statement for this table with one parameter for the primary key.
+     * @return
+     */
+    public String createSelectAllStatement(){
+        return "SELECT * from " + getFQTablename();
+    }
+
     public String createRegisterStatement() {
         String x = null;
         boolean isFirst = true;

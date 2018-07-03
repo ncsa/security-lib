@@ -17,8 +17,9 @@ abstract public class AdminConnectionParameters extends SQLConnectionImpl {
             int port,
             String jdbcDriver,
             String clientUsername,
-            boolean useSSL) {
-        super(username, password,databaseName,schema,  host,  port, jdbcDriver, useSSL);
+            boolean useSSL,
+            String parameters) {
+        super(username, password,databaseName,schema,  host,  port, jdbcDriver, useSSL, parameters);
         this.clientUsername = clientUsername;
     }
 

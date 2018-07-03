@@ -4,18 +4,17 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.CachedMapFacade;
 import edu.uiuc.ncsa.security.core.exceptions.DestroyedException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A cache. Set the backing store if you have one, otherwise this works perfectly well as an
@@ -31,6 +30,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     public TransactionStore getBackingStore() {
         return (TransactionStore) getTheStore();
+    }
+
+    @Override
+    public MapConverter<V> getConverter() {
+        return getBackingStore().getConverter();
     }
 
     public TransactionCache(TransactionStore backingStore) {
@@ -100,6 +104,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
         if (isDestroyed()) {
             throw new DestroyedException();
         }
+    }
+
+    @Override
+    public List<V> getAll() {
+        throw new NotImplementedException("Error: this is not supported in a cache.");
     }
 
     public void update(BasicTransaction t) {

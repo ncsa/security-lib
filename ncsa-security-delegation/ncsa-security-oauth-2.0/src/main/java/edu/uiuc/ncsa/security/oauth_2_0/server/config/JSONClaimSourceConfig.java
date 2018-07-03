@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -37,16 +36,16 @@ public abstract class JSONClaimSourceConfig {
     public abstract String getName();
 
 
-    public abstract JSONArray getPostProcessing();
+    public abstract JSONObject getPostProcessing();
 
-    public abstract void setPostProcessing(JSONArray postProcessing);
+    public abstract void setPostProcessing(JSONObject postProcessing);
 
     /**
      * The <b>raw json</b> for the pre-processing directives. This has to be done this way since the directives
      * rely on being constructed with the claims at runtime (e.g. for replacement templates).
      * @return
      */
-    public abstract JSONArray getPreProcessing();
+    public abstract JSONObject getPreProcessing();
 
-    public abstract void setPreProcessing(JSONArray preProcessing);
+    public abstract void setPreProcessing(JSONObject preProcessing);
 }

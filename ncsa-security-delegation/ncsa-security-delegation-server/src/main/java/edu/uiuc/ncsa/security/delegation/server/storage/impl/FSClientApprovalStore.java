@@ -61,4 +61,9 @@ public abstract class FSClientApprovalStore<V extends ClientApproval> extends Fi
         }
         return count;
     }
+
+    @Override
+    public MapConverter<V> getConverter() {
+        return converter;
+    }
 }

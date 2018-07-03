@@ -21,8 +21,9 @@ public class H2ConnectionParameters extends SQLConnectionImpl {
                                   String host,
                                   int port,
                                   String jdbcDriver,
-                                  boolean useSSL) {
-        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL);
+                                  boolean useSSL,
+                                  String parameters) {
+        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL,parameters);
 
     }
 

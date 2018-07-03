@@ -60,19 +60,18 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
+                releaseConnection(c);
                 throw new TransactionNotFoundException("No transaction found for identifier \"" + identifier + "\"");
             }
 
             ColumnMap map = rsToMap(rs);
             rs.close();
             stmt.close();
-
+            releaseConnection(c);
             t = create();
             populate(map, t);
         } catch (SQLException e) {
             throw new GeneralException("Error getting transaction with identifier \"" + identifier + "\"", e);
-        }finally {
-            releaseConnection(c);
         }
         return t;
     }

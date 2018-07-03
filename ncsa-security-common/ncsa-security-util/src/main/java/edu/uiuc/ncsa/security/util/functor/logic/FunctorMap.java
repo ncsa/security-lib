@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * A map of all functors that have resulted in the execution of a functor. This lets you recover them in toto
+ * and pass them around.
  * <p>Created by Jeff Gaynor<br>
  * on 3/22/18 at  2:16 PM
  */
@@ -27,7 +29,7 @@ public class FunctorMap extends HashMap<String, List<JFunctor>> {
     }
 
     /**
-     * Add all of the funtors in the argument to this map.
+     * Add all of the functors in the argument to this map.
      *
      * @param functorMap
      * @return

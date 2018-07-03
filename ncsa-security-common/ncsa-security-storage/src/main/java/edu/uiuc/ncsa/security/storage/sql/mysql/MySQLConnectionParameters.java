@@ -15,14 +15,17 @@ public class MySQLConnectionParameters extends SQLConnectionImpl {
             String host,
             int port,
             String jdbcDriver,
-            boolean useSSL
+            boolean useSSL,
+            String parameters
     ) {
-        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL);
+        super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL,parameters);
     }
 
     @Override
     public String getJdbcUrl() {
-        return String.format("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&user=%s&password=%s" + (useSSL?"&useSSL=true":""),
+        String jdbcURL = addParameters("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&user=%s&password=%s" + (useSSL?"&useSSL=true":""));
+
+        return String.format(jdbcURL,
                 host, port, schema, username, password);
     }
 

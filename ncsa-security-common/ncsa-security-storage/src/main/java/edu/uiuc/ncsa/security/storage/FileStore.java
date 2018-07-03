@@ -358,6 +358,14 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return (V) loadByIdentifier(key.toString());
     }
 
+    @Override
+    public List<V> getAll() {
+        LinkedList<V> allEntries = new LinkedList<>();
+        for(Identifier d : keySet()){
+               allEntries.add(get(d));
+        }
+        return allEntries;
+    }
 
     public boolean delete(String identifier) {
         V t = loadByIdentifier(identifier);
@@ -439,5 +447,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     public V create() {
         checkPermissions();
         return super.create();
+    }
+
+    public MapConverter<V> getConverter() {
+        return converter;
     }
 }

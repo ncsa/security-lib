@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.security.core.*;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An in-memory store. This is useful in several different ways and is in effect
@@ -101,5 +103,12 @@ public class MemoryStore<V extends Identifiable> extends HashMap<Identifier, V> 
         realSave(value);
     }
 
-
+    @Override
+    public List<V> getAll() {
+        LinkedList<V> allEntries = new LinkedList<>();
+        for(Identifier d: keySet()){
+            allEntries.add(get(d));
+        }
+        return allEntries;
+    }
 }

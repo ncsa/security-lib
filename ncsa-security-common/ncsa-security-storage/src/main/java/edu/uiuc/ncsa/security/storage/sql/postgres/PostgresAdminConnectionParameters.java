@@ -16,8 +16,9 @@ public class PostgresAdminConnectionParameters extends AdminConnectionParameters
           int port,
           String jdbcDriver,
           String clientUsername,
-          boolean useSSL) {
-        super(username, password,databaseName,schema,  host,  port, jdbcDriver, clientUsername, useSSL);
+          boolean useSSL,
+          String parameters) {
+        super(username, password,databaseName,schema,  host,  port, jdbcDriver, clientUsername, useSSL,parameters);
     }
 
     public String getJdbcUrl() {
