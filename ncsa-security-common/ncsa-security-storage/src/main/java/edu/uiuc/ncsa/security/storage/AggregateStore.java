@@ -3,7 +3,9 @@ package edu.uiuc.ncsa.security.storage;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 
 import java.util.*;
@@ -240,6 +242,11 @@ public class AggregateStore<V extends Store> implements Store {
             allEntries.add((V) object);
         }
         return allEntries;
+    }
+
+    @Override
+    public XMLConverter getXMLConverter() {
+        throw new NotImplementedException("Error: Cannot have a single converter for an aggregate store");
     }
 }
 

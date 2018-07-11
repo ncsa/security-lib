@@ -92,6 +92,10 @@ public abstract class StoreCommands extends CommonCommands {
         say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
     }
 
+    // Note to self -- cannot just have these here because all of the machinery to do this to and from XML resides in another
+    // module and that would create a circular set of dependencies. This is the reason there is the subclass StoreCommands2
+    // in OA4MP. Best we can do with how Java works...
+
     public abstract void serialize(InputLine inputLine);
 
     public abstract void deserialize(InputLine inputLine);

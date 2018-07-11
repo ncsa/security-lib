@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.security.delegation.server.storage;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.delegation.storage.impl.BaseClientConverter;
+import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.AggregateStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -14,8 +16,13 @@ public class AggregateClientStore<V extends ClientStore> extends AggregateStore<
     }
 
     @Override
-    public BaseClientConverter getConverter() {
-        return null;
+    public XMLConverter getXMLConverter() {
+        throw new NotImplementedException("Error: No single converter for an aggregate store is possible");
+    }
+
+    @Override
+    public MapConverter getMapConverter() {
+        throw new NotImplementedException("Error: No single converter for an aggregate store is possible");
     }
 
     @Override

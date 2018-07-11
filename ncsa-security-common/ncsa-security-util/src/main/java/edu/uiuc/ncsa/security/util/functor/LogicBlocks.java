@@ -49,12 +49,14 @@ public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> im
             return true;
         }
         result = false;
-        for (LogicBlock lb : this) {
+        boolean breakLoop = false;
+       myLoop:  for (LogicBlock lb : this) {
             //lb.execute();
             boolean rc = false;
             switch (connector) {
                 case XOR:
                     rc = doXORCase(lb);
+                    breakLoop = rc;
                     break;
                 case OR:
                     rc = doORCase(lb);
@@ -65,8 +67,8 @@ public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> im
                 case UNKNOWN:
                     throw new NFWException("Error: there is no connector for this set of logic blocks.");
             }
-            if (!rc) {
-                break;
+            if (breakLoop) {
+                break myLoop; // be sure to break the right thing!
             }
         }
         executed = true;
@@ -74,8 +76,8 @@ public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> im
     }
 
     /**
-     * The logical connector is excluive or. This means that the processing ends if any of the logic blocks fail to
-     * be true (be careful of nesting if then else -- the else result will be added to the functor map, BUT execution will stop.
+     * The logical connector is excluive or. This means that the processing ends as soon as the first block is true.
+     * else -- the else result will be added to the functor map, BUT execution will stop.
      * Invoking the XOR connector means to stop processing in this case!!!
      *
      * @param lb
@@ -83,7 +85,7 @@ public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> im
      */
     protected boolean doXORCase(LogicBlock lb) {
         lb.execute();
-        boolean rc = false;
+        boolean rc = false; // up to this point, no block has worked, hence this is a valid assumption.
         if (lb.getIfBlock().getBooleanResult()) {
             // this is true, so keep processing
             result = true;

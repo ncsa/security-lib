@@ -22,5 +22,8 @@ public abstract class FSClientStore<V extends Client> extends FileStore<V> imple
         super(f, idp, cp);
     }
 
-
+    @Override
+    public MapConverter<V> getMapConverter() {
+        return converter;
+    }
 }

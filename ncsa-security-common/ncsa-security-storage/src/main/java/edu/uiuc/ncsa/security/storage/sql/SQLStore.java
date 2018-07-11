@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.storage.sql;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -569,7 +570,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
         }
     }
-    public MapConverter<V> getConverter(){
+    public XMLConverter<V> getXMLConverter(){
         return converter;
     }
 }

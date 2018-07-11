@@ -467,6 +467,68 @@ public class JFunctorTest extends TestBase {
 
     }
 
+    /**
+     * Creates a {@link LogicBlock}. If makeTrue is true then the block will evaluate to
+     * true and the result will be "FOO", if false, the result will be "bar". The
+     * functor map then can have $toUpperCase or $toLowerCase (so they are distinct and can be
+     * tested).
+     * @param ff
+     * @param makeTrue
+     * @return
+     */
+    LogicBlock createLB(JFunctorFactory ff, boolean makeTrue){
+
+        jIf jif1 = new jIf();
+        if(makeTrue) {
+            jif1.addArg(ff.create("{\"$equals\":[\"foo\",\"foo\"]}"));
+        }else{
+            jif1.addArg(ff.create("{\"$equals\":[\"foo\",\"bar\"]}"));
+
+        }
+
+        jThen jthen1 = new jThen();
+        jthen1.addArg(ff.create("{\"$toUpperCase\":[\"foo\"]}"));
+
+     /*   jElse jelse1 = new jElse();
+        jelse1.addArg(ff.create("{\"$toLowerCase\":[\"BAR\"]}"));
+     */   LogicBlock logicBlock1 = new LogicBlock(ff, jif1, jthen1);
+        return logicBlock1;
+
+    }
+
+    /**
+     * Tests that an XOR logib block will terminate as soon as it hits a true conditional.
+     * @throws Exception
+     */
+    @Test
+    public void testXOR_LBCreation() throws Exception {
+        JFunctorFactory ff = new JFunctorFactory();
+
+        LogicBlock lbTrue = createLB(ff, true);
+        LogicBlock lbFalse  = createLB(ff, false);
+        XORLogicBlocks logicBlocks = new XORLogicBlocks();
+        logicBlocks.add(lbTrue);
+        logicBlocks.add(lbFalse);
+        logicBlocks.execute();
+        assert logicBlocks.getFunctorMap().containsKey(FunctorTypeImpl.TO_UPPER_CASE.getValue());
+        assert !logicBlocks.getFunctorMap().containsKey(FunctorTypeImpl.TO_LOWER_CASE);
+
+        // And another one
+
+        logicBlocks = new XORLogicBlocks();
+        logicBlocks.add(lbFalse);
+        logicBlocks.add(lbFalse);
+        logicBlocks.add(lbFalse);
+        logicBlocks.add(lbFalse);
+        logicBlocks.add(lbTrue);
+        logicBlocks.execute();
+
+        assert logicBlocks.getFunctorMap().containsKey(FunctorTypeImpl.TO_UPPER_CASE.getValue());
+        assert !logicBlocks.getFunctorMap().containsKey(FunctorTypeImpl.TO_LOWER_CASE);
+
+    }
+
+
     @Test
     public void testDrop() throws Exception {
         jDrop jDrop = new jDrop();

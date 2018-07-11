@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.CachedMapFacade;
 import edu.uiuc.ncsa.security.core.exceptions.DestroyedException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -11,7 +12,6 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.net.URI;
 import java.util.*;
@@ -33,8 +33,8 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     }
 
     @Override
-    public MapConverter<V> getConverter() {
-        return getBackingStore().getConverter();
+    public XMLConverter<V> getXMLConverter() {
+        return getBackingStore().getXMLConverter();
     }
 
     public TransactionCache(TransactionStore backingStore) {

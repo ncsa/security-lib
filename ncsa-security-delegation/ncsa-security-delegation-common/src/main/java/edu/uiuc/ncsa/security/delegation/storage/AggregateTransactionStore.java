@@ -1,12 +1,12 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.storage.AggregateStore;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * An aggregate store for transactions.
@@ -49,7 +49,7 @@ public class AggregateTransactionStore<V extends TransactionStore> extends Aggre
     }
 
     @Override
-    public MapConverter getConverter() {
+    public XMLConverter getXMLConverter() {
         throw new NotImplementedException("Error: there is no single converter possible for an aggregate store. Method not implemented");
     }
 }

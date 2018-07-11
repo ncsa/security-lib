@@ -57,4 +57,5 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      */
     public List<V> getAll();
 
+    public XMLConverter<V> getXMLConverter();
 }

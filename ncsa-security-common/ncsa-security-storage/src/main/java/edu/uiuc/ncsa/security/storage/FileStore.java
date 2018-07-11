@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.storage;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
 import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -449,7 +450,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return super.create();
     }
 
-    public MapConverter<V> getConverter() {
+    public XMLConverter<V> getXMLConverter() {
         return converter;
     }
 }

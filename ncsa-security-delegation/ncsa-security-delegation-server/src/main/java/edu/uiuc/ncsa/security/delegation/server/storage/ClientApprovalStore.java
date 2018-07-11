@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.delegation.server.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,6 +22,4 @@ public interface ClientApprovalStore<V extends ClientApproval> extends Store<V> 
      */
     int getUnapprovedCount();
     int getPendingCount();
-    MapConverter<V> getConverter();
-
 }

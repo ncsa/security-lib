@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.server.storage;
 
 import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 /**
  * Marker interface for client stores
@@ -8,5 +9,5 @@ import edu.uiuc.ncsa.security.delegation.storage.Client;
  * on May 24, 2011 at  4:02:39 PM
  */
 public interface ClientStore<V extends Client> extends BaseClientStore<V> {
-
+        public MapConverter<V> getMapConverter();
 }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
@@ -9,8 +10,10 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransactionConverter;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransactionProvider;
 import edu.uiuc.ncsa.security.delegation.storage.impl.FSTransactionStore;
-import edu.uiuc.ncsa.security.delegation.token.*;
-import edu.uiuc.ncsa.security.storage.data.MapConverter;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.Verifier;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -117,7 +120,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
     public static class TestFileStore extends FSTransactionStore<BasicTransaction> {
         @Override
-        public MapConverter getConverter() {
+        public XMLConverter getXMLConverter() {
             throw new NotImplementedException("Error: Method not implemented");
         }
         public TestFileStore(File file, IdentifiableProviderImpl<BasicTransaction> btp, TestTokenForge ttf) throws IOException {

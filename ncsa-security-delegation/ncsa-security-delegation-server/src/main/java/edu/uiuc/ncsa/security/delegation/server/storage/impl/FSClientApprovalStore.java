@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.server.storage.impl;
 
 import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApproval;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
@@ -63,7 +64,7 @@ public abstract class FSClientApprovalStore<V extends ClientApproval> extends Fi
     }
 
     @Override
-    public MapConverter<V> getConverter() {
+    public XMLConverter<V> getXMLConverter() {
         return converter;
     }
 }

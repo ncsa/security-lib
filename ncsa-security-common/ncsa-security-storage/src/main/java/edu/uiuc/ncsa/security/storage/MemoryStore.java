@@ -18,7 +18,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 11/3/11 at  1:14 PM
  */
-public class MemoryStore<V extends Identifiable> extends HashMap<Identifier, V> implements Store<V> {
+public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identifier, V> implements Store<V> {
     public MemoryStore(IdentifiableProvider<V> identifiableProvider) {
         super();
         this.identifiableProvider = identifiableProvider;

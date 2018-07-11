@@ -2,16 +2,19 @@ package edu.uiuc.ncsa.security.storage.data;
 
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.XMLConverter;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A class that converts between objects and maps. You must supply some key.
  * <p>Created by Jeff Gaynor<br>
  * on 4/13/12 at  11:38 AM
  */
-public class MapConverter<V extends Identifiable> {
+public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
     public SerializationKeys keys;
     protected IdentifiableProvider<V> provider;
 
@@ -34,13 +37,14 @@ public class MapConverter<V extends Identifiable> {
         return fromMap(data, null);
     }
 
-    public V createIfNeeded(V v){
+    public V createIfNeeded(V v) {
         if (v == null) {
             v = provider.get(false);
         }
-       return v;
+        return v;
     }
-    public V fromMap(ConversionMap<String, Object> map, V v)  {
+
+    public V fromMap(ConversionMap<String, Object> map, V v) {
         v = createIfNeeded(v);
         v.setIdentifier(map.getIdentifier(keys.identifier()));
         return v;
@@ -79,8 +83,26 @@ public class MapConverter<V extends Identifiable> {
         }
         // Have to always include the identifier.
         reducedMap.put(getKeys().identifier(), v.getIdentifierString());
-        V x =  fromMap(reducedMap, null);
+        V x = fromMap(reducedMap, null);
         return x;
+
+    }
+
+    @Override
+    public V fromMap(Map<String, Object> map, V v) {
+        if (map instanceof ConversionMap) {
+            return (V) fromMap((ConversionMap) map, v);
+        }
+        throw new NotImplementedException("Error: not implement for non ConversionMap objects");
+    }
+
+    @Override
+    public void toMap(V value, Map<String, Object> data) {
+        if (data instanceof ConversionMap) {
+            toMap(value, (ConversionMap) data);
+            return;
+        }
+        throw new NotImplementedException("Error: not implement for non ConversionMap objects");
 
     }
 }
