@@ -216,8 +216,9 @@ public abstract class StoreCommands extends CommonCommands {
     protected void showCreateHelp() {
         say("Create a new entry in the currently active store.");
         say("Syntax is\n");
-        say("create [/id]\n");
-        say("where the id is a unique uri which will identify the object. If you do not specify an");
+        say("create [id]\n");
+        say("where the id is a unique uri which will identify the object. (Note that there is not a lead slash! ");
+        say("Just enter the identifier if you want to set it. Be sure it is a valid uri.) If you do not specify an");
         say("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
     }
 

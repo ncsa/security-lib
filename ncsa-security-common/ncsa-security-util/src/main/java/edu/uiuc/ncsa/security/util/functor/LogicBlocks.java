@@ -17,11 +17,26 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 4/20/18 at  10:26 AM
  */
-public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements JMetaFunctor {
+public  class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements JMetaFunctor {
+    public LogicBlocks(int connector) {
+        this.connector = connector;
+    }
+
+    /**
+     * A default constructor. You need to set the connector type before invoking {@link #execute()} or this will fail.
+     */
+    public LogicBlocks() {
+        this(UNKNOWN);
+    }
+
     public static final int XOR = 0;
     public static final int OR = 1;
     public static final int AND = 2;
     public static final int UNKNOWN = -1;
+
+    public void setConnector(int connector) {
+        this.connector = connector;
+    }
 
     protected int connector = UNKNOWN;
 
@@ -105,7 +120,7 @@ public abstract class LogicBlocks<V extends LogicBlock> extends LinkedList<V> im
 
         if (lb.getConsequent() != null) {
             DebugUtil.dbg(this, "Got consequent, adding results to functor map:" + lb.getConsequent().getFunctorMap());
-            getFunctorMap().putAll(lb.getConsequent().getFunctorMap());
+            getFunctorMap().addAll(lb.getConsequent().getFunctorMap());
         }
     }
 

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor;
 
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
 import edu.uiuc.ncsa.security.util.functor.strings.*;
@@ -7,6 +8,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
@@ -105,7 +107,7 @@ public class JFunctorFactory {
      */
     public LogicBlocks<? extends LogicBlock> createLogicBlock(JSONObject jsonObject) {
         LogicBlocks<LogicBlock> bloxx = null;
-        if(jsonObject.isEmpty()){
+        if (jsonObject.isEmpty()) {
             return new ORLogicBlocks(); // default
         }
         JSONArray array = null;
@@ -184,6 +186,88 @@ public class JFunctorFactory {
         return rawJson.containsKey(type.getValue());
     }
 
+    public JFunctor lookUpFunctor(FunctorType type) {
+        return lookUpFunctor(type.getValue());
+    }
+
+    /**
+     * This does the actual work of looking up the functor and creating a new one.
+     * @param name
+     * @return
+     */
+    public JFunctor lookUpFunctor(String name) {
+        if (name.equals(AND.getValue())) {
+            return new jAnd();
+        }
+        if (name.equals(OR.getValue())) {
+            return new jOr();
+        }
+        if (name.equals(XOR.getValue())) {
+            return new jXOr();
+        }
+        if (name.equals(NOT.getValue())) {
+            return new jNot();
+        }
+        if (name.equals(REPLACE.getValue())) {
+            return new jReplace();
+        }
+
+        if (name.equals(CONCAT.getValue())) {
+            return new jConcat();
+        }
+
+        if (name.equals(EXISTS.getValue())) {
+            return new jExists();
+        }
+        if (name.equals(EQUALS.getValue())) {
+            return new jEquals();
+        }
+        if (name.equals(MATCH.getValue())) {
+            return new jMatch();
+        }
+        if (name.equals(TO_ARRAY.getValue())) {
+            return new jToArray();
+        }
+        if (name.equals(CONTAINS.getValue())) {
+            return new jContains();
+        }
+
+        if (name.equals(ENDS_WITH.getValue())) {
+            return new jEndsWith();
+        }
+        if (name.equals(STARTS_WITH.getValue())) {
+            return new jStartsWith();
+        }
+
+        if (name.equals(IF.getValue())) {
+            return new jIf();
+        }
+
+        if (name.equals(THEN.getValue())) {
+            return new jThen();
+        }
+        if (name.equals(TRUE.getValue())) {
+            return new jTrue();
+        }
+        if (name.equals(FALSE.getValue())) {
+            return new jFalse();
+        }
+        if (name.equals(ELSE.getValue())) {
+            return new jElse();
+        }
+        if (name.equals(TO_LOWER_CASE.getValue())) {
+            return new jToLowerCase();
+        }
+        if (name.equals(TO_UPPER_CASE.getValue())) {
+            return new jToUpperCase();
+        }
+        if (name.equals(DROP.getValue())) {
+            return new jDrop();
+        }
+        return null;
+
+    }
+
 
     /**
      * This figures out which functor to create based on the key of the raw JSON object. Override
@@ -194,73 +278,12 @@ public class JFunctorFactory {
      * @return
      */
     protected JFunctor figureOutFunctor(JSONObject rawJson) {
-        if (hasEnum(rawJson, AND)) {
-            return new jAnd();
+        Iterator iterator = rawJson.keys();
+        String functorKey = (String) iterator.next();
+        if(iterator.hasNext()){
+            throw new GeneralException("Error: too many functors in this JSON object. There should be exactly one functor");
         }
-        if (hasEnum(rawJson, OR)) {
-            return new jOr();
-        }
-        if (hasEnum(rawJson, XOR)) {
-            return new jXOr();
-        }
-        if (hasEnum(rawJson, NOT)) {
-            return new jNot();
-        }
-        if (hasEnum(rawJson, REPLACE)) {
-            return new jReplace();
-        }
-
-        if (hasEnum(rawJson, CONCAT)) {
-            return new jConcat();
-        }
-
-        if (hasEnum(rawJson, EXISTS)) {
-            return new jExists();
-        }
-        if (hasEnum(rawJson, EQUALS)) {
-            return new jEquals();
-        }
-        if (hasEnum(rawJson, MATCH)) {
-            return new jMatch();
-        }
-        if (hasEnum(rawJson, CONTAINS)) {
-            return new jContains();
-        }
-
-        if (hasEnum(rawJson, ENDS_WITH)) {
-            return new jEndsWith();
-        }
-        if (hasEnum(rawJson, STARTS_WITH)) {
-            return new jStartsWith();
-        }
-
-        if (hasEnum(rawJson, IF)) {
-            return new jIf();
-        }
-
-        if (hasEnum(rawJson, THEN)) {
-            return new jThen();
-        }
-        if (hasEnum(rawJson, TRUE)) {
-            return new jTrue();
-        }
-        if (hasEnum(rawJson, FALSE)) {
-            return new jFalse();
-        }
-        if (hasEnum(rawJson, ELSE)) {
-            return new jElse();
-        }
-        if (hasEnum(rawJson, TO_LOWER_CASE)) {
-            return new jToLowerCase();
-        }
-        if (hasEnum(rawJson, TO_UPPER_CASE)) {
-            return new jToUpperCase();
-        }
-        if (hasEnum(rawJson, DROP)) {
-            return new jDrop();
-        }
-        return null;
-
+        return lookUpFunctor(functorKey);
     }
 
     public JFunctor fromJSON(JSONObject rawJson) {

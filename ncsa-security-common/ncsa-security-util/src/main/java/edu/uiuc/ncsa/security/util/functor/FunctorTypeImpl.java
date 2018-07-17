@@ -25,7 +25,8 @@ public enum FunctorTypeImpl implements FunctorType {
     TO_LOWER_CASE("$toLowerCase"),
     TO_UPPER_CASE("$toUpperCase"),
     CONCAT("$concat"),
-    DROP("$drop");
+    DROP("$drop"),
+    TO_ARRAY("$toArray");
 
     private String value;
 

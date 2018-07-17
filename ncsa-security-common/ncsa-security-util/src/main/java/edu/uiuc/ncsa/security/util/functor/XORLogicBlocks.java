@@ -6,6 +6,6 @@ package edu.uiuc.ncsa.security.util.functor;
  */
 public class XORLogicBlocks extends LogicBlocks {
     public XORLogicBlocks() {
-        connector = XOR;
+        super(XOR);
     }
 }

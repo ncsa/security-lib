@@ -6,6 +6,6 @@ package edu.uiuc.ncsa.security.util.functor;
  */
 public class ORLogicBlocks extends LogicBlocks {
     public ORLogicBlocks() {
-        connector = OR;
+        super(OR);
     }
 }

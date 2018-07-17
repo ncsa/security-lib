@@ -432,6 +432,23 @@ public class JFunctorTest extends TestBase {
 
     }
 
+    @Test
+    public void testToArray() throws Exception{
+        JFunctorFactory ff = new JFunctorFactory();
+        String arg = "A;B;C";
+        String delim = ";";
+        jToArray toArray = new jToArray();
+        toArray.addArg(arg);
+        toArray.addArg(delim);
+        toArray = (jToArray) reTestIt(toArray);
+        assert toArray.getResult() instanceof JSONArray;
+        JSONArray array = (JSONArray) toArray.getResult();
+        assert array.size() == 3;
+        assert array.contains("A");
+        assert array.contains("B");
+        assert array.contains("C");
+        System.out.println(toArray.toJSON().toString(2));
+    }
     /**
      * Tests the case that the if and then functors are supplied in a constructor so that no parsing is needed to start the
      * execution.

@@ -6,6 +6,6 @@ package edu.uiuc.ncsa.security.util.functor;
  */
 public class ANDLogicBlocks extends LogicBlocks {
     public ANDLogicBlocks() {
-        connector = AND;
+        super(AND);
     }
 }

@@ -28,6 +28,11 @@ public class LogicBlock implements JMetaFunctor {
         return result;
     }
 
+    public LogicBlock(JFunctorFactory factory) {
+        this.factory = factory;
+        initialized = true; // probably not at this point.
+    }
+
     public LogicBlock(JFunctorFactory factory, jIf ifBlock, jThen thenBlock, jElse elseBlock) {
         this.factory = factory;
         this.ifBlock = ifBlock;
