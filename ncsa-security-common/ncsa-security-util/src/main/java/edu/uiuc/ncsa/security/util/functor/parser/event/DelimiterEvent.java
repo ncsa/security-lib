@@ -5,9 +5,10 @@ package edu.uiuc.ncsa.security.util.functor.parser.event;
  * on 7/16/18 at  11:25 AM
  */
 public class DelimiterEvent extends ParserEvent {
-    public DelimiterEvent(EventDrivenParser source, String name) {
+    public DelimiterEvent(EventDrivenParser source, String name, char delimiter) {
         super(source);
         this.name = name;
+        this.delimiter = delimiter;
     }
 
     public String getName() {
@@ -15,4 +16,10 @@ public class DelimiterEvent extends ParserEvent {
     }
 
     String name;
+
+    public char getDelimiter() {
+        return delimiter;
+    }
+
+    char delimiter;
 }

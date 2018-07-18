@@ -22,7 +22,7 @@ public class jEndsWith extends jStringComparisons {
             return result;
         }
         if (args.size() != 2) {
-            throw new IllegalStateException("Error: this functor requires two arguments. It currently has " + args.size() + " arguments.");
+            throw new IllegalStateException("Error: this functor, \""+ type.getValue()  +"\", requires two arguments. It currently has " + args.size() + " arguments.");
         }
 
         String target = processArg(args.get(0));

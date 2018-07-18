@@ -60,6 +60,8 @@ public class EDLBSHandler extends AbstractHandler implements DelimiterListener, 
     public void closeDelimiter(DelimiterEvent delimeterEvent) {
         super.closeDelimiter(delimeterEvent);
         logicBlocks.add(lbh.getLogicBlock());
+        delimeterEvent.getParser().removeBracketListener(lbh);
+        delimeterEvent.getParser().removeCommaListener(lbh);
         lbh.reset();
     }
 

@@ -11,7 +11,7 @@ import java.util.List;
  * on 2/27/18 at  8:53 AM
  */
 public abstract class JFunctorImpl implements JFunctor {
-    FunctorType type;
+   protected FunctorType type;
 
     protected JFunctorImpl(FunctorType type) {
 

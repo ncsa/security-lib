@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -49,6 +50,11 @@ public abstract class TestConfigLoader<T extends TestEnvironment> extends Loggin
             @Override
             public String getVersionString() {
                 return "1.0";
+            }
+
+            @Override
+            public HashMap<String, String> getConstants() {
+                return null;
             }
         };
         TestEnvironment testEnvironment = t.load();

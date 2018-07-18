@@ -7,12 +7,15 @@ import edu.uiuc.ncsa.security.util.functor.logic.jThen;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
 import edu.uiuc.ncsa.security.util.functor.parser.ParserError;
 
+import java.util.Stack;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 7/16/18 at  12:00 PM
  */
 public class EventDrivenLogicBlockHandler extends AbstractHandler implements DelimiterListener, CommaListener {
     EventDrivenFunctorHandler fHandler;
+    Stack<LogicBlock> stack = new Stack<>();
 
     public EventDrivenLogicBlockHandler(EventDrivenFunctorHandler fHandler, JFunctorFactory functorFactory) {
         super(functorFactory);
@@ -26,9 +29,6 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
      * @return
      */
     public LogicBlock getLogicBlock() {
-        if (logicBlock == null) {
-            logicBlock = new LogicBlock(getFunctorFactory(), ifBlock, thenBlock, elseBlock);
-        }
         return logicBlock;
     }
 
@@ -37,11 +37,11 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
     jThen thenBlock = null;
     jElse elseBlock = null;
 
-    public JFunctorImpl getCurrentFunctor() {
-        return currentFunctor;
+    public JFunctorImpl getCurrentBlock() {
+        return currentBlock;
     }
 
-    JFunctorImpl currentFunctor;
+    JFunctorImpl currentBlock;
 
     @Override
     public void openDelimiter(DelimiterEvent delimeterEvent) {
@@ -53,7 +53,9 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
                 throw new ParserError("Error: malformed conditional. There is already an if statement");
             }
             ifBlock = new jIf();
-            currentFunctor = ifBlock;
+            logicBlock = new LogicBlock(getFunctorFactory(),ifBlock,null);
+            stack.push(logicBlock);
+            currentBlock = ifBlock;
             gotOne = true;
         }
         if (equals(name, FunctorTypeImpl.THEN)) {
@@ -61,7 +63,8 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
                 throw new ParserError("Error: malformed conditional. There is already a then statement");
             }
             thenBlock = new jThen();
-            currentFunctor = thenBlock;
+            stack.peek().setThenBlock(thenBlock);
+            currentBlock = thenBlock;
             gotOne = true;
         }
         if (equals(name, FunctorTypeImpl.ELSE)) {
@@ -69,7 +72,8 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
                 throw new ParserError("Error: malformed conditional. There is already an else statement");
             }
             elseBlock = new jElse();
-            currentFunctor = elseBlock;
+            stack.peek().setElseBlock(elseBlock);
+            currentBlock = elseBlock;
             gotOne = true;
         }
 
@@ -90,17 +94,18 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
     public void closeDelimiter(DelimiterEvent delimeterEvent) {
         super.closeDelimiter(delimeterEvent);
         JFunctor functor = getjFunctor(delimeterEvent.getName());
-        currentFunctor.addArg(functor);
+        currentBlock.addArg(functor);
         delimeterEvent.getParser().removeCommaListener(fHandler);
         delimeterEvent.getParser().removeDQListener(fHandler);
         delimeterEvent.getParser().removeParenthesisListener(fHandler);
-        currentFunctor = null;
+        fHandler.reset();
+        currentBlock = null;
     }
 
     protected JFunctor getjFunctor(String name) {
         JFunctor functor = fHandler.getFunctor();
         if (functor == null) {
-            // ok, special case that the
+            // ok, special case that the keywords true/false get turned into functors.
             if (name.equals(FunctorTypeImpl.TRUE.getValue().substring(1))) {
                 functor = getFunctorFactory().lookUpFunctor(FunctorTypeImpl.TRUE);
             }
@@ -120,7 +125,10 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
     public void gotComma(CommaEvent commaEvent) {
         if (fHandler.areDelimitersBalanced()&&fHandler.isUsed()) {// this has to be in use so that the comma is inside some set of delimiters.
             // then we have finished with this functor
-            getCurrentFunctor().addArg(getjFunctor(commaEvent.getText()));
+            if(currentBlock == null){
+                System.out.println(getClass().getSimpleName() + ".gotComma: text=" + commaEvent.getText());
+            }
+            getCurrentBlock().addArg(getjFunctor(commaEvent.getText()));
             fHandler.reset();
         }
     }
@@ -133,6 +141,6 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
         ifBlock = null;
         thenBlock = null;
         elseBlock = null;
-        currentFunctor = null;
+        currentBlock = null;
     }
 }

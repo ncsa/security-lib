@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.core.util;
 
+import java.util.HashMap;
+
 /**
  * For loading a configuration into an environment. .
  * <p>Created by Jeff Gaynor<br>
@@ -23,4 +25,11 @@ public interface ConfigurationLoader<T extends AbstractEnvironment> {
      * @throws Exception
      */
     public T createInstance();
+
+    /**
+     * Get any constants associated with this loader.
+     * @return
+     */
+    HashMap<String, String> getConstants();
+
 }

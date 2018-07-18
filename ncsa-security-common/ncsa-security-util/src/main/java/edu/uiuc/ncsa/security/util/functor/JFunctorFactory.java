@@ -349,4 +349,9 @@ public class JFunctorFactory {
         String key = jsonObject.keySet().iterator().next().toString();
         return jsonObject.get(key) instanceof JSONArray;
     }
+
+    @Override
+    public String toString() {
+        return "JFunctorFactory{}";
+    }
 }

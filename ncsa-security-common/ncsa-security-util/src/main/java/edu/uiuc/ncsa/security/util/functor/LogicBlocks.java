@@ -59,7 +59,6 @@ public  class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements
 
 
     public Object execute() {
-        DebugUtil.dbg(this, "starting to execute logic blocks, type #=" + connector);
         if (isExecuted()) {
             return true;
         }

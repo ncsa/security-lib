@@ -5,10 +5,14 @@ import edu.uiuc.ncsa.security.util.functor.parser.ParserError;
 import java.util.LinkedList;
 
 /**
+ * An event driven parser for functors. Note that this does allow for escape characters. Any single character
+ * preceeded by a backslash will be passed along unaltered.
  * <p>Created by Jeff Gaynor<br>
  * on 7/16/18 at  11:27 AM
  */
 public class EventDrivenParser {
+    public static  final char escapeChar = '\\';
+    public boolean debugOn = false; // this is public, so set it if you need it. It does get very verbose!
     LinkedList<DelimiterListener> braceListeners = new LinkedList<>();
     LinkedList<DelimiterListener> bracketListeners = new LinkedList<>();
     ;
@@ -55,24 +59,38 @@ public class EventDrivenParser {
     }
 
     protected void notifyOpenListeners(LinkedList<DelimiterListener> listeners, DelimiterEvent event) {
+        if(debugOn){
+            System.out.println(getClass().getSimpleName() + ".notifyOpenDelim: " + event.getDelimiter()+", name=" + event.getName());
+        }
         for (DelimiterListener d : listeners) {
             d.openDelimiter(event);
         }
     }
 
     protected void notifyCloseListeners(LinkedList<DelimiterListener> listeners, DelimiterEvent event) {
+        if(debugOn){
+            System.out.println(getClass().getSimpleName() + ".notifyCloseDelim: " + event.getDelimiter() + ", name=" + event.getName());
+        }
         for (DelimiterListener d : listeners) {
             d.closeDelimiter(event);
         }
     }
 
     protected void notifyCommaListeners(LinkedList<CommaListener> listeners, CommaEvent event) {
+        if(debugOn){
+            System.out.println(getClass().getSimpleName() + ".notifyComma text:" + event.getText());
+        }
+
         for (CommaListener d : listeners) {
             d.gotComma(event);
         }
     }
 
     protected void notifyDQListeners(LinkedList<DoubleQuoteListener> listeners, DoubleQuoteEvent event) {
+        if(debugOn){
+            System.out.println(getClass().getSimpleName() + ".notifyDQ:" + event.getCharacters());
+        }
+
         for (DoubleQuoteListener d : listeners) {
             d.gotText(event);
         }
@@ -88,35 +106,41 @@ public class EventDrivenParser {
         int closeBracketCount = 0; // the number of close brackets, ].
         int closeParenthesisCount = 0; // the number of close parentheses, ).
         StringBuffer sb = new StringBuffer();
+        boolean escapeCharFound = false;
         for (char c : chars) {
+            if(escapeCharFound){
+                sb.append(c);
+                escapeCharFound = false;
+                continue;
+            }
             switch (c) {
                 case '{':
-                    notifyOpenListeners(braceListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyOpenListeners(braceListeners, new DelimiterEvent(this, sb.toString().trim(), '{'));
                     openBraceCount++;
                     sb = new StringBuffer();
                     break;
                 case '}':
-                    notifyCloseListeners(braceListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyCloseListeners(braceListeners, new DelimiterEvent(this, sb.toString().trim(),'}'));
                     sb = new StringBuffer();
                     closeBraceCount++;
                     break;
                 case '[':
-                    notifyOpenListeners(bracketListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyOpenListeners(bracketListeners, new DelimiterEvent(this, sb.toString().trim(), '['));
                     openBracketCount++;
                     sb = new StringBuffer();
                     break;
                 case ']':
-                    notifyCloseListeners(bracketListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyCloseListeners(bracketListeners, new DelimiterEvent(this, sb.toString().trim(),']'));
                     sb = new StringBuffer();
                     closeBracketCount++;
                     break;
                 case '(':
-                    notifyOpenListeners(parenthesisListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyOpenListeners(parenthesisListeners, new DelimiterEvent(this, sb.toString().trim(),'('));
                     openParenthesistCount++;
                     sb = new StringBuffer();
                     break;
                 case ')':
-                    notifyCloseListeners(parenthesisListeners, new DelimiterEvent(this, sb.toString().trim()));
+                    notifyCloseListeners(parenthesisListeners, new DelimiterEvent(this, sb.toString().trim(),')'));
                     closeParenthesisCount++;
                     sb = new StringBuffer();
                     break;
@@ -133,6 +157,9 @@ public class EventDrivenParser {
                 case ',':
                     notifyCommaListeners(commaListeners, new CommaEvent(this, sb.toString().trim()));
                     sb = new StringBuffer();
+                    break;
+                case escapeChar:
+                    escapeCharFound = true;
                     break;
                 default:
                     sb.append(c);
