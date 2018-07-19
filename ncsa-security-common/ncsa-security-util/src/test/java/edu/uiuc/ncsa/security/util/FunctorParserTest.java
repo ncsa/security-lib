@@ -423,6 +423,27 @@ public class FunctorParserTest extends TestBase {
         eh.getLogicBlocks().execute();
         assert eh.getLogicBlocks().getFunctorMap().containsKey(FunctorTypeImpl.CONCAT.getValue());
         assert eh.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.CONCAT.getValue()).get(0).getResult().equals("pq");
-
     }
+
+    /**
+      * Test that running the parser against the handler works, when there is no
+     * outer logic block.
+      *
+      * @throws Exception
+      */
+     @Test
+     public void testLBHandler() throws Exception {
+         String testString = "drop(\"A\",toUpperCase(\"abcda\"))";
+
+         EventDrivenParser parser = new EventDrivenParser();
+               JFunctorFactory functorFactory = createFunctorFactory();
+               EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
+               EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
+               EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
+               parser.addBraceListener(eh);
+               parser.addCommaListener(eh);
+               parser.parse(testString);
+
+
+     }
 }
