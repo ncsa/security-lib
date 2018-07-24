@@ -100,6 +100,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     public abstract void deserialize(InputLine inputLine);
 
+    public abstract void search(InputLine inputLine);
 
     public void update(InputLine inputLine) {
         if (showHelp(inputLine)) {

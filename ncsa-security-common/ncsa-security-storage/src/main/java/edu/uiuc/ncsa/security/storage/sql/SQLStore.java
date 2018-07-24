@@ -247,6 +247,36 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         return t;
     }
 
+
+    public List<V> search(String key, String condition, boolean isRegEx) {
+        String searchString = "select * from " + getTable().getFQTablename() + " where " + key + " " +  (isRegEx?"regexp":"=") + " ?";
+          List<V>  values = new ArrayList<>();
+          Connection c = getConnection();
+          V t = null;
+          try {
+              PreparedStatement stmt = c.prepareStatement(searchString);
+              stmt.setString(1, condition);
+              stmt.executeQuery();
+              ResultSet rs = stmt.getResultSet();
+              // Now we have to pull in all the values.
+              while(rs.next()){
+                  ColumnMap map = rsToMap(rs);
+                  t = create();
+                  populate(map, t);
+                  values.add(t);
+              }
+
+              rs.close();
+              stmt.close();
+              releaseConnection(c);
+          } catch (SQLException e) {
+              destroyConnection(c);
+              throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
+          }
+          return values;
+      }
+
+
     /**
      * Take the values in the current row and stash them in a map, keyed by column name.
      *

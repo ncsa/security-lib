@@ -58,4 +58,14 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public List<V> getAll();
 
     public XMLConverter<V> getXMLConverter();
+
+    /**
+     * Allows for searching via a reg ex. Note that this may be very expensive for certain stores!
+     * @param key
+     * @param condition
+     * @param isRegEx
+     * @return
+     */
+    public List<V> search(String key, String condition, boolean isRegEx);
+
 }

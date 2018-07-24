@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.security.oauth_2_0.server.config.JSONClaimSourceConfig;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
 import net.sf.json.JSONObject;
 
@@ -24,8 +23,8 @@ public interface ClaimSource {
      *
      * @param configuration
      */
-    public void setConfiguration(JSONClaimSourceConfig configuration);
-    public JSONClaimSourceConfig  getConfiguration();
+    public void setConfiguration(ClaimSourceConfiguration configuration);
+    public ClaimSourceConfiguration  getConfiguration();
     public boolean hasConfiguration();
 
     /**
@@ -44,6 +43,10 @@ public interface ClaimSource {
     // Resolves OAUTH-199, pass in servlet request to the claim source.
     public JSONObject process(JSONObject claims, HttpServletRequest request, ServiceTransaction transaction) throws UnsupportedScopeException;
 
+    /**
+     * Set the scopes for this source.
+     * @param scopes
+     */
     public void setScopes(Collection<String> scopes);
 
     /**

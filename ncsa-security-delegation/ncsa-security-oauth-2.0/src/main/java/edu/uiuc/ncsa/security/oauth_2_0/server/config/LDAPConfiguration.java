@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import javax.naming.Name;
@@ -28,15 +27,6 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
     int port = -1;
     SSLConfiguration sslConfiguration;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    String name = "";
 
     public String getSearchNameKey() {
         return searchNameKey;
@@ -82,20 +72,6 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         this.searchAttributes = searchAttributes;
     }
 
-    /**
-     * If this is disabled (or there is no configuration for one) then the LDAP scope handler should
-     * not be created, just a basic one.
-     * @return
-     */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    boolean enabled = false;
 
     public String getPassword() {
         return password;
@@ -160,24 +136,6 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         this.contextName = contextName;
     }
 
-    boolean failOnError = false;
-    boolean notifyOnFail = false;
-
-    public boolean isFailOnError() {
-        return failOnError;
-    }
-
-    public void setFailOnError(boolean failOnError) {
-        this.failOnError = failOnError;
-    }
-
-    public boolean isNotifyOnFail() {
-        return notifyOnFail;
-    }
-
-    public void setNotifyOnFail(boolean notifyOnFail) {
-        this.notifyOnFail = notifyOnFail;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -210,8 +168,8 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         ldap2.setServer(getServer());
         ldap2.setSslConfiguration(getSslConfiguration());
         ldap2.setSearchBase(getSearchBase());
-        ldap2.setPreProcessing(getPreProcessing());
-        ldap2.setPostProcessing(getPostProcessing());
+        ldap2.setRawPostProcessor(getRawPostProcessor());
+        ldap2.setRawPreProcessor(getRawPreProcessor());
         return ldap2;
     }
 
@@ -236,41 +194,20 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
 
     @Override
     public void fromJSON(JSONObject json) {
-        LDAPConfigurationUtil.fromJSON(this, json);
+        LDAPConfigurationUtil x = new LDAPConfigurationUtil();
+        x.fromJSON(this, json);
     }
 
     @Override
     public JSONObject toJSON() {
-        return LDAPConfigurationUtil.toJSON(this);
+        LDAPConfigurationUtil x = new LDAPConfigurationUtil();
+        return x.toJSON(this);
     }
 
     @Override
     public boolean hasJSONObject() {
         return true;
     }
-    JSONObject preProcessing = null;
 
-    public JSONObject getPostProcessing() {
-        return postProcessing;
-    }
-
-    public void setPostProcessing(JSONObject postProcessing) {
-        this.postProcessing = postProcessing;
-    }
-
-    /**
-     * The <b>raw json</b> for the pre-processing directives. This has to be done this way since the directives
-     * rely on being constructed with the claims at runtime (e.g. for replacement templates).
-     * @return
-     */
-    public JSONObject getPreProcessing() {
-        return preProcessing;
-    }
-
-    public void setPreProcessing(JSONObject preProcessing) {
-        this.preProcessing = preProcessing;
-    }
-
-    JSONObject postProcessing = null;
 
 }

@@ -60,7 +60,7 @@ public class InputLine {
         if(size() == 0){
             throw new ArgumentNotFoundException();
         }
-        return getArg(size()-1);
+        return getArg(size() - 1);
     }
 
     /**
@@ -129,5 +129,36 @@ public class InputLine {
             index++;
         }
         return -1;
+    }
+
+    /**
+     * This will find the index for the "key" and return the very next argument. This is a
+     * very, very use idiom for retrieving arguments for options.<br/><br/>
+     * E.g. If the command line were
+     * <pre>
+     *    myfunc -x foo -y fnord -blarg
+     * </pre>
+     * Then
+     * <pre>
+     *       getNextArgFor("-x");
+     * </pre>
+     * would return "foo". On the other hand
+     * <pre>
+     *       getNextArgFor("-blarg");
+     * </pre>
+     * would return a null, since there is no possible argument for it.
+     *
+     * @param key
+     * @return
+     */
+    public String getNextArgFor(String key){
+        int index = indexOf(key);
+        if(index <= 0){ // so if it is not found (-1) or is the name of the function (0) return null
+            return null;
+        }
+        if(index ==getArgs().size()-1){ // so it is the last arg in the string and there cannot be another
+            return null;
+        }
+        return getArg(1 + index); // finally, a result!
     }
 }

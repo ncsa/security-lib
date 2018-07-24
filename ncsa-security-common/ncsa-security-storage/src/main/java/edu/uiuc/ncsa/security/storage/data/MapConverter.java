@@ -93,6 +93,7 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
         if (map instanceof ConversionMap) {
             return (V) fromMap((ConversionMap) map, v);
         }
+        System.err.print("MapConverter.fromMap(): failed for " + v);
         throw new NotImplementedException("Error: not implement for non ConversionMap objects");
     }
 
@@ -102,6 +103,7 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
             toMap(value, (ConversionMap) data);
             return;
         }
+        System.err.print("MapConverter.toMap(): failed for " + data);
         throw new NotImplementedException("Error: not implement for non ConversionMap objects");
 
     }

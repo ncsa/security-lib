@@ -3,7 +3,8 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
-import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfigurationUtil;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfigurationUtil;
 import net.sf.json.JSON;
@@ -24,23 +25,20 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfiguration
  * <p>Created by Jeff Gaynor<br>
  * on 5/4/16 at  8:50 AM
  */
-public class LDAPConfigurationUtil {
+public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
     public static final String LDAP_TAG = "ldap";
     public static final String LDAP_PASSWORD_TAG = "password";
     public static final String LDAP_ADDRESS_TAG = "address";
     public static final String LDAP_SEARCH_BASE_TAG = "searchBase";
     public static final String SEARCH_NAME_USERNAME = "username";
     public static final String SEARCH_NAME_KEY = "searchName";
-    public static final String CONFIGURATION_NAME_KEY = "name";
 
     public static final String LDAP_SEARCH_ATTRIBUTES_TAG = "searchAttributes";
     public static final String LDAP_SEARCH_ATTRIBUTE_TAG = "attribute";
     public static final String LDAP_SECURITY_PRINCIPAL_TAG = "principal";
     public static final String LDAP_PORT_TAG = "port";
     public static final String LDAP_CONTEXT_NAME_TAG = "contextName";
-    public static final String LDAP_ENABLED_TAG = "enabled";
-    public static final String LDAP_FAIL_ON_ERROR_TAG = "failOnError";
-    public static final String LDAP_NOTIFY_ON_FAIL_TAG = "notifyOnFail";
+
     public static final int DEFAULT_PORT = 636;
     public static final String LDAP_AUTH_TYPE = "authorizationType";
     public static final String LDAP_AUTH_NONE = "none";
@@ -53,6 +51,16 @@ public class LDAPConfigurationUtil {
     public static final String RETURN_NAME = "returnName"; // attribute for the attribute tag.E.g. <attribute returnName="foo">bar</attributte>
     public static final String RETURN_AS_LIST = "returnAsList"; // attribute for the attribute tag.E.g. <attribute returnAsList="true">bar</attributte>
     public static final String IS_GROUP = "isGroup"; // attribute telling that this is the group information.
+
+    @Override
+    public ClaimSourceConfiguration createConfiguration() {
+        return new LDAPConfiguration();
+    }
+
+    @Override
+    public String getComponentName() {
+        return LDAP_TAG;
+    }
 
     public static class AttributeEntry {
         public AttributeEntry(String sourceName, String targetName, boolean isList, boolean isGroup) {
@@ -86,30 +94,18 @@ public class LDAPConfigurationUtil {
      * @param node
      * @return
      */
-    public static LDAPConfiguration getLdapConfiguration(MyLoggingFacade logger, ConfigurationNode node) {
-        LDAPConfiguration ldapConfiguration = new LDAPConfiguration();
-        logger.info("Starting to load LDAP configuration.");
+    public  LDAPConfiguration getLdapConfiguration(MyLoggingFacade logger, ConfigurationNode node) {
         ConfigurationNode ldapNode = Configurations.getFirstNode(node, LDAP_TAG);
+        // This comes from the server configuration so we have to look for the right node to kick this off.
+        LDAPConfiguration ldapConfiguration = (LDAPConfiguration) getConfiguration(logger, ldapNode);
+        logger.info("Starting to load LDAP configuration.");
 
-
-        if (ldapNode == null) {
-            logger.info("No LDAP configuration found.");
-            ldapConfiguration.setEnabled(false);
-            return ldapConfiguration;
+        if(!ldapConfiguration.isEnabled()){
+            return ldapConfiguration; // nothing to do.
         }
         // There is a configuration, so implicitly enable this.
-        ldapConfiguration.setEnabled(true);
         SSLConfiguration sslConfiguration = SSLConfigurationUtil.getSSLConfiguration(logger, ldapNode);
         ldapConfiguration.setSslConfiguration(sslConfiguration);
-        String errs = getNodeValue(ldapNode, LDAP_FAIL_ON_ERROR_TAG);
-        if (!(errs == null || errs.length() == 0)) {
-            ldapConfiguration.setFailOnError(Boolean.getBoolean(errs));
-        }
-        errs = getNodeValue(ldapNode, LDAP_NOTIFY_ON_FAIL_TAG);
-        if (!(errs == null || errs.length() == 0)) {
-            ldapConfiguration.setNotifyOnFail(Boolean.getBoolean(errs));
-        }
-
 
         ldapConfiguration.setServer(getNodeValue(ldapNode, LDAP_ADDRESS_TAG));
         String x = getNodeValue(ldapNode, LDAP_CONTEXT_NAME_TAG);
@@ -174,14 +170,7 @@ public class LDAPConfigurationUtil {
         }
 
         ldapConfiguration.setPassword(getNodeValue(ldapNode, LDAP_PASSWORD_TAG));
-        x = getFirstAttribute(ldapNode, LDAP_ENABLED_TAG);
-        if (x != null) {
-            try {
-                ldapConfiguration.setEnabled(Boolean.parseBoolean(x));
-            } catch (Throwable t) {
-                logger.warn("Could not parsed enabled flag value of \"" + x + "\". Assuming LDAP is enabled.");
-            }
-        }
+
         x = getFirstAttribute(ldapNode, LDAP_AUTH_TYPE);
         ldapConfiguration.setAuthType(getAuthType(x));
 
@@ -191,7 +180,7 @@ public class LDAPConfigurationUtil {
     }
 
 
-    protected static int getAuthType(String x) {
+    protected int getAuthType(String x) {
         int rc = LDAP_AUTH_UNSPECIFIED_KEY; // default
         if (x != null) {
             // If specified, figure out what they want.
@@ -215,7 +204,7 @@ public class LDAPConfigurationUtil {
      * @param configurations
      * @return
      */
-    public static JSONArray toJSON(Collection<LDAPConfiguration> configurations) {
+    public JSONArray toJSON(Collection<LDAPConfiguration> configurations) {
         JSONArray ldaps = new JSONArray();
         for (LDAPConfiguration ldap : configurations) {
             ldaps.add(toJSON(ldap));
@@ -229,29 +218,22 @@ public class LDAPConfigurationUtil {
      * @param configuration
      * @return
      */
-    public static JSONObject toJSON(LDAPConfiguration configuration) {
-        JSONUtil jsonUtil = getJSONUtil();
-        JSONObject ldap = new JSONObject();
-        JSONObject content = new JSONObject();
-        ldap.put(LDAP_TAG, content);
-        jsonUtil.setJSONValue(ldap, CONFIGURATION_NAME_KEY, configuration.getName());
-        jsonUtil.setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
-        jsonUtil.setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
-        jsonUtil.setJSONValue(ldap, LDAP_ENABLED_TAG, configuration.isEnabled());
-        jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
-        jsonUtil.setJSONValue(ldap, LDAP_FAIL_ON_ERROR_TAG, configuration.isFailOnError());
-        jsonUtil.setJSONValue(ldap, LDAP_NOTIFY_ON_FAIL_TAG, configuration.isNotifyOnFail());
-        jsonUtil.setJSONValue(ldap, CLAIM_PRE_PROCESSING_KEY, configuration.getPreProcessing());
-        jsonUtil.setJSONValue(ldap, CLAIM_POST_PROCESSING_KEY, configuration.getPostProcessing());
+    public  JSONObject toJSON(LDAPConfiguration configuration) {
+        JSONObject ldap = super.toJSON(configuration);
+        getJSONUtil().setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
+        getJSONUtil().setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
+        getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, configuration.getAuthType());
+        getJSONUtil().setJSONValue(ldap, CLAIM_PRE_PROCESSING_KEY, configuration.getJSONPreProcessing());
+        getJSONUtil().setJSONValue(ldap, CLAIM_POST_PROCESSING_KEY, configuration.getJSONPostProcessing());
 
         if (configuration.getAuthType() == LDAP_AUTH_NONE_KEY) {
-            jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);
+            getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_NONE);
         }
         if (configuration.getAuthType() == LDAP_AUTH_SIMPLE_KEY) {
-            jsonUtil.setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_SIMPLE);
+            getJSONUtil().setJSONValue(ldap, LDAP_AUTH_TYPE, LDAP_AUTH_SIMPLE);
 
-            jsonUtil.setJSONValue(ldap, LDAP_PASSWORD_TAG, configuration.getPassword());
-            jsonUtil.setJSONValue(ldap, LDAP_SECURITY_PRINCIPAL_TAG, configuration.getSecurityPrincipal());
+            getJSONUtil().setJSONValue(ldap, LDAP_PASSWORD_TAG, configuration.getPassword());
+            getJSONUtil().setJSONValue(ldap, LDAP_SECURITY_PRINCIPAL_TAG, configuration.getSecurityPrincipal());
         }
 
         // Now for the search attributes
@@ -268,32 +250,25 @@ public class LDAPConfigurationUtil {
             }
             searchAttributes.add(entry);
         }
-        jsonUtil.setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);
-        jsonUtil.setJSONValue(ldap, LDAP_SEARCH_BASE_TAG, configuration.getSearchBase());
+        getJSONUtil().setJSONValue(ldap, LDAP_SEARCH_ATTRIBUTES_TAG, searchAttributes);
+        getJSONUtil().setJSONValue(ldap, LDAP_SEARCH_BASE_TAG, configuration.getSearchBase());
         if (configuration.getSearchNameKey() != null) {
-            jsonUtil.setJSONValue(ldap, SEARCH_NAME_KEY, configuration.getSearchNameKey());
+            getJSONUtil().setJSONValue(ldap, SEARCH_NAME_KEY, configuration.getSearchNameKey());
         }
         if (configuration.getContextName() == null) {
-            jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, "");
+            getJSONUtil().setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, "");
 
         } else {
-            jsonUtil.setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
+            getJSONUtil().setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, configuration.getContextName());
         }
         if (configuration.getSslConfiguration() != null) {
             JSONObject jsonSSL = SSLConfigurationUtil2.toJSON(configuration.getSslConfiguration());
-            jsonUtil.setJSONValue(ldap, SSLConfigurationUtil2.SSL_TAG, jsonSSL.getJSONObject(SSLConfigurationUtil2.SSL_TAG));
+            getJSONUtil().setJSONValue(ldap, SSLConfigurationUtil2.SSL_TAG, jsonSSL.getJSONObject(SSLConfigurationUtil2.SSL_TAG));
         }
         return ldap;
     }
 
-    static JSONUtil jsonUtil = null;
 
-    protected static JSONUtil getJSONUtil() {
-        if (jsonUtil == null) {
-            jsonUtil = new JSONUtil(LDAP_TAG);
-        }
-        return jsonUtil;
-    }
 
     /**
      * Takes a generic {@link JSON} object and disambiguates it, returning a collection of LDAP
@@ -302,7 +277,7 @@ public class LDAPConfigurationUtil {
      * @param json
      * @return
      */
-    public static Collection<LDAPConfiguration> fromJSON(JSON json) {
+    public  Collection<LDAPConfiguration> fromJSON(JSON json) {
         if (json instanceof JSONArray) {
             return fromJSON((JSONArray) json);
         }
@@ -316,7 +291,7 @@ public class LDAPConfigurationUtil {
         return ldaps;
     }
 
-    public static Collection<LDAPConfiguration> fromJSON(JSONArray json) {
+    public Collection<LDAPConfiguration> fromJSON(JSONArray json) {
         LinkedList<LDAPConfiguration> ldaps = new LinkedList<>();
         for (int i = 0; i < json.size(); i++) {
             ldaps.add(fromJSON(json.getJSONObject(i)));
@@ -324,20 +299,28 @@ public class LDAPConfigurationUtil {
         return ldaps;
     }
 
-    public static boolean isLDAPCOnfig(JSONObject json) {
+    /**
+     * Check if a configuration is for ldap.
+     * @param json
+     * @return
+     */
+    public boolean isLDAPCOnfig(JSONObject json) {
         return json.containsKey(LDAP_TAG);
     }
 
     /**
-     * Populate an existing LDAPConfiguration from the JSON.
+     * Populate an <b>existing</b> LDAPConfiguration from the JSON.
      *
-     * @param config
+     * @param claimSourceConfiguration
      * @param json
      * @return
      */
-    public static LDAPConfiguration fromJSON(LDAPConfiguration config, JSONObject json) {
-        JSONUtil jsonUtil = getJSONUtil();
+    @Override
+    public LDAPConfiguration fromJSON(ClaimSourceConfiguration claimSourceConfiguration, JSONObject json) {
+        super.fromJSON(claimSourceConfiguration, json);
+        LDAPConfiguration config = (LDAPConfiguration)claimSourceConfiguration;
 
+        JSONUtil jsonUtil = getJSONUtil();
         String contextName = jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG);
         if (contextName == null) {
             config.setContextName("");
@@ -346,18 +329,10 @@ public class LDAPConfigurationUtil {
         }
 
 
-        config.setEnabled(jsonUtil.getJSONValueBoolean(json, LDAP_ENABLED_TAG));
-        config.setName(jsonUtil.getJSONValueString(json, CONFIGURATION_NAME_KEY));
         String x = jsonUtil.getJSONValueString(json, LDAP_AUTH_TYPE);
         config.setAuthType(getAuthType(x)); // default
         config.setServer(jsonUtil.getJSONValueString(json, LDAP_ADDRESS_TAG));
         config.setPort(jsonUtil.getJSONValueInt(json, LDAP_PORT_TAG));
-        if (jsonUtil.hasKey(json, LDAP_FAIL_ON_ERROR_TAG)) {
-            config.setFailOnError(jsonUtil.getJSONValueBoolean(json, LDAP_FAIL_ON_ERROR_TAG));
-        }
-        if (jsonUtil.hasKey(json, LDAP_NOTIFY_ON_FAIL_TAG)) {
-            config.setNotifyOnFail(jsonUtil.getJSONValueBoolean(json, LDAP_NOTIFY_ON_FAIL_TAG));
-        }
         Object se = jsonUtil.getJSONValue(json, LDAP_SEARCH_ATTRIBUTES_TAG);
         if (se instanceof JSONArray) {
             JSONArray searchAttributes = (JSONArray) se;
@@ -383,45 +358,15 @@ public class LDAPConfigurationUtil {
             jsonSSL.put(SSLConfigurationUtil2.SSL_TAG, jsonUtil.getJSONValue(json, SSLConfigurationUtil2.SSL_TAG));
             SSLConfiguration sslConfiguration = SSLConfigurationUtil2.fromJSON(jsonSSL);
             config.setSslConfiguration(sslConfiguration);
-            config.setPreProcessing(makeProcessor(json, CLAIM_PRE_PROCESSING_KEY));
-            config.setPostProcessing(makeProcessor(json, CLAIM_POST_PROCESSING_KEY));
         }
         return config;
 
     }
 
-    protected static JSONObject makeProcessor(JSONObject json, String key) {
-        String x = jsonUtil.getJSONValueString(json, key);
-        if(x!= null && !x.isEmpty()){
-            JSONArray array = null;
-            try{
-                array = JSONArray.fromObject(x);
-                JSONObject j = new JSONObject();
-                j.put(FunctorTypeImpl.OR.getValue(), array);
-                return j;
-            }catch(Throwable t){
-                  // do nothing
-            }
-            // So it's not an array. See if it's a JSONObject
-            try{
-                return JSONObject.fromObject(x);
-            }catch(Throwable t){
-            }
-        }
-        // do nothing if it is not JSON
-        return null;
-    }
 
-    public static LDAPConfiguration fromJSON(JSONObject json) {
+    public  LDAPConfiguration fromJSON(JSONObject json) {
         LDAPConfiguration config = new LDAPConfiguration();
         return fromJSON(config, json);
-    }
-
-    public static void main(String[] args) {
-        try {
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
     }
 
 }

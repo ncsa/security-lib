@@ -248,5 +248,10 @@ public class AggregateStore<V extends Store> implements Store {
     public XMLConverter getXMLConverter() {
         throw new NotImplementedException("Error: Cannot have a single converter for an aggregate store");
     }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx) {
+        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+    }
 }
 

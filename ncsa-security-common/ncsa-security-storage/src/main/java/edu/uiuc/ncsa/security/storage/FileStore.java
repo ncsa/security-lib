@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * A store backed by the file system. This works with all implementations since it just serializes whatever
@@ -141,11 +142,11 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
             fos = new FileOutputStream(f);
             if (converter != null) {
-                    XMLMap map = new XMLMap();
-                    converter.toMap(t, map);
-                    map.toXML(fos);
-                    fos.flush();
-                    fos.close();
+                XMLMap map = new XMLMap();
+                converter.toMap(t, map);
+                map.toXML(fos);
+                fos.flush();
+                fos.close();
             } else {
                 throw new IllegalStateException("Error: no converter");
             }
@@ -225,9 +226,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             fis = new FileInputStream(f);
             return loadStream(fis);
         } catch (Throwable e) {
-            if(DebugUtil.isEnabled()){e.printStackTrace();}
-          //  String message = "Warning: the file named \"" + f.getAbsolutePath() + "\" could not be loaded. Skipping.";
-          //  throw new GeneralException(message, e);
+            if (DebugUtil.isEnabled()) {
+                System.err.println("Could not load file \"" + f.getAbsolutePath() + "\", printing stack trace...");
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -284,7 +286,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                 V t = null;
                 if (!failures.contains(f.getAbsolutePath())) {
                     t = loadFile(f);
-                    if(t!= null) {
+                    if (t != null) {
                         ids.add(t.getIdentifier());
                     }
                 }
@@ -306,7 +308,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         Collection<V> allOfThem = new LinkedList<V>();
         for (File f : storageDirectory.listFiles()) {
             V t = loadFile(f);
-            if(t!=null) {
+            if (t != null) {
                 allOfThem.add(t);
             }
         }
@@ -318,9 +320,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         Set<Entry<Identifier, V>> entries = new HashSet<Entry<Identifier, V>>();
         for (File f : storageDirectory.listFiles()) {
             V t = loadFile(f);
-            if (t != null)   {
+            if (t != null) {
                 entries.add(new SimpleEntryImpl<Identifier, V>(t.getIdentifier(), (V) t));
-        }
+            }
         }
         return entries;
     }
@@ -362,8 +364,8 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     @Override
     public List<V> getAll() {
         LinkedList<V> allEntries = new LinkedList<>();
-        for(Identifier d : keySet()){
-               allEntries.add(get(d));
+        for (Identifier d : keySet()) {
+            allEntries.add(get(d));
         }
         return allEntries;
     }
@@ -390,7 +392,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         if (f.exists() && !f.isDirectory()) {
             f.delete();
         }
-        if(oldItem.getIdentifierString() != null){
+        if (oldItem.getIdentifierString() != null) {
             removeIndexEntry(oldItem.getIdentifierString()); // The main index
         }
 
@@ -409,7 +411,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             return null;
         }
         V t = (V) loadByIdentifier(key.toString());
-        V x =  realRemove(t);
+        V x = realRemove(t);
         return x;
     }
 
@@ -453,4 +455,39 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     public XMLConverter<V> getXMLConverter() {
         return converter;
     }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx) {
+        /*
+        This can be a very expensive way to do this, but it does allow for searching through an
+        entire file store for things.
+        MemoryStore has this code boilerplated into it...
+         */
+        ArrayList<V> results = new ArrayList();
+        Collection<V> values = values();
+        Iterator iterator = values.iterator();
+        Pattern pattern = null;
+        if(isRegEx) {
+            pattern = Pattern.compile(condition);
+        }
+        while (iterator.hasNext()) {
+            V v = (V) iterator.next();
+            XMLMap map = new XMLMap();
+
+            getXMLConverter().toMap(v, map);
+            String targetValue = map.get(key).toString();
+            if (isRegEx) {
+                if (pattern.matcher(targetValue).matches()) {
+                    results.add(v);
+                }
+            } else {
+                if (targetValue.equals(condition)) {
+                    results.add(v);
+                }
+            }
+
+        }
+        return results;
+    }
+
 }

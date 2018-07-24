@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
+import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSourceConfiguration;
 import net.sf.json.JSONObject;
 
 /**
@@ -9,7 +10,7 @@ import net.sf.json.JSONObject;
  * <p>Created by Jeff Gaynor<br>
  * on 4/16/18 at  2:12 PM
  */
-public abstract class JSONClaimSourceConfig {
+public abstract class JSONClaimSourceConfig extends ClaimSourceConfiguration{
     public JSONClaimSourceConfig(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
     }
@@ -33,19 +34,5 @@ public abstract class JSONClaimSourceConfig {
     }
 
 
-    public abstract String getName();
 
-
-    public abstract JSONObject getPostProcessing();
-
-    public abstract void setPostProcessing(JSONObject postProcessing);
-
-    /**
-     * The <b>raw json</b> for the pre-processing directives. This has to be done this way since the directives
-     * rely on being constructed with the claims at runtime (e.g. for replacement templates).
-     * @return
-     */
-    public abstract JSONObject getPreProcessing();
-
-    public abstract void setPreProcessing(JSONObject preProcessing);
 }
