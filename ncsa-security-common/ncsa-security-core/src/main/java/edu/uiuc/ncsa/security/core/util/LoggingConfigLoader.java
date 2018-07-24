@@ -19,8 +19,6 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
      * @return
      */
     public abstract String getVersionString();
-    // FIXME!! Make sure the version number is right here. Every component references this for its version number!!
-    //public static final String VERSION_NUMBER = "3.0";
     protected ConfigurationNode cn;
     protected Provider<MyLoggingFacade> loggerProvider;
     protected MyLoggingFacade myLogger = null;
