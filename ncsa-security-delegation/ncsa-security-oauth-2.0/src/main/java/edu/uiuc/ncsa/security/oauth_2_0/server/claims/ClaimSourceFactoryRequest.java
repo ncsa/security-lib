@@ -28,9 +28,28 @@ public class ClaimSourceFactoryRequest {
     Collection<String> scopes;
     MyLoggingFacade logger;
 
+    public ClaimSourceConfiguration getConfiguration() {
+        return configuration;
+    }
 
-    public ClaimSourceFactoryRequest(MyLoggingFacade logger, Collection<String> scopes) {
+    public void setConfiguration(ClaimSourceConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    ClaimSourceConfiguration configuration;
+
+    public ClaimSourceFactoryRequest(MyLoggingFacade logger, ClaimSourceConfiguration config, Collection<String> scopes) {
         this.logger = logger;
         this.scopes = scopes;
+        this.configuration = config;
+    }
+
+    @Override
+    public String toString() {
+        return "ClaimSourceFactoryRequest{" +
+                "configuration=" + configuration +
+                ", scopes=" + scopes +
+                ", logger=" + logger +
+                '}';
     }
 }

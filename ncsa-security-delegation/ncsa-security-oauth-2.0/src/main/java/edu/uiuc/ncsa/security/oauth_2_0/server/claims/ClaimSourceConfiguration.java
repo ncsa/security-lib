@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.Map;
+
 /**
  * Every {@link ClaimSource} can have a pre or post-processor. These may be either given as JSON objects or as
  * interpretable code. Note that the contract is that if the raw json can be interpreted as a JSON object,
@@ -13,10 +15,30 @@ import net.sf.json.JSONObject;
  */
 public class ClaimSourceConfiguration {
     protected String name = "";
+
+    /**
+     * Opaque identifier for uniquely identifying this configuratioin
+     *
+     * @return
+     */
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    protected String id = "";
     protected boolean failOnError = false;
     protected boolean notifyOnFail = false;
-    protected boolean enabled = true;
+    protected boolean enabled = false; // default, since if this is not configured, do not run it.
 
+    /**
+     * Human readable string that describes this configuration
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -25,6 +47,13 @@ public class ClaimSourceConfiguration {
         return name;
     }
 
+    /**
+     * Enable this component. If false then this component will not be used, regardless. Among other things
+     * this lets administrators turn off a claim source at the spigot if there is, e.g. a compromise in it,
+     * without having to reconfigure the client.
+     *
+     * @return
+     */
     public boolean isEnabled() {
         return enabled;
     }
@@ -33,6 +62,12 @@ public class ClaimSourceConfiguration {
         this.enabled = enabled;
     }
 
+    /**
+     * Fail if there is an error, i.e. if the claim source throws an exception, all further processing stops at that point,
+     * otherwise, continue, but just don't include the claims from this sournce
+     *
+     * @return
+     */
     public boolean isFailOnError() {
         return failOnError;
     }
@@ -40,6 +75,15 @@ public class ClaimSourceConfiguration {
     public void setFailOnError(boolean failOnError) {
         this.failOnError = failOnError;
     }
+
+    /**
+     * If this claim source has an error, notify the system administrators. This may or may not be an issue,
+     * for instance, if the client merely wants to try and retrieve information should it be there,
+     * but otherwise it does not matter. At the other end of the spectrum, if the claim source fails
+     * it may be an institution-wide issue we need to know about it now.
+     *
+     * @return
+     */
 
     public boolean isNotifyOnFail() {
         return notifyOnFail;
@@ -93,10 +137,10 @@ public class ClaimSourceConfiguration {
 
 
     public JSONObject getJSONPostProcessing() {
-        if(jsonPostProcessorDone){
+        if (jsonPostProcessorDone) {
             return jsonPostProcessing;
         }
-        jsonPostProcessing =  makeProcessor(rawPostProcessor);
+        jsonPostProcessing = makeProcessor(rawPostProcessor);
         jsonPostProcessorDone = true;
         return jsonPostProcessing;
     }
@@ -105,7 +149,7 @@ public class ClaimSourceConfiguration {
         return getJSONPreProcessing() != null;
     }
 
-    public boolean hasJSONPostPorcessing() {
+    public boolean hasJSONPostProcessing() {
         return getJSONPostProcessing() != null;
     }
 
@@ -116,33 +160,50 @@ public class ClaimSourceConfiguration {
      * @return
      */
     public JSONObject getJSONPreProcessing() {
-        if(jsonPreProcessorDone){
+        if (jsonPreProcessorDone) {
             return jsonPreProcessing;
         }
         jsonPreProcessing = makeProcessor(rawPreProcessor);
-        jsonPostProcessorDone = true;
+        jsonPreProcessorDone = true;
         return jsonPreProcessing;
     }
+
     protected JSONObject makeProcessor(String rawProcessor) {
-         if(rawProcessor!= null && !rawProcessor.isEmpty()){
-             JSONArray array = null;
-             try{
-                 array = JSONArray.fromObject(rawProcessor);
-                 JSONObject j = new JSONObject();
-                 j.put(FunctorTypeImpl.OR.getValue(), array);
-                 return j;
-             }catch(Throwable t){
-                   // do nothing
-             }
-             // So it's not an array. See if it's a JSONObject
-             try{
-                 return JSONObject.fromObject(rawProcessor);
-             }catch(Throwable t){
-             }
-         }
-         // do nothing if it is not JSON
-         return null;
-     }
+        if (rawProcessor != null && !rawProcessor.isEmpty()) {
+            JSONArray array = null;
+            try {
+                array = JSONArray.fromObject(rawProcessor);
+                JSONObject j = new JSONObject();
+                j.put(FunctorTypeImpl.OR.getValue(), array);
+                return j;
+            } catch (Throwable t) {
+                // do nothing
+            }
+            // So it's not an array. See if it's a JSONObject
+            try {
+                return JSONObject.fromObject(rawProcessor);
+            } catch (Throwable t) {
+            }
+        }
+        // do nothing if it is not JSON
+        return null;
+    }
 
+    Map<String, Object> map = null;
 
+    /**
+     * Set a bunch of properties for this configuration object.
+     *
+     * @param map
+     */
+    public void setProperties(Map<String, Object> map) {
+        this.map = map;
+    }
+
+    public Object getProperty(String key) {
+        if (map == null || !map.containsKey(key)) {
+            return null;
+        }
+        return map.get(key);
+    }
 }

@@ -153,10 +153,8 @@ public class InputLine {
      */
     public String getNextArgFor(String key){
         int index = indexOf(key);
-        if(index <= 0){ // so if it is not found (-1) or is the name of the function (0) return null
-            return null;
-        }
-        if(index ==getArgs().size()-1){ // so it is the last arg in the string and there cannot be another
+        // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
+        if(index ==getArgs().size()){ // so it is the last arg in the string and there cannot be another
             return null;
         }
         return getArg(1 + index); // finally, a result!
