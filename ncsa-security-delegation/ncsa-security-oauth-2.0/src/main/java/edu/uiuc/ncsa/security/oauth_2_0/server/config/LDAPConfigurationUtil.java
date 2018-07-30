@@ -25,7 +25,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfiguration
  * <p>Created by Jeff Gaynor<br>
  * on 5/4/16 at  8:50 AM
  */
-public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
+public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
     public static final String LDAP_TAG = "ldap";
     public static final String LDAP_PASSWORD_TAG = "password";
     public static final String LDAP_ADDRESS_TAG = "address";
@@ -94,13 +94,13 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
      * @param node
      * @return
      */
-    public  LDAPConfiguration getLdapConfiguration(MyLoggingFacade logger, ConfigurationNode node) {
+    public LDAPConfiguration getLdapConfiguration(MyLoggingFacade logger, ConfigurationNode node) {
         ConfigurationNode ldapNode = Configurations.getFirstNode(node, LDAP_TAG);
         // This comes from the server configuration so we have to look for the right node to kick this off.
         LDAPConfiguration ldapConfiguration = (LDAPConfiguration) getConfiguration(logger, ldapNode);
         logger.info("Starting to load LDAP configuration.");
 
-        if(!ldapConfiguration.isEnabled()){
+        if (!ldapConfiguration.isEnabled()) {
             return ldapConfiguration; // nothing to do.
         }
         // There is a configuration, so implicitly enable this.
@@ -218,7 +218,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
      * @param configuration
      * @return
      */
-    public  JSONObject toJSON(LDAPConfiguration configuration) {
+    public JSONObject toJSON(LDAPConfiguration configuration) {
         JSONObject ldap = super.toJSON(configuration);
         getJSONUtil().setJSONValue(ldap, LDAP_ADDRESS_TAG, configuration.getServer());
         getJSONUtil().setJSONValue(ldap, LDAP_PORT_TAG, configuration.getPort());
@@ -244,7 +244,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
             entry.put("name", ae.sourceName);
             entry.put(RETURN_AS_LIST, ae.isList);
             entry.put(RETURN_NAME, ae.targetName);
-            if(ae.isGroup) {
+            if (ae.isGroup) {
                 // only serialize this really if it is true. Implicitly this is false.
                 entry.put(IS_GROUP, ae.isGroup);
             }
@@ -269,7 +269,6 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
     }
 
 
-
     /**
      * Takes a generic {@link JSON} object and disambiguates it, returning a collection of LDAP
      * configurations.
@@ -277,7 +276,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
      * @param json
      * @return
      */
-    public  Collection<LDAPConfiguration> fromJSON(JSON json) {
+    public Collection<LDAPConfiguration> fromJSON(JSON json) {
         if (json instanceof JSONArray) {
             return fromJSON((JSONArray) json);
         }
@@ -301,11 +300,12 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
 
     /**
      * Check if a configuration is for ldap.
+     *
      * @param json
      * @return
      */
     public boolean isLDAPCOnfig(JSONObject json) {
-        return json.containsKey(LDAP_TAG);
+        return isInstanceOf(json);
     }
 
     /**
@@ -318,7 +318,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
     @Override
     public LDAPConfiguration fromJSON(ClaimSourceConfiguration claimSourceConfiguration, JSONObject json) {
         super.fromJSON(claimSourceConfiguration, json);
-        LDAPConfiguration config = (LDAPConfiguration)claimSourceConfiguration;
+        LDAPConfiguration config = (LDAPConfiguration) claimSourceConfiguration;
 
         JSONUtil jsonUtil = getJSONUtil();
         String contextName = jsonUtil.getJSONValueString(json, LDAP_CONTEXT_NAME_TAG);
@@ -364,7 +364,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil{
     }
 
 
-    public  LDAPConfiguration fromJSON(JSONObject json) {
+    public LDAPConfiguration fromJSON(JSONObject json) {
         LDAPConfiguration config = new LDAPConfiguration();
         return fromJSON(config, json);
     }

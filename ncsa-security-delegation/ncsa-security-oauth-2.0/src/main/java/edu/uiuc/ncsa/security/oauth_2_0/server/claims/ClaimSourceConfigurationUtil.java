@@ -16,7 +16,8 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfiguration
  * on 7/23/18 at  3:49 PM
  */
 public class ClaimSourceConfigurationUtil {
-    public static final String ID_TAG = "name";
+    public static final String ID_TAG = "id";
+    public static final String NAME_TAG = "name";
     public static final String ENABLED_TAG = "enabled";
     public static final String FAIL_ON_ERROR_TAG = "failOnError";
     public static final String NOTIFY_ON_FAIL_TAG = "notifyOnFail";
@@ -24,6 +25,18 @@ public class ClaimSourceConfigurationUtil {
         return "default";
     }
 
+    /**
+     * Returns if the JSON is the type for for this utility. The basic form of a JSON object for this is
+     * <pre>
+     *     {"type":{config}}
+     * </pre>
+     * and all this does is check that the type matches the {@link #getComponentName()}.
+     * @param jsonObject
+     * @return
+     */
+    public boolean isInstanceOf(JSONObject jsonObject){
+        return jsonObject.containsKey(getComponentName());
+    }
     /**
      * Override as needed to create a new configuration of the right type.
      * @return
@@ -63,6 +76,11 @@ public class ClaimSourceConfigurationUtil {
                      logger.warn("Could not parsed enabled flag value of \"" + x + "\". Assuming configuration is enabled.");
                  }
              }
+
+        String name = getNodeValue(node, NAME_TAG);
+        String id = getNodeValue(node, ID_TAG);
+        config.setName(name);
+        config.setId(id);
         String errs = getNodeValue(node, FAIL_ON_ERROR_TAG);
         if (!(errs == null || errs.length() == 0)) {
             config.setFailOnError(Boolean.getBoolean(errs));
@@ -86,7 +104,8 @@ public class ClaimSourceConfigurationUtil {
         JSONObject jsonConfig = new JSONObject();
         JSONObject content = new JSONObject();
         jsonConfig.put(getComponentName(), content);
-        jsonUtil.setJSONValue(jsonConfig, ID_TAG, config.getName());
+        jsonUtil.setJSONValue(jsonConfig, ID_TAG, config.getId());
+        jsonUtil.setJSONValue(jsonConfig, NAME_TAG, config.getName());
         jsonUtil.setJSONValue(jsonConfig, ENABLED_TAG, config.isEnabled());
         jsonUtil.setJSONValue(jsonConfig, FAIL_ON_ERROR_TAG, config.isFailOnError());
         jsonUtil.setJSONValue(jsonConfig, NOTIFY_ON_FAIL_TAG, config.isNotifyOnFail());
@@ -107,6 +126,9 @@ public class ClaimSourceConfigurationUtil {
         if(config == null) {
             config = createConfiguration();
         }
+
+        config.setId(jsonUtil.getJSONValueString(json, ID_TAG));
+        config.setName(jsonUtil.getJSONValueString(json, NAME_TAG));
         config.setEnabled(jsonUtil.getJSONValueBoolean(json, ENABLED_TAG));
         if (jsonUtil.hasKey(json, FAIL_ON_ERROR_TAG)) {
             config.setFailOnError(jsonUtil.getJSONValueBoolean(json, FAIL_ON_ERROR_TAG));
@@ -115,9 +137,9 @@ public class ClaimSourceConfigurationUtil {
             config.setNotifyOnFail(jsonUtil.getJSONValueBoolean(json, NOTIFY_ON_FAIL_TAG));
         }
 
-        config.setName(jsonUtil.getJSONValueString(json, ID_TAG));
         config.setRawPreProcessor(jsonUtil.getJSONValueString(json, CLAIM_PRE_PROCESSING_KEY));
         config.setRawPostProcessor(jsonUtil.getJSONValueString(json, CLAIM_POST_PROCESSING_KEY));
+        config.setProperties(json.getJSONObject(getComponentName()));
         return config;
     }
 

@@ -59,7 +59,8 @@ public abstract class JFunctorImpl implements JFunctor {
         }
         for (int i = 0; i < args.size(); i++) {
             if (!(args.get(i) instanceof JFunctorImpl)) {
-                throw new IllegalStateException("Error: argument is not a functor");
+                throw new IllegalStateException("Error: Functor " + type.getValue() + " has arg[" + i + "]= \""+ args.get(i) +
+                        "\" which is not a functor, it is of type \"" + args.get(i).getClass().getSimpleName() + "\"");
             }
         }
 

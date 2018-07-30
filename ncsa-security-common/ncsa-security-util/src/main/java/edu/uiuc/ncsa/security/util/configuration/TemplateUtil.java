@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.security.util.configuration;
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-
 import java.util.Map;
 
 /**
@@ -22,7 +20,6 @@ public class TemplateUtil {
     public static String replaceAll(String template, Map replacements) {
         String out = template;
         if (out == null || out.length() == 0) {
-            DebugUtil.dbg(TemplateUtil.class, "Empty template found, no message body or subject.");
             return out;
         }
         int count = 0;
@@ -37,7 +34,6 @@ public class TemplateUtil {
                 out = out.replaceAll(newKey, replacements.get(key).toString());
             }
         }
-        DebugUtil.dbg(TemplateUtil.class, "made " + count + " replacements in the template");
         return out;
     }
 }
