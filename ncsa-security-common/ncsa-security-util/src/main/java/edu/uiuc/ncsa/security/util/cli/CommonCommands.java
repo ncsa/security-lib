@@ -35,6 +35,7 @@ public abstract class CommonCommands implements Commands {
 
     public static String BATCH_MODE_FLAG = "-batch";
 
+
     protected CommonCommands(MyLoggingFacade logger) {
         this.logger = logger;
     }
