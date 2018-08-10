@@ -128,6 +128,10 @@ public abstract class StoreCommands extends CommonCommands {
 
     }
 
+    public Identifiable createNew(){
+        return this.getStore().create();
+    }
+
     /**
      * This is the workhorse method for the object that lets you edit the values.
      * Generally this should do validation and checking so that updates to the store
@@ -286,7 +290,7 @@ public abstract class StoreCommands extends CommonCommands {
                 tryAgain = false;
             }
         } // end input loop.
-        c = getStore().create();
+        c = createNew();
 
         if (id != null) {
             if (getStore().containsKey(id)) {

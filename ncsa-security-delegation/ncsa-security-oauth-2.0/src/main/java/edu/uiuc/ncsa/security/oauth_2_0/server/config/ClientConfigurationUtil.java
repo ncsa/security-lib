@@ -229,6 +229,6 @@ public class ClientConfigurationUtil {
     }
 
     public static void setComment(JSONObject config, String comment) {
-        config.put(COMMENT_KEY, comment);
+          config.put(COMMENT_KEY, comment);
     }
 }
