@@ -29,7 +29,7 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
         super(node, null);
     }
 
-    boolean disableDefaultStore = false;
+    boolean disableDefaultStore = true; // Fix for CIL-502: Require that database explicitly enable in-memory stores to use them.
 
     protected boolean isDefaultStoreDisabled(boolean... x) {
         if (x.length != 0) disableDefaultStore = x[0];
