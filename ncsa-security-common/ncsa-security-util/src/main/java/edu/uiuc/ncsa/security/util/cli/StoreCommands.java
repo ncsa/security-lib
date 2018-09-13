@@ -102,6 +102,8 @@ public abstract class StoreCommands extends CommonCommands {
 
     public abstract void search(InputLine inputLine);
 
+   public abstract  void edit(InputLine inputLine);
+
     public void update(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showUpdateHelp();

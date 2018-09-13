@@ -12,7 +12,7 @@ import java.util.Vector;
 public final class CommandLineTokenizer {
 	public static void main(String[] args) {
 		CommandLineTokenizer clt = new CommandLineTokenizer();
-		String[] test = { "     ", "hash 1024k", "GEt blarf.txt warf.txt", "put \"wo of\" \"blar g\"" };
+		String[] test = { "a [2,5] \"foo\" \"asd  baz\"", "     ", "hash 1024k", "GEt blarf.txt warf.txt", "put \"wo of\" \"blar g\"" };
 		Vector v;
 		try {
 			for (int i = 0; i < test.length; i++) {
@@ -27,7 +27,7 @@ public final class CommandLineTokenizer {
 			e.printStackTrace();
 		}
 	} // end main (for debugging)
-	Vector tokenize(String cl) throws MalformedCommandException {
+	protected Vector tokenize(String cl) throws MalformedCommandException {
 		boolean isQuotePending = false;
 		String cl2 = cl.trim();
 		Vector outV = new Vector();

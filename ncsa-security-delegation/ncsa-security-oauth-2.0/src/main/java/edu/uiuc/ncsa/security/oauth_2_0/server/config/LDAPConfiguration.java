@@ -72,6 +72,15 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         this.searchAttributes = searchAttributes;
     }
 
+    public String getSearchFilterAttribute() {
+        return searchFilterAttribute;
+    }
+
+    public void setSearchFilterAttribute(String searchFilterAttribute) {
+        this.searchFilterAttribute = searchFilterAttribute;
+    }
+
+    String searchFilterAttribute = "uid"; // DEFAULT!!!
 
     public String getPassword() {
         return password;
@@ -170,6 +179,7 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         ldap2.setSearchBase(getSearchBase());
         ldap2.setRawPostProcessor(getRawPostProcessor());
         ldap2.setRawPreProcessor(getRawPreProcessor());
+        ldap2.setSearchFilterAttribute(getSearchFilterAttribute());
         return ldap2;
     }
 

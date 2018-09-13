@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.request.BasicRequest;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -43,26 +44,7 @@ public abstract class TokenAwareServer extends ASImpl {
         if (wellKnown == null) {
             throw new NFWException("Error: no well-known URI has been configured. Please add this to the configuration file.");
         }
-
         return JWTUtil.getJsonWebKeys(getServiceClient(), wellKnown);
-/*
-        String rawResponse = getServiceClient().getRawResponse(wellKnown);
-        JSON rawJSON = JSONSerializer.toJSON(rawResponse);
-
-        if (!(rawJSON instanceof JSONObject)) {
-            throw new IllegalStateException("Error: Attempted to get JSON Object but returned result is not JSON");
-        }
-        JSONObject json = (JSONObject) rawJSON;
-        String rawKeys = getServiceClient().getRawResponse(json.getString("jwks_uri"));
-        JSONWebKeys keys = null;
-        JSONObject claims = null;
-        try {
-            keys = JSONWebKeyUtil.fromJSON(rawKeys);
-        } catch (Throwable e) {
-            throw new GeneralException("Error getting keys", e);
-        }
-        return keys;
-*/
     }
 
     protected JSONObject getAndCheckResponse(String response) {
@@ -71,8 +53,15 @@ public abstract class TokenAwareServer extends ASImpl {
             //    System.out.println(getClass().getSimpleName() + ".getAccessToken: response from server is " + response);
             throw new GeneralException("Error: Response from server was html: " + response);
         }
-        JSONObject jsonObject = JSONObject.fromObject(response);
-
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = JSONObject.fromObject(response);
+        }catch(Throwable t){
+            // it is at this point we may not have a JSON object because the request failed and the server returned an
+            // error string. Throw an exception, print the response.
+            DebugUtil.dbg(this,"Response from server was not a JSON Object: " + response);
+            throw new GeneralException("Error: The server encountered an error nd the response was not JSON.", t);
+        }
         if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {
             throw new GeneralException("Error: incorrect token type");
         }

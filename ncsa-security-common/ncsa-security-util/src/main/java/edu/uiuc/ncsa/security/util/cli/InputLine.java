@@ -20,6 +20,9 @@ public class InputLine {
         parsedInput = v;
     }
 
+    protected InputLine(){
+
+    }
     /**
      * This returns this as a string
      *
@@ -45,7 +48,7 @@ public class InputLine {
         return parsedInput.subList(1, parsedInput.size());
     }
 
-    List<String> parsedInput;
+   protected  List<String> parsedInput;
 
     /**
      * This returns the zero-th input.

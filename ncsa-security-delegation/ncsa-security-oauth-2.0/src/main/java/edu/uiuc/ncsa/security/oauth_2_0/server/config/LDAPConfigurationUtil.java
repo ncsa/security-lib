@@ -31,7 +31,10 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
     public static final String LDAP_ADDRESS_TAG = "address";
     public static final String LDAP_SEARCH_BASE_TAG = "searchBase";
     public static final String SEARCH_NAME_USERNAME = "username";
-    public static final String SEARCH_NAME_KEY = "searchName";
+    public static final String SEARCH_NAME_KEY = "searchName"; // This is the name of the claim whose value is used
+    public static final String SEARCH_FILTER_ATTRIBUTE_KEY = "searchFilterAttribute"; // This is the name of the attribute in LDAP to search for
+    // The search is done by searchFilterAttribute=searchName, e.g. uid=eppn. The defaut filter attribute is uid.
+    public static final String SEARCH_FILTER_ATTRIBUTE_DEFAULT = "uid"; // This is the default attribute name for the search
 
     public static final String LDAP_SEARCH_ATTRIBUTES_TAG = "searchAttributes";
     public static final String LDAP_SEARCH_ATTRIBUTE_TAG = "attribute";
@@ -255,6 +258,9 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         if (configuration.getSearchNameKey() != null) {
             getJSONUtil().setJSONValue(ldap, SEARCH_NAME_KEY, configuration.getSearchNameKey());
         }
+        if (configuration.getSearchFilterAttribute() != null) {
+            getJSONUtil().setJSONValue(ldap, SEARCH_FILTER_ATTRIBUTE_KEY, configuration.getSearchFilterAttribute());
+        }
         if (configuration.getContextName() == null) {
             getJSONUtil().setJSONValue(ldap, LDAP_CONTEXT_NAME_TAG, "");
 
@@ -354,6 +360,12 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
             config.setSearchNameKey(jsonUtil.getJSONValueString(json, SEARCH_NAME_KEY));
             config.setSecurityPrincipal(jsonUtil.getJSONValueString(json, LDAP_SECURITY_PRINCIPAL_TAG));
             config.setPassword(jsonUtil.getJSONValueString(json, LDAP_PASSWORD_TAG));
+            x = jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_KEY);
+            if (x != null && x.length() != 0) {
+                config.setSearchFilterAttribute(jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_KEY));
+            } else {
+                config.setSearchFilterAttribute(jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_DEFAULT));
+            }
             JSONObject jsonSSL = new JSONObject();
             jsonSSL.put(SSLConfigurationUtil2.SSL_TAG, jsonUtil.getJSONValue(json, SSLConfigurationUtil2.SSL_TAG));
             SSLConfiguration sslConfiguration = SSLConfigurationUtil2.fromJSON(jsonSSL);
