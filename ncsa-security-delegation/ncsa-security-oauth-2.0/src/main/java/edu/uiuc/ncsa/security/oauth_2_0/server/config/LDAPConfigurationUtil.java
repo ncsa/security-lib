@@ -361,10 +361,11 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
             config.setSecurityPrincipal(jsonUtil.getJSONValueString(json, LDAP_SECURITY_PRINCIPAL_TAG));
             config.setPassword(jsonUtil.getJSONValueString(json, LDAP_PASSWORD_TAG));
             x = jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_KEY);
-            if (x != null && x.length() != 0) {
-                config.setSearchFilterAttribute(jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_KEY));
+
+            if (x != null && 0 < x.length()) {
+                config.setSearchFilterAttribute(x);
             } else {
-                config.setSearchFilterAttribute(jsonUtil.getJSONValueString(json, SEARCH_FILTER_ATTRIBUTE_DEFAULT));
+                config.setSearchFilterAttribute(SEARCH_FILTER_ATTRIBUTE_DEFAULT);
             }
             JSONObject jsonSSL = new JSONObject();
             jsonSSL.put(SSLConfigurationUtil2.SSL_TAG, jsonUtil.getJSONValue(json, SSLConfigurationUtil2.SSL_TAG));

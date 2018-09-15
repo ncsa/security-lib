@@ -33,6 +33,4 @@ public abstract class JSONClaimSourceConfig extends ClaimSourceConfiguration{
         this.jsonObject = json;
     }
 
-
-
 }

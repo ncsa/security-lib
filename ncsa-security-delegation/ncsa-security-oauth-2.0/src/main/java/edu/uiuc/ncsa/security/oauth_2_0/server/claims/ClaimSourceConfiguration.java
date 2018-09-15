@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +35,22 @@ public class ClaimSourceConfiguration {
     protected boolean failOnError = false;
     protected boolean notifyOnFail = false;
     protected boolean enabled = false; // default, since if this is not configured, do not run it.
+
+    /**
+     * This is the list of claims from the headers to omit. In other words, this module will reject these out of hand
+     * and never return them in a claims object. This is extremely useful in not having existing claims being over-written
+     * (which can happen if something like mod_auth_openidc is acting as an intermediary and adding spurious claims.)
+     * @return
+     */
+    public List<String> getOmitList() {
+        return omitList;
+    }
+
+    public void setOmitList(List<String> omitList) {
+        this.omitList = omitList;
+    }
+     // CIL-513 fix.
+    List<String> omitList = new LinkedList<>();
 
     /**
      * Human readable string that describes this configuration
@@ -205,5 +223,17 @@ public class ClaimSourceConfiguration {
             return null;
         }
         return map.get(key);
+    }
+
+    @Override
+    public String toString() {
+        return "ClaimSourceConfiguration{" +
+                "enabled=" + enabled +
+                ", name='" + name + '\'' +
+                ", id='" + id + '\'' +
+                ", failOnError=" + failOnError +
+                ", notifyOnFail=" + notifyOnFail +
+                ", omitList=" + omitList +
+                '}';
     }
 }

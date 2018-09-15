@@ -60,7 +60,7 @@ public abstract class TokenAwareServer extends ASImpl {
             // it is at this point we may not have a JSON object because the request failed and the server returned an
             // error string. Throw an exception, print the response.
             DebugUtil.dbg(this,"Response from server was not a JSON Object: " + response);
-            throw new GeneralException("Error: The server encountered an error nd the response was not JSON.", t);
+            throw new GeneralException("Error: The server encountered an error and the response was not JSON:\n\"" + response +"\"", t);
         }
         if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {
             throw new GeneralException("Error: incorrect token type");
@@ -83,7 +83,7 @@ public abstract class TokenAwareServer extends ASImpl {
         }
         // Now we have to check claims.
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
-            throw new GeneralException("Error: Audience is incorrect");
+            throw new GeneralException("Error: Audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         try {

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.delegation.storage.JSONUtil;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -21,7 +22,9 @@ public class ClaimSourceConfigurationUtil {
     public static final String ENABLED_TAG = "enabled";
     public static final String FAIL_ON_ERROR_TAG = "failOnError";
     public static final String NOTIFY_ON_FAIL_TAG = "notifyOnFail";
-    public String getComponentName(){
+    public static final String OMIT_CLAIMS_LIST_TAG = "omitClaimsList";
+
+    public String getComponentName() {
         return "default";
     }
 
@@ -31,28 +34,31 @@ public class ClaimSourceConfigurationUtil {
      *     {"type":{config}}
      * </pre>
      * and all this does is check that the type matches the {@link #getComponentName()}.
+     *
      * @param jsonObject
      * @return
      */
-    public boolean isInstanceOf(JSONObject jsonObject){
+    public boolean isInstanceOf(JSONObject jsonObject) {
         return jsonObject.containsKey(getComponentName());
     }
+
     /**
      * Override as needed to create a new configuration of the right type.
+     *
      * @return
      */
-    public ClaimSourceConfiguration createConfiguration(){
-     return new ClaimSourceConfiguration();
+    public ClaimSourceConfiguration createConfiguration() {
+        return new ClaimSourceConfiguration();
     }
+
     /**
      * Populate a {@link ClaimSourceConfiguration}
-     * <b><i>NOTE</i></b> the node is assumed to be fo rthe form {"componentName":{}} where the key is the component name
+     * <b><i>NOTE</i></b> the node is assumed to be for the form {"componentName":{}} where the key is the component name
      * is the claim source, e.g. ldap that is used. The default is "default". The vlaue is the actual configuration.
      * This lets you stick these all over
      * the place and they stay encapsulated nicely in JSON configuration files.
-     *
+     * <p/>
      * The value will be of the form {"enabled":"true",...} (so all the tags are top-level in it).
-     *
      *
      * @param logger
      * @param node
@@ -69,13 +75,13 @@ public class ClaimSourceConfigurationUtil {
         }
         config.setEnabled(true); //default
         String x = getFirstAttribute(node, ENABLED_TAG);
-             if (x != null) {
-                 try {
-                     config.setEnabled(Boolean.parseBoolean(x));
-                 } catch (Throwable t) {
-                     logger.warn("Could not parsed enabled flag value of \"" + x + "\". Assuming configuration is enabled.");
-                 }
-             }
+        if (x != null) {
+            try {
+                config.setEnabled(Boolean.parseBoolean(x));
+            } catch (Throwable t) {
+                logger.warn("Could not parsed enabled flag value of \"" + x + "\". Assuming configuration is enabled.");
+            }
+        }
 
         String name = getNodeValue(node, NAME_TAG);
         String id = getNodeValue(node, ID_TAG);
@@ -89,17 +95,22 @@ public class ClaimSourceConfigurationUtil {
         if (!(errs == null || errs.length() == 0)) {
             config.setNotifyOnFail(Boolean.getBoolean(errs));
         }
-
+       String omitList = getNodeValue(node, OMIT_CLAIMS_LIST_TAG);
+        if(omitList!= null && !omitList.isEmpty()){
+            JSONArray array = JSONArray.fromObject(omitList);
+            config.setOmitList(array);
+        }
         return config;
     }
 
 
     /**
      * Note that is is assumed that the json object is the correct
+     *
      * @param config
      * @return
      */
-    public  JSONObject toJSON(ClaimSourceConfiguration config){
+    public JSONObject toJSON(ClaimSourceConfiguration config) {
         JSONUtil jsonUtil = getJSONUtil();
         JSONObject jsonConfig = new JSONObject();
         JSONObject content = new JSONObject();
@@ -111,19 +122,31 @@ public class ClaimSourceConfigurationUtil {
         jsonUtil.setJSONValue(jsonConfig, NOTIFY_ON_FAIL_TAG, config.isNotifyOnFail());
         jsonUtil.setJSONValue(jsonConfig, CLAIM_PRE_PROCESSING_KEY, config.getRawPreProcessor());
         jsonUtil.setJSONValue(jsonConfig, CLAIM_POST_PROCESSING_KEY, config.getRawPostProcessor());
+        if (config.getOmitList() != null && !config.getOmitList().isEmpty()) {
+            JSONArray omitList = null;
+            if (config.getOmitList() instanceof JSONArray) {
+                jsonUtil.setJSONValue(jsonConfig, OMIT_CLAIMS_LIST_TAG, config.getOmitList());
+            } else {
+                omitList = new JSONArray();
+                omitList.addAll(config.getOmitList());
+                jsonUtil.setJSONValue(jsonConfig, OMIT_CLAIMS_LIST_TAG, omitList);
+            }
+        }
+
         return jsonConfig;
     }
 
 
     /**
      * Populate and <b><i>existing</i></b> configuration.
+     *
      * @param config
      * @param json
      * @return
      */
     public ClaimSourceConfiguration fromJSON(ClaimSourceConfiguration config, JSONObject json) {
         JSONUtil jsonUtil = getJSONUtil();
-        if(config == null) {
+        if (config == null) {
             config = createConfiguration();
         }
 
@@ -136,7 +159,19 @@ public class ClaimSourceConfigurationUtil {
         if (jsonUtil.hasKey(json, NOTIFY_ON_FAIL_TAG)) {
             config.setNotifyOnFail(jsonUtil.getJSONValueBoolean(json, NOTIFY_ON_FAIL_TAG));
         }
-
+        // CIL-513 fix
+        Object rawOmitList = jsonUtil.getJSONValue(json, OMIT_CLAIMS_LIST_TAG);
+        if (rawOmitList == null) {
+            config.setOmitList(new JSONArray());
+        }else{
+            JSONArray array = null;
+            if (rawOmitList instanceof JSONArray) {
+                array = (JSONArray) rawOmitList;
+            } else {
+                array = JSONArray.fromObject(rawOmitList);
+            }
+            config.setOmitList(array);
+        }
         config.setRawPreProcessor(jsonUtil.getJSONValueString(json, CLAIM_PRE_PROCESSING_KEY));
         config.setRawPostProcessor(jsonUtil.getJSONValueString(json, CLAIM_POST_PROCESSING_KEY));
         config.setProperties(json.getJSONObject(getComponentName()));
@@ -145,10 +180,12 @@ public class ClaimSourceConfigurationUtil {
 
     JSONUtil jsonUtil = null;
 
-   protected JSONUtil getJSONUtil() {
-       if (jsonUtil == null) {
-           jsonUtil = new JSONUtil(getComponentName());
-       }
-       return jsonUtil;
-   }
+    protected JSONUtil getJSONUtil() {
+        if (jsonUtil == null) {
+            jsonUtil = new JSONUtil(getComponentName());
+        }
+        return jsonUtil;
+    }
+
+
 }
