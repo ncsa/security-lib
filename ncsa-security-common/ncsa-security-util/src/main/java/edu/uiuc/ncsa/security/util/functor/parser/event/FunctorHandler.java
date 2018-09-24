@@ -10,8 +10,8 @@ import java.util.Stack;
  * <p>Created by Jeff Gaynor<br>
  * on 7/16/18 at  11:46 AM
  */
-public class EventDrivenFunctorHandler extends AbstractHandler implements DoubleQuoteListener, DelimiterListener, CommaListener {
-    public EventDrivenFunctorHandler(JFunctorFactory functorFactory) {
+public class FunctorHandler extends AbstractHandler implements DoubleQuoteListener, DelimiterListener, CommaListener {
+    public FunctorHandler(JFunctorFactory functorFactory) {
         super(functorFactory);
     }
     Stack<JFunctor> stack = new Stack<>();

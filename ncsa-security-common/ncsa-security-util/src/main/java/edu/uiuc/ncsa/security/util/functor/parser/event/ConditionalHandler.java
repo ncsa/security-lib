@@ -10,16 +10,32 @@ import edu.uiuc.ncsa.security.util.functor.parser.ParserError;
 import java.util.Stack;
 
 /**
+ * This handles a logic block of the form if[A]then[B}else[C]. Each of if, then, else are
+ * conditionals and a stack of which is doing what is kept. The final result i the
+ * {@link #getLogicBlock()} call that returns the whole thing.
+ * <br/>If this is invoked and there is no conditional stack (so against a sinple functor)
+ * then the functor handler will have that in it and you can access it that way.
  * <p>Created by Jeff Gaynor<br>
  * on 7/16/18 at  12:00 PM
  */
-public class EventDrivenLogicBlockHandler extends AbstractHandler implements DelimiterListener, CommaListener {
-    EventDrivenFunctorHandler fHandler;
+public class ConditionalHandler extends AbstractHandler implements DelimiterListener, CommaListener {
+    public EventDrivenFunctorHandler getFunctorHandler() {
+        if(functorHandler == null){
+            functorHandler = new EventDrivenFunctorHandler(getFunctorFactory());
+        }
+        return functorHandler;
+    }
+
+    public void setFunctorHandler(EventDrivenFunctorHandler functorHandler) {
+        this.functorHandler = functorHandler;
+    }
+
+    EventDrivenFunctorHandler functorHandler;
     Stack<LogicBlock> stack = new Stack<>();
 
-    public EventDrivenLogicBlockHandler(EventDrivenFunctorHandler fHandler, JFunctorFactory functorFactory) {
+    public ConditionalHandler(EventDrivenFunctorHandler functorHandler, JFunctorFactory functorFactory) {
         super(functorFactory);
-        this.fHandler = fHandler;
+        this.functorHandler = functorHandler;
     }
     // trick here is that this must manage the fHandler as well.
 
@@ -78,10 +94,10 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
         }
 
         if (gotOne) {
-            fHandler.reset();
-            delimeterEvent.getParser().addParenthesisListener(fHandler);
-            delimeterEvent.getParser().addCommaListener(fHandler);
-            delimeterEvent.getParser().addDoubleQuoteListener(fHandler);
+            functorHandler.reset();
+            delimeterEvent.getParser().addParenthesisListener(functorHandler);
+            delimeterEvent.getParser().addCommaListener(functorHandler);
+            delimeterEvent.getParser().addDoubleQuoteListener(functorHandler);
 
         } else {
             throw new ParserError("Error: unknown logic block type");
@@ -95,15 +111,15 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
         super.closeDelimiter(delimeterEvent);
         JFunctor functor = getjFunctor(delimeterEvent.getName());
         currentBlock.addArg(functor);
-        delimeterEvent.getParser().removeCommaListener(fHandler);
-        delimeterEvent.getParser().removeDQListener(fHandler);
-        delimeterEvent.getParser().removeParenthesisListener(fHandler);
-        fHandler.reset();
+        delimeterEvent.getParser().removeCommaListener(functorHandler);
+        delimeterEvent.getParser().removeDQListener(functorHandler);
+        delimeterEvent.getParser().removeParenthesisListener(functorHandler);
+        functorHandler.reset();
         currentBlock = null;
     }
 
     protected JFunctor getjFunctor(String name) {
-        JFunctor functor = fHandler.getFunctor();
+        JFunctor functor = functorHandler.getFunctor();
         if (functor == null) {
             // ok, special case that the keywords true/false get turned into functors.
             if (name.equals(FunctorTypeImpl.TRUE.getValue().substring(1))) {
@@ -123,20 +139,22 @@ public class EventDrivenLogicBlockHandler extends AbstractHandler implements Del
 
     @Override
     public void gotComma(CommaEvent commaEvent) {
-        if (fHandler.areDelimitersBalanced()&&fHandler.isUsed()) {// this has to be in use so that the comma is inside some set of delimiters.
+        if (functorHandler.areDelimitersBalanced()&& functorHandler.isUsed()) {// this has to be in use so that the comma is inside some set of delimiters.
             // then we have finished with this functor
             if(currentBlock == null){
                 System.out.println(getClass().getSimpleName() + ".gotComma: text=" + commaEvent.getText());
             }
             getCurrentBlock().addArg(getjFunctor(commaEvent.getText()));
-            fHandler.reset();
+            functorHandler.reset();
         }
     }
 
     @Override
     public void reset() {
         super.reset();
-        fHandler.reset();
+        if(functorHandler != null) {
+            functorHandler.reset();
+        }
         logicBlock = null;
         ifBlock = null;
         thenBlock = null;
