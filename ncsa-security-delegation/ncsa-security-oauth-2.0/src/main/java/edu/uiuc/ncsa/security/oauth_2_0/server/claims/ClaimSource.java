@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,12 +82,12 @@ public interface ClaimSource {
      * constructed on the fly from the current state of the claims.
      * @return
      */
-   public LogicBlocks getPreProcessor();
+   public Script getPreProcessor();
 
     /**
      * See comment in {@link #getPreProcessor()}.
      * @return
      */
-    public LogicBlocks getPostProcessor();
+    public Script getPostProcessor();
 
 }

@@ -14,6 +14,9 @@ import java.util.List;
  */
 public class FunctorMap extends HashMap<String, List<JFunctor>> {
     public void put(JFunctor functor) {
+        if(functor == null){
+            return;
+        }
         if (containsKey(functor.getName())) {
             get(functor.getName()).add(functor);
         } else {
@@ -35,6 +38,9 @@ public class FunctorMap extends HashMap<String, List<JFunctor>> {
      * @return
      */
     public void addAll(FunctorMap functorMap) {
+        if(functorMap == null){
+            return;
+        }
         for (String key : functorMap.keySet()) {
             List<JFunctor> functors = functorMap.get(key);
             if (containsKey(key)) {

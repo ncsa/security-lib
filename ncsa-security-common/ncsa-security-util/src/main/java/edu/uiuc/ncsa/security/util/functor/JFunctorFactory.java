@@ -4,12 +4,12 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
 import edu.uiuc.ncsa.security.util.functor.strings.*;
+import edu.uiuc.ncsa.security.util.functor.system.jgetEnv;
+import edu.uiuc.ncsa.security.util.functor.system.jsetEnv;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
 
@@ -20,6 +20,41 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
  * on 2/27/18 at  9:07 AM
  */
 public class JFunctorFactory {
+
+    Map<String,String> environment = new HashMap<>();
+
+    public Map<String, String> getEnvironment() {
+        return environment;
+    }
+
+    /**
+     * Get all the tmeplates for all replacements. This is usually the runtime environment but can be anything.
+     * @return
+     */
+    public Map<String, String> getReplacementTemplates() {
+        return getEnvironment();
+    }
+
+    public void setEnvironment(Map<String, String> environment) {
+        this.environment = environment;
+    }
+
+    public JFunctorFactory() {
+    }
+
+    boolean verboseOn = false;
+
+    public boolean isVerboseOn() {
+        return verboseOn;
+    }
+
+    public void setVerboseOn(boolean verboseOn) {
+        this.verboseOn = verboseOn;
+    }
+
+    public JFunctorFactory(boolean verboseOn) {
+        this.verboseOn = verboseOn;
+    }
 
     /**
      * This will create a single functor from the object. If you have a full configuration
@@ -192,6 +227,7 @@ public class JFunctorFactory {
 
     /**
      * This does the actual work of looking up the functor and creating a new one.
+     *
      * @param name
      * @return
      */
@@ -255,6 +291,15 @@ public class JFunctorFactory {
         if (name.equals(ELSE.getValue())) {
             return new jElse();
         }
+        if (name.equals(ECHO.getValue())) {
+            return new jEcho(verboseOn);
+        }
+        if (name.equals(SET_ENV.getValue())) {
+               return new jsetEnv(getEnvironment());
+           }
+        if (name.equals(GET_ENV.getValue())) {
+                return new jgetEnv(getEnvironment());
+            }
         if (name.equals(TO_LOWER_CASE.getValue())) {
             return new jToLowerCase();
         }
@@ -280,7 +325,7 @@ public class JFunctorFactory {
     protected JFunctor figureOutFunctor(JSONObject rawJson) {
         Iterator iterator = rawJson.keys();
         String functorKey = (String) iterator.next();
-        if(iterator.hasNext()){
+        if (iterator.hasNext()) {
             throw new GeneralException("Error: too many functors in this JSON object. There should be exactly one functor");
         }
         return lookUpFunctor(functorKey);
@@ -352,6 +397,6 @@ public class JFunctorFactory {
 
     @Override
     public String toString() {
-        return "JFunctorFactory{}";
+        return "JFunctorFactory{env=" + getEnvironment() + ", verbose? " + verboseOn + "}";
     }
 }

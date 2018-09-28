@@ -20,14 +20,19 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
  * on 7/16/18 at  2:34 PM
  */
 public class SwitchHandler extends AbstractHandler implements DelimiterListener, CommaListener {
-    public SwitchHandler(EventDrivenLogicBlockHandler eventDrivenLogicBlockHandler,
+    public SwitchHandler(ConditionalHandler conditionalHandler,
                          JFunctorFactory functorFactory) {
         super(functorFactory);
-        logicBlockHandler = eventDrivenLogicBlockHandler;
+        logicBlockHandler = conditionalHandler;
     }
 
     public void runLogicBlocks() {
         getLogicBlocks().execute();
+    }
+
+    @Override
+    public int getHandlerType() {
+        return SWITCH_TYPE;
     }
 
     /**
@@ -71,7 +76,7 @@ public class SwitchHandler extends AbstractHandler implements DelimiterListener,
         return getLogicBlocks().getFunctorMap().get(key);
     }
 
-    EventDrivenLogicBlockHandler logicBlockHandler;
+    ConditionalHandler logicBlockHandler;
 
     public LogicBlocks<? extends LogicBlock> getLogicBlocks() {
         return logicBlocks;

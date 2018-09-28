@@ -14,24 +14,50 @@ public class FunctorHandler extends AbstractHandler implements DoubleQuoteListen
     public FunctorHandler(JFunctorFactory functorFactory) {
         super(functorFactory);
     }
+
     Stack<JFunctor> stack = new Stack<>();
+
+    /**
+     * Return the result from te functor that was executed.
+     *
+     * @return
+     */
+    public Object getFResult() {
+        if (getFunctor() == null) {
+            throw new IllegalStateException("Error: This handler has not been executed yet.");
+        }
+        return getFunctor().getResult();
+    }
+
     public JFunctor getFunctor() {
         return functor;
     }
 
-    protected JFunctor getFunctor(String name) {
+    /**
+     * Internal call to the factory to find the functor there by name.
+     *
+     * @param name
+     * @return
+     */
+    protected JFunctor lookupFunctor(String name) {
         return getFunctorFactory().lookUpFunctor("$" + name);
     }
 
     JFunctor functor;    // top-level functor
+
     @Override
     public void gotComma(CommaEvent commaEvent) {
     }
 
     @Override
+    public int getHandlerType() {
+        return FUNCTOR_TYPE;
+    }
+
+    @Override
     public void openDelimiter(DelimiterEvent delimeterEvent) {
         super.openDelimiter(delimeterEvent);
-        JFunctor currentFunctor = getFunctor(delimeterEvent.getName());
+        JFunctor currentFunctor = lookupFunctor(delimeterEvent.getName());
         stack.push(currentFunctor);
         if (functor == null) {
             /*
@@ -41,9 +67,9 @@ public class FunctorHandler extends AbstractHandler implements DoubleQuoteListen
              */
             functor = currentFunctor;
         }
-        if (1 < stack.size() ) {
+        if (1 < stack.size()) {
             // size - 2 gets the previous item on the stack since in this LIFO stack element 0 is the most recent.
-            stack.get(stack.size()-2).addArg(stack.peek());
+            stack.get(stack.size() - 2).addArg(stack.peek());
         }
     }
 

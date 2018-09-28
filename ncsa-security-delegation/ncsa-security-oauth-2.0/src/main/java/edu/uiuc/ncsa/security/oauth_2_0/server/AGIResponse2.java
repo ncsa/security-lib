@@ -20,6 +20,10 @@ import java.util.Map;
  * on 6/4/13 at  5:06 PM
  */
 public class AGIResponse2 extends IResponse2 implements AGResponse {
+    public AGIResponse2(boolean isOIDC) {
+        super(isOIDC);
+    }
+
     public Client getClient() {
         return client;
     }

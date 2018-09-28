@@ -150,6 +150,7 @@ public class ClaimSourceConfiguration {
     String rawPostProcessor;
     protected boolean jsonPreProcessorDone = false;
     protected boolean jsonPostProcessorDone = false;
+
     JSONObject jsonPreProcessing = null;
     JSONObject jsonPostProcessing = null;
 

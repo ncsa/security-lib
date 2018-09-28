@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.util.functor.logic;
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.CONTAINS;
 
 /**
+ * contains[needle,haystack]<br>
+ * This will search for needle in haystack and return true if found.
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  10:43 AM
  */

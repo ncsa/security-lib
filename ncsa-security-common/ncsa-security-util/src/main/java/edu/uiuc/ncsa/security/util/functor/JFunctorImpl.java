@@ -79,6 +79,19 @@ public abstract class JFunctorImpl implements JFunctor {
         return result;
     }
 
+    /**
+     * This will always return a list. If the result is not a list, it will be enclosed in an list.
+     * @return
+     */
+    public List getListResult(){
+        if(result instanceof List){
+            return (List)result;
+        }
+        ArrayList arrayList = new ArrayList();
+        arrayList.add(result);
+        return arrayList;
+
+    }
     public boolean getBooleanResult() {
         if (result == null) {
             throw new NullPointerException();

@@ -13,17 +13,21 @@ import javax.servlet.http.HttpServletRequest;
  * on 2/26/14 at  11:32 AM
  */
 public class RTIRequest extends IssuerRequest {
-    public RTIRequest(Client client) {
+    boolean isOIDC = true;
+    public RTIRequest(Client client, boolean isOIDC) {
         super(client);
+        this.isOIDC =isOIDC;
     }
 
-    public RTIRequest(HttpServletRequest servletRequest, Client client) {
+    public RTIRequest(HttpServletRequest servletRequest, Client client, boolean isOIDC) {
         super(servletRequest, client);
+        this.isOIDC = isOIDC;
     }
 
-    public RTIRequest(HttpServletRequest servletRequest, Client client, AccessToken accessToken) {
+    public RTIRequest(HttpServletRequest servletRequest, Client client, AccessToken accessToken, boolean isOIDC) {
         super(servletRequest, client);
         this.accessToken = accessToken;
+        this.isOIDC = isOIDC;
     }
 
     public AccessToken getAccessToken() {
@@ -40,7 +44,7 @@ public class RTIRequest extends IssuerRequest {
     @Override
     public Response process(Server server) {
         if(server instanceof RTI2){
-            return ((RTI2)server).processRTRequest(this);
+            return ((RTI2)server).processRTRequest(this, isOIDC);
         }
         return super.process(server);
     }

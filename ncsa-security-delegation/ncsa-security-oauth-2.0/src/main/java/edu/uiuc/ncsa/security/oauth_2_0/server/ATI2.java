@@ -18,14 +18,15 @@ import java.util.Map;
  * on 6/4/13 at  5:05 PM
  */
 public class ATI2 extends AbstractIssuer implements ATIssuer {
-
+    boolean isOIDC = true;
     /**
     Constructor
     @param tokenForge Token forge to use
     @address URI of access token endpoint
      */
-    public ATI2(TokenForge tokenForge, URI address) {
+    public ATI2(TokenForge tokenForge, URI address,boolean isOIDC) {
         super(tokenForge, address);
+        this.isOIDC = isOIDC;
     }
 
     /**
@@ -37,7 +38,7 @@ public class ATI2 extends AbstractIssuer implements ATIssuer {
         Map<String,String> reqParamMap = OA2Utilities.getParameters(accessTokenRequest.getServletRequest());
         // get access token
         OA2TokenForge tf2 = (OA2TokenForge) tokenForge;
-        ATIResponse2 atResp = new ATIResponse2(tf2.getAccessToken(), tf2.getRefreshToken());
+        ATIResponse2 atResp = new ATIResponse2(tf2.getAccessToken(), tf2.getRefreshToken(), isOIDC);
         atResp.setParameters(reqParamMap);
         return atResp;
     }

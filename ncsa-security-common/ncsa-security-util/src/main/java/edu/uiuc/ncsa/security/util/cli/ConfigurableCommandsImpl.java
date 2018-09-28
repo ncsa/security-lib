@@ -21,7 +21,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         this.logger = logger;
     }
 
-
     /**
      * returns "true if the command has the flag --help in it. This is a cue from the user to show
      * the help for a given function. So it the function is called "X" and its help is in the function
@@ -396,10 +395,13 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             useHelp();
             return true;
         }
+
         if (1 == inputLine.size()) {
             say("Sorry, you need to give the name of the component to invoke it.");
             return true;
         }
         return false;
     }
+
+
 }

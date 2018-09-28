@@ -23,7 +23,7 @@ public class RTI2 extends AbstractIssuer {
         super(tokenForge, address);
     }
 
-    public IResponse2 processRTRequest(IssuerRequest req) {
+    public IResponse2 processRTRequest(IssuerRequest req, boolean isOIDC) {
 
         RTIRequest request = (RTIRequest) req;
         Map<String, String> reqParamMap = OA2Utilities.getParameters(request.getServletRequest());
@@ -33,7 +33,7 @@ public class RTI2 extends AbstractIssuer {
         RefreshToken refreshToken = tokenForge2.getRefreshToken();
         AccessToken accessToken = tokenForge2.getAccessToken(); // spec says all new access token
 
-        RTIResponse resp = new RTIResponse(accessToken,refreshToken);
+        RTIResponse resp = new RTIResponse(accessToken,refreshToken,isOIDC);
         resp.setParameters(reqParamMap);
         return resp;
     }

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
 /**
+ * concat(A,B,C,...) <br/>
  * A functor that accepts a list of string and simply concatenates them into a single string.
  * <p>Created by Jeff Gaynor<br>
  * on 4/5/18 at  4:16 PM

@@ -15,13 +15,14 @@ import java.net.URI;
  * on 6/4/13 at  5:05 PM
  */
 public class PAI2 extends AbstractIssuer implements PAIssuer {
-
+    boolean isOIDC = true;
     /** Constructor
     @param tokenForge Token forge to use
     @param address URI of cert request endpoint
     */
-    public PAI2(TokenForge tokenForge, URI address) {
+    public PAI2(TokenForge tokenForge, URI address,boolean isOIDC) {
         super(tokenForge, address);
+        this.isOIDC = isOIDC;
     }
 
     /**
@@ -33,7 +34,7 @@ public class PAI2 extends AbstractIssuer implements PAIssuer {
         try {
          //   Map<String, String> reqParamMap = OA2Utilities.getParameters(paRequest.getServletRequest());
 
-            PAIResponse2 paResponse = new PAIResponse2();
+            PAIResponse2 paResponse = new PAIResponse2(isOIDC);
             paResponse.setAccessToken(paRequest.getAccessToken()); // return the right access token with this, so the caller can track it
             return paResponse;
         } catch (Exception x) {

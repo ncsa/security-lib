@@ -2,13 +2,19 @@ package edu.uiuc.ncsa.security.util;
 
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import edu.uiuc.ncsa.security.util.functor.parser.FunctorParser;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EDLBSHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenFunctorHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenLogicBlockHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.event.ConditionalHandler;
 import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenParser;
-import edu.uiuc.ncsa.security.util.functor.parser.old.JSONHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.event.FunctorHandler;
+import edu.uiuc.ncsa.security.util.functor.parser.event.SwitchHandler;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.FileReader;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,33 +31,40 @@ public class FunctorParserTest extends TestBase {
 
     /**
      * tests the and functor, which requires that multiple arguments be parsed correctly then evaluated.
+     *
      * @throws Exception
      */
     @Test
     public void testAND() throws Exception {
-        String testString = "and(endsWith(\"the quick brown fox\",\"fox\"),contains(\"foo\",\"zfoo\"))";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert (Boolean) eventDrivenFunctorHandler.getFunctor().getResult();
+        String testString = "and(endsWith('the quick brown fox','fox'),contains('foo','zfoo'))";
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        AbstractHandler abstractHandler = eventDrivenParser.parse(testString);
+        assert abstractHandler.getHandlerType() == AbstractHandler.FUNCTOR_TYPE;
+        FunctorHandler eh = (FunctorHandler) abstractHandler;
+        assert (Boolean) eh.getFunctor().getResult();
     }
 
     /**
      * Test that basic logib block parsing works.
+     *
      * @throws Exception
      */
     @Test
     public void testLB() throws Exception {
-        String testString = "if[match(\"B\",\"B\")]then[toLowerCase(\"Z\")]";
+        String testString = "if[match('B','B')]then[toLowerCase('Z')]";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        ConditionalHandler conditionalHandler = (ConditionalHandler) parser.parse(testString);
+        assert conditionalHandler.getLogicBlock().getResults().size() == 1;
+        assert conditionalHandler.getLogicBlock().getConsequent().getListResult().get(0).equals("z");
+    }
+
+/*    @Test
+    public void testOLDLB() throws Exception {
+        String testString = "if[match('B','B')]then[toLowerCase('Z')]";
         EventDrivenParser parser = new EventDrivenParser();
         JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
+        FunctorHandler fh = new FunctorHandler(functorFactory);
+        ConditionalHandler lbh = new ConditionalHandler(fh, functorFactory);
         parser.addBracketListener(lbh);
         parser.addCommaListener(lbh);
         parser.parse(testString);
@@ -59,7 +72,7 @@ public class FunctorParserTest extends TestBase {
         // Remember that logic blocks can have lists of functors to execute, so the result is an array of each result.
         assert lbh.getLogicBlock().getResults().size() == 1;
         lbh.getLogicBlock().getResults().get(0).equals("z");
-    }
+    }*/
 
     /**
      * Tests that having multiple functors in the consequent is correctly interpreted
@@ -68,61 +81,47 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testLBMultipleThenClause() throws Exception {
-        String testString = "if[match(\"B\",\"B\")]then[toLowerCase(\"Z\"),toUpperCase(\"a\"), toLowerCase(\"BcD\")]";
-        EventDrivenParser parser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        parser.addBracketListener(lbh);
-        parser.addCommaListener(lbh);
-        parser.parse(testString);
-        lbh.getLogicBlock().execute();
-        // Remember that logic blocks can have lists of functors to execute, so the result is an array of each result.
-        assert lbh.getLogicBlock().getResults().size() == 3;
-        lbh.getLogicBlock().getResults().get(0).equals("z");
-        lbh.getLogicBlock().getResults().get(1).equals("A");
-        lbh.getLogicBlock().getResults().get(2).equals("bcd");
+        String testString = "if[match('B','B')]then[toLowerCase('Z'),toUpperCase('a'), toLowerCase('BcD')]";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        ConditionalHandler conditionalHandler = (ConditionalHandler) parser.parse(testString);
+        List list = conditionalHandler.getLogicBlock().getConsequent().getListResult();
+        assert list.size() == 3;
+        assert list.get(0).equals("z");
+        assert list.get(1).equals("A");
+        assert list.get(2).equals("bcd");
+
     }
 
     /**
      * Test that a conditional with an else clause is parsed correctly
+     *
      * @throws Exception
      */
     @Test
     public void testLBElseClause() throws Exception {
-        String testString = "if[match(\"B\",\"C\")]then[toLowerCase(\"Z\"),toUpperCase(\"a\")]else[toLowerCase(\"BcD\")]";
-        EventDrivenParser parser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        parser.addBracketListener(lbh);
-        parser.addCommaListener(lbh);
-        parser.parse(testString);
-        lbh.getLogicBlock().execute();
-        // Remember that logic blocks can have lists of functors to execute, so the result is an array of each result.
-        assert lbh.getLogicBlock().getResults().size() == 1;
-        lbh.getLogicBlock().getResults().get(0).equals("bcd");
+        String testString = "if[match('B','C')]then[toLowerCase('Z'),toUpperCase('a')]else[toLowerCase('BcD')]";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        ConditionalHandler conditionalHandler = (ConditionalHandler) parser.parse(testString);
+
+        // Remember that logic blocks can have lists of functors to execute, so the result is a list of each result.
+        List list = conditionalHandler.getLogicBlock().getConsequent().getListResult();
+        assert list.size() == 1;
+        assert list.get(0).equals("bcd");
     }
 
     /**
-     * Test that functor composition ishandled correctly.
+     * Test that functor composition is handled correctly.
      *
      * @throws Exception
      */
     @Test
     public void testFunctorComposition() throws Exception {
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        String testString = "toUpperCase(toLowerCase(toUpperCase('a')))";
 
-        String testString = "toUpperCase(toLowerCase(toUpperCase(\"a\")))";
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFunctor().getResult().equals("A");
 
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("A");
     }
 
     /**
@@ -132,18 +131,11 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFHandlerArgumentParsing() throws Exception {
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        String testString = "drop(toUpperCase('a'),toUpperCase('abcda'))";
 
-        String testString = "drop(toUpperCase(\"a\"),toUpperCase(\"abcda\"))";
-
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("BCD");
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("BCD");
     }
 
     /**
@@ -153,19 +145,29 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFHandlerStringArgumentParsing() throws Exception {
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        String testString = "concat('a','b','c','d')";
+
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("abcd");
+    }
+
+/* Really low level way to use the parse. kept for now for reference.
+
+  @Test
+    public void testOLDFHandlerMultipleArgumentParsing() throws Exception {
         EventDrivenParser eventDrivenParser = new EventDrivenParser();
         JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        FunctorHandler functorHandler = new FunctorHandler(functorFactory);
+        eventDrivenParser.addParenthesisListener(functorHandler);
+        eventDrivenParser.addDoubleQuoteListener(functorHandler);
+        eventDrivenParser.addCommaListener(functorHandler);
 
-        String testString = "concat(\"a\",\"b\",\"c\",\"d\")";
+        String testString = "concat('a','b','c','d')";
 
         eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("abcd");
-    }
+        functorHandler.getFunctor().execute();
+    }*/
 
     /**
      * Test that a string or functor arguments is handled correctly
@@ -174,18 +176,11 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFHandlerMultipleArgumentParsing() throws Exception {
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        String testString = "concat(toLowerCase('A'),toLowerCase('B'),toLowerCase('C'),toLowerCase('d'))";
 
-        String testString = "concat(toLowerCase(\"A\"),toLowerCase(\"B\"),toLowerCase(\"C\"),toLowerCase(\"d\"))";
-
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("abcd");
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("abcd");
     }
 
     /**
@@ -195,55 +190,36 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFHandlerCommas() throws Exception {
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        String testString = "concat('a',concat('b',concat('c','d')))";
 
-        String testString = "concat(\"a\",concat(\"b\",concat(\"c\",\"d\")))";
-
-        eventDrivenParser.parse(testString);
-        assert eventDrivenFunctorHandler.areDelimitersBalanced();
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("abcd");
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("abcd");
     }
 
     @Test
     public void testFHandler2() throws Exception {
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
 
-        String testString = "drop(\"A\",toUpperCase(\"abcda\"))";
+        String testString = "drop('A',toUpperCase('abcda'))";
 
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("BCD");
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("BCD");
     }
 
     @Test
     public void testFHandlerWhitespace() throws Exception {
         String testString = "drop(\n" +
-                "     \"A\",\n" +
+                "     'A',\n" +
                 "     toUpperCase(\n" +
-                "            \"abcda  \"\n" +
+                "            'abcda  '\n" +
                 "     )\n" +
                 ")";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
 
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("BCD  ");
+
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("BCD  ");
     }
 
     /**
@@ -254,39 +230,18 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFHandler2Reset() throws Exception {
-        String testString = "drop(\"A\",toUpperCase(\"abcda\"))";
+        String testString = "drop('A',toUpperCase('abcda'))";
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFunctor().getResult().equals("BCD");
 
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
 
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("BCD");
-        eventDrivenFunctorHandler.reset();
-        testString = "drop(\"A\",toUpperCase(\"aspqra\"))";
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("SPQR");
-
+        eventDrivenParser.reset();
+        testString = "drop('A',toUpperCase('aspqra'))";
+        functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFunctor().getResult().equals("SPQR");
     }
 
-    /**
-     * An experimental parser to turn the basic simple notation into JSON code.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testJSONParser() throws Exception {
-        String testString = "if[and(A(\"B\"),zz(W))]then[Q(R(\"Z\"))]";
-        FunctorParser parser = new FunctorParser();
-        JSONHandler handler = new JSONHandler();
-        parser.parse(testString, handler);
-    }
 
     /**
      * This does a simple logic block test of a single conditional. Note that the conditional uses the special
@@ -296,20 +251,33 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testSimpleLogicBlocks() throws Exception {
-        String testString = "and{if[true]then[toLowerCase(\"ABC\")]}";
-        EventDrivenParser parser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler lbs = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(lbs);
-        parser.addCommaListener(lbs);
+        String testString = "and{if[true]then[toLowerCase('ABC')]}";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+
         parser.parse(testString);
-        lbs.getLogicBlocks().execute();
+        SwitchHandler lbs = parser.getSwitchHandler();
         assert lbs.getLogicBlocks().getFunctorMap().size() == 1;
         assert lbs.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.TO_LOWER_CASE.getValue()).size() == 1;
         assert lbs.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.TO_LOWER_CASE.getValue()).get(0).getResult().equals("abc");
     }
+
+
+ /*   @Test
+       public void testOLDSimpleLogicBlocks() throws Exception {
+           String testString = "and{if[true]then[toLowerCase('ABC')]}";
+           EventDrivenParser parser = new EventDrivenParser();
+           JFunctorFactory functorFactory = createFunctorFactory();
+           FunctorHandler fh = new FunctorHandler(functorFactory);
+           ConditionalHandler lbh = new ConditionalHandler(fh, functorFactory);
+           SwitchHandler edlbs = new SwitchHandler(lbh, functorFactory);
+           parser.addBraceListener(edlbs);
+           parser.addCommaListener(edlbs);
+           parser.parse(testString);
+           edlbs.getLogicBlocks().execute();
+           assert edlbs.getLogicBlocks().getFunctorMap().size() == 1;
+           assert edlbs.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.TO_LOWER_CASE.getValue()).size() == 1;
+           assert edlbs.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.TO_LOWER_CASE.getValue()).get(0).getResult().equals("abc");
+       }*/
 
     /**
      * This does a simple logic block test of a single conditional. Note that the conditional uses the special
@@ -319,15 +287,11 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testANDLogicBlocks() throws Exception {
-        String testString = "and{if[true]then[toLowerCase(\"ABC\")],if[true]then[toLowerCase(\"DEF\")]}";
-        EventDrivenParser parser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler lbs = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(lbs);
-        parser.addCommaListener(lbs);
+        String testString = "and{if[true]then[toLowerCase('ABC')],if[true]then[toLowerCase('DEF')]}";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+
         parser.parse(testString);
+        SwitchHandler lbs = parser.getSwitchHandler();
         lbs.getLogicBlocks().execute();
         assert lbs.getLogicBlocks().getFunctorMap().size() == 1; // in the functor map, both these have the same key, toLowerCase
         assert lbs.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.TO_LOWER_CASE.getValue()).size() == 2;
@@ -341,18 +305,13 @@ public class FunctorParserTest extends TestBase {
     @Test
     public void testFunctorComma() throws Exception {
         String testString = "      and(" +
-                "          contains(toLowerCase(\"FOO\"),\"zfoo\")," +
-                "         endsWith(\"abc\",\"c\")" +
+                "          contains(toLowerCase('FOO'),'zfoo')," +
+                "         endsWith('abc','c')" +
                 "        )";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert (Boolean) eventDrivenFunctorHandler.getFunctor().getResult();
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert (Boolean) functorHandler.getFResult();
     }
 
     /**
@@ -363,87 +322,204 @@ public class FunctorParserTest extends TestBase {
      */
     @Test
     public void testFunctorDepthAndBreadth() throws Exception {
-        String testString = "concat(\"a\",concat(\"b\",concat(\"c\",toUpperCase(\"d\"))),toLowerCase(\"EFG\"),toUpperCase(drop(\"Q\",concat(\"hQ\",\"iQ\",\"Qj\"))))";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("abcDefgHIJ") : "Got " + eventDrivenFunctorHandler.getFunctor().getResult();
+        String testString = "concat('a',concat('b',concat('c',toUpperCase('d'))),toLowerCase('EFG'),toUpperCase(drop('Q',concat('hQ','iQ','Qj'))))";
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("abcDefgHIJ") : "Got " + functorHandler.getFResult();
     }
 
+    /**
+     * Characters may be escaped if they are preceeded with a backslash. \. This allows you to e.g. concatenate strings
+     * that contain what are otherwise control characters like [, ( and {.
+     *
+     * @throws Exception
+     */
     @Test
     public void testescapeCharacter() throws Exception {
-        String testString = "concat(\"\\\"\\\"\\{\\}\",concat(\"\\[\\]\",concat(\"\\(\\)\",toUpperCase(\"d\"))),toLowerCase(\"EFG\"),toUpperCase(drop(\"Q\",concat(\"hQ\",\"iQ\",\"Qj\"))))";
-        EventDrivenParser eventDrivenParser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler eventDrivenFunctorHandler = new EventDrivenFunctorHandler(functorFactory);
-        eventDrivenParser.addParenthesisListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addDoubleQuoteListener(eventDrivenFunctorHandler);
-        eventDrivenParser.addCommaListener(eventDrivenFunctorHandler);
-        eventDrivenParser.parse(testString);
-        eventDrivenFunctorHandler.getFunctor().execute();
-        assert eventDrivenFunctorHandler.getFunctor().getResult().equals("\"\"{}[]()DefgHIJ") : "Got " + eventDrivenFunctorHandler.getFunctor().getResult();
+        String testString = "concat('\\'\\'\\{\\}',concat('\\[\\]',concat('\\(\\)',toUpperCase('d'))),toLowerCase('EFG'),toUpperCase(drop('Q',concat('hQ','iQ','Qj'))))";
+        EventDrivenParser eventDrivenParser = new EventDrivenParser(createFunctorFactory());
+
+        FunctorHandler functorHandler = (FunctorHandler) eventDrivenParser.parse(testString);
+        assert functorHandler.getFResult().equals("''{}[]()DefgHIJ") : "Got " + functorHandler.getFResult();
     }
 
     @Test
-    public void testNestedConditionals() throws Exception {
-//                String testString = "if[contains(\"foo\",\"zfoo\")]then[if[endsWith(\"abc\",\"c\")]then[concat(\"eppn\",\"A\")]]";
+    public void testORSwitch() throws Exception {
+//                String testString = "if[contains('foo','zfoo')]then[if[endsWith('abc','c')]then[concat('eppn','A')]]";
         String testString = "" +
                 " or{" +
                 "   if[" +
                 "      and(" +
-                "          contains(toLowerCase(\"FOO\"),\"zfoo\")," +
-                "         endsWith(\"abc\",\"c\")" +
+                "          contains(toLowerCase('FOO'),'zfoo')," +
+                "         endsWith('abc','c')" +
                 "        )" +
                 "     ]then[" +
-                "      concat(\"p\",\"q\")" +
+                "      concat('p','q')" +
                 "     ]," +
                 "   if[" +
                 "    and(" +
-                "        contains(\"foo\",\"zfoo\")," +
-                "       endsWith(\"abc\",\"d\")" +
+                "        contains('foo','zfoo')," +
+                "       endsWith('abc','d')" +
                 "      )" +
                 "    ]then[" +
-                "  concat(\"x\",\"y\")" +
+                "  concat('x','y')" +
                 "   ]" +
                 " }";
         // All this should result in the string "pq"
-        EventDrivenParser parser = new EventDrivenParser();
-        JFunctorFactory functorFactory = createFunctorFactory();
-        EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-        EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-        EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
-        parser.addBraceListener(eh);
-        parser.addCommaListener(eh);
-        parser.parse(testString);
-        eh.getLogicBlocks().execute();
-        assert eh.getLogicBlocks().getFunctorMap().containsKey(FunctorTypeImpl.CONCAT.getValue());
-        assert eh.getLogicBlocks().getFunctorMap().get(FunctorTypeImpl.CONCAT.getValue()).get(0).getResult().equals("pq");
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+
+        SwitchHandler switchHandler = (SwitchHandler) parser.parse(testString);
+
+        SwitchHandler lbh = parser.getSwitchHandler();
+        assert lbh.getResultAt(0, 0).equals("pq");
+    }
+
+    @Test
+    public void testJSONSwitch() throws Exception {
+        //                String testString = "if[contains('foo','zfoo')]then[if[endsWith('abc','c')]then[concat('eppn','A')]]";
+        JSONObject jsonScript = new JSONObject();
+        JSONArray array = new JSONArray();
+        array.add("# Comment that ought to be ignored.");
+        array.add(" or{");
+        array.add("   if[");
+        array.add("      and(");
+        array.add("          contains(toLowerCase('FOO'),'zfoo'),");
+        array.add("         endsWith('abc','c')");
+        array.add("        )");
+        array.add("     ]then[");
+        array.add("      concat('p','q')");
+        array.add("     ],");
+        array.add("   if[");
+        array.add("    and(");
+        array.add("        contains('foo','zfoo'),");
+        array.add("       endsWith('abc','d')");
+        array.add("      )");
+        array.add("    ]then[");
+        array.add("  concat('x','y')");
+        array.add("   ]");
+        array.add(" };");
+        jsonScript.put("script", array);
+        Script script = new Script(createFunctorFactory(), jsonScript);
+        script.execute();
+        assert script.getHandlers().size() == 1;
+        SwitchHandler switchHandler = (SwitchHandler) script.getHandlers().get(0);
+        assert switchHandler.getResultAt(0, 0).equals("pq");
     }
 
     /**
-      * Test that running the parser against the handler works, when there is no
-     * outer logic block.
-      *
-      * @throws Exception
-      */
-     @Test
-     public void testLBHandler() throws Exception {
-         String testString = "drop(\"A\",toUpperCase(\"abcda\"))";
+     * Just like the above, except the very final ; is missing, which should cause the script to throw an exception.
+     * @throws Exception
+     */
 
-         EventDrivenParser parser = new EventDrivenParser();
-               JFunctorFactory functorFactory = createFunctorFactory();
-               EventDrivenFunctorHandler fh = new EventDrivenFunctorHandler(functorFactory);
-               EventDrivenLogicBlockHandler lbh = new EventDrivenLogicBlockHandler(fh, functorFactory);
-               EDLBSHandler eh = new EDLBSHandler(lbh, functorFactory);
-               parser.addBraceListener(eh);
-               parser.addCommaListener(eh);
-               parser.parse(testString);
+    @Test
+      public void testJSONBADSwitch() throws Exception {
+          //                String testString = "if[contains('foo','zfoo')]then[if[endsWith('abc','c')]then[concat('eppn','A')]]";
+          JSONObject jsonScript = new JSONObject();
+          JSONArray array = new JSONArray();
+          array.add("# Comment that ought to be ignored.");
+          array.add(" or{");
+          array.add("   if[");
+          array.add("      and(");
+          array.add("          contains(toLowerCase('FOO'),'zfoo'),");
+          array.add("         endsWith('abc','c')");
+          array.add("        )");
+          array.add("     ]then[");
+          array.add("      concat('p','q')");
+          array.add("     ],");
+          array.add("   if[");
+          array.add("    and(");
+          array.add("        contains('foo','zfoo'),");
+          array.add("       endsWith('abc','d')");
+          array.add("      )");
+          array.add("    ]then[");
+          array.add("  concat('x','y')");
+          array.add("   ]");
+          array.add(" }"); // <--- ONLY difference with previous test initialization.
+          jsonScript.put("script", array);
+          Script script = new Script(createFunctorFactory(), jsonScript);
+        try {
+            script.execute();
+            assert false : "Missing line termination should have caused reading JSON to fail.";
+        }catch(Throwable s){
+            assert true;
+        }
+
+      }
+
+    /**
+     * Test that running the parser against the handler works, and that the returned handler can resolve its type.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testLBHandler() throws Exception {
+        String testString = "drop('A',toUpperCase('abcda'))";
+
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        AbstractHandler abstractHandler = parser.parse(testString);
+        assert abstractHandler.getHandlerType() == AbstractHandler.FUNCTOR_TYPE;
+        FunctorHandler functorHandler = (FunctorHandler) abstractHandler;
+        assert functorHandler.getFResult().equals("BCD") : "Got " + functorHandler.getFResult();
 
 
-     }
+    }
+
+    /**
+     * Take a simple expression and the parser interpet it correctly..
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSimpleFunctor1() throws Exception {
+        String raw = "concat(toLowerCase('FOO'),'bar')";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+
+        FunctorHandler functorHandler = (FunctorHandler) parser.parse(raw);
+        assert functorHandler.getFResult().equals("foobar");
+
+    }
+
+    /**
+     * Check that accessing the result via the functor map has the functor map populated correctly
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testFunctorMap() throws Exception {
+        String raw = "if[true]then[concat(toLowerCase('FOO'),'bar')]";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        AbstractHandler abstractHandler = parser.parse(raw);
+        assert abstractHandler.getHandlerType() == AbstractHandler.CONDITIONAL_TYPE;
+        ConditionalHandler conditionalHandler = (ConditionalHandler) abstractHandler;
+        assert conditionalHandler.getLogicBlock().getConsequent().getFunctorMap().containsKey(FunctorTypeImpl.CONCAT.getValue());
+        assert conditionalHandler.getLogicBlock().getConsequent().getFunctorMap().get(FunctorTypeImpl.CONCAT.getValue()).get(0).getResult().equals("foobar");
+
+    }
+
+    @Test
+    public void testNoElse() throws Exception {
+        String raw = "if[false]then[concat(toLowerCase('FOO'),'bar')]";
+        EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+        AbstractHandler abstractHandler = parser.parse(raw);
+        assert abstractHandler.getHandlerType() == AbstractHandler.CONDITIONAL_TYPE;
+        ConditionalHandler conditionalHandler = (ConditionalHandler) abstractHandler;
+        assert !conditionalHandler.getLogicBlock().hasConsequent();
+
+    }
+
+    @Test
+    public void testScript1() throws Exception {
+        File f = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/test-script1.cmd");
+        if (!f.exists()) {
+            System.out.print("Warning: test file '" + f.getAbsolutePath() + "' does not exist. Skipping test");
+        }
+        FileReader fileReader = new FileReader(f);
+        JFunctorFactory functorFactory = createFunctorFactory();
+        functorFactory.setVerboseOn(true); //enable output to console.
+        Script script = new Script(functorFactory);
+        script.execute(fileReader);
+        assert functorFactory.getEnvironment().containsKey("key0") : "Missing key";
+        assert functorFactory.getEnvironment().get("key0").equals("value0") : "Incorrect sotred value. Expected \"value0\" and got \"" + functorFactory.getEnvironment().get("key0") + "\"";
+    }
 }

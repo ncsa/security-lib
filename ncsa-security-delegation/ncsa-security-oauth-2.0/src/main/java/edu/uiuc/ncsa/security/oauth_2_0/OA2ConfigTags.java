@@ -13,6 +13,7 @@ public interface OA2ConfigTags {
     public String MAX_CLIENT_REFRESH_TOKEN_LIFETIME = "maxClientRefreshTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_LIFETIME = "refreshTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_ENABLED = "refreshTokenEnabled"; // Enable or disable refresh tokens for this server.
+    public String OIDC_SUPPORT_ENABLED = "OIDCEnabled"; // Enable or disable OIDC support for this server.
     public String CLIENT_SECRET_LENGTH= "clientSecretLength"; // in bytes.
     public String ENABLE_TWO_FACTOR_SUPPORT= "enableTwoFactorSupport"; // boolean for enabling two factor support.
     // Note -- enabling two factor support boils down to not testing the connection early since the

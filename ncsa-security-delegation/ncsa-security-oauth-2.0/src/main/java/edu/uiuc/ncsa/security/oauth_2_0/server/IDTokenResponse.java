@@ -23,7 +23,10 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  * on 8/17/17 at  1:03 PM
  */
 public abstract class IDTokenResponse extends IResponse2 {
-    public IDTokenResponse(AccessToken accessToken, RefreshToken refreshToken) {
+    public IDTokenResponse(AccessToken accessToken,
+                           RefreshToken refreshToken,
+                           boolean isOIDC) {
+        super(isOIDC);
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
@@ -78,13 +81,15 @@ public abstract class IDTokenResponse extends IResponse2 {
     boolean signToken = false;
 
     JSONObject claims;
+
     public JSONObject getClaims() {
-        if(claims == null) {
+        if (claims == null) {
             claims = new JSONObject();
         }
         return claims;
     }
-    public void setClaims(JSONObject claims){
+
+    public void setClaims(JSONObject claims) {
         this.claims = claims;
     }
 
@@ -119,7 +124,6 @@ public abstract class IDTokenResponse extends IResponse2 {
             m.put(REFRESH_TOKEN, getRefreshToken().getToken());
             m.put(EXPIRES_IN, (getRefreshToken().getExpiresIn() / 1000));
         }
-        //m.put(SCOPE, "openid"); // all we support in base protocol.
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.
             String ss = "";
@@ -132,21 +136,24 @@ public abstract class IDTokenResponse extends IResponse2 {
             }
             m.put(SCOPE, ss);
         }
-        JSONObject claims = getClaims();
+        if (isOIDC()) {
+            JSONObject claims = getClaims();
 
-        try {
-            String idTokken = null;
-            if (isSignToken()) {
-                idTokken = JWTUtil.createJWT(claims, getJsonWebKey());
-            } else {
-                idTokken = JWTUtil.createJWT(claims);
+            try {
+                String idTokken = null;
+                if (isSignToken()) {
+                    idTokken = JWTUtil.createJWT(claims, getJsonWebKey());
+                } else {
+                    idTokken = JWTUtil.createJWT(claims);
+                }
+                if (ServletDebugUtil.isEnabled()) {
+                    ServletDebugUtil.dbg(this, "raw ID_Token=" + idTokken);
+                }
+                m.put(ID_TOKEN, idTokken);
+            } catch (Throwable e) {
+                throw new IllegalStateException("Error: cannot create ID token", e);
             }
-            if (ServletDebugUtil.isEnabled()) {
-                ServletDebugUtil.dbg(this, "raw ID_Token=" + idTokken);
-            }
-            m.put(ID_TOKEN, idTokken);
-        } catch (Throwable e) {
-            throw new IllegalStateException("Error: cannot create token", e);
+
         }
 
         JSONObject json = JSONObject.fromObject(m);

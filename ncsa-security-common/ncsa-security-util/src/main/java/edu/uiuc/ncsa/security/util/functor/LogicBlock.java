@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.functor.logic.jElse;
 import edu.uiuc.ncsa.security.util.functor.logic.jIf;
 import edu.uiuc.ncsa.security.util.functor.logic.jThen;
@@ -54,8 +55,8 @@ public class LogicBlock implements JMetaFunctor {
     jIf ifBlock;
 
     /**
-     * The consequent is either the hten or else block, depending on the antecedent (the if block). If this has not
-     * executed, then null is returned.
+     * The consequent is either the then or else block, depending on the antecedent (the if block). If this has not
+     * executed, then null is returned. Also, if there no else and the if clause is false, it will be empty
      *
      * @return
      */
@@ -69,6 +70,9 @@ public class LogicBlock implements JMetaFunctor {
         return elseBlock;
     }
 
+    public boolean hasConsequent(){
+        return getConsequent()!=null;
+    }
     public jElse getElseBlock() {
         return elseBlock;
     }
@@ -176,6 +180,8 @@ public class LogicBlock implements JMetaFunctor {
         if (initialized) {
             return;
         }
+        DebugUtil.dbg(this,"initialized, raw JSON = " + json);
+
         // the assumption is that this object has three elements for if, then and else, plus possibly others.
         if (json.containsKey(IF.getValue())) {
             ifBlock = createIfBlock();

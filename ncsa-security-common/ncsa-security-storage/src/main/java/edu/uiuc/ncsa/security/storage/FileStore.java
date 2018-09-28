@@ -220,10 +220,15 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
 
     protected V loadFile(File f) {
+        if(f.length() == 0){
+            DebugUtil.dbg(this, "Skipping file of length zero:" + f);
+            return null;
+        }
         FileInputStream fis = null;
         checkPermissions();
         try {
             fis = new FileInputStream(f);
+
             return loadStream(fis);
         } catch (Throwable e) {
             if (DebugUtil.isEnabled()) {

@@ -11,6 +11,15 @@ import edu.uiuc.ncsa.security.util.functor.parser.event.DelimiterEvent;
  * on 7/15/18 at  5:21 PM
  */
 public abstract class AbstractHandler {
+    public static final int SWITCH_TYPE = 0;
+    public static final int CONDITIONAL_TYPE = 1;
+    public static final int FUNCTOR_TYPE = 2;
+
+    /**
+     * Allows for determining the type of handler without resorting to a lot of java class operations.
+     * @return
+     */
+    abstract public int getHandlerType();
     public AbstractHandler(JFunctorFactory functorFactory) {
         this.functorFactory = functorFactory;
     }
@@ -63,10 +72,10 @@ public abstract class AbstractHandler {
     @Override
     public String toString() {
         return "AbstractHandler{" +
-                "closeDelimiterCount=" + closeDelimiterCount +
-                ", functorFactory=" + functorFactory +
-                ", openDelimiterCount=" + openDelimiterCount +
+                "functorFactory=" + functorFactory +
                 ", used=" + used +
+                ", closeDelimiterCount=" + closeDelimiterCount +
+                ", openDelimiterCount=" + openDelimiterCount +
                 '}';
     }
 }

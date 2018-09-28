@@ -3,6 +3,9 @@ package edu.uiuc.ncsa.security.util.functor.logic;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 
 /**
+ * match[target, regex] <br>
+ * Returns a boolean if the regex finds a match in the target. Note that if you need simpler matching, you can
+ * use either {@link jEquals} or {@link jContains} instead.
  * Tests matching.
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  11:40 AM

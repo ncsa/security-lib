@@ -56,7 +56,7 @@ public class FunctorHandler implements DefaultHandler {
     TopHandlerInterface currentHandler = null;
     TopHandlerInterface previousHandler = null;
 
-    public EventDrivenFunctorHandler(FunctorHandlerInterface fHandler,
+    public FunctorHandler(FunctorHandlerInterface fHandler,
                           LogicBlockHandlerInterface lbHandler,
                           LogicBlocksHandlerInterface lbsHandler) {
         this.fHandler = fHandler;

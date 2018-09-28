@@ -9,7 +9,8 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
  */
 public class RTIResponse extends IDTokenResponse {
     public RTIResponse(AccessToken accessToken,
-                       RefreshToken refreshToken) {
-        super(accessToken, refreshToken);
+                       RefreshToken refreshToken,
+                       boolean isOIDC) {
+        super(accessToken, refreshToken,isOIDC);
     }
 }

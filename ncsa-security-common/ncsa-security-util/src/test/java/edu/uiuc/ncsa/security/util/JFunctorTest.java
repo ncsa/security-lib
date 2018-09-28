@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.security.util;
 import edu.uiuc.ncsa.security.util.functor.*;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
 import edu.uiuc.ncsa.security.util.functor.strings.*;
+import edu.uiuc.ncsa.security.util.functor.system.jgetEnv;
+import edu.uiuc.ncsa.security.util.functor.system.jsetEnv;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -122,6 +124,16 @@ public class JFunctorTest extends TestBase {
         // the edge case of a JSON array of nulls.
 
     }
+
+    @Test
+       public void testBadEquals() throws Exception {
+           jEquals jEquals = new jEquals();
+           jEquals.addArg((String) null);
+           jEquals.addArg("fox");
+           jEquals.execute();
+           assert !jEquals.getBooleanResult();
+       }
+
 
     @Test
     public void testBadMatch() throws Exception {
@@ -570,5 +582,41 @@ public class JFunctorTest extends TestBase {
         jDrop.execute();
         assert jDrop.getResult().equals("bob.smith");
         assert reTestIt(jDrop).getResult().equals("bob.smith");
+    }
+
+    /**
+     * Test the environment. This puts the key/value pair of foo + bar into the environment.
+     * @throws Exception
+     */
+    @Test
+    public void testEnv() throws Exception{
+        JFunctorFactory ff = new JFunctorFactory();
+        jsetEnv xx = new jsetEnv(null);
+        xx.addArg("foo");
+        xx.addArg("bar");
+        String rawSet = xx.toJSON().toString();
+        JFunctor setEnv = ff.create(rawSet);
+        setEnv.execute();
+        assert ff.getEnvironment().containsKey("foo");
+        assert ff.getEnvironment().get("foo").equals("bar");
+        jgetEnv yy = new jgetEnv(null);
+        yy.addArg("foo");
+        String rawGet = yy.toJSON().toString();
+        jgetEnv getEnv = (jgetEnv) ff.create(rawGet);
+        getEnv.execute();
+        assert getEnv.getResult().equals("bar");
+
+    }
+
+    @Test
+    public void testEcho() throws Exception{
+        JFunctorFactory ff = new JFunctorFactory(true);
+        jEcho xx = new jEcho(true);
+        xx.addArg("Hello world");
+        String raw = xx.toJSON().toString();
+        System.out.println(raw);
+        JFunctor functor = ff.create(raw);
+        functor.execute();
+
     }
 }

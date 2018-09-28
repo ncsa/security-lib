@@ -10,9 +10,6 @@ import java.util.StringTokenizer;
  * JVM hosts, the only reasonable way to edit things at the command line is going to be with some form
  * of line editor. Rather than be clever and create one, this is a <b>basic</b> port of the tried and true
  * Unix line editor, ed.
- * <h3>The Contract</h3>
- * This will support the standard commands as documented <a href="https://www.gnu.org/software/ed/manual/ed_manual.html">here</a>.
- * This relates to the commands themselves. Pipes and such cannot be sensibly done in Java and are not supported.
  * <h3>Usage</h3>
  * You use this by creating an instance with either a buffer of lines or a string which is parsed simply into lines (this
  * is not perfect since there can be some cross-platform issues -- better to roll it yourself). You then invoke

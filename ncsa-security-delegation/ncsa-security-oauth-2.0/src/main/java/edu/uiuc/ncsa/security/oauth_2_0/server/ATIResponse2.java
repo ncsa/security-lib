@@ -12,8 +12,9 @@ import edu.uiuc.ncsa.security.delegation.token.Verifier;
  */
 public class ATIResponse2 extends IDTokenResponse implements ATResponse {
     public ATIResponse2(AccessToken accessToken,
-                        RefreshToken refreshToken) {
-        super(accessToken,refreshToken);
+                        RefreshToken refreshToken,
+                        boolean isOIDC) {
+        super(accessToken,refreshToken,isOIDC);
     }
     Verifier verifier;
 

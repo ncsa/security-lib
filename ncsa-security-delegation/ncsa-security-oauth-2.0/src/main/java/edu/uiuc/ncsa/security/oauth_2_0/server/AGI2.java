@@ -18,14 +18,15 @@ import java.util.Map;
  * on 6/4/13 at  5:03 PM
  */
 public class AGI2 extends AbstractIssuer implements AGIssuer {
-
+    boolean isOIDC = true;
     /**
     Constructor
     @param tokenForge Token forge to use
     @param address URI of authorization endpoint
      */
-    public AGI2(TokenForge tokenForge, URI address) {
+    public AGI2(TokenForge tokenForge, URI address, boolean isOIDC) {
         super(tokenForge, address);
+        this.isOIDC = isOIDC;
     }
 
     /**
@@ -42,7 +43,7 @@ public class AGI2 extends AbstractIssuer implements AGIssuer {
         // TODO Check parameters passed in
 
         AuthorizationGrant ag = tokenForge.getAuthorizationGrant(); // get a fresh new shiny one.
-        AGIResponse2 agResponse = new AGIResponse2();
+        AGIResponse2 agResponse = new AGIResponse2(isOIDC);
         agResponse.setGrant(ag);
         agResponse.setParameters(reqParamMap);
 

@@ -21,6 +21,9 @@ import java.util.Map;
  * on 6/5/13 at  9:31 AM
  */
 public class PAIResponse2 extends IResponse2 implements PAResponse {
+    public PAIResponse2(boolean isOIDC) {
+        super(isOIDC);
+    }
 
     ProtectedAsset protectedAsset;
     AccessToken accessToken;

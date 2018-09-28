@@ -19,21 +19,26 @@ import java.util.Stack;
  * on 7/16/18 at  12:00 PM
  */
 public class ConditionalHandler extends AbstractHandler implements DelimiterListener, CommaListener {
-    public EventDrivenFunctorHandler getFunctorHandler() {
+    public FunctorHandler getFunctorHandler() {
         if(functorHandler == null){
-            functorHandler = new EventDrivenFunctorHandler(getFunctorFactory());
+            functorHandler = new FunctorHandler(getFunctorFactory());
         }
         return functorHandler;
     }
 
-    public void setFunctorHandler(EventDrivenFunctorHandler functorHandler) {
+    public void setFunctorHandler(FunctorHandler functorHandler) {
         this.functorHandler = functorHandler;
     }
 
-    EventDrivenFunctorHandler functorHandler;
+    FunctorHandler functorHandler;
     Stack<LogicBlock> stack = new Stack<>();
 
-    public ConditionalHandler(EventDrivenFunctorHandler functorHandler, JFunctorFactory functorFactory) {
+    @Override
+    public int getHandlerType() {
+        return CONDITIONAL_TYPE;
+    }
+
+    public ConditionalHandler(FunctorHandler functorHandler, JFunctorFactory functorFactory) {
         super(functorFactory);
         this.functorHandler = functorHandler;
     }
@@ -148,6 +153,8 @@ public class ConditionalHandler extends AbstractHandler implements DelimiterList
             functorHandler.reset();
         }
     }
+
+
 
     @Override
     public void reset() {

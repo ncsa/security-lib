@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
+import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import net.sf.json.JSONObject;
 
 import javax.inject.Provider;
@@ -23,8 +24,8 @@ public class ClientConfigurationFactory<V extends ClientConfiguration> implement
      */
     public V newInstance(JSONObject json) {
         V cc = get();
-        JSONObject j = ClientConfigurationUtil.getRuntime(json);
-        cc.setRuntime(functorFactory.createLogicBlock(j));
+        //JSONObject j = ClientConfigurationUtil.getRuntime(json);
+        cc.setRuntime(new Script(functorFactory, ClientConfigurationUtil.getRuntime(json)));
         return cc;
     }
 

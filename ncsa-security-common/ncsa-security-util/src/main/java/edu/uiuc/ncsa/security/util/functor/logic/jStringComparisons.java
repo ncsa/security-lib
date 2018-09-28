@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
@@ -20,7 +21,12 @@ public abstract class jStringComparisons extends JFunctorImpl {
      */
     protected String processArg(Object obj) {
         String needle = null;
+        DebugUtil.dbg(this,".process: object = " + obj);
         boolean isString = false;
+        if(obj == null){
+            needle = "";
+            isString = true;
+        }
         if(obj instanceof String){
              needle = (String) obj;
             isString = true;
@@ -35,9 +41,6 @@ public abstract class jStringComparisons extends JFunctorImpl {
 
         if(!isString && !isFunctor){
             needle = String.valueOf(obj); // um, whatever it is, return it as a string...
-
-
-
         }
         return needle;
     }
