@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
@@ -26,6 +28,11 @@ public class CLIDriver {
     public static final int USER_EXIT_RC = 10;
     public static final int SHUTDOWN_RC = -10;
     public static final int HELP_RC = 100;
+
+
+    List<String> commandHistory = new LinkedList<>();
+    public static final String REPEAT_LAST_COMMAND = "/r";
+    public static final String HISTORY_LIST_COMMAND = "/h";
 
 
     private Commands[] commands; // implementation of this abstract class.
@@ -79,6 +86,25 @@ public class CLIDriver {
             try {
                 say2(prompt);
                 cmdLine = readline();
+                boolean storeLine = true;
+                if (cmdLine.equals(REPEAT_LAST_COMMAND)) {
+                    if (0 < commandHistory.size()) {
+                        cmdLine = commandHistory.get(0);
+                        storeLine = false;
+                    } else {
+                        say("no commands found");
+                    }
+                }
+                if (cmdLine.equals(HISTORY_LIST_COMMAND)) {
+                    for (int i = 0; i < commandHistory.size(); i++) {
+                        // an iterator actually prints these in reverse order. Print them in order.
+                        say(commandHistory.get(i));
+                    }
+                    continue;
+                }
+                if(storeLine){
+                    commandHistory.add(0, cmdLine);
+                }
                 switch (execute(cmdLine)) {
                     case HELP_RC:
                         listCLIMethods();
@@ -135,17 +161,17 @@ public class CLIDriver {
                     try {
                         invokeMethod(commands[i], cmdS, cliAV);
                         return OK_RC; // it worked
-                    }catch(InvocationTargetException itx){
-                        if(debug){
+                    } catch (InvocationTargetException itx) {
+                        if (debug) {
                             itx.printStackTrace();
                         }
                         // this is the most likely way to get and exception
-                        if((itx.getTargetException()!=null) && (itx.getTargetException() instanceof ExitException)){
+                        if ((itx.getTargetException() != null) && (itx.getTargetException() instanceof ExitException)) {
                             return USER_EXIT_RC;
                         }
-                        if(itx.getCause() != null){
+                        if (itx.getCause() != null) {
                             say("Exception. The cause is: " + itx.getCause().getMessage());
-                        }else{
+                        } else {
                             say("Invocation target exception encountered:" + itx.getTargetException());
                         }
 

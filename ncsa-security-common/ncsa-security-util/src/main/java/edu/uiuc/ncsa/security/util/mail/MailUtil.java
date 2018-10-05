@@ -6,10 +6,7 @@ import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
+import javax.mail.*;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -230,7 +227,12 @@ public class MailUtil extends TemplateUtil implements Logable {
             message.setRecipients(Message.RecipientType.TO, getMailEnvironment().recipients);
             message.setSubject(replaceAll(subjectTemplate, replacements));
             message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
+            if(replacements.containsKey("reply-to")){
+                InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
 
+                message.setReplyTo(new Address[]{address});
+
+            }
             tr.sendMessage(message, getMailEnvironment().recipients);
             info("Mail notification sent to " + Arrays.toString(getMailEnvironment().recipients));
             return true;

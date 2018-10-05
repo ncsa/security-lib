@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor.parser;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -147,46 +146,29 @@ public class Script {
 
     protected void executeScript(List<String> commands) {
         checkVersion();
-        DebugUtil.dbg(this, "preparing to run script:");
-        for (String x : commands) {
-            DebugUtil.dbg(this, x);
-        }
+
         EventDrivenParser parser = createParser();
         functorMap = new FunctorMap();
         for (String command : commands) {
             try {
-                DebugUtil.dbg(this, "executing \"" + command + "\"");
                 AbstractHandler abstractHandler = parser.parse(command, functorFactory.getReplacementTemplates());
-                DebugUtil.dbg(this, "executed parser, got handler " + abstractHandler.getClass().getSimpleName() + ", " + abstractHandler);
 
                 handlers.add(abstractHandler);
                 if (abstractHandler.getHandlerType() == AbstractHandler.SWITCH_TYPE) {
-                    DebugUtil.dbg(this, "Switch handler added");
-
                     SwitchHandler s = (SwitchHandler) abstractHandler;
                     functorMap.addAll(s.getLogicBlocks().getFunctorMap());
                 }
                 if (abstractHandler.getHandlerType() == AbstractHandler.FUNCTOR_TYPE) {
-                    DebugUtil.dbg(this, "Functor handler added");
                     FunctorHandler functorHandler = (FunctorHandler) abstractHandler;
                     functorMap.put(functorHandler.getFunctor());
                 }
                 if (abstractHandler.getHandlerType() == AbstractHandler.CONDITIONAL_TYPE) {
 
                     ConditionalHandler conditionalHandler = (ConditionalHandler) abstractHandler;
-                    DebugUtil.dbg(this, "Conditional handler added, result = ");
-                    if (conditionalHandler.getLogicBlock() == null) {
-                        DebugUtil.dbg(this, "NULL LOGIC BLOCK encountered.");
-                    } else {
-                        DebugUtil.dbg(this, "  Adding logic block.");
-
+                    if (conditionalHandler.getLogicBlock() != null){
                         if (conditionalHandler.getLogicBlock().hasConsequent()) {
-                            DebugUtil.dbg(this, "    has consequent.");
                             if (conditionalHandler.getLogicBlock().getConsequent().getFunctorMap() != null) {
-                                DebugUtil.dbg(this, "      consequent has functor map:" + conditionalHandler.getLogicBlock().getConsequent().getFunctorMap());
                                 functorMap.addAll(conditionalHandler.getLogicBlock().getConsequent().getFunctorMap());
-                            } else {
-                                DebugUtil.dbg(this, "      no functor map");
                             }
                         }
                     }

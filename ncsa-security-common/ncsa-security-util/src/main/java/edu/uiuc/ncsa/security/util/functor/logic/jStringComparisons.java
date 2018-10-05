@@ -21,7 +21,6 @@ public abstract class jStringComparisons extends JFunctorImpl {
      */
     protected String processArg(Object obj) {
         String needle = null;
-        DebugUtil.dbg(this,".process: object = " + obj);
         boolean isString = false;
         if(obj == null){
             needle = "";

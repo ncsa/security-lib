@@ -218,11 +218,17 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
     }
 
-
+    boolean removeEmptyFiles = true;
     protected V loadFile(File f) {
         if(f.length() == 0){
-            DebugUtil.dbg(this, "Skipping file of length zero:" + f);
-            return null;
+            if(removeEmptyFiles){
+               f.delete();
+                DebugUtil.dbg(this, "Deleting empty file:" + f);
+                return null;
+            }else {
+                DebugUtil.dbg(this, "Skipping file of length zero:" + f);
+                return null;
+            }
         }
         FileInputStream fis = null;
         checkPermissions();

@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor.parser.event;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
@@ -164,14 +163,11 @@ public class EventDrivenParser {
 
 
     protected void execute() {
-        DebugUtil.dbg(this, ".execute: hasConditional = " + hasConditional());
         if (hasFunctor()) {
             functorHandler.getFunctor().execute();
         }
         if (hasConditional()) {
             getConditionalHandler().getLogicBlock().execute();
-            DebugUtil.dbg(this, ".execute: executed conditional handler");
-
         }
         if (hasSwitch()) {
             getSwitchHandler().execute();
@@ -207,7 +203,6 @@ public class EventDrivenParser {
                 hasSwitch = true;
                 break;
             case CONDITIONAL_TYPE:
-                DebugUtil.dbg(this,"getType = conditional");
                 functorHandler = new FunctorHandler(functorFactory);
                 conditionalHandler = new ConditionalHandler(functorHandler, functorFactory);
                 addBracketListener(conditionalHandler);

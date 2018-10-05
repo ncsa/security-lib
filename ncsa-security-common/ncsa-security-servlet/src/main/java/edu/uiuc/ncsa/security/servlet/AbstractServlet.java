@@ -22,7 +22,7 @@ import java.io.IOException;
  * <p>Created by Jeff Gaynor<br>
  * on May 3, 2010 at  11:35:16 AM
  */
-public abstract class  AbstractServlet extends HttpServlet implements Logable {
+public abstract class AbstractServlet extends HttpServlet implements Logable {
     public static final String PING_PARAMETER = "ping";
 
     static ConfigurationLoader<? extends AbstractEnvironment> configurationLoader;
@@ -83,7 +83,7 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
     }
 
     public void debug(String x) {
-      getMyLogger().debug(x);
+        getMyLogger().debug(x);
     }
 
     public void error(String x) {
@@ -141,6 +141,13 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
             //   printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
             /*
+            So we are clear on this... Tomcat will take any POST that has the body encoded as application/x-www-form-urlencoded,
+            open
+            the input stream and put the parameters into the parameter map, which can be accessed with the getParameter call. The OAuth spec
+            allows for POST with this encoding, so as long as everyone follows the spec, we really do not need to do anything.
+            Should we ever need to read the body of  a POST (because we are getting something exotic and not url form encoded),
+            something like this is in order:
+
             To read the request body for processing use something like this.
                // Read from request
                StringBuilder buffer = new StringBuilder();
@@ -151,6 +158,15 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
                 }
                String data = buffer.toString()
              */
+
+            /*
+            IN point of fact if a request comes that is in an unsupported type, we should reject it like so:
+              Fixes CIL-517
+             */
+            if (!httpServletRequest.getContentType().equals("application/x-www-form-urlencoded")) {
+                httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+                throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
+            }
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {
             handleException(t, httpServletRequest, httpServletResponse);
@@ -170,6 +186,7 @@ public abstract class  AbstractServlet extends HttpServlet implements Logable {
 
     /**
      * This returns true or false for
+     *
      * @param req
      * @param resp
      * @return
