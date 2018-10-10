@@ -29,8 +29,11 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
 
 public class ATServer2 extends TokenAwareServer implements ATServer {
 
-    public ATServer2(ServiceClient serviceClient, String wellKnown) {
-        super(serviceClient, wellKnown);
+    public ATServer2(ServiceClient serviceClient,
+                     String wellKnown,
+                     boolean oidcEnabled) {
+        super(serviceClient, wellKnown,oidcEnabled);
+
     }
 
     /**
@@ -85,22 +88,24 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 // This is optional to return, so it is possible that this might not work.
             }
         }
-        JSONObject claims = getAndCheckIDToken(jsonObject, atRequest);
-        if (jsonObject.containsKey(ID_TOKEN)) {
-            params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
-        }
-        // and now the specific checks for ID tokens returned by the AT server.
-        if (!claims.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
-            throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
-        }
+        if(oidcEnabled) {
+            JSONObject idToken = getAndCheckIDToken(jsonObject, atRequest);
+            if (jsonObject.containsKey(ID_TOKEN)) {
+                params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
+            }
+            // and now the specific checks for ID tokens returned by the AT server.
+            if (!idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
+                throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
+            }
 
-        params.put(ISSUED_AT, new Date(claims.getLong(ISSUED_AT) * 1000L));
-        params.put(SUBJECT, claims.getString(SUBJECT));
-        if (claims.containsKey(AUTHORIZATION_TIME)) {
-            // auth_time claim is optional (unless max_age is returned). At this point we do not do max_age.
-            params.put(AUTHORIZATION_TIME, claims.getLong(AUTHORIZATION_TIME));
+            params.put(ISSUED_AT, new Date(idToken.getLong(ISSUED_AT) * 1000L));
+            params.put(SUBJECT, idToken.getString(SUBJECT));
+            if (idToken.containsKey(AUTHORIZATION_TIME)) {
+                // auth_time claim is optional (unless max_age is returned). At this point we do not do max_age.
+                params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
+            }
+            params.put(ID_TOKEN, idToken);
         }
-        params.put(ID_TOKEN, claims);
         ATResponse2 atr = createResponse(at, rt);
         atr.setParameters(params);
         return atr;

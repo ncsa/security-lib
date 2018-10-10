@@ -65,7 +65,7 @@ public class LineEditor {
 
     CommandLineTokenizer CLT = new CommandLineTokenizer();
 
-    public static String PROMPT = ">";
+    public static String PROMPT = "edit >";
     public static final String END_COMMAND = "."; // end input to buffer
     public static final String APPEND_COMMAND = "a"; // append to end of file
     public static final String APPEND_COMMAND_LONG = "append"; // append to end of file
@@ -148,6 +148,7 @@ public class LineEditor {
             say2(PROMPT);
             String command = readline().trim();
             EditorInputLine eil = null;
+            boolean isUnkownCommand = true;
             try {
                 eil = new EditorInputLine(command);
             } catch (Throwable t) {
@@ -156,19 +157,24 @@ public class LineEditor {
             }
             if (eil.isCommand(QUIT_COMMAND, QUIT_COMMAND_LONG)) {
                 isDone = true;
+                isUnkownCommand = false;
                 sayv("bye-bye...");
                 break;
             }
             if (eil.isCommand(INSERT_COMMAND, INSERT_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doInsert(eil);
             }
             if (eil.isCommand(PRINT_COMMAND, PRINT_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doPrint(eil);
             }
             if (eil.isCommand(SIZE_COMMAND, SIZE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 say("buffer contains " + getBuffer().size() + " line" + (getBuffer().size() == 1 ? "." : "s."));
             }
             if (eil.isCommand(CLEAR_COMMAND, CLEAR_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 say("are you sure you want to clear the buffer (y|n)?");
                 if (readline().equals("y")) {
                     buffer = new LinkedList<>();
@@ -176,51 +182,67 @@ public class LineEditor {
                 }
             }
             if (eil.isCommand(COPY_COMMAND, COPY_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doCopy(eil);
             }
             if (eil.isCommand(CUT_COMMAND, CUT_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doCut(eil);
             }
 
             if (eil.isCommand(MOVE_COMMAND, MOVE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doMove(eil);
             }
             if (eil.isCommand(EDIT_A_LINE_COMMAND, EDIT_A_LINE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doEditLines(eil);
             }
             if (eil.isCommand(PASTE_COMMAND, PASTE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doPaste(eil);
             }
             if (eil.isCommand(READ_COMMAND, READ_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doRead(eil);
             }
             if (eil.isCommand(WRITE_COMMAND, WRITE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doWrite(eil);
             }
             if (eil.isCommand(HELP_COMMAND)) {
+                isUnkownCommand = false;
                 if (!eil.hasArgs()) {
                     allHelp();
                 }
             }
             if(eil.isCommand(FIND_COMMAND, FIND_COMMAND_LONG)){
+                isUnkownCommand = false;
                 doFind(eil);
             }
             if (eil.isCommand(SUBSITUTE_COMMAND, SUBSITUTE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doSubstitute(eil);
             }
             if (eil.isCommand(DELETE_COMMAND, DELETE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doDelete(eil);
             }
             if (eil.isCommand(VIEW_CLIPBOARD_COMMAND, VIEW_CLIPBOARD_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 doViewClipboard(eil);
             }
             if (eil.isCommand(VERBOSE_COMMAND, VERBOSE_COMMAND_LONG)) {
+                isUnkownCommand = false;
                 if (showHelp(eil)) {
                     verboseHelp();
                 } else {
                     verboseOn = !verboseOn;
                     say("verbose mode is now " + (verboseOn ? "ON" : "OFF"));
                 }
+            }
+            if(isUnkownCommand){
+                say("Sorry, unknown command. Type ? for help");
             }
         }
         say("done!");

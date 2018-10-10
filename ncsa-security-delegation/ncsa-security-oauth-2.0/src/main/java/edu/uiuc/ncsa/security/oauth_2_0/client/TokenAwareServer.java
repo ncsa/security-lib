@@ -22,6 +22,7 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.*;
  * on 9/13/17 at  2:37 PM
  */
 public abstract class TokenAwareServer extends ASImpl {
+    boolean oidcEnabled = true;
 
     ServiceClient serviceClient;
 
@@ -30,10 +31,13 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
 
-    public TokenAwareServer(ServiceClient serviceClient, String wellKnown) {
+    public TokenAwareServer(ServiceClient serviceClient,
+                            String wellKnown,
+                            boolean oidcEnabled) {
         super(serviceClient.host());
         this.serviceClient = serviceClient;
         this.wellKnown = wellKnown;
+        this.oidcEnabled = oidcEnabled;
     }
 
     String wellKnown = null;
@@ -69,6 +73,9 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
     protected JSONObject getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
+        if(!oidcEnabled){
+            return new JSONObject();
+        }
         JSONWebKeys keys = getJsonWebKeys();
 
         JSONObject claims;

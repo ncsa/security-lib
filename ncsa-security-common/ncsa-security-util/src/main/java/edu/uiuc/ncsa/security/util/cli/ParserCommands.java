@@ -37,9 +37,9 @@ public class ParserCommands extends CommonCommands {
             showSetFileHelp();
             return;
         }
-        if(inputLine.hasArgs()) {
+        if (inputLine.hasArgs()) {
             file = new File(inputLine.getLastArg());
-        }else{
+        } else {
             say("uh-oh! You seem to have forgotten the argument...");
         }
     }
@@ -119,11 +119,18 @@ public class ParserCommands extends CommonCommands {
         }
         File currentFile = file;
         if (inputLine.hasArgs()) {
-            currentFile = new File(inputLine.getArg(0));
+            currentFile = new File(inputLine.getLastArg());
+
         } else {
             if (currentFile == null) {
                 String newFile = getInput("Enter file to edit", "");
                 currentFile = new File(newFile);
+            }
+        }
+        if (file == null) {
+            String setFile = getInput("No default file. Set this to be the default (y/n)?", "y");
+            if (setFile.equals("y")) {
+                file = currentFile;
             }
         }
 
@@ -145,6 +152,7 @@ public class ParserCommands extends CommonCommands {
             LineEditor editor = new LineEditor(buffer);
             editor.execute();
             String saveIt = getInput("save it (y/n)?", "y");
+
             if (saveIt.equals("y")) {
                 FileWriter fw = new FileWriter(currentFile);
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -154,6 +162,7 @@ public class ParserCommands extends CommonCommands {
                 }
                 bw.flush();
                 bw.close();
+                say("saved");
             }
 
         } catch (Throwable t) {

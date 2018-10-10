@@ -22,8 +22,8 @@ import java.util.HashMap;
  */
 public class RTServer2 extends TokenAwareServer implements RTServer {
 
-    public RTServer2(ServiceClient serviceClient, String wellknown) {
-        super(serviceClient, wellknown);
+    public RTServer2(ServiceClient serviceClient, String wellknown, boolean oidcEnabled) {
+        super(serviceClient, wellknown, oidcEnabled);
     }
 
     @Override
@@ -45,12 +45,14 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         }
         long expiresIn = Long.parseLong(exp) * 1000;
 
-        JSONObject claims = getAndCheckIDToken(json, rtRequest);
         OA2RefreshTokenImpl refreshTokenImpl2 = new OA2RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
         AccessToken newAT = new AccessTokenImpl(URI.create(returnedAT));
         refreshTokenImpl2.setExpiresIn(expiresIn);
         RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2);
-        rtResponse.setParameters(claims);
+        if (oidcEnabled) {
+            JSONObject idToken = getAndCheckIDToken(json, rtRequest);
+            rtResponse.setParameters(idToken);
+        }
         return rtResponse;
     }
 
@@ -65,7 +67,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         return response;
     }
 
-    public RTResponse createResponse(AccessToken at, RefreshToken rt){
+    public RTResponse createResponse(AccessToken at, RefreshToken rt) {
         return new RTResponse(at, rt);
     }
 }
