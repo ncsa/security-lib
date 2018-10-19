@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 /**
  * Very straightforward servlet wrapper. This sets up logging and debug. All posts and gets
@@ -163,7 +164,21 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
             IN point of fact if a request comes that is in an unsupported type, we should reject it like so:
               Fixes CIL-517
              */
-            if (!httpServletRequest.getContentType().equals("application/x-www-form-urlencoded")) {
+            String rawContentType = httpServletRequest.getContentType();
+            if(rawContentType == null || rawContentType.isEmpty()){
+                httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+                throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
+            }
+            // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
+            // there may be several things in the content type (such as the charset, boundary, etc.) all separated
+            // by semicolons. Split it up and check that one of them is the correct type.
+            StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
+            boolean gotOne = false;
+            while(tokenizer.hasMoreTokens()){
+                gotOne = gotOne || tokenizer.nextToken().trim().equals("application/x-www-form-urlencoded");
+            }
+
+            if (!gotOne) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
                 throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }

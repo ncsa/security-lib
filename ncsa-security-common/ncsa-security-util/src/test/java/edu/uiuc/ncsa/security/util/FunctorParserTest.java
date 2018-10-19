@@ -522,4 +522,18 @@ public class FunctorParserTest extends TestBase {
         assert functorFactory.getEnvironment().containsKey("key0") : "Missing key";
         assert functorFactory.getEnvironment().get("key0").equals("value0") : "Incorrect sotred value. Expected \"value0\" and got \"" + functorFactory.getEnvironment().get("key0") + "\"";
     }
+    @Test
+       public void testScript2() throws Exception {
+           File f = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/test/resources/test-script2.cmd");
+           if (!f.exists()) {
+               System.out.print("Warning: test file '" + f.getAbsolutePath() + "' does not exist. Skipping test");
+           }
+           FileReader fileReader = new FileReader(f);
+           JFunctorFactory functorFactory = createFunctorFactory();
+           functorFactory.setVerboseOn(true); //enable output to console.
+           Script script = new Script(functorFactory);
+           script.execute(fileReader);
+           assert functorFactory.getEnvironment().containsKey("foo") : "Missing key";
+           assert functorFactory.getEnvironment().get("fnord").equals("baz") : "Incorrect sotred value. Expected \"baz\" and got \"" + functorFactory.getEnvironment().get("fnord") + "\"";
+       }
 }

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
@@ -72,6 +73,24 @@ public class CLIDriver {
         return getBufferedReader().readLine();
     }
 
+    protected static final int NEW_COMMAND = 0;
+    protected static final int REPEAT_COMMAND = 10;
+    protected static final int HISTORY_COMMAND = 20;
+
+    // TODO - Add more CLI-level commands?
+    // Might very well want to fold this into the standard flow rather than intercept it first.
+    // Have to think about that...
+    // Might want
+    //  /s file = save/serialize history buffer to file,
+    //  /d file = import/deserialize buffer from file
+    //  /i file = interpret all the commands in a file, i.e. run a script.
+    protected int getCommandType(String cmdLine){
+        StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
+        String nextToken = st.nextToken();
+        if(nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND;
+        if(nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND;
+        return NEW_COMMAND;
+    }
     /**
      * Actual method that starts up this driver and sets out prompts etc.
      *
@@ -95,12 +114,32 @@ public class CLIDriver {
                         say("no commands found");
                     }
                 }
-                if (cmdLine.equals(HISTORY_LIST_COMMAND)) {
-                    for (int i = 0; i < commandHistory.size(); i++) {
-                        // an iterator actually prints these in reverse order. Print them in order.
-                        say(commandHistory.get(i));
+                if (cmdLine.trim().startsWith(HISTORY_LIST_COMMAND)) {
+                    // Either of the following work:
+                    // /h == print history with line numbers
+                    // /h int = execute line # int, or print history if that fails
+                    StringTokenizer st = new StringTokenizer(cmdLine," ");
+                    st.nextToken(); // This is the "/h" which we already know about
+                    boolean printIt = true;
+                    if(st.hasMoreTokens()){
+                           try{
+                               int lineNo = Integer.parseInt(st.nextToken());
+                               if(0 <= lineNo && lineNo < commandHistory.size()){
+                                   cmdLine = commandHistory.get(lineNo);
+                                   storeLine = false;
+                                   printIt = false;
+                               }
+                           }catch(Throwable t){
+                               // do nothing, just print out the history.
+                           }
                     }
-                    continue;
+                    if(printIt){
+                        for (int i = 0; i < commandHistory.size(); i++) {
+                            // an iterator actually prints these in reverse order. Print them in order.
+                            say(i + ": " + commandHistory.get(i));
+                        }
+                        continue;
+                    }
                 }
                 if(storeLine){
                     commandHistory.add(0, cmdLine);
