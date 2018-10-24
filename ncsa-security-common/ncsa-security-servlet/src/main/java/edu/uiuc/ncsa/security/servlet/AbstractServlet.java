@@ -139,7 +139,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
-            //   printAllParameters(httpServletRequest);
+               printAllParameters(httpServletRequest);
             if (doPing(httpServletRequest, httpServletResponse)) return;
             /*
             So we are clear on this... Tomcat will take any POST that has the body encoded as application/x-www-form-urlencoded,
@@ -158,15 +158,17 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
                    buffer.append(line);
                 }
                String data = buffer.toString()
-             */
 
+             NOTE that once the buffer is read once it cannot, of course, be read again without throwing an exception.
             /*
             IN point of fact if a request comes that is in an unsupported type, we should reject it like so:
               Fixes CIL-517
              */
-            String rawContentType = httpServletRequest.getContentType();
+           String rawContentType = httpServletRequest.getContentType();
+           ServletDebugUtil.dbg(this,"in POST, raw content = "+ rawContentType);
             if(rawContentType == null || rawContentType.isEmpty()){
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+                ServletDebugUtil.dbg(this,"in POST, raw content empty, throwing exception");
                 throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
             }
             // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
@@ -175,15 +177,23 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
             StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
             boolean gotOne = false;
             while(tokenizer.hasMoreTokens()){
-                gotOne = gotOne || tokenizer.nextToken().trim().equals("application/x-www-form-urlencoded");
+                String foo = tokenizer.nextToken().trim();
+                ServletDebugUtil.dbg(this,"checking encoding, next = " + foo);
+                gotOne = gotOne || foo.equals("application/x-www-form-urlencoded");
+                ServletDebugUtil.dbg(this,"checking encoding, gotOne = " + gotOne);
             }
 
             if (!gotOne) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+                ServletDebugUtil.dbg(this,"in POST, did NOT get one, throwing exception");
+
                 throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
+            ServletDebugUtil.dbg(this,"encoding ok, starting doIt()");
+
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {
+            t.printStackTrace();
             handleException(t, httpServletRequest, httpServletResponse);
         }
     }

@@ -18,41 +18,42 @@ public class ServletDebugUtil extends DebugUtil {
           if (queryString != null) {
               reqUrl += "?" + queryString;
           }
-          System.err.println("\n" + klasse.getSimpleName() + " at " + (new Date()));
-          System.err.println("Request parameters for " + reqUrl + "");
+          printIt("\n" + klasse.getSimpleName() + " at " + (new Date()));
+          printIt("HTTP method=" + request.getMethod());
+          printIt("Request parameters for " + reqUrl + "");
 
           if (request.getParameterMap() == null || request.getParameterMap().isEmpty()) {
-              System.err.println("  (none)");
+              printIt("  (none)");
           } else {
               for (Object key : request.getParameterMap().keySet()) {
                   String[] values = request.getParameterValues(key.toString());
-                  System.err.println(" " + key + ":");
+                  printIt(" " + key + ":");
                   if (values == null || values.length == 0) {
-                      System.err.println("   (no values)");
+                      printIt("   (no values)");
                   } else {
                       for (String x : values) {
-                          System.err.println("   " + x);
+                          printIt("   " + x);
                       }
                   }
               }
           }
-          System.err.println("Cookies:");
+          printIt("Cookies:");
           if (request.getCookies() == null) {
-              System.err.println(" (none)");
+              printIt(" (none)");
           } else {
               for (javax.servlet.http.Cookie c : request.getCookies()) {
-                  System.err.println(" " + c.getName() + "=" + c.getValue());
+                  printIt(" " + c.getName() + "=" + c.getValue());
               }
           }
-          System.err.println("Headers:");
+          printIt("Headers:");
           Enumeration e = request.getHeaderNames();
           if (!e.hasMoreElements()) {
-              System.err.println(" (none)");
+              printIt(" (none)");
           } else {
               while (e.hasMoreElements()) {
                   String name = e.nextElement().toString();
-                  System.err.println(" " + name);
-                  System.err.println("   " + request.getHeader(name));
+                  printIt(" " + name);
+                  printIt("   " + request.getHeader(name));
               }
           }
       }

@@ -2,7 +2,11 @@ edu.uiuc.ncsa.security.util.cli
 edu.uiuc.ncsa.security.util.configuration
 edu.uiuc.ncsa.security.util.functor
 edu.uiuc.ncsa.security.util.functor.logic
+edu.uiuc.ncsa.security.util.functor.parser
+edu.uiuc.ncsa.security.util.functor.parser.event
+edu.uiuc.ncsa.security.util.functor.parser.old
 edu.uiuc.ncsa.security.util.functor.strings
+edu.uiuc.ncsa.security.util.functor.system
 edu.uiuc.ncsa.security.util.jwk
 edu.uiuc.ncsa.security.util.mail
 edu.uiuc.ncsa.security.util.pkcs
