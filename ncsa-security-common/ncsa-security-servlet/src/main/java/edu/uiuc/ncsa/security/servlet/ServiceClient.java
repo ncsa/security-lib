@@ -10,7 +10,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -145,50 +145,68 @@ public class ServiceClient {
         return getString;
     }
 
+    /**
+     * Do a POST to the service using the parameters. This is automatically encoded as JSON and the assumption is that
+     * the response is JSON as well.
+     */
+/*    public JSONObject doPost(String address, JSONObject json){
+       HttpPost post = new HttpPost(address);
+       // now to add the parameters to the body of the post.
+        //post.getEntity().()
+        StringEntity stringEntity = new StringEntity("", "application/json");
+        UrlEncodedFormEntity xxx = new UrlEncodedFormEntity(null);
+        xxx.
+    }*/
+
+    protected String doRequest(HttpRequestBase httpRequestBase){
+        HttpClient client = clientPool.pop();
+           HttpResponse response = null;
+           try{
+
+               response = client.execute(httpRequestBase);
+           }catch(Throwable t){
+               ServletDebugUtil.dbg(this, "Error  invoking execute for client", t);
+               if(ServletDebugUtil.isEnabled()){
+                   t.printStackTrace();
+               }
+               throw new GeneralException("Error invoking client", t);
+           }
+           try {
+
+               if(response.getEntity() != null && response.getEntity().getContentType()!=null) {
+                   ServletDebugUtil.dbg(this, "Raw response, content type:" + response.getEntity().getContentType());
+               }else{
+                   ServletDebugUtil.dbg(this, "No response entity or no content type.");
+
+               }
+               if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT){
+                   clientPool.push(client);
+                   return "";
+               }
+
+               HttpEntity entity1 = response.getEntity();
+               String x = EntityUtils.toString(entity1);
+               if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                   // If there was a proper error thrown on the server then we should be able to parse the contents of the
+                   // response.
+
+                   ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " + response.getStatusLine().getStatusCode());
+                   xx.setContent(x);
+                   xx.setStatus(response.getStatusLine().getStatusCode());
+                   clientPool.destroy(client);
+                   throw xx;
+               }
+               clientPool.push(client);
+               return x;
+           } catch (IOException e) {
+               throw new GeneralException("Error invoking http client", e);
+           }
+
+
+    }
     public String getRawResponse(String requestString) {
         HttpGet httpGet = new HttpGet(requestString);
-        HttpClient client = clientPool.pop();
-        HttpResponse response = null;
-        try{
-
-            response = client.execute(httpGet);
-        }catch(Throwable t){
-            ServletDebugUtil.dbg(this, "Error  invoking execute for client", t);
-            if(ServletDebugUtil.isEnabled()){
-                t.printStackTrace();
-            }
-            throw new GeneralException("Error invoking client", t);
-        }
-        try {
-
-            if(response.getEntity() != null && response.getEntity().getContentType()!=null) {
-                ServletDebugUtil.dbg(this, "Raw response, content type:" + response.getEntity().getContentType());
-            }else{
-                ServletDebugUtil.dbg(this, "No response entity or no content type.");
-
-            }
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT){
-                clientPool.push(client);
-                return "";
-            }
-
-            HttpEntity entity1 = response.getEntity();
-            String x = EntityUtils.toString(entity1);
-            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                // If there was a proper error thrown on the server then we should be able to parse the contents of the
-                // response.
-
-                ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " + response.getStatusLine().getStatusCode());
-                xx.setContent(x);
-                xx.setStatus(response.getStatusLine().getStatusCode());
-                clientPool.destroy(client);
-                throw xx;
-            }
-            clientPool.push(client);
-            return x;
-        } catch (IOException e) {
-            throw new GeneralException("Error invoking http client", e);
-        }
+        return doRequest(httpGet);
     }
 
 

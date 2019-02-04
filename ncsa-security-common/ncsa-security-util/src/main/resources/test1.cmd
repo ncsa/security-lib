@@ -11,8 +11,10 @@ echo('${orcid}');
 
 
 if[
-     endsWith(getEnv('orcid'),'ize')
+    endsWith(getEnv('orcid'),'ize')
    ]then[
-     echo('got one')]else[echo('newp')
-  ];
+     echo('got one')
+   ]else[
+     echo('newp')
+];
 

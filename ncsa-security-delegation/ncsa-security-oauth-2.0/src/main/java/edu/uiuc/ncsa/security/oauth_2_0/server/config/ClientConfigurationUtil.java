@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.config;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
@@ -21,6 +22,7 @@ public class ClientConfigurationUtil {
     public static final String RUNTIME_KEY = "runtime";
     public static final String SAVED_KEY = "isSaved";
     public static final String COMMENT_KEY = "comment";
+    public static final String EXTRA_ATTRIBUTES_KEY = "extraAttributes"; // for extra content management attributes, among others
 
     public static void setRuntime(JSONObject config, JSONObject runtime) {
         config.put(RUNTIME_KEY, runtime);
@@ -93,6 +95,7 @@ public class ClientConfigurationUtil {
      *     }
      * </pre>
      * This method returns the JSON array <code>[X,y,z]</code>.
+     *
      * @param topLevelKey
      * @param config
      * @param key
@@ -220,15 +223,43 @@ public class ClientConfigurationUtil {
      * @param config
      * @return
      */
-    public static String getComment(JSONObject config) {
-        if (config.containsKey(COMMENT_KEY)) {
-            return config.getString(COMMENT_KEY);
+    public static JSONArray getComment(JSONObject config) {
+        if (!config.containsKey(COMMENT_KEY)) {
+            return new JSONArray();
+        }
+        try {
+            return config.getJSONArray(COMMENT_KEY);
+        } catch (JSONException jsx) {
+            // means that the entry is not a JSON Array, so process it generically
+            // and return it folded in to one.
+            JSONArray array = new JSONArray();
+            array.add(config.getString(COMMENT_KEY));
+            return array;
         }
 
-        return "";
+    }
+
+    public static void setComment(JSONObject config, JSONArray comment) {
+        config.put(COMMENT_KEY, comment);
     }
 
     public static void setComment(JSONObject config, String comment) {
-          config.put(COMMENT_KEY, comment);
+        JSONArray array = new JSONArray();
+        array.add(comment);
+        config.put(COMMENT_KEY, array);
     }
+
+    public static void setExtraAttributes(JSONObject config, JSONObject attributes) {
+        config.put(EXTRA_ATTRIBUTES_KEY, attributes);
+    }
+
+
+    public static JSONObject getExtraAttributes(JSONObject config) {
+        if (!config.containsKey(EXTRA_ATTRIBUTES_KEY)) {
+            return new JSONObject();
+        }
+        return config.getJSONObject(EXTRA_ATTRIBUTES_KEY);
+
+    }
+
 }

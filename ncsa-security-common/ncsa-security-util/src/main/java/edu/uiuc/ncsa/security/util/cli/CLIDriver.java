@@ -76,6 +76,7 @@ public class CLIDriver {
     protected static final int NEW_COMMAND = 0;
     protected static final int REPEAT_COMMAND = 10;
     protected static final int HISTORY_COMMAND = 20;
+    protected static final int EXECUTE_COMMAND = 30;
 
     // TODO - Add more CLI-level commands?
     // Might very well want to fold this into the standard flow rather than intercept it first.
@@ -114,6 +115,9 @@ public class CLIDriver {
                         say("no commands found");
                     }
                 }
+                /*
+                NOTE that the history command also executes lines in the buffer if the number is given.
+                 */
                 if (cmdLine.trim().startsWith(HISTORY_LIST_COMMAND)) {
                     // Either of the following work:
                     // /h == print history with line numbers

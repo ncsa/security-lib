@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.strings;
 
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
+import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
 /**
@@ -26,9 +27,19 @@ public class jEcho extends JFunctorImpl {
     public Object execute() {
         // This can get executed any number of times, so just keep doing it if requested
         if (verboseOn) {
-            for (Object arg : getArgs()) {
-                System.out.println(arg);
-                result = arg;
+
+            for (Object obj : getArgs()) {
+                String x = null;
+
+                if (obj instanceof JFunctor) {
+                    JFunctor ff = (JFunctor) obj;
+                    ff.execute();
+                    x = String.valueOf(ff.getResult());
+                } else {
+                    x = String.valueOf(obj);
+                }
+                System.out.println(x);
+                result = x;
             }
         }
         return result;

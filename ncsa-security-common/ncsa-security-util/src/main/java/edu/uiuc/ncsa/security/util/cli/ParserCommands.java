@@ -14,8 +14,9 @@ import java.util.List;
  * on 9/25/18 at  10:51 AM
  */
 public class ParserCommands extends CommonCommands {
-    public ParserCommands(MyLoggingFacade logger) {
+    public ParserCommands(MyLoggingFacade logger, JFunctorFactory functorFactory) {
         super(logger);
+        this.functorFactory = functorFactory;
     }
 
     @Override
@@ -57,7 +58,8 @@ public class ParserCommands extends CommonCommands {
 
     protected JFunctorFactory getFunctorFactory() {
         if (functorFactory == null) {
-            functorFactory = new JFunctorFactory(true);
+            //functorFactory = new JFunctorFactory(true);
+            throw new IllegalStateException("Error: No functor factory has been configured.");
         }
         return functorFactory;
     }
