@@ -52,6 +52,9 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
     protected JSONObject getAndCheckResponse(String response) {
+        if (response == null || response.length() == 0) {
+            throw new GeneralException("Error: The server encountered an error and the response was empty.");
+        }
         if (response.startsWith("<") || response.startsWith("\n")) {
             // this is actually HTML
             //    System.out.println(getClass().getSimpleName() + ".getAccessToken: response from server is " + response);
@@ -60,11 +63,11 @@ public abstract class TokenAwareServer extends ASImpl {
         JSONObject jsonObject = null;
         try {
             jsonObject = JSONObject.fromObject(response);
-        }catch(Throwable t){
+        } catch (Throwable t) {
             // it is at this point we may not have a JSON object because the request failed and the server returned an
             // error string. Throw an exception, print the response.
-            DebugUtil.dbg(this,"Response from server was not a JSON Object: " + response);
-            throw new GeneralException("Error: The server encountered an error and the response was not JSON:\n\"" + response +"\"", t);
+            DebugUtil.dbg(this, "Response from server was not a JSON Object: " + response);
+            throw new GeneralException("Error: The server encountered an error and the response was not JSON:\n\"" + response + "\"", t);
         }
         if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {
             throw new GeneralException("Error: incorrect token type");
@@ -73,7 +76,7 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
     protected JSONObject getAndCheckIDToken(JSONObject jsonObject, BasicRequest atRequest) {
-        if(!oidcEnabled){
+        if (!oidcEnabled) {
             return new JSONObject();
         }
         JSONWebKeys keys = getJsonWebKeys();
@@ -83,7 +86,7 @@ public abstract class TokenAwareServer extends ASImpl {
             throw new GeneralException("Error: Missing id token.");
         }
         claims = JWTUtil.verifyAndReadJWT(jsonObject.getString(ID_TOKEN), keys);
-        if(claims.isNullObject()){
+        if (claims.isNullObject()) {
             // the response may be a null object. At this point it means that there was a null
             // object and that the resulting signature was valid for it, so that is indeed the server response.
             return new JSONObject();

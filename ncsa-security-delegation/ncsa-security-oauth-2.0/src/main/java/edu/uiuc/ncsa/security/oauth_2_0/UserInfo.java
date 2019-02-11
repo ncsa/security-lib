@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONObject;
 
 import java.util.HashMap;
@@ -33,10 +34,14 @@ public class UserInfo {
 
     public JSONObject toJSon(){
         if(map == null ) return null;
+        DebugUtil.trace(this, "map is " + map);
+
         if(map instanceof JSONObject){
             return (JSONObject) map;
         }
-        return JSONObject.fromObject(map);
+        JSONObject jj = JSONObject.fromObject(map);
+        DebugUtil.trace(this, "JSON object from map is " + jj);
+        return jj;
     }
     public String getString(String key) {
         Object x = getMap().get(key);

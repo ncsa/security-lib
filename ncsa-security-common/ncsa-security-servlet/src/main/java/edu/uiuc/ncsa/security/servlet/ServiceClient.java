@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -185,7 +186,7 @@ public class ServiceClient {
                }
 
                HttpEntity entity1 = response.getEntity();
-               String x = EntityUtils.toString(entity1);
+               String x = EntityUtils.toString(entity1, StandardCharsets.UTF_8);
                if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                    // If there was a proper error thrown on the server then we should be able to parse the contents of the
                    // response.

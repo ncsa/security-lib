@@ -114,7 +114,6 @@ public abstract class IDTokenResponse extends IResponse2 {
      * @param response Response to write to
      */
     public void write(HttpServletResponse response) throws IOException {
-        Writer osw = response.getWriter();
         // m contains the top-level JSON object that is serialized for the response. The
         // claims are part of this and keyed to the id_token.
         HashMap m = new HashMap();
@@ -158,7 +157,9 @@ public abstract class IDTokenResponse extends IResponse2 {
 
         JSONObject json = JSONObject.fromObject(m);
 
-        response.setContentType("application/json");
+        response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        Writer osw = response.getWriter();
         json.write(osw);
         osw.flush();
         osw.close();
