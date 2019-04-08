@@ -21,7 +21,7 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  4:33 PM
  */
-public class LogicBlock implements JMetaFunctor {
+public class LogicBlock implements JSONFunctor {
     Boolean result = null;
 
     @Override

@@ -128,10 +128,10 @@ public class ConditionalHandler extends AbstractHandler implements DelimiterList
         if (functor == null) {
             // ok, special case that the keywords true/false get turned into functors.
             if (name.equals(FunctorTypeImpl.TRUE.getValue().substring(1))) {
-                functor = getFunctorFactory().lookUpFunctor(FunctorTypeImpl.TRUE);
+                functor = (JFunctor)getFunctorFactory().lookUpFunctor(FunctorTypeImpl.TRUE);
             }
             if (name.equals(FunctorTypeImpl.FALSE.getValue().substring(1))) {
-                functor = getFunctorFactory().lookUpFunctor(FunctorTypeImpl.FALSE);
+                functor = (JFunctor)getFunctorFactory().lookUpFunctor(FunctorTypeImpl.FALSE);
             }
         }
         if (functor == null) {

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
-import edu.uiuc.ncsa.security.util.functor.JMetaFunctor;
+import edu.uiuc.ncsa.security.util.functor.JSONFunctor;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.NOT;
 
@@ -23,7 +23,7 @@ public class jNot extends JFunctorImpl {
         if (1 < args.size()) {
             throw new IllegalStateException("Error: too many args");
         }
-        JMetaFunctor ff = (JMetaFunctor) args.get(0);
+        JSONFunctor ff = (JSONFunctor) args.get(0);
         ff.execute();
         boolean rc = (Boolean)ff.getResult();
         rc = !rc;

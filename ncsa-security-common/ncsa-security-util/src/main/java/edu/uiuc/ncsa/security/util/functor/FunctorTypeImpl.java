@@ -30,7 +30,8 @@ public enum FunctorTypeImpl implements FunctorType {
     TO_ARRAY("$toArray"),
     SET_ENV("$setEnv"),
     GET_ENV("$getEnv"),
-    CLEAR_ENV("$clearEnv");
+    CLEAR_ENV("$clearEnv"),
+    RAISE_ERROR("$raiseError");
 
     private String value;
 

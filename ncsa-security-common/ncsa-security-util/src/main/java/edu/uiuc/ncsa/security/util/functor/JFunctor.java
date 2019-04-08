@@ -8,7 +8,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  8:52 AM
  */
-public interface JFunctor extends JMetaFunctor{
+public interface JFunctor extends JSONFunctor {
 
     String getName();
 
@@ -16,6 +16,6 @@ public interface JFunctor extends JMetaFunctor{
     void addArg(String x);
     void addArg(Integer x);
     void addArg(JFunctor x);
-    void addArg(JMetaFunctor x);
+    void addArg(JSONFunctor x);
     void addArg(List<JFunctor> functors);
 }

@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
-import edu.uiuc.ncsa.security.util.functor.JMetaFunctor;
+import edu.uiuc.ncsa.security.util.functor.JSONFunctor;
 
 /**
  * This is the exclusive OR operator. This means that if there is a list of conditionals,
@@ -37,7 +37,7 @@ public class jXOr extends JFunctorImpl {
          //  checkArgs();
            boolean rc = false;
            for (int i = 0; i < args.size(); i++) {
-               JMetaFunctor ff = (JMetaFunctor) args.get(i);
+               JSONFunctor ff = (JSONFunctor) args.get(i);
                ff.execute();
                if((Boolean) ff.getResult()){
                    index = i;

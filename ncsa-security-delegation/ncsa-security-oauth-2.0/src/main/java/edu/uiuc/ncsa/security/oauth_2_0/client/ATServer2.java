@@ -28,6 +28,26 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
  */
 
 public class ATServer2 extends TokenAwareServer implements ATServer {
+    /**
+       * Place holder class for storing ID tokens. ID tokens are consumable in the sense that once we
+       * get them back, they are checked for validity and passed along to the client. The problem is that
+       * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
+       * that we keep them around for at least a bit. This store holds the raw token (as a string) and
+       * the corresponding {@link net.sf.json.JSONObject} keyed by {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}.
+       *
+       */
+
+      public static class IDTokenEntry {
+          public JSONObject idToken;
+          public String rawToken;
+      }
+
+
+      static HashMap<String,IDTokenEntry> idTokenStore = new HashMap<String,IDTokenEntry>();
+
+      public static HashMap<String,IDTokenEntry> getIDTokenStore(){
+          return idTokenStore;
+      }
 
     public ATServer2(ServiceClient serviceClient,
                      String wellKnown,
@@ -89,9 +109,11 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             }
         }
         if(oidcEnabled) {
+            IDTokenEntry idTokenEntry = new IDTokenEntry( );
             JSONObject idToken = getAndCheckIDToken(jsonObject, atRequest);
             if (jsonObject.containsKey(ID_TOKEN)) {
                 params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
+                idTokenEntry.rawToken = (String) params.get(RAW_ID_TOKEN);
             }
             // and now the specific checks for ID tokens returned by the AT server.
             if (!idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
@@ -105,6 +127,8 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
             }
             params.put(ID_TOKEN, idToken);
+            idTokenEntry.idToken = idToken;
+            getIDTokenStore().put(at.getToken(), idTokenEntry);
         }
         ATResponse2 atr = createResponse(at, rt);
         atr.setParameters(params);

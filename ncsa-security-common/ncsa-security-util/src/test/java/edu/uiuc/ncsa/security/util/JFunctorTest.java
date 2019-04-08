@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.security.util;
 
+import edu.uiuc.ncsa.security.core.exceptions.FunctorRuntimeException;
 import edu.uiuc.ncsa.security.util.functor.*;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
 import edu.uiuc.ncsa.security.util.functor.strings.*;
+import edu.uiuc.ncsa.security.util.functor.system.jRaiseError;
 import edu.uiuc.ncsa.security.util.functor.system.jgetEnv;
 import edu.uiuc.ncsa.security.util.functor.system.jsetEnv;
 import net.sf.json.JSONArray;
@@ -609,12 +611,30 @@ public class JFunctorTest extends TestBase {
     }
 
     @Test
+    public void testRaiseError() throws Exception{
+        JFunctorFactory ff = new JFunctorFactory(true);
+        jRaiseError raiseError = new jRaiseError();
+        String errorMsg = "error message " + Long.toHexString(System.currentTimeMillis()); // something unique to test against.
+        raiseError.addArg(errorMsg);
+        String raw = raiseError.toJSON().toString();
+        System.out.println("Raw JSON for raise error = " + raw.toString());
+        JFunctor functor = ff.create(raw);
+        try{
+            functor.execute();
+            assert false:"No error was raised by the jRaiseError functor";
+        }catch(FunctorRuntimeException frx){
+            assert frx.getMessage().equals(errorMsg);
+        }catch(Throwable t){
+            assert false:"Error: an incorrect exception was raised of type " + t.getClass().getSimpleName();
+        }
+
+    }
+    @Test
     public void testEcho() throws Exception{
         JFunctorFactory ff = new JFunctorFactory(true);
         jEcho xx = new jEcho(true);
         xx.addArg("Hello world");
         String raw = xx.toJSON().toString();
-        System.out.println(raw);
         JFunctor functor = ff.create(raw);
         functor.execute();
 

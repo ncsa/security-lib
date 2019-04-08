@@ -17,7 +17,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 4/20/18 at  10:26 AM
  */
-public  class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements JMetaFunctor {
+public  class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements JSONFunctor {
     public LogicBlocks(int connector) {
         this.connector = connector;
     }

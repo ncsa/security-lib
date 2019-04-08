@@ -1,20 +1,12 @@
 package edu.uiuc.ncsa.security.util.functor.parser;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
-import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
-import edu.uiuc.ncsa.security.util.functor.parser.event.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * A wrapper for a couple of type of scripting objects. This is to determine which is which and execute the script.
@@ -42,12 +34,10 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 9/24/18 at  1:49 PM
  */
-public class Script {
+public class Script extends AbstractScript {
     public static String SCRIPT_KEY = "script";
     public static String VERSION_KEY = "version";
     public static final String VERSION_1_0 = "1.0";
-    JSONObject rawContent = null;
-    JFunctorFactory functorFactory = null;
 
     /**
      * Use this to initialize the entire parser in advance of execution. You may then execute it
@@ -57,13 +47,12 @@ public class Script {
      * @param rawContent
      */
     public Script(JFunctorFactory functorFactory, JSONObject rawContent) {
-        this.functorFactory = functorFactory;
+        super(functorFactory);
         this.rawContent = rawContent;
-
     }
 
     public Script(JFunctorFactory functorFactory) {
-        this.functorFactory = functorFactory;
+        super(functorFactory);
     }
 
     public void execute() {
@@ -87,50 +76,6 @@ public class Script {
         executeJSON(rawContent);
     }
 
-    /**
-     * Executes a file.
-     *
-     * @param file
-     */
-    public void execute(File file) {
-        if (!file.exists()) {
-            throw new IllegalStateException("Error: the file \"" + file.getAbsolutePath() + "\" does not exist");
-        }
-        try {
-            FileReader fileReader = new FileReader(file);
-            executeScript(ParserUtil.processInput(fileReader));
-        } catch (Throwable throwable) {
-            throw new GeneralException("Error parsing file. \"" + throwable.getMessage() + "\"", throwable);
-        }
-    }
-
-    public void execute(List<String> commands) {
-        executeScript(commands);
-    }
-
-    public void execute(Reader reader) {
-        try {
-            execute(ParserUtil.processInput(reader, true));
-        } catch (Throwable throwable) {
-            throw new ParserError("Error parsing input reader", throwable);
-        }
-    }
-
-    protected EventDrivenParser createParser() {
-        return new EventDrivenParser(functorFactory);
-    }
-
-    protected void checkVersion() {
-      /*  if (rawContent.containsKey(VERSION_KEY)) {
-            String version = rawContent.getString(VERSION_KEY);
-            if (!version.equals(VERSION_1_0)) {
-                throw new UnsupportedVersionException("Error: This parser only supports version " + VERSION_1_0);
-            }
-        } else {
-            throw new UnsupportedVersionException("Error: This parser only supports version " + VERSION_1_0);
-        }*/
-    }
-
 
     protected void executeScript(JSONObject rawContent) {
         JSONArray array = rawContent.getJSONArray(SCRIPT_KEY);
@@ -144,51 +89,11 @@ public class Script {
         execute(reader);
     }
 
-    protected void executeScript(List<String> commands) {
-        checkVersion();
-
-        EventDrivenParser parser = createParser();
-        functorMap = new FunctorMap();
-        for (String command : commands) {
-            try {
-                AbstractHandler abstractHandler = parser.parse(command, functorFactory.getReplacementTemplates());
-
-                handlers.add(abstractHandler);
-                if (abstractHandler.getHandlerType() == AbstractHandler.SWITCH_TYPE) {
-                    SwitchHandler s = (SwitchHandler) abstractHandler;
-                    functorMap.addAll(s.getLogicBlocks().getFunctorMap());
-                }
-                if (abstractHandler.getHandlerType() == AbstractHandler.FUNCTOR_TYPE) {
-                    FunctorHandler functorHandler = (FunctorHandler) abstractHandler;
-                    functorMap.put(functorHandler.getFunctor());
-                }
-                if (abstractHandler.getHandlerType() == AbstractHandler.CONDITIONAL_TYPE) {
-
-                    ConditionalHandler conditionalHandler = (ConditionalHandler) abstractHandler;
-                    if (conditionalHandler.getLogicBlock() != null){
-                        if (conditionalHandler.getLogicBlock().hasConsequent()) {
-                            if (conditionalHandler.getLogicBlock().getConsequent().getFunctorMap() != null) {
-                                functorMap.addAll(conditionalHandler.getLogicBlock().getConsequent().getFunctorMap());
-                            }
-                        }
-                    }
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-
-        }
-    }
-
-    public boolean hasHandlers() {
-        return 0 < handlers.size();
-    }
 
     public boolean hasLogicBlocks() {
         return logicBlocks != null;
     }
 
-    List<AbstractHandler> handlers = new LinkedList<>();
     LogicBlocks<? extends LogicBlock> logicBlocks = null;
 
     /**
@@ -214,14 +119,5 @@ public class Script {
         return logicBlocks;
     }
 
-    public List<AbstractHandler> getHandlers() {
-        return handlers;
-    }
 
-    FunctorMap functorMap;
-
-    public FunctorMap getFunctorMap() {
-        return functorMap;
-
-    }
 }

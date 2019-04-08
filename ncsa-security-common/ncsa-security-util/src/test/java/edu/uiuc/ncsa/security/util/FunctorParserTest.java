@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
+import edu.uiuc.ncsa.security.core.exceptions.FunctorRuntimeException;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
@@ -507,6 +508,24 @@ public class FunctorParserTest extends TestBase {
         assert !conditionalHandler.getLogicBlock().hasConsequent();
 
     }
+
+    /**
+     * test that if a condition is met that raises an error, the error is created and propagates as it should.
+     * This also shows it works in scripting too.
+     * @throws Exception
+     */
+    @Test
+     public void testError() throws Exception {
+        String message = "error " + Long.toHexString(System.currentTimeMillis());
+         String testString = "if[match('A','B')]then[toLowerCase('Z')]else[raiseError('" + message+ "')]";
+         EventDrivenParser parser = new EventDrivenParser(createFunctorFactory());
+         try {
+            ConditionalHandler conditionalHandler = (ConditionalHandler) parser.parse(testString);
+            assert false : "Did not raise errpor in test";
+         }catch(FunctorRuntimeException frx){
+             assert frx.getMessage().equals(message);
+         }
+     }
 
     @Test
     public void testScript1() throws Exception {

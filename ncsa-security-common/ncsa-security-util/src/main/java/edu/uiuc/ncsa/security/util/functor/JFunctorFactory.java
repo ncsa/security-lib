@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.util.functor.logic.*;
 import edu.uiuc.ncsa.security.util.functor.strings.*;
+import edu.uiuc.ncsa.security.util.functor.system.jRaiseError;
 import edu.uiuc.ncsa.security.util.functor.system.jgetEnv;
 import edu.uiuc.ncsa.security.util.functor.system.jsetEnv;
 import net.sf.json.JSONArray;
@@ -221,7 +222,7 @@ public class JFunctorFactory {
         return rawJson.containsKey(type.getValue());
     }
 
-    public JFunctor lookUpFunctor(FunctorType type) {
+    public JMetaMetaFunctor lookUpFunctor(FunctorType type) {
         return lookUpFunctor(type.getValue());
     }
 
@@ -231,7 +232,8 @@ public class JFunctorFactory {
      * @param name
      * @return
      */
-    public JFunctor lookUpFunctor(String name) {
+    public JMetaMetaFunctor lookUpFunctor(String name) {
+
         if (name.equals(AND.getValue())) {
             return new jAnd();
         }
@@ -309,6 +311,9 @@ public class JFunctorFactory {
         if (name.equals(DROP.getValue())) {
             return new jDrop();
         }
+        if(name.equals(RAISE_ERROR.getValue())){
+            return new jRaiseError();
+        }
         return null;
 
     }
@@ -322,7 +327,7 @@ public class JFunctorFactory {
      * @param rawJson
      * @return
      */
-    protected JFunctor figureOutFunctor(JSONObject rawJson) {
+    protected JMetaMetaFunctor figureOutFunctor(JSONObject rawJson) {
         Iterator iterator = rawJson.keys();
         String functorKey = (String) iterator.next();
         if (iterator.hasNext()) {
@@ -335,12 +340,16 @@ public class JFunctorFactory {
         if (!isFunctor(rawJson)) {
             throw new IllegalArgumentException("Error: not a functor");
         }
-        JFunctor ff = figureOutFunctor(rawJson);
+        JMetaMetaFunctor ff = figureOutFunctor(rawJson);
         if (ff == null) {
             throw new NotImplementedException("Error: \"" + rawJson + "\" is not an implemented functor");
         }
-        addArgs(ff, rawJson);
-        return ff;
+        if(!(ff instanceof JSONFunctor)){
+            throw new NotImplementedException("Error: The functor is not a JSONFunctor");
+
+        }
+        addArgs((JFunctor)ff, rawJson);
+        return (JFunctor)ff;
 
     }
 

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.util.functor.logic;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
-import edu.uiuc.ncsa.security.util.functor.JMetaFunctor;
+import edu.uiuc.ncsa.security.util.functor.JSONFunctor;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.OR;
 
@@ -22,7 +22,7 @@ public class jOr extends JFunctorImpl {
         checkArgs();
         boolean rc = false;
         for (int i = 0; i < args.size(); i++) {
-            JMetaFunctor ff = (JMetaFunctor) args.get(i);
+            JSONFunctor ff = (JSONFunctor) args.get(i);
             ff.execute();
             rc = rc || (Boolean) ff.getResult();
         }

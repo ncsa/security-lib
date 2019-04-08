@@ -40,7 +40,7 @@ public class FunctorHandler extends AbstractHandler implements DoubleQuoteListen
      * @return
      */
     protected JFunctor lookupFunctor(String name) {
-        return getFunctorFactory().lookUpFunctor("$" + name);
+        return (JFunctor)getFunctorFactory().lookUpFunctor("$" + name);
     }
 
     JFunctor functor;    // top-level functor

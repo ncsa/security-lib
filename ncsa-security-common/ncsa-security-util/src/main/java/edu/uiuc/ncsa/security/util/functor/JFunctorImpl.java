@@ -132,7 +132,7 @@ public abstract class JFunctorImpl implements JFunctor {
     public void addArg(JFunctor x) {
         getArgs().add(x);
     }
-    public void addArg(JMetaFunctor x) {
+    public void addArg(JSONFunctor x) {
         getArgs().add(x);
     }
 
@@ -160,8 +160,8 @@ public abstract class JFunctorImpl implements JFunctor {
             }else{
                 // null objects are possible. intercept it here or it will be rendered as the string "null" by the
                 // JSON library.
-                if (obj instanceof JMetaFunctor) {
-                    JMetaFunctor ff = (JMetaFunctor) obj;
+                if (obj instanceof JSONFunctor) {
+                    JSONFunctor ff = (JSONFunctor) obj;
                     jsonArray.add(ff.toJSON());
                 } else {
                     jsonArray.add(obj);
