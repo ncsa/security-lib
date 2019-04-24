@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
 import java.util.Stack;
 
 /**
+ * This creates functors by adding arguments to them.
  * <p>Created by Jeff Gaynor<br>
  * on 7/16/18 at  11:46 AM
  */

@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
+import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
@@ -40,7 +41,12 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
       public static class IDTokenEntry {
           public JSONObject idToken;
           public String rawToken;
-      }
+
+        @Override
+        public String toString() {
+            return this.getClass().getSimpleName() + "[idToken=" + (idToken==null?"(null)":idToken.toString(2)) + ", rawToken=" + (rawToken==null?"(null)":rawToken) +   "]";
+        }
+    }
 
 
       static HashMap<String,IDTokenEntry> idTokenStore = new HashMap<String,IDTokenEntry>();
@@ -108,13 +114,23 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 // This is optional to return, so it is possible that this might not work.
             }
         }
+        ServletDebugUtil.trace(this, "Is OIDC enabled? "  + oidcEnabled);
+
         if(oidcEnabled) {
+            ServletDebugUtil.trace(this, "Processing id token entry");
             IDTokenEntry idTokenEntry = new IDTokenEntry( );
+            ServletDebugUtil.trace(this, "created new idTokenEntry " );
             JSONObject idToken = getAndCheckIDToken(jsonObject, atRequest);
+            ServletDebugUtil.trace(this,"got id token = " + idToken.toString(2));
             if (jsonObject.containsKey(ID_TOKEN)) {
                 params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
                 idTokenEntry.rawToken = (String) params.get(RAW_ID_TOKEN);
+                ServletDebugUtil.trace(this,"raw token = " + idTokenEntry.rawToken);
             }
+
+            idTokenEntry.idToken = idToken;
+            ServletDebugUtil.trace(this,"idTokenEntry= " + idTokenEntry);
+
             // and now the specific checks for ID tokens returned by the AT server.
             if (!idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
                 throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
@@ -127,8 +143,12 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
             }
             params.put(ID_TOKEN, idToken);
-            idTokenEntry.idToken = idToken;
+            ServletDebugUtil.trace(this, "Adding idTokenEntry with id = " + at.getToken() + " to the ID Token store. Store has " + getIDTokenStore().size() + " entries");
             getIDTokenStore().put(at.getToken(), idTokenEntry);
+            ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());
+            ServletDebugUtil.trace(this, "Added idTokenEntry to the ID Token store. Store now has " + getIDTokenStore().size() + " entries");
+        }else{
+            ServletDebugUtil.trace(this, "Skipping id token entry...");
         }
         ATResponse2 atr = createResponse(at, rt);
         atr.setParameters(params);

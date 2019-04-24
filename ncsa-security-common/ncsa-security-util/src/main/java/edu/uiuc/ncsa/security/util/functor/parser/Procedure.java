@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.security.util.json.JSONEntry;
 import edu.uiuc.ncsa.security.util.json.JSONStore;
 import net.sf.json.JSONArray;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,7 +112,9 @@ public class Procedure extends AbstractScript implements JMetaMetaFunctor {
     }
 
     List<String> rawContent;
-
+    /*
+    First test: create a very basic procedure with trivial namespace.
+     */
     protected static List<String> createTest() {
         LinkedList<String> proc = new LinkedList<>();
         proc.add(NAMESPACE + ";");
@@ -124,6 +125,11 @@ public class Procedure extends AbstractScript implements JMetaMetaFunctor {
         return proc;
     }
 
+    /*
+    Create a procedure with trivial namespace that is defined in terms of the procedure in createTest.
+    This is to show we can create procedures from existing procedures and invoke them. If we can do this, then
+    we can create pretty much any procedure we want from existing ones.
+     */
     protected static List<String> createTest2() {
         LinkedList<String> proc = new LinkedList<>();
         proc.add(NAMESPACE + ";");
@@ -189,7 +195,7 @@ public class Procedure extends AbstractScript implements JMetaMetaFunctor {
         }
     }
 
-   protected static Identifier ID_DEF = BasicIdentifier.newID("id:test_2");
+   protected static Identifier ID_DEF = BasicIdentifier.newID("test");
 
     protected static JM populateStore() {
         JM jm = new JM();
@@ -207,22 +213,35 @@ public class Procedure extends AbstractScript implements JMetaMetaFunctor {
     }
 
     public static void main(String[] args) {
+/*      Testing URIs for localhost in ivp 6 -- unrelated to procedure testing directly.
         URI qqq = URI.create("http://[::1]:61023/oauth2redirect/example-provider");
         System.out.println("scheme = " + qqq.getScheme());
         System.out.println("host = " + qqq.getHost());
         System.out.println("is absolute = " + qqq.isAbsolute());
+*/
+
+        // Create a procedure called test and populate it into the store with a namespace.
+        // Note that this procedure is defined in terms of other procedures, not Java code.
         List<String> testProcedure = createTest();
         StoredProcFactory ff = new StoredProcFactory(populateStore(), true);
+        // Retrieve the procedure
         Procedure pp = (Procedure)ff.lookUpFunctor(ID_DEF.toString());
-        System.out.println("Stored procedure is " + pp);
+        System.out.println("Stored procedure is " + pp); // echo we got it
+        // Setup an environment to show we can execute this new procedure dynamically
         ff.getEnvironment().put("A", "foo");
         ff.getEnvironment().put("B", "bar");
+        // Create the procedure directly and echo it was made right
         Procedure procedure = new Procedure(testProcedure, ff);
+        System.out.println("Created 'test' procedure from the factory:");
         System.out.println(procedure);
         System.out.println("buffer = " + procedure.getBuffer());
+        // Execute said procedure. Result should be two printed lines.
         procedure.execute(procedure.getBuffer());
+        // Now for the next phase of this test: We have defined a procedure and put it into the store. Next we
+        // create another procedure, called test2 and see if we can resolve the definition against the stored procedure
         List<String> testProcedure2 = createTest2();
         procedure = new Procedure(testProcedure2, ff);
+        System.out.println("Created 'test2' procedure from the factory:");
         System.out.println(procedure);
         System.out.println("buffer = " + procedure.getBuffer());
         procedure.execute(procedure.getBuffer());

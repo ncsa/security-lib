@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.Version;
+import edu.uiuc.ncsa.security.core.configuration.ConfigurationTags;
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
@@ -22,6 +24,28 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     protected ConfigurationNode cn;
     protected Provider<MyLoggingFacade> loggerProvider;
     protected MyLoggingFacade myLogger = null;
+
+    /**
+     * Checks for and sets up the debugging for this loader. Once this is set up, you may have to tell any environments that
+     * use it that debugging is enabled. 
+     */
+    protected void loadDebug() {
+        String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
+        try {
+            System.err.println(this.getClass().getSimpleName() + ".load: setting debug for \"" + rawDebug + "\"");
+            if (rawDebug == null || rawDebug.isEmpty()) {
+                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+            } else {
+                DebugUtil.setDebugLevel(rawDebug);
+            }
+            System.err.println(this.getClass().getSimpleName() + ".load: set debug to level " + DebugUtil.getDebugLevel());
+
+        } catch (Throwable t) {
+            // ok, so that didn't work, fall back to the old way
+            DebugUtil.setIsEnabled(Boolean.parseBoolean(rawDebug));
+        }
+    }
+
 
     protected class MyLoggerProvider implements Provider<MyLoggingFacade> {
         MyLoggingFacade logger;
@@ -48,7 +72,13 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
             if (currentNode != null) {
                 loggerProvider = new LoggerProvider(currentNode);
             } else {
-                loggerProvider = new LoggerProvider("delegation.xml", "NCSA Delegation", 1, 1000000, true, false, true);
+                loggerProvider = new LoggerProvider("delegation.xml",
+                        "NCSA Delegation",
+                        1,
+                        1000000,
+                        true,
+                        false,
+                        true);
             }
         } else {
             loggerProvider = new MyLoggerProvider(logger);

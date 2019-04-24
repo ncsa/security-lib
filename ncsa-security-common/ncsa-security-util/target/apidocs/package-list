@@ -7,6 +7,8 @@ edu.uiuc.ncsa.security.util.functor.parser.event
 edu.uiuc.ncsa.security.util.functor.parser.old
 edu.uiuc.ncsa.security.util.functor.strings
 edu.uiuc.ncsa.security.util.functor.system
+edu.uiuc.ncsa.security.util.functor.user_defined
+edu.uiuc.ncsa.security.util.json
 edu.uiuc.ncsa.security.util.jwk
 edu.uiuc.ncsa.security.util.mail
 edu.uiuc.ncsa.security.util.pkcs
