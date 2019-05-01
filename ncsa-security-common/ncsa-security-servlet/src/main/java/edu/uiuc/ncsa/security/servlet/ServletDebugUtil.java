@@ -11,6 +11,7 @@ import java.util.Enumeration;
  * on 3/20/17 at  11:07 AM
  */
 public class ServletDebugUtil extends DebugUtil {
+
     public static  void printAllParameters(Class klasse, HttpServletRequest request) {
         if(!isEnabled()) return;
           String reqUrl = request.getRequestURL().toString();
@@ -57,4 +58,6 @@ public class ServletDebugUtil extends DebugUtil {
               }
           }
       }
+
+
 }

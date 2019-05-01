@@ -115,10 +115,7 @@ public class MyTrustManager implements X509TrustManager {
     }
 
     void dbg(String x) {
-        if (debugOn) {
-            System.out.println(getClass().getName() + "(" + (new Date()) + "): " + x);
-            getLogger().info(getClass().getName() + "(" + (new Date()) + "): " + x);
-        }
+      DebugUtil.dbg(this, x);
     }
 
     String host;

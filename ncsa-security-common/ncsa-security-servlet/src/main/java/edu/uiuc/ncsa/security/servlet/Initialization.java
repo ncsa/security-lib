@@ -13,7 +13,7 @@ import javax.servlet.ServletException;
  * ideal.This interface decouples initialization from the servlet. The {@link Bootstrapper}
  * is tasked with making the correct instance of this class which is then injected into the
  * servlet statically on boot. This in turn is called in the servlet init method.
- * <br/><br/>This solve issue OAUTH-112.
+ * <br/><br/>This solves issue OAUTH-112.
  * <p>Created by Jeff Gaynor<br>
  * on 4/15/14 at  10:24 AM
  */

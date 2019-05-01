@@ -12,6 +12,7 @@ import java.util.logging.Logger;
  * on Nov 9, 2010 at  10:59:40 AM
  */
 public class MyLoggingFacade implements Logable {
+    String host;
     // This implements Logable so it is easier to pass implementing classes through to it.
 
     public MyLoggingFacade(Logger logger) {

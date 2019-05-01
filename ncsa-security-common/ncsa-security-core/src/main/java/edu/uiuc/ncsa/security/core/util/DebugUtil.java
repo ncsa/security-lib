@@ -9,10 +9,13 @@ import java.util.Date;
  * Note that this is not logging. Use the {@link MyLoggingFacade} for that. This is for levels of debugging that may be
  * turned off completely. Logging will be put into the log file. Debugging commands all go to stderr so that they are not part of
  * logging on purpose, but can be collected and viewed separately.
+ * <p>Optionally if this is being run on a server, you may specify a host to be printed with each message. If
+ * this is not set, that is fine.</p>
  * <p>Created by Jeff Gaynor<br>
  * on 7/27/16 at  2:55 PM
  */
 public class DebugUtil {
+
     /**
      * Turn of debugging
      */
@@ -119,12 +122,26 @@ public class DebugUtil {
      * @param callingClass
      * @param message
      */
+/*
     public static void printIt(int level, Class callingClass, String message) {
         if (level <= getDebugLevel()) {
             printIt(callingClass.getSimpleName() + " (" + (new Date()) + ") " + toLabel(level) + ": " + message);
         }
     }
+*/
 
+
+    public static void printIt(int level, Class callingClass, String message) {
+        // Standard logging format is date host service: message
+        if (level <= getDebugLevel()) {
+            if(host == null || host.isEmpty()) {
+                printIt(Iso8601.date2String(new Date()) + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+            }else{
+                printIt(Iso8601.date2String(new Date()) + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+                //printIt(callingClass.getSimpleName() + " (" + (new Date()) + ") " + host + " " +  toLabel(level) + ": " + message);
+            }
+        }
+    }
     protected static void printIt(String message) {
         System.err.println(message);
     }
@@ -266,5 +283,6 @@ public class DebugUtil {
         warn(callingClass, message);
     }
 
+    public static String host;
 
 }

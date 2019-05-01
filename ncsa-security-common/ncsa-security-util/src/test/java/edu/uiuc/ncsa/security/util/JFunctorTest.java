@@ -100,6 +100,15 @@ public class JFunctorTest extends TestBase {
         assert reTestIt(jMatch).getBooleanResult();
     }
 
+    @Test
+    public void testMatch2() throws Exception {
+        jMatch jMatch = new jMatch();
+        jMatch.addArg("fox");
+        jMatch.addArg(".*f.*");
+        jMatch.execute();
+        assert jMatch.getBooleanResult();
+        assert reTestIt(jMatch).getBooleanResult();
+    }
 
     @Test
     public void testEquals() throws Exception {
