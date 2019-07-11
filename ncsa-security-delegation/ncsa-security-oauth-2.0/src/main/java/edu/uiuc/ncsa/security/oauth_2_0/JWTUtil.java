@@ -75,15 +75,8 @@ public class JWTUtil {
 
 
     protected static String concat(JSONObject header, JSONObject payload) {
-
         return Base64.encodeBase64URLSafeString(header.toString().getBytes()) + "." +
                 Base64.encodeBase64URLSafeString(payload.toString().getBytes());
-
-/*
-        return Base64.encodeBase64String(header.toString().getBytes()) + "." +
-                Base64.encodeBase64String(payload.toString().getBytes());
-*/
-
     }
 
     public static final String NONE_JWT = "none";
@@ -200,12 +193,13 @@ public class JWTUtil {
         output[SIGNATURE_INDEX] = signature;
         return output;
     }
-   public static final int HEADER_INDEX = 0;
-   public static final int PAYLOAD_INDEX = 1;
-   public static final int SIGNATURE_INDEX = 2;
+
+    public static final int HEADER_INDEX = 0;
+    public static final int PAYLOAD_INDEX = 1;
+    public static final int SIGNATURE_INDEX = 2;
 
     public static JSONObject verifyAndReadJWT(String jwt, JSONWebKeys webKeys) {
-        if(jwt == null || jwt.isEmpty()){
+        if (jwt == null || jwt.isEmpty()) {
             throw new GeneralException("Error: missing or empty token");
         }
         String[] x = decat(jwt);
@@ -246,11 +240,12 @@ public class JWTUtil {
      * Create a basic {@link ServiceClient} to get the keys from the well known page. If you require a special
      * setup (e.g. your own SSL certs), you will need to create your own ServiceClient and supply that in the
      * related call getJSONWebKeys(ServiceClient, String wellKnown).
+     *
      * @param wellKnown
      * @return
      */
     public static JSONWebKeys getJsonWebKeys(String wellKnown) {
-        if(wellKnown == null || wellKnown.isEmpty()){
+        if (wellKnown == null || wellKnown.isEmpty()) {
             throw new GeneralException("Error: missing well known URI. Cannot get keys");
         }
         ServiceClient serviceClient = new ServiceClient(URI.create(wellKnown));
@@ -258,7 +253,7 @@ public class JWTUtil {
     }
 
     public static JSONWebKeys getJsonWebKeys(URI wellKnown) {
-        if(wellKnown == null){
+        if (wellKnown == null) {
             throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
         }
 
@@ -266,20 +261,20 @@ public class JWTUtil {
     }
 
     public static JSONObject verifyAndReadJWT(String jwt, URI wellKnown) {
-         if(wellKnown == null){
-             throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
-         }
-         if(jwt == null || jwt.isEmpty()){
-             throw new GeneralException("Error: Missing or empty token.");
-         }
-         return verifyAndReadJWT(jwt, JWTUtil.getJsonWebKeys(wellKnown.toString()));
-     }
+        if (wellKnown == null) {
+            throw new GeneralException("Error: Missing well known uri. Cannot resolve the keys");
+        }
+        if (jwt == null || jwt.isEmpty()) {
+            throw new GeneralException("Error: Missing or empty token.");
+        }
+        return verifyAndReadJWT(jwt, JWTUtil.getJsonWebKeys(wellKnown.toString()));
+    }
 
     public static JSONWebKeys getJsonWebKeys(ServiceClient serviceClient, String wellKnown) {
-        if(serviceClient == null){
+        if (serviceClient == null) {
             throw new GeneralException("Error: Missing service client.");
         }
-        if(wellKnown == null || wellKnown.isEmpty()){
+        if (wellKnown == null || wellKnown.isEmpty()) {
             throw new GeneralException("Error: missing well known URI. Cannot get keys");
         }
 
@@ -301,23 +296,26 @@ public class JWTUtil {
         }
         return keys;
     }
-    /** Strictly for testing.
+
+    /**
+     * Strictly for testing.
      * This will take two arguments, a file name containing the keys, the word decode|encode and a string.
      * If the word decode is used, then the string is decoded against the
+     *
      * @param args
      */
     public static void main(String[] args) {
         try {
-           // firstTest();
-         //   firstTestB();
-          //    otherTest();
+            // firstTest();
+            //   firstTestB();
+            //    otherTest();
             testSigning();
             JSONWebKeys keys = getJsonWebKeys("https://test.cilogon.org/oauth2/.well-known");
             System.out.println("Detected " + keys.size() + " keys on test.cilogon.org");
             //  testSigningDirectly();
             //testJWT_IO();
-           // printKeys();
-           // generateAndSign();
+            // printKeys();
+            // generateAndSign();
         } catch (Throwable t) {
             t.printStackTrace();
         }

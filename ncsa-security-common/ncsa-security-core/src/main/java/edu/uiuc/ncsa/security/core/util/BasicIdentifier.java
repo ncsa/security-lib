@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidURIException;
 
 import java.net.URI;
-import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
@@ -61,7 +60,6 @@ public class BasicIdentifier implements Identifier {
         return newID("urn:id:" + UUID.randomUUID());
     }
 
-    static SecureRandom random = new SecureRandom();
 
     @Override
     public boolean equals(Object obj) {

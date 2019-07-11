@@ -14,6 +14,14 @@ import java.util.Set;
  * This is a pre-processor for JSON objects.
  * The contract of this is as follows. A JSON object may have an attribute that is one of these directives, the
  * argument is then applied.
+ * <h3>Example</h3>
+ * <pre>
+ *     {
+ *         "foo":"bar",
+ *         "#import":"id"
+ *     }
+ * </pre>
+ * This means that the JSON with "id" is imported and 
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/19 at  4:11 PM
  */

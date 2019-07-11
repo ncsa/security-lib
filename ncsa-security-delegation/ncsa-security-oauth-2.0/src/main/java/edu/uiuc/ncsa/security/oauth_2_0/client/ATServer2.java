@@ -30,37 +30,39 @@ import static edu.uiuc.ncsa.security.oauth_2_0.server.claims.OA2Claims.SUBJECT;
 
 public class ATServer2 extends TokenAwareServer implements ATServer {
     /**
-       * Place holder class for storing ID tokens. ID tokens are consumable in the sense that once we
-       * get them back, they are checked for validity and passed along to the client. The problem is that
-       * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
-       * that we keep them around for at least a bit. This store holds the raw token (as a string) and
-       * the corresponding {@link net.sf.json.JSONObject} keyed by {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}.
-       *
-       */
+     * Place holder class for storing ID tokens. ID tokens are consumable in the sense that once we
+     * get them back, they are checked for validity and passed along to the client. The problem is that
+     * many applications (such as Kubernetes) are using them as a "poor man's SciToken", necessitating
+     * that we keep them around for at least a bit. This store holds the raw token (as a string) and
+     * the corresponding {@link net.sf.json.JSONObject} keyed by {@link edu.uiuc.ncsa.security.delegation.token.AccessToken}.
+     */
 
-      public static class IDTokenEntry {
-          public JSONObject idToken;
-          public String rawToken;
+    public static class IDTokenEntry {
+        public JSONObject idToken;
+        public String rawToken;
 
         @Override
         public String toString() {
-            return this.getClass().getSimpleName() + "[idToken=" + (idToken==null?"(null)":idToken.toString(2)) + ", rawToken=" + (rawToken==null?"(null)":rawToken) +   "]";
+            return this.getClass().getSimpleName() + "[idToken=" + (idToken == null ? "(null)" : idToken.toString(2)) + ", rawToken=" + (rawToken == null ? "(null)" : rawToken) + "]";
         }
     }
 
 
-      static HashMap<String,IDTokenEntry> idTokenStore = new HashMap<String,IDTokenEntry>();
+    static HashMap<String, IDTokenEntry> idTokenStore = new HashMap<String, IDTokenEntry>();
 
-      public static HashMap<String,IDTokenEntry> getIDTokenStore(){
-          return idTokenStore;
-      }
+    public static HashMap<String, IDTokenEntry> getIDTokenStore() {
+        return idTokenStore;
+    }
 
     public ATServer2(ServiceClient serviceClient,
                      String wellKnown,
-                     boolean oidcEnabled) {
-        super(serviceClient, wellKnown,oidcEnabled);
-
+                     boolean oidcEnabled,
+                     boolean useBasicAuth) {
+        super(serviceClient, wellKnown, oidcEnabled);
+        this.useBasicAuth = useBasicAuth;
     }
+
+    boolean useBasicAuth = false;
 
     /**
      * Processes access token request
@@ -91,11 +93,21 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         HashMap m = new HashMap();
         m.put(AUTHORIZATION_CODE, atRequest.getAuthorizationGrant().getToken());
         m.put(GRANT_TYPE, AUTHORIZATION_CODE_VALUE);
-        m.put(CLIENT_ID, atRequest.getClient().getIdentifierString());
-        m.put(CLIENT_SECRET, atRequest.getClient().getSecret());
-
+        String clientID = atRequest.getClient().getIdentifierString();
+        String clientSecret = atRequest.getClient().getSecret();
+        if (!useBasicAuth) {
+            // using HTTP Basic Authorization, do not send the credentials along in the map.
+            // Use the appropriate call below.
+            m.put(CLIENT_ID, clientID);
+            m.put(CLIENT_SECRET, clientSecret);
+        }
         m.put(REDIRECT_URI, params.get(REDIRECT_URI));
-        String response = getServiceClient().getRawResponse(m);
+        String response = null;
+        if (useBasicAuth) {
+            response = getServiceClient().getRawResponse(m, clientID, clientSecret);
+        } else {
+            response = getServiceClient().getRawResponse(m);
+        }
         JSONObject jsonObject = getAndCheckResponse(response);
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {
             throw new IllegalArgumentException("Error: No access token found in server response");
@@ -114,22 +126,22 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 // This is optional to return, so it is possible that this might not work.
             }
         }
-        ServletDebugUtil.trace(this, "Is OIDC enabled? "  + oidcEnabled);
+        ServletDebugUtil.trace(this, "Is OIDC enabled? " + oidcEnabled);
 
-        if(oidcEnabled) {
+        if (oidcEnabled) {
             ServletDebugUtil.trace(this, "Processing id token entry");
-            IDTokenEntry idTokenEntry = new IDTokenEntry( );
-            ServletDebugUtil.trace(this, "created new idTokenEntry " );
+            IDTokenEntry idTokenEntry = new IDTokenEntry();
+            ServletDebugUtil.trace(this, "created new idTokenEntry ");
             JSONObject idToken = getAndCheckIDToken(jsonObject, atRequest);
-            ServletDebugUtil.trace(this,"got id token = " + idToken.toString(2));
+            ServletDebugUtil.trace(this, "got id token = " + idToken.toString(2));
             if (jsonObject.containsKey(ID_TOKEN)) {
                 params.put(RAW_ID_TOKEN, jsonObject.getString(ID_TOKEN));
                 idTokenEntry.rawToken = (String) params.get(RAW_ID_TOKEN);
-                ServletDebugUtil.trace(this,"raw token = " + idTokenEntry.rawToken);
+                ServletDebugUtil.trace(this, "raw token = " + idTokenEntry.rawToken);
             }
 
             idTokenEntry.idToken = idToken;
-            ServletDebugUtil.trace(this,"idTokenEntry= " + idTokenEntry);
+            ServletDebugUtil.trace(this, "idTokenEntry= " + idTokenEntry);
 
             // and now the specific checks for ID tokens returned by the AT server.
             if (!idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
@@ -147,7 +159,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             getIDTokenStore().put(at.getToken(), idTokenEntry);
             ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());
             ServletDebugUtil.trace(this, "Added idTokenEntry to the ID Token store. Store now has " + getIDTokenStore().size() + " entries");
-        }else{
+        } else {
             ServletDebugUtil.trace(this, "Skipping id token entry...");
         }
         ATResponse2 atr = createResponse(at, rt);

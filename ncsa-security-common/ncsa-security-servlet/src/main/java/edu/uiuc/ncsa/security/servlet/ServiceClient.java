@@ -1,10 +1,12 @@
 package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.Pool;
 import edu.uiuc.ncsa.security.util.ssl.SSLConfiguration;
 import edu.uiuc.ncsa.security.util.ssl.VerifyingHTTPClientFactory;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -117,6 +119,10 @@ public class ServiceClient {
         return convertToStringRequest(host, strings);
     }
 
+    public String getRawResponse(Map m, String id, String secret) {
+        return getRawResponse(convertToStringRequest(host().toString(), m), id, secret);
+    }
+    
     public String getRawResponse(Map m) {
         return getRawResponse(convertToStringRequest(host().toString(), m));
     }
@@ -159,11 +165,29 @@ public class ServiceClient {
         xxx.
     }*/
 
+    /**
+     * This will set the basic authorization in the headers for the request.
+     * @param httpRequestBase
+     * @param id
+     * @param secret
+     * @return
+     */
+    protected String doRequest(HttpRequestBase httpRequestBase, String id, String secret){
+        String creds = id + ":" + secret;
+        creds = Base64.encodeBase64String(creds.getBytes());
+        while(creds.endsWith("=")){
+            // shave off any trailing = from the encoding. 
+            creds = creds.substring(creds.length() - 1);
+        }
+        DebugUtil.trace(this, "Doing request with basic authz " + creds);
+        httpRequestBase.setHeader("Authorization", "Basic " + creds);
+        return doRequest(httpRequestBase);
+    }
+
     protected String doRequest(HttpRequestBase httpRequestBase){
         HttpClient client = clientPool.pop();
            HttpResponse response = null;
            try{
-
                response = client.execute(httpRequestBase);
            }catch(Throwable t){
                ServletDebugUtil.dbg(this, "Error  invoking execute for client", t);
@@ -205,6 +229,11 @@ public class ServiceClient {
 
 
     }
+    public String getRawResponse(String requestString, String id, String secret) {
+        HttpGet httpGet = new HttpGet(requestString);
+        return doRequest(httpGet, id, secret);
+    }
+    
     public String getRawResponse(String requestString) {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet);

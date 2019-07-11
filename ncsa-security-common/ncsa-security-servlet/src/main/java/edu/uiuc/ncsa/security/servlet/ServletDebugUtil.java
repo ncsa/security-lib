@@ -13,7 +13,7 @@ import java.util.Enumeration;
 public class ServletDebugUtil extends DebugUtil {
 
     public static  void printAllParameters(Class klasse, HttpServletRequest request) {
-        if(!isEnabled()) return;
+        if(!isEnabled()) {return;}
           String reqUrl = request.getRequestURL().toString();
           String queryString = request.getQueryString();   // d=789
           if (queryString != null) {
@@ -22,7 +22,7 @@ public class ServletDebugUtil extends DebugUtil {
           printIt("\n" + klasse.getSimpleName() + " at " + (new Date()));
           printIt("HTTP method=" + request.getMethod());
           printIt("Request parameters for " + reqUrl + "");
-
+          printIt("Query String:\"" + queryString + "\"");
           if (request.getParameterMap() == null || request.getParameterMap().isEmpty()) {
               printIt("  (none)");
           } else {
