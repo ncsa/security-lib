@@ -18,6 +18,7 @@ public interface StorageConfigurationTags extends ConfigurationTags {
     public static final String FS_PATH = "path";
     public static final String FS_INDEX = "indexPath";
     public static final String FS_DATA = "dataPath";
+    public static final String FS_REMOVE_EMPTY_FILES = "removeEmptyFiles";
 
     // for SQL stores
 

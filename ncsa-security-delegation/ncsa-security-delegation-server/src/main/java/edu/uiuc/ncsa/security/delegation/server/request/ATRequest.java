@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.delegation.server.request;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
  * on May 13, 2011 at  12:30:35 PM
  */
 public class ATRequest extends IssuerRequest {
-    public ATRequest(HttpServletRequest httpServletRequest, Client client) {
-        super(httpServletRequest, client);
+    public ATRequest(HttpServletRequest httpServletRequest, ServiceTransaction transaction) {
+        super(httpServletRequest, transaction);
     }
 
     AuthorizationGrant authorizationGrant;

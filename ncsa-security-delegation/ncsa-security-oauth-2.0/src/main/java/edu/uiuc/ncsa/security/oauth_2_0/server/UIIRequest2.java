@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerRequest;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,8 +23,8 @@ public class UIIRequest2 extends IssuerRequest{
     }
 
     String username;
-    public UIIRequest2(HttpServletRequest servletRequest, Client client, AccessToken accessToken) {
-        super(servletRequest, client);
+    public UIIRequest2(HttpServletRequest servletRequest, ServiceTransaction transaction, AccessToken accessToken) {
+        super(servletRequest, transaction);
         this.accessToken = accessToken;
     }
 

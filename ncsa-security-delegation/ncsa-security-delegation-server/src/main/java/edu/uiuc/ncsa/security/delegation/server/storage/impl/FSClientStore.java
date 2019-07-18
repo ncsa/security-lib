@@ -14,12 +14,13 @@ import java.io.File;
  * on 11/3/11 at  3:40 PM
  */
 public abstract class FSClientStore<V extends Client> extends FileStore<V> implements ClientStore<V> {
-    protected FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProviderImpl<V> idp,MapConverter<V> cp) {
-        super(storeDirectory, indexDirectory, idp, cp);
+    protected FSClientStore(File storeDirectory, File indexDirectory, IdentifiableProviderImpl<V> idp,MapConverter<V> cp,
+                            boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
     }
 
-    public FSClientStore(File f, IdentifiableProviderImpl<V> idp,MapConverter<V> cp) {
-        super(f, idp, cp);
+    public FSClientStore(File f, IdentifiableProviderImpl<V> idp,MapConverter<V> cp, boolean removeEmptyFiles) {
+        super(f, idp, cp, removeEmptyFiles);
     }
 
     @Override

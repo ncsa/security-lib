@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerRequest;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,18 +14,18 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RTIRequest extends IssuerRequest {
     boolean isOIDC = true;
-    public RTIRequest(Client client, boolean isOIDC) {
-        super(client);
+    public RTIRequest(ServiceTransaction transaction, boolean isOIDC) {
+        super(transaction);
         this.isOIDC =isOIDC;
     }
 
-    public RTIRequest(HttpServletRequest servletRequest, Client client, boolean isOIDC) {
-        super(servletRequest, client);
+    public RTIRequest(HttpServletRequest servletRequest, ServiceTransaction transaction, boolean isOIDC) {
+        super(servletRequest, transaction);
         this.isOIDC = isOIDC;
     }
 
-    public RTIRequest(HttpServletRequest servletRequest, Client client, AccessToken accessToken, boolean isOIDC) {
-        super(servletRequest, client);
+    public RTIRequest(HttpServletRequest servletRequest, ServiceTransaction transaction, AccessToken accessToken, boolean isOIDC) {
+        super(servletRequest, transaction);
         this.accessToken = accessToken;
         this.isOIDC = isOIDC;
     }

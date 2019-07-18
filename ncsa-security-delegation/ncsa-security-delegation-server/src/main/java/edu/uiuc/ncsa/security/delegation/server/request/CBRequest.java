@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.delegation.server.request;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.issuers.CBIssuer;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 
@@ -68,8 +68,8 @@ public class CBRequest extends IssuerRequest {
     Verifier verifier;
     URI callbackUri;
 
-    public CBRequest(Client client) {
-        super(client);
+    public CBRequest(ServiceTransaction transaction) {
+        super(transaction);
 
     }
 

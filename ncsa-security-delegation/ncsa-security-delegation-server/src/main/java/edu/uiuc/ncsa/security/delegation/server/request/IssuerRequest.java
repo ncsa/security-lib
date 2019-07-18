@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.server.request;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.services.Request;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
@@ -14,12 +15,25 @@ import javax.servlet.http.HttpServletRequest;
  * on May 13, 2011 at  11:57:57 AM
  */
 public abstract class IssuerRequest implements Request {
-    public IssuerRequest(Client client) {
-        this.client = client;
+    public IssuerRequest(ServiceTransaction transaction) {
+        this.transaction = transaction;
     }
 
-    public IssuerRequest(HttpServletRequest servletRequest, Client client) {
-        this.client = client;
+    public ServiceTransaction getTransaction() {
+        return transaction;
+    }
+
+    /**
+     * Generally this should not be needed. If possible, always set the transaction in the constructor.
+     * @param transaction
+     */
+    public void setTransaction(ServiceTransaction transaction) {
+        this.transaction = transaction;
+    }
+
+    ServiceTransaction transaction;
+    public IssuerRequest(HttpServletRequest servletRequest, ServiceTransaction transaction) {
+        this(transaction);
         this.servletRequest = servletRequest;
     }
 
@@ -39,12 +53,8 @@ public abstract class IssuerRequest implements Request {
     HttpServletRequest servletRequest;
 
     public Client getClient() {
-        return client;
+        return getTransaction().getClient();
     }
 
-    public void setClient(Client client) {
-        this.client = client;
-    }
 
-    Client client;
 }

@@ -90,7 +90,7 @@ public class Ingester {
                 addedIDs.add(id);
             }
         }
-
+                         
         // so we have an array of JSONObjects and can loop through them.
         return addedIDs;
     }

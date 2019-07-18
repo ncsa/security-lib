@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.Initializable;
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.core.configuration.provider.TypedProvider;
@@ -23,12 +24,28 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
     protected static final String PATH_KEY = StorageConfigurationTags.FS_PATH;
     protected static final String INDEX_KEY = StorageConfigurationTags.FS_INDEX;
     protected static final String DATA_KEY = StorageConfigurationTags.FS_DATA;
-    protected MapConverter converter;
 
+    Boolean removeEmptyFiles = null;
+    protected MapConverter converter;
+    public boolean isRemoveEmptyFiles(){
+        if(removeEmptyFiles == null) {
+            String rawValue = Configurations.getFirstAttribute(getConfig(), StorageConfigurationTags.FS_REMOVE_EMPTY_FILES);
+            if(rawValue == null || rawValue.isEmpty()){
+                removeEmptyFiles = true; //default
+            }
+            try{
+                removeEmptyFiles = Boolean.parseBoolean(rawValue);
+            }catch(Throwable t){
+                removeEmptyFiles = true; // default
+            }
+        }
+        return removeEmptyFiles;
+    }
 
     public FSProvider(ConfigurationNode config, String type, String target, MapConverter converter) {
         super(config, type, target);
         this.converter = converter;
+
     }
 
 
@@ -48,8 +65,8 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
 
     /**
      * It is up to you to add the appropriate logic to check for the correct store type (e.g. transaction store)
-     * and instantiate it in the {@link #produce(java.io.File, java.io.File)} method. This method simply invokes the
-     * {@link #produce(java.io.File, java.io.File)}
+     * and instantiate it in the {@link #produce(java.io.File, java.io.File, boolean)} method. This method simply invokes the
+     * {@link #produce(java.io.File, java.io.File, boolean)}
      * method and returns that result.
      *
      * @return
@@ -96,7 +113,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
         }
         File indexDirectory = new File(indexPath);
         File storeDirectory = new File(dataPath);
-        fs = produce(storeDirectory, indexDirectory);
+        fs = produce(storeDirectory, indexDirectory, isRemoveEmptyFiles());
         Initializable initializable = new FSInitializer(storeDirectory, indexDirectory);
         if (!initializable.isCreated()) {
             initializable.createNew();
@@ -112,7 +129,7 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
      * @param indexPath
      * @return
      */
-    protected abstract T produce(File dataPath, File indexPath);
+    protected abstract T produce(File dataPath, File indexPath, boolean removeEmptyFiles);
 
 
 }

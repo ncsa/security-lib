@@ -80,7 +80,27 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         }
     }
 
-    protected FileStore(File storeDirectory, File indexDirectory, IdentifiableProvider<V> identifiableProvider, MapConverter<V> converter) {
+    /**
+     * For the case where the data and index directories are explicitly given.
+     *
+     * @param storeDirectory
+     * @param indexDirectory
+     * @param identifiableProvider
+     * @param converter
+     */
+    protected FileStore(File storeDirectory,
+                        File indexDirectory,
+                        IdentifiableProvider<V> identifiableProvider,
+                        MapConverter<V> converter,
+                        boolean removeEmptyFiles) {
+        doSetup(storeDirectory, indexDirectory, identifiableProvider, converter, removeEmptyFiles);
+    }
+
+    protected void doSetup(File storeDirectory,
+                           File indexDirectory,
+                           IdentifiableProvider<V> identifiableProvider,
+                           MapConverter<V> converter,
+                           boolean removeEmptyFiles) {
         initializer = new FSInitializer(storeDirectory, indexDirectory);
         if (!initializer.isCreated()) {
             if (!initializer.createNew()) {
@@ -93,8 +113,24 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         this.storageDirectory = storeDirectory;
         this.identifiableProvider = identifiableProvider;
         this.converter = converter;
+        this.removeEmptyFiles =removeEmptyFiles;
     }
 
+    /**
+     * Accepts a directory for both the index and data and creates the subdirectories.
+     *
+     * @param directory
+     * @param idp
+     * @param cp
+     */
+    public FileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp, boolean removeEmptyFiles) {
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException("Error: the given directory \"" + directory.getAbsolutePath() + "\" is not a directory. Cannot create sub-directories.");
+        }
+        File storeDir = new File(directory, "store");
+        File index = new File(directory, "index");
+        doSetup(storeDir, index,idp, cp, removeEmptyFiles);
+    }
 
     protected File indexDirectory;
 
@@ -219,13 +255,16 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     boolean removeEmptyFiles = true;
+
     protected V loadFile(File f) {
-        if(f.length() == 0){
-            if(removeEmptyFiles){
-               f.delete();
+        if (f.length() == 0) {
+            //Fixes CIL-518. Can't quite tell if there is a failure on create with a zero length file (since there
+            // are practically too many places it could fail. Best we can do is delete any we find.
+            if (removeEmptyFiles) {
+                f.delete();
                 DebugUtil.dbg(this, "Deleting empty file:" + f);
                 return null;
-            }else {
+            } else {
                 DebugUtil.dbg(this, "Skipping file of length zero:" + f);
                 return null;
             }
@@ -243,22 +282,6 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             }
             return null;
         }
-    }
-
-    public FileStore(File directory, IdentifiableProvider<V> idp, MapConverter<V> cp) {
-        converter = cp;
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Error: the given directory \"" + directory.getAbsolutePath() + "\" is not a directory. Cannot create sub-directories.");
-        }
-        File storeDir = new File(directory, "store");
-        File index = new File(directory, "index");
-        initializer = new FSInitializer(storeDir, index);
-        if (!initializer.isCreated()) {
-            initializer.createNew();
-        }
-        storageDirectory = storeDir;
-        indexDirectory = index;
-        identifiableProvider = idp;
     }
 
 
@@ -478,7 +501,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         Collection<V> values = values();
         Iterator iterator = values.iterator();
         Pattern pattern = null;
-        if(isRegEx) {
+        if (isRegEx) {
             pattern = Pattern.compile(condition);
         }
         while (iterator.hasNext()) {

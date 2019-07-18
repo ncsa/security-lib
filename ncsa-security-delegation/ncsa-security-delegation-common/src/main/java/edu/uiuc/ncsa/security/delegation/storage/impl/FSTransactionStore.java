@@ -24,16 +24,19 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
                                  File indexDirectory,
                                  IdentifiableProvider<V> idp,
                                  TokenForge tokenForge,
-                                 MapConverter<V> mp) {
-        super(storeDirectory, indexDirectory, idp, mp);
+                                 MapConverter<V> mp,
+                                 boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, mp, removeEmptyFiles);
         this.tokenForge = tokenForge;
     }
 
     protected TokenForge tokenForge;
 
     public FSTransactionStore(File file,
-                              IdentifiableProvider<V> idp, TokenForge tokenForge, MapConverter<V> mp) {
-        super(file, idp, mp);
+                              IdentifiableProvider<V> idp,
+                              TokenForge tokenForge,
+                              MapConverter<V> mp, boolean removeEmptyFiles) {
+        super(file, idp, mp, removeEmptyFiles);
         this.tokenForge = tokenForge;
     }
 

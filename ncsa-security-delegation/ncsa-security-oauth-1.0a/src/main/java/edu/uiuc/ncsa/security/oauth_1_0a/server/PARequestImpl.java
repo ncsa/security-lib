@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_1_0a.server;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import net.oauth.OAuthMessage;
 
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class PARequestImpl extends PARequest {
     public PARequestImpl(PARequest paRequest) {
-        super(paRequest.getServletRequest(), paRequest.getClient());
+        super(paRequest.getServletRequest(), paRequest.getTransaction());
         if(paRequest.getAccessToken() != null){
             setAccessToken(paRequest.getAccessToken());
         }
@@ -40,7 +40,7 @@ public class PARequestImpl extends PARequest {
         return parameters;
     }
 
-    public PARequestImpl(HttpServletRequest servletRequest, Client client) {
-        super(servletRequest, client);
+    public PARequestImpl(HttpServletRequest servletRequest, ServiceTransaction transaction) {
+        super(servletRequest, transaction);
     }
 }

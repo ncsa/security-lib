@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_1_0a.server;
 
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
@@ -20,14 +21,20 @@ import java.util.Map;
  */
 public class AGResponseImpl implements AGResponse {
     public Client getClient() {
-        return client;
+        return getServiceTransaction().getClient();
     }
 
-    public void setClient(Client client) {
-        this.client = client;
+    @Override
+    public ServiceTransaction getServiceTransaction() {
+        return transaction;
     }
 
-    Client client;
+    @Override
+    public void setServiceTransaction(ServiceTransaction transaction) {
+        this.transaction = transaction;
+    }
+
+    ServiceTransaction transaction;
     public AuthorizationGrant getGrant() {
         return grant;
     }

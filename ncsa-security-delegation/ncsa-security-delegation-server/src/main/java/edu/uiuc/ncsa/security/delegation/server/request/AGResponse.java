@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.server.request;
 
-import edu.uiuc.ncsa.security.delegation.storage.Client;
+import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 
 /**
@@ -10,6 +10,6 @@ import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
  */
 public interface AGResponse extends IssuerResponse {
     public AuthorizationGrant getGrant();
-    public Client getClient();
-    public void setClient(Client client);
+    public ServiceTransaction getServiceTransaction();
+    public void setServiceTransaction(ServiceTransaction transaction);
 }

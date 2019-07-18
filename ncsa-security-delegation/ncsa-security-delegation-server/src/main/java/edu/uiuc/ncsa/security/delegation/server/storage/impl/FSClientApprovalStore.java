@@ -18,14 +18,16 @@ import java.io.File;
 public abstract class FSClientApprovalStore<V extends ClientApproval> extends FileStore<V> implements ClientApprovalStore<V> {
     protected FSClientApprovalStore(File storeDirectory, File indexDirectory,
                                     IdentifiableProviderImpl<V> idp,
-                                    MapConverter<V> cp) {
-        super(storeDirectory, indexDirectory, idp, cp);
+                                    MapConverter<V> cp,
+                                    boolean removeEmptyFiles) {
+        super(storeDirectory, indexDirectory, idp, cp, removeEmptyFiles);
     }
 
     protected FSClientApprovalStore(File file,
                                     IdentifiableProviderImpl<V> idp,
-                                    MapConverter<V> cp) {
-        super(new File(file, "cas"), idp, cp);
+                                    MapConverter<V> cp,
+                                    boolean removeEmptyFiles) {
+        super(new File(file, "cas"), idp, cp, removeEmptyFiles);
     }
 
 
