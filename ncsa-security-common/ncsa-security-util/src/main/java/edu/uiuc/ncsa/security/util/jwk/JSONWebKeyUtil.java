@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
@@ -38,6 +39,7 @@ public class JSONWebKeyUtil {
 
     /**
      * Read a set of keys from a file. The format of the file is that of the spec.
+     *
      * @param file
      * @return
      * @throws NoSuchAlgorithmException
@@ -73,12 +75,31 @@ public class JSONWebKeyUtil {
         for (int i = 0; i < array.size(); i++) {
             JSONObject key = array.getJSONObject(i);
             JSONWebKey entry = new JSONWebKey();
-            entry.id = key.getString(KEY_ID);
-            entry.algorithm = key.getString(ALGORITHM);
-            entry.use = key.getString(USE);
-            entry.type = key.getString(KEY_TYPE);
+            // Key type is required
+            boolean skipIt = false;
+            if (key.containsKey(KEY_TYPE)) {
+                entry.type = key.getString(KEY_TYPE);
+                // Note that OA4MP only supports RSA keys at this time, since these are by far the most widely used.
+                if (!entry.type.toLowerCase().startsWith("rsa")) {
+                    DebugUtil.trace(JSONWebKeyUtil.class, "loading JSON webkeys and ignoring key of type " + entry.type);
+                    skipIt = true;
+                    // throw new GeneralException("Unsupported key type. Must be RSA");
+                }
+            } else {
+                throw new IllegalStateException("Error: missing key type");
+            }
+            if (key.containsKey(KEY_ID)) {
+                entry.id = key.getString(KEY_ID);
+            }
+            // The algorithm is optional and not every site supports it.
+            if (key.containsKey(ALGORITHM)) {
+                entry.algorithm = key.getString(ALGORITHM);
+            }
+            if (key.containsKey(USE)) {
+                entry.use = key.getString(USE);
+            }
             // have to figure out what is in this entry.
-            if (key.containsKey(MODULUS) && key.containsKey(PUBLIC_EXPONENT)) {
+            if (!skipIt && key.containsKey(MODULUS) && key.containsKey(PUBLIC_EXPONENT)) {
                 byte[] mod = Base64.decodeBase64(key.getString(MODULUS));
                 BigInteger modulus = new BigInteger(mod);
                 byte[] pubExp = Base64.decodeBase64(key.getString(PUBLIC_EXPONENT));
@@ -104,31 +125,32 @@ public class JSONWebKeyUtil {
         return keys;
     }
 
-    protected static String bigIntToString(BigInteger bigInteger){
+    protected static String bigIntToString(BigInteger bigInteger) {
         return Base64.encodeBase64URLSafeString(bigInteger.toByteArray());
     }
 
     /**
      * Serialize a set of keys (as a java object) to JSON.
+     *
      * @param webKeys
      * @return
      */
-    public static JSONObject toJSON(JSONWebKeys webKeys){
+    public static JSONObject toJSON(JSONWebKeys webKeys) {
         JSONObject json = new JSONObject();
         JSONArray array = new JSONArray();
-        for(String key : webKeys.keySet()){
+        for (String key : webKeys.keySet()) {
             JSONWebKey webKey = webKeys.get(key);
-            if(webKey.type.equals("RSA")) {
+            if (webKey.type.equals("RSA")) {
                 JSONObject jsonKey = new JSONObject();
                 RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
-                jsonKey.put(MODULUS,bigIntToString(rsaPub.getModulus()));
+                jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
                 jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
                 jsonKey.put(ALGORITHM, webKey.algorithm);
                 jsonKey.put(KEY_ID, webKey.id);
                 jsonKey.put(USE, webKey.use);
                 jsonKey.put(KEY_TYPE, "RSA");
-                if(webKey.privateKey != null){
-                    RSAPrivateKey privateKey = (RSAPrivateKey)webKey.privateKey;
+                if (webKey.privateKey != null) {
+                    RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
                     jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
                 }
                 array.add(jsonKey);
@@ -141,12 +163,13 @@ public class JSONWebKeyUtil {
     /**
      * Very useful utility to take a set of keys and return another set of keys that are only the public parts.
      * This set, for instance, can be returned as a response to public requests.
+     *
      * @param keys
      * @return
      */
-    public static JSONWebKeys makePublic(JSONWebKeys keys){
-        JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID()) ;
-        for(String key:keys.keySet()){
+    public static JSONWebKeys makePublic(JSONWebKeys keys) {
+        JSONWebKeys newKeys = new JSONWebKeys(keys.getDefaultKeyID());
+        for (String key : keys.keySet()) {
             try {
                 JSONWebKey newKey = keys.get(key).clone();
                 newKey.privateKey = null;

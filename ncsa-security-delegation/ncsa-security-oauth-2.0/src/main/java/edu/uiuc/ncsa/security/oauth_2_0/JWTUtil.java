@@ -198,6 +198,23 @@ public class JWTUtil {
     public static final int PAYLOAD_INDEX = 1;
     public static final int SIGNATURE_INDEX = 2;
 
+    /**
+     * This will only peel off the header and payload. No verification of any sort is done!!
+     * @param jwt
+     * @return
+     */
+    public static JSONObject[] readJWT(String jwt){
+        if (jwt == null || jwt.isEmpty()) {
+               throw new GeneralException("Error: missing or empty token");
+           }
+           String[] x = decat(jwt);
+           JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
+           JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
+           JSONObject rc[] = new JSONObject[2];
+           rc[HEADER_INDEX] = h;
+           rc[PAYLOAD_INDEX] = p;
+           return rc;
+    }
     public static JSONObject verifyAndReadJWT(String jwt, JSONWebKeys webKeys) {
         if (jwt == null || jwt.isEmpty()) {
             throw new GeneralException("Error: missing or empty token");

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.client;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.client.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
@@ -74,6 +75,8 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         return getAccessToken(atRequest);
     }
 
+
+
     /**
      * Gets access token. This also returns the refresh token (if any) in the response.
      * Note that there are claims that are returned in the a parameter map for the
@@ -89,6 +92,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         if (params.get(REDIRECT_URI) == null) {
             throw new GeneralException("Error: the client redirect uri was not set in the request.");
         }
+        DebugUtil.trace(this, "getting access token, use http header for token? " + useBasicAuth);
         // Create the request
         HashMap m = new HashMap();
         m.put(AUTHORIZATION_CODE, atRequest.getAuthorizationGrant().getToken());
