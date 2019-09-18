@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -182,6 +181,7 @@ public class Configurations {
      * @return
      */
     public static ConfigurationNode getFirstNode(ConfigurationNode node, String name) {
+        if(node==null) return null;
         List list = node.getChildren(name);
         if (list.isEmpty()) {
             return null;

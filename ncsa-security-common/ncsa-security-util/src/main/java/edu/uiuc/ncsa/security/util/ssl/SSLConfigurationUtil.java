@@ -175,14 +175,6 @@ public class SSLConfigurationUtil implements Serializable {
                 sslConfiguration.setTrustRootType(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_TYPE));
 
             }
-
-
-
-       /*     sslKeystoreConfiguration.setTrustRootPath(getNodeValue(node, SSL_TRUSTSTORE_PATH));
-            sslKeystoreConfiguration.setTrustRootPassword(getNodeValue(node, SSL_TRUSTSTORE_PASSWORD));
-            sslKeystoreConfiguration.setTrustRootType(getNodeValue(node, SSL_TRUSTSTORE_TYPE));
-       */
-
             if (logger != null) {
                 logger.info("Done loading SSL configuration");
             }
@@ -195,7 +187,7 @@ public class SSLConfigurationUtil implements Serializable {
         if (cfgNode != null) {
             return getOLDSSLConfiguration(logger, cfgNode);
         }
-        cfgNode = getFirstNode(node, SSL_TAG);
+        cfgNode = getFirstNode(node, SSL_TAG); // if the node is null then the next call returns a generic SSL object.
         return getNEWSSLConfiguration(logger, cfgNode);
     }
 
