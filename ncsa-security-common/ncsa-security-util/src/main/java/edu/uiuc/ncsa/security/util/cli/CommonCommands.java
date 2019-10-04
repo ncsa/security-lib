@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import net.sf.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -23,6 +25,7 @@ public abstract class CommonCommands implements Commands {
      * commands strictly without user intervention, failing if, for instance, some parameters are missing
      * rather than prompting for them. Typically, the {@link CLIDriver} instance sets this at the time of
      * invocation.
+     *
      * @return
      */
     public boolean isBatchMode() {
@@ -40,7 +43,7 @@ public abstract class CommonCommands implements Commands {
         this.logger = logger;
     }
 
-   protected MyLoggingFacade logger;
+    protected MyLoggingFacade logger;
 
     @Override
     public void debug(String x) {
@@ -108,7 +111,9 @@ public abstract class CommonCommands implements Commands {
      * @param x
      */
     protected void say(String x) {
-        System.out.println(defaultIndent + x);
+        if(isPrintOuput()) {
+            System.out.println(defaultIndent + x);
+        }
     }
 
     /**
@@ -209,4 +214,309 @@ public abstract class CommonCommands implements Commands {
         return isEmpty(x) ? getPlaceHolder() : x;
     }
 
+    public CLIDriver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(CLIDriver driver) {
+        this.driver = driver;
+    }
+
+    CLIDriver driver;
+    protected String CL_OUTPUT_FILE_FLAG = "-out";
+    protected String CL_INPUT_FILE_FLAG = "-in";
+
+    String ENV_ADD_FLAG = "-add";
+    String ENV_OVERWRITE_FLAG = "-overwrite";
+    String ENV_JSON_FLAG = "-json";
+
+    protected void printSetEnvHelp() {
+        say("set_env [" + ENV_ADD_FLAG + "] " + CL_INPUT_FILE_FLAG + " file");
+        sayi("This takes a properties file of key/value pairs and stores them for use.");
+        sayi("You may access these values in any command with a reaplacement template ${key} is replaced by its value");
+        sayi("This allows you to set environment variables externally and manage them.");
+        sayi(ENV_ADD_FLAG + " will simply add the properties to any existing properties rather than over-writing them");
+        sayi("This lets you pull in many properties from differen sources. Not adding this flag replaces the current environment.");
+        sayi(ENV_OVERWRITE_FLAG + " Implies the add flag. This means that the new properties overwrite the old");
+        sayi("Otherwise, the old properties are preserved.");
+        sayi(ENV_JSON_FLAG + " The properties are in a JSON object, rather than just a flat file of key=value pairs.");
+        sayi("Only strings are supported and there is no guarantee as to behavior if other objects are used.");
+        say("See also: clear_env, print_env");
+    }
+
+
+    public void set_env(InputLine inputline) throws Exception {
+        if (showHelp(inputline)) {
+            printSetEnvHelp();
+            return;
+
+        }
+        if (gracefulExit(!inputline.hasArg(CL_INPUT_FILE_FLAG), "Missing properties file: no " + CL_INPUT_FILE_FLAG + " switch.")) {
+            return;
+        }
+        Map map = null;
+        String inputFile = inputline.getNextArgFor(CL_INPUT_FILE_FLAG);
+        File f = new File(inputFile);
+        if (!f.isFile()) {
+            sayv("Sorry but the file \"" + f + "\" does not exist.");
+            return;
+        }
+        if (inputline.hasArg(ENV_JSON_FLAG)) {
+            sayv("loading json properties file");
+            map = readJSON(inputFile);
+        } else {
+            sayv("loading Java properties file");
+            map = new XProperties(f);
+        }
+        sayv("loaded properties: " + map);
+        if (inputline.hasArg(ENV_ADD_FLAG)) {
+            Map oldProps = getDriver().getEnv();
+            if (oldProps != null) {
+                XProperties xp = new XProperties();
+                xp.add(oldProps, false);
+
+                xp.add(map, inputline.hasArg(ENV_OVERWRITE_FLAG));
+                map = xp;
+            }
+        }
+        getDriver().setEnv(map);
+    }
+
+    protected void printEnvHelp() {
+        say("print_env ");
+        sayi("This will print out the current list of environment variables, '(empty)' if there are none.");
+        say("See also: set_env, clear_env");
+    }
+
+    public void print_env(InputLine inputLine) throws Exception {
+        if (getDriver().hasEnv()) {
+            say(getDriver().getEnv().toString());
+        } else {
+            say("(empty)");
+        }
+    }
+
+
+    protected void clearEnvHelp() {
+        say("clear_env");
+        sayi("clear any environment variables.");
+        say("See also: set_env, print_env");
+    }
+
+    public void clear_env(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            clearEnvHelp();
+            return;
+        }
+        getDriver().setEnv(null);
+    }
+
+    /**
+     * Exit gracefully. That is to say, if the exitNow flag is true, do a system shutdown in batch mode and otherwise,
+     * do nothing. If the flag is true and the mode is interactive, then print the message and return true, prompting
+     * the system to return;
+     *
+     * @param exitNow
+     * @param msg
+     * @return
+     */
+    protected boolean gracefulExit(boolean exitNow, String msg) {
+        if (exitNow) {
+            if (isBatch()) {
+                sayv(msg);
+                System.exit(1);
+            }
+            say(msg);
+            return true;
+        }
+        return false;
+    }
+
+    /* If this is used, then each line of the file is read as an input and processed. It overrides the
+     * {@link #BATCH_MODE_FLAG} if used and that is ignored.
+     */
+    public static String BATCH_FILE_MODE_FLAG = "-batchFile";
+    /**
+     * If a line contains this character, then the line is truncated at that point before processing.
+     */
+    //public static String BATCH_FILE_COMMENT_CHAR = "//";
+    /**
+     * If a line ends with this (after the comment is removed), then glow it on to the
+     * next input line. In effect this lets you split commands across multiple lines, e.g.
+     * <pre>
+     * ls \//My comment
+     * -la \
+     * foobar
+     * </pre>
+     * is the same as entering the single line
+     * <pre>ls -la foobar</pre>
+     * Notice that the lines are concatenated and the comment is stripped out.
+     */
+    public static String BATCH_FILE_LINE_CONTINUES = "\\";
+
+    public boolean isBatchFile() {
+        return batchFile;
+    }
+
+    public void setBatchFile(boolean batchFile) {
+        this.batchFile = batchFile;
+    }
+
+    protected boolean batchFile = false;
+
+    /**
+     * returns true if this is either a batch file or in batch mode. In that case only output is generated
+     * on errors if verbosity is on.
+     *
+     * @return
+     */
+    protected boolean isBatch() {
+        return isBatchFile() || isBatchMode();
+    }
+
+    /**
+     * Use this for verbose mode.
+     *
+     * @param x
+     */
+    protected void sayv(String x) {
+        // suppress output if this is run from the command line.
+        logit(x);
+        if (isPrintOuput() && isVerbose()) {
+            say(x);
+        }
+    }
+
+    protected void logit(String x) {
+        if (logger != null) {
+            logger.info(x);
+        }
+    }
+
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    protected void setVerboseHelp() {
+        say("set_verbose_on true | false ");
+        sayi("Chiefly for batch files to toggle whether or not there is verbose mode on.");
+        say("See also set_output_on");
+    }
+
+    /**
+     * So batch files can change whether or not they are verbose
+     *
+     * @param inputLine
+     */
+    public void set_verbose_on(InputLine inputLine) throws Exception {
+        if (inputLine.hasArg("true")) {
+            setVerbose(true);
+        } else {
+            setVerbose(false);
+        }
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    boolean verbose;
+
+    /**
+     * If this is set true, then no output is generated. This is usedul in batch mode or with a batch file.
+     *
+     * @return
+     */
+    public boolean isPrintOuput() {
+        return printOuput;
+    }
+
+    public void setPrintOuput(boolean printOuput) {
+        this.printOuput = printOuput;
+    }
+
+    boolean printOuput = true; // default is to always print output since this a command line tool.
+
+
+    protected void setOuputOnHelp() {
+        say("set_output_on true| false");
+        sayi("This is used chiefly with batch files, to toggle whether or not there is output directed to the console,");
+        sayi("true means to turn on output, false means to suspend it");
+        say("See also: set_verbose_on");
+    }
+
+    public void set_output_on(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            setOuputOnHelp();
+            return;
+        }
+        // A little bit trickier than it looks since we have an internal flag for the negation of this.
+        // We also want to be sure they really want to turn off output, so we only test for logical true
+        // That way if they screw it up they still at least get output...
+        if (inputLine.hasArg("true")) {
+            logit("Turning output on");
+            setPrintOuput(true);
+        } else {
+            logit("Turning output off");
+            setPrintOuput(false);
+        }
+    }
+
+
+    protected void versionHelp() {
+        say("version ");
+        sayi("prints the current version number of this program.");
+    }
+
+    public void version(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            versionHelp();
+            return;
+        }
+        say("* CLI (Command Line Interpreter) Version " + LoggingConfigLoader.VERSION_NUMBER);
+    }
+
+    protected void echoHelp() {
+        say("echo arg0 arg1...");
+        sayi("Simply echos the arg(s) to the console . This is extremely useful in scripts.");
+        say("See also set_output_on");
+    }
+
+    public void echo(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            echoHelp();
+            return;
+        }
+        say(inputLine.format());
+    }
+
+    /**
+     * read a text file and return a single string of the content. This is intended for small files
+     * which will be processed into something else (e.g. turned into a JSON object, key set etc.)
+     *
+     * @param filename
+     * @return
+     * @throws Exception
+     */
+    protected String readFile(String filename) throws Exception {
+        File f = new File(filename);
+        if (!f.exists()) {
+            return null;
+        }
+        FileReader fr = new FileReader(f);
+        BufferedReader br = new BufferedReader(fr);
+        String output = "";
+        String currentLine = br.readLine();
+        while (currentLine != null) {
+            output = output + currentLine;
+            currentLine = br.readLine();
+        }
+        br.close();
+        return output;
+    }
+
+    protected JSONObject readJSON(String filename) throws Exception {
+        return JSONObject.fromObject(readFile(filename));
+    }
 }

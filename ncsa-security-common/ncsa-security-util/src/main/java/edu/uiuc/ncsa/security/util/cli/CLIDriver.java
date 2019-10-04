@@ -1,13 +1,12 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
 
@@ -35,7 +34,24 @@ public class CLIDriver {
     public static final String REPEAT_LAST_COMMAND = "/r";
     public static final String HISTORY_LIST_COMMAND = "/h";
 
+    /*
+    Added Environment support. This allows for having any extension od CommonCommands use the set_env call
+    to pull in properties from either a Java rpoperties file or from a JSON file. Type "set_env --help" at the command
+    line to see what's what.
+     */
+    Map env;
 
+    public Map getEnv() {
+        return env;
+    }
+
+    public void setEnv(Map env) {
+        this.env = env;
+    }
+
+    public boolean hasEnv(){
+        return env != null && !env.isEmpty();
+    }
     private Commands[] commands; // implementation of this abstract class.
     CommandLineTokenizer CLT = new CommandLineTokenizer();
 
@@ -45,6 +61,11 @@ public class CLIDriver {
 
     public CLIDriver(Commands... cci) {
         super();
+        for(Commands xxx : cci){
+            if(xxx instanceof CommonCommands){
+                ((CommonCommands)xxx).setDriver(this);
+            }
+        }
         setCLICommands(cci);
     }
 
@@ -85,13 +106,14 @@ public class CLIDriver {
     //  /s file = save/serialize history buffer to file,
     //  /d file = import/deserialize buffer from file
     //  /i file = interpret all the commands in a file, i.e. run a script.
-    protected int getCommandType(String cmdLine){
+    protected int getCommandType(String cmdLine) {
         StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
         String nextToken = st.nextToken();
-        if(nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND;
-        if(nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND;
+        if (nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND;
+        if (nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND;
         return NEW_COMMAND;
     }
+
     /**
      * Actual method that starts up this driver and sets out prompts etc.
      *
@@ -106,6 +128,9 @@ public class CLIDriver {
             try {
                 say2(prompt);
                 cmdLine = readline();
+                if(hasEnv()){
+                    cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
+                }
                 boolean storeLine = true;
                 if (cmdLine.equals(REPEAT_LAST_COMMAND)) {
                     if (0 < commandHistory.size()) {
@@ -122,22 +147,22 @@ public class CLIDriver {
                     // Either of the following work:
                     // /h == print history with line numbers
                     // /h int = execute line # int, or print history if that fails
-                    StringTokenizer st = new StringTokenizer(cmdLine," ");
+                    StringTokenizer st = new StringTokenizer(cmdLine, " ");
                     st.nextToken(); // This is the "/h" which we already know about
                     boolean printIt = true;
-                    if(st.hasMoreTokens()){
-                           try{
-                               int lineNo = Integer.parseInt(st.nextToken());
-                               if(0 <= lineNo && lineNo < commandHistory.size()){
-                                   cmdLine = commandHistory.get(lineNo);
-                                   storeLine = false;
-                                   printIt = false;
-                               }
-                           }catch(Throwable t){
-                               // do nothing, just print out the history.
-                           }
+                    if (st.hasMoreTokens()) {
+                        try {
+                            int lineNo = Integer.parseInt(st.nextToken());
+                            if (0 <= lineNo && lineNo < commandHistory.size()) {
+                                cmdLine = commandHistory.get(lineNo);
+                                storeLine = false;
+                                printIt = false;
+                            }
+                        } catch (Throwable t) {
+                            // do nothing, just print out the history.
+                        }
                     }
-                    if(printIt){
+                    if (printIt) {
                         for (int i = 0; i < commandHistory.size(); i++) {
                             // an iterator actually prints these in reverse order. Print them in order.
                             say(i + ": " + commandHistory.get(i));
@@ -145,7 +170,7 @@ public class CLIDriver {
                         continue;
                     }
                 }
-                if(storeLine){
+                if (storeLine) {
                     commandHistory.add(0, cmdLine);
                 }
                 switch (execute(cmdLine)) {
@@ -176,18 +201,36 @@ public class CLIDriver {
         }
     }
 
+
+    /**
+     * So that various other programs can call this as needed
+     * @param cmds
+     * @return
+     */
+    public int execute(String[] cmds) {
+        Vector cmdV = new Vector();
+        for (String x : cmds) {
+            cmdV.add(x);
+        }
+        return execute(cmdV);
+    }
+
+    public int execute(String cmdLine) {
+        Vector cmdV = CLT.tokenize(cmdLine);
+        return execute(cmdV);
+    }
+
     /**
      * Returns a logical true if one of the command lines executes the line successfully. This will
      * also throw a shutdown exception if the user asks it to..
      * Otherwise it returns false;
      *
-     * @param cmdLine
+     * @param cmdV
      * @return
      */
 
-    public int execute(String cmdLine) {
+    public int execute(Vector cmdV) {
         try {
-            Vector cmdV = CLT.tokenize(cmdLine);
             if (cmdV.size() > 0) {
                 String cmdS = ((String) cmdV.elementAt(0));
                 if (cmdS.toLowerCase().equals("exit") ||
@@ -236,6 +279,7 @@ public class CLIDriver {
     protected void listCLIMethods() {
         say("Here are the commands available:");
         String[] tempCCIN = CLIReflectionUtil.getCommandsNameList(getCLICommands());
+        Arrays.sort(tempCCIN); // make it in sorted order.
         for (int i = 0; i < tempCCIN.length; i++) {
             say(tempCCIN[i]);
         }

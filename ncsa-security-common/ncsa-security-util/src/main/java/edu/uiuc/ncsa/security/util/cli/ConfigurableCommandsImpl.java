@@ -13,6 +13,10 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * Basic implementation of Commands. This supports loading configurations.
+ * <b>NOTE</b> This does not actually run commands! It is a top-level class that delegates to its
+ * command implementations (such as for stores, keys). Therefore, you should not put code here
+ * that actually executes things. The contract of this is that it manages logging, loading configurations
+ * and instantiating the actual {@link Commands} implementations that do everything.
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  11:35 AM
  */

@@ -69,11 +69,10 @@ public abstract class StoreCommands extends CommonCommands {
     protected void showUpdateHelp() {
         say("Updates an entry, that is to say, allows you to edit the values stored for an entry");
         say("Syntax:\n");
-        say("update index\n");
-        say("where the index is the index in the list command.");
+        say("update index");
+
     }
-
-
+  
     protected void showSerializeHelp() {
         say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
         say("serialize  [-file path] index");
@@ -91,6 +90,7 @@ public abstract class StoreCommands extends CommonCommands {
         say("with that identifier the operation will fail. If there is no identifier, one will be created.");
         say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
     }
+
 
     // Note to self -- cannot just have these here because all of the machinery to do this to and from XML resides in another
     // module and that would create a circular set of dependencies. This is the reason there is the subclass StoreCommands2

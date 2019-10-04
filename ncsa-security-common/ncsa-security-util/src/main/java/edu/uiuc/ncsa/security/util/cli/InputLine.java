@@ -20,9 +20,10 @@ public class InputLine {
         parsedInput = v;
     }
 
-    protected InputLine(){
+    protected InputLine() {
 
     }
+
     /**
      * This returns this as a string
      *
@@ -34,8 +35,66 @@ public class InputLine {
             out = new String[parsedInput.size() - 1];
             // first pass tells whether to put a blank between arguments. The zero-th
             // element of the vector is the function, so omit that.
-            for (int i =1; i< parsedInput.size(); i++) {
-                out[i-1] = parsedInput.get(i);
+            for (int i = 1; i < parsedInput.size(); i++) {
+                out[i - 1] = parsedInput.get(i);
+            }
+        }
+        return out;
+    }
+
+    /**
+     * returns the arguments as a vector. This omits the name of the function, returning only the arguments themselves
+     * @return
+     */
+    public Vector argsToVector(){
+        Vector v = new Vector();
+        if(parsedInput == null){
+            return v;
+        }
+        for(int i = 1; i < parsedInput.size(); i++){
+            v.add(getArg(i));
+        }
+        return v;
+    }
+    /**
+     * Use for switches with value, e.g. if you have "-foo bar" then invoke this with "-foo" and bar will be removed too.
+     * To remove a single value, use {@link #removeSwitch(String)}
+     * @param value
+     */
+    public void removeSwitchAndValue(String value){
+        String x = getNextArgFor(value);
+        removeSwitch(x);
+        removeSwitch(value);
+    }
+    /**
+     * Remove a value. NOTE that removing a switch does not remove its value!!! To do this all at once, use
+     * {@link #removeSwitchAndValue(String)}
+     * @param value
+     */
+    public void removeSwitch(String value){
+     if(parsedInput != null){
+         parsedInput.remove(value);
+     }
+    }
+    @Override
+
+    public String toString() {
+        return "InputLine[" + parsedInput + "]";
+    }
+
+    public String format() {
+        String out = "";
+        String[] args = argsToStringArray();
+
+        if (!(args == null || args.length == 0)) {
+            boolean firstPass = true;
+            for (String x : args) {
+                if (firstPass) {
+                    firstPass = false;
+                    out = x;
+                } else {
+                    out = out + " " + x;
+                }
             }
         }
         return out;
@@ -48,10 +107,11 @@ public class InputLine {
         return parsedInput.subList(1, parsedInput.size());
     }
 
-   protected  List<String> parsedInput;
+    protected List<String> parsedInput;
 
     /**
      * This returns the zero-th input.
+     *
      * @return
      */
     public String getCommand() {
@@ -59,8 +119,8 @@ public class InputLine {
         return parsedInput.get(0).toLowerCase();
     }
 
-    public String getLastArg(){
-        if(size() == 0){
+    public String getLastArg() {
+        if (size() == 0) {
             throw new ArgumentNotFoundException();
         }
         return getArg(size() - 1);
@@ -69,6 +129,7 @@ public class InputLine {
     /**
      * Remember that the zero-th argument is the command, so that the arguments properly
      * begin at index = 1.
+     *
      * @param index
      * @return
      */
@@ -154,12 +215,23 @@ public class InputLine {
      * @param key
      * @return
      */
-    public String getNextArgFor(String key){
+    public String getNextArgFor(String key) {
         int index = indexOf(key);
         // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
-        if(index ==getArgs().size()){ // so it is the last arg in the string and there cannot be another
+        if (index == getArgs().size()) { // so it is the last arg in the string and there cannot be another
             return null;
         }
         return getArg(1 + index); // finally, a result!
+    }
+
+    /**
+     * Returns the number of arguments for this input line.
+     * @return
+     */
+    public int getArgCount(){
+        if(parsedInput == null || parsedInput.isEmpty()){
+            return 0;
+        }
+        return parsedInput.size() - 1;
     }
 }

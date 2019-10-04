@@ -27,7 +27,7 @@ public final class CommandLineTokenizer {
 			e.printStackTrace();
 		}
 	} // end main (for debugging)
-	protected Vector tokenize(String cl) throws MalformedCommandException {
+	public Vector tokenize(String cl) throws MalformedCommandException {
 		boolean isQuotePending = false;
 		String cl2 = cl.trim();
 		Vector outV = new Vector();
