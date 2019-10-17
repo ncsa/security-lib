@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.storage.FileStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * File-based storage for clients.
@@ -26,5 +27,11 @@ public abstract class FSClientStore<V extends Client> extends FileStore<V> imple
     @Override
     public MapConverter<V> getMapConverter() {
         return converter;
+    }
+
+    @Override
+    public void realSave(boolean checkExists, V t) {
+        t.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.realSave(checkExists, t);
     }
 }

@@ -71,6 +71,16 @@ public class BaseClient extends IdentifiableImpl {
         this.creationTS = creationTS;
     }
 
+    public Date getLastModifiedTS() {
+        return lastModifiedTS;
+    }
+
+    public void setLastModifiedTS(Date lastModifiedTS) {
+        this.lastModifiedTS = lastModifiedTS;
+    }
+
+    Date lastModifiedTS = new java.sql.Timestamp(new Date().getTime());
+
 
     @Override
     public boolean equals(Object obj) {

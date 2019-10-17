@@ -43,6 +43,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         value.setSecret(map.getString(getBKK().secret()));
         value.setName(map.getString(getBKK().name()));
         value.setCreationTS(map.getDate(getBKK().creationTS()));
+        value.setLastModifiedTS(map.getDate(getBKK().lastModifiedTS()));
         value.setEmail(map.getString(getBKK().email()));
         return value;
     }
@@ -54,6 +55,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         map.put(getBKK().email(), client.getEmail());
         map.put(getBKK().name(), client.getName());
         map.put(getBKK().creationTS(), client.getCreationTS());
+        map.put(getBKK().lastModifiedTS(), client.getLastModifiedTS());
     }
 
     public V fromJSON(JSONObject json) {
@@ -66,6 +68,14 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         if (rawDate != null) {
             try {
                 v.setCreationTS(Iso8601.string2Date(rawDate).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        rawDate = getJsonUtil().getJSONValueString(json, getBKK().lastModifiedTS());
+        if (rawDate != null) {
+            try {
+                v.setLastModifiedTS(Iso8601.string2Date(rawDate).getTime());
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -86,6 +96,9 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         getJsonUtil().setJSONValue(json, getBKK().secret(), client.getSecret());
         if (client.getCreationTS() != null) {
             getJsonUtil().setJSONValue(json, getBKK().creationTS(), Iso8601.date2String(client.getCreationTS()));
+        }
+        if (client.getLastModifiedTS() != null) {
+            getJsonUtil().setJSONValue(json, getBKK().lastModifiedTS(), Iso8601.date2String(client.getLastModifiedTS()));
         }
     }
 

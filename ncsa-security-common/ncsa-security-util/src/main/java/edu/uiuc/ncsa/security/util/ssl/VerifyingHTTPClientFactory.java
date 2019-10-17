@@ -277,12 +277,15 @@ public class VerifyingHTTPClientFactory implements Logable {
 
     /**
      * Returns a NEW trust manager with each call since the trust manager needs to have its host set.
+     * Note that this defaults to injecting
      *
      * @return
      * @throws IOException
      */
     public MyTrustManager newMyTrustManager() throws IOException {
-        return new MyTrustManager(logger, "CN=localhost", getSSLConfiguration());
+        return new MyTrustManager(logger,
+                null, // WAS CN=localhost. Probably better to not set anything. 
+                getSSLConfiguration());
     }
 
 

@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.Date;
+
 /**  Abstract class that gets the inheritance and generics right.
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/12 at  11:12 AM
@@ -30,5 +32,9 @@ public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> impleme
         return this.identifiableProvider;
     }
 
-
+    @Override
+    public void save(V value) {
+        value.setLastModifiedTS(new java.sql.Timestamp(new Date().getTime()));
+        super.save(value);
+    }
 }

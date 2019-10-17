@@ -42,28 +42,28 @@ public class ServiceClient {
 
     boolean verbose = false;
 
-    public ServiceClient(URI host, SSLConfiguration sslConfiguration) {
-        this.host = host;
+    public ServiceClient(URI address, SSLConfiguration sslConfiguration) {
+        this.address = address;
         this.sslConfiguration = sslConfiguration;
     }
 
-    URI host;
+    URI address;
 
     /**
      * Basic default service client that uses the java keystore only.
      *
-     * @param host
+     * @param address
      */
-    public ServiceClient(URI host) {
-        this.host = host;
+    public ServiceClient(URI address) {
+        this.address = address;
         SSLConfiguration sslConfiguration1 = new SSLConfiguration();
         sslConfiguration1.setUseDefaultJavaTrustStore(true);
         this.sslConfiguration = sslConfiguration1;
     }
 
     public URI host(URI... x) {
-        if (0 < x.length) host = x[0];
-        return host;
+        if (0 < x.length) address = x[0];
+        return address;
     }
 
 
@@ -81,7 +81,8 @@ public class ServiceClient {
         @Override
         public HttpClient create() {
             try {
-                return getF().getClient(host.toString());
+               // return getF().getClient(host.toString());
+                return getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
             } catch (IOException e) {
                 throw new GeneralException("Error getting https-aware client");
             }

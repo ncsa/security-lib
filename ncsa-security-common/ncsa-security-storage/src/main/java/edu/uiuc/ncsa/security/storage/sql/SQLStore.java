@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptors;
@@ -551,6 +552,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
         for (Field field : java.sql.Types.class.getFields()) {
             try {
+                DebugUtil.trace(this, "Adding JDBC field =" + field);
                 jdbcMappings.put((Integer) field.get(null), field.getName());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
@@ -563,8 +565,19 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         for (ColumnDescriptorEntry cde : cds) {
             if (!foundCols.containsKey(cde.getName().toLowerCase())) {
                 // create the column
-                System.err.println("Adding column " + cde.getName() + " of type " + cde.getType());
-                String rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType());
+                String rawStmt  = null;
+                if(cde.getType() == Types.TIMESTAMP){
+                    DebugUtil.trace(this, "Adding column " + cde.getName() + " of type TIMESTAMP = " + cde.getType());
+                    // Timestamps must be explicitly allowed to be negative or have a default time or there will be an exception.
+                    // Note that the next statement should work for versions of MySQL and for PostgreSQL. It may need
+                    // modification for other database types.
+                     rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType()) + " DEFAULT CURRENT_TIMESTAMP";
+                }else{
+                    System.err.println("Adding column " + cde.getName() + " of type " + cde.getType());
+                    rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType());
+                }
+                DebugUtil.trace(this, "Executing update statement \"" + rawStmt + "\"");
+
                 stmt.executeUpdate(rawStmt);
             }
         }

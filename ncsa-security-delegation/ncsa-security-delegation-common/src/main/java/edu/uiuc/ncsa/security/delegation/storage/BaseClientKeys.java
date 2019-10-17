@@ -13,7 +13,7 @@ public class BaseClientKeys extends SerializationKeys {
     String creationTS = "creation_ts";
     String name = "name";
     String email = "email";
-
+    String lastModifiedTS = "last_modified_ts";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
@@ -30,6 +30,11 @@ public class BaseClientKeys extends SerializationKeys {
          return creationTS;
      }
 
+    public String lastModifiedTS(String... x) {
+         if (0 < x.length) lastModifiedTS = x[0];
+         return lastModifiedTS;
+     }
+
 
     public String secret(String... x) {
         if (0 < x.length) secret = x[0];
@@ -43,6 +48,7 @@ public class BaseClientKeys extends SerializationKeys {
         allKeys.add(email());
         allKeys.add(creationTS());
         allKeys.add(secret());
+        allKeys.add(lastModifiedTS());
         return allKeys;
     }
 }

@@ -304,10 +304,28 @@ public class MyTrustManager implements X509TrustManager {
         // Essentially, we have to check that the CN and the host match,
         MyLoggingFacade ll = getLogger();
         String CN = getCommonName(cert.getSubjectX500Principal().getName());
-        //System.err.println(getClass().getSimpleName() + ".checkServerDN: CN on cert = " + CN);
+        
         if (hasServerDN()) {
-            // Fixes OAUTH-176: server DN can be overridden
+            // Fixes OAUTH-176: server DN can be injected.
+            /*
+             Note that since it is getting hard to track down the older OAUTH Jira tickets, I'll quote
+             the original for OAUTH-176 here:
+
+             -----
+             Allow specification of subjectDN in the MyProxy configuration
+             (http://grid.ncsa.illinois.edu/myproxy/oauth/server/configuration/server-myproxy.xhtml).
+             This will give the OA4MP server functionality equivalent to MYPROXY_SERVER_DN in
+             http://grid.ncsa.illinois.edu/myproxy/man/myproxy-logon.1.html and the -subject option
+             in https://github.com/jglobus/JGlobus/blob/master/myproxy/src/main/java/org/globus/myproxy/MyProxyCLI.java
+             to support the case where the hostname of the myproxy-server does not match the DN of the myproxy-server's
+             host certificate. This is useful for testing and in DNS load-balancing setups.
+             -----
+
+             However, this means allowing injecting it in to the trust manager generally, which is also a useful thing
+             to do for, say, clients with self-signed certs. 
+             */
             String configuredCN = getCommonName(getServerDN());
+            dbg(".checkServerDN: A server DN has been configured.");
             dbg(".checkServerDN: Configured serverDN has CN = " + configuredCN);
 
             if (CN.equals(configuredCN)) {
@@ -319,7 +337,7 @@ public class MyTrustManager implements X509TrustManager {
         }
         dbg(".checkServerDN: Checking cert CN against hostname");
 
-        // So if the serDN and the returned hostname do NOT match, check the cert name against the hostname
+        // So if the server DN and the returned hostname do NOT match, check the cert name against the hostname
         if (getHost().equals("localhost")) {
             try {
                 setHost(InetAddress.getLocalHost().getHostName());
