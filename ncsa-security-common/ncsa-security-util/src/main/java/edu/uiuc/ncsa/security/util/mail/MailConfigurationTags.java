@@ -21,4 +21,5 @@ public interface MailConfigurationTags extends ConfigurationTags {
     public static final String MAIL_RECIPIENTS = "recipients";
     public static final String MAIL_MESSAGE_TEMPLATE = "messageTemplate";
     public static final String MAIL_SUBJECT_TEMPLATE = "subjectTemplate";
+    public static final String MAIL_COMPONENT = "component";
 }

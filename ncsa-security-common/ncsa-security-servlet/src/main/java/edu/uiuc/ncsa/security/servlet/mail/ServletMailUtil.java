@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 import java.util.Properties;
 
 /**
+ * Note this is used in OA4MP and CILogon.
  * <p>Created by Jeff Gaynor<br>
  * on 6/25/13 at  11:00 AM
  */

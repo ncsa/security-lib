@@ -30,6 +30,7 @@ public class SSLConfigurationUtil implements Serializable {
     public static final String SSL_TRUSTSTORE_PATH = "path";
     public static final String SSL_TRUSTSTORE_PASSWORD = "password";
     public static final String SSL_TRUSTSTORE_TYPE = "type";
+    public static final String SSL_TRUSTSTORE_CERTIFICATE_DN = "certDN";
 
     public final static String TLS_VERSION_1_0 = "1.0";
     public final static String TLS_VERSION_1_1 = "1.1";
@@ -173,7 +174,7 @@ public class SSLConfigurationUtil implements Serializable {
                 sslConfiguration.setTrustRootPassword(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PASSWORD));
                 //sslKeystoreConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
                 sslConfiguration.setTrustRootType(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_TYPE));
-
+                sslConfiguration.setTrustRootCertDN(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_CERTIFICATE_DN));
             }
             if (logger != null) {
                 logger.info("Done loading SSL configuration");

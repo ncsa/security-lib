@@ -284,7 +284,6 @@ public class VerifyingHTTPClientFactory implements Logable {
      */
     public MyTrustManager newMyTrustManager() throws IOException {
         return new MyTrustManager(logger,
-                null, // WAS CN=localhost. Probably better to not set anything. 
                 getSSLConfiguration());
     }
 

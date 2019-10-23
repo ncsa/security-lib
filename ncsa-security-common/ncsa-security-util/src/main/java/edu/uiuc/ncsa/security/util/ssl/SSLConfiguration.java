@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
+import java.security.cert.X509Certificate;
+
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
 /**
@@ -17,7 +19,27 @@ public class SSLConfiguration extends SSLKeystoreConfiguration {
 
   String trustRootPassword;
 
+    /**
+     * This is used in the trust root manager to check against the certificate DN. This is useful if there are
+     * self-signed certs, since when the TrustManager invokes {@link javax.net.ssl.X509TrustManager#checkServerTrusted(X509Certificate[], String)}
+     * it invokes checkServerDN to verify that the name on the certificate matches the lookup. Normally you do
+     * not have to set this BUT in cases of self-signed certs, it may need to be manually set since the lookup for the
+     * hostname (especially localhost) might not work quite as expected without a lot of hacking of the DNS.
+     * Most common use case is this is in the client's SSL configuration and is set to "CN=localhost" for a self-signed cert.
+     * @return
+     */
+    public String getTrustRootCertDN() {
+        return trustRootCertDN;
+    }
 
+    public void setTrustRootCertDN(String trustRootCertDN) {
+        this.trustRootCertDN = trustRootCertDN;
+    }
+    public boolean hasCertDN(){
+        return trustRootCertDN!=null;
+    }
+
+    String trustRootCertDN;
     public String getTrustRootType() {
         return trustRootType;
     }

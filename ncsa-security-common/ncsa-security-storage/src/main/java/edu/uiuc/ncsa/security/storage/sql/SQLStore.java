@@ -552,7 +552,6 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
         for (Field field : java.sql.Types.class.getFields()) {
             try {
-                DebugUtil.trace(this, "Adding JDBC field =" + field);
                 jdbcMappings.put((Integer) field.get(null), field.getName());
             } catch (IllegalAccessException e) {
                 e.printStackTrace();

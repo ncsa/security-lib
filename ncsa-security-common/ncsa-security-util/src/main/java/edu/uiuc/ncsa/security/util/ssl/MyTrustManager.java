@@ -32,19 +32,10 @@ public class MyTrustManager implements X509TrustManager {
     boolean debugOn = DebugUtil.isEnabled(); // set to false for release
     boolean stackTracesOn = false; // set to false for use as a library, true for standalone release
 
-    public MyTrustManager(MyLoggingFacade logger, String trustRootPath) {
-        this(logger, null, trustRootPath);
-    }
-
-
-    public MyTrustManager(MyLoggingFacade logger, SSLConfiguration sslConfiguration) {
-        this(logger, null, sslConfiguration);
-    }
-
-    public MyTrustManager(MyLoggingFacade logger, String serverDN, SSLConfiguration sslConfiguration) {
+    public MyTrustManager(MyLoggingFacade logger,  SSLConfiguration sslConfiguration) {
         this.logger = logger;
-        this.serverDN = serverDN;
         this.sslConfiguration = sslConfiguration;
+        this.serverDN = sslConfiguration.getTrustRootCertDN();
         this.trustRootPath = sslConfiguration.getTrustrootPath();
     }
 

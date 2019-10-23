@@ -70,8 +70,12 @@ public interface ClaimSource {
 
     /**
      * Whether to run this during the authorization phase or not. That means it will either run in the authorization servlet
-     * or, if there is an external authorization application (e.g. Shibboleth) it will be invoked when the transaction has been created.
-     * The other option is to be invoked immediately before the access token is issued.
+     * or, if there is an external authorization application (e.g. Shibboleth) it will be invoked when the
+     * transaction has been created. Normally this is set true if there is some state (such as reading claims from
+     * HTTP headers) that will not exist after the authorization has happened.
+     * The other option (when this is false) is to be invoked immediately before the access token is issued.
+     * Note that if there are out of band operations (e.g. CILogon makes several calls to the backend database as it
+     * gets the user information together) then all of those should be done by the time the access token is issued.
      *
      * @return
      */
