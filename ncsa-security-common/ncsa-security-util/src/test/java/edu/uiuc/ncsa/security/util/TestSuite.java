@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        TemplateTest.class,
         FunctorParserTest.class,
         JFunctorFactoryTests.class,
         JFunctorTest.class,

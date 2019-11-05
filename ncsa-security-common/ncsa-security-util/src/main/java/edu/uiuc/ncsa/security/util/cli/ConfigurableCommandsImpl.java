@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
@@ -7,9 +8,15 @@ import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
+import net.sf.json.JSONObject;
 import org.apache.commons.cli.*;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Map;
 
 /**
  * Basic implementation of Commands. This supports loading configurations.
@@ -70,7 +77,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         say("\nExample\n");
         say("   load default /var/www/config/config.xml \n");
         say("loads the configuration named \"default\" from the file named \"config.xml\" in the directory \"/var/www/config\"\n");
-        say("Note that after a oad, any new configuration file becomes the default for future store operations.");
+        say("Note that after a load, any new configuration file becomes the default for future store operations.");
     }
 
 
@@ -132,11 +139,73 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
 
     public static final String DEFAULT_LOG_FILE = "log.xml";
-
+    public static final String ENV_OPTION = "set_env";
+    public static final String ENV_LONG_OPTION = "set_env";
 
     public static final String CONFIG_NAME_OPTION = "name";
     public static final String CONFIG_NAME_LONG_OPTION = "name";
 
+    public Map<Object, Object> getGlobalEnv() {
+        return globalEnv;
+    }
+
+    Map<Object, Object> globalEnv;
+
+    protected void readEnv(String path) {
+        // All errors loading the environment are benign.
+        File f = new File(path);
+        if (!f.exists()) {
+            say("Cannot read environment file \"" + path + "\"");
+            return;
+        }
+        if (!f.isFile()) {
+            say("\"" + path + "\" is not  file and cannot be read to set the environment.");
+            return;
+        }
+        String allLines = "";
+        try {
+            FileReader fileReader = new FileReader(f);
+            BufferedReader bf = new BufferedReader(fileReader);
+            String lineIn = bf.readLine();
+            while (lineIn != null) {
+                allLines = allLines + lineIn;
+                lineIn = bf.readLine();
+            }
+            bf.close();
+        } catch (Throwable t) {
+            say("Error loading environment: \"" + t.getMessage() + "\"");
+            if (isVerbose()) {
+                t.printStackTrace();
+            }
+
+        }
+        try {
+            JSONObject jsonObject = JSONObject.fromObject(allLines);
+            if (jsonObject != null && !jsonObject.isEmpty()) {
+                globalEnv = jsonObject;
+                return;
+            }
+        } catch (Throwable tt) {
+            // Must be a properties file...
+        }
+        // now figure out what the format is.
+        try {
+            XProperties xp = new XProperties();
+            xp.load(f);
+            if (!xp.isEmpty()) {
+                globalEnv = xp;
+            }
+        } catch (Throwable t) {
+            if (isVerbose()) {
+                t.printStackTrace();
+            }
+            say("Could not parse envirnoment file.");
+        }
+    }
+
+    /**
+     * Called at initialization to read and process the command line arguments.
+     */
     public void initialize() {
         if (getConfigFile() == null || getConfigFile().length() == 0) {
             say("Warning: no configuration file specified. type in 'load --help' to see how to load one.");
@@ -170,6 +239,10 @@ public abstract class ConfigurableCommandsImpl implements Commands {
                 throw (RuntimeException) x;
             }
             throw new GeneralException("Error initializing CLI:" + x.getMessage(), x);
+        }
+        if(hasOption(ENV_OPTION, ENV_LONG_OPTION)){
+            String envFile = getCommandLine().getOptionValue(ENV_OPTION);
+            readEnv(envFile);
         }
     }
 
@@ -306,6 +379,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         options.addOption(CONFIG_NAME_OPTION, CONFIG_NAME_LONG_OPTION, true, "Set the name of the configuration");
         options.addOption(LOG_FILE_OPTION, LOG_FILE_LONG_OPTION, true, "Set the log file");
         options.addOption(USE_COMPONENT_OPTION, USE_COMPONENT_LONG_OPTION, true, "Specify the component to use.");
+        options.addOption(ENV_OPTION, ENV_LONG_OPTION, true, "Specify the environment to use.");
         return options;
     }
 
@@ -390,6 +464,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     /**
      * Override this to invoke the specific components that make up your CLI.
+     *
      * @param inputLine
      * @return
      * @throws Exception

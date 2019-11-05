@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.security.util.functor.JFunctor;
 import edu.uiuc.ncsa.security.util.functor.JFunctorImpl;
 
 /**
- * $drop["A",""] removes A from B and returns the rest, e.g. <br/>
+ * $drop[A,B] removes A from B and returns the rest, e.g. <br/>
  * <pre>
  * $drop["@bigstate.edu","bob@bigstate.edu"]
  * </pre>

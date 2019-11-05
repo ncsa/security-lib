@@ -989,8 +989,23 @@ public class XProperties extends Properties {
             ok = ok && ((Integer) oList[1]).intValue() == integerTest;
             ok = ok && ((Double) oList[2]).doubleValue() == dd;
             System.out.println("serialized list test = " + (ok ? "ok" : "failed"));
+            System.out.println("toString(2):\n" + xp.toString(2));
         } catch (Exception x) {
             x.printStackTrace();
         }
+    }
+
+    public synchronized String toString(int indent) {
+        String blanks = "";
+        for(int i =0; i< indent; i++){
+            blanks = blanks + " ";
+        }
+        String out = "{" + (isEmpty()?"":"\n");
+        for(Object rawKey: keySet()){
+            String key = rawKey.toString();
+            out = out + blanks + key + "=" +  getString(key) + "\n";
+        }
+        out = out +  "}";
+        return out;
     }
 }

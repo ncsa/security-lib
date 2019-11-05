@@ -36,7 +36,7 @@ public class CLIDriver {
 
     /*
     Added Environment support. This allows for having any extension od CommonCommands use the set_env call
-    to pull in properties from either a Java rpoperties file or from a JSON file. Type "set_env --help" at the command
+    to pull in properties from either a Java properties file or from a JSON file. Type "set_env --help" at the command
     line to see what's what.
      */
     Map env;
@@ -59,7 +59,7 @@ public class CLIDriver {
     boolean isDone = false;
     boolean debug = false;   // This is set manually here.
 
-    public CLIDriver(Commands... cci) {
+    public CLIDriver( Commands... cci) {
         super();
         for(Commands xxx : cci){
             if(xxx instanceof CommonCommands){

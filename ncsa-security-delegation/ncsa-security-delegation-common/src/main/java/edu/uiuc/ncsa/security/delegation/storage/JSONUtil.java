@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -30,6 +31,12 @@ This method sets or gets one of the components from the JSON object
         return json.getJSONObject(getComponentName()).get(key);
     }
 
+    public JSONArray getJSONArray(JSONObject json, String key){
+        if (!hasKey(json, key)) return null;
+        Object object = getJSONValue(json, key);
+       JSONArray array =  JSONArray.fromObject(object); // should get converted from a String
+        return array;
+    }
     public String getJSONValueString(JSONObject json, String key) {
         if (!hasKey(json, key)) return null;
         Object object = getJSONValue(json, key);

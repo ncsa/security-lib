@@ -100,6 +100,14 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         this.port = port;
     }
 
+    /**
+     * This is a raw string of addresses (possibly plural) all comma separated. Each address will be checked in sequence.
+     * The idea is that there are multiple LDAP servers with identical configurations that have difference addresses in
+     * case of failure (e.g.ldap1.ncsa.illinois.edu, ladp2.ncsa.illinois.edu) and the contract is that if there are multiple
+     * addresses here, they will be sequentially checked until one of them works and then the LDAP claim source is deemed
+     * done. Only in the case that <b>all</b> the addresses fail is a failure raised. 
+     * @return
+     */
     public String getServer() {
         return server;
     }

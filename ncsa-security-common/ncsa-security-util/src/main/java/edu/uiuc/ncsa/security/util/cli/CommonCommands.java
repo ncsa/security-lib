@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import net.sf.json.JSONObject;
 
 import java.io.*;
+import java.util.Date;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
@@ -111,7 +112,7 @@ public abstract class CommonCommands implements Commands {
      * @param x
      */
     protected void say(String x) {
-        if(isPrintOuput()) {
+        if (isPrintOuput()) {
             System.out.println(defaultIndent + x);
         }
     }
@@ -229,9 +230,12 @@ public abstract class CommonCommands implements Commands {
     String ENV_ADD_FLAG = "-add";
     String ENV_OVERWRITE_FLAG = "-overwrite";
     String ENV_JSON_FLAG = "-json";
+    String ENV_KEY_FLAG = "-key";
+    String ENV_VALUE_FLAG = "-value";
 
-    protected void printSetEnvHelp() {
-        say("set_env [" + ENV_ADD_FLAG + "] " + CL_INPUT_FILE_FLAG + " file");
+
+    protected void printReadEnvHelp() {
+        say("read_env [" + ENV_ADD_FLAG + "] " + CL_INPUT_FILE_FLAG + " file");
         sayi("This takes a properties file of key/value pairs and stores them for use.");
         sayi("You may access these values in any command with a reaplacement template ${key} is replaced by its value");
         sayi("This allows you to set environment variables externally and manage them.");
@@ -241,15 +245,41 @@ public abstract class CommonCommands implements Commands {
         sayi("Otherwise, the old properties are preserved.");
         sayi(ENV_JSON_FLAG + " The properties are in a JSON object, rather than just a flat file of key=value pairs.");
         sayi("Only strings are supported and there is no guarantee as to behavior if other objects are used.");
-        say("See also: clear_env, print_env");
+        say("See also: set_env, save_env, clear_env, print_env");
     }
 
+
+    protected void printSetEnvHelp() {
+        say("set_env [" + ENV_KEY_FLAG + " key " + ENV_VALUE_FLAG + " value");
+        sayi("Set a single environment value for a given key.");
+        sayi("E.g.");
+        sayi("set_env " + ENV_KEY_FLAG + " foo " + ENV_VALUE_FLAG + " \"The quick brown fox\"");
+        sayi("would result in an environment variable named \"foo\" with the phrase \"the quick brown fox\"");
+        sayi("as its value.");
+        say("See also: set_env, clear_env");
+    }
 
     public void set_env(InputLine inputline) throws Exception {
         if (showHelp(inputline)) {
             printSetEnvHelp();
             return;
+        }
+        if (!inputline.hasArg(ENV_KEY_FLAG)) {
+            say("Sorry, no key flag specified.");
+            return;
+        }
+        if (!inputline.hasArg(ENV_VALUE_FLAG)) {
+            say("Sorry, no value flag specified.");
+            return;
+        }
+        getDriver().getEnv().put(inputline.getNextArgFor(ENV_KEY_FLAG), inputline.getNextArgFor(ENV_VALUE_FLAG));
 
+    }
+
+    public void read_env(InputLine inputline) throws Exception {
+        if (showHelp(inputline)) {
+            printReadEnvHelp();
+            return;
         }
         if (gracefulExit(!inputline.hasArg(CL_INPUT_FILE_FLAG), "Missing properties file: no " + CL_INPUT_FILE_FLAG + " switch.")) {
             return;
@@ -282,6 +312,47 @@ public abstract class CommonCommands implements Commands {
         getDriver().setEnv(map);
     }
 
+    protected void printSaveEnvHelp() {
+        say("save_env " + CL_OUTPUT_FILE_FLAG + " filePath + [" + ENV_JSON_FLAG + "]");
+        sayi("Write the current environment to the given file. If you specify the " + ENV_JSON_FLAG);
+        sayi("the contents of the file will be a JSON object. Otherwise, this will be a java properties file");
+        say("See also read_env, set_env");
+    }
+
+    public void save_env(InputLine inputLine) throws Exception {
+        if (showHelp(inputLine)) {
+            printSaveEnvHelp();
+            return;
+        }
+        if (!inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
+            say("Sorry, no file specified.");
+            return;
+        }
+        if (!getDriver().hasEnv()) {
+            // nix to do
+            return;
+        }
+        File f = new File(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG));
+        boolean isJSON = inputLine.hasArg(ENV_JSON_FLAG);
+
+        if (isJSON) {
+            JSONObject json = new JSONObject();
+            json.putAll(getDriver().getEnv());
+            String out = json.toString(2);
+            FileWriter fileWriter = new FileWriter(f);
+            fileWriter.write(out);
+            fileWriter.flush();
+            fileWriter.close();
+        }else{
+            XProperties xp = new XProperties();
+            xp.putAll(getDriver().getEnv());
+            FileOutputStream fos = new FileOutputStream(f);
+            xp.save(fos, "OA4MP environment serialized on " + (new Date()));
+            fos.flush();
+            fos.close();
+        }
+    }
+
     protected void printEnvHelp() {
         say("print_env ");
         sayi("This will print out the current list of environment variables, '(empty)' if there are none.");
@@ -290,7 +361,9 @@ public abstract class CommonCommands implements Commands {
 
     public void print_env(InputLine inputLine) throws Exception {
         if (getDriver().hasEnv()) {
-            say(getDriver().getEnv().toString());
+            XProperties xProperties = new XProperties();
+            xProperties.putAll(getDriver().getEnv());
+            say(xProperties.toString(2));
         } else {
             say("(empty)");
         }
@@ -298,14 +371,18 @@ public abstract class CommonCommands implements Commands {
 
 
     protected void clearEnvHelp() {
-        say("clear_env");
-        sayi("clear any environment variables.");
+        say("clear_env [" + ENV_KEY_FLAG + " key]");
+        sayi("clear a specific environment variable. If there is no argument, it will clear all values.");
         say("See also: set_env, print_env");
     }
 
     public void clear_env(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             clearEnvHelp();
+            return;
+        }
+        if(inputLine.hasArg(ENV_KEY_FLAG)){
+            getDriver().getEnv().remove(inputLine.getNextArgFor(ENV_KEY_FLAG));
             return;
         }
         getDriver().setEnv(null);

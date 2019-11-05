@@ -87,7 +87,9 @@ public abstract class AbstractScript {
 
     protected void executeScript(List<String> commands) {
         checkVersion();
-
+        if(commands== null || commands.isEmpty()){
+            return;
+        }
         EventDrivenParser parser = createParser();
         functorMap = new FunctorMap();
         for (String command : commands) {
