@@ -60,6 +60,21 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
         return Long.parseLong(obj.toString());
     }
 
+    /**
+     * Returns zero if the value is null;
+     * @param key
+     * @return
+     */
+    public int getInteger(String key) {
+        Object obj = get(key);
+        if(obj instanceof Integer){
+            return (Integer) get(key);
+
+        }
+        if(obj == null) return 0;
+        return Integer.parseInt(obj.toString());
+    }
+
     public boolean getBoolean(String key) {
         Object obj = get(key);
         if(obj instanceof Boolean){

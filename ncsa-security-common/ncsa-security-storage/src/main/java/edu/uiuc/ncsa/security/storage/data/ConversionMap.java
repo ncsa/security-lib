@@ -39,6 +39,12 @@ public interface ConversionMap<K, V> extends Map<K, V> {
     public long getLong(K key);
 
     /**
+     * Convenience method to change the value to an integer.
+     * @param key
+     * @return
+     */
+    public int getInteger(K key);
+    /**
      * Convenience method to change the value to a string
      * @param key
      * @return
