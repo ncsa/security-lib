@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
+import javax.crypto.SecretKey;
 import java.io.*;
+import java.security.KeyStore;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
@@ -179,5 +181,17 @@ public class SSLKeystoreConfiguration implements Serializable {
             }
         }
         return true;
+    }
+    public static void main(String[] args){
+        try{
+            // for CIL-602 -- create a Java keystore on the file from certs
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            SecretKey secretKey = null;
+            KeyStore.SecretKeyEntry secret
+             = new KeyStore.SecretKeyEntry(secretKey);
+        }catch(Throwable t){
+            t.printStackTrace();
+        }
+
     }
 }
