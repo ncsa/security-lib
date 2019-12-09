@@ -135,7 +135,23 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
     }
 
     ExceptionHandler exceptionHandler;
+    protected boolean checkContentType(String rawContentType, String contentType){
+        ServletDebugUtil.dbg(this,"checking content type = "+ rawContentType);
 
+           // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
+           // there may be several things in the content type (such as the charset, boundary, etc.) all separated
+           // by semicolons. Split it up and check that one of them is the correct type.
+           StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
+           boolean gotOne = false;
+           while(tokenizer.hasMoreTokens()){
+               String foo = tokenizer.nextToken().trim();
+               ServletDebugUtil.dbg(this,"checking encoding, next = " + foo);
+               gotOne = gotOne || foo.equals(contentType);
+               ServletDebugUtil.dbg(this,"checking encoding, gotOne = " + gotOne);
+           }
+           return gotOne;
+
+    }
     @Override
     public void doPost(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws ServletException, IOException {
         try {
@@ -171,22 +187,10 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
                 ServletDebugUtil.dbg(this,"in POST, raw content empty, throwing exception");
                 throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
             }
-            // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
-            // there may be several things in the content type (such as the charset, boundary, etc.) all separated
-            // by semicolons. Split it up and check that one of them is the correct type.
-            StringTokenizer tokenizer = new StringTokenizer(rawContentType, ";");
-            boolean gotOne = false;
-            while(tokenizer.hasMoreTokens()){
-                String foo = tokenizer.nextToken().trim();
-                ServletDebugUtil.dbg(this,"checking encoding, next = " + foo);
-                gotOne = gotOne || foo.equals("application/x-www-form-urlencoded");
-                ServletDebugUtil.dbg(this,"checking encoding, gotOne = " + gotOne);
-            }
 
-            if (!gotOne) {
+            if (!checkContentType(rawContentType, "application/x-www-form-urlencoded" )) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
                 ServletDebugUtil.dbg(this,"in POST, did NOT get one, throwing exception");
-
                 throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
             ServletDebugUtil.dbg(this,"encoding ok, starting doIt()");

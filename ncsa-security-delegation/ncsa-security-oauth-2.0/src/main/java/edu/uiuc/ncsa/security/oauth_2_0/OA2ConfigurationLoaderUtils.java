@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import static edu.uiuc.ncsa.security.oauth_2_0.OA2ConfigTags.SCOPES;
@@ -21,7 +21,7 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
 
     public static Collection<String> getScopes(ConfigurationNode cn) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (scopes == null) {
-            scopes = new ArrayList<String>();
+            scopes = new HashSet<>(); // keep the elements unique
             // First thing is to take all the basic scopes supported and include them.
             for (String s : OA2Scopes.basicScopes) {
                 scopes.add(s);
@@ -33,7 +33,7 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
                 for (int i = 0; i < kids.size(); i++) {
                     ConfigurationNode currentNode = (ConfigurationNode) kids.get(i);
 
-                    String currentScope = (String) currentNode.getValue();
+                    String currentScope = ((String) currentNode.getValue()).trim(); // in case they leave a blank or two in the config.
                     String x = Configurations.getFirstAttribute(currentNode, SCOPE_ENABLED);
                     if (x != null) {
                         boolean isEnabled = Boolean.parseBoolean(x);
@@ -46,7 +46,7 @@ public class OA2ConfigurationLoaderUtils extends ConfigUtil {
                         }
                     } else {
                         // default is if the enabled flag is omitted, to assume it is enabled and add it.
-                        scopes.add(currentScope);
+                            scopes.add(currentScope);
                     }
                 }
             }

@@ -2,9 +2,7 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
@@ -21,7 +19,6 @@ public class CLIDriver {
      * is thrown.
      */
     public static final String EXIT_COMMAND = "/exit";
-    public static final String CLEAR_COMMAND = "/clear";
 
     public static final int OK_RC = 0;
     public static final int ABNORMAL_RC = -1;
@@ -31,8 +28,13 @@ public class CLIDriver {
 
 
     List<String> commandHistory = new LinkedList<>();
-    public static final String REPEAT_LAST_COMMAND = "/r";
+    public static final String PRINT_HELP_COMMAND = "/?";
+    public static final String CLEAR_BUFFER_COMMAND = "/c";
+    public static final String LOAD_BUFFER_COMMAND = "/l";
     public static final String HISTORY_LIST_COMMAND = "/h";
+    public static final String SHORT_EXIT_COMMAND = "/q";
+    public static final String REPEAT_LAST_COMMAND = "/r";
+    public static final String WRITE_BUFFER_COMMAND = "/w";
 
     /*
     Added Environment support. This allows for having any extension od CommonCommands use the set_env call
@@ -49,9 +51,10 @@ public class CLIDriver {
         this.env = env;
     }
 
-    public boolean hasEnv(){
+    public boolean hasEnv() {
         return env != null && !env.isEmpty();
     }
+
     private Commands[] commands; // implementation of this abstract class.
     CommandLineTokenizer CLT = new CommandLineTokenizer();
 
@@ -59,11 +62,11 @@ public class CLIDriver {
     boolean isDone = false;
     boolean debug = false;   // This is set manually here.
 
-    public CLIDriver( Commands... cci) {
+    public CLIDriver(Commands... cci) {
         super();
-        for(Commands xxx : cci){
-            if(xxx instanceof CommonCommands){
-                ((CommonCommands)xxx).setDriver(this);
+        for (Commands xxx : cci) {
+            if (xxx instanceof CommonCommands) {
+                ((CommonCommands) xxx).setDriver(this);
             }
         }
         setCLICommands(cci);
@@ -94,24 +97,141 @@ public class CLIDriver {
         return getBufferedReader().readLine();
     }
 
-    protected static final int NEW_COMMAND = 0;
-    protected static final int REPEAT_COMMAND = 10;
-    protected static final int HISTORY_COMMAND = 20;
-    protected static final int EXECUTE_COMMAND = 30;
+    protected static final int NEW_COMMAND_VALUE = 0;
+    protected static final int REPEAT_COMMAND_VALUE = 10;
+    protected static final int HISTORY_COMMAND_VALUE = 20;
+    protected static final int WRITE_BUFFER_COMMAND_VALUE = 30;
+    protected static final int READ_BUFFER_COMMAND_VALUE = 40;
+    protected static final int CLEAR_BUFFER_COMMAND_VALUE = 50;
+    protected static final int SHORT_EXIT_COMMAND_VALUE = 60;
+    protected static final int PRINT_HELP_COMMAND_VALUE = 70;
 
     // TODO - Add more CLI-level commands?
     // Might very well want to fold this into the standard flow rather than intercept it first.
-    // Have to think about that...
-    // Might want
-    //  /s file = save/serialize history buffer to file,
-    //  /d file = import/deserialize buffer from file
-    //  /i file = interpret all the commands in a file, i.e. run a script.
+    //  /i file = interpret all the commands in a file, i.e. run a script. No arg runs command buffer as batch file????
     protected int getCommandType(String cmdLine) {
         StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
         String nextToken = st.nextToken();
-        if (nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND;
-        if (nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND;
-        return NEW_COMMAND;
+        if (nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND_VALUE;
+        if (nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND_VALUE;
+        if (nextToken.equals(WRITE_BUFFER_COMMAND)) return WRITE_BUFFER_COMMAND_VALUE;
+        if (nextToken.equals(LOAD_BUFFER_COMMAND)) return READ_BUFFER_COMMAND_VALUE;
+        if (nextToken.equals(CLEAR_BUFFER_COMMAND)) return CLEAR_BUFFER_COMMAND_VALUE;
+        if (nextToken.equals(SHORT_EXIT_COMMAND)) return SHORT_EXIT_COMMAND_VALUE;
+        if (nextToken.equals(PRINT_HELP_COMMAND)) return PRINT_HELP_COMMAND_VALUE;
+        return NEW_COMMAND_VALUE;
+    }
+
+    protected void printHelp(){
+        String indent = "  ";
+        // This is help for the built in commands here
+        say("Command buffer commands. These are understood at all times and are interpreted before");
+        say(indent + "any commands are issued.");
+        say(indent + PRINT_HELP_COMMAND + " = print this help");
+        say(indent + CLEAR_BUFFER_COMMAND + " =  clear the command history");
+        say(indent + LOAD_BUFFER_COMMAND + " path = load the command history saved in the path");
+        say(indent + HISTORY_LIST_COMMAND + " [index] = either print the entire command history (no argument)");
+        say(indent + indent + " or re-execute the command at the given index.");
+        say(indent + SHORT_EXIT_COMMAND + " = shorthand to exit this component");
+        say(indent + REPEAT_LAST_COMMAND + " = re-evaluate the most recent (0th index) command in the history");
+        say(indent + indent + "This is equivalent to issuing " + HISTORY_LIST_COMMAND + " 0");
+        say(indent + WRITE_BUFFER_COMMAND + " path = write the command history to the given file" );
+
+        say("E.g.");
+        say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
+    }
+    protected String doRepeatCommand() {
+        if (0 < commandHistory.size()) {
+            return commandHistory.get(0);
+        }
+        say("no commands found");
+        return null;
+    }
+
+    protected String doHistory(String cmdLine) {
+        // Either of the following work:
+        // /h == print history with line numbers
+        // /h int = execute line # int, or print history if that fails
+        StringTokenizer st = new StringTokenizer(cmdLine, " ");
+        st.nextToken(); // This is the "/h" which we already know about
+        boolean printIt = true;
+        if (st.hasMoreTokens()) {
+            try {
+                int lineNo = Integer.parseInt(st.nextToken());
+                if (0 <= lineNo && lineNo < commandHistory.size()) {
+                    return commandHistory.get(lineNo);
+                }
+            } catch (Throwable t) {
+                // do nothing, just print out the history.
+            }
+        }
+        if (printIt) {
+            for (int i = 0; i < commandHistory.size(); i++) {
+                // an iterator actually prints these in reverse order. Print them in order.
+                say(i + ": " + commandHistory.get(i));
+            }
+        }
+        return null;
+    }
+
+    protected void doBufferWrite(String cmdLine) throws Exception {
+        String rawFile = cmdLine.substring(WRITE_BUFFER_COMMAND.length()).trim();
+        if (rawFile == null || rawFile.isEmpty()) {
+            say("Sorry, missing file path.");
+            return;
+        }
+        if (commandHistory.isEmpty()) {
+            say("(empty command buffer)");
+            return;
+        }
+        File f = new File(rawFile);
+        FileWriter fileWriter = new FileWriter(f);
+        long byteCount = 0L;
+        for (String newLine : commandHistory) {
+            newLine = newLine + "\n";
+            byteCount = byteCount + newLine.length();
+            fileWriter.write(newLine);
+        }
+        fileWriter.flush();
+        fileWriter.close();
+        say("wrote " + byteCount + " bytes to " + rawFile);
+
+    }
+
+    protected void doBufferRead(String cmdLine) throws Exception {
+        String rawFile = cmdLine.substring(LOAD_BUFFER_COMMAND.length()).trim();
+        if (rawFile == null || rawFile.isEmpty()) {
+            say("Sorry, missing file path.");
+            return;
+        }
+        File f = new File(rawFile);
+        if (!f.exists()) {
+            say("Sorry, the file \"" + rawFile + "\" does not exist");
+            return;
+        }
+        if (!f.isFile()) {
+            say("Sorry but \"" + rawFile + "\" is not a file");
+            return;
+        }
+
+        if (!f.canRead()) {
+            say("Sorry but \"" + rawFile + "\" cannot be read.");
+            return;
+        }
+        FileReader fr = new FileReader(f);
+        BufferedReader br = new BufferedReader(fr);
+        String newLine = br.readLine();
+        long byteCount = 0L;
+        int lineCount = 0; //read one
+        commandHistory = new LinkedList();
+        while (newLine != null) {
+            lineCount++;
+            byteCount = byteCount + newLine.length();
+            commandHistory.add(newLine);
+            newLine = br.readLine();
+        }
+        br.close();
+        say(byteCount + " bytes read, " + lineCount + " line" + (lineCount == 1 ? "" : "s") + " added.");
     }
 
     /**
@@ -128,49 +248,43 @@ public class CLIDriver {
             try {
                 say2(prompt);
                 cmdLine = readline();
-                if(hasEnv()){
+                if (hasEnv()) {
                     cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
                 }
                 boolean storeLine = true;
-                if (cmdLine.equals(REPEAT_LAST_COMMAND)) {
-                    if (0 < commandHistory.size()) {
-                        cmdLine = commandHistory.get(0);
+                switch (getCommandType(cmdLine)) {
+                    case REPEAT_COMMAND_VALUE:
+                        cmdLine = doRepeatCommand();
+                        storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
+                        break;
+                    case HISTORY_COMMAND_VALUE:
+                        cmdLine = doHistory(cmdLine);
+                        if (cmdLine == null) {
+                            continue;// if there is nothing in the buffer, cmdLine is null, don't store it.
+                        }
                         storeLine = false;
-                    } else {
-                        say("no commands found");
-                    }
-                }
-                /*
-                NOTE that the history command also executes lines in the buffer if the number is given.
-                 */
-                if (cmdLine.trim().startsWith(HISTORY_LIST_COMMAND)) {
-                    // Either of the following work:
-                    // /h == print history with line numbers
-                    // /h int = execute line # int, or print history if that fails
-                    StringTokenizer st = new StringTokenizer(cmdLine, " ");
-                    st.nextToken(); // This is the "/h" which we already know about
-                    boolean printIt = true;
-                    if (st.hasMoreTokens()) {
-                        try {
-                            int lineNo = Integer.parseInt(st.nextToken());
-                            if (0 <= lineNo && lineNo < commandHistory.size()) {
-                                cmdLine = commandHistory.get(lineNo);
-                                storeLine = false;
-                                printIt = false;
-                            }
-                        } catch (Throwable t) {
-                            // do nothing, just print out the history.
-                        }
-                    }
-                    if (printIt) {
-                        for (int i = 0; i < commandHistory.size(); i++) {
-                            // an iterator actually prints these in reverse order. Print them in order.
-                            say(i + ": " + commandHistory.get(i));
-                        }
+                        break;
+                    case WRITE_BUFFER_COMMAND_VALUE:
+                        doBufferWrite(cmdLine);
                         continue;
-                    }
+                    case READ_BUFFER_COMMAND_VALUE:
+                        doBufferRead(cmdLine);
+                        continue;
+                    case CLEAR_BUFFER_COMMAND_VALUE:
+                        commandHistory = new LinkedList<>();
+                        say("Command history cleared.");
+                        continue;
+                    case SHORT_EXIT_COMMAND_VALUE:
+                        quit(null);
+                        return;
+                    case PRINT_HELP_COMMAND_VALUE:
+                        printHelp();
+                        continue;
+                    case NEW_COMMAND_VALUE:
+                    default:
                 }
                 if (storeLine) {
+                    // Store it if it was not retrieved from the command history.
                     commandHistory.add(0, cmdLine);
                 }
                 switch (execute(cmdLine)) {
@@ -204,6 +318,7 @@ public class CLIDriver {
 
     /**
      * So that various other programs can call this as needed
+     *
      * @param cmds
      * @return
      */

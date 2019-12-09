@@ -58,7 +58,7 @@ public abstract class HierarchicalConfigProvider<T> implements Provider<T>, CfgE
     }
 
     /**
-     * Gets the attribute with the given key. This slaps "[@" and "]" around the key to conform wit
+     * Gets the attribute with the given key. This slaps "[@" and "]" around the key to conform with
      * how Apache resolves these.
      *
      * @param key

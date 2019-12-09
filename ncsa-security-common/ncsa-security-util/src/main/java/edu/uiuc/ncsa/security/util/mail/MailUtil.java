@@ -20,6 +20,7 @@ import java.util.Properties;
 
 /**
  * A utility for sending messages via SMTP or SMTPS using Java mail.
+ * A MailUtil object contains a complete configuration for sending messages.
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/11 at  1:18 PM
  */
@@ -64,12 +65,21 @@ public class MailUtil extends TemplateUtil implements Logable {
         return getMailEnvironment().mailEnabled;
     }
 
-    public static class MailEnvironment extends AbstractEnvironment {
+    public static class MailEnvironment extends AbstractEnvironment implements  MailConfigurationTags{
         public MailEnvironment(boolean mailEnabled) {
             this.mailEnabled = mailEnabled;
         }
 
         boolean starttls = false;
+
+        /**
+         * Populate from a map
+         * @param map
+         */
+        public MailEnvironment(Map<String, Object> map) {
+             if(map.containsKey(MAIL_ENABLED)) this.mailEnabled = (boolean) map.get(MAIL_ENABLED);
+             if(map.containsKey(MAIL_MESSAGE_TEMPLATE))this.messageTemplate = (String) map.get(MAIL_MESSAGE_TEMPLATE);
+        }
 
         public MailEnvironment(
                 boolean mailEnabled,
@@ -96,6 +106,15 @@ public class MailUtil extends TemplateUtil implements Logable {
             this.starttls = starttls;
         }
 
+        /**
+         * Take
+         * @param otherME
+         */
+        public void update(MailEnvironment otherME){
+
+        }
+
+/*
         protected void init(boolean mailEnabled,
                             String server,
                             int port,
@@ -135,6 +154,7 @@ public class MailUtil extends TemplateUtil implements Logable {
             debug("Email uses ssl: " + (useSSL ? "y" : "n") + ", server=" + server + ", sender=" + from);
 
         }
+*/
 
 
         boolean mailEnabled;
