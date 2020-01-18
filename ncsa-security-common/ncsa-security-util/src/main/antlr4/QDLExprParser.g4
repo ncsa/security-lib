@@ -19,6 +19,7 @@ expression
  | prefix=('++'|'--') expression                        #prefix
  | '-' expression                                       #unaryMinusExpression
  | '!' expression                                       #notExpression
+ | expression op=('*' | '/') expression                 #multiplyExpression
  | expression op=('+' | '-') expression                 #addExpression
  | expression op=('<' | '>' | '<=' | '>=') expression   #compExpression
  | expression op=('==' | '!=') expression               #eqExpression

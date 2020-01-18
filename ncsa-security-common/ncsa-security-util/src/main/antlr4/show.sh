@@ -11,4 +11,4 @@ echo "reading command file from "  $SCRIPT_DIR
 echo "switching to directory " $OUT_DIR
 cd $OUT_DIR
 echo "running file " $SCRIPT_DIR$1
-java -cp $ANTLR4_CP: org.antlr.v4.gui.TestRig QDLParser elements -gui $SCRIPT_DIR$1
+java -cp $ANTLR4_CP: org.antlr.v4.gui.TestRig $OUT_DIR/QDL elements -diagnostics -gui $SCRIPT_DIR$1

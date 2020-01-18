@@ -3,11 +3,11 @@
 
 
 */
-grammar QDL2VariableParser;
+grammar QDLVariableParser;
 
 scalar : ID ;
 
-stem : ID '.' (ID | Number);
+stem : ID '.' ((ID | Number) '.')* (ID|Number)?;
 
 
 // Lexer stuff
@@ -28,6 +28,8 @@ stem : ID '.' (ID | Number);
 
 // Constants. These are here so they are lexical units and the parser can access them as such.
 
+    Times   : '*';
+    Divide  : '/';
     PlusPlus: '++';
        Plus : '+';
   MinusMinus: '--';

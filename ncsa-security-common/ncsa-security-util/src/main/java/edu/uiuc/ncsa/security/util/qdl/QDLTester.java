@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.util.qdl;
 
 import edu.uiuc.ncsa.security.util.qdl.generated.QDLParserLexer;
 import edu.uiuc.ncsa.security.util.qdl.generated.QDLParserParser;
+import edu.uiuc.ncsa.security.util.qdl.parsing.QDLDebugListener;
 import org.antlr.v4.runtime.*;
 
 import java.io.FileReader;
@@ -38,25 +39,25 @@ public class QDLTester {
                 throw new IllegalStateException("failed to parse at line " + line + " due to " + msg, e);
             }
         });
-        QDLListener qdlListener = new QDLListener();
+        QDLDebugListener qdlListener = new QDLDebugListener();
         p.addParseListener(qdlListener);
         p.elements();
     }
 
     protected static void test1() throws Throwable {
         String in = "the ${speed} brown \n${dawg} jumped.";
-        HashMap<String, Object> templates = new HashMap<>();
+        HashMap<String, String> templates = new HashMap<>();
         templates.put("speed", "quick");
         templates.put("dawg", "fox");
         StringReader sr = new StringReader(in);
-        QDLRunner runner = new QDLRunner();
-        StringReader rc = (StringReader) runner.proProcessStream(sr, templates);
+        QDLParserDriver runner = new QDLParserDriver(templates);
+        StringReader rc = (StringReader) runner.preProcessStream(sr, templates);
         System.out.println(rc.toString());
     }
 
     protected static void testVars() throws Throwable {
         FileReader vars = new FileReader("/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/resources/antlr4/test-variables.cmd");
-        QDLRunner runner = new QDLRunner();
+        QDLParserDriver runner = new QDLParserDriver(new HashMap());
         runner.execute(vars);
     }
 }
