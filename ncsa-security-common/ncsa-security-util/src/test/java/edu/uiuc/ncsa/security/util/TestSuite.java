@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
-import edu.uiuc.ncsa.security.util.qdl.*;
+import edu.uiuc.ncsa.security.util.cache.CacheTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -12,22 +12,13 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        QDLVariableTest.class,
-        TestMonadicOperations.class,
-        TestDyadicOperations.class,
-        ExpressionTest.class,
-        StatementTest.class,
-        IOFunctionTest.class,
-        StringFunctionTests.class,
-        MathFunctionsTest.class,
-        StemFunctionsTest.class
-    /*    TemplateTest.class,
+        TemplateTest.class,
         FunctorParserTest.class,
         JFunctorFactoryTests.class,
         JFunctorTest.class,
         JSONPreprocessorTest.class,
         CacheTest.class,
-        EditorTest.class */
+        EditorTest.class
 })
 public class TestSuite extends junit.framework.TestSuite {
 }

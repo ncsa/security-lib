@@ -68,7 +68,6 @@ import java.util.TimeZone;
  * fractions of seconds are handled in an unintiutive way so that errors were being consistently introduced. The method
  * <code>fixSeconds</code> fixes this and there are regression tests to catch this now as well.
  *
- * @author Joe Futrelle
  */
 public class Iso8601 {
     /**

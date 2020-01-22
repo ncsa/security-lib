@@ -41,7 +41,8 @@
     </properties>
     <modules>
         <module>ncsa-security-common</module>
-        <module>ncsa-security-delegation</module>
+	<module>ncsa-security-delegation</module>
+	<module>ncsa-qdl</module>
     </modules>
     <dependencies>
         <dependency>
