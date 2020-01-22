@@ -70,6 +70,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     protected void printKids(ParserRuleContext ctx) {
         sayii("this <" + ctx.getText() + ">=[" + Integer.toHexString(ctx.hashCode()) + "]");
         sayii("parent = [" + Integer.toHexString(ctx.getParent().hashCode()) + "]");
+        sayii("child count = " + ctx.getChildCount());
         if (ctx.children != null) {
             for (ParseTree parseTree : ctx.children) {
                 sayii("child <" + parseTree.getText() + ">=[" + Integer.toHexString(parseTree.hashCode()) +

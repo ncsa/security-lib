@@ -86,6 +86,11 @@ public class SymbolStack extends AbstractSymbolTable {
         getRightST(variableName).setStringValue(variableName, value);
     }
 
+    @Override
+    public void setValue(String variableName, Object value) {
+           getRightST(variableName).setValue(variableName, value);
+    }
+
     /**
      * Generally use this method. So the searchSTs looks in all the tables, including the current one. If none of them
      * work, then the default is to work with the zero-th table. So this searches and returns

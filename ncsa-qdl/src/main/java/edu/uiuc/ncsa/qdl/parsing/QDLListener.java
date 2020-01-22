@@ -4,15 +4,14 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.statements.ConditionalStatement;
-import edu.uiuc.ncsa.qdl.statements.Element;
-import edu.uiuc.ncsa.qdl.statements.Statement;
-import edu.uiuc.ncsa.qdl.statements.WhileLoop;
+import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.net.URI;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -98,19 +97,32 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, new Assignment());
     }
 
-    protected Statement resolveChild(ParseTree currentChild) {
+    protected Statement resolveChild(ParseTree currentChild, boolean removeChild) {
         // the most common pattern is that a child node or one of its children is
         // the actual node we need. This checks if the argument is a child in the table
         // and returns that, if not it starts to look through descendents.
         String id = IDUtils.createIdentifier(currentChild);
         if (parsingMap.containsKey(id)) {
-            return parsingMap.getStatementFromContext(currentChild);
+            Statement s = parsingMap.getStatementFromContext(currentChild);
+            if (removeChild) {
+                parsingMap.remove(IDUtils.createIdentifier(currentChild));
+            }
+            return s;
         }
         ParseRecord p = parsingMap.findFirstChild(currentChild);
         if (p != null && p instanceof StatementRecord) {
-            return ((StatementRecord) p).statement;
+            Statement s = ((StatementRecord) p).statement;
+            if (removeChild) {
+                parsingMap.remove(IDUtils.createIdentifier(currentChild));
+            }
+            return s;
         }
         return null;
+
+    }
+
+    protected Statement resolveChild(ParseTree currentChild) {
+        return resolveChild(currentChild, false);
     }
 
     @Override
@@ -119,7 +131,7 @@ public class QDLListener implements QDLParserListener {
         // The variable is the 0th child, the argument is the 2nd.
         assignment.setVariableReference(ctx.children.get(0).getText());
         ParseTree valueNode = ctx.children.get(2);
-        ExpressionNode arg  = (ExpressionNode) resolveChild(ctx.children.get(2));
+        ExpressionNode arg = (ExpressionNode) resolveChild(ctx.children.get(2));
         assignment.setArgument(arg);
     }
 
@@ -140,13 +152,14 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitFunction(QDLParserParser.FunctionContext ctx) {
+        // Note that this resolves **all** functions, specifically the built in ones.
         Polyad polyad = (Polyad) parsingMap.getStatementFromContext(ctx);
         // need to process its argument list.
         // There are 3 children  "f(" arglist ")", so we want the middle one.
+
         String name = ctx.getChild(0).getText();
         if (name.endsWith("(")) {
             name = name.substring(0, name.length() - 1);
-
         }
         polyad.setName(name);
         polyad.setOperatorType(state.getFunctionType(name));
@@ -154,6 +167,7 @@ public class QDLListener implements QDLParserListener {
         for (int i = 0; i < kids.getChildCount(); i++) {
             ParseTree kid = kids.getChild(i);
             if (!kid.getText().equals(",")) {
+
                 // add it.
                 //        dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
                 polyad.getArgumments().add((ExpressionNode) resolveChild(kid));
@@ -178,7 +192,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitFunctions(QDLParserParser.FunctionsContext ctx) {
-
     }
 
     @Override
@@ -207,7 +220,6 @@ public class QDLListener implements QDLParserListener {
         ConstantNode constantNode = new ConstantNode(value, Constant.LONG_TYPE);
         stash(ctx, constantNode);
     }
-
 
 
     @Override
@@ -426,7 +438,10 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitElement(QDLParserParser.ElementContext ctx) {
         // Find the correct statement and put it in the element
-        StatementRecord statementRecord = (StatementRecord) parsingMap.findFirstChild(ctx);
+        StatementRecord statementRecord = (StatementRecord) parsingMap.findFirstChild(ctx, true);
+        if (statementRecord == null) {
+            return;
+        }
         String id = IDUtils.createIdentifier(ctx);
         ElementRecord elementRecord = (ElementRecord) parsingMap.get(id);
         elementRecord.getElement().setStatement(statementRecord.statement);
@@ -510,26 +525,16 @@ public class QDLListener implements QDLParserListener {
         doLoop(ctx);
     }
 
-    protected void doLoop(ParseTree ctx) {
+    protected void doLoop(QDLParserParser.LoopStatementContext ctx) {
         // single line loop tests
         //a:=3; while[ a < 6 ]do[ q:= 6; say(q + a++); ]; // prints 9 10 11
         //a:=3; while[ a < 6 ]do[ q:= 6; say(q+a); ++a;]; // prints 9 10 11
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q+a); a--;]; // prints 14 13
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q + --a); ]; // prints 13 12
         WhileLoop whileLoop = (WhileLoop) parsingMap.getStatementFromContext(ctx);
-        //#0 is while[ // #1 is conditional, #2 is ]do[. #3 starts the statements
-        whileLoop.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
-        try {
-            for (int i = 3; i < ctx.getChildCount(); i++) {
-                ParseTree p = ctx.getChild(i);
-                if (p.getText().equals(";") || p.getText().equals("]")) {
-                    continue;
-                }
-                Statement s = resolveChild(p);
-                whileLoop.getStatements().add(s);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
+        whileLoop.setConditional((ExpressionNode) parsingMap.getStatementFromContext(ctx.expression()));
+        for (QDLParserParser.StatementContext stmt : ctx.statement()) {
+            whileLoop.getStatements().add(resolveChild(stmt));
         }
     }
 
@@ -545,12 +550,38 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterDefineStatement(QDLParserParser.DefineStatementContext ctx) {
+        parsingMap.startMark();
+    }
+
+    protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
+        FunctionRecord functionRecord = new FunctionRecord();
+        functionRecord.sourceCode = defineContext.getText();
+        if (!functionRecord.sourceCode.endsWith(";")) {
+            functionRecord.sourceCode = functionRecord.sourceCode + ";";
+        }
+        QDLParserParser.FunctionContext nameAndArgsNode = defineContext.function();
+        String name = nameAndArgsNode.getChild(0).getText();
+        if (name.endsWith("(")) {
+            name = name.substring(0, name.length() - 1);
+        }
+        functionRecord.name = name;
+        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+            functionRecord.argNames.add(argListContext.getText());
+        }
+        for (QDLParserParser.StatementContext sc : defineContext.statement()) {
+            functionRecord.statements.add(resolveChild(sc));
+        }
+        state.getFunctionTable().put(functionRecord);
+        parsingMap.rollback();
+        parsingMap.endMark();
+        parsingMap.clearMark();
 
     }
 
+
     @Override
     public void exitDefineStatement(QDLParserParser.DefineStatementContext ctx) {
-
+        doDefine2(ctx);
     }
 
     @Override
@@ -575,11 +606,39 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
+        ModuleStatement module = new ModuleStatement();
+        stash(ctx, module);
+        // keep the top level module but don't let the system try to turn anything else in to statements.
+        parsingMap.startMark();
+    }
 
+    protected String stripSingleQuotes(String rawString) {
+        String out = rawString.trim();
+        if (out.startsWith("'")) {
+            out = out.substring(1);
+        }
+        if (out.endsWith("'")) {
+            out = out.substring(0, out.length() - 1);
+        }
+        return out;
     }
 
     @Override
-    public void exitModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
+    public void exitModuleStatement(QDLParserParser.ModuleStatementContext moduleContext) {
+        // module['uri:/foo','bar']body[ say( 'hi');]; // single line test
+        ModuleStatement module = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
+        URI namespace = URI.create(stripSingleQuotes(moduleContext.STRING(0).toString()));
+        String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
+        module.setNamespace(namespace);
+        module.setAlias(alias);
+        for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
+            module.getStatements().add(resolveChild(stmt));
+        }
+
+
+        parsingMap.endMark();
+        parsingMap.rollback();
+        parsingMap.clearMark();
 
     }
 

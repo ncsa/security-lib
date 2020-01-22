@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -39,10 +40,28 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             metaEvaluator.addEvaluator(new IOEvaluator());
             metaEvaluator.addEvaluator(new MathEvaluator());
             metaEvaluator.addEvaluator(new ControlEvaluator());
+            metaEvaluator.addEvaluator(new FunctionEvaluator());
+
         }
         return metaEvaluator;
     }
 
+
+    /**
+     * Adds this table to the function evaluator. 
+     * @param functionTable
+     */
+    public void addFunctionTable(FunctionTable functionTable){
+        for(AbstractFunctionEvaluator e : evaluators){
+            if(e instanceof FunctionEvaluator){
+                FunctionEvaluator fe = (FunctionEvaluator)e;
+                if(!fe.functionTables.contains(functionTable)) {
+                    fe.addFunctionTable(functionTable);
+                }
+            }
+        }
+
+    }
     public static void setMetaEvaluator(MetaEvaluator metaEvaluator) {
         MetaEvaluator.metaEvaluator = metaEvaluator;
     }

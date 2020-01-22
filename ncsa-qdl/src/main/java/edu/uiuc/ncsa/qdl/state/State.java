@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 /**
  * /**
@@ -16,14 +17,26 @@ public class State {
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
+                 FunctionTable functionTable,
                  ModuleMap moduleMap) {
         this.resolver = resolver;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.moduleMap = moduleMap;
+        this.functionTable = functionTable;
+        metaEvaluator.addFunctionTable(functionTable);
     }
 
+    public FunctionTable getFunctionTable() {
+        return functionTable;
+    }
+
+    public void setFunctionTable(FunctionTable functionTable) {
+        this.functionTable = functionTable;
+    }
+
+    FunctionTable functionTable;
     public ModuleMap getModuleMap() {
         return moduleMap;
     }
@@ -91,7 +104,12 @@ public class State {
     public State newLocalState() {
         SymbolStack newStack = new SymbolStack(resolver, symbolStack.getParentTables());
         newStack.addParent(new SymbolTableImpl(resolver));
-        State newState = new State(resolver, newStack, getOpEvaluator(), getMetaEvaluator(), getModuleMap());
+        State newState = new State(resolver,
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                getFunctionTable(),
+                getModuleMap());
         return newState;
     }
 }

@@ -6,7 +6,7 @@ grammar QDLControlParser;
 
 import QDLVariableParser,QDLExprParser;
 
-element : (statement ';' ) | moduleStatement ;
+element : (statement ';' ) | (moduleStatement ';') ;
 
 statement :
             defineStatement
@@ -39,7 +39,7 @@ defineStatement:
      DefineStatement function BodyStatement (statement ';')* LeftBracket;
 
 moduleStatement:
-     ModuleStatement (statement ';')* BodyStatement (statement ';')* LeftBracket;
+     ModuleStatement STRING (',' STRING)? BodyStatement (statement ';')* LeftBracket;
 
 tryCatchStatement:
      TryStatement (statement ';')* CatchStatement (statement ';')* LeftBracket;

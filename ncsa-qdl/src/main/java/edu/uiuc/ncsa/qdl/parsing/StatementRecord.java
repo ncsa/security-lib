@@ -18,9 +18,9 @@ public class StatementRecord extends ParseRecord {
     @Override
     public String toString() {
         return "StatementRecord[" +
-                "identifier='" + identifier + '\'' +
-                ", parentIdentifier='" + parentIdentifier + '\'' +
-                ", statement=" + statement +
+                "id='" + identifier + '\'' +
+                ", parentId='" + parentIdentifier + '\'' +
+                ", stmt=" + statement +
                 ']';
     }
 }

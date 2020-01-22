@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -47,7 +48,9 @@ public class QDLCommands extends CommonCommands {
             state = new State(NamespaceResolver.getResolver(),
                     stack   ,
                     new OpEvaluator(),
-                    MetaEvaluator.getInstance(), new ModuleMap());
+                    MetaEvaluator.getInstance(),
+                    new FunctionTable(),
+                    new ModuleMap());
         }
         return state;
 

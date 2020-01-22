@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.exceptions.ImportException;
-import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
@@ -43,7 +41,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         setValue(variableName, value);
     }
 
-    protected boolean setModuleValue(String variable, Object value) {
+    /*protected boolean setModuleValue(String variable, Object value) {
         if(!isImported(variable)){
             return false;
         }
@@ -61,7 +59,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
             module.getSymbols().setValue(tail, value);
             return true;
         }
-    }
+    }*/
 
     /**
      * Called internally after all checks etc, have been done. In particular, this does NOT check if the
@@ -71,8 +69,8 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
      * @param variableName
      * @param value
      */
-    protected void setValue(String variableName, Object value) {
-        if(setModuleValue(variableName, value)) return;
+    public void setValue(String variableName, Object value) {
+     //   if(setModuleValue(variableName, value)) return;
         if (!isStem(variableName)) {
             map.put(variableName, value);
             return;
@@ -150,7 +148,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         return var.contains("#");
     }
 
-    protected Module findModule(String variable) {
+   /* protected Module findModule(String variable) {
         if (isImported(variable)) {
             String head = getHashHead(variable);
             String tail = getHashTail(variable);
@@ -165,14 +163,14 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         }
         return null;
     }
-
-    protected Object checkImports(String variable) {
+*/
+    /*protected Object checkImports(String variable) {
         Module module = findModule(variable);
         if (module != null) {
             return module.getSymbols().resolveValue(getHashTail(variable));
         }
         return null;
-    }
+    }*/
 
     /**
      * This will do lookups <b>including resolutions for stem variables.</b>
@@ -182,11 +180,11 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
      */
     @Override
     public Object resolveValue(String variable) {
-        Object obj = checkImports(variable);
+   /*     Object obj = checkImports(variable);
         if (obj != null) {
             return obj;
         }
-        boolean isStem = isStem(variable);
+   */     boolean isStem = isStem(variable);
         if (!isStem) {
             if (map.containsKey(variable)) {
                 return map.get(variable);

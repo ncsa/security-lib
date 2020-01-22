@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.Element;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -54,6 +55,7 @@ public class QDLParserDriver {
                 new SymbolStack(namespaceResolver),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
+                new FunctionTable(),
                 new ModuleMap());
     }
 

@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.statements.Element;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class QDLRunner {
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
+                    new FunctionTable(),
                     new ModuleMap());
         }
         return state;
@@ -62,7 +64,10 @@ public class QDLRunner {
         try {
             State currentState = getState();
             for (Element element : elements) {
-                element.getStatement().evaluate(currentState);
+                if(element.getStatement()!= null) {
+                    // it can happen that the parser returns an empty statement. Skip it.
+                    element.getStatement().evaluate(currentState);
+                }
             }
         } catch (Throwable t) {
             t.printStackTrace();

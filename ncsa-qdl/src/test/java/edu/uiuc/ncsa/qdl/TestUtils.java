@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,6 +30,7 @@ public class TestUtils {
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
+                new FunctionTable(),
                 new ModuleMap());
         return state;
     }
@@ -42,7 +44,9 @@ public class TestUtils {
            State state = new State(namespaceResolver,
                    getTestSymbolStack(),
                    new OpEvaluator(),
-                   MetaEvaluator.getInstance(), new ModuleMap());
+                   MetaEvaluator.getInstance(),
+                   new FunctionTable(),
+                   new ModuleMap());
            return state;
        }
     public OpEvaluator getOpEvaluator() {

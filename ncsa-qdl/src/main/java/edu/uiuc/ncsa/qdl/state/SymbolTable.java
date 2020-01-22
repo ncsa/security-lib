@@ -10,6 +10,7 @@ import java.util.Set;
  * on 1/18/20 at  7:33 AM
  */
 public interface SymbolTable {
+    void setValue(String variableName, Object value);
     void setStringValue(String variableName, String value);
 
     void setLongValue(String variableName, Long value);

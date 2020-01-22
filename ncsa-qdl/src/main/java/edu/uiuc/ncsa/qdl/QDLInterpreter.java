@@ -40,9 +40,15 @@ public class QDLInterpreter {
         StringReader reader = new StringReader(line);
         QDLParserDriver driver = new QDLParserDriver(environment, state);
         driver.setDebugOn(isDebugOn());
-        QDLRunner runner = new QDLRunner(driver.parse(reader));
-        runner.setState(state);
-        runner.run();
+        try {
+            QDLRunner runner = new QDLRunner(driver.parse(reader));
+            runner.setState(state);
+            runner.run();
+
+        }catch(IllegalStateException isx){
+            isx.printStackTrace();
+          System.out.println("syntax error");
+        }
     }
 
 }

@@ -1,13 +1,12 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.QDLParserDriver;
+import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
-import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.io.File;
@@ -44,7 +43,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
 
     // Module stuff
-    public static String CREATE_MODULE = "create_module";
+  /*  public static String CREATE_MODULE = "create_module";
     public static final int CREATE_MODULE_TYPE = 200 + CONTROL_BASE_VALUE;
 
     public static String BEGIN_MODULE = "begin_module";
@@ -52,7 +51,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public static String END_MODULE = "end_module";
     public static final int END_MODULE_TYPE = 202 + CONTROL_BASE_VALUE;
-
+*/
     public static String IMPORT = "import";
     public static final int IMPORT_TYPE = 203 + CONTROL_BASE_VALUE;
 
@@ -61,6 +60,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public static String LOAD_MODULE = "load_module";
     public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
+
+    // try ... catch
+
+    public static String RAISE_ERROR = "raise_error";
+    public static final int RAISE_ERROR_TYPE = 300 + CONTROL_BASE_VALUE;
 
    /* public static String DROP_MODULE = "drop_module";
     public static final int DROP_MODULE_TYPE = 206 + CONTROL_BASE_VALUE;*/
@@ -78,11 +82,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (name.equals(CHECK_AFTER)) return CHECK_AFTER_TYPE;
         //   if (name.equals(CREATE_MODULE)) return CREATE_MODULE_TYPE;
         if (name.equals(IMPORT)) return IMPORT_TYPE;
-        if (name.equals(BEGIN_MODULE)) return BEGIN_MODULE_TYPE;
-        if (name.equals(END_MODULE)) return END_MODULE_TYPE;
+//        if (name.equals(BEGIN_MODULE)) return BEGIN_MODULE_TYPE;
+  //      if (name.equals(END_MODULE)) return END_MODULE_TYPE;
         if (name.equals(SET_ALIAS)) return SET_ALIAS_TYPE;
         //   if (name.equals(DROP_MODULE)) return DROP_MODULE_TYPE;
         if (name.equals(LOAD_MODULE)) return LOAD_MODULE_TYPE;
+        if (name.equals(RAISE_ERROR)) return RAISE_ERROR_TYPE;
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -98,13 +103,13 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case RETURN_TYPE:
                 doReturn(polyad, state);
                 return true;
-            case BEGIN_MODULE_TYPE:
+    /*        case BEGIN_MODULE_TYPE:
                 doBeginModule(polyad, state);
                 return true;
             case END_MODULE_TYPE:
                 doEndModule(polyad, state);
                 return true;
-            case IMPORT_TYPE:
+    */        case IMPORT_TYPE:
                 doImport(polyad, state);
                 return true;
             case SET_ALIAS_TYPE:
@@ -114,9 +119,33 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 if (isServerMode()) return true;
                 doLoadModule(polyad, state);
                 return true;
-
+            case RAISE_ERROR_TYPE:
+                doRaiseError(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    protected void doRaiseError(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() == 0) {
+            throw new IllegalArgumentException("Error:" + RAISE_ERROR + " requires at least a single argument");
+        }
+        Object arg1 = polyad.getArgumments().get(0).evaluate(state);
+        if (arg1 == null) {
+            arg1 = "(no message)";
+        }
+        Object arg2 = null;
+        state.getSymbolStack().setStringValue("error_message", arg1.toString());
+        if (polyad.getArgumments().size() == 2) {
+            arg2 = polyad.getArgumments().get(1).evaluate(state);
+            if (isLong(arg2)) {
+                state.getSymbolStack().setLongValue("error_code", (Long) arg2);
+            }
+
+        }
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
     }
 
     protected void doReturn(Polyad polyad, State state) {
@@ -125,18 +154,26 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 polyad.setEvaluated(true);
                 polyad.setResult(null);
                 polyad.setResultType(Constant.NULL_TYPE);
+                break;
             case 1:
                 Object r = polyad.getArgumments().get(0).evaluate(state);
                 polyad.setResult(r);
                 polyad.setResultType(polyad.getArgumments().get(0).getResultType());
                 polyad.setEvaluated(true);
-                return;
+                break;
             default:
                 throw new IllegalArgumentException("Error. Wrong number of arguments. You can only return at most a single value");
         }
+
+        // Magic. Sort of. Since it is impossible to tell when or how a function will invoke its
+        // return, we throw an exception and catch it at the right time.
+        ReturnException rx =new ReturnException();
+        rx.result = polyad.getResult();
+        rx.resultType = polyad.getResultType();
+        throw rx;
     }
 
-    protected void doBeginModule(Polyad polyad, State state) {
+   /* protected void doBeginModule(Polyad polyad, State state) {
         if (!(0 < polyad.getArgumments().size() && polyad.getArgumments().size() < 3)) {
             throw new IllegalArgumentException("Error: Wrong number of arguments. The " + BEGIN_MODULE +
                     " command requires a namespace and an optional alias. You supplied " + polyad.getArgumments().size());
@@ -181,7 +218,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
-
+*/
     protected void doSetAlias(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: The " + SET_ALIAS + " command requires two arguments.");
@@ -203,7 +240,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-    protected void doEndModule(Polyad polyad, State state) {
+   /* protected void doEndModule(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 0) {
             throw new IllegalArgumentException("Error: the " + END_MODULE + "  command requires no arguments");
         }
@@ -213,7 +250,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
         polyad.setResultType(Constant.STRING_TYPE);
     }
-
+*/
     protected void doLoadModule(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires a single argument. The full path to the module's file.");
@@ -271,7 +308,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         String moduleName = arg.toString();
 
-        if(!state.getModuleMap().containsKey(moduleName)){
+        if (!state.getModuleMap().containsKey(moduleName)) {
             throw new IllegalArgumentException("Error: could not find module \"" + moduleName + " to import");
         }
         SymbolTable st = state.getSymbolStack().getTopST();
