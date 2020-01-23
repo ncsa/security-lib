@@ -266,7 +266,7 @@ public class QDLListener implements QDLParserListener {
 
     }
 
-   
+
     @Override
     public void enterLogical(QDLParserParser.LogicalContext ctx) {
 
@@ -533,7 +533,7 @@ public class QDLListener implements QDLParserListener {
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q+a); a--;]; // prints 14 13
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q + --a); ]; // prints 13 12
         WhileLoop whileLoop = (WhileLoop) parsingMap.getStatementFromContext(ctx);
-        whileLoop.setConditional((ExpressionNode) parsingMap.getStatementFromContext(ctx.expression()));
+        whileLoop.setConditional((ExpressionNode) resolveChild(ctx.expression()));
         for (QDLParserParser.StatementContext stmt : ctx.statement()) {
             whileLoop.getStatements().add(resolveChild(stmt));
         }
@@ -645,11 +645,35 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx) {
-
+        TryCatch tryCatch = new TryCatch();
+        stash(ctx, tryCatch);
     }
 
     @Override
-    public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx) {
+    public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
+        TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
+
+        boolean addToTry = true;
+        try {
+            for (int i = 1; i < tcContext.getChildCount(); i++) {
+                ParseTree p = tcContext.getChild(i);
+                if (p.getText().equals("]catch[")) {
+                    addToTry = false;
+                    continue;
+                }
+                if (p.getText().equals(";") || p.getText().equals("]")) {
+                    continue;
+                }
+                if (addToTry) {
+                    Statement s = resolveChild(p);
+                    tryCatch.getTryStatements().add(s);
+                } else {
+                    tryCatch.getCatchStatements().add(resolveChild(p));
+                }
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
 
     }
 

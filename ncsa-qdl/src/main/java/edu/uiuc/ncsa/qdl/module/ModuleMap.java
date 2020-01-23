@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.module;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 import java.net.URI;
 import java.util.HashMap;
 
@@ -9,6 +12,22 @@ import java.util.HashMap;
  */
 public class ModuleMap extends HashMap<URI, Module> {
     public void put(Module module){
-        super.put(module.getName(), module);
+        super.put(module.getNamespace(), module);
+    }
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        for(URI key : keySet()){
+            jsonObject.put(key.toString(), get(key).toJSON());
+        }
+        return jsonObject;
+    }
+
+    public void fromJSON(JSONObject jsonObject){
+        for(Object key: jsonObject.keySet()){
+            JSONArray array = jsonObject.getJSONArray(key.toString());
+            Module module = new Module();
+            module.fromJSON(array);
+            put(module);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
+import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import org.junit.Test;
@@ -10,7 +11,7 @@ import org.junit.Test;
  * on 1/10/20 at  2:43 PM
  */
 public class QDLVariableTest extends TestBase {
-      TestUtils testUtils = TestUtils.newInstance();
+    TestUtils testUtils = TestUtils.newInstance();
     QDLParserDriver runner;
 
     /**
@@ -110,22 +111,72 @@ public class QDLVariableTest extends TestBase {
         assert st.isDefined(stem);
     }
 
-  /*  @Test
-       public void testVariables2() throws Exception {
-           SymbolTable st = new SymbolTableImpl(NamespaceResolver.getResolver());
-           String prefix = "urn:my/test#";
-           st.setRawValue(prefix + "a", "12345");
-           assert st.resolveValue(prefix + "a").equals(new Long(12345));
-           st.setRawValue(prefix + "b", "true");
-           assert st.resolveValue(prefix + "b") == Boolean.TRUE;
-           st.setRawValue("c", "false");
-           assert st.resolveValue("c") == Boolean.FALSE;
-           st.setRawValue("d", "null");
-           assert !st.isDefined("d");
-           String value = "mairzy((%^998e98nfg98u";
-           st.setRawValue("e", "'" + value + "'"); // how it comes out of the parser
-           assert st.resolveValue("e").equals(value);
-       }*/
+    /**
+     * Acid test for the stack. In this case there is a long stem and each of the variables is
+     * placed in a different symbol table, maximizing searching needed.
+     * @throws Exception
+     */
+    @Test
+    public void testDeepResolutionOnStack() throws Exception {
+        SymbolTableImpl st0 = new SymbolTableImpl(NamespaceResolver.getResolver());
+        SymbolTableImpl st1 = new SymbolTableImpl(NamespaceResolver.getResolver());
+        SymbolTableImpl st2 = new SymbolTableImpl(NamespaceResolver.getResolver());
+        SymbolTableImpl st3 = new SymbolTableImpl(NamespaceResolver.getResolver());
+        SymbolTableImpl st4 = new SymbolTableImpl(NamespaceResolver.getResolver());
+        SymbolStack stack = new SymbolStack(NamespaceResolver.getResolver());
 
+        st4.setRawValue("z", "1");
+        stack.addParent(st4);
+        st3.setRawValue("y.1", "2");
+        stack.addParent(st3);
+        st2.setRawValue("x.2", "3");
+        stack.addParent(st2);
+        st1.setRawValue("w.3", "4");
+        stack.addParent(st0);
+        st0.setRawValue("A.4", "5");
+        stack.addParent(st1);
+        // first test, i = 0, so foo.i should resolve to foo.0
+        String stem = "A.w.x.y.z";
+        // so now we set the value.
+       // stack.setRawValue(stem, "6");
+        Object output = stack.resolveValue(stem);
+        // FYI Every integer in QDL is a long!!! so testing against an int fails.
+        assert output.equals(5L) : "expected 5 and got " + stack.resolveValue(stem);
+        assert stack.isDefined(stem);
+    }
+
+
+    /**
+     * This also checks for deep resolution and then it sets the value and then reads it.
+     * @throws Exception
+     */
+    @Test
+      public void testDeepResolutionAndSetVariable() throws Exception {
+          SymbolTableImpl st0 = new SymbolTableImpl(NamespaceResolver.getResolver());
+          SymbolTableImpl st1 = new SymbolTableImpl(NamespaceResolver.getResolver());
+          SymbolTableImpl st2 = new SymbolTableImpl(NamespaceResolver.getResolver());
+          SymbolTableImpl st3 = new SymbolTableImpl(NamespaceResolver.getResolver());
+          SymbolTableImpl st4 = new SymbolTableImpl(NamespaceResolver.getResolver());
+          SymbolStack stack = new SymbolStack(NamespaceResolver.getResolver());
+
+          st4.setRawValue("z", "1");
+          stack.addParent(st4);
+          st3.setRawValue("y.1", "2");
+          stack.addParent(st3);
+          st2.setRawValue("x.2", "3");
+          stack.addParent(st2);
+          st1.setRawValue("w.3", "4");
+          stack.addParent(st0);
+          st0.setRawValue("A.4", "5");
+          stack.addParent(st1);
+          // first test, i = 0, so foo.i should resolve to foo.0
+          String stem = "A.w.x.y.z";
+          // so now we set the value.
+          stack.setValue(stem, "6");
+          Object output = stack.resolveValue(stem);
+          // FYI Every integer in QDL is a long!!! so testing against an int fails.
+          assert output.equals("6") : "expected 6 and got " + stack.resolveValue(stem);
+          assert stack.isDefined(stem);
+      }
 
 }

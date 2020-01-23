@@ -63,9 +63,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
 
     public void put(ElementRecord record) {
         if (markAdditions) {
-            System.out.println("ParsingMap.put(Element), adding id " + record.identifier);
             addedIds.add(record.identifier);
-            System.out.println("ParsingMap.put(Element), number of entries =" +addedIds.size());
         }
         if (size() == 0) {
             setRoot(record);
@@ -80,10 +78,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
 
     public void put(StatementRecord record) {
         if (markAdditions) {
-            System.out.println("ParsingMap.put(Statement), adding id " + record.identifier);
             addedIds.add(record.identifier);
-            System.out.println("ParsingMap.put(Statement), number of entries =" +addedIds.size());
-
         }
 
         if (size() == 0) {

@@ -3,12 +3,12 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import net.sf.json.JSON;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * /**
@@ -26,7 +26,7 @@ public class SymbolStack extends AbstractSymbolTable {
 
     @Override
     public void setDecimalValue(String variableName, BigDecimal value) {
-            setValue(variableName, value);
+        setValue(variableName, value);
     }
 
     /**
@@ -79,20 +79,87 @@ public class SymbolStack extends AbstractSymbolTable {
         return getParentTables().get(0);
     }
 
-    protected SymbolTable searchSTs(String variableName) {
+    protected Object findValueInATable(String var) {
         for (SymbolTable s : getParentTables()) {
-            if (s.isDefined(variableName)) return s;
+            if (s.isDefined(var)) {
+                return s.resolveValue(var);
+            }
         }
         return null;
     }
 
+
+    public Object resolveValue(String variableName) {
+        if (isStem(variableName)) {
+
+            String head = getStemHead(variableName);
+
+            if (null != findValueInATable(head + ".")) {
+                // this is not defined any place, so it gets a null.
+                return null;
+            }
+            if (variableName.endsWith(".")) {
+                return findValueInATable(variableName);
+            }
+
+            String tail = getStemTail(variableName);
+            // the real issue is that a stem like a.b.c.d.e may have each of the variables in
+            // a different and effectively random symbol table. 
+            StringTokenizer tokenizer = new StringTokenizer(tail, ".");
+            String[] vars = new String[tokenizer.countTokens()];
+            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
+                vars[i] = tokenizer.nextToken();
+            }
+            // These are reversed. Now we start the lookup  and this means
+            // we start working our way backwards
+
+            String currentVariable = "";
+            boolean isFirstPass = true;
+            Object returnedValue = null;
+            for (int i = 0; i < vars.length; i++) {
+                if (isFirstPass) {
+                    isFirstPass = false;
+                    currentVariable = vars[i];
+                } else {
+                    currentVariable = vars[i] + "." + returnedValue.toString();
+                }
+                Object obj = findValueInATable(currentVariable);
+                if (obj != null) {
+                    returnedValue = obj;
+                } else {
+                    returnedValue = currentVariable;
+                }
+
+            }
+
+            return findValueInATable(head  + returnedValue); // head include final .
+        }
+        return findValueInATable(variableName);
+    }
+
     public void setStringValue(String variableName, String value) {
-        getRightST(variableName).setStringValue(variableName, value);
+        setValue(variableName, value);
+        // getRightST(variableName).setStringValue(variableName, value);
     }
 
     @Override
     public void setValue(String variableName, Object value) {
-           getRightST(variableName).setValue(variableName, value);
+        if (isDefined(variableName)) {
+            SymbolTable st = getRightST(variableName);
+            if(!isStem(variableName)){
+                st.setValue(variableName, value);
+                return;
+            }
+            if(isTotalStem(variableName)){
+                st.setValue(variableName, value);
+                return;
+            }
+            String t = getStemTail(variableName);
+            Object resolvedTail = resolveValue(t);
+            st.setValue(getStemHead(variableName) + resolvedTail, value);
+            return;
+        }
+        getTopST().setValue(variableName, value);
     }
 
     /**
@@ -104,23 +171,31 @@ public class SymbolStack extends AbstractSymbolTable {
      * @return
      */
     protected SymbolTable getRightST(String variableName) {
-        SymbolTable symbolTable = searchSTs(variableName);
-        if (symbolTable == null) {
-            symbolTable = getParentTables().get(0);
+        String variableToCheck = variableName;
+        if(isStem(variableName)){
+                variableToCheck = getStemHead(variableName);
         }
-        return symbolTable;
+        for (SymbolTable s : getParentTables()) {
+            if (s.isDefined(variableToCheck)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     public void setLongValue(String variableName, Long value) {
-        getRightST(variableName).setLongValue(variableName, value);
+        setValue(variableName, value);
     }
 
     public void setBooleanValue(String variableName, Boolean value) {
-        getRightST(variableName).setBooleanValue(variableName, value);
+        setValue(variableName, value);
     }
 
     public void setRawValue(String rawName, String rawValue) {
-        getRightST(rawName).setRawValue(rawName, rawValue);
+        if (isDefined(rawName)) {
+            getRightST(rawName).setRawValue(rawName, rawValue);
+        }
+        getTopST().setRawValue(rawName, rawValue);
     }
 
     public void clear() {
@@ -128,34 +203,9 @@ public class SymbolStack extends AbstractSymbolTable {
         getTopST().clear();
     }
 
-    public Object resolveValue(String variable) {
-        if(isStem(variable)){
-            // The tail may be in a different symbol table than the head.
-            String tail = getStemTail(variable);
-            Object value = getRightST(tail).resolveValue(tail);
-/*
-            String newVar = getStemHead(variable) + value;
-            Object foo = getRightST(newVar).resolveValue(newVar);
-*/
-
-            // FIX ME!! THis qctually requires we loop since there may be multiple keys all in
-            // different scopes. e.g. a.b.c.d.
-/*
-            while(isStem(newVar)){
-
-            }
-*/
-            if(value != null){
-                String newVar = getStemHead(variable) + value;
-                return getRightST(newVar).resolveValue(newVar);
-            }
-        }
-        return getRightST(variable).resolveValue(variable);
-    }
-
 
     public boolean isDefined(String variable) {
-        return getRightST(variable).isDefined(variable);
+        return resolveValue(variable) != null;
     }
 
     public void remove(String symbol) {
@@ -163,18 +213,67 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     public void setStemVariable(String key, StemVariable stem) {
+        if (!isCompoundStem(key)) {
+            if (isTotalStem(key)) {
+                if (isDefined(key)) {
+                    getRightST(key).setStemVariable(key, stem);
+                    return;
+                } else {
+                    getTopST().setStemVariable(key, stem);
+                }
+                return;
+
+            }
+            // much harder is if it is a long stem a.b.c...
+            String h = getStemHead(key);
+            String t = getStemTail(key);
+            Object newKey = findValueInATable(t);
+            if (newKey == null) {
+                getTopST().setStemVariable(key, stem);
+                return;
+            }
+
+
+        }
+
         getRightST(key).setStemVariable(key, stem);
     }
 
     public Set<String> listVariables() {
         Set<String> vars = new HashSet<>();
-        for(SymbolTable st : getParentTables()){
-          vars.addAll(st.listVariables());
+        for (SymbolTable st : getParentTables()) {
+            vars.addAll(st.listVariables());
         }
         return vars;
     }
 
     public void addModule(Module module) {
-           throw new NotImplementedException();
+        throw new NotImplementedException();
+    }
+
+    public JSON toJSON() {
+        JSONArray array = new JSONArray();
+        for (SymbolTable st : getParentTables()) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.putAll(st.getMap());
+            array.add(jsonObject);
+        }
+        return array;
+    }
+
+    public void fromJSON(JSONArray array) {
+        for (int i = array.size(); i < 0; i--) {
+            // these were put in in reverse order, so have to pop them out.
+            SymbolTableImpl symbolTable = new SymbolTableImpl(NamespaceResolver.getResolver());
+            JSONObject jsonObject = array.getJSONObject(i);
+            symbolTable.getMap().putAll(jsonObject);
+
+        }
+        return;
+    }
+
+    @Override
+    public Map getMap() {
+        return null;
     }
 }

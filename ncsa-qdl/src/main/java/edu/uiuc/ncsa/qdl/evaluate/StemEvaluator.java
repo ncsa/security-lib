@@ -169,7 +169,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.getArgumments().get(0).evaluate(state);
         Object arg = polyad.getArgumments().get(0).getResult();
-        if (isStem(arg)) {
+        if (!isStem(arg)) {
             throw new IllegalArgumentException("Error: The " + HAS_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
@@ -294,7 +294,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.getArgumments().get(0).evaluate(state);
         Object arg = polyad.getArgumments().get(0).getResult();
-        if (isStem(arg)) {
+        if (!isStem(arg)) {
             throw new IllegalArgumentException("Error: The " + INCLUDE_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
@@ -321,7 +321,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             String currentKey = keyList.getString(index);
             if (target.containsKey(currentKey)) {
-                result.put(index, target.get(currentKey));
+                result.put(currentKey, target.get(currentKey));
             }
         }
         polyad.setResult(result);
@@ -341,7 +341,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.getArgumments().get(0).evaluate(state);
         Object arg = polyad.getArgumments().get(0).getResult();
-        if (isStem(arg)) {
+        if (!isStem(arg)) {
             throw new IllegalArgumentException("Error: The " + EXCLUDE_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
@@ -352,10 +352,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             StemVariable result = new StemVariable();
             String excluded = arg2.toString();
             for (String ndx : target.keySet()) {
-                if (!target.containsKey(excluded)) {
                     result.put(ndx, target.get(ndx));
-                }
             }
+            result.remove(excluded);
             polyad.setResult(result);
             polyad.setResultType(Constant.STEM_TYPE);
             polyad.setEvaluated(true);
@@ -363,15 +362,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable keyList = (StemVariable) arg2;
         StemVariable result = new StemVariable();
-        for (int i = 0; i < keyList.size(); i++) {
-            // for loop to be sure that everything is done in order.
-            String index = Integer.toString(i);
-            if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
-            }
-            String currentKey = keyList.getString(index);
-            if (!target.containsKey(currentKey)) {
-                result.put(index, target.get(currentKey));
+        for (String key : target.keySet()) {
+            if (!keyList.containsValue(key)) {
+                result.put(key, target.get(key));
             }
         }
         polyad.setResult(result);
@@ -393,7 +386,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.getArgumments().get(0).evaluate(state);
         Object arg = polyad.getArgumments().get(0).getResult();
-        if (isStem(arg)) {
+        if (!isStem(arg)) {
             throw new IllegalArgumentException("Error: The " + RENAME_KEYS + " command requires a stem as its first argument.");
         }
         polyad.getArgumments().get(1).evaluate(state);
@@ -453,10 +446,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         int index = 0;
         StemVariable newKeys = (StemVariable) arg2;
         for (String key : newKeys.keySet()) {
-              if(target.containsKey(key)){
-                  String currentIndex = Integer.toString(index++);
-                  result.put(currentIndex, key);
-              }
+            if (target.containsKey(key)) {
+                String currentIndex = Integer.toString(index++);
+                result.put(currentIndex, key);
+            }
         }
 
         polyad.setResult(result);

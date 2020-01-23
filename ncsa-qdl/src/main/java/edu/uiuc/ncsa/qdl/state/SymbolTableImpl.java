@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.util.StemVariable;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -301,11 +302,14 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
 
     @Override
     public void addModule(Module module) {
-        if (importedModules.containsKey(module.getName())) {
+        if (importedModules.containsKey(module.getNamespace())) {
             return;
         }
         importedModules.put(module);
     }
 
-
+    @Override
+    public Map getMap() {
+        return map;
+    }
 }

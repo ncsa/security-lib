@@ -47,4 +47,22 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     protected boolean isStem(String variable) {
         return variable.contains(".");
     }
+
+    /**
+     * This tests if the stem is compound like a.b.c
+     * @param var
+     * @return
+     */
+    protected boolean isCompoundStem(String var) {
+        return isStem(var) && (var.indexOf(".") != var.lastIndexOf("."));
+    }
+
+    /**
+     * For the case of a stem like a. Returns false if it is of the form a.b. or some such.
+     * @param var
+     * @return
+     */
+    protected boolean isTotalStem(String var){
+        return isStem(var) && var.endsWith(".") && !isCompoundStem(var);
+    }
 }

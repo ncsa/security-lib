@@ -39,6 +39,32 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
+    public void testGetKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "One Ring to rule them all");
+        sourceStem.put("find", "One Ring to find them");
+        sourceStem.put("bring", "One Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+
+        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+
+        polyad.addArgument(arg);
+        polyad.evaluate(state);
+        assert polyad.getResult() instanceof StemVariable;
+        StemVariable result = (StemVariable) polyad.getResult();
+        for (int i = 0; i < 4; i++) {
+            String key = Integer.toString(i);
+            assert sourceStem.containsKey(result.get(key));
+        }
+    }
+
+    @Test
     public void testSizeString() throws Exception {
         String input = "One Ring to rule them all, One Ring to find them";
 
@@ -92,16 +118,16 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-       public void testCommonKeys() throws Exception {
-           State state = testUtils.getNewState();
-           SymbolTable symbolTable = state.getSymbolStack();
+    public void testCommonKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
 
-           StemVariable sourceStem = new StemVariable();
-           sourceStem.put("rule", "One Ring to rule them all");
-           sourceStem.put("find", "One Ring to find them");
-           sourceStem.put("bring", "One Ring to bring them all");
-           sourceStem.put("bind", "and in the darkness bind them");
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "One Ring to rule them all");
+        sourceStem.put("find", "One Ring to find them");
+        sourceStem.put("bring", "One Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
 
         StemVariable sourceStem2 = new StemVariable();
         sourceStem2.put("rule", "mairzy doats");
@@ -111,24 +137,263 @@ public class StemFunctionsTest extends TestBase {
         sourceStem2.put("5", "whatever");
 
 
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("sourceStem2.", sourceStem2);
+        Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        VariableNode arg2 = new VariableNode("sourceStem2.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable keys = (StemVariable) polyad.getResult();
+        assert keys.size() == 3;
+        assert keys.containsValue("rule");
+        assert keys.containsValue("find");
+        assert !keys.containsValue("bind");
+        assert keys.containsValue("bring");
+        for (String key : keys.keySet()) {
+            System.out.println("  var." + key + " == " + keys.get(key));
+        }
+    }
+
+    @Test
+    public void testIncludeKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        int count = 5;
+        int j = 0;
+        for (int i = 0; i < 2 * count; i++) {
+            String key = getRandomString();
+            if (0 == i % 2) {
+                keys.put(Integer.toString(j++), key);
+            }
+            sourceStem.put(key, getRandomString());
+        }
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("keys.", keys);
+        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        VariableNode arg2 = new VariableNode("keys.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == count;
+        for (int i = 0; i < count; i++) {
+            System.out.println(" i = " + i);
+
+            assert result.containsKey(keys.getString(Integer.toString(i)));
+        }
+    }
+
+    @Test
+    public void testRenameKeys() throws Exception {
+        // Take a stem and a list of
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        int count = 5;
+        for (int i = 0; i < 2 * count; i++) {
+            String key = getRandomString();
+            sourceStem.put(key, getRandomString());
+            keys.put(key, getRandomString());
+        }
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("keys.", keys);
+        Polyad polyad = new Polyad(StemEvaluator.RENAME_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        VariableNode arg2 = new VariableNode("keys.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == 2 * count;
+        for (String key : keys.keySet()) {
+            assert result.containsKey(keys.get(key));
+            assert result.get(key) == sourceStem.get(key);
+        }
+
+    }
+
+    @Test
+    public void testExcludeKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        int count = 5;
+        int j = 0;
+        for (int i = 0; i < 2 * count; i++) {
+            String key = getRandomString();
+            if (0 == i % 2) {
+                keys.put(Integer.toString(j++), key);
+            }
+            sourceStem.put(key, getRandomString());
+        }
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("keys.", keys);
+        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        VariableNode arg2 = new VariableNode("keys.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == count;
+        for (int i = 0; i < count; i++) {
+            System.out.println(" i = " + i);
+
+            assert !result.containsKey(keys.getString(Integer.toString(i)));
+        }
+    }
+
+    @Test
+    public void testExcludeScalarKey() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        String targetKey = getRandomString();
+
+        sourceStem.put(targetKey, getRandomString());
+        int count = 5;
+        for (int i = 0; i < count; i++) {
+            String key = getRandomString();
+            sourceStem.put(key, getRandomString());
+        }
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == count; // we added one, then removed it.
+        assert !result.containsKey(targetKey);
+    }
+
+    @Test
+       public void testIncludeScalarKey() throws Exception {
+           State state = testUtils.getNewState();
+           SymbolTable symbolTable = state.getSymbolStack();
+
+
+           StemVariable sourceStem = new StemVariable();
+           StemVariable keys = new StemVariable();
+           String targetKey = getRandomString();
+
+           sourceStem.put(targetKey, getRandomString());
+           int count = 5;
+           for (int i = 0; i < count; i++) {
+               String key = getRandomString();
+               sourceStem.put(key, getRandomString());
+           }
+
 
            symbolTable.setStemVariable("sourceStem.", sourceStem);
-           symbolTable.setStemVariable("sourceStem2.", sourceStem2);
-           Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS_TYPE);
+           Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
            VariableNode arg = new VariableNode("sourceStem.");
-           VariableNode arg2 = new VariableNode("sourceStem2.");
+           ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
            polyad.addArgument(arg);
            polyad.addArgument(arg2);
            polyad.evaluate(state);
-           StemVariable keys = (StemVariable) polyad.getResult();
-           assert keys.size() == 3;
-           assert keys.containsValue("rule");
-           assert keys.containsValue("find");
-           assert !keys.containsValue("bind");
-           assert keys.containsValue("bring");
-           for (String key : keys.keySet()) {
-               System.out.println("  var." + key + " == " + keys.get(key));
+           StemVariable result = (StemVariable) polyad.getResult();
+           assert result.size() == 1;
+           assert result.containsKey(targetKey);
+       }
+    @Test
+    public void testHasKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        int count = 5;
+        int j = 0;
+        for (int i = 0; i < 2 * count; i++) {
+            String key = getRandomString();
+            if (0 == i % 2) {
+                keys.put(Integer.toString(j++), key);
+            }
+            sourceStem.put(key, getRandomString());
+        }
+        // add a few that aren't in the target stem.
+        for (int i = 0; i < count; i++) {
+            keys.put(Integer.toString(j++), getRandomString());
+        }
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("keys.", keys);
+        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        VariableNode arg2 = new VariableNode("keys.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == count * 2;
+        j = 0;
+        for (int i = 0; i < count; i++) {
+            assert result.getBoolean(Integer.toString(j++));
+        }
+        for (int i = 0; i < count; i++) {
+            assert !result.getBoolean(Integer.toString(j++));
+        }
+
+    }
+
+    @Test
+       public void testHasScalarKeys() throws Exception {
+           State state = testUtils.getNewState();
+           SymbolTable symbolTable = state.getSymbolStack();
+
+
+           StemVariable sourceStem = new StemVariable();
+           StemVariable keys = new StemVariable();
+           int count = 5;
+           String targetKey = getRandomString();
+           sourceStem.put(targetKey, getRandomString());
+           int j = 0;
+           for (int i = 0; i < count; i++) {
+               String key = getRandomString();
+               if (0 == i % 2) {
+                   keys.put(Integer.toString(j++), key);
+               }
+               sourceStem.put(key, getRandomString());
            }
+           // add a few that aren't in the target stem.
+           for (int i = 0; i < count; i++) {
+               keys.put(Integer.toString(j++), getRandomString());
+           }
+           symbolTable.setStemVariable("sourceStem.", sourceStem);
+           symbolTable.setStemVariable("keys.", keys);
+           Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
+           VariableNode arg = new VariableNode("sourceStem.");
+           ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
+           polyad.addArgument(arg);
+           polyad.addArgument(arg2);
+           polyad.evaluate(state);
+           assert (Boolean) polyad.getResult();
        }
 
     @Test

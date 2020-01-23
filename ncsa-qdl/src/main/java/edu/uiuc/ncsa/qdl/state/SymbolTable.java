@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -37,4 +38,6 @@ public interface SymbolTable {
     Set<String> listVariables();
 
     void addModule(Module module);
+
+    public Map getMap();
 }
