@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -34,6 +35,10 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
     public void setLongValue(String variableName, Long value) {
         setValue(variableName, value);
     }
+    @Override
+       public void setDecimalValue(String variableName, BigDecimal value) {
+           setValue(variableName, value);
+       }
 
 
     @Override

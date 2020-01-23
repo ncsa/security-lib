@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,10 @@ public class SymbolStack extends AbstractSymbolTable {
         this.namespaceResolver = namespaceResolver;
     }
 
-
+    @Override
+    public void setDecimalValue(String variableName, BigDecimal value) {
+            setValue(variableName, value);
+    }
 
     /**
      * This constructor takes all of the parents and then pushes a new {@link SymbolTableImpl}
@@ -145,7 +149,6 @@ public class SymbolStack extends AbstractSymbolTable {
                 String newVar = getStemHead(variable) + value;
                 return getRightST(newVar).resolveValue(newVar);
             }
-            System.out.println(getStemHead(variable) + value);
         }
         return getRightST(variable).resolveValue(variable);
     }

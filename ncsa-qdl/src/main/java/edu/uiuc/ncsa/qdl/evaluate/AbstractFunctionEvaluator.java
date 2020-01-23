@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +50,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return obj instanceof Boolean;
     }
 
+    protected boolean areAllBoolean(Object... objects){
+        for(Object arg : objects){
+            if(!isBoolean(arg)) return false;
+        }
+        return true;
+    }
     protected boolean areAllStems(Object... objects) {
         for (Object arg : objects) {
             if (!isStem(arg)) return false;
@@ -80,6 +87,44 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         return true;
     }
+       protected boolean isNumber(Object arg){
+           return (arg instanceof Long) || (arg instanceof BigDecimal);
+       }
+
+       protected boolean isBigDecimal(Object obj){
+        return obj instanceof BigDecimal;
+       }
+       protected boolean areAnyBigDecimals(Object... objects){
+        for(Object arg : objects){
+                if(isBigDecimal(arg)) return true;
+        }
+        return false;
+       }
+
+    /**
+     * How to compare two big decimals requires some work.
+     * @param a
+     * @param b
+     * @return
+     */
+       protected boolean bdEquals(BigDecimal a, BigDecimal b){
+        BigDecimal r = a.subtract(b);
+        return r.compareTo(BigDecimal.ZERO) == 0;
+       }
+
+    protected boolean areAllNumbers(Object... objects) {
+          for (Object arg : objects) {
+              if (!isNumber(arg)) return false;
+          }
+          return true;
+      }
+    protected BigDecimal toBD(Object obj){
+        if(!isNumber(obj)) throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
+        if(obj instanceof BigDecimal) return (BigDecimal) obj;
+        if(obj instanceof Long) return new BigDecimal((Long) obj);
+        if(obj instanceof Integer) return new BigDecimal((Integer) obj);
+        throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
+    }
 
     protected StemVariable toStem(Object object) {
         if (isStem(object)) return (StemVariable) object;
@@ -96,8 +141,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     public static class fpResult {
-        Object result;
-        int resultType;
+       public Object result;
+        public int resultType;
     }
 
     protected void finishExpr(ExpressionImpl node, fpResult r) {
@@ -107,7 +152,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     // ToDO make a processN method from these. Just have to scratch head about certian bookkeeping.
-    protected void process1(Polyad polyad,
+    protected void process1(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
                             State state) {
@@ -130,7 +175,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         polyad.setEvaluated(true);
     }
 
-    protected void process2(Polyad polyad,
+    protected void process2(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
                             State state) {
@@ -160,7 +205,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         polyad.setEvaluated(true);
     }
 
-    protected void process3(Polyad polyad,
+    protected void process3(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
                             State state) {

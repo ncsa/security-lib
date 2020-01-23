@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl;
 import junit.framework.TestCase;
 import org.apache.commons.codec.binary.Base64;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Random;
 
@@ -44,5 +45,24 @@ abstract public class TestBase extends TestCase {
     public static URI createToken(String infix) {
         return URI.create("ncsa:cilogon:test:" + infix + "/" + getRandomString(12) + "/" + System.currentTimeMillis());
     }
+    protected boolean testNumberEquals(Object arg1, Object arg2){
+        if((arg1 instanceof Long) && (arg2 instanceof Long)){
+            return arg1.equals(arg2);
+        }
+        BigDecimal left;
+        BigDecimal right;
+        if(arg1 instanceof Long){
+             left = new BigDecimal((Long)arg1);
+        }else{
+            left = (BigDecimal)arg1;
+        }
+        if(arg2 instanceof Long){
+             right = new BigDecimal((Long)arg2);
+        }else{
+            right = (BigDecimal)arg2;
+        }
 
+        BigDecimal result = left.subtract(right);
+        return result.compareTo(BigDecimal.ZERO) == 0;
+    }
 }

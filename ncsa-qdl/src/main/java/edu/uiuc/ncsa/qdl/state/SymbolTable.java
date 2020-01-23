@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -13,6 +14,7 @@ public interface SymbolTable {
     void setValue(String variableName, Object value);
     void setStringValue(String variableName, String value);
 
+    void setDecimalValue(String variableName, BigDecimal value);
     void setLongValue(String variableName, Long value);
 
     void setBooleanValue(String variableName, Boolean value);

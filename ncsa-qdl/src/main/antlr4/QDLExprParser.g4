@@ -5,7 +5,7 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-assignment : ( scalar | stem) op=ASSIGN  expression;
+assignment : variable op=ASSIGN  expression;
    argList : expression (',' expression)*;
   function : FuncStart argList* ')';
 
@@ -27,11 +27,10 @@ expression
  | expression '||' expression                           #orExpression
  | '(' expression ')'                                   #association
  | LeftBracket                                          #leftBracket
- | Number                                               #numbers
+ | variable                                             #variables
+ | number                                               #numbers
  | Bool                                                 #logical
  | Null                                                 #null
- | scalar                                               #variables
- | stem                                                 #stemVariables
  | STRING                                               #strings
  | ';'                                                  #semi_for_empty_expressions
  ;

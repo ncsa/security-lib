@@ -122,40 +122,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
             say("exitElements", ctx);
     }*/
 
-    @Override
-    public void enterScalar(QDLParserParser.ScalarContext ctx) {
-        String id = enter("scalar");
-        fakeStack.put(id, null);
-        say("enter scalar;" + id);
-        printKids(ctx);
-    }
 
-    @Override
-    public void exitScalar(QDLParserParser.ScalarContext ctx) {
-        String id = xit("scalar");
-        fakeStack.put(id, ctx.ID().toString());
-        sayi("exit scalar:" + id);
-        sayii("ID=" + ctx.ID());
-    }
-
-    @Override
-    public void enterStem(QDLParserParser.StemContext ctx) {
-        String id = enter("stem");
-        say("enter stem:" + id);
-        fakeStack.put(id, null);
-        printKids(ctx);
-
-    }
-
-    @Override
-    public void exitStem(QDLParserParser.StemContext ctx) {
-        String id = xit("stem");
-        fakeStack.put(id, ctx.getText());
-        sayi("exit stem:" + id, ctx);
-
-        sayii("ID=" + ctx.ID());
-        sayii("Digits=" + ctx.Number());
-    }
 
     @Override
     public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
@@ -170,7 +137,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
         sayii("op=" + ctx.op);
         sayii("[" + Integer.toHexString(ctx.hashCode()) + "]");
         sayii("expr=" + ctx.expression());
-        sayii("scalar=" + ctx.scalar());
+        sayii("variable=" + ctx.variable());
         sayii("parent id [" + Integer.toHexString(ctx.getParent().hashCode()) + "]");
         for (ParseTree parseTree : ctx.children) {
             sayii("child =[" + Integer.toHexString(parseTree.hashCode()) +
@@ -216,7 +183,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void exitVariables(QDLParserParser.VariablesContext ctx) {
 
         sayi("exitVariables", ctx);
-        sayi("scalar =" + ctx.scalar());
+        sayi("variable =" + ctx.variable());
         sayi("text =" + ctx.getText());
     }
 
@@ -255,7 +222,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     @Override
     public void exitNumbers(QDLParserParser.NumbersContext ctx) {
         sayi("exit numbers", ctx);
-        sayii("number=" + ctx.Number());
+        sayii("number=" + ctx.number());
 
     }
 
@@ -299,16 +266,18 @@ public class QDLDebugListener extends QDLParserBaseListener {
     }
 
     @Override
-    public void enterStemVariables(QDLParserParser.StemVariablesContext ctx) {
-        say("enter stem var");
+    public void enterVariable(QDLParserParser.VariableContext ctx) {
+        say("enter variables");
         printKids(ctx);
     }
 
     @Override
-    public void exitStemVariables(QDLParserParser.StemVariablesContext ctx) {
-        sayi("exit stem variables ", ctx);
+    public void exitVariable(QDLParserParser.VariableContext ctx) {
+        sayi("exit variables ", ctx);
 
     }
+
+
 
     @Override
     public void enterLogical(QDLParserParser.LogicalContext ctx) {

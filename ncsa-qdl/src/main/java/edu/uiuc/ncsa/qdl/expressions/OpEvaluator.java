@@ -1,18 +1,20 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 
-import edu.uiuc.ncsa.qdl.evaluate.EvaluatorInterface;
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+
+import java.math.BigDecimal;
 
 /**
  * Class the will evaluate and expression
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:20 PM
  */
-public class OpEvaluator implements EvaluatorInterface {
+public class OpEvaluator extends AbstractFunctionEvaluator {
 
     public static String ASSIGNMENT = ":=";
     public static String TIMES = "*";
@@ -111,137 +113,238 @@ public class OpEvaluator implements EvaluatorInterface {
         }
     }
 
+
     protected void doDyadComparisonOperator(Dyad dyad, State state) {
-        Long left = (Long) dyad.getLeftArgument().evaluate(state);
-        Long right = (Long) dyad.getRightArgument().evaluate(state);
-        Boolean result = null;
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                if (!areAllNumbers(objects)) {
+                    throw new IllegalArgumentException("Error: only numbers may be compared");
+                }
+                BigDecimal left = toBD(objects[0]);
+                BigDecimal right = toBD(objects[1]);
+                int leftToRight = left.compareTo(right);
+                fpResult r = new fpResult();
+                Boolean result = false;
+                switch (dyad.getOperatorType()) {
+                    case LESS_THAN_VALUE:
+                        result = (leftToRight < 0);
+                        break;
+                    case LESS_THAN_EQUAL_VALUE:
+                        result = (leftToRight < 0) || (leftToRight == 0);
+                        break;
+                    case MORE_THAN_VALUE:
+                        result = (0 < leftToRight);
+                        break;
+                    case MORE_THAN_EQUAL_VALUE:
+                        result = (0 == leftToRight) || (0 < leftToRight);
+                        break;
+                }
+                r.result = result;
+                r.resultType = Constant.BOOLEAN_TYPE;
+
+                return r;
+            }
+        };
+        String op = "";
         switch (dyad.getOperatorType()) {
             case LESS_THAN_VALUE:
-                result = left < right;
+                op = LESS_THAN;
                 break;
             case LESS_THAN_EQUAL_VALUE:
-                result = left <= right;
+                op = LESS_THAN_EQUAL;
                 break;
             case MORE_THAN_VALUE:
-                result = left > right;
+                op = MORE_THAN;
                 break;
             case MORE_THAN_EQUAL_VALUE:
-                result = left >= right;
+                op = MORE_THAN_EQUAL;
                 break;
         }
-        dyad.setResult(result);
-        dyad.setEvaluated(true);
-        dyad.setResultType(Constant.BOOLEAN_TYPE);
+        process2(dyad, pointer, op, state);
 
     }
 
     protected void doDyadEqualsOperator(Dyad dyad, State state) {
-        Object left = dyad.getLeftArgument().evaluate(state);
-        Object right = dyad.getRightArgument().evaluate(state);
-        Boolean result = null;
-        switch (dyad.getOperatorType()) {
-            case EQUALS_VALUE:
-                result = left.equals(right);
-                break;
-            case NOT_EQUAL_VALUE:
-                result = !left.equals(right);
-                break;
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (areAnyBigDecimals(objects)) {
+                    BigDecimal left = toBD(objects[0]);
+                    BigDecimal right = toBD(objects[1]);
+                    switch (dyad.getOperatorType()) {
+                        case EQUALS_VALUE:
+                            r.result = bdEquals(left, right);
+                            break;
+                        case NOT_EQUAL_VALUE:
+                            r.result = !bdEquals(left, right);
+                            break;
+                    } // end switch
+                } else {
+                    // just do object comparison
+                    switch (dyad.getOperatorType()) {
+                        case EQUALS_VALUE:
+                            r.result = objects[0].equals(objects[1]);
+                            break;
+                        case NOT_EQUAL_VALUE:
+                            r.result = !objects[0].equals(objects[1]);
+                            break;
+                    }//end switch
+                }
+                r.resultType = Constant.BOOLEAN_TYPE;
+                return r;
+            }
+        };
+        String op = (dyad.operatorType == EQUALS_VALUE ? EQUALS : NOT_EQUAL);
+        process2(dyad, pointer, op, state);
 
-        }
-        dyad.setResult(result);
-        dyad.setEvaluated(true);
-        dyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     protected void doDyadLogicalOperator(Dyad dyad, State state) {
-        Boolean left = (Boolean) dyad.getLeftArgument().evaluate(state);
-        Boolean right = (Boolean) dyad.getRightArgument().evaluate(state);
-        Boolean result = null;
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (!areAllBoolean(objects)) {
+                    throw new IllegalArgumentException("Error: arguments must be boolean for logical operations");
+                }
+                Boolean left = (Boolean) dyad.getLeftArgument().evaluate(state);
+                Boolean right = (Boolean) dyad.getRightArgument().evaluate(state);
+                Boolean result = null;
+                switch (dyad.getOperatorType()) {
+                    case AND_VALUE:
+                        r.result = left && right;
+                        break;
+                    case OR_VALUE:
+                        r.result = left || right;
+                        break;
+                    case EQUALS_VALUE:
+                        r.result = left == right;
+                        break;
+                    case NOT_EQUAL_VALUE:
+                        r.result = left != right;
+                        break;
+                }
+                r.resultType = Constant.BOOLEAN_TYPE;
+                return r;
+
+            }
+        };
+        String op = "";
         switch (dyad.getOperatorType()) {
             case AND_VALUE:
-                result = left && right;
+                op = AND;
                 break;
             case OR_VALUE:
-                result = left || right;
+                op = OR;
                 break;
             case EQUALS_VALUE:
-                result = left == right;
+                op = EQUALS;
                 break;
             case NOT_EQUAL_VALUE:
-                result = left != right;
+                op = NOT_EQUAL;
                 break;
 
         }
-        dyad.setResult(result);
-        dyad.setEvaluated(true);
-        dyad.setResultType(Constant.BOOLEAN_TYPE);
+        process2(dyad, pointer, op, state);
     }
 
     protected void doDyadMinus(Dyad dyad, State state) {
-        Object left = dyad.getArgumments().get(0).evaluate(state);
-        Object right = dyad.getArgumments().get(1).evaluate(state);
-        Object result = null;
-        if ((left instanceof Long) && (right instanceof Long)) {
-            Long lLeft = (Long) left;
-            Long lRight = (Long) right;
-            result = lLeft - lRight;
-            dyad.setResultType(Constant.LONG_TYPE);
-        } else {
-            // contract says to remove the string on the right from the one on the
-            // left.
-            String lString = left.toString();
-            String rString = right.toString();
-            int ndx = lString.indexOf(rString);
-            while (0 <= ndx) {
-                lString = lString.substring(0, ndx) + lString.substring(ndx + rString.length());
-                ndx = lString.indexOf(rString);
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (areAllNumbers(objects)) {
+                    if (areAllLongs(objects)) {
+                        r.result = (Long) objects[0] - (Long) objects[1];
+                        r.resultType = Constant.LONG_TYPE;
+                    } else {
+                        BigDecimal left = toBD(objects[0]);
+                        BigDecimal right = toBD(objects[1]);
+                        r.result = left.subtract(right);
+                        r.resultType = Constant.DECIMAL_TYPE;
+                    }
+                } else {
+                    if (!areAllStrings(objects)) {
+                        throw new IllegalArgumentException("Error: cannot perform " + MINUS + " on mixed argument types.");
+                    }
+                    String lString = objects[0].toString();
+                    String rString = objects[1].toString();
+                    int ndx = lString.indexOf(rString);
+                    while (0 <= ndx) {
+                        lString = lString.substring(0, ndx) + lString.substring(ndx + rString.length());
+                        ndx = lString.indexOf(rString);
+                    }
+                    r.result = lString;
+                    r.resultType = Constant.STRING_TYPE;
+                }
+                return r;
             }
-            result = lString;
-            dyad.setResultType(Constant.STRING_TYPE);
-        }
-        dyad.setResult(result);
-        dyad.setEvaluated(true);
+        };
+        process2(dyad, pointer, PLUS, state);
     }
 
     protected void doDyadTimesOrDivide(Dyad dyad, State state, boolean doTimes) {
-        Object result = null;
-        Object left = dyad.getArgumments().get(0).evaluate(state);
-        Object right = dyad.getArgumments().get(1).evaluate(state);
-        if ((left instanceof Long) && (right instanceof Long)) {
-            Long lLeft = (Long) left;
-            Long lRight = (Long) right;
-            if (doTimes) {
-                result = lLeft * lRight;
-            } else {
-                result = lLeft / lRight;
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (areAllNumbers(objects)) {
+                    if (areAllLongs(objects)) {
+                        if (doTimes) {
+                            r.result = (Long) objects[0] * (Long) objects[1];
+                        } else {
+                            r.result = (Long) objects[0] / (Long) objects[1];
+                        }
+                        r.resultType = Constant.LONG_TYPE;
+                    } else {
+                        BigDecimal left = toBD(objects[0]);
+                        BigDecimal right = toBD(objects[1]);
+                        if (doTimes) {
+                            r.result = left.multiply(right);
+                        } else {
+                            r.result = left.divide(right);
+                        }
+                        r.resultType = Constant.DECIMAL_TYPE;
+                    }
+                } else {
+                    throw new IllegalArgumentException("Error: operation is not defined for  non-numeric types");
+                }
+                return r;
             }
-        } else {
-            throw new IllegalArgumentException("Error cannot multiply or divide non-numbers");
-        }
-        dyad.setResult(result);
-        dyad.setResultType(Constant.LONG_TYPE);
-        dyad.setEvaluated(true);
+        };
+        process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
     }
 
     protected void doDyadPlus(Dyad dyad, State state) {
-        Object result = null;
-        Object left = dyad.getArgumments().get(0).evaluate(state);
-        Object right = dyad.getArgumments().get(1).evaluate(state);
-        if ((left instanceof Long) && (right instanceof Long)) {
-            Long lLeft = (Long) left;
-            Long lRight = (Long) right;
-            result = lLeft + lRight;
-            dyad.setResultType(Constant.LONG_TYPE);
-        } else {
-            result = left.toString() + right.toString();
-            dyad.setResultType(Constant.STRING_TYPE);
-        }
-        dyad.setResult(result);
-        dyad.setEvaluated(true);
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (areAllNumbers(objects)) {
+                    if (areAllLongs(objects)) {
+                        r.result = (Long) objects[0] + (Long) objects[1];
+                        r.resultType = Constant.LONG_TYPE;
+                    } else {
+                        BigDecimal left = toBD(objects[0]);
+                        BigDecimal right = toBD(objects[1]);
+                        r.result = left.add(right);
+                        r.resultType = Constant.DECIMAL_TYPE;
+                    }
+                } else {
+                    r.result = objects[0].toString() + objects[1].toString();
+                    r.resultType = Constant.STRING_TYPE;
+                }
+                return r;
+            }
+        };
+        process2(dyad, pointer, PLUS, state);
     }
 
 
     public void evaluate(Monad monad, State state) {
+
         switch (monad.getOperatorType()) {
             case NOT_VALUE:
                 doMonadNot(monad, state);
@@ -261,8 +364,19 @@ public class OpEvaluator implements EvaluatorInterface {
 
     }
 
+    /**
+     * NOTE that at this point this only works for single variables -- you can't apply
+     * this to a stem.
+     * @param monad
+     * @param state
+     * @param isPlusPlus
+     */
     protected void doMonadIncOrDec(Monad monad, State state, boolean isPlusPlus) {
         VariableNode var = (VariableNode) monad.getArgument();
+        Object obj = var.evaluate(state);
+        if(!isLong(obj)){
+            throw new IllegalArgumentException("Error: " + (isPlusPlus?PLUS_PLUS:MINUS_MINUS) + " requires an integer value");
+        }
         Long x = (Long) var.evaluate(state);
         Long result = null;
         if (isPlusPlus) {
@@ -285,17 +399,40 @@ public class OpEvaluator implements EvaluatorInterface {
 
 
     protected void doMonadNot(Monad monad, State state) {
-        Boolean b = (Boolean) monad.getArgument().evaluate(state);
-        monad.setResult(!b);
-        monad.setResultType(Constant.BOOLEAN_TYPE);
-        monad.setEvaluated(true);
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                    fpResult r = new fpResult();
+                    if(!isBoolean(objects[0])){
+                        throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not \"" + objects[0] + "\"");
+                    }
+                Boolean b = (Boolean) monad.getArgument().evaluate(state);
+                r.result = !b;
+                r.resultType = Constant.BOOLEAN_TYPE;
+                return r;
+            }
+        };
+        process1(monad, pointer, NOT, state);
     }
 
     protected void doMonadMinus(Monad monad, State state) {
-        Long value = (Long) monad.getArgument().evaluate(state);
-        monad.setResult(-value);
-        monad.setResultType(Constant.LONG_TYPE);
-        monad.setEvaluated(true);
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if(!isNumber(objects[0])) throw new IllegalArgumentException("Error: You can only take the negative of a number");
+                if(isLong(objects[0])){
+                    r.result =  -(Long) objects[0];
+                    r.resultType = Constant.LONG_TYPE;
+                }else{
+                    BigDecimal x = toBD(objects[0]);
+                    r.result = BigDecimal.ZERO.subtract(x);
+                    r.resultType = Constant.DECIMAL_TYPE;
+                }
+                return r;
+            }
+        };
+        process1(monad,pointer,MINUS,state);
     }
 
     public void evaluate(Nilad nilad, State state) {
@@ -306,4 +443,8 @@ public class OpEvaluator implements EvaluatorInterface {
     }
 
 
+    @Override
+    public boolean evaluate(Polyad polyad, State state) {
+        return false;
+    }
 }

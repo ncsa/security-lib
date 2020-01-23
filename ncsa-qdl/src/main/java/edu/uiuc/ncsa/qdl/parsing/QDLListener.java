@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.math.BigDecimal;
 import java.net.URI;
 
 /**
@@ -54,31 +55,23 @@ public class QDLListener implements QDLParserListener {
     }
 
     @Override
-    public void enterScalar(QDLParserParser.ScalarContext ctx) {
+    public void enterVariable(QDLParserParser.VariableContext ctx) {
         stash(ctx, new VariableNode(null));
+
     }
 
     @Override
-    public void exitScalar(QDLParserParser.ScalarContext ctx) {
+    public void exitVariable(QDLParserParser.VariableContext ctx) {
         StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
         if (ctx.getText().equals("true") || ctx.getText().equals("false")) {
             // SPECIAL CASE. The parse recognizes true and false, but does not know what to do with them.
             // We are here because it lumps them together with the variable values.
-            ConstantNode cnode = new ConstantNode(new Boolean(ctx.ID().equals("true")), Constant.BOOLEAN_TYPE);
+            ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals("true")), Constant.BOOLEAN_TYPE);
             p.statement = cnode;
         } else {
             ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
         }
-    }
 
-    @Override
-    public void enterStem(QDLParserParser.StemContext ctx) {
-        stash(ctx, new VariableNode(null));
-    }
-
-    @Override
-    public void exitStem(QDLParserParser.StemContext ctx) {
-        ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
     }
 
     protected void stash(ParseTree parseTree, Element element) {
@@ -210,15 +203,32 @@ public class QDLListener implements QDLParserListener {
     }
 
     @Override
+    public void enterNumber(QDLParserParser.NumberContext ctx) {
+
+    }
+
+    @Override
+    public void exitNumber(QDLParserParser.NumberContext ctx) {
+        ConstantNode constantNode;
+        if (ctx.getText().contains(".")) {
+            BigDecimal decimal = new BigDecimal(ctx.getText());
+            constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
+        } else {
+            Long value = Long.parseLong(ctx.getChild(0).getText());
+            constantNode = new ConstantNode(value, Constant.LONG_TYPE);
+        }
+        stash(ctx, constantNode);
+
+    }
+
+    @Override
     public void enterNumbers(QDLParserParser.NumbersContext ctx) {
 
     }
 
     @Override
     public void exitNumbers(QDLParserParser.NumbersContext ctx) {
-        Long value = Long.parseLong(ctx.getChild(0).getText());
-        ConstantNode constantNode = new ConstantNode(value, Constant.LONG_TYPE);
-        stash(ctx, constantNode);
+
     }
 
 
@@ -256,16 +266,7 @@ public class QDLListener implements QDLParserListener {
 
     }
 
-    @Override
-    public void enterStemVariables(QDLParserParser.StemVariablesContext ctx) {
-
-    }
-
-    @Override
-    public void exitStemVariables(QDLParserParser.StemVariablesContext ctx) {
-
-    }
-
+   
     @Override
     public void enterLogical(QDLParserParser.LogicalContext ctx) {
 

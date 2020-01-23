@@ -75,7 +75,7 @@ public class StemFunctionsTest extends TestBase {
         sourceStem.put("bind", "and in the darkness bind them");
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS_TYPE);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -90,6 +90,46 @@ public class StemFunctionsTest extends TestBase {
             assert sourceStem.containsKey(keys.get(key));
         }
     }
+
+    @Test
+       public void testCommonKeys() throws Exception {
+           State state = testUtils.getNewState();
+           SymbolTable symbolTable = state.getSymbolStack();
+
+
+           StemVariable sourceStem = new StemVariable();
+           sourceStem.put("rule", "One Ring to rule them all");
+           sourceStem.put("find", "One Ring to find them");
+           sourceStem.put("bring", "One Ring to bring them all");
+           sourceStem.put("bind", "and in the darkness bind them");
+
+        StemVariable sourceStem2 = new StemVariable();
+        sourceStem2.put("rule", "mairzy doats");
+        sourceStem2.put("find", "and dozey");
+        sourceStem2.put("bring", "doats");
+        sourceStem2.put("3", "and in the darkness bind them");
+        sourceStem2.put("5", "whatever");
+
+
+
+           symbolTable.setStemVariable("sourceStem.", sourceStem);
+           symbolTable.setStemVariable("sourceStem2.", sourceStem2);
+           Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS_TYPE);
+           VariableNode arg = new VariableNode("sourceStem.");
+           VariableNode arg2 = new VariableNode("sourceStem2.");
+           polyad.addArgument(arg);
+           polyad.addArgument(arg2);
+           polyad.evaluate(state);
+           StemVariable keys = (StemVariable) polyad.getResult();
+           assert keys.size() == 3;
+           assert keys.containsValue("rule");
+           assert keys.containsValue("find");
+           assert !keys.containsValue("bind");
+           assert keys.containsValue("bring");
+           for (String key : keys.keySet()) {
+               System.out.println("  var." + key + " == " + keys.get(key));
+           }
+       }
 
     @Test
     public void testmakeIndex() throws Exception {

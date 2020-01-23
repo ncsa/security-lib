@@ -50,6 +50,10 @@ public class Assignment implements Statement {
                 break;
             case Constant.LONG_TYPE:
                 symbolTable.setLongValue(variableReference, (Long) result);
+
+                break;
+            case Constant.DECIMAL_TYPE:
+                symbolTable.setValue(variableReference, result);
                 break;
             default:
                 throw new IllegalArgumentException("error, the type of the value \"" + argument.getResult() + "\" is unknown");
