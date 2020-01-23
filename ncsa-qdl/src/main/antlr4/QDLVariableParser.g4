@@ -11,17 +11,15 @@ grammar QDLVariableParser;
 
   variable : ID;
 
-   number : Nummer;
+   number : Number;
 
 
 // Lexer stuff
 // NOTE: ORDER MATTERS!! You can easily break the parser if you change the order of these
 // so if you add a rule, you must re-run the tests and look for regression and be prepared
 // to move the new rule around to the right spot.
-     Nummer : [0-9]+ ('.')? [0-9]*;
+     Number : [0-9]+ ('.')? [0-9]*;
          ID : [a-zA-Z_$][a-zA-Z_$0-9#.]*;
-      Sign  : ('+'|'-');
-      //Nummer : [0-9]+;
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : ':=';
    FuncStart: ID '(';

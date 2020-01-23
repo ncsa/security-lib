@@ -27,8 +27,8 @@ expression
  | expression '||' expression                           #orExpression
  | '(' expression ')'                                   #association
  | LeftBracket                                          #leftBracket
- | variable                                             #variables
  | number                                               #numbers
+ | variable                                             #variables
  | Bool                                                 #logical
  | Null                                                 #null
  | STRING                                               #strings
