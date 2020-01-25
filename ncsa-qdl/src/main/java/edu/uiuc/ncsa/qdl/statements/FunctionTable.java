@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import org.apache.commons.collections.list.TreeList;
+
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -26,5 +29,16 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
 
     public boolean containsKey(String var, int argCount) {
         return super.containsKey(createKey(var, argCount));
+    }
+
+    public String listFunctions(){
+        List<String> names = new TreeList();
+        for(String key: keySet()){
+            String name = key.substring(0, key.indexOf(munger)); // de-munge
+            FunctionRecord fr = get(key);
+            name = name + "(" + fr.getArgCount() + ")";
+            names.add(name);
+        }
+        return names.toString();
     }
 }

@@ -53,7 +53,7 @@ public class ConditionalStatement implements Statement {
                 arg.evaluate(newState);
             }
         } else {
-            if (elseArguments != null) {
+            if (elseArguments != null && !elseArguments.isEmpty()) {
                 for (Statement arg : elseArguments) {
                     arg.evaluate(newState);
                 }
@@ -62,4 +62,16 @@ public class ConditionalStatement implements Statement {
         }
         return result;
     }
+
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    @Override
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+
+    String sourceCode;
 }

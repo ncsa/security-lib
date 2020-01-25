@@ -118,8 +118,22 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 Long pos = new Long(-1L);
-                if (areAllStrings(objects)) {
-                    pos = new Long(objects[0].toString().indexOf(objects[1].toString()));
+                boolean caseSensitive = true;
+                if(objects.length == 3){
+                       if(!(objects[2] instanceof Boolean)){
+                           throw new IllegalArgumentException("Error: if the 3rd argument is given, it must be a boolean.");
+                       }
+                       caseSensitive = (Boolean)objects[2];
+                }
+
+                if (areAllStrings(objects[0], objects[1])) {
+                    if(caseSensitive){
+                        pos = new Long(objects[0].toString().indexOf(objects[1].toString()));
+
+                    } else{
+
+                        pos = new Long(objects[0].toString().toLowerCase().indexOf(objects[1].toString().toLowerCase()));
+                    }
                 }
                 r.result = pos;
                 r.resultType = Constant.LONG_TYPE;
@@ -127,7 +141,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process2(polyad, pointer, INDEX_OF,state);
+        process2(polyad, pointer, INDEX_OF,state, true);
     }
 
     protected void doContains(Polyad polyad,State state) {
@@ -135,8 +149,19 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-                if (areAllStrings(objects)) {
-                    r.result = objects[0].toString().contains(objects[1].toString());
+                if (areAllStrings(objects[0], objects[1])) {
+                    boolean caseSensitive = true;
+                    if(objects.length == 3){
+                           if(!(objects[2] instanceof Boolean)){
+                               throw new IllegalArgumentException("Error: if the 3rd argument is given, it must be a boolean.");
+                           }
+                           caseSensitive = (Boolean)objects[2];
+                    }
+                    if(caseSensitive){
+                        r.result = objects[0].toString().contains(objects[1].toString());
+                    }else{
+                        r.result = objects[0].toString().toLowerCase().contains(objects[1].toString().toLowerCase());
+                    }
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = Boolean.FALSE;
@@ -146,7 +171,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process2(polyad, pointer, CONTAINS,state);
+        process2(polyad, pointer, CONTAINS,state, true);
 
     }
 

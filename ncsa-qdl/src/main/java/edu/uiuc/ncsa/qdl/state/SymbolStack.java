@@ -36,9 +36,12 @@ public class SymbolStack extends AbstractSymbolTable {
      * @param parentTables
      */
     public SymbolStack(NamespaceResolver namespaceResolver, ArrayList<SymbolTable> parentTables) {
-        this.parentTables = parentTables;
+        for (SymbolTable s : parentTables) {
+            // use this and not addParent, since that reverses their order, inserting a the front of the list
+            getParentTables().add(s);
+        }
         this.namespaceResolver = namespaceResolver;
-        parentTables.add(new SymbolTableImpl(namespaceResolver));
+        addParent(new SymbolTableImpl(namespaceResolver));
     }
 
     /*
@@ -94,7 +97,7 @@ public class SymbolStack extends AbstractSymbolTable {
 
             String head = getStemHead(variableName);
 
-            if (null != findValueInATable(head + ".")) {
+            if (null == findValueInATable(head)) {
                 // this is not defined any place, so it gets a null.
                 return null;
             }
@@ -131,10 +134,20 @@ public class SymbolStack extends AbstractSymbolTable {
                 }
 
             }
-
-            return findValueInATable(head  + returnedValue); // head include final .
+      //      System.out.println("SymbolStack (" + getParentTables().size() + ") returning " + variableName + " = " + returnedValue);
+            return findValueInATable(head + returnedValue); // head include final .
         }
-        return findValueInATable(variableName);
+     /*   for(SymbolTable s : getParentTables()){
+            if(s.isDefined(variableName)) {
+                System.out.println("\n   checking  parents " + variableName + " = " + s.resolveValue(variableName));
+            }
+
+        }*/
+        Object obj = findValueInATable(variableName);
+        //System.out.println("SymbolStack2  (" + getParentTables().size() + ") returning " + variableName + " = " + obj);
+
+
+        return obj;
     }
 
     public void setStringValue(String variableName, String value) {
@@ -144,36 +157,44 @@ public class SymbolStack extends AbstractSymbolTable {
 
     @Override
     public void setValue(String variableName, Object value) {
-        if (isDefined(variableName)) {
-            SymbolTable st = getRightST(variableName);
-            if(!isStem(variableName)){
-                st.setValue(variableName, value);
-                return;
-            }
-            if(isTotalStem(variableName)){
-                st.setValue(variableName, value);
-                return;
-            }
-            String t = getStemTail(variableName);
-            Object resolvedTail = resolveValue(t);
-            st.setValue(getStemHead(variableName) + resolvedTail, value);
+        SymbolTable st = getRightST(variableName);
+        if (st == null) {
+            // nothing like this exists, so it goes in the local environment
+            getTopST().setValue(variableName, value);
             return;
         }
-        getTopST().setValue(variableName, value);
+        if (isTotalStem(variableName)) {
+            // case is setting something like a. := ...
+            // Just set it. No tail resolution needed.
+            st.setValue(variableName, value);
+            return;
+        }
+        if (!isStem(variableName)) {
+            st.setValue(variableName, value);
+            return;
+        }
+
+        String t = getStemTail(variableName);
+        Object resolvedTail = resolveValue(t);
+        st.setValue(getStemHead(variableName) + (resolvedTail==null?t:resolvedTail), value);
+        return;
     }
 
     /**
      * Generally use this method. So the searchSTs looks in all the tables, including the current one. If none of them
      * work, then the default is to work with the zero-th table. So this searches and returns
      * the correct table.
+     * <br/><br/> <b>NOTE</b> this will look for the variable, if simple and the stem -- with no resolution of the
+     * tail. So if this is passed a.b.c.d.e it will return the {@link SymbolTable} containing a. The tail has to be
+     * resolved elsewhere. A null means this variable is not defined anyplace.
      *
      * @param variableName
      * @return
      */
     protected SymbolTable getRightST(String variableName) {
         String variableToCheck = variableName;
-        if(isStem(variableName)){
-                variableToCheck = getStemHead(variableName);
+        if (isStem(variableName)) {
+            variableToCheck = getStemHead(variableName);
         }
         for (SymbolTable s : getParentTables()) {
             if (s.isDefined(variableToCheck)) {

@@ -293,34 +293,35 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-       public void testIncludeScalarKey() throws Exception {
-           State state = testUtils.getNewState();
-           SymbolTable symbolTable = state.getSymbolStack();
+    public void testIncludeScalarKey() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
 
-           StemVariable sourceStem = new StemVariable();
-           StemVariable keys = new StemVariable();
-           String targetKey = getRandomString();
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        String targetKey = getRandomString();
 
-           sourceStem.put(targetKey, getRandomString());
-           int count = 5;
-           for (int i = 0; i < count; i++) {
-               String key = getRandomString();
-               sourceStem.put(key, getRandomString());
-           }
+        sourceStem.put(targetKey, getRandomString());
+        int count = 5;
+        for (int i = 0; i < count; i++) {
+            String key = getRandomString();
+            sourceStem.put(key, getRandomString());
+        }
 
 
-           symbolTable.setStemVariable("sourceStem.", sourceStem);
-           Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
-           VariableNode arg = new VariableNode("sourceStem.");
-           ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
-           polyad.addArgument(arg);
-           polyad.addArgument(arg2);
-           polyad.evaluate(state);
-           StemVariable result = (StemVariable) polyad.getResult();
-           assert result.size() == 1;
-           assert result.containsKey(targetKey);
-       }
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == 1;
+        assert result.containsKey(targetKey);
+    }
+
     @Test
     public void testHasKeys() throws Exception {
         State state = testUtils.getNewState();
@@ -363,38 +364,38 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-       public void testHasScalarKeys() throws Exception {
-           State state = testUtils.getNewState();
-           SymbolTable symbolTable = state.getSymbolStack();
+    public void testHasScalarKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
 
-           StemVariable sourceStem = new StemVariable();
-           StemVariable keys = new StemVariable();
-           int count = 5;
-           String targetKey = getRandomString();
-           sourceStem.put(targetKey, getRandomString());
-           int j = 0;
-           for (int i = 0; i < count; i++) {
-               String key = getRandomString();
-               if (0 == i % 2) {
-                   keys.put(Integer.toString(j++), key);
-               }
-               sourceStem.put(key, getRandomString());
-           }
-           // add a few that aren't in the target stem.
-           for (int i = 0; i < count; i++) {
-               keys.put(Integer.toString(j++), getRandomString());
-           }
-           symbolTable.setStemVariable("sourceStem.", sourceStem);
-           symbolTable.setStemVariable("keys.", keys);
-           Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
-           VariableNode arg = new VariableNode("sourceStem.");
-           ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
-           polyad.addArgument(arg);
-           polyad.addArgument(arg2);
-           polyad.evaluate(state);
-           assert (Boolean) polyad.getResult();
-       }
+        StemVariable sourceStem = new StemVariable();
+        StemVariable keys = new StemVariable();
+        int count = 5;
+        String targetKey = getRandomString();
+        sourceStem.put(targetKey, getRandomString());
+        int j = 0;
+        for (int i = 0; i < count; i++) {
+            String key = getRandomString();
+            if (0 == i % 2) {
+                keys.put(Integer.toString(j++), key);
+            }
+            sourceStem.put(key, getRandomString());
+        }
+        // add a few that aren't in the target stem.
+        for (int i = 0; i < count; i++) {
+            keys.put(Integer.toString(j++), getRandomString());
+        }
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("keys.", keys);
+        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        assert (Boolean) polyad.getResult();
+    }
 
     @Test
     public void testmakeIndex() throws Exception {
@@ -460,5 +461,78 @@ public class StemFunctionsTest extends TestBase {
         polyad.addArgument(arg);
         polyad.evaluate(state);
         assert !symbolTable.isDefined("sourceStem.");
+    }
+
+    @Test
+    public void testdefaultValue() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "One Ring to rule them all");
+        sourceStem.put("find", "One Ring to find them");
+        sourceStem.put("bring", "One Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        Long expectedResult = new Long(42L);
+        VariableNode arg = new VariableNode("sourceStem.");
+        ConstantNode arg2 = new ConstantNode(expectedResult, Constant.LONG_TYPE);
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2);
+        polyad.evaluate(state);
+        Long defaultValue = (Long) polyad.getResult();
+        assert defaultValue.equals(expectedResult);
+        assert sourceStem.getDefaultValue().equals(expectedResult);
+        assert sourceStem.get("foo").equals(expectedResult);
+    }
+
+    @Test
+    public void testBadValue() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
+
+
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "One Ring to rule them all");
+        sourceStem.put("find", "One Ring to find them");
+        sourceStem.put("bring", "One Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
+
+
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        polyad.addArgument(arg);
+        polyad.addArgument(arg); // set second to be a stem so it fails
+        try {
+            polyad.evaluate(state);
+            assert false;
+        } catch (IllegalArgumentException x) {
+            assert true;
+        }
+    }
+
+    @Test
+    public void testDefault_NoStem() throws Exception {
+        State state = testUtils.getNewState();
+        Long expectedResult = new Long(42L);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        VariableNode arg = new VariableNode("sourceStem.");
+        ConstantNode arg2 = new ConstantNode(expectedResult, Constant.LONG_TYPE);
+
+        polyad.addArgument(arg);
+        polyad.addArgument(arg2); // set second to be a stem so it fails
+        polyad.evaluate(state);
+        StemVariable sourceStem = (StemVariable) state.getSymbolStack().resolveValue("sourceStem.");
+        Long defaultValue = (Long) polyad.getResult();
+        assert defaultValue.equals(expectedResult);
+        assert sourceStem.getDefaultValue().equals(expectedResult);
+        assert sourceStem.get("foo").equals(expectedResult);
+        assert !sourceStem.containsKey("foo");
+
     }
 }

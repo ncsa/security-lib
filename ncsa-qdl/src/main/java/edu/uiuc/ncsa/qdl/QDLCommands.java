@@ -14,7 +14,10 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.Vector;
 
 /**
@@ -32,7 +35,7 @@ public class QDLCommands extends CommonCommands {
     }
 
     protected void showRunHelp() {
-        say("run [-x line | -line]");
+        say("run [-x line | -buffer]");
         sayi("-x means to immediately execute the rest of the line and not enter the interpreter.");
         sayi("-line = run in line mode. Every line is executed. This lets you use this much like a calculator.");
         sayi("        (Be sure you end each command with a semicolon or you will get errors");
@@ -69,16 +72,19 @@ public class QDLCommands extends CommonCommands {
     protected String DEBUG_PROMPT = ")debug"; // toggle debug
     protected String MODE_COMMAND = ")mode";
     protected String SAVE_COMMAND = ")save";
-    protected void loadState(String path){
+    protected String LOAD_COMMAND = ")load"; // grab a file and run it
+    protected String CLEAR_COMMAND = ")clear"; // reset the state to being new.
+
+    protected void loadState(String path) {
         try {
 
-            FileReader fis  = new FileReader(path);
+            FileReader fis = new FileReader(path);
             BufferedReader bi = new BufferedReader(fis);
             String lineIn = bi.readLine();
             StringBuffer stringBuffer = new StringBuffer();
-            while(lineIn != null){
-                   stringBuffer.append(lineIn);
-                   lineIn = bi.readLine();
+            while (lineIn != null) {
+                stringBuffer.append(lineIn);
+                lineIn = bi.readLine();
             }
             bi.close();
             JSONObject jsonObject = JSONObject.fromObject(stringBuffer.toString());
@@ -86,33 +92,35 @@ public class QDLCommands extends CommonCommands {
             mm.fromJSON(jsonObject.getJSONObject("module"));
 
 
-        }catch(Throwable t){
+        } catch (Throwable t) {
             say("workspace not loaded.");
             t.printStackTrace();
         }
     }
-     protected void saveState(String path){
-         try {
-             File f = new File(path);
-             JSONObject jsonObject = new JSONObject();
-             JSON json = state.getSymbolStack().toJSON();
-             jsonObject.put("stack", json);
-             JSON mm = state.getModuleMap().toJSON();
-             jsonObject.put("modules", mm);
-             FileWriter fw = new FileWriter("/tmp/qdl.ws");
-             fw.write(jsonObject.toString(2));
-             fw.flush();
-             fw.close();
 
-             say("Symbol table saved ");
-         }catch(Throwable t){
-             say("Symbol not table saved ");
+    protected void saveState(String path) {
+        try {
+            File f = new File(path);
+            JSONObject jsonObject = new JSONObject();
+            JSON json = state.getSymbolStack().toJSON();
+            jsonObject.put("stack", json);
+            JSON mm = state.getModuleMap().toJSON();
+            jsonObject.put("modules", mm);
+            FileWriter fw = new FileWriter("/tmp/qdl.ws");
+            fw.write(jsonObject.toString(2));
+            fw.flush();
+            fw.close();
 
-             t.printStackTrace();
-         }
-     }
+            say("Symbol table saved ");
+        } catch (Throwable t) {
+            say("Symbol not table saved ");
+
+            t.printStackTrace();
+        }
+    }
+
     public void run(InputLine inputLine) throws Throwable {
-        boolean lineMode = inputLine.hasArg("-line");
+        boolean bufferMode = inputLine.hasArg("-buffer");
         boolean isDebugOn = inputLine.hasArg("-debug");
         if (showHelp(inputLine)) {
             showRunHelp();
@@ -131,10 +139,10 @@ public class QDLCommands extends CommonCommands {
 
         }
 
-        if (lineMode) {
-            say("Line mode. Every time you hit return, the line executes. Enter " + OFF_COMMAND + " to exit.");
-        } else {
+        if (bufferMode) {
             say("Buffered mode. To execute the buffer, enter a single '.' or )exit to exit");
+        } else {
+            say("Line mode. Every time you hit return, the line executes. Enter " + OFF_COMMAND + " to exit.");
         }
         boolean isExit = false;
         StringBuffer buffer = new StringBuffer();
@@ -144,7 +152,7 @@ public class QDLCommands extends CommonCommands {
             say("parser debug mode enabled.");
         }
         while (!isExit) {
-            if (lineMode) {
+            if (bufferMode) {
                 System.out.print(RUN_PROMPT);
             }
             String input = readline().trim();
@@ -153,6 +161,56 @@ public class QDLCommands extends CommonCommands {
                 vars = vars.substring(1); // chop off lead [
                 vars = vars.substring(0, vars.length() - 1);
                 say(vars);
+                continue;
+            }
+            if (input.startsWith(LOAD_COMMAND)) {
+                String name = input.substring(LOAD_COMMAND.length()).trim();
+                File f;
+                File rootDir = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/");
+
+                if (name == null || name.isEmpty()) {
+                    f = new File(rootDir, "recursion_test_fib.qdl");
+                } else {
+                    f = new File(rootDir, name);
+
+                }
+                say("loading " + f.getName());
+                FileReader fileReader = new FileReader(f);
+                StringBuffer stringBuffer = new StringBuffer();
+                try {
+                    BufferedReader br = new BufferedReader(fileReader);
+                    String line = br.readLine();
+                    while (line != null) {
+                        stringBuffer.append(line + "\n"); // so it has lines to check if it blows up
+                        line = br.readLine();
+                    }
+                    br.close();
+                    interpreter.execute(stringBuffer.toString());
+                    say("ok");
+                } catch (Throwable t) {
+                    say("uh-oh " + t.getMessage());
+
+                }
+
+                continue;
+            }
+            if(input.equals(CLEAR_COMMAND)){
+                NamespaceResolver resolver = state.getResolver();
+                State newState = new State(resolver,
+                        new SymbolStack(resolver),
+                        state.getOpEvaluator(),
+                        state.getMetaEvaluator(),
+                        new FunctionTable(),
+                        new ModuleMap());
+                state = newState;
+                say("workspace cleared");
+                continue;
+            }
+            if (input.equals(FUNCS_COMMAND)) {
+                String funs = state.getFunctionTable().listFunctions().trim();
+                funs = funs.substring(1); // chop off lead [
+                funs = funs.substring(0, funs.length() - 1);
+                say(funs);
                 continue;
             }
             if (input.equals(DEBUG_PROMPT)) {
@@ -173,7 +231,7 @@ public class QDLCommands extends CommonCommands {
                 continue;
             }
             boolean isExecute = false;
-            if (lineMode) {
+            if (!bufferMode) {
                 buffer.append(input + "\n");
                 try {
                     interpreter.execute(buffer.toString());

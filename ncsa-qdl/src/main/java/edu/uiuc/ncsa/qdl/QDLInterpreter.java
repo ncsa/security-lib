@@ -46,7 +46,7 @@ public class QDLInterpreter {
             runner.run();
 
         }catch(IllegalStateException isx){
-            isx.printStackTrace();
+           // isx.printStackTrace();
           System.out.println("syntax error");
         }
     }

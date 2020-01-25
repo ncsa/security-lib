@@ -1,0 +1,19 @@
+/*
+  This will generate the first n Fibonaaci numbers and stick the value in a stem
+  Jeff Gaynor
+  1/25/2020
+*/
+define[
+   fib2(n)
+   ]body[
+       a.0 := 1;
+       a.1 := 1;
+       while[
+          for_next(i, n, 2)
+       ]do[
+           j := i - 1;
+           k := i - 2;
+           a.i := a.j + a.k;
+       ]; //end while
+       return(a.);
+   ]; //end definition.

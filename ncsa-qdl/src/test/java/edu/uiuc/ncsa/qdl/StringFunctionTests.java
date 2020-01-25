@@ -108,6 +108,40 @@ public class StringFunctionTests extends TestBase {
     }
 
     @Test
+       public void testContainsStemStringCaseInsensitive() throws Exception {
+           State state = testUtils.getNewState();
+           SymbolTable symbolTable = state.getSymbolStack();
+
+           StemVariable sourceStem = new StemVariable();
+           sourceStem.put("rule", "oNe Ring to rule them all");
+           sourceStem.put("find", "OnE Ring to find them");
+           sourceStem.put("bring", "one Ring to bring them all");
+           sourceStem.put("bind", "and in the darkness bind them");
+           String targetString = "One";
+
+           symbolTable.setStemVariable("sourceStem.", sourceStem);
+           symbolTable.setStringValue("targetString", targetString);
+
+           Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+           VariableNode left = new VariableNode("sourceStem.");
+           VariableNode right = new VariableNode("targetString");
+           ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
+
+           polyad.addArgument(left);
+           polyad.addArgument(right);
+           polyad.addArgument(ignoreCase);
+           polyad.evaluate(state);
+           StemVariable result = (StemVariable) polyad.getResult();
+           assert result.containsKey("rule");
+           assert result.getBoolean("rule");
+           assert result.containsKey("find");
+           assert result.getBoolean("find");
+           assert result.containsKey("bring");
+           assert result.getBoolean("bring");
+           assert result.containsKey("bind");
+           assert !result.getBoolean("bind");
+       }
+    @Test
     public void testContainsStemStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -272,6 +306,37 @@ public class StringFunctionTests extends TestBase {
         assert result.getLong("bring") == 0L;
     }
 
+    @Test
+     public void testIndexOfStemString_ignoreCase() throws Exception {
+         State state = testUtils.getTestState();
+         SymbolTable symbolTable = state.getSymbolStack();
+
+         StemVariable sourceStem = new StemVariable();
+         sourceStem.put("rule", "one Ring to rule them all");
+         sourceStem.put("find", "onE Ring to find them");
+         sourceStem.put("bring", "oNE Ring to bring them all");
+         sourceStem.put("bind", "and in the darkness bind them");
+         String targetString = "ONE";
+
+         symbolTable.setStemVariable("sourceStem.", sourceStem);
+         symbolTable.setStringValue("targetString", targetString);
+
+         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+         VariableNode left = new VariableNode("sourceStem.");
+         VariableNode right = new VariableNode("targetString");
+        ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
+
+         polyad.addArgument(left);
+         polyad.addArgument(right);
+         polyad.addArgument(ignoreCase);
+         polyad.evaluate(state);
+         StemVariable result = (StemVariable) polyad.getResult();
+         assert result.size() == 4;
+         assert result.getLong("rule") == 0L;
+         assert result.getLong("find") == 0L;
+         assert result.getLong("bind") == -1L;
+         assert result.getLong("bring") == 0L;
+     }
     @Test
     public void testIndexOfStemStem() throws Exception {
         State state = testUtils.getNewState();

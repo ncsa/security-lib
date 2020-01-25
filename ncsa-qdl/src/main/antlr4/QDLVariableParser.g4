@@ -4,11 +4,6 @@
 
 */
 grammar QDLVariableParser;
-
-//scalar : (ID '#')? ID ;
-
-//stem : ID '.' ((ID | Digits) '.')* (ID|Digits)?;
-
   variable : ID;
 
    number : Number;

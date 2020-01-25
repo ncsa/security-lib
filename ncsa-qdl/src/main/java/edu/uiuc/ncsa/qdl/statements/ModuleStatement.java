@@ -52,4 +52,16 @@ public class ModuleStatement implements Statement {
     public void setStatements(List<Statement> statements) {
         this.statements = statements;
     }
+
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    @Override
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+
+    String sourceCode;
 }

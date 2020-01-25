@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
 import edu.uiuc.ncsa.qdl.state.State;
 
 import java.util.ArrayList;
@@ -17,7 +18,9 @@ public class TryCatch implements Statement {
             for (Statement s : tryStatements) {
                 s.evaluate(localState);
             }
-        } catch (Throwable t) {
+        } catch (RaiseErrorException t) {
+            localState.getSymbolStack().getTopST().setStringValue("error_message", t.getPolyad().getArgumments().get(0).getResult().toString());
+            localState.getSymbolStack().getTopST().setLongValue("error_code", (Long) t.getPolyad().getArgumments().get(1).getResult());
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }
@@ -44,5 +47,16 @@ public class TryCatch implements Statement {
         this.catchStatements = catchStatements;
     }
 
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    @Override
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+
+    String sourceCode;
 }
 

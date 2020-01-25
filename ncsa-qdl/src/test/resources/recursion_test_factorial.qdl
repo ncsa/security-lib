@@ -1,0 +1,13 @@
+/*
+   A test for recursion to compute the factorial of a non-negative integer.
+   n! = n*(n-1)*(n-2)*...*(1);
+   Jeff Gaynor
+   1/25/2020
+*/
+define[
+  fac(n)
+  ]body[
+    if[n==0]then[return(1);];
+    return(n*fac(n-1));
+  ];
+

@@ -9,5 +9,6 @@ import edu.uiuc.ncsa.qdl.state.State;
  */
 public interface Statement {
     public Object evaluate(State state);
-
+    public String getSourceCode();
+    public void setSourceCode(String sourceCode);
 }

@@ -87,4 +87,14 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return operatorType;
     }
 
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+
+    String sourceCode;
 }

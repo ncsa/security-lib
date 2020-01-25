@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.QDLParserDriver;
+import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -146,6 +147,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
+        throw new RaiseErrorException(polyad);
     }
 
     protected void doReturn(Polyad polyad, State state) {

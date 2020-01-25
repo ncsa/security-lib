@@ -217,4 +217,16 @@ public class WhileLoop implements Statement {
         }
         return Boolean.TRUE;
     }
+
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    @Override
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
+
+    String sourceCode;
 }

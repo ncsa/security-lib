@@ -1,0 +1,12 @@
+/*
+  Tests recursion by computing Fibonacci series for n a non-negative integer.
+  Jeff Gaynor
+  1/25/2020
+
+*/
+define[
+   fib(n)
+  ]body[
+    if[ n <= 2 ]then[ return(1);];
+    return( fib(n - 1) + fib(n - 2));
+   ];

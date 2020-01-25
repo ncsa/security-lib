@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.RecursionException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -69,7 +70,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     + polyad.getArgumments().size() + " arguments was not found.");
         }
         State localState = state.newLocalState();
-        SymbolTable symbolTable = localState.getSymbolStack();
+        // we are going to write local variables here and the MUST get priority over already exiting ones
+        // but without actually changing them (or e.g., recursion is impossible). 
+        SymbolTable symbolTable = localState.getSymbolStack().getTopST();
         // now we populate the local state with the variables.
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
             // note that the call evaluates the state in the non-local environment as per contract,
@@ -84,6 +87,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(rx.resultType);
                 polyad.setEvaluated(true);
                 return;
+            } catch(java.lang.StackOverflowError sx){
+                throw new RecursionException();
             }
         }
         polyad.setResult(Boolean.TRUE);

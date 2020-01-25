@@ -68,6 +68,7 @@ public class QDLListener implements QDLParserListener {
             // We are here because it lumps them together with the variable values.
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals("true")), Constant.BOOLEAN_TYPE);
             p.statement = cnode;
+            cnode.setSourceCode(ctx.getText());
         } else {
             ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
         }
@@ -126,6 +127,7 @@ public class QDLListener implements QDLParserListener {
         ParseTree valueNode = ctx.children.get(2);
         ExpressionNode arg = (ExpressionNode) resolveChild(ctx.children.get(2));
         assignment.setArgument(arg);
+        assignment.setSourceCode(ctx.getText());
     }
 
     @Override
@@ -147,6 +149,7 @@ public class QDLListener implements QDLParserListener {
     public void exitFunction(QDLParserParser.FunctionContext ctx) {
         // Note that this resolves **all** functions, specifically the built in ones.
         Polyad polyad = (Polyad) parsingMap.getStatementFromContext(ctx);
+        polyad.setSourceCode(ctx.getText());
         // need to process its argument list.
         // There are 3 children  "f(" arglist ")", so we want the middle one.
 
@@ -199,6 +202,7 @@ public class QDLListener implements QDLParserListener {
 
         // in the context, the operator is the 0th child since it is prefixed.
         monad.setOperatorType(state.getOperatorType(ctx.getChild(0).getText()));
+        monad.setSourceCode(ctx.getText());
         finish(monad, ctx);
     }
 
@@ -253,7 +257,6 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, new Monad(OpEvaluator.NOT_VALUE, false));// automatically prefix
         Monad monad = (Monad) parsingMap.getStatementFromContext(ctx);
         finish(monad, ctx);
-
     }
 
     @Override
@@ -285,11 +288,15 @@ public class QDLListener implements QDLParserListener {
     protected void finish(Dyad dyad, ParseTree parseTree) {
         dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
         dyad.setRightArgument((ExpressionNode) resolveChild(parseTree.getChild(2)));
+        dyad.setSourceCode(parseTree.getText());
+
     }
 
     protected void finish(Monad monad, ParseTree parseTree) {
         int index = monad.isPostFix() ? 0 : 1; // post fix means 0th is the arg, prefix means 1 is the arg.
         monad.setArgument((ExpressionNode) resolveChild(parseTree.getChild(index)));
+        monad.setSourceCode(parseTree.getText());
+
     }
 
     @Override
@@ -373,6 +380,7 @@ public class QDLListener implements QDLParserListener {
             value = value.substring(0, value.length() - 1);
         }
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
+        node.setSourceCode(ctx.getText());
         stash(ctx, node);
         // that's it. set the value and we're done.
     }
@@ -467,6 +475,7 @@ public class QDLListener implements QDLParserListener {
         ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
         //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
         conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
+        conditionalStatement.setSourceCode(ctx.getText());
         boolean addToIf = true;
         try {
             for (int i = 3; i < ctx.getChildCount(); i++) {
@@ -488,6 +497,7 @@ public class QDLListener implements QDLParserListener {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
     }
 
     @Override
@@ -537,6 +547,7 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.StatementContext stmt : ctx.statement()) {
             whileLoop.getStatements().add(resolveChild(stmt));
         }
+        whileLoop.setSourceCode(ctx.getText());
     }
 
     @Override
@@ -635,7 +646,7 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
             module.getStatements().add(resolveChild(stmt));
         }
-
+       module.setSourceCode(moduleContext.getText());
 
         parsingMap.endMark();
         parsingMap.rollback();
@@ -652,7 +663,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
-
+         tryCatch.setSourceCode(tcContext.getText());
         boolean addToTry = true;
         try {
             for (int i = 1; i < tcContext.getChildCount(); i++) {

@@ -31,4 +31,15 @@ public class SwitchStatement implements Statement {
         }
         return Boolean.FALSE;
     }
+    String sourceCode;
+
+    @Override
+    public String getSourceCode() {
+        return sourceCode;
+    }
+
+    @Override
+    public void setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+    }
 }

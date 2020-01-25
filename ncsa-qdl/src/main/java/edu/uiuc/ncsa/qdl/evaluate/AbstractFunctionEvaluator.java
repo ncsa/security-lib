@@ -178,13 +178,26 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     protected void process2(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
-                            State state) {
-        if (polyad.getArgumments().size() != 2) {
+                            State state
+                            ) {
+                process2(polyad,pointer,name,state,false);
+    }
+
+    protected void process2(ExpressionImpl polyad,
+                            fPointer pointer,
+                            String name,
+                            State state,
+                            boolean optionalArgs) {
+        if (!optionalArgs && polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
         Object arg1 = polyad.getArgumments().get(0).evaluate(state);
         Object arg2 = polyad.getArgumments().get(1).evaluate(state);
-
+        if(optionalArgs){
+            for(int i = 2; i < polyad.getArgumments().size(); i++){
+                polyad.getArgumments().get(i).evaluate(state);
+            }
+        }
         if (areNoneStems(arg1, arg2)) {
             fpResult result = pointer.process(arg1, arg2);
             finishExpr(polyad, result);
@@ -197,7 +210,19 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         // now we loop -- note that we must still preserve which is the first and second argument
         // so all this is basically to figure out how to loop over what.
         for (String key : keys) {
-            fpResult r = pointer.process(stem1.get(key), stem2.get(key));
+            fpResult r;
+            if(optionalArgs){
+                Object[] objects = new Object[polyad.getArgumments().size()];
+                objects[0] = stem1.get(key);
+                objects[1] = stem2.get(key);
+                for(int i = 2; i < objects.length; i++){
+                    objects[i] = polyad.getArgumments().get(i).getResult();
+                }
+                r = pointer.process(objects);
+
+            }else{
+                 r = pointer.process(stem1.get(key), stem2.get(key));
+            }
             outStem.put(key, r.result);
         }
         polyad.setResult(outStem);

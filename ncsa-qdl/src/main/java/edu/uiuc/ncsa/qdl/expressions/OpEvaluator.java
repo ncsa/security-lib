@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Class the will evaluate and expression
@@ -50,6 +51,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int NOT_VALUE = 208;
     public static final int TIMES_VALUE = 209;
     public static final int DIVIDE_VALUE = 210;
+
+    public int getNumericDigits() {
+        return numericDigits;
+    }
+
+    public void setNumericDigits(int numericDigits) {
+        this.numericDigits = numericDigits;
+    }
+
+    int numericDigits = 50; // default precision for decimals.
 
     /**
      * Given an operator, this will return the integer value associated with it for lookups later.
@@ -282,7 +293,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process2(dyad, pointer, PLUS, state);
+        process2(dyad, pointer, MINUS, state);
     }
 
     protected void doDyadTimesOrDivide(Dyad dyad, State state, boolean doTimes) {
@@ -295,7 +306,26 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         if (doTimes) {
                             r.result = (Long) objects[0] * (Long) objects[1];
                         } else {
-                            r.result = (Long) objects[0] / (Long) objects[1];
+                            // So dividing a long by a long might result in
+                            // a decimal. This checks that and if so, return it,
+                            // otherwise it returns a long.
+                            Long leftLong = (Long)objects[0];
+                            Long rightLong = (Long)objects[1];
+                            if(leftLong % rightLong == 0){
+                                r.result = (Long) objects[0] / (Long) objects[1];
+
+                            }else{
+                                BigDecimal left = new BigDecimal((Long)objects[0]);
+                                BigDecimal right = new BigDecimal((Long)objects[1]);
+                                try {
+                                    BigDecimal out = left.divide(right, getNumericDigits(), RoundingMode.DOWN);
+                                    r.result = out;
+                                    r.resultType = Constant.DECIMAL_TYPE;
+
+                                }catch (ArithmeticException x){
+
+                                }
+                            }
                         }
                         r.resultType = Constant.LONG_TYPE;
                     } else {
@@ -367,6 +397,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     /**
      * NOTE that at this point this only works for single variables -- you can't apply
      * this to a stem.
+     *
      * @param monad
      * @param state
      * @param isPlusPlus
@@ -374,8 +405,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     protected void doMonadIncOrDec(Monad monad, State state, boolean isPlusPlus) {
         VariableNode var = (VariableNode) monad.getArgument();
         Object obj = var.evaluate(state);
-        if(!isLong(obj)){
-            throw new IllegalArgumentException("Error: " + (isPlusPlus?PLUS_PLUS:MINUS_MINUS) + " requires an integer value");
+        if (!isLong(obj)) {
+            throw new IllegalArgumentException("Error: " + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires an integer value");
         }
         Long x = (Long) var.evaluate(state);
         Long result = null;
@@ -402,12 +433,11 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
-                    fpResult r = new fpResult();
-                    if(!isBoolean(objects[0])){
-                        throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not \"" + objects[0] + "\"");
-                    }
-                Boolean b = (Boolean) monad.getArgument().evaluate(state);
-                r.result = !b;
+                fpResult r = new fpResult();
+                if (!isBoolean(objects[0])) {
+                    throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not \"" + objects[0] + "\"");
+                }
+                r.result = !(Boolean) objects[0];
                 r.resultType = Constant.BOOLEAN_TYPE;
                 return r;
             }
@@ -420,11 +450,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-                if(!isNumber(objects[0])) throw new IllegalArgumentException("Error: You can only take the negative of a number");
-                if(isLong(objects[0])){
-                    r.result =  -(Long) objects[0];
+                if (!isNumber(objects[0]))
+                    throw new IllegalArgumentException("Error: You can only take the negative of a number");
+                if (isLong(objects[0])) {
+                    r.result = -(Long) objects[0];
                     r.resultType = Constant.LONG_TYPE;
-                }else{
+                } else {
                     BigDecimal x = toBD(objects[0]);
                     r.result = BigDecimal.ZERO.subtract(x);
                     r.resultType = Constant.DECIMAL_TYPE;
@@ -432,7 +463,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process1(monad,pointer,MINUS,state);
+        process1(monad, pointer, MINUS, state);
     }
 
     public void evaluate(Nilad nilad, State state) {

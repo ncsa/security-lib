@@ -102,8 +102,8 @@ public class State {
      *
      */
     public State newLocalState() {
+        //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack(resolver, symbolStack.getParentTables());
-        newStack.addParent(new SymbolTableImpl(resolver));
         State newState = new State(resolver,
                 newStack,
                 getOpEvaluator(),

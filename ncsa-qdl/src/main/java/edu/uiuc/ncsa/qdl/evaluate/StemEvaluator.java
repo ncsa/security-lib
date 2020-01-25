@@ -30,6 +30,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String IS_DEFINED = "is_defined";
     public static final int IS_DEFINED_TYPE = 6 + STEM_FUNCTION_BASE_VALUE;
 
+    public static String SET_DEFAULT = "set_default";
+    public static final int SET_DEFAULT_TYPE = 7 + STEM_FUNCTION_BASE_VALUE;
+
+
     // Key functions
     public static String COMMON_KEYS = "common_keys";
     public static final int COMMON_KEYS_TYPE = 100 + STEM_FUNCTION_BASE_VALUE;
@@ -51,20 +55,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String RENAME_KEYS = "rename_keys";
     public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String SUBSET_KEYS = "subset_keys";
-    public static final int SUBSET_KEYS_TYPE = 106 + STEM_FUNCTION_BASE_VALUE;
+    public static String MASK = "mask";
+    public static final int MASK_TYPE = 106 + STEM_FUNCTION_BASE_VALUE;
 
 
     @Override
     public int getType(String name) {
         if (name.equals(SIZE)) return SIZE_TYPE;
+        if (name.equals(MASK)) return MASK_TYPE;
+        if (name.equals(SET_DEFAULT)) return SET_DEFAULT_TYPE;
         if (name.equals(COMMON_KEYS)) return COMMON_KEYS_TYPE;
         if (name.equals(EXCLUDE_KEYS)) return EXCLUDE_KEYS_TYPE;
         if (name.equals(GET_KEYS)) return GET_KEYS_TYPE;
         if (name.equals(HAS_KEYS)) return HAS_KEYS_TYPE;
         if (name.equals(INCLUDE_KEYS)) return INCLUDE_KEYS_TYPE;
         if (name.equals(RENAME_KEYS)) return RENAME_KEYS_TYPE;
-        if (name.equals(SUBSET_KEYS)) return SUBSET_KEYS_TYPE;
         if (name.equals(TO_STEM)) return TO_STEM_TYPE;
         if (name.equals(TO_LIST)) return TO_LIST_TYPE;
         if (name.equals(REMOVE)) return REMOVE_TYPE;
@@ -78,6 +83,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getOperatorType()) {
             case SIZE_TYPE:
                 doSize(polyad, state);
+                return true;
+            case SET_DEFAULT_TYPE:
+                doSetDefault(polyad, state);
+                return true;
+            case MASK_TYPE:
+                doMask(polyad, state);
                 return true;
             case COMMON_KEYS_TYPE:
                 doCommonKeys(polyad, state);
@@ -352,7 +363,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             StemVariable result = new StemVariable();
             String excluded = arg2.toString();
             for (String ndx : target.keySet()) {
-                    result.put(ndx, target.get(ndx));
+                result.put(ndx, target.get(ndx));
             }
             result.remove(excluded);
             polyad.setResult(result);
@@ -455,5 +466,74 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(result);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+    }
+
+    /**
+     * Sets the default value for a stem. returns the default value set.
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doSetDefault(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() != 2) {
+            throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " function requires 2 arguments");
+        }
+        polyad.getArgumments().get(0).evaluate(state);
+        polyad.getArgumments().get(1).evaluate(state);
+        Object r = polyad.getArgumments().get(0).getResult();
+        StemVariable stemVariable;
+        if (r == null) {
+            stemVariable = new StemVariable();
+            VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
+            state.getSymbolStack().setStemVariable(variableNode.getVariableReference(), stemVariable);
+        } else {
+            if (!isStem(r)) {
+                throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
+            }
+            stemVariable = (StemVariable) r;
+
+        }
+        Object defaultValue = polyad.getArgumments().get(1).getResult();
+        if (isStem(defaultValue)) {
+            throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts only a scalar as its second argument.");
+        }
+        stemVariable.setDefaultValue(defaultValue);
+        polyad.setResult(defaultValue);
+        polyad.setResultType(polyad.getArgumments().get(1).getResultType());
+        polyad.setEvaluated(true);
+    }
+
+    protected void doMask(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() != 2) {
+            throw new IllegalArgumentException("Error: the " + MASK + " function requires 2 arguments");
+        }
+        polyad.getArgumments().get(0).evaluate(state);
+        polyad.getArgumments().get(1).evaluate(state);
+        Object obj1 = polyad.getArgumments().get(0).getResult();
+        Object obj2 = polyad.getArgumments().get(1).getResult();
+        if (!areAllStems(obj1, obj2)) {
+            throw new IllegalArgumentException("Error: the " + MASK + " requires both arguments be stem variables");
+        }
+        StemVariable stem1 = (StemVariable) obj1;
+        StemVariable stem2 = (StemVariable) obj2;
+        StemVariable result = new StemVariable();
+        for (String key : stem2.keySet()) {
+            if (!stem1.containsKey(key)) {
+                throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the first stem. " +
+                        "Every key in the second argument must be a key in the first.");
+            }
+            Object rawBit = stem2.get(key);
+            if (!isBoolean(rawBit)) {
+                throw new IllegalArgumentException("Error: Every value of the second argument must be boolean");
+            }
+            Boolean b = (Boolean) rawBit;
+            if (b) {
+                result.put(key, stem1.get(key));
+            }
+        }
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResult(result);
+        polyad.setEvaluated(true);
+
     }
 }

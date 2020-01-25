@@ -12,5 +12,6 @@ public class QDLCLI {
         QDLCommands commands = new QDLCommands(new MyLoggingFacade("QDL"));
         CLIDriver driver = new CLIDriver(commands);
         driver.start();
+
     }
 }
