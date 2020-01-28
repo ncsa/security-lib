@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;

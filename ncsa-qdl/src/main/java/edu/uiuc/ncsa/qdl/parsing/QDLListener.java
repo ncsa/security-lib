@@ -1,8 +1,11 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -115,6 +118,7 @@ public class QDLListener implements QDLParserListener {
 
     }
 
+
     protected Statement resolveChild(ParseTree currentChild) {
         return resolveChild(currentChild, false);
     }
@@ -210,12 +214,15 @@ public class QDLListener implements QDLParserListener {
     public void enterNumber(QDLParserParser.NumberContext ctx) {
 
     }
-
+   /*  protected boolean isUnaryMinus(ParseTree p){
+        return (p.getParent() instanceof QDLParserParser.NumbersContext) && (p.getParent().getParent() instanceof QDLParserParser.UnaryMinusExpressionContext);
+     }*/
     @Override
     public void exitNumber(QDLParserParser.NumberContext ctx) {
+
         ConstantNode constantNode;
         if (ctx.getText().contains(".")) {
-            BigDecimal decimal = new BigDecimal(ctx.getText());
+            BigDecimal decimal = new BigDecimal( ctx.getText());
             constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
         } else {
             Long value = Long.parseLong(ctx.getChild(0).getText());
@@ -232,7 +239,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitNumbers(QDLParserParser.NumbersContext ctx) {
-
     }
 
 
@@ -248,7 +254,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterNotExpression(QDLParserParser.NotExpressionContext ctx) {
-        //stash(ctx, new Monad(opEvaluator, OpEvaluator.NOT_VALUE, false));// automatically prefix
     }
 
     @Override
@@ -305,14 +310,19 @@ public class QDLListener implements QDLParserListener {
         finish(orStmt, ctx);
     }
 
+    boolean isUnaryMinus = false;
+
     @Override
     public void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-
+     // ARGH as per antlr4 spec, this need no be called and whether it is varies by compilation.
+        // Do not use this. Put everything in the exit statement.
     }
 
     @Override
     public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-
+        Monad monad = new Monad(OpEvaluator.MINUS_VALUE, false);
+        stash(ctx, monad);
+        finish(monad, ctx);
     }
 
     @Override
@@ -471,7 +481,7 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, new ConditionalStatement());
     }
 
-    protected void doConditional(ParseTree ctx) {
+    protected ConditionalStatement doConditional(ParseTree ctx) {
         ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
         //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
         conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
@@ -498,6 +508,7 @@ public class QDLListener implements QDLParserListener {
             t.printStackTrace();
         }
 
+        return conditionalStatement;
     }
 
     @Override
@@ -552,12 +563,22 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
-
+        stash(ctx, new SwitchStatement());
+        parsingMap.startMark();
     }
 
+    // )load switch_test.qdl
     @Override
     public void exitSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
-
+        SwitchStatement switchStatement = (SwitchStatement) parsingMap.getStatementFromContext(ctx);
+        switchStatement.setSourceCode(ctx.getText());
+        for (QDLParserParser.IfStatementContext ifc : ctx.ifStatement()) {
+            ConditionalStatement cs = (ConditionalStatement) parsingMap.getStatementFromContext(ifc);
+            switchStatement.getArguments().add(cs);
+        }
+        parsingMap.endMark();
+        parsingMap.rollback();
+        parsingMap.clearMark();
     }
 
     @Override
@@ -583,9 +604,14 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.StatementContext sc : defineContext.statement()) {
             functionRecord.statements.add(resolveChild(sc));
         }
-        state.getFunctionTable().put(functionRecord);
-        parsingMap.rollback();
+        if (isModule) {
+            // Functions defined in a module go there.
+            currentModule.getState().getFunctionTable().put(functionRecord);
+        } else {
+            state.getFunctionTable().put(functionRecord);
+        }
         parsingMap.endMark();
+        parsingMap.rollback();
         parsingMap.clearMark();
 
     }
@@ -616,14 +642,6 @@ public class QDLListener implements QDLParserListener {
 
     }
 
-    @Override
-    public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
-        ModuleStatement module = new ModuleStatement();
-        stash(ctx, module);
-        // keep the top level module but don't let the system try to turn anything else in to statements.
-        parsingMap.startMark();
-    }
-
     protected String stripSingleQuotes(String rawString) {
         String out = rawString.trim();
         if (out.startsWith("'")) {
@@ -635,19 +653,59 @@ public class QDLListener implements QDLParserListener {
         return out;
     }
 
+    boolean isModule = false;
+    Module currentModule = null;
+    ModuleStatement moduleStatement = null;
+
+    @Override
+    public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
+        if (isModule) {
+            throw new QDLException("Error: Modules cannot be nested");
+        }
+        moduleStatement = new ModuleStatement();
+
+        stash(ctx, moduleStatement);
+        // start mark after module statement is added or it gets
+        // removed from the element list and never evaluates.
+        parsingMap.startMark();
+
+        isModule = true;
+        State localState = state.newModuleState();
+        currentModule = new Module();
+        currentModule.setState(localState);
+        moduleStatement.setLocalState(localState);
+        // keep the top. level module but don't let the system try to turn anything else in to statements.
+    }
+
+
     @Override
     public void exitModuleStatement(QDLParserParser.ModuleStatementContext moduleContext) {
         // module['uri:/foo','bar']body[ say( 'hi');]; // single line test
-        ModuleStatement module = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
+        // )load module_example.qdl
+        isModule = false;
+        ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
         URI namespace = URI.create(stripSingleQuotes(moduleContext.STRING(0).toString()));
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
-        module.setNamespace(namespace);
-        module.setAlias(alias);
-        for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
-            module.getStatements().add(resolveChild(stmt));
-        }
-       module.setSourceCode(moduleContext.getText());
+        currentModule.setNamespace(namespace);
+        currentModule.setAlias(alias);
+        state.getModuleMap().put(currentModule);
 
+        for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
+            // Issue is that resolving children as we do gets the function definitions.
+            // that are in any define contexts. So if this is a define context,
+            // skip it. They are handled elsewhere and the definitions are never evaluated
+            // just stashed.
+            boolean isSkip = false;
+            for (int i = 0; i < stmt.getChildCount(); i++) {
+                isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.DefineStatementContext);
+            }
+            if (!isSkip) {
+                Statement kid = resolveChild(stmt);
+                moduleStatement.getStatements().add(kid);
+            }
+            //}
+        }
+        moduleStatement.setSourceCode(moduleContext.getText());
         parsingMap.endMark();
         parsingMap.rollback();
         parsingMap.clearMark();
@@ -663,7 +721,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
-         tryCatch.setSourceCode(tcContext.getText());
+        tryCatch.setSourceCode(tcContext.getText());
         boolean addToTry = true;
         try {
             for (int i = 1; i < tcContext.getChildCount(); i++) {

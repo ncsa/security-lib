@@ -2,61 +2,28 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 
+import java.net.URI;
+import java.util.Set;
+
 /**
  * Keeps namepsaces and their aliases. It is assumed that both of these are unique.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:13 AM
  */
 public class NamespaceResolver {
-    public String getActiveNamespace() {
-        return activeNamespace;
-    }
-
-    public void setActiveNamespace(String activeNamespace) {
-        this.activeNamespace = activeNamespace;
-    }
-
-    public String getDefaultUserNamespace() {
-        return QDL_DEFAULT_USER_NAMESPACE;
-    }
-
-    public boolean hasNamespace(String namespace){
-        return map.containsKey(namespace);
-    }
-
-    public boolean isDefaultNamespaceActive(){
-        return getActiveNamespace().equals(getDefaultUserNamespace());
-    }
-
-    public String getDefaultSystemNamespace() {
-        return QDL_DEFAULT_SYSTEM_NAMESPACE;
-    }
-
-    public String getDefaultSystemAlias() {
-        return QDL_DEFAULT_SYSTEM_ALIAS;
-    }
-
-    public String getDefaultUserAlias() {
-        return QDL_DEFAULT_USER_ALIAS;
-    }
-
-    public String activeNamespace = QDL_DEFAULT_USER_NAMESPACE;// default
     /**
-     * The default system namespace is for all og the built-in functions.
+     * Delimiter for namespaces
      */
-    public static String QDL_DEFAULT_SYSTEM_NAMESPACE = "qdl:/system";
-    public static String QDL_DEFAULT_SYSTEM_ALIAS = "sys";
-    /**
-     * All variables and functions a user defines are in this namespace unless
-     * a new namespace is set.
-     */
-    public static String QDL_DEFAULT_USER_NAMESPACE = "qdl:/user";
-    public static String QDL_DEFAULT_USER_ALIAS = "user";
+    public static final String NS_DELIMITER = "#";
+
+    public void addImport(URI moduleName, String alias) {
+        // If there is already an entry, overwrite it in case the alias changed.
+        map.put(moduleName, alias);
+
+
+    }
 
     public NamespaceResolver() {
-        // always pre-populate.
-        map.put(QDL_DEFAULT_SYSTEM_NAMESPACE, QDL_DEFAULT_SYSTEM_ALIAS);
-        map.put(QDL_DEFAULT_USER_NAMESPACE, QDL_DEFAULT_USER_ALIAS);
     }
 
     /**
@@ -77,18 +44,18 @@ public class NamespaceResolver {
     }
 
     static NamespaceResolver resolver;
-
-    DoubleHashMap<String, String> map = new DoubleHashMap<>();
-
-    public void createNS(String namespace, String alias) {
-        map.put(namespace, alias);
+    public boolean hasImports(){
+        return !map.isEmpty();
     }
 
-    public String getByAlias(String alias) {
+    DoubleHashMap<URI, String> map = new DoubleHashMap<>();
+
+
+    public URI getByAlias(String alias) {
         return map.getByValue(alias);
     }
 
-    public String getAlias(String namespace) {
+    public String getAlias(URI namespace) {
         return map.get(namespace);
     }
 
@@ -96,7 +63,11 @@ public class NamespaceResolver {
         return map.getByValue(alias) != null;
     }
 
-    public void remove(String namespace) {
+    public void remove(URI namespace) {
         map.remove(namespace);
+    }
+
+    public Set<URI> keySet(){
+        return map.keySet();
     }
 }

@@ -47,25 +47,6 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         setValue(variableName, value);
     }
 
-    /*protected boolean setModuleValue(String variable, Object value) {
-        if(!isImported(variable)){
-            return false;
-        }
-        Module module = findModule(variable);
-        if (module == null) {
-            throw new ImportException("Error: the module \"" + getHashHead(variable) + "\" has not been imported");
-        }else{
-            // next thing is that you can ONLY set a module value if it exists -- no defining new things in another
-            // namespace!
-            String tail = getHashTail(variable);
-            if(!module.getSymbols().isDefined(getHashTail(variable))){
-                throw new NamespaceException("Error: You cannot define a new variable \""
-                        + tail + "\" in the namespace \"" + getHashHead(variable + "\""));
-            }
-            module.getSymbols().setValue(tail, value);
-            return true;
-        }
-    }*/
 
     /**
      * Called internally after all checks etc, have been done. In particular, this does NOT check if the
@@ -81,23 +62,44 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
             map.put(variableName, value);
             return;
         }
+        if(isTotalStem(variableName)){
+            // Simplest case of setting a. := stem. No resolution. 
+            map.put(variableName, value);
+            return;
+        }
+        // So the stem is compound, like a.b.c and requires resolving variable values from the right to
+        // see what the actual indix for this is. Then the stem will be set to that index.
+        // So if a.b.c resolves to a.2, then a.2 is set to the value (which may be a stem).
         String head = getStemHead(variableName);
         String tail = getStemTail(variableName);
         if (isStem(tail)) {
             Object xxx = resolveValue(tail);
             tail = xxx.toString();
         }
+        String tailKey = tail;
         if (map.containsKey(tail)) {
-            Object object = map.get(tail);
-
+            Object tailValue = map.get(tail);
+            if(tailValue != null){
+                tailKey = tailValue.toString();
+            }
         }
+
         StemVariable stemVar = null;
         if (map.containsKey(head)) {
             stemVar = (StemVariable) map.get(head);
         } else {
-            stemVar = new StemVariable();
-            map.put(head, stemVar);
+            // Completely new entry. Make a stem, add the value, return
+            StemVariable entry = new StemVariable();
+
+            if(value == null) {
+                map.put(head, entry);
+            }else {
+                entry.put(tailKey, value);
+                map.put(head, entry);
+            }
+            return;
         }
+
         String keyValue = tail.toString();
         if (map.containsKey(tail)) {
             keyValue = map.get(tail).toString();

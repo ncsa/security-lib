@@ -26,3 +26,14 @@ while[
        ]; // end catch block
        // This means that the try...catch has ended. It will be redone on the next loop
    ]; // end while
+
+/*
+  Expected output:
+  
+  A remainder of 0 is fine.
+  1 not divisible by 5
+  2 not divisible by 5
+  3 not divisible by 5
+  A remainder of 4 is fine.
+
+*/

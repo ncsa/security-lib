@@ -10,7 +10,13 @@ import java.net.URI;
  * on 1/21/20 at  11:03 AM
  */
 public class Module {
-
+    /**
+     * This returns true only if the module is from another language than a QDL module.
+     * @return
+     */
+    public boolean isExternal(){
+        return false;
+    }
     public Module() {
     }
 
@@ -63,4 +69,11 @@ public class Module {
         alias = array.getString(1);
     }
 
+    @Override
+    public String toString() {
+        return "Module{" +
+                ", namespace=" + namespace +
+                ", alias='" + alias + '\'' +
+                '}';
+    }
 }

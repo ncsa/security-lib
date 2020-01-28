@@ -1,0 +1,38 @@
+/*
+  This tests modules and how they are to work at a basic level.
+  Jeff Gaynor
+  1/26/2020
+*/
+module[
+   'a:a','a'
+]body[
+    foo := 'abar';
+    define[f(n)]body[return(n+1);];
+]; // end
+
+module[
+   'b:b','b'
+]body[
+    foo := 'bbar';
+    define[f(n)]body[return(n-1);];
+]; // end
+
+// Using it before import raises an error
+
+say('is function? ' + is_function('f'));
+
+q := 42; // not in modules
+
+import('a:a');
+say(a#f(1));
+// no issues
+
+// If we import the b module though, there is a name clash and then there is an error raised
+import('b:b');
+say(b#f(1));
+
+// qualifying these works.
+
+say(a#f(1 + q*2));
+say(b#f(3*q - 1));
+

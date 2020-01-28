@@ -193,16 +193,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable keyList = (StemVariable) arg2;
-        StemVariable result = new StemVariable();
-        for (int i = 0; i < keyList.size(); i++) {
-            // for loop to be sure that everything is done in order.
-            String index = Integer.toString(i);
-            if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
-            }
-            result.put(index, target.containsKey(keyList.get(index)));
-        }
+        StemVariable result = target.hasKeys((StemVariable) arg2);
         polyad.setResult(result);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
@@ -274,7 +265,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
         variableNode.evaluate(state);
-        state.getSymbolStack().remove(variableNode.getVariableReference());
+        state.remove(variableNode.getVariableReference());
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
@@ -287,7 +278,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
         variableNode.evaluate(state);
-        boolean isDef = state.getSymbolStack().isDefined(variableNode.getVariableReference());
+        boolean isDef = state.isDefined(variableNode.getVariableReference());
         polyad.setResult(isDef);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
@@ -322,19 +313,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable keyList = (StemVariable) arg2;
-        StemVariable result = new StemVariable();
-        for (int i = 0; i < keyList.size(); i++) {
-            // for loop to be sure that everything is done in order.
-            String index = Integer.toString(i);
-            if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
-            }
-            String currentKey = keyList.getString(index);
-            if (target.containsKey(currentKey)) {
-                result.put(currentKey, target.get(currentKey));
-            }
-        }
+        StemVariable result = target.includeKeys((StemVariable) arg2);
         polyad.setResult(result);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
@@ -371,13 +350,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable keyList = (StemVariable) arg2;
-        StemVariable result = new StemVariable();
-        for (String key : target.keySet()) {
-            if (!keyList.containsValue(key)) {
-                result.put(key, target.get(key));
-            }
-        }
+        StemVariable result = target.excludeKeys((StemVariable) arg2);
         polyad.setResult(result);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
@@ -409,20 +382,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         StemVariable target = (StemVariable) arg;
-
-
-        StemVariable newKeys = (StemVariable) arg2;
-        for (String key : newKeys.keySet()) {
-            if (target.containsKey(key)) {
-                String newKey = newKeys.getString(key);
-                if (target.containsKey(newKey)) {
-                    throw new IllegalArgumentException("Error: The current stem already has a key named \"" + newKeys.getString(key)
-                            + "\". This operation does not replace values, it only renames existing keys.");
-                }
-                target.put(newKey, target.get(key));
-                target.remove(key);
-            }
-        }
+        target.renameKeys((StemVariable) arg2);
 
         polyad.setResult(target);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -453,15 +413,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         StemVariable target = (StemVariable) arg;
-        StemVariable result = new StemVariable();
-        int index = 0;
-        StemVariable newKeys = (StemVariable) arg2;
-        for (String key : newKeys.keySet()) {
-            if (target.containsKey(key)) {
-                String currentIndex = Integer.toString(index++);
-                result.put(currentIndex, key);
-            }
-        }
+        StemVariable result = target.commonKeys((StemVariable) arg2);
 
         polyad.setResult(result);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -485,7 +437,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (r == null) {
             stemVariable = new StemVariable();
             VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
-            state.getSymbolStack().setStemVariable(variableNode.getVariableReference(), stemVariable);
+            state.setValue(variableNode.getVariableReference(), stemVariable);
         } else {
             if (!isStem(r)) {
                 throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
@@ -516,24 +468,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stem1 = (StemVariable) obj1;
         StemVariable stem2 = (StemVariable) obj2;
-        StemVariable result = new StemVariable();
-        for (String key : stem2.keySet()) {
-            if (!stem1.containsKey(key)) {
-                throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the first stem. " +
-                        "Every key in the second argument must be a key in the first.");
-            }
-            Object rawBit = stem2.get(key);
-            if (!isBoolean(rawBit)) {
-                throw new IllegalArgumentException("Error: Every value of the second argument must be boolean");
-            }
-            Boolean b = (Boolean) rawBit;
-            if (b) {
-                result.put(key, stem1.get(key));
-            }
-        }
+        StemVariable result = stem1.mask(stem2);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setResult(result);
         polyad.setEvaluated(true);
 
     }
+
+
 }

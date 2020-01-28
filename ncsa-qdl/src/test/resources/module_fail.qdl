@@ -1,0 +1,21 @@
+/*
+  Modules may not be nested, so trying to run this should cause an error..
+  Jeff Gaynor
+  1/26/2020
+*/
+module[
+   'a:a','a'
+]body[
+   module[
+      'b:b','b'
+   ]body[
+      foo := 'bbar';
+      define[f(n)]body[return(n-1);];
+   ]; // end nested module
+    foo := 'abar';
+    define[f(n)]body[return(n+1);];
+]; // end
+
+
+
+

@@ -38,7 +38,13 @@ public class IOEvaluator extends MathEvaluator {
                 if(isServerMode()) return true;
                 String result = "";
                 if(polyad.getArgumments().size() != 0) {
-                    result = polyad.getArgumments().get(0).evaluate(state).toString();
+                    Object temp = polyad.getArgumments().get(0).evaluate(state);
+                    if(temp == null){
+                        result = "null";
+
+                    } else{
+                        result = temp.toString();
+                    }
                 }
                 System.out.println(result);
                 polyad.setResult(null);

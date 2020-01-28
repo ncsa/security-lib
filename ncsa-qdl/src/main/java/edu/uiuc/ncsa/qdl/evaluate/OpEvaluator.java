@@ -1,9 +1,8 @@
-package edu.uiuc.ncsa.qdl.expressions;
+package edu.uiuc.ncsa.qdl.evaluate;
 
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
@@ -207,7 +206,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        String op = (dyad.operatorType == EQUALS_VALUE ? EQUALS : NOT_EQUAL);
+        String op = (dyad.getOperatorType() == EQUALS_VALUE ? EQUALS : NOT_EQUAL);
         process2(dyad, pointer, op, state);
 
     }
@@ -220,8 +219,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 if (!areAllBoolean(objects)) {
                     throw new IllegalArgumentException("Error: arguments must be boolean for logical operations");
                 }
-                Boolean left = (Boolean) dyad.getLeftArgument().evaluate(state);
-                Boolean right = (Boolean) dyad.getRightArgument().evaluate(state);
+                Boolean left = (Boolean) objects[0];
+                Boolean right = (Boolean) objects[1];
                 Boolean result = null;
                 switch (dyad.getOperatorType()) {
                     case AND_VALUE:
@@ -418,14 +417,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
         }
         monad.setResultType(Constant.LONG_TYPE); // should be redundant
-        SymbolTable st = state.getSymbolStack();
         if (monad.isPostFix()) {
             monad.setResult(x); // so the returned result is NOT incremented for postfixes.
         } else {
             monad.setResult(result); // so the returned result is the increment for prefixes
         }
         monad.setEvaluated(true);
-        st.setLongValue(var.getVariableReference(), result);
+        state.setValue(var.getVariableReference(), result);
     }
 
 

@@ -19,7 +19,8 @@ import org.junit.runners.Suite;
         IOFunctionTest.class,
         StringFunctionTests.class,
         MathFunctionsTest.class,
-        StemFunctionsTest.class
+        StemFunctionsTest.class,
+        ParserTest.class
    
 })
 public class TestSuite extends junit.framework.TestSuite {

@@ -20,7 +20,7 @@ public class StatementRecord extends ParseRecord {
         return "StatementRecord[" +
                 "id='" + identifier + '\'' +
                 ", parentId='" + parentIdentifier + '\'' +
-                ", stmt=" + statement +
+                ", stmt=" + statement.getSourceCode() +
                 ']';
     }
 }

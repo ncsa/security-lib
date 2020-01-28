@@ -8,7 +8,11 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.junit.Test;
+
+import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -533,6 +537,29 @@ public class StemFunctionsTest extends TestBase {
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
         assert !sourceStem.containsKey("foo");
+
+    }
+    @Test
+    public void testJSON() throws Exception{
+        // This is not a test. It is me debugging whether I want to try and figure out how to convert stems to
+        // JSON objects. Could be handy, but it's quite a rats nest.
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObject1 = new JSONObject();
+        JSONObject jsonObject2 = new JSONObject();
+        JSONArray array = new JSONArray();
+        int count = 10;
+        for(int i = 0; i< count; i++){
+            array.add(getRandomString(4));
+        }
+        jsonObject2.put("test_stem", array);
+        jsonObject1.put("date", new Date());
+        jsonObject1.put("long", System.currentTimeMillis());
+        jsonObject1.put("float", new Float("12.34"));
+        jsonObject.put("stem1", jsonObject1);
+        jsonObject.put("stem2", jsonObject2);
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.fromJSON(jsonObject);
+        System.out.println(stemVariable.toString());
 
     }
 }

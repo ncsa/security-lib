@@ -1,17 +1,17 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.QDLParserDriver;
-import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
-import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
+import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.io.File;
 import java.io.FileReader;
+import java.net.URI;
 import java.util.HashMap;
 
 /**
@@ -84,7 +84,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         //   if (name.equals(CREATE_MODULE)) return CREATE_MODULE_TYPE;
         if (name.equals(IMPORT)) return IMPORT_TYPE;
 //        if (name.equals(BEGIN_MODULE)) return BEGIN_MODULE_TYPE;
-  //      if (name.equals(END_MODULE)) return END_MODULE_TYPE;
+        //      if (name.equals(END_MODULE)) return END_MODULE_TYPE;
         if (name.equals(SET_ALIAS)) return SET_ALIAS_TYPE;
         //   if (name.equals(DROP_MODULE)) return DROP_MODULE_TYPE;
         if (name.equals(LOAD_MODULE)) return LOAD_MODULE_TYPE;
@@ -110,7 +110,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case END_MODULE_TYPE:
                 doEndModule(polyad, state);
                 return true;
-    */        case IMPORT_TYPE:
+    */
+            case IMPORT_TYPE:
                 doImport(polyad, state);
                 return true;
             case SET_ALIAS_TYPE:
@@ -136,7 +137,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             arg1 = "(no message)";
         }
         Object arg2 = null;
-        state.getSymbolStack().setStringValue("error_message", arg1.toString());
+        state.setValue("error_message", arg1.toString());
         if (polyad.getArgumments().size() == 2) {
             arg2 = polyad.getArgumments().get(1).evaluate(state);
             if (isLong(arg2)) {
@@ -169,58 +170,58 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         // Magic. Sort of. Since it is impossible to tell when or how a function will invoke its
         // return, we throw an exception and catch it at the right time.
-        ReturnException rx =new ReturnException();
+        ReturnException rx = new ReturnException();
         rx.result = polyad.getResult();
         rx.resultType = polyad.getResultType();
         throw rx;
     }
 
-   /* protected void doBeginModule(Polyad polyad, State state) {
-        if (!(0 < polyad.getArgumments().size() && polyad.getArgumments().size() < 3)) {
-            throw new IllegalArgumentException("Error: Wrong number of arguments. The " + BEGIN_MODULE +
-                    " command requires a namespace and an optional alias. You supplied " + polyad.getArgumments().size());
-        }
-        Object arg1 = null;
-        Object arg2 = null;
-        String namespace = null;
-        String alias = null;
-        switch (polyad.getArgumments().size()) {
-            case 2:
-                arg2 = polyad.getArgumments().get(1).evaluate(state);
-                if (!isString(arg2)) throw new IllegalArgumentException("Error: The alias must be a string");
-                alias = arg2.toString();
-            case 1:
-                arg1 = polyad.getArgumments().get(0).evaluate(state);
-                if (!isString(arg1)) throw new IllegalArgumentException("Error: The namespace must be a string");
-                namespace = arg1.toString();
-                break;
-        }
+    /* protected void doBeginModule(Polyad polyad, State state) {
+         if (!(0 < polyad.getArgumments().size() && polyad.getArgumments().size() < 3)) {
+             throw new IllegalArgumentException("Error: Wrong number of arguments. The " + BEGIN_MODULE +
+                     " command requires a namespace and an optional alias. You supplied " + polyad.getArgumments().size());
+         }
+         Object arg1 = null;
+         Object arg2 = null;
+         String namespace = null;
+         String alias = null;
+         switch (polyad.getArgumments().size()) {
+             case 2:
+                 arg2 = polyad.getArgumments().get(1).evaluate(state);
+                 if (!isString(arg2)) throw new IllegalArgumentException("Error: The alias must be a string");
+                 alias = arg2.toString();
+             case 1:
+                 arg1 = polyad.getArgumments().get(0).evaluate(state);
+                 if (!isString(arg1)) throw new IllegalArgumentException("Error: The namespace must be a string");
+                 namespace = arg1.toString();
+                 break;
+         }
 
-        Module module = null;
-        if (alias != null && state.getModuleMap().containsKey(namespace)) {
-            throw new IllegalArgumentException("Error: You cannot set the alias if the module has been defined. Use the set_alias command.");
-        }
-        if (!state.getModuleMap().containsKey(namespace)) {
-            if (alias != null && !alias.isEmpty()) {
-                module = new Module(new SymbolTableImpl(
-                        state.getResolver()),
-                        state.getResolver(),
-                        namespace);
+         Module module = null;
+         if (alias != null && state.getModuleMap().containsKey(namespace)) {
+             throw new IllegalArgumentException("Error: You cannot set the alias if the module has been defined. Use the set_alias command.");
+         }
+         if (!state.getModuleMap().containsKey(namespace)) {
+             if (alias != null && !alias.isEmpty()) {
+                 module = new Module(new SymbolTableImpl(
+                         state.getResolver()),
+                         state.getResolver(),
+                         namespace);
 
-            } else {
-                module = new Module(new SymbolTableImpl(
-                        state.getResolver()),
-                        state.getResolver(),
-                        namespace, alias);
-            }
-            state.getModuleMap().put(module);
-        }
-        state.getResolver().setActiveNamespace(namespace);
-        polyad.setEvaluated(true);
-        polyad.setResult(Boolean.TRUE);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
-    }
-*/
+             } else {
+                 module = new Module(new SymbolTableImpl(
+                         state.getResolver()),
+                         state.getResolver(),
+                         namespace, alias);
+             }
+             state.getModuleMap().put(module);
+         }
+         state.getResolver().setActiveNamespace(namespace);
+         polyad.setEvaluated(true);
+         polyad.setResult(Boolean.TRUE);
+         polyad.setResultType(Constant.BOOLEAN_TYPE);
+     }
+ */
     protected void doSetAlias(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: The " + SET_ALIAS + " command requires two arguments.");
@@ -242,17 +243,17 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-   /* protected void doEndModule(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() != 0) {
-            throw new IllegalArgumentException("Error: the " + END_MODULE + "  command requires no arguments");
-        }
-        NamespaceResolver resolver = state.getResolver();
-        resolver.setActiveNamespace(resolver.getDefaultUserNamespace());
-        polyad.setResult(resolver.getActiveNamespace());
-        polyad.setEvaluated(true);
-        polyad.setResultType(Constant.STRING_TYPE);
-    }
-*/
+    /* protected void doEndModule(Polyad polyad, State state) {
+         if (polyad.getArgumments().size() != 0) {
+             throw new IllegalArgumentException("Error: the " + END_MODULE + "  command requires no arguments");
+         }
+         NamespaceResolver resolver = state.getResolver();
+         resolver.setActiveNamespace(resolver.getDefaultUserNamespace());
+         polyad.setResult(resolver.getActiveNamespace());
+         polyad.setEvaluated(true);
+         polyad.setResultType(Constant.STRING_TYPE);
+     }
+ */
     protected void doLoadModule(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires a single argument. The full path to the module's file.");
@@ -305,16 +306,42 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
         }
         Object arg = polyad.getArgumments().get(0).evaluate(state);
-        if (!isString(arg)) {
-            throw new IllegalArgumentException("Error: the argument to " + IMPORT + " must be a string");
+        if (arg == null) {
+            throw new MissingArgumentException("Error: You must supply a module name to import.");
         }
-        String moduleName = arg.toString();
+        String alias = null;
+        if (polyad.getArgumments().size() == 2) {
+            Object arg2 = polyad.getArgumments().get(0).evaluate(state);
+            if (arg2 == null || !isString(arg2)) {
+                throw new MissingArgumentException("Error: You must supply a valid alias import.");
+            }
+            alias = arg2.toString();
+        }
 
-        if (!state.getModuleMap().containsKey(moduleName)) {
-            throw new IllegalArgumentException("Error: could not find module \"" + moduleName + " to import");
+        URI moduleName = null;
+        try {
+            moduleName = URI.create(arg.toString());
+        } catch (Throwable t) {
+            polyad.setResult(null);
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(false);
+            throw new QDLException("Error: the module name must be a uri");
         }
-        SymbolTable st = state.getSymbolStack().getTopST();
+
+        if(!state.getModuleMap().containsKey(moduleName)){
+            throw new ImportException("Error: module \"" + moduleName + "\" not found. You must load it before importing it.");
+        }
         Module module = state.getModuleMap().get(moduleName);
-        st.addModule(module);
+
+        NamespaceResolver resolver = state.getResolver();
+        if(alias == null){
+            // No alias specified, so just import it with its default alias.
+            resolver.addImport(moduleName, module.getAlias());
+        }else{
+            resolver.addImport(moduleName, alias);
+        }
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
     }
 }

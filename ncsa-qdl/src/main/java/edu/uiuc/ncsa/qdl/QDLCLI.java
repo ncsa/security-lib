@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.security.util.cli.CLIDriver;
  * on 1/11/20 at  4:24 PM
  */
 public class QDLCLI {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         QDLCommands commands = new QDLCommands(new MyLoggingFacade("QDL"));
         CLIDriver driver = new CLIDriver(commands);
         driver.start();

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
+import edu.uiuc.ncsa.qdl.statements.Statement;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class QDLRunner {
 
     /**
      * You may inject state at runtime if you need this to start with some existing state.
+     *
      * @param state
      */
     public void setState(State state) {
@@ -64,9 +67,15 @@ public class QDLRunner {
         try {
             State currentState = getState();
             for (Element element : elements) {
-                if(element.getStatement()!= null) {
+                if (element.getStatement() != null) {
                     // it can happen that the parser returns an empty statement. Skip it.
-                    element.getStatement().evaluate(currentState);
+                    Statement stmt = element.getStatement();
+                    if (stmt instanceof ModuleStatement) {
+                        ModuleStatement ms = (ModuleStatement) stmt;
+                        ms.evaluate(currentState);
+                    }else {
+                        stmt.evaluate(currentState);
+                    }
                 }
             }
         } catch (Throwable t) {

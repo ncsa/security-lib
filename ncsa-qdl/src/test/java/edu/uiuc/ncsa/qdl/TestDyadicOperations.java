@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;

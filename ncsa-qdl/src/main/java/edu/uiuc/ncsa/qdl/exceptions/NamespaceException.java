@@ -1,12 +1,10 @@
 package edu.uiuc.ncsa.qdl.exceptions;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  3:42 PM
  */
-public class NamespaceException extends GeneralException {
+public class NamespaceException extends QDLException {
     public NamespaceException() {
     }
 

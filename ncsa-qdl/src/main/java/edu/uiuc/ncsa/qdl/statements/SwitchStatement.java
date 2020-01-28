@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.statements;
 
 import edu.uiuc.ncsa.qdl.state.State;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public class SwitchStatement implements Statement {
         this.arguments = arguments;
     }
 
-    List<ConditionalStatement> arguments;
+    List<ConditionalStatement> arguments = new ArrayList<>();
     @Override
     public Object evaluate(State state) {
 

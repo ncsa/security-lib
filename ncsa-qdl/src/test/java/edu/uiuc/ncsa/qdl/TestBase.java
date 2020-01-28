@@ -12,6 +12,15 @@ import java.util.Random;
  * on Nov 27, 2010 at  2:08:07 PM
  */
 abstract public class TestBase extends TestCase {
+    /**
+     * Simple utility that appends the line and a return. Use this to make scripts for testing the parser itself.
+     * @param stringBuffer
+     * @param x
+     * @return
+     */
+    protected StringBuffer addLine(StringBuffer stringBuffer, String x){
+        return stringBuffer.append(x + "\n");
+    }
     /*
     This is actually just a copy of the test base class in security-util, but it cuts out
     a dependency.

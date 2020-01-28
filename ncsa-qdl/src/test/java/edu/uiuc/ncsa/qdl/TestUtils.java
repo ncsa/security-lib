@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.expressions.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;

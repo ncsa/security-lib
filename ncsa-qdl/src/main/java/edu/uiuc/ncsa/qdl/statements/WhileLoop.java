@@ -144,9 +144,7 @@ public class WhileLoop implements Statement {
                 statement.evaluate(localState);
             }
         }
-
-        //   popStack(conditional.getState());
-        return Boolean.TRUE;
+  return Boolean.TRUE;
     }
 
     protected Object doBasicWhile(State localState) {

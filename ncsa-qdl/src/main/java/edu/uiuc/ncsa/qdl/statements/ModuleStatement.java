@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.statements;
 
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
@@ -33,14 +32,21 @@ public class ModuleStatement implements Statement {
         this.alias = alias;
     }
 
+    public State getLocalState() {
+        return localState;
+    }
+
+    public void setLocalState(State localState) {
+        this.localState = localState;
+    }
+
+    State localState;
     @Override
     public Object evaluate(State state) {
-        State localState = state.newLocalState();
-        Module module = new Module(getNamespace(), getAlias(), localState);
+        // Only use local state at this point.
         for(Statement s : getStatements()){
-            s.evaluate(localState);
+            s.evaluate(getLocalState());
         }
-        state.getModuleMap().put(module);
         return null;
     }
     List<Statement> statements = new ArrayList<>();

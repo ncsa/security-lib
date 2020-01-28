@@ -30,7 +30,7 @@ public class VariableNode extends ExpressionImpl {
     public Object evaluate(State state) {
         // The contract is that variables resolve to their values when asked and are not mutable.
         // Might change that..
-        result = state.getSymbolStack().resolveValue(variableReference);
+        result = state.getValue(variableReference);
         evaluated = true;
         resultType = Constant.getType(result);
         return result;

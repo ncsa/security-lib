@@ -134,19 +134,10 @@ public class SymbolStack extends AbstractSymbolTable {
                 }
 
             }
-      //      System.out.println("SymbolStack (" + getParentTables().size() + ") returning " + variableName + " = " + returnedValue);
             return findValueInATable(head + returnedValue); // head include final .
         }
-     /*   for(SymbolTable s : getParentTables()){
-            if(s.isDefined(variableName)) {
-                System.out.println("\n   checking  parents " + variableName + " = " + s.resolveValue(variableName));
-            }
 
-        }*/
         Object obj = findValueInATable(variableName);
-        //System.out.println("SymbolStack2  (" + getParentTables().size() + ") returning " + variableName + " = " + obj);
-
-
         return obj;
     }
 
@@ -160,19 +151,19 @@ public class SymbolStack extends AbstractSymbolTable {
         SymbolTable st = getRightST(variableName);
         if (st == null) {
             // nothing like this exists, so it goes in the local environment
-            getTopST().setValue(variableName, value);
-            return;
+             st = getTopST();
         }
+        if (!isStem(variableName)) {
+               st.setValue(variableName, value);
+               return;
+           }
         if (isTotalStem(variableName)) {
             // case is setting something like a. := ...
             // Just set it. No tail resolution needed.
             st.setValue(variableName, value);
             return;
         }
-        if (!isStem(variableName)) {
-            st.setValue(variableName, value);
-            return;
-        }
+
 
         String t = getStemTail(variableName);
         Object resolvedTail = resolveValue(t);
@@ -260,8 +251,8 @@ public class SymbolStack extends AbstractSymbolTable {
         getRightST(key).setStemVariable(key, stem);
     }
 
-    public Set<String> listVariables() {
-        Set<String> vars = new HashSet<>();
+    public TreeSet<String> listVariables() {
+        TreeSet<String> vars = new TreeSet<>();
         for (SymbolTable st : getParentTables()) {
             vars.addAll(st.listVariables());
         }

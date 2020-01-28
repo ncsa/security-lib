@@ -1,9 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 /**
@@ -37,23 +35,14 @@ public class Assignment implements Statement {
     public Object evaluate(State state) {
         result = argument.evaluate(state);
         resultType = argument.getResultType();
-        SymbolTable symbolTable = state.getSymbolStack();
+       // SymbolTable symbolTable = state.getSymbolStack();
         switch (argument.getResultType()) {
             case Constant.STEM_TYPE:
-                symbolTable.setStemVariable(variableReference, (StemVariable) result);
-                break;
             case Constant.STRING_TYPE:
-                symbolTable.setStringValue(variableReference, (String) result);
-                break;
             case Constant.BOOLEAN_TYPE:
-                symbolTable.setBooleanValue(variableReference, (Boolean) result);
-                break;
             case Constant.LONG_TYPE:
-                symbolTable.setLongValue(variableReference, (Long) result);
-
-                break;
             case Constant.DECIMAL_TYPE:
-                symbolTable.setValue(variableReference, result);
+                state.setValue(variableReference, result);
                 break;
             default:
                 throw new IllegalArgumentException("error, the type of the value \"" + argument.getResult() + "\" is unknown");
