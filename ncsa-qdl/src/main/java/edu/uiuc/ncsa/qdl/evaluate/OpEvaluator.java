@@ -17,8 +17,10 @@ import java.math.RoundingMode;
 public class OpEvaluator extends AbstractFunctionEvaluator {
 
     public static String ASSIGNMENT = ":=";
+    public static String POWER = "^";
     public static String TIMES = "*";
     public static String DIVIDE = "/";
+    public static String INTEGER_DIVIDE = "%";
     public static String PLUS = "+";
     public static String MINUS = "-";
     public static String PLUS_PLUS = "++";
@@ -50,6 +52,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int NOT_VALUE = 208;
     public static final int TIMES_VALUE = 209;
     public static final int DIVIDE_VALUE = 210;
+    public static final int POWER_VALUE = 211;
+    public static final int INTEGER_DIVIDE_VALUE = 212;
 
     public int getNumericDigits() {
         return numericDigits;
@@ -81,8 +85,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         if (oo.equals(NOT_EQUAL)) return NOT_EQUAL_VALUE;
         if (oo.equals(OR)) return OR_VALUE;
         if (oo.equals(PLUS)) return PLUS_VALUE;
+        if (oo.equals(POWER)) return POWER_VALUE;
         if (oo.equals(TIMES)) return TIMES_VALUE;
         if (oo.equals(DIVIDE)) return DIVIDE_VALUE;
+        if (oo.equals(INTEGER_DIVIDE)) return INTEGER_DIVIDE_VALUE;
         // monadic operators.
         if (oo.equals(MINUS_MINUS)) return MINUS_MINUS_VALUE;
         if (oo.equals(NOT)) return NOT_VALUE;
@@ -92,8 +98,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     public void evaluate(Dyad dyad, State state) {
         switch (dyad.getOperatorType()) {
+            case POWER_VALUE:
+                doPower(dyad, state);
+                return;
             case TIMES_VALUE:
                 doDyadTimesOrDivide(dyad, state, true);
+                return;
+            case INTEGER_DIVIDE_VALUE:
+                doDyadIntegerDivide(dyad, state);
                 return;
             case DIVIDE_VALUE:
                 doDyadTimesOrDivide(dyad, state, false);
@@ -121,6 +133,62 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             default:
                 throw new NotImplementedException("Unknown dyadic operator");
         }
+    }
+
+    protected void doDyadIntegerDivide(Dyad dyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (!areAllNumbers(objects)) {
+                    throw new IllegalArgumentException("Error: operation is not defined for  non-numeric types");
+                }
+                if (areAllLongs(objects)) {
+                    Long leftLong = (Long) objects[0];
+                    Long rightLong = (Long) objects[1];
+                    r.result = (Long) objects[0] / (Long) objects[1];
+                    r.resultType = Constant.LONG_TYPE;
+                } else {
+                    BigDecimal left = toBD(objects[0]);
+                    BigDecimal right = toBD(objects[1]);
+                    r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN).longValue();
+                    r.resultType = Constant.LONG_TYPE;
+                }
+                return r;
+            }
+        };
+        process2(dyad, pointer, INTEGER_DIVIDE, state);
+    }
+
+    private void doPower(Dyad dyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (!isLong(objects[1])) {
+                    throw new IllegalArgumentException("Error: Exponentiation requires the second argument be an integer");
+                }
+                if (areAllNumbers(objects)) {
+                    if (areAllLongs(objects)) {
+                        double dd = Math.pow((Long) objects[0], (Long) objects[1]);
+                        // wee bit of cenversion since this only returns doubles, not longs
+                        BigDecimal bd = new BigDecimal(dd);
+                        r.result = bd;
+                        r.resultType = Constant.DECIMAL_TYPE;
+                    } else {
+                        BigDecimal left = toBD(objects[0]);
+                        int n = ((Long) objects[1]).intValue();
+                        r.result = left.pow(n);
+                        r.resultType = Constant.DECIMAL_TYPE;
+                    }
+                } else {
+                    throw new IllegalArgumentException("Exponentiation requires a int or decimal be raised to an int power");
+                }
+                return r;
+            }
+        };
+        process2(dyad, pointer, POWER, state);
+
     }
 
 
@@ -308,20 +376,20 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             // So dividing a long by a long might result in
                             // a decimal. This checks that and if so, return it,
                             // otherwise it returns a long.
-                            Long leftLong = (Long)objects[0];
-                            Long rightLong = (Long)objects[1];
-                            if(leftLong % rightLong == 0){
+                            Long leftLong = (Long) objects[0];
+                            Long rightLong = (Long) objects[1];
+                            if (leftLong % rightLong == 0) {
                                 r.result = (Long) objects[0] / (Long) objects[1];
 
-                            }else{
-                                BigDecimal left = new BigDecimal((Long)objects[0]);
-                                BigDecimal right = new BigDecimal((Long)objects[1]);
+                            } else {
+                                BigDecimal left = new BigDecimal((Long) objects[0]);
+                                BigDecimal right = new BigDecimal((Long) objects[1]);
                                 try {
                                     BigDecimal out = left.divide(right, getNumericDigits(), RoundingMode.DOWN);
                                     r.result = out;
                                     r.resultType = Constant.DECIMAL_TYPE;
 
-                                }catch (ArithmeticException x){
+                                } catch (ArithmeticException x) {
 
                                 }
                             }
@@ -333,7 +401,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         if (doTimes) {
                             r.result = left.multiply(right);
                         } else {
-                            r.result = left.divide(right);
+                            r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
                         }
                         r.resultType = Constant.DECIMAL_TYPE;
                     }

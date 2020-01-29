@@ -192,7 +192,7 @@ public class StemVariable extends HashMap<String, Object> {
             if (!keyList.containsKey(index)) {
                 throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
             }
-            result.put(index, containsKey(keyList.get(index)));
+            result.put(index, containsKey(keyList.get(index).toString()));
         }
         return result;
     }

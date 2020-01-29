@@ -127,6 +127,13 @@ public abstract class CommonCommands implements Commands {
     }
 
     /**
+     * Double indent -- useful for lists. 
+     * @param x
+     */
+    protected void sayii(String x) {
+         say(INDENT + INDENT + x);
+     }
+    /**
      * Output the string without any linefeed. This is used for prompts.
      *
      * @param x

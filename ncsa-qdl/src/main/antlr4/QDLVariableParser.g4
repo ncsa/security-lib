@@ -8,6 +8,9 @@ grammar QDLVariableParser;
 
    number : Number;
 
+   fdoc : FDOC;
+
+
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.
 
@@ -15,7 +18,7 @@ grammar QDLVariableParser;
 // NOTE: ORDER MATTERS!! You can easily break the parser if you change the order of these
 // so if you add a rule, you must re-run the tests and look for regression and be prepared
 // to move the new rule around to the right spot.
-     Number : [0-9]+ ('.')? [0-9]*;
+     Number : ([0-9]+ ('.')? [0-9]*)|('.'[0-9]+);
          ID : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : ':=';
@@ -42,6 +45,8 @@ grammar QDLVariableParser;
   NotEquals : '!=';
         And : '&&';
          Or : '||';
+   Backtick : '`';
+    Percent : '%';
 
 // The left bracket, as the end of a control statement, has to be found in the lexer.
    LeftBracket: ']';
@@ -69,3 +74,5 @@ COMMENT :   '/*' .*? '*/' -> skip;
 LINE_COMMENT:   '//' ~[\r\n]* -> skip;
 
 WS2 : [ \t\r\n]+ ->skip;
+
+FDOC :  '>>' ~[\r\n]*;

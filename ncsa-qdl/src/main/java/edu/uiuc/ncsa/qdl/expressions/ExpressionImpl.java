@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;
@@ -35,6 +36,9 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return arguments;
     }
 
+    public Object evalArg(int index, State state){
+        return getArgumments().get(index).evaluate(state);
+    }
     @Override
     public void setArguments(ArrayList<ExpressionNode> arguments) {
         this.arguments = arguments;

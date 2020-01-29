@@ -1,0 +1,28 @@
+/*
+  This is a pretty complete QDL program to compute Armstrong numbers
+  Jeff Gaynor
+  1/29/2020
+*/
+define[
+  armstrong(m)
+  ]body[
+     >> An Armstrong number is a 3 digit number that is equal to the sum of its cubed digits. This computes them for 100 < n < 1000.
+     >> So for example 407 is an Armstrong number since 407 = 4^3 + 0^3 + 7^3
+     if[ m < 100]then[say('sorry, m must be 100 or larger'); return();];
+     if[1000 < m]then[say('sorry, m must be less than 1000'); return();];
+     sum := 0;
+     while[
+         for_next(j, m)
+       ]do[
+          n := j;
+          while[
+              0 < n
+          ]do[
+              b := mod(n, 10);
+              sum := sum + b^3;
+              n := n%10; // integer division means n goes to zero
+          ]; //end inner while
+          if[sum == j]then[say(sum);];
+          sum := 0;
+       ]; // end while
+  ]; // end define

@@ -441,7 +441,7 @@ public class StemFunctionsTest extends TestBase {
         polyad.addArgument(new ConstantNode("baz", Constant.STRING_TYPE));
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
-        assert result.size() == 8;
+        assert result.size() == 5;
         for (String key : result.keySet()) {
             System.out.println("  var." + key + " == " + result.get(key));
         }

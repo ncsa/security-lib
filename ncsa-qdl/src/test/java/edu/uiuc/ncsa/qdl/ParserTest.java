@@ -94,35 +94,94 @@ public class ParserTest extends TestBase {
         assert state.getValue("b").equals(new Long(11L));
         assert state.getValue("c").equals(new Long(-3L));
     }
+
     @Test
-        public void testPreMinuses() throws Throwable {
+    public void testPreMinuses() throws Throwable {
         // This tests multiple decrements. NOTE that the values are multipled as it decrements,
         // so the effect is to compute the factorial in this case. Prefix means the new value
         // is computed and returned, so this is (4-1)!
-            State state = testUtils.getNewState();
-            StringBuffer script = new StringBuffer();
-            addLine(script, "a:=4;");
-            addLine(script, "b:=-(--a * 1 *  --a * 1 * --a);");
-            QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a:=4;");
+        addLine(script, "b:=-(--a * 1 *  --a * 1 * --a);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
 
-            assert state.getValue("a").equals(new Long(1L));
-            assert state.getValue("b").equals(new Long(-6L));
-        }
+        assert state.getValue("a").equals(new Long(1L));
+        assert state.getValue("b").equals(new Long(-6L));
+    }
 
     @Test
-           public void testPostMinuses() throws Throwable {
-           // This tests multiple decrements. NOTE that the values are multipled as it decrements,
-           // so the effect is to compute the factorial in this case. Post decr. means the previous value
+    public void testPostMinuses() throws Throwable {
+        // This tests multiple decrements. NOTE that the values are multipled as it decrements,
+        // so the effect is to compute the factorial in this case. Post decr. means the previous value
         // is returned and the new one is stored, so this is 4!
-               State state = testUtils.getNewState();
-               StringBuffer script = new StringBuffer();
-               addLine(script, "a:=4;");
-               addLine(script, "b:=-(a-- * 1 *  a-- * 1 * a--);");
-               QDLInterpreter interpreter = new QDLInterpreter(null, state);
-               interpreter.execute(script.toString());
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a:=4;");
+        addLine(script, "b:=-(a-- * 1 *  a-- * 1 * a--);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
 
-               assert state.getValue("a").equals(new Long(1L));
-               assert state.getValue("b").equals(new Long(-24L));
-           }
+        assert state.getValue("a").equals(new Long(1L));
+        assert state.getValue("b").equals(new Long(-24L));
+    }
+
+    /**
+     * This test exists because the has_keys function was not actually converting the arguments of
+     * its key list to strings, hence no actual list of integers would ever give a true result.
+     * This test makes sure that is checked since it was a serious issue.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testHasKeys() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "var. := random(5);");
+        addLine(script, "w. := to_list(10);");
+        addLine(script, "z. := has_keys(var., w.;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // so the first 5 entries are true, the next 5 are false.
+        for (int i = 0; i < 5; i++) {
+            assert (Boolean) state.getValue("z." + i);
+        }
+
+        for (int i = 5; i < 10; i++) {
+            assert !(Boolean) state.getValue("z." + i);
+        }
+
+    }
+
+    @Test
+    public void testBadAssignment() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a = 3");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            System.out.println(state.getValue("a"));
+            assert false : "Was able to make an assignment with = not :=";
+        } catch (Throwable t) {
+            assert true;
+        }
+
+    }
+
+    @Test
+    public void testExecute() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "execute('var := \\'abc\\' + \\'def\\');'");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        System.out.println(state.getValue("var"));
+        assert state.getValue("var").equals("abcdef");
+
+    }
 }

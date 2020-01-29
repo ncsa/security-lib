@@ -63,24 +63,21 @@ public class QDLRunner {
 
     List<Element> elements;
 
-    public void run() {
-        try {
-            State currentState = getState();
-            for (Element element : elements) {
-                if (element.getStatement() != null) {
-                    // it can happen that the parser returns an empty statement. Skip it.
-                    Statement stmt = element.getStatement();
-                    if (stmt instanceof ModuleStatement) {
-                        ModuleStatement ms = (ModuleStatement) stmt;
-                        ms.evaluate(currentState);
-                    }else {
-                        stmt.evaluate(currentState);
-                    }
+    public void run() throws Throwable {
+        State currentState = getState();
+        for (Element element : elements) {
+            if (element.getStatement() != null) {
+                // it can happen that the parser returns an empty statement. Skip it.
+                Statement stmt = element.getStatement();
+                if (stmt instanceof ModuleStatement) {
+                    ModuleStatement ms = (ModuleStatement) stmt;
+                    ms.evaluate(currentState);
+                } else {
+                    stmt.evaluate(currentState);
                 }
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
         }
+
     }
 
 }

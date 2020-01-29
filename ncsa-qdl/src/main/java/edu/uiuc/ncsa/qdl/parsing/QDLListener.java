@@ -214,15 +214,13 @@ public class QDLListener implements QDLParserListener {
     public void enterNumber(QDLParserParser.NumberContext ctx) {
 
     }
-   /*  protected boolean isUnaryMinus(ParseTree p){
-        return (p.getParent() instanceof QDLParserParser.NumbersContext) && (p.getParent().getParent() instanceof QDLParserParser.UnaryMinusExpressionContext);
-     }*/
+
     @Override
     public void exitNumber(QDLParserParser.NumberContext ctx) {
 
         ConstantNode constantNode;
         if (ctx.getText().contains(".")) {
-            BigDecimal decimal = new BigDecimal( ctx.getText());
+            BigDecimal decimal = new BigDecimal(ctx.getText());
             constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
         } else {
             Long value = Long.parseLong(ctx.getChild(0).getText());
@@ -314,7 +312,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-     // ARGH as per antlr4 spec, this need no be called and whether it is varies by compilation.
+        // ARGH as per antlr4 spec, this need no be called and whether it is varies by compilation.
         // Do not use this. Put everything in the exit statement.
     }
 
@@ -327,12 +325,13 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterEqExpression(QDLParserParser.EqExpressionContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.EQUALS_VALUE));
+        stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
     }
 
     @Override
     public void exitEqExpression(QDLParserParser.EqExpressionContext ctx) {
         Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
+        dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
         finish(dyad, ctx);
     }
 
@@ -348,18 +347,25 @@ public class QDLListener implements QDLParserListener {
     }
 
     @Override
+    public void enterPowerExpression(QDLParserParser.PowerExpressionContext ctx) {
+
+    }
+
+    @Override
+    public void exitPowerExpression(QDLParserParser.PowerExpressionContext ctx) {
+        Dyad dyad = new Dyad(OpEvaluator.POWER_VALUE);
+        stash(ctx, dyad);
+        finish(dyad, ctx);
+    }
+
+    @Override
     public void enterMultiplyExpression(QDLParserParser.MultiplyExpressionContext ctx) {
 
     }
 
     @Override
     public void exitMultiplyExpression(QDLParserParser.MultiplyExpressionContext ctx) {
-        Dyad dyad;
-        if (ctx.Times() != null) {
-            dyad = new Dyad(OpEvaluator.TIMES_VALUE);
-        } else {
-            dyad = new Dyad(OpEvaluator.DIVIDE_VALUE);
-        }
+        Dyad dyad = new Dyad(state.getOperatorType(ctx.op.getText()));
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
@@ -389,6 +395,11 @@ public class QDLListener implements QDLParserListener {
         if (value.endsWith("'")) {
             value = value.substring(0, value.length() - 1);
         }
+
+       value =  value.replace("\\'", "'");
+   //    value =  value.replace("\\n", "\n");
+   //    value =  value.replace("\\t", "\t");
+   //    value =  value.replace("\\r", "\r");
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
         node.setSourceCode(ctx.getText());
         stash(ctx, node);
@@ -582,6 +593,17 @@ public class QDLListener implements QDLParserListener {
     }
 
     @Override
+    public void enterFdoc(QDLParserParser.FdocContext ctx) {
+    }
+
+    @Override
+    public void exitFdoc(QDLParserParser.FdocContext ctx) {
+        // we don't do anything with this element, but since we are implementing the interface,
+        // have to put it here. The fdoc elements are handled in the function definition
+        // code.
+    }
+
+    @Override
     public void enterDefineStatement(QDLParserParser.DefineStatementContext ctx) {
         parsingMap.startMark();
     }
@@ -589,6 +611,10 @@ public class QDLListener implements QDLParserListener {
     protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
         FunctionRecord functionRecord = new FunctionRecord();
         functionRecord.sourceCode = defineContext.getText();
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < defineContext.getChildCount(); i++) {
+            stringBuffer.append(defineContext.getChild(i).getText() + "\n");
+        }
         if (!functionRecord.sourceCode.endsWith(";")) {
             functionRecord.sourceCode = functionRecord.sourceCode + ";";
         }
@@ -600,6 +626,14 @@ public class QDLListener implements QDLParserListener {
         functionRecord.name = name;
         for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
             functionRecord.argNames.add(argListContext.getText());
+        }
+        for (QDLParserParser.FdocContext fd : defineContext.fdoc()) {
+            String doc = fd.getText();
+            // strip off function comment marker
+            if (doc.startsWith(">>")) {
+                doc = doc.substring(2).trim();
+            }
+            functionRecord.documentation.add(doc);
         }
         for (QDLParserParser.StatementContext sc : defineContext.statement()) {
             functionRecord.statements.add(resolveChild(sc));

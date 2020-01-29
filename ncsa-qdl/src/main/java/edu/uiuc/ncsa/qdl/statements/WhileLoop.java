@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.qdl.statements;
 
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.BreakException;
+import edu.uiuc.ncsa.qdl.exceptions.ContinueException;
+import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
@@ -47,7 +49,7 @@ public class WhileLoop implements Statement {
             return doForLoop(localState);
         }
 
-        if (conditional.getOperatorType() == ControlEvaluator.HAS_KEYS_TYPE) {
+        if (conditional.getOperatorType() == ControlEvaluator.FOR_KEYS_TYPE) {
             return hasKeysLoop(localState);
         }
         return doBasicWhile(localState);
@@ -58,19 +60,15 @@ public class WhileLoop implements Statement {
 
         do {
             for (Statement statement : getStatements()) {
-                if (statement instanceof Polyad) {
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.CONTINUE_TYPE) {
-                        continue;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.BREAK_TYPE) {
-                        break;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.RETURN_TYPE) {
-                        // a return issued in a loop is ill-defined and practically just means the same as break.
-                        break;
-                    }
+                try {
+                    statement.evaluate(localState);
+                } catch (BreakException b) {
+                    return Boolean.TRUE;
+                } catch (ContinueException cx) {
+                    // just continue.
+                } catch (ReturnException rx) {
+                    return Boolean.TRUE;
                 }
-                statement.evaluate(localState);
             }
         } while ((Boolean) conditional.evaluate(localState));
         return Boolean.TRUE;
@@ -129,50 +127,46 @@ public class WhileLoop implements Statement {
         for (int i = start; i != endValue; i = i + increment) {
             localST.setLongValue(loopArg, (long) i);
             for (Statement statement : getStatements()) {
-                if (statement instanceof Polyad) {
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.CONTINUE_TYPE) {
-                        continue;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.BREAK_TYPE) {
-                        break;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.RETURN_TYPE) {
-                        // a return issued in a loop is ill-defined and practically just means the same as break.
-                        break;
-                    }
+                try {
+                    statement.evaluate(localState);
+                } catch (BreakException b) {
+                    return Boolean.TRUE;
+                } catch (ContinueException cx) {
+                    // just continue.
+                } catch (ReturnException rx) {
+                    return Boolean.TRUE;
                 }
-                statement.evaluate(localState);
-            }
-        }
-  return Boolean.TRUE;
-    }
-
-    protected Object doBasicWhile(State localState) {
-        while ((Boolean) conditional.evaluate(localState)) {
-            for (Statement statement : getStatements()) {
-                if (statement instanceof Polyad) {
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.CONTINUE_TYPE) {
-                        continue;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.BREAK_TYPE) {
-                        break;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.RETURN_TYPE) {
-                        // a return issued in a loop is ill-defined and practically just means the same as break.
-                        break;
-                    }
-
-
-                }
-                statement.evaluate(localState);
             }
         }
         return Boolean.TRUE;
     }
 
+    protected Object doBasicWhile(State localState) {
+        while ((Boolean) conditional.evaluate(localState)) {
+            for (Statement statement : getStatements()) {
+                try {
+                    statement.evaluate(localState);
+                } catch (BreakException b) {
+                    return Boolean.TRUE;
+                } catch (ContinueException cx) {
+                    // just continue.
+                } catch (ReturnException rx) {
+                    return Boolean.TRUE;
+                }
+            }
+        }
+        return Boolean.TRUE;
+    }
+
+    /**
+     * for_keys(var, stem.) --  Loop over the keys in a given stem, assigning each to the var.
+     *
+     * @param localState
+     * @return
+     */
     protected Object hasKeysLoop(State localState) {
         if (conditional.getArgumments().size() != 2) {
-            throw new IllegalArgumentException("Error: You must supply two arguments for " + ControlEvaluator.HAS_KEYS);
+            throw new IllegalArgumentException("Error: You must supply two arguments for " + ControlEvaluator.FOR_KEYS);
         }
         String loopVar = null;
         StemVariable stemVariable = null;
@@ -183,7 +177,7 @@ public class WhileLoop implements Statement {
             throw new IllegalArgumentException("Error: The target of the command must be a stem variable");
         }
 
-        // Don't evaluate -- we just want the name fo the variable.
+        // Don't evaluate -- we just want the name of the variable.
         arg = conditional.getArgumments().get(0);
         if (arg instanceof VariableNode) {
             loopVar = ((VariableNode) arg).getVariableReference();
@@ -193,24 +187,20 @@ public class WhileLoop implements Statement {
         }
 
         SymbolTable localST = localState.getSymbolStack().getTopST();
-         // my.foo := 'bar'; my.0 := 32;
-        //while[has_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
+        // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
+        //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
         for (String key : stemVariable.keySet()) {
             localST.setStringValue(loopVar, key);
             for (Statement statement : getStatements()) {
-                if (statement instanceof Polyad) {
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.CONTINUE_TYPE) {
-                        continue;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.BREAK_TYPE) {
-                        break;
-                    }
-                    if (((Polyad) statement).getOperatorType() == ControlEvaluator.RETURN_TYPE) {
-                        // a return issued in a loop is ill-defined and practically just means the same as break.
-                        break;
-                    }
+                try {
+                    statement.evaluate(localState);
+                } catch (BreakException b) {
+                    return Boolean.TRUE;
+                } catch (ContinueException cx) {
+                    // just continue.
+                } catch (ReturnException rx) {
+                    return Boolean.TRUE;
                 }
-                statement.evaluate(localState);
             }
         }
         return Boolean.TRUE;

@@ -142,7 +142,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         int resultType = 0;
 
         // if the argument is a number return that many random numbers in a stem variable.
-        Object arg = polyad.getArgumments().get(0).evaluate(state);
+        Object arg = polyad.evalArg(0,state);;
         if (arg instanceof Long) {
             int size = ((Long) arg).intValue();
             StemVariable stemVariable = new StemVariable();
@@ -165,7 +165,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     protected void doRandomString(Polyad polyad, State state) {
         int length = 16;
         if (polyad.getArgumments().size() == 1) {
-            polyad.getArgumments().get(0).evaluate(state);
+            polyad.evalArg(0,state);;
             Object obj = polyad.getArgumments().get(0).getResult();
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();

@@ -10,6 +10,7 @@ import java.util.List;
 public class FunctionRecord {
     public String name;
     public String sourceCode;
+    public List<String> documentation = new ArrayList<>();
     public List<Statement> statements = new ArrayList<>();
     public List<String> argNames = new ArrayList<>();
     public int getArgCount(){

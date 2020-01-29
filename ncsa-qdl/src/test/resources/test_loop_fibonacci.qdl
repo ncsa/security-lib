@@ -6,6 +6,11 @@
 define[
    fib2(n)
    ]body[
+   >> This will compute the n-th element of a Fibonacci sequence.
+   >> A Fibonacci sequence, a_, a_1, a_2, ... is defined as
+   >>     a_n = a_n-1 + a_n-2
+   >> Acceptable inputs are any positive integer.
+   >> This function returns a stem list whose elements are the sequence.
        a.0 := 1;
        a.1 := 1;
        while[

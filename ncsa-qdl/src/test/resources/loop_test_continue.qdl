@@ -1,0 +1,20 @@
+
+/*
+   test that the continue command executes correctly. This should continue the loop processing so the
+   expected output is 0,1,2,4
+   Jeff Gaynor
+   1/28/2020
+*/
+
+while[
+     for_next(j,5)
+   ]do[
+     if[
+        j==3
+     ]then[
+        continue();
+     ]else[
+        say('j='+j);
+   ]; // end if
+]; // end loop
+

@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -41,6 +43,43 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
             names.add(name);
         }
         return names;
+    }
+
+    /**
+     * Just lists the first line of every function with documentation
+     *
+     * @return
+     */
+    public List<String> listDoxx() {
+        ArrayList<String> docs = new ArrayList<>();
+        for (String key : keySet()) {
+            String name = key.substring(0, key.indexOf(munger)); // de-munge
+            FunctionRecord fr = get(key);
+            name = name + "(" + fr.getArgCount() + ")";
+            if (0 < fr.documentation.size()) {
+                name = name + ": " + fr.documentation.get(0);
+            } else {
+                name = name + ": (none)";
+
+            }
+            docs.add(name);
+        }
+
+        return docs;
+    }
+
+    /**
+     * Returns the specific documentation for a function. The request is of the form name(args);
+     *
+     * @param fName
+     * @return
+     */
+    public List<String> getDocumentation(String fName, int argCount) {
+        if (get(fName, argCount) == null) {
+            return null;
+        } else {
+            return get(fName, argCount).documentation;
+        }
     }
 
     /**

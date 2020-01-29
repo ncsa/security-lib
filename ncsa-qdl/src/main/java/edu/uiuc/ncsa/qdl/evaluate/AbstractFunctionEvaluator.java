@@ -160,7 +160,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
-        Object arg1 = polyad.getArgumments().get(0).evaluate(state);
+        Object arg1 = polyad.evalArg(0,state);;
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -192,17 +192,20 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (!optionalArgs && polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
-        Object arg1 = polyad.getArgumments().get(0).evaluate(state);
-        Object arg2 = polyad.getArgumments().get(1).evaluate(state);
+        Object arg1 = polyad.evalArg(0,state);;
+        Object arg2 = polyad.evalArg(1,state);;
         if(arg1 == null) throw new UnknownSymbolException();
         if(arg2 == null) throw new UnknownSymbolException();
+        Object[] argList = new Object[polyad.getArgumments().size()];
+        argList[0] = arg1;
+        argList[1] = arg2;
         if(optionalArgs){
             for(int i = 2; i < polyad.getArgumments().size(); i++){
-                polyad.getArgumments().get(i).evaluate(state);
+                argList[i] = polyad.getArgumments().get(i).evaluate(state);
             }
         }
-        if (areNoneStems(arg1, arg2)) {
-            fpResult result = pointer.process(arg1, arg2);
+        if (areNoneStems(argList)) {
+            fpResult result = pointer.process(argList);
             finishExpr(polyad, result);
             return;
         }
@@ -240,9 +243,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (polyad.getArgumments().size() != 3) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
         }
-        Object arg1 = polyad.getArgumments().get(0).evaluate(state);
-        Object arg2 = polyad.getArgumments().get(1).evaluate(state);
-        Object arg3 = polyad.getArgumments().get(2).evaluate(state);
+        Object arg1 = polyad.evalArg(0,state);;
+        Object arg2 = polyad.evalArg(1,state);;
+        Object arg3 = polyad.evalArg(2,state);;
 
         if (areNoneStems(arg1, arg2, arg3)) {
             fpResult result = pointer.process(arg1, arg2, arg3);

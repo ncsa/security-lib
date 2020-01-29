@@ -42,7 +42,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 if (polyad.getArgumments().size() != 1) {
                     throw new IllegalArgumentException("Error: You must supply at least one argument.");
                 }
-                Object object = polyad.getArgumments().get(0).evaluate(state);
+                Object object = polyad.evalArg(0,state);;
                 if (object == null) {
                     throw new MissingArgumentException("Error: You must supply an argument for the " + IS_FUNCTION + " command.");
                 }
@@ -52,7 +52,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 String name = object.toString();
                 int argCount = -1; // default -- get any
                 if (polyad.getArgumments().size() == 2) {
-                    Object object2 = polyad.getArgumments().get(1).evaluate(state);
+                    Object object2 = polyad.evalArg(1,state);;
                     if (!isLong(object2)) {
                         throw new IllegalArgumentException("Error: The argument count must be a number.");
                     }
@@ -72,7 +72,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doJavaFunction(Polyad polyad, State state, FR_WithState frs) {
-        // Contains a java function that is wrapped int a QDLFunction. The polyad here contains the
+        // Contains a java function that is wrapped in a QDLFunction. The polyad here contains the
         // arguments that are needed to unpack this.
         Object[] argList = new Object[polyad.getArgumments().size()];
         for (int i = 0; i < polyad.getArgumments().size(); i++) {

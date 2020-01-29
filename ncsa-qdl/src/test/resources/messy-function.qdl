@@ -1,0 +1,42 @@
+/*
+  A messy function to test expression parsing
+  Jeff Gaynor
+  1/28/2020
+
+*/
+define[
+    f(x)
+  ]body[
+   >> This is a nasty polynomial. It shows how QDL can parse very complex expressions
+   >> Evaluating this at .5 yields 6.54166666666666666666
+    return(  (9*x*x*x - 27*x*x - (4*x + 12))/(3*x*x + 1 + (5-x*x)));
+];
+
+// f2 is defined as a check -- if the parser ever breaks then the grouping will likely be off
+// so f(x) != f2(x).
+
+define[
+    f2(x)
+  ]body[
+   >> This is a nasty polynomial using variable multiplication and parentheses everywhere to make it work right.
+   >> Evaluating this at .5 yields -3.01923076923076923076
+    return(  ((9*x*x*x) - (27*x*x) - (4*x + 12))/((3*x*x) + 1 + (5 - (x*x))));
+];
+
+define[
+    f3(x)
+  ]body[
+   >> This is a nasty polynomial using exponents.
+   >> It shows how QDL can parse very complex expressions
+   >> Evaluating this at .5 yields -3.01923076923076923076
+    return(  (9*x^3 - 27*x^2 - (4*x + 12))/(3*x^2 + 1 + (5 - x^2)));
+];
+
+define[
+  check_parser(x)
+  ]body[
+  >> A check of the parser. Run this and it should return true.
+  >> If  not, then somehow parsing of parenthesized expressions has been
+  >> broken.
+    say(f(x) == f2(x));
+  ];

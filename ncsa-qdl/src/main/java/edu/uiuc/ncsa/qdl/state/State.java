@@ -14,6 +14,8 @@ import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
@@ -358,22 +360,88 @@ public class State {
         }
         return out;
     }
-    public TreeSet<String> listFunctions(){
+
+    public TreeSet<String> listFunctions() {
         TreeSet<String> out = getFunctionTable().listFunctions();
-           for (URI key : getResolver().keySet()) {
-               TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions();
-               for (String x : uqVars) {
-                   out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
-               }
-           }
-           return out;
+        for (URI key : getResolver().keySet()) {
+            TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions();
+            for (String x : uqVars) {
+                out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
+            }
+        }
+        return out;
     }
 
     public void addModule(Module module) {
-        if(module instanceof JavaModule){
-            ((JavaModule)module).init(this.newModuleState());
+        if (module instanceof JavaModule) {
+            ((JavaModule) module).init(this.newModuleState());
         }
         getModuleMap().put(module);
 
     }
+
+    public List<String> listDocumentation() {
+        List<String> out = getFunctionTable().listDoxx();
+        for (URI key : getResolver().keySet()) {
+            List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();
+            for (String x : uqVars) {
+                out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
+            }
+        }
+        return out;
+
+    }
+
+    public List<String> listFunctionDoc(String fname, int argCount) {
+        if (fname.contains(NS_DELIMITER)) {
+            String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
+            String realName = fname.substring(1 + fname.indexOf(NS_DELIMITER));
+            if (alias == null || alias.isEmpty()) {
+                List<String> out = getFunctionTable().getDocumentation(realName, argCount);
+                if (out == null) {
+                    return new ArrayList<>();
+                }
+                return out;
+            }
+            if (!resolver.hasAlias(alias)) {
+                // so they asked for something that didn't exist
+                return new ArrayList<>();
+            }
+            URI ns = resolver.getByAlias(alias);
+            List<String> docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
+            if (docs == null) {
+                return new ArrayList<>();
+            }
+            return docs;
+            // easy cases.
+
+        }
+        // No imports, not qualified, hand back whatever we have
+        if (!resolver.hasImports()) {
+            List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+            if (out == null) {
+                return new ArrayList<>();
+            }
+            return out;
+        }
+        // Final case, unqualified name and there are imports. Return all that match.
+        List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+        if (out == null) {
+            out = new ArrayList<>();
+        }
+        for (URI key : getResolver().keySet()) {
+            String caput = getResolver().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
+
+            List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
+                    argCount);
+            if (doxx == null) {
+                out.add(caput + " none");
+            } else {
+                out.add(caput);
+                out.addAll(doxx);
+            }
+        }
+        return out;
+    }
+
 }

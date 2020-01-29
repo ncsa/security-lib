@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -11,6 +13,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.CommonCommands;
@@ -24,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -72,7 +76,7 @@ public class QDLCommands extends CommonCommands {
     protected String CLEAR_COMMAND = ")clear"; // reset the state to being new.
     protected String DEBUG_PROMPT = ")debug"; // toggle debug
     protected String FUNCS_COMMAND = ")funcs";
-    protected String HELP_COMMAND = ")help"; // reset the state to being new.
+    protected String HELP_COMMAND = ")help"; // show various types of help
     protected String OFF_COMMAND = ")off";
     protected String LOAD_COMMAND = ")load"; // grab a file and run it
     protected String BUFFER_COMMAND = ")buffer";
@@ -80,6 +84,9 @@ public class QDLCommands extends CommonCommands {
     protected String SAVE_COMMAND = ")save";
     protected String RUN_COMMAND = ")run";
     protected String VARS_COMMAND = ")vars";
+    protected String SET_ENV_COMMAND = ")set_env";
+    protected String LIST_ENV_COMMAND = ")list_env";
+    protected String REMOVE_ENV_COMMAND = ")remove_env";
     protected String RUN_PROMPT = "    ";
 
     protected void showRunHelp() {
@@ -92,13 +99,13 @@ public class QDLCommands extends CommonCommands {
         //sayii(DEBUG_PROMPT + " -- ");
         sayii(FUNCS_COMMAND + " -- List all of the imported and user defined functions this workspace knows about.");
         sayii(HELP_COMMAND + " -- This message.");
-        sayii(OFF_COMMAND + " -- Exit the workpace without saving.");
+        sayii(OFF_COMMAND + " -- Exit the workspace without saving.");
         sayii(LOAD_COMMAND + " file -- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayii(BUFFER_COMMAND + "ON|OFF -- Toggle between line mode (default, every line is executed on return) and ");
+        sayii(BUFFER_COMMAND + " ON|OFF -- Toggle between line mode (default, every line is executed on return) and ");
         sayii("      buffered mode, where lines are stored. Entering a single period as the first character on a line and hitting ");
         sayii("      return executes and flushes the buffer.");
         sayii(MODULES_COMMAND + " -- Lists all the imported modules this workspace knows about.");
-        sayii(RUN_COMMAND + "file -- Loads a file into its own interpreter and runs it. Output comes to this terminal.");
+        sayii(RUN_COMMAND + " -- Loads a file into its own interpreter and runs it. Output comes to this terminal.");
         sayii(SAVE_COMMAND + " -- Save the current state of the workspace.");
         sayii(VARS_COMMAND + " -- Lists all of the variables this workspace knows about.");
     }
@@ -127,6 +134,11 @@ public class QDLCommands extends CommonCommands {
     }
 
     protected String getCommandArg(String command, String input) {
+        if (input.length() <= command.length()) {
+            // probably means they did not supply an argument to the command
+         //   say("No argument supplied.");
+            return null;
+        }
         return input.substring(command.length() + 1).trim();
 
     }
@@ -152,6 +164,25 @@ public class QDLCommands extends CommonCommands {
         }
     }
 
+    protected void handleException(Throwable t) {
+
+        if ((t instanceof IllegalStateException) | (t instanceof ParsingException)) {
+            say("syntax error");
+            return;
+        }
+        if (t instanceof IllegalArgumentException) {
+            say("illegal argument: " + t.getMessage());
+            return;
+        }
+        if (t instanceof QDLException) {
+                   say(t.getMessage());
+                   return;
+               }
+        say("error: " + t.getMessage());
+    }
+
+    File homeDir = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources");
+    
     protected StringBuffer snarfFile(String name) {
         File f;
         File rootDir = new File("/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/");
@@ -185,6 +216,7 @@ public class QDLCommands extends CommonCommands {
     public void run(InputLine inputLine) throws Throwable {
         boolean bufferMode = inputLine.hasArg("-buffer");
         boolean isDebugOn = inputLine.hasArg("-debug");
+        isDebugOn = true;
         say("*****************************************");
         say("QDL Command Line Interpreter");
         say("Version " + QDLVersion.VERSION);
@@ -202,7 +234,11 @@ public class QDLCommands extends CommonCommands {
                 xx = xx + obj.toString();
             }
             QDLInterpreter interpreter = new QDLInterpreter(new HashMap<>(), getState());
-            interpreter.execute(xx);
+            try {
+                interpreter.execute(xx);
+            } catch (Throwable t) {
+                handleException(t);
+            }
             return;
 
         }
@@ -221,47 +257,45 @@ public class QDLCommands extends CommonCommands {
             }
             String input = readline().trim();
             if (input.equals(VARS_COMMAND)) {
-                String vars = state.listVariables().toString().trim();
-                vars = vars.substring(1); // chop off lead [
-                vars = vars.substring(0, vars.length() - 1);
-                say(vars);
+                doVarsCommand();
                 continue;
             }
-            if (input.equals(HELP_COMMAND)) {
-                showRunHelp();
+            if (input.startsWith(HELP_COMMAND)) {
+                String args = getCommandArg(HELP_COMMAND, input);
+                if (args == null || args.length() == 0) {
+                    showRunHelp();
+                    continue;
+                }
+                if (args.toLowerCase().equals("list")) {
+                    List<String> doxx = state.listDocumentation();
+                    for (String x : doxx) {
+                        say(x);
+                    }
+                    continue;
+                }
+                // last case, assume there are two arguments
+                String fName = args.substring(0, args.indexOf(" ")).trim();
+                String rawArgCount = args.substring(1 + args.indexOf(" ")).trim();
+                int argCount = 0;
+
+                try {
+                    argCount = Integer.parseInt(rawArgCount);
+                } catch (Throwable t) {
+                    say("Sorry, but \"" + rawArgCount + "\" is not an integer");
+                    continue;
+                }
+                List<String> doxx = state.listFunctionDoc(fName, argCount);
+                for (String x : doxx) {
+                    say(x);
+                }
                 continue;
             }
             if (input.startsWith(RUN_COMMAND)) {
-                String fileName = getCommandArg(RUN_COMMAND, input);
-                StringBuffer stringBuffer = snarfFile(fileName);
-                if (stringBuffer != null) {
-                    NamespaceResolver namespaceResolver = new NamespaceResolver();
-                    State runtime = new State(namespaceResolver,
-                            new SymbolStack(namespaceResolver),
-                            new OpEvaluator(),
-                            new MetaEvaluator(),
-                            new FunctionTable(),
-                            new ModuleMap());
-                    QDLInterpreter interpreter2 = new QDLInterpreter(new HashMap<>(), runtime);
-                    try {
-                        say("   >> running " + fileName);
-                        interpreter2.execute(stringBuffer.toString());
-                    } catch (Throwable t) {
-                        say("oh-oh. That didn't work. Message was:" + t.getMessage());
-                    }
-
-                }
+                doRunCommand(input);
                 continue;
             }
             if (input.equals(MODULES_COMMAND)) {
-                TreeSet<String> m = new TreeSet<>();
-                for (URI key : state.getModuleMap().keySet()) {
-                    m.add(key + " = " + state.getModuleMap().get(key).getAlias());
-                }
-                String modules = m.toString();
-                modules = modules.substring(1); // chop off lead [
-                modules = modules.substring(0, modules.length() - 1);
-                say(modules);
+                doModules();
                 continue;
             }
             if (input.startsWith(BUFFER_COMMAND)) {
@@ -289,34 +323,15 @@ public class QDLCommands extends CommonCommands {
                 continue;
             }
             if (input.startsWith(LOAD_COMMAND)) {
-                String fileName = getCommandArg(LOAD_COMMAND, input);
-                StringBuffer stringBuffer = snarfFile(fileName);
-                if (stringBuffer != null) {
-                    say("   >> loading " + fileName);
-
-                    interpreter.execute(stringBuffer.toString());
-                    say("ok");
-                }
-
+                doLoadCommand(interpreter, input);
                 continue;
             }
             if (input.equals(CLEAR_COMMAND)) {
-                NamespaceResolver resolver = state.getResolver();
-                State newState = new State(resolver,
-                        new SymbolStack(resolver),
-                        state.getOpEvaluator(),
-                        state.getMetaEvaluator(),
-                        new FunctionTable(),
-                        new ModuleMap());
-                state = newState;
-                say("workspace cleared");
+                interpreter = doClearCommand();
                 continue;
             }
             if (input.equals(FUNCS_COMMAND)) {
-                String funs = state.listFunctions().toString().trim();
-                funs = funs.substring(1); // chop off lead [
-                funs = funs.substring(0, funs.length() - 1);
-                say(funs);
+                doFuncsCommand();
                 continue;
             }
             if (input.equals(DEBUG_PROMPT)) {
@@ -342,7 +357,7 @@ public class QDLCommands extends CommonCommands {
                 try {
                     interpreter.execute(buffer.toString());
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    handleException(t);
                 }
                 buffer = new StringBuffer();
 
@@ -351,7 +366,7 @@ public class QDLCommands extends CommonCommands {
                     try {
                         interpreter.execute(buffer.toString());
                     } catch (Throwable t) {
-                        t.printStackTrace();
+                        handleException(t);
                     }
                     buffer = new StringBuffer();
                 } else {
@@ -360,6 +375,93 @@ public class QDLCommands extends CommonCommands {
             }
 
         }
+    }
+
+    protected void doFuncsCommand() {
+        String funs = state.listFunctions().toString().trim();
+        funs = funs.substring(1); // chop off lead [
+        funs = funs.substring(0, funs.length() - 1);
+        say(funs);
+    }
+
+    protected QDLInterpreter doClearCommand() {
+        QDLInterpreter interpreter;
+        NamespaceResolver resolver = state.getResolver();
+        State newState = new State(resolver,
+                new SymbolStack(resolver),
+                state.getOpEvaluator(),
+                state.getMetaEvaluator(),
+                new FunctionTable(),
+                new ModuleMap());
+        state = newState;
+        // Get rid of everything.
+        interpreter = new QDLInterpreter( getState());
+
+        say("workspace cleared");
+        return interpreter;
+    }
+
+    protected void doLoadCommand(QDLInterpreter interpreter, String input) {
+        String fileName = getCommandArg(LOAD_COMMAND, input);
+        if (fileName == null || fileName.isEmpty()) return;
+
+        StringBuffer stringBuffer = snarfFile(fileName);
+        if (stringBuffer != null) {
+            say("   >> loading " + fileName);
+            say("ok");
+
+            try {
+                interpreter.execute(stringBuffer.toString());
+            } catch (Throwable t) {
+                handleException(t);
+            }
+        }
+    }
+
+    protected void doVarsCommand() {
+        String vars = state.listVariables().toString().trim();
+        vars = vars.substring(1); // chop off lead [
+        vars = vars.substring(0, vars.length() - 1);
+        say(vars);
+    }
+
+    protected void doRunCommand(String input) {
+        String fileName = getCommandArg(RUN_COMMAND, input);
+        String commands = null;
+        try {
+             commands = FileUtil.readFileAsString(homeDir.toString() + "/" + fileName);
+        }catch(Throwable t){
+            say("uh-oh didn't find that file");
+            return;
+        }
+        if (commands != null && !commands.isEmpty()) {
+            NamespaceResolver namespaceResolver = new NamespaceResolver();
+            State runtime = new State(namespaceResolver,
+                    new SymbolStack(namespaceResolver),
+                    new OpEvaluator(),
+                    new MetaEvaluator(),
+                    new FunctionTable(),
+                    new ModuleMap());
+            QDLInterpreter interpreter2 = new QDLInterpreter(new HashMap<>(), runtime);
+            try {
+                say("   >> running " + fileName);
+                interpreter2.execute(commands);
+            } catch (Throwable t) {
+                handleException(t);
+            }
+
+        }
+    }
+
+    protected void doModules() {
+        TreeSet<String> m = new TreeSet<>();
+        for (URI key : state.getModuleMap().keySet()) {
+            m.add(key + " = " + state.getModuleMap().get(key).getAlias());
+        }
+        String modules = m.toString();
+        modules = modules.substring(1); // chop off lead [
+        modules = modules.substring(0, modules.length() - 1);
+        say(modules);
     }
 
     protected static String DUMMY_FUNCTION = "dummy0"; // used to create initial command line
@@ -372,9 +474,9 @@ public class QDLCommands extends CommonCommands {
         }
         InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
         QDLCommands qc = new QDLCommands(new MyLoggingFacade("QDLCommands"));
-       QDLLoaderImpl q = new QDLLoaderImpl();
-       
-       System.out.println(q.getClass().getCanonicalName());
+        QDLLoaderImpl q = new QDLLoaderImpl();
+
+      //  System.out.println(q.getClass().getCanonicalName());
         State state = qc.getState();
         if (argLine.hasArg("-ext")) {
             String loaderClass = argLine.getNextArgFor("-ext");
@@ -385,13 +487,5 @@ public class QDLCommands extends CommonCommands {
 
         qc.run(new InputLine(new Vector()));
 
-/*
-        CLIDriver cli = new CLIDriver());
-        // Easy case -- no arguments, so just start.
-        if (args == null || args.length == 0) {
-            cli.start();
-            return;
-        }
-*/
     }
 }

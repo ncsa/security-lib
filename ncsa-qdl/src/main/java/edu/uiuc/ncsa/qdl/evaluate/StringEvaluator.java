@@ -90,8 +90,55 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case TOKENIZE_TYPE:
                 doTokenize(polyad,state);
                 return true;
+            case SUBSTRING_TYPE:
+                doSubstring(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    protected void doSubstring(Polyad polyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult result = new fpResult();
+                if(!isString(objects[0])){
+                    throw new IllegalArgumentException("Error: The first argument to " + SUBSTRING + " must be a string.");
+                }
+                String arg = objects[0].toString();
+                if(!isLong(objects[1])){
+                    throw new IllegalArgumentException("Error: The second argument to " + SUBSTRING + " must be an integer.");
+                }
+                int n = ((Long)objects[1]).intValue();
+                int length = arg.length(); // default
+                String padding = null;
+                if(2 < objects.length){
+                    if(!isLong(objects[2])){
+                        throw new IllegalArgumentException("Error: The third argument to " + SUBSTRING + " must be an integer.");
+                    }
+                    length = ((Long)objects[2]).intValue();
+                }
+                if(3 < objects.length){
+                    if(!isString(objects[3])){
+                        throw new IllegalArgumentException("Error: The fourth argument to " + SUBSTRING + " must be a string.");
+                    }
+                    padding = objects[3].toString();
+                }
+                String r = arg.substring(n, Math.min(length, arg.length())); // the Java way
+                if(arg.length() < length && padding != null){
+                     StringBuffer stringBuffer = new StringBuffer();
+                     for(int i = 0; i < 1 + (length - arg.length())/padding.length(); i++){
+                         stringBuffer.append(padding);
+                     }
+                     r = r + stringBuffer.toString().substring(0,1 + length - arg.length());
+                }
+                result.result = r;
+                result.resultType = Constant.STRING_TYPE;
+                
+                return result;
+            }
+        };
+        process2(polyad,pointer,SUBSTRING,state,true);
     }
 
     protected void doTrim(Polyad polyad,State state) {

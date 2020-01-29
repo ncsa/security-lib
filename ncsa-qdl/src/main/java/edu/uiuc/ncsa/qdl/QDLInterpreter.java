@@ -3,7 +3,9 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.State;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +26,11 @@ public class QDLInterpreter {
 
     Map<String, String> environment;
 
+    public QDLInterpreter(State state) {
+        this.environment = new HashMap<>();
+        this.state = state;
+    }
+
     public QDLInterpreter(Map<String, String> environment, State state) {
         this.environment = environment;
         this.state = state;
@@ -37,18 +44,24 @@ public class QDLInterpreter {
      * the command line this is ok but does not scale in any way.
      */
     public void execute(String line) throws Throwable {
+        oldExec(line);
+    }
+
+    QDLParserDriver driver2 = new QDLParserDriver(environment, state);
+
+
+    protected void newExec(String line) throws Throwable {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(line.getBytes());
+
+    }
+
+    protected void oldExec(String line) throws Throwable {
         StringReader reader = new StringReader(line);
         QDLParserDriver driver = new QDLParserDriver(environment, state);
         driver.setDebugOn(isDebugOn());
-        try {
-            QDLRunner runner = new QDLRunner(driver.parse(reader));
-            runner.setState(state);
-            runner.run();
-
-        }catch(IllegalStateException isx){
-           // isx.printStackTrace();
-          System.out.println("syntax error");
-        }
+        QDLRunner runner = new QDLRunner(driver.parse(reader));
+        runner.setState(state);
+        runner.run();
     }
 
 }

@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
+import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.Statement;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
@@ -192,7 +192,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
         if(returnNullOK){
             return null;
         }
-        throw new GeneralException("Depth error: no children were found to a depth of " + maxSearchDepth);
+        throw new ParsingException("Depth error: no children were found to a depth of " + maxSearchDepth);
     }
 
     int maxSearchDepth = 10; // how far down the tree's children we are willing to go before bailing.

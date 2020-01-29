@@ -35,11 +35,15 @@ loopStatement:
 switchStatement:
     SwitchStatement (ifStatement ';')* LeftBracket;
 
+
 defineStatement:
-     DefineStatement function BodyStatement (statement ';')* LeftBracket;
+     DefineStatement function BodyStatement fdoc* (statement ';')+ LeftBracket;
+
 
 moduleStatement:
      ModuleStatement STRING (',' STRING)? BodyStatement (statement ';')* LeftBracket;
 
 tryCatchStatement:
      TryStatement (statement ';')* CatchStatement (statement ';')* LeftBracket;
+
+

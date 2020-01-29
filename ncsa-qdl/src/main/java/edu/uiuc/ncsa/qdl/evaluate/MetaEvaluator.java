@@ -46,20 +46,6 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-    /**
-     * Adds this table to the function evaluator. 
-     */
-  /*  public void addFunctionTable(FunctionTable functionTable){
-        for(AbstractFunctionEvaluator e : evaluators){
-            if(e instanceof FunctionEvaluator){
-                FunctionEvaluator fe = (FunctionEvaluator)e;
-                if(!fe.functionTables.contains(functionTable)) {
-                    fe.addFunctionTable(functionTable);
-                }
-            }
-        }
-
-    }*/
     public static void setMetaEvaluator(MetaEvaluator metaEvaluator) {
         MetaEvaluator.metaEvaluator = metaEvaluator;
     }
@@ -106,7 +92,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error. Wrong number of arguments. " +
                     "This requires a single argument that is a string or a list of them.");
         }
-        Object result = polyad.getArgumments().get(0).evaluate(state);
+        Object result = polyad.evalArg(0,state);;
         StemVariable stem = null;
 
         if (isString(result)) {
