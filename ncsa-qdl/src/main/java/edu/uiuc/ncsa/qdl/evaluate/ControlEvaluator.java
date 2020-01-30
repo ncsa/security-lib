@@ -1,20 +1,20 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
-import java.util.HashMap;
 
 /**
  * For ocntrol structure in loops, conditionals etc.
@@ -154,16 +154,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         Object arg1 = polyad.evalArg(0,state);;
         try {
-            FileReader fileReader = new FileReader(arg1.toString());
-            BufferedReader br = new BufferedReader(fileReader);
-            String lineIn = br.readLine();
-            StringBuffer stringBuffer = new StringBuffer();
-            while (lineIn != null) {
-                stringBuffer.append(lineIn + "\n");
-            }
-            br.close();
-            QDLInterpreter interpreter = new QDLInterpreter(localState);
-            interpreter.execute(stringBuffer.toString());
+            QDLParser interpreter = new QDLParser(localState);
+            interpreter.execute(FileUtil.readFileAsString(arg1.toString()));
         } catch (Throwable t) {
             throw new QDLRuntimeException("Error running script \"" + arg1 + "\"", t);
         }
@@ -239,7 +231,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         try {
             FileReader fileReader = new FileReader(file);
-            QDLParserDriver parserDriver = new QDLParserDriver(new HashMap<>(), state);
+            QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
             // Exceptional case where we just run it directly.
             QDLRunner runner = new QDLRunner(parserDriver.parse(fileReader));
             runner.setState(state);

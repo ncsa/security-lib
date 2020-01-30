@@ -1,15 +1,15 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -107,7 +107,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         }
 
 
-        QDLInterpreter p = new QDLInterpreter(new HashMap<>(), state);
+        QDLParser p = new QDLParser(new XProperties(), state);
         for (int i = 0; i < stem.size(); i++) {
             String currentIndex = Integer.toString(i);
             if (!stem.containsKey(currentIndex)) {

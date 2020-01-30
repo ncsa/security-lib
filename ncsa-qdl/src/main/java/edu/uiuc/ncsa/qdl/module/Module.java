@@ -3,13 +3,14 @@ package edu.uiuc.ncsa.qdl.module;
 import edu.uiuc.ncsa.qdl.state.State;
 import net.sf.json.JSONArray;
 
+import java.io.Serializable;
 import java.net.URI;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  11:03 AM
  */
-public class Module {
+public class Module implements Serializable {
     /**
      * This returns true only if the module is from another language than a QDL module.
      * @return

@@ -1,10 +1,12 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import java.io.Serializable;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:22 AM
  */
-public interface EvaluatorInterface {
+public interface EvaluatorInterface extends Serializable {
     // only guaranteed value for all of them.
     int UNKNOWN_VALUE = -1;
 

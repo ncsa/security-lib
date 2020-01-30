@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.extensions;
 
+import java.io.Serializable;
+
 /**
  * A wrapper for a single Java method that can be invoked from QDL. It may indeed be a single utility, or it may
  * front an entire class and expose the methods in it (so you {@link #getInstance()}  call just hands this class
@@ -8,7 +10,7 @@ package edu.uiuc.ncsa.qdl.extensions;
  * <p>Created by Jeff Gaynor<br>
  * on 1/27/20 at  12:02 PM
  */
-public interface QDLFunction {
+public interface QDLFunction extends Serializable {
     /**
      * The name of this function as you want it invoked in QDL.
      * @return

@@ -72,8 +72,7 @@ public class FileUtil {
         int i = 0;
         //Read from the stream
         for (String content : contents) {
-            System.out.println("loading::" + content);
-            stringBuffer.append(content);
+            stringBuffer.append(content+"\n");
         }
 
         return stringBuffer.toString();

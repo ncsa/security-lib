@@ -1,18 +1,16 @@
-package edu.uiuc.ncsa.qdl;
+package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.generated.QDLParserLexer;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.parsing.ParsingMap;
-import edu.uiuc.ncsa.qdl.parsing.QDLDebugListener;
-import edu.uiuc.ncsa.qdl.parsing.QDLListener;
 import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -24,7 +22,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The main parser. Feed it text, it returns a list of elements which may be executed.
@@ -44,12 +41,12 @@ public class QDLParserDriver {
 
     State state;
 
-    public QDLParserDriver(Map<String, String> environment, State state) {
+    public QDLParserDriver(XProperties environment, State state) {
         this.environment = environment;
         this.state = state;
     }
 
-    public QDLParserDriver(Map<String, String> environment) {
+    public QDLParserDriver(XProperties environment) {
         this.environment = environment;
         NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
         this.state = new State(NamespaceResolver.getResolver(),
@@ -60,7 +57,7 @@ public class QDLParserDriver {
                 new ModuleMap());
     }
 
-    Map<String, String> environment;
+    XProperties environment;
 
     ParsingMap parsingMap = new ParsingMap();
 
@@ -71,7 +68,7 @@ public class QDLParserDriver {
         return parsingMap.getElements();
     }
 
-    protected Reader preProcessStream(Reader reader, Map<String, String> replacements) throws Exception {
+    protected Reader preProcessStream(Reader reader, XProperties replacements) throws Exception {
         BufferedReader br = new BufferedReader(reader);
         if (replacements == null || replacements.isEmpty()) {
             return reader;

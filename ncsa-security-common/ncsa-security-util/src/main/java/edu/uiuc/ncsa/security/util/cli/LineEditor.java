@@ -28,6 +28,9 @@ public class LineEditor {
     boolean saved = false;
 
     public List<String> getBuffer() {
+        if (buffer == null) {
+            buffer = new LinkedList<>();
+        }
         return buffer;
     }
 
@@ -46,6 +49,9 @@ public class LineEditor {
         return output;
     }
 
+    public LineEditor(StringBuffer buffer) {
+        this(buffer.toString());
+    }
     public LineEditor(List<String> buffer) {
         this.buffer = buffer;
     }
@@ -144,6 +150,9 @@ public class LineEditor {
 
     public void execute() throws Throwable {
         say("CLI editor.");
+        if (getBuffer().isEmpty()) {
+            say("Empty buffer. Type ? to see help.");
+        }
         while (!isDone) {
             say2(PROMPT);
             String command = readline().trim();
@@ -164,6 +173,8 @@ public class LineEditor {
             if (eil.isCommand(INSERT_COMMAND, INSERT_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doInsert(eil);
+                saved = false;
+
             }
             if (eil.isCommand(PRINT_COMMAND, PRINT_COMMAND_LONG)) {
                 isUnkownCommand = false;
@@ -180,6 +191,8 @@ public class LineEditor {
                     buffer = new LinkedList<>();
                     say("buffer cleared.");
                 }
+                saved = true; // nothing to save.
+
             }
             if (eil.isCommand(COPY_COMMAND, COPY_COMMAND_LONG)) {
                 isUnkownCommand = false;
@@ -188,19 +201,27 @@ public class LineEditor {
             if (eil.isCommand(CUT_COMMAND, CUT_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doCut(eil);
+                saved = false;
+
             }
 
             if (eil.isCommand(MOVE_COMMAND, MOVE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doMove(eil);
+                saved = false;
+
             }
             if (eil.isCommand(EDIT_A_LINE_COMMAND, EDIT_A_LINE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doEditLines(eil);
+                saved = false;
+
             }
             if (eil.isCommand(PASTE_COMMAND, PASTE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doPaste(eil);
+                saved = false;
+
             }
             if (eil.isCommand(READ_COMMAND, READ_COMMAND_LONG)) {
                 isUnkownCommand = false;
@@ -209,6 +230,7 @@ public class LineEditor {
             if (eil.isCommand(WRITE_COMMAND, WRITE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doWrite(eil);
+                saved = true;
             }
             if (eil.isCommand(HELP_COMMAND)) {
                 isUnkownCommand = false;
@@ -216,17 +238,19 @@ public class LineEditor {
                     allHelp();
                 }
             }
-            if(eil.isCommand(FIND_COMMAND, FIND_COMMAND_LONG)){
+            if (eil.isCommand(FIND_COMMAND, FIND_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doFind(eil);
             }
             if (eil.isCommand(SUBSITUTE_COMMAND, SUBSITUTE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doSubstitute(eil);
+                saved = false;
             }
             if (eil.isCommand(DELETE_COMMAND, DELETE_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doDelete(eil);
+                saved = false;
             }
             if (eil.isCommand(VIEW_CLIPBOARD_COMMAND, VIEW_CLIPBOARD_COMMAND_LONG)) {
                 isUnkownCommand = false;
@@ -241,32 +265,33 @@ public class LineEditor {
                     say("verbose mode is now " + (verboseOn ? "ON" : "OFF"));
                 }
             }
-            if(isUnkownCommand){
+            if (isUnkownCommand) {
                 say("Sorry, unknown command. Type ? for help");
             }
         }
         say("done!");
 
     }
-    protected void doFindHelp(){
+
+    protected void doFindHelp() {
         say(FIND_COMMAND + "|" + FIND_COMMAND_LONG + " [x,y] regex = search through lines in a range");
         say("        listing all the lines that match the regex. Omitting the range implies search the whole buffer");
     }
 
-    protected void doFind(EditorInputLine eil){
-          if(showHelp(eil)){
-              doFindHelp();
-              return;
-          }
+    protected void doFind(EditorInputLine eil) {
+        if (showHelp(eil)) {
+            doFindHelp();
+            return;
+        }
         int[] range = getRange(eil);
         int count = 0;
-        for(int  i = range[0]; i <= range[1]; i++){
-            if(getBuffer().get(i).matches(eil.getLastArg())){
+        for (int i = range[0]; i <= range[1]; i++) {
+            if (getBuffer().get(i).matches(eil.getLastArg())) {
                 say(i + ": " + getBuffer().get(i));
                 count++;
             }
         }
-         sayv(count + " lines matched");
+        sayv(count + " lines matched");
     }
 
     protected void doSubstituteHelp() {
@@ -702,7 +727,7 @@ public class LineEditor {
             EditorInputLine eil = new EditorInputLine(READ_COMMAND + " \"" + arg + "\"");
             try {
                 lineEditor.doRead(eil);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 lineEditor.say("skipped file named \"" + arg + "\"");
             }
         }

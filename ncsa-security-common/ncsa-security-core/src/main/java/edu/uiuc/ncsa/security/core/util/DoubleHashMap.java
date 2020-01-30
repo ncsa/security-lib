@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core.util;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Set;
  * <p>Created by Jeff Gaynor<br>
  * on 3/1/12 at  2:06 PM
  */
-public class DoubleHashMap<K,V> implements Map<K,V> {
+public class DoubleHashMap<K,V> implements Map<K,V>, Serializable {
     HashMap<K,V> kToV = new HashMap<K, V>();
     HashMap<V,K> vToK = new HashMap<V, K>();
 

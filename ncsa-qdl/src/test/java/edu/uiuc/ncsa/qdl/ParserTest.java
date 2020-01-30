@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class ParserTest extends TestBase {
         addLine(script, "a:=5;");
         addLine(script, "b := -10;");
         addLine(script, "c:=a+b;");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a").equals(new Long(5L));
         assert state.getValue("b").equals(new Long(-10L));
@@ -35,7 +36,7 @@ public class ParserTest extends TestBase {
         addLine(script, "c:=-5;");
         addLine(script, "d:=a<b&&c<a;");
         addLine(script, "e:=!(a<b&&c<a);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
 
         interpreter.execute(script.toString());
         assert state.getValue("a").equals(new Long(5L));
@@ -55,7 +56,7 @@ public class ParserTest extends TestBase {
         addLine(script, "c:=2;");
         addLine(script, "d:=a++ < 0;");
         addLine(script, "e:=!((a<--b)&&(c<a));");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a").equals(new Long(1L)); // got incremented
         assert state.getValue("b").equals(new Long(-1L)); // got decremented twice
@@ -71,7 +72,7 @@ public class ParserTest extends TestBase {
         StringBuffer script = new StringBuffer();
         addLine(script, "a:='" + test + "';");
         addLine(script, "say(a);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
     }
 
@@ -88,7 +89,7 @@ public class ParserTest extends TestBase {
         addLine(script, "a:=-4;");
         addLine(script, "b:=11;");
         addLine(script, "c:=-(11+2*a);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a").equals(new Long(-4L));
         assert state.getValue("b").equals(new Long(11L));
@@ -104,7 +105,7 @@ public class ParserTest extends TestBase {
         StringBuffer script = new StringBuffer();
         addLine(script, "a:=4;");
         addLine(script, "b:=-(--a * 1 *  --a * 1 * --a);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
         assert state.getValue("a").equals(new Long(1L));
@@ -120,7 +121,7 @@ public class ParserTest extends TestBase {
         StringBuffer script = new StringBuffer();
         addLine(script, "a:=4;");
         addLine(script, "b:=-(a-- * 1 *  a-- * 1 * a--);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
         assert state.getValue("a").equals(new Long(1L));
@@ -142,7 +143,7 @@ public class ParserTest extends TestBase {
         addLine(script, "var. := random(5);");
         addLine(script, "w. := to_list(10);");
         addLine(script, "z. := has_keys(var., w.;");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         // so the first 5 entries are true, the next 5 are false.
         for (int i = 0; i < 5; i++) {
@@ -161,7 +162,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a = 3");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         try {
             interpreter.execute(script.toString());
             System.out.println(state.getValue("a"));
@@ -178,7 +179,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "execute('var := \\'abc\\' + \\'def\\');'");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         System.out.println(state.getValue("var"));
         assert state.getValue("var").equals("abcdef");

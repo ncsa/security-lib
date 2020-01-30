@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.qdl.extensions;
 
+import java.io.Serializable;
+
 /**
  * this represents a QDL variable.
  * <p>Created by Jeff Gaynor<br>
  * on 1/27/20 at  12:02 PM
  */
-public interface QDLVariable {
+public interface QDLVariable extends Serializable {
     /**
      * The name of the variable. This may be a simple name for a scalar, like "a",
      * or it may represent a stem, like "a.". You may even set specific stem values

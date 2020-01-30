@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.Set;
 
@@ -10,7 +11,8 @@ import java.util.Set;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:13 AM
  */
-public class NamespaceResolver {
+public class NamespaceResolver implements Serializable {
+    private static final long serialversionUID =  129348938L;
     /**
      * Delimiter for namespaces
      */
@@ -48,7 +50,7 @@ public class NamespaceResolver {
         return !map.isEmpty();
     }
 
-    DoubleHashMap<URI, String> map = new DoubleHashMap<>();
+    protected DoubleHashMap<URI, String> map = new DoubleHashMap<>();
 
 
     public URI getByAlias(String alias) {

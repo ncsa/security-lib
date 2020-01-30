@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.extensions;
 
 import edu.uiuc.ncsa.qdl.module.Module;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -12,6 +13,6 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/27/20 at  5:47 PM
  */
-public interface QDLLoader {
+public interface QDLLoader extends Serializable {
     List<Module> load();
 }

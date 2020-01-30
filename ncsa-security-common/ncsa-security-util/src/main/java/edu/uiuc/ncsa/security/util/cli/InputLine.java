@@ -128,7 +128,10 @@ public class InputLine {
 
     /**
      * Remember that the zero-th argument is the command, so that the arguments properly
-     * begin at index = 1.
+     * begin at index = 1. <br/>
+     * So if the command was <br/><br/>
+     * foo -A b -C -D<br/><br/>
+     * getArg(0) returns "foo" and getArg(1) returns "-A";
      *
      * @param index
      * @return
@@ -170,6 +173,15 @@ public class InputLine {
     public boolean hasArg(String arg) {
         return -1 != indexOf(arg);
     }
+
+    /**
+     * Is there a given arg at the given index? Useful if certain arguments are expected at certain positions.
+     * @param index
+     * @return
+     */
+    public boolean hasArgAt(int index) {
+          return index <= getArgCount();
+      }
 
     /**
      * If this command line has arguments at all.

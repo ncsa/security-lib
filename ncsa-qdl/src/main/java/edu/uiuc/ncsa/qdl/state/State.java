@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,8 @@ import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
  */
-public class State {
+public class State implements Serializable {
+    private static final long serialversionUID = 129348937L;
     public State(NamespaceResolver resolver,
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
@@ -320,7 +322,10 @@ public class State {
                 }
             }
         }
-
+          if(st == null){
+              // Didn't find it any place so keep to the local state
+              st = getSymbolStack().getTopST();
+          }
         switch (op) {
             case OP_GET:
                 return st.resolveValue(variableName);

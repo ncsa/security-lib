@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:48 AM
  */
-public class FunctionRecord {
+public class FunctionRecord implements Serializable {
     public String name;
     public String sourceCode;
     public List<String> documentation = new ArrayList<>();
