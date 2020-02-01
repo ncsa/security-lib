@@ -74,7 +74,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         String tail = getStemTail(variableName);
         if (isStem(tail)) {
             Object xxx = resolveValue(tail);
-            tail = xxx.toString();
+            tail = xxx==null?tail:xxx.toString();
         }
         String tailKey = tail;
         if (map.containsKey(tail)) {

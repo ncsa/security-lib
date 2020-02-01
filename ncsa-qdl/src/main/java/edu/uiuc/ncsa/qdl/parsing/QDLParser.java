@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 
 /**
@@ -44,24 +43,14 @@ public class QDLParser {
      * the command line this is ok but does not scale in any way.
      */
     public void execute(String line) throws Throwable {
-        oldExec(line);
-    }
-
-    QDLParserDriver driver2 = new QDLParserDriver(environment, state);
-
-
-    protected void newExec(String line) throws Throwable {
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(line.getBytes());
-
-    }
-
-    protected void oldExec(String line) throws Throwable {
         StringReader reader = new StringReader(line);
-        QDLParserDriver driver = new QDLParserDriver(environment, state);
-        driver.setDebugOn(isDebugOn());
-        QDLRunner runner = new QDLRunner(driver.parse(reader));
-        runner.setState(state);
-        runner.run();
+             QDLParserDriver driver = new QDLParserDriver(environment, state);
+             driver.setDebugOn(isDebugOn());
+             QDLRunner runner = new QDLRunner(driver.parse(reader));
+             runner.setState(state);
+             runner.run();
     }
+
+
 
 }

@@ -44,7 +44,7 @@ public class ConditionalStatement implements Statement {
 
     @Override
     public Object evaluate(State state) {
-        State newState = state.newLocalState();
+        State newState = state.newStateWithImports();
 
         Boolean result = false;
         if ((Boolean) getConditional().evaluate(newState)) {

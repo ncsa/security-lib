@@ -95,6 +95,12 @@ public class State implements Serializable {
         }
 
         if (name.contains(NS_DELIMITER)) {
+            if(name.startsWith(NS_DELIMITER)){
+                // case is that it is directly qualified for the top leve. Check it, return what is there.
+                frs.functionRecord = getFunctionTable().get(name.substring(1), argCount);
+                frs.state = this;
+                return frs;
+            }
             String resolvedName = name.substring(name.indexOf(NS_DELIMITER) + 1);
             Module module = resolveRawNameToModule(name);
             if (argCount == -1) {
@@ -196,14 +202,27 @@ public class State implements Serializable {
         return getMetaEvaluator().getType(name);
     }
 
+    public State newStateNoImports() {
+        NamespaceResolver nr = new NamespaceResolver();
+        SymbolStack newStack = new SymbolStack(nr, symbolStack.getParentTables());
+        State newState = new State(nr,
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                getFunctionTable(),
+                getModuleMap());
+        return newState;
+
+    }
+
     /**
      * Takes this state object and sets up a new local environment. This is passed to things
-     * like loops, conditionals etc. The lifecycle of these is that they are basically abandoned
+     * like loops, functions, conditionals etc. The lifecycle of these is that they are basically abandoned
      * when done then garbage collected.
      *
      * @return State
      */
-    public State newLocalState() {
+    public State newStateWithImports() {
         //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack(resolver, symbolStack.getParentTables());
         State newState = new State(resolver,
@@ -435,15 +454,17 @@ public class State implements Serializable {
             out = new ArrayList<>();
         }
         for (URI key : getResolver().keySet()) {
-            String caput = getResolver().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
+            if(getModuleMap().get(key).getState().getFunctionTable().get(fname, argCount)!= null){
+                String caput = getResolver().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
 
-            List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
-                    argCount);
-            if (doxx == null) {
-                out.add(caput + " none");
-            } else {
-                out.add(caput);
-                out.addAll(doxx);
+                List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
+                        argCount);
+                if (doxx == null) {
+                    out.add(caput + " none");
+                } else {
+                    out.add(caput);
+                    out.addAll(doxx);
+                }
             }
         }
         return out;

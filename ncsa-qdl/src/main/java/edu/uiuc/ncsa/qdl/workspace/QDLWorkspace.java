@@ -61,7 +61,7 @@ public class QDLWorkspace {
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
             boolean executeLocalBuffer = false;
-            boolean executeExternalFile  = false;
+            boolean executeExternalFile = false;
             System.out.print(INDENT);
             String input = workspaceCommands.readline().trim();
             if (input.startsWith(")")) {
@@ -82,20 +82,22 @@ public class QDLWorkspace {
                 }
             }
             try {
-                if(executeLocalBuffer){
-                    if(workspaceCommands.getLocalBuffer() != null){
+                if (executeLocalBuffer) {
+                    if (workspaceCommands.getLocalBuffer() != null) {
                         workspaceCommands.getInterpreter().execute(workspaceCommands.getLocalBuffer().toString());
-                    continue;
-                    }
-                    if(workspaceCommands.getExternalBuffer() != null){
-                        try{
-                            String xb = FileUtil.readFileAsString(workspaceCommands.getExternalBuffer().getAbsolutePath());
-                            workspaceCommands.getInterpreter().execute(xb);
-                        }catch(IOException t){
-                            workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
-                        }
                         continue;
                     }
+                }
+                if (executeExternalFile) {
+                    if (workspaceCommands.getExternalBuffer() != null) {
+                        try {
+                            String xb = FileUtil.readFileAsString(workspaceCommands.getExternalBuffer().getAbsolutePath());
+                            workspaceCommands.getInterpreter().execute(xb);
+                        } catch (IOException t) {
+                            workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
+                        }
+                    }
+                    continue;
                 }
                 workspaceCommands.getInterpreter().execute(input);
             } catch (Throwable t) {
@@ -103,9 +105,6 @@ public class QDLWorkspace {
             }
         }
     }
-
-
-
 
 
     public static void main(String[] args) throws Throwable {

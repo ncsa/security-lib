@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
 import java.io.*;
 import java.net.URI;
@@ -98,7 +99,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     public int execute(String inline) {
-
+        inline = TemplateUtil.replaceAll( inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
 
         switch (inputLine.getCommand()) {
@@ -122,8 +123,7 @@ public class WorkspaceCommands implements Logable {
             case MODULES_COMMAND:
                 return doModulesCommand(inputLine);
             case OFF_COMMAND:
-                System.out.print("Do you want to exit? (y/n)");
-                if (readline().equals("y")) {
+                if (readline("Do you want to exit? (y/n)").equals("y")) {
                     return RC_EXIT_NOW;
                 }
                 say("System exit cancelled.");
@@ -186,8 +186,7 @@ public class WorkspaceCommands implements Logable {
             lineEditor.execute();
             // The user has to save their changes in the editor.
             if (!lineEditor.isSaved()) {
-                System.out.print("Did you want to save the buffer? (y/n):");
-                String inLine = readline();
+                String inLine = readline("Did you want to save the buffer? (y/n):");
                 if (inLine.equals("y")) {
                     FileUtil.writeStringToFile(file.getAbsolutePath(), lineEditor.bufferToString());
                 }
@@ -262,7 +261,15 @@ public class WorkspaceCommands implements Logable {
                 return doEnvSave(inputLine);
             case "set":
                 return doEnvSet(inputLine);
+            case "name":
+                if(envFile == null){
+                    say("No environment file has been set.");
+                }else{
+                    say(envFile.getAbsolutePath());
+                }
+                return RC_CONTINUE;
         }
+        say("Unknown environment command.");
         return RC_CONTINUE;
     }
 
@@ -274,7 +281,9 @@ public class WorkspaceCommands implements Logable {
 
         try {
             FileWriter fileWriter = new FileWriter(currentFile);
-            env.store(fileWriter, "Saved by QDL workspace at " + Iso8601.date2String(new Date()));
+            String message = "Environment saved to \"" + currentFile.getAbsolutePath() + "\" at " + Iso8601.date2String(new Date());
+            env.store(fileWriter, message);
+            say(message);
         } catch (Throwable t) {
             say("Saving the environment to \"" + currentFile.getAbsolutePath() + "\" failed:" + t.getMessage());
         }
@@ -335,8 +344,14 @@ public class WorkspaceCommands implements Logable {
         }
         StringBuffer value = new StringBuffer();
         // REMEMBER that the getArgCount is the number of arguments and the 0th element is the command
+        boolean isFirstPass = true;
         for (int i = FIRST_ARG_INDEX + 1; i < inputLine.getArgCount() + 1; i++) {
-            value.append(inputLine.getArg(i) + " ");
+            if(isFirstPass){
+                value.append(inputLine.getArg(i));
+                isFirstPass = false;
+            }else{
+                value.append(" " + inputLine.getArg(i));
+            }
         }
         env.put(pName, value.toString());
         return RC_CONTINUE;
@@ -408,26 +423,44 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         switch (inputLine.getArg(FIRST_ARG_INDEX)) {
-            case "on":
-                useLocalBuffer = true;
-                say("Local buffer enabled.");
+            case "clear":
+                localBuffer = new StringBuffer();
+                say("Local buffer cleared");
                 return RC_CONTINUE;
             case "off":
                 useLocalBuffer = false;
                 say("Local buffer disabled.");
                 return RC_CONTINUE;
-            case "save":
-                return doBufferSave(inputLine);
+            case "on":
+                useLocalBuffer = true;
+                say("Local buffer enabled.");
+                return RC_CONTINUE;
+            case "prepend":
+                if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
+                    say("You must supply a file name for this operation.");
+                    return RC_CONTINUE;
+                }
+                StringBuffer tempSB = new StringBuffer();
+                try {
+                    tempSB.append(FileUtil.readFileAsString(inputLine.getArg(1 + FIRST_ARG_INDEX)));
+                    tempSB.append("\n" + localBuffer.toString());
+                    localBuffer = tempSB;
+                    say("Buffer updated.");
+                } catch (Throwable t) {
+                    say("Sorry, could not read the file \"" + inputLine.getArg(1 + FIRST_ARG_INDEX) + "\":" + t.getMessage());
+                    break;
+                }
+                useLocalBuffer = true;
+                return RC_CONTINUE;
             case "show":
                 if (localBuffer != null) {
                     say(localBuffer.toString());
                 }
                 return RC_CONTINUE;
-            case "clear":
-                localBuffer = new StringBuffer();
-                say("Local buffer cleared");
-                return RC_CONTINUE;
+            case "save":
+                return doBufferSave(inputLine);
             case "load":
+                // case falls through!!
                 localBuffer = new StringBuffer();
             case "append":
                 if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
@@ -441,7 +474,10 @@ public class WorkspaceCommands implements Logable {
                     say("Sorry, could not read the file \"" + inputLine.getArg(1 + FIRST_ARG_INDEX) + "\":" + t.getMessage());
                     break;
                 }
+                useLocalBuffer = true;
                 return RC_CONTINUE;
+
+
         }
         say("say unknown buffer command.");
         return RC_CONTINUE;
@@ -453,6 +489,16 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         File targetFile = resolveAgainstRoot(inputLine.getArg(1 + FIRST_ARG_INDEX));
+        if(targetFile.exists()){
+            if(!targetFile.isFile()){
+                say("Sorry, but \"" + targetFile.getAbsolutePath() + "\" is not a file and cannot be overwritten. Aborting...");
+                return RC_CONTINUE;
+            }
+            if(!readline("\"" + targetFile.getAbsolutePath() + "\" exists. Do you want to overwrite it? (y/n):").equals("y")){
+                 say("aborting...");
+                 return RC_CONTINUE;
+            }
+        }
         try {
             if (localBuffer == null) {
                 say("Sorry, the buffer is empty. There is nothing to save.");
@@ -876,6 +922,8 @@ public class WorkspaceCommands implements Logable {
             if (envFile.exists()) {
                 env.load(envFile);
             }
+            // set some useful things.
+            env.put("qdl_root", rootDir.getAbsolutePath());
         }
 
         LoggerProvider loggerProvider = null;
@@ -924,6 +972,10 @@ public class WorkspaceCommands implements Logable {
 
     BufferedReader bufferedReader;
 
+    public String readline(String prompt) {
+         System.out.print(prompt);
+         return readline();
+    }
     public String readline() {
         try {
             String x = getBufferedReader().readLine();

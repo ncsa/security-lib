@@ -22,6 +22,7 @@ import java.util.List;
  * on 1/22/20 at  10:53 AM
  */
 public class FunctionEvaluator extends AbstractFunctionEvaluator {
+    public static long serialVersionUID = 654768894456L;
     List<FunctionTable> functionTables = new ArrayList<>();
     public static final int BASE_FUNCTION_VALUE = 6000;
     public static final String IS_FUNCTION = "is_function";
@@ -103,7 +104,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             throw new UndefinedFunctionException("Error: the function \"" + polyad.getName() + "\" with "
                     + polyad.getArgumments().size() + " arguments was not found.");
         }
-        State localState = frs.state.newLocalState();
+        State localState = frs.state.newStateNoImports();
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getTopST();

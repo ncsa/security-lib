@@ -13,7 +13,7 @@ import java.util.List;
 public class TryCatch implements Statement {
     @Override
     public Object evaluate(State state) {
-        State localState = state.newLocalState();
+        State localState = state.newStateWithImports();
         try {
             for (Statement s : tryStatements) {
                 s.evaluate(localState);

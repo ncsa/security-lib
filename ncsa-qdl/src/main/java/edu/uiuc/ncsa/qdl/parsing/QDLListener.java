@@ -16,6 +16,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.StringTokenizer;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -625,7 +626,13 @@ public class QDLListener implements QDLParserListener {
         }
         functionRecord.name = name;
         for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
-            functionRecord.argNames.add(argListContext.getText());
+            // this is a comma delimited list of arguments.
+            String allArgs = argListContext.getText();
+
+            StringTokenizer st = new StringTokenizer(allArgs, ",");
+            while(st.hasMoreElements()){
+                functionRecord.argNames.add(st.nextToken());
+            }
         }
         for (QDLParserParser.FdocContext fd : defineContext.fdoc()) {
             String doc = fd.getText();

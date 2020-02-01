@@ -41,7 +41,7 @@ public class WhileLoop implements Statement {
 
     @Override
     public Object evaluate(State state) {
-        State localState = state.newLocalState();
+        State localState = state.newStateWithImports();
         if (conditional.getOperatorType() == ControlEvaluator.CHECK_AFTER_TYPE) {
             return doPostLoop(localState);
         }
