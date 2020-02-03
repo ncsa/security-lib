@@ -39,7 +39,6 @@ public interface SymbolTable extends Serializable {
 
     Set<String> listVariables();
 
-    void addModule(Module module);
 
     public Map getMap();
 }

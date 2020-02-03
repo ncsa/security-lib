@@ -529,7 +529,7 @@ public class StemFunctionsTest extends TestBase {
         ConstantNode arg2 = new ConstantNode(expectedResult, Constant.LONG_TYPE);
 
         polyad.addArgument(arg);
-        polyad.addArgument(arg2); // set second to be a stem so it fails
+        polyad.addArgument(arg2);
         polyad.evaluate(state);
         StemVariable sourceStem = (StemVariable) state.getSymbolStack().resolveValue("sourceStem.");
         Long defaultValue = (Long) polyad.getResult();

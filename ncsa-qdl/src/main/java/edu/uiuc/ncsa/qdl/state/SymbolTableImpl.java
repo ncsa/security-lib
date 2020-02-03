@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 
 import java.math.BigDecimal;
@@ -14,10 +12,8 @@ import java.util.Set;
  * on 1/10/20 at  4:15 PM
  */
 public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable {
-    NamespaceResolver namespaceResolver;
 
-    public SymbolTableImpl(NamespaceResolver namespaceResolver) {
-        this.namespaceResolver = namespaceResolver;
+    public SymbolTableImpl() {
     }
 
     protected HashMap<String, Object> map = new HashMap();
@@ -152,33 +148,6 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         map = new HashMap();
     }
 
-    protected boolean isImported(String var) {
-        return var.contains("#");
-    }
-
-   /* protected Module findModule(String variable) {
-        if (isImported(variable)) {
-            String head = getHashHead(variable);
-            String tail = getHashTail(variable);
-            String namespace;
-            if (namespaceResolver.hasAlias(head)) {
-                namespace = namespaceResolver.getByAlias(head);
-            } else {
-                namespace = head;
-            }
-            return importedModules.get(namespace);
-
-        }
-        return null;
-    }
-*/
-    /*protected Object checkImports(String variable) {
-        Module module = findModule(variable);
-        if (module != null) {
-            return module.getSymbols().resolveValue(getHashTail(variable));
-        }
-        return null;
-    }*/
 
     /**
      * This will do lookups <b>including resolutions for stem variables.</b>
@@ -188,11 +157,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
      */
     @Override
     public Object resolveValue(String variable) {
-   /*     Object obj = checkImports(variable);
-        if (obj != null) {
-            return obj;
-        }
-   */     boolean isStem = isStem(variable);
+     boolean isStem = isStem(variable);
         if (!isStem) {
             if (map.containsKey(variable)) {
                 return map.get(variable);
@@ -211,7 +176,9 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         String actualKey = tail;
         if (isStem(tail)) {
             Object zzzz = resolveValue(tail);
-            actualKey = zzzz.toString();
+            // So this means the compoud tail like "0.0" does not exist either.
+            // This is a new key and should be returned unaltered.
+            actualKey = zzzz==null?tail:zzzz.toString();
         }
         if (map.containsKey(tail)) {
             actualKey = map.get(tail).toString();
@@ -221,14 +188,14 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
     }
 
     /**
-     * Return if the symbol is defined. This needs work for stem variables.
+     * Return if the symbol is defined. 
      *
      * @param symbol
      * @return
      */
     @Override
     public boolean isDefined(String symbol) {
-        if (isStem(symbol)) {
+ /*       if (isStem(symbol)) {
             String head = getStemHead(symbol);
             if (!map.containsKey(head)) {
                 return false;
@@ -243,7 +210,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
                 return stem.containsKey(tail);
             }
             return stem.containsKey(foo.toString()); // since the value may be an integer, e.g.
-        }
+        }*/
         return map.containsKey(symbol);
     }
 
@@ -300,15 +267,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         return map.keySet();
     }
 
-    ModuleMap importedModules = new ModuleMap();
 
-    @Override
-    public void addModule(Module module) {
-        if (importedModules.containsKey(module.getNamespace())) {
-            return;
-        }
-        importedModules.put(module);
-    }
 
     @Override
     public Map getMap() {

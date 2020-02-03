@@ -52,7 +52,7 @@ public class QDLWorkspace {
 
     public void run(InputLine inputLine) throws Throwable {
         workspaceCommands.say("*****************************************");
-        workspaceCommands.say("QDL Command Line Interpreter");
+        workspaceCommands.say("Welcome to the QDL Workspace");
         workspaceCommands.say("Version " + QDLVersion.VERSION);
         workspaceCommands.say("Type " + workspaceCommands.HELP_COMMAND + " for help.");
         workspaceCommands.say("*****************************************");

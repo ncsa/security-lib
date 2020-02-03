@@ -214,13 +214,16 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doEditLocal() {
+        if(localBuffer == null){
+            say("New local buffer created.");
+        }
         LineEditor lineEditor = new LineEditor(localBuffer.toString());
         try {
             lineEditor.execute();
             localBuffer = new StringBuffer();
             localBuffer.append(lineEditor.bufferToString());
         } catch (Throwable t) {
-            say("There was an erro during editing: " + t.getMessage());
+            say("There was an error during editing: " + t.getMessage());
         }
         return RC_CONTINUE;
     }
@@ -414,7 +417,7 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    boolean useLocalBuffer = false;
+    boolean useLocalBuffer = true; // default at startup so )edit command just works
 
     private int doLocalBuffer(InputLine inputLine) {
 
@@ -858,8 +861,8 @@ public class WorkspaceCommands implements Logable {
     protected State getState() {
         if (state == null) {
             NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
-            SymbolTableImpl symbolTable = new SymbolTableImpl(namespaceResolver);
-            SymbolStack stack = new SymbolStack(namespaceResolver);
+            SymbolTableImpl symbolTable = new SymbolTableImpl();
+            SymbolStack stack = new SymbolStack();
             stack.addParent(symbolTable);
             state = new State(NamespaceResolver.getResolver(),
                     stack,
@@ -949,6 +952,7 @@ public class WorkspaceCommands implements Logable {
         }
         logger = loggerProvider.get();
         if (inputLine.hasArg(CLA_EXTENSIONS)) {
+            // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl"
             String loaderClass = inputLine.getNextArgFor("-ext");
             Class klasse = state.getClass().forName(loaderClass);
             QDLLoader loader = (QDLLoader) klasse.newInstance();

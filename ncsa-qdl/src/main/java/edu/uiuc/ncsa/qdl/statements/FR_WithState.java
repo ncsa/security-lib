@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
-import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.AbstractState;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -8,6 +8,6 @@ import edu.uiuc.ncsa.qdl.state.State;
  */
 public class FR_WithState {
     public FunctionRecord functionRecord;
-    public State state;
+    public AbstractState state;
     public boolean isExternalModule = false;
 }

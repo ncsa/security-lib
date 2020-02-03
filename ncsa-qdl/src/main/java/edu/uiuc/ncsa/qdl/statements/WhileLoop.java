@@ -122,7 +122,7 @@ public class WhileLoop implements Statement {
                 throw new IllegalArgumentException("Error: incorrect number of arguments for " + ControlEvaluator.FOR_NEXT + ".");
         }
         // while[for_next(j,0,10,-1)]do[say(j);];  // test statememt
-        SymbolTable localST = localState.getSymbolStack().getTopST();
+        SymbolTable localST = localState.getSymbolStack().getLocalST();
 
         for (int i = start; i != endValue; i = i + increment) {
             localST.setLongValue(loopArg, (long) i);
@@ -186,7 +186,7 @@ public class WhileLoop implements Statement {
 
         }
 
-        SymbolTable localST = localState.getSymbolStack().getTopST();
+        SymbolTable localST = localState.getSymbolStack().getLocalST();
         // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
         //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
         for (String key : stemVariable.keySet()) {

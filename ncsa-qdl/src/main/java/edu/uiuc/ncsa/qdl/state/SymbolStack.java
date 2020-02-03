@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
@@ -8,7 +7,10 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 /**
  * /**
@@ -18,10 +20,8 @@ import java.util.*;
  * on 1/18/20 at  7:31 AM
  */
 public class SymbolStack extends AbstractSymbolTable {
-    NamespaceResolver namespaceResolver;
-
-    public SymbolStack(NamespaceResolver namespaceResolver) {
-        this.namespaceResolver = namespaceResolver;
+    public SymbolStack() {
+        addParent(new SymbolTableImpl());
     }
 
     @Override
@@ -35,13 +35,12 @@ public class SymbolStack extends AbstractSymbolTable {
      *
      * @param parentTables
      */
-    public SymbolStack(NamespaceResolver namespaceResolver, ArrayList<SymbolTable> parentTables) {
+    public SymbolStack(ArrayList<SymbolTable> parentTables) {
         for (SymbolTable s : parentTables) {
             // use this and not addParent, since that reverses their order, inserting a the front of the list
             getParentTables().add(s);
         }
-        this.namespaceResolver = namespaceResolver;
-        addParent(new SymbolTableImpl(namespaceResolver));
+        addParent(new SymbolTableImpl());
     }
 
     /*
@@ -57,9 +56,6 @@ public class SymbolStack extends AbstractSymbolTable {
         return parentTables;
     }
 
-    public void setParentTables(ArrayList<SymbolTable> parentTables) {
-        this.parentTables = parentTables;
-    }
 
     ArrayList<SymbolTable> parentTables;
 
@@ -68,31 +64,43 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     /**
-     * Used for retrieving the parents of this to, e.g., make another environment at the same level.
-     *
+     * Get the current most local symbol table.
      * @return
      */
-    public List<SymbolTable> getOnlyParents() {
-        ArrayList<SymbolTable> parents = new ArrayList<>();
-        System.arraycopy(parentTables, 1, parents, 0, parentTables.size() - 1);
-        return parents;
-    }
-
-    public SymbolTable getTopST() {
+    public SymbolTable getLocalST() {
         return getParentTables().get(0);
     }
 
+    /**
+     * Looks through the symbol tables in this state and returns the value for the variable <b>or</b>
+     * null if there is no value.
+     * @param var
+     * @return
+     */
     protected Object findValueInATable(String var) {
         for (SymbolTable s : getParentTables()) {
-            if (s.isDefined(var)) {
-                return s.resolveValue(var);
+            Object obj = s.resolveValue(var);
+            if(obj != null){
+                return obj;
             }
         }
         return null;
     }
 
-
     public Object resolveValue(String variableName) {
+                  return findValueInATable(variableName); // to keep current code working
+    }
+
+    /**
+     * Returns the value for a variable. This used to do this for a stem variable but the
+     * algorithm it used was too simple-minded ultimately. Since it requres access to
+     * namespaces. it was moved to the {@link State} object.
+     *
+     * @param variableName
+     * @return
+     * @deprecated
+     */
+    public Object oldResolveValue(String variableName) {
         if (isStem(variableName)) {
 
             String head = getStemHead(variableName);
@@ -143,7 +151,6 @@ public class SymbolStack extends AbstractSymbolTable {
 
     public void setStringValue(String variableName, String value) {
         setValue(variableName, value);
-        // getRightST(variableName).setStringValue(variableName, value);
     }
 
     @Override
@@ -151,8 +158,10 @@ public class SymbolStack extends AbstractSymbolTable {
         SymbolTable st = getRightST(variableName);
         if (st == null) {
             // nothing like this exists, so it goes in the local environment
-             st = getTopST();
+             st = getLocalST();
         }
+        st.setValue(variableName, value);
+/*
         if (!isStem(variableName)) {
                st.setValue(variableName, value);
                return;
@@ -169,6 +178,7 @@ public class SymbolStack extends AbstractSymbolTable {
         Object resolvedTail = resolveValue(t);
         st.setValue(getStemHead(variableName) + (resolvedTail==null?t:resolvedTail), value);
         return;
+*/
     }
 
     /**
@@ -192,7 +202,7 @@ public class SymbolStack extends AbstractSymbolTable {
                 return s;
             }
         }
-        return null;
+        return getLocalST();
     }
 
     public void setLongValue(String variableName, Long value) {
@@ -207,21 +217,21 @@ public class SymbolStack extends AbstractSymbolTable {
         if (isDefined(rawName)) {
             getRightST(rawName).setRawValue(rawName, rawValue);
         }
-        getTopST().setRawValue(rawName, rawValue);
+        getLocalST().setRawValue(rawName, rawValue);
     }
 
     public void clear() {
         // clear only applies to the current state.
-        getTopST().clear();
+        getLocalST().clear();
     }
 
 
     public boolean isDefined(String variable) {
-        return resolveValue(variable) != null;
+        return findValueInATable(variable) != null;
     }
 
     public void remove(String symbol) {
-        getTopST().remove(symbol);
+        getLocalST().remove(symbol);
     }
 
     public void setStemVariable(String key, StemVariable stem) {
@@ -231,7 +241,7 @@ public class SymbolStack extends AbstractSymbolTable {
                     getRightST(key).setStemVariable(key, stem);
                     return;
                 } else {
-                    getTopST().setStemVariable(key, stem);
+                    getLocalST().setStemVariable(key, stem);
                 }
                 return;
 
@@ -241,13 +251,10 @@ public class SymbolStack extends AbstractSymbolTable {
             String t = getStemTail(key);
             Object newKey = findValueInATable(t);
             if (newKey == null) {
-                getTopST().setStemVariable(key, stem);
+                getLocalST().setStemVariable(key, stem);
                 return;
             }
-
-
         }
-
         getRightST(key).setStemVariable(key, stem);
     }
 
@@ -257,10 +264,6 @@ public class SymbolStack extends AbstractSymbolTable {
             vars.addAll(st.listVariables());
         }
         return vars;
-    }
-
-    public void addModule(Module module) {
-        throw new NotImplementedException();
     }
 
     public JSON toJSON() {
@@ -276,7 +279,7 @@ public class SymbolStack extends AbstractSymbolTable {
     public void fromJSON(JSONArray array) {
         for (int i = array.size(); i < 0; i--) {
             // these were put in in reverse order, so have to pop them out.
-            SymbolTableImpl symbolTable = new SymbolTableImpl(NamespaceResolver.getResolver());
+            SymbolTableImpl symbolTable = new SymbolTableImpl();
             JSONObject jsonObject = array.getJSONObject(i);
             symbolTable.getMap().putAll(jsonObject);
 
@@ -286,6 +289,6 @@ public class SymbolStack extends AbstractSymbolTable {
 
     @Override
     public Map getMap() {
-        return null;
+        throw new NotImplementedException("Don't call this. It makes no sense in a stack");
     }
 }

@@ -23,8 +23,8 @@ public class TestUtils {
     NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
 
     public State getNewState() {
-        SymbolTableImpl st = new SymbolTableImpl(namespaceResolver);
-        SymbolStack stack = new SymbolStack(namespaceResolver);
+        SymbolTableImpl st = new SymbolTableImpl();
+        SymbolStack stack = new SymbolStack();
         stack.addParent(st);
         State state = new State(namespaceResolver,
                 stack,
@@ -58,7 +58,7 @@ public class TestUtils {
     }
 
     public SymbolTable getSymbolTable() {
-        return new SymbolTableImpl(namespaceResolver);
+        return new SymbolTableImpl();
     }
 
     /**
@@ -69,7 +69,7 @@ public class TestUtils {
      * @return
      */
     public SymbolStack getTestSymbolStack() {
-        SymbolTableImpl st = new SymbolTableImpl(namespaceResolver);
+        SymbolTableImpl st = new SymbolTableImpl();
         st.setRawValue("string", "'a string'");
         st.setRawValue("long", "2468");
         st.setRawValue("boolean", "true");
@@ -78,7 +78,7 @@ public class TestUtils {
         st.setRawValue("random.0", "'" + TestBase.getRandomString() + "'");
         st.setRawValue("random.1", "'" + TestBase.getRandomString() + "'");
         st.setRawValue("random.2", "'" + TestBase.getRandomString() + "'");
-        SymbolStack stack = new SymbolStack(namespaceResolver);
+        SymbolStack stack = new SymbolStack();
         stack.addParent(st);
         return stack;
     }

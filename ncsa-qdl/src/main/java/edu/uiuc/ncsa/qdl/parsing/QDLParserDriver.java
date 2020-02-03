@@ -50,7 +50,7 @@ public class QDLParserDriver {
         this.environment = environment;
         NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
         this.state = new State(NamespaceResolver.getResolver(),
-                new SymbolStack(namespaceResolver),
+                new SymbolStack(),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FunctionTable(),

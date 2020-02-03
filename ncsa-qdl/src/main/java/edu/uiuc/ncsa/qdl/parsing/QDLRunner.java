@@ -25,8 +25,8 @@ public class QDLRunner {
 
     public State getState() {
         if (state == null) {
-            SymbolStack stack = new SymbolStack(namespaceResolver);
-            SymbolTableImpl symbolTable = new SymbolTableImpl(namespaceResolver);
+            SymbolStack stack = new SymbolStack();
+            SymbolTableImpl symbolTable = new SymbolTableImpl();
             stack.addParent(symbolTable);
             state = new State(NamespaceResolver.getResolver(),
                     stack,

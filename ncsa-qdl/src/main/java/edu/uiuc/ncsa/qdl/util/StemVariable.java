@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -58,6 +60,72 @@ public class StemVariable extends HashMap<String, Object> {
             return defaultValue;
         }
         return super.get(key);
+    }
+
+    public Object get(StemMultiIndex w) {
+        StemVariable currentStem = this;
+        /**
+         * Drill down, checking everything exists.
+         */
+        for (int i = 0; i < w.getComponents().length - 1; i++) {
+            String name = w.getComponents()[i] + ".";
+            StemVariable nextStem = (StemVariable) currentStem.get(name);
+            if (nextStem == null) {
+                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + "\".");
+            }
+            currentStem = nextStem;
+        }
+        // for last one. May be a variable or a stem
+        if (w.isStem()) {
+            return currentStem.get(w.getLastComponent() + ".");
+        } else {
+          return  currentStem.get(w.getLastComponent());
+        }
+    }
+
+    public void set(StemMultiIndex w, Object value) {
+        StemVariable currentStem = this;
+        /**
+         * Drill down to next. If this is a completely new variable, may have to make all
+         * the ones in between.
+         */
+        for (int i = 0; i < w.getComponents().length - 1; i++) {
+            String name = w.getComponents()[i] + ".";
+            StemVariable nextStem = (StemVariable) currentStem.get(name);
+            if (nextStem == null) {
+                nextStem = new StemVariable();
+                currentStem.put(name, nextStem);
+            }
+            currentStem = nextStem;
+        }
+        // for last one
+        if (w.isStem()) {
+            currentStem.put(w.getLastComponent() + ".", value);
+        } else {
+            currentStem.put(w.getLastComponent(), value);
+        }
+    }
+
+    public void remove(StemMultiIndex w) {
+        StemVariable currentStem = this;
+        /**
+         * Drill down, checking everything exists.
+         */
+        for (int i = 0; i < w.getComponents().length - 1; i++) {
+            String name = w.getComponents()[i] + ".";
+            StemVariable nextStem = (StemVariable) currentStem.get(name);
+            if (nextStem == null) {
+                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + "\".");
+            }
+            currentStem = nextStem;
+        }
+        // for last one. May be a variable or a stem
+        if (w.isStem()) {
+            currentStem.remove(w.getLastComponent() + ".");
+        } else {
+            currentStem.remove(w.getLastComponent());
+        }
+
     }
 
     /**
@@ -242,7 +310,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (obj instanceof Double) return new BigDecimal(obj.toString());
         if (obj instanceof Boolean) return obj;
         if (obj instanceof Long) return obj;
-        if (obj instanceof Date) return Iso8601.date2String((Date)obj);
+        if (obj instanceof Date) return Iso8601.date2String((Date) obj);
         if (obj instanceof String) return obj;
         if (obj instanceof JSONArray) return convert((JSONArray) obj);
         if (obj instanceof JSONObject) return convert((JSONObject) obj);

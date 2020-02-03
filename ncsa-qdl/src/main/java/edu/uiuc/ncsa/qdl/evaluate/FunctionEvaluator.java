@@ -107,7 +107,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         State localState = frs.state.newStateNoImports();
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
-        SymbolTable symbolTable = localState.getSymbolStack().getTopST();
+        SymbolTable symbolTable = localState.getSymbolStack().getLocalST();
         // now we populate the local state with the variables.
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
             // note that the call evaluates the state in the non-local environment as per contract,

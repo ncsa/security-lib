@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.qdl.state;
 
 /**
+ * The interface for access to symboles (a.a variables) in QDL. Note that this is not assumed
+ * to be namespace aware at all. It is not the task of this component to understand or resolve
+ * namespaces.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  5:04 PM
  */
@@ -26,15 +29,7 @@ public abstract class AbstractSymbolTable implements SymbolTable {
         return getTail(stem, ".");
     }
 
-    protected String getHashHead(String var) {
-        return getHead(var, "#");
-    }
-
-    protected String getHashTail(String var) {
-        return getTail(var, "#");
-
-    }
-
+    
     protected String getHead(String var, String delimiter) {
         return var.substring(0, var.indexOf(delimiter) + 1);
     }

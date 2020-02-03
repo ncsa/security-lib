@@ -33,9 +33,9 @@ public class Assignment implements Statement {
     ExpressionNode argument;
 
     public Object evaluate(State state) {
+
         result = argument.evaluate(state);
         resultType = argument.getResultType();
-       // SymbolTable symbolTable = state.getSymbolStack();
         switch (argument.getResultType()) {
             case Constant.STEM_TYPE:
             case Constant.STRING_TYPE:
@@ -46,8 +46,6 @@ public class Assignment implements Statement {
                 break;
             default:
                 throw new IllegalArgumentException("error, the type of the value \"" + argument.getResult() + "\" is unknown");
-
-
         }
         return result;
     }
