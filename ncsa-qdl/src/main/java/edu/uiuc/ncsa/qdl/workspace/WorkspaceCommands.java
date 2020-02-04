@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
-import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
@@ -535,11 +535,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doModuleImports(InputLine inputLine) {
-        if (!state.getResolver().hasImports()) {
+        if (!state.getImportedModules().hasImports()) {
             say("(no imports)");
         } else {
-            for (URI uri : state.getResolver().keySet()) {
-                say(uri + " = " + state.getResolver().getAlias(uri));
+            for (URI uri : state.getImportedModules().keySet()) {
+                say(uri + " = " + state.getImportedModules().getAlias(uri));
             }
         }
         return RC_CONTINUE;
@@ -860,11 +860,11 @@ public class WorkspaceCommands implements Logable {
 
     protected State getState() {
         if (state == null) {
-            NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
+            ImportManager namespaceResolver = ImportManager.getResolver();
             SymbolTableImpl symbolTable = new SymbolTableImpl();
             SymbolStack stack = new SymbolStack();
             stack.addParent(symbolTable);
-            state = new State(NamespaceResolver.getResolver(),
+            state = new State(ImportManager.getResolver(),
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),

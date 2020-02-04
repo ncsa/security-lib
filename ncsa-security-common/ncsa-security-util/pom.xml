@@ -38,6 +38,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
             </plugin>
             <plugin>
@@ -128,8 +129,6 @@
 
 
     </dependencies>
-<!--    <build>
-        <finalName>qdl</finalName>
-    </build>-->
+
    
 </project>

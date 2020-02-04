@@ -7,11 +7,12 @@ import java.net.URI;
 import java.util.Set;
 
 /**
- * Keeps namepsaces and their aliases. It is assumed that both of these are unique.
+ * Keeps imported namespaces and their aliases. It is assumed that both of these are unique.
+ * Modules are kept elsewhere and a module must be imported before it ends up here.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:13 AM
  */
-public class NamespaceResolver implements Serializable {
+public class ImportManager implements Serializable {
     private static final long serialversionUID =  129348938L;
     /**
      * Delimiter for namespaces
@@ -21,11 +22,9 @@ public class NamespaceResolver implements Serializable {
     public void addImport(URI moduleName, String alias) {
         // If there is already an entry, overwrite it in case the alias changed.
         map.put(moduleName, alias);
-
-
     }
 
-    public NamespaceResolver() {
+    public ImportManager() {
     }
 
     /**
@@ -34,18 +33,18 @@ public class NamespaceResolver implements Serializable {
      *
      * @return
      */
-    public static NamespaceResolver getResolver() {
+    public static ImportManager getResolver() {
         if (resolver == null) {
-            resolver = new NamespaceResolver();
+            resolver = new ImportManager();
         }
         return resolver;
     }
 
-    public static void setResolver(NamespaceResolver resolver) {
-        NamespaceResolver.resolver = resolver;
+    public static void setResolver(ImportManager resolver) {
+        ImportManager.resolver = resolver;
     }
 
-    static NamespaceResolver resolver;
+    static ImportManager resolver;
     public boolean hasImports(){
         return !map.isEmpty();
     }

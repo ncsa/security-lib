@@ -19,13 +19,13 @@ import java.io.Serializable;
 public abstract class AbstractState implements Serializable {
     private static final long serialversionUID = 129348937L;
 
-    public AbstractState(NamespaceResolver resolver,
+    public AbstractState(ImportManager importedModules,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FunctionTable functionTable,
                          ModuleMap moduleMap) {
-        this.resolver = resolver;
+        this.importedModules = importedModules;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
@@ -53,14 +53,14 @@ public abstract class AbstractState implements Serializable {
     }
 
     protected ModuleMap moduleMap;
-    NamespaceResolver resolver;
+    ImportManager importedModules;
 
-    public NamespaceResolver getResolver() {
-        return resolver;
+    public ImportManager getImportedModules() {
+        return importedModules;
     }
 
-    public void setResolver(NamespaceResolver resolver) {
-        this.resolver = resolver;
+    public void setImportedModules(ImportManager importedModules) {
+        this.importedModules = importedModules;
     }
 
     public SymbolStack getSymbolStack() {

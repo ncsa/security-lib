@@ -274,7 +274,9 @@ public class ParserTest extends TestBase {
             assert compare(d, bd, comparisonTolerance);
         }
     }
-     BigDecimal comparisonTolerance = new BigDecimal(".0000000000001");
+
+    BigDecimal comparisonTolerance = new BigDecimal(".0000000000001");
+
     /**
      * Test for multiplying two matrices with integer stems. Mostly this is a regression
      * test to check that compound stems (like a.0.0) are  resolved right. When twiddleing
@@ -311,7 +313,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-         script = new StringBuffer();
+        script = new StringBuffer();
         addLine(script, "z. := mm(a.,b.);");
         addLine(script, "q := is_defined(c.);"); // double check internal state stays there
         interpreter.execute(script.toString());
@@ -533,6 +535,67 @@ public class ParserTest extends TestBase {
 
     }
 
+    /**
+     * Make modules with the same variables, import then use NS qualification on the stem and its
+     * indices to access them. 
+     * @throws Throwable
+     */
+    public void testNSAndStem() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + to_list(5);];");
+        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + to_list(5);];");
+        addLine(script, "i:=0;");
+        addLine(script, "j:=5;");
+        addLine(script, "list. := to_list(10);");
+        addLine(script, "import('a:a');");
+        addLine(script, "import('a:b');");
+        addLine(script, "d := a#list.b#i;");
+        addLine(script, "e := b#list.#i;");
+
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        Long d = getLongValue("d", state);
+        Long e = getLongValue("e", state);
+        assert d.equals(-9L);
+        assert e.equals(-20l);
+    }
+
+
+    /**
+     * In this case, modules have, of course, unique namespaces, but the aliases conflict so that is
+     * changed in import.
+     * @throws Throwable
+     */
+    @Test
+    public void testImportAndAlias() throws Throwable {
+
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + to_list(5);];");
+          addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + to_list(5);];");
+          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := to_list(5);]");
+          addLine(script, "i:=0;");
+          addLine(script, "j:=5;");
+          addLine(script, "list. := to_list(10);");
+          addLine(script, "import('a:a');");
+          addLine(script, "import('b:b');");
+          addLine(script, "import('a:b', 'd');");
+          addLine(script, "d := d#list.b#i;");
+          addLine(script, "e := b#list.d#i;");
+
+
+          QDLParser interpreter = new QDLParser(null, state);
+          interpreter.execute(script.toString());
+
+          Long d = getLongValue("d", state);
+          Long e = getLongValue("e", state);
+          assert d.equals(1L);
+          assert e.equals(-19l);
+      }
     /*
     Conenience getters for testing
      */

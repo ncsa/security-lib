@@ -14,14 +14,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:42 AM
  */
 public abstract class VariableState extends NamespaceAwareState {
-    public VariableState(NamespaceResolver resolver,
+    public VariableState(ImportManager resolver,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
@@ -147,7 +147,7 @@ public abstract class VariableState extends NamespaceAwareState {
             // easy case. Everything is qualified
             isNSQ = true;
             variableName = getFQName(w.name);
-            uri = resolver.getByAlias(getAlias(variableName));
+            uri = importedModules.getByAlias(getAlias(w.name));
             stem = (StemVariable) getModuleMap().get(uri).getState().getSymbolStack().resolveValue(variableName);
         } else {
             // Local variables. Remove lead # if needed.
@@ -216,7 +216,7 @@ public abstract class VariableState extends NamespaceAwareState {
 
         if (isNSQname(variableName)) {
             // get the module, hand back the value.
-            URI uri = resolver.getByAlias(getAlias(variableName));
+            URI uri = importedModules.getByAlias(getAlias(variableName));
             switch (op) {
                 case OP_GET:
                     return getModuleMap().get(uri).getState().getValue(getFQName(variableName));
@@ -291,10 +291,10 @@ public abstract class VariableState extends NamespaceAwareState {
 
     public TreeSet<String> listVariables() {
         TreeSet<String> out = getSymbolStack().listVariables();
-        for (URI key : getResolver().keySet()) {
+        for (URI key : getImportedModules().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listVariables();
             for (String x : uqVars) {
-                out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;

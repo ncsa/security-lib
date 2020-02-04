@@ -132,7 +132,7 @@ public class LineEditor {
         say(FIND_COMMAND + " (" + FIND_COMMAND_LONG + ") search lines that match a given regular expression, printing each line found.");
         say(INSERT_COMMAND + " (" + INSERT_COMMAND_LONG + ") insert lines starting at a give index or append lines to the end of the buffer.");
         say(CLEAR_COMMAND + " (" + CLEAR_COMMAND_LONG + ") clear the buffer (but not the clipboard)");
-        say(MOVE_COMMAND + " (" + MOVE_COMMAND_LONG + ") move a block of text suing the clipboard");
+        say(MOVE_COMMAND + " (" + MOVE_COMMAND_LONG + ") move a block of text using the clipboard");
         say(PRINT_COMMAND + " (" + PRINT_COMMAND_LONG + ") print the buffer or a subset of it");
         say(QUIT_COMMAND + " (" + QUIT_COMMAND_LONG + ") quit the editor");
         say(READ_COMMAND + " (" + READ_COMMAND_LONG + ") read a file into the buffer");

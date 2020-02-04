@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
@@ -21,14 +21,14 @@ import java.util.List;
  * on 1/22/20 at  6:15 AM
  */
 public class QDLRunner {
-    NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
+    ImportManager namespaceResolver = ImportManager.getResolver();
 
     public State getState() {
         if (state == null) {
             SymbolStack stack = new SymbolStack();
             SymbolTableImpl symbolTable = new SymbolTableImpl();
             stack.addParent(symbolTable);
-            state = new State(NamespaceResolver.getResolver(),
+            state = new State(ImportManager.getResolver(),
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),

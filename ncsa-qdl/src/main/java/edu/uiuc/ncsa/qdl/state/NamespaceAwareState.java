@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 import java.net.URI;
 
-import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
 
 /**
  * This adds the namespace resolution awareness to the state object.
@@ -19,7 +19,7 @@ import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
  * on 2/2/20 at  6:40 AM
  */
 public abstract class NamespaceAwareState extends AbstractState {
-    public NamespaceAwareState(NamespaceResolver resolver,
+    public NamespaceAwareState(ImportManager resolver,
                                SymbolStack symbolStack,
                                OpEvaluator opEvaluator,
                                MetaEvaluator metaEvaluator,
@@ -45,15 +45,15 @@ public abstract class NamespaceAwareState extends AbstractState {
         if (alias == null || alias.isEmpty()) {
             throw new UnknownSymbolException(("Internal error: The alias has not set"));
         }
-        if (!getResolver().hasAlias(alias)) {
+        if (!getImportedModules().hasAlias(alias)) {
             throw new UnknownSymbolException("Error: No such alias exists");
         }
-        URI moduleURI = getResolver().getByAlias(alias);
+        URI moduleURI = getImportedModules().getByAlias(alias);
         return getModuleMap().get(moduleURI);
     }
 
     public boolean isNSQname(String x) {
-        return x.contains(NamespaceResolver.NS_DELIMITER) && !x.startsWith(NS_DELIMITER);
+        return x.contains(ImportManager.NS_DELIMITER) && !x.startsWith(NS_DELIMITER);
     }
 
     /**
@@ -63,7 +63,7 @@ public abstract class NamespaceAwareState extends AbstractState {
      * @return
      */
     public boolean isNSQLocalName(String x) {
-        return x.startsWith(NamespaceResolver.NS_DELIMITER);
+        return x.startsWith(ImportManager.NS_DELIMITER);
 
     }
 
@@ -74,22 +74,26 @@ public abstract class NamespaceAwareState extends AbstractState {
      * @return
      */
     public boolean isUNQName(String x) {
-        return -1 == x.indexOf(NamespaceResolver.NS_DELIMITER);
+        return -1 == x.indexOf(ImportManager.NS_DELIMITER);
     }
 
     public void checkNSClash(String x) {
         if (isNSQname(x) || isNSQLocalName(x)) return;
         // so it has no qualification.
         if (isNSQname(x)) {
-            if (getResolver().hasImports()) {
+            if (getImportedModules().hasImports()) {
                 return;
             } else {
                 throw new ImportException("Error: The variable \"" + x + "\" is qualified but no modules have been imported.");
             }
         }
-        // so we look at all modules for the name.
+        if(!getImportedModules().hasImports()){
+            // no imports mean no clashes.
+            return;
+        }
+        // so we look at all imported modules for the name.
         boolean isFound = getSymbolStack().isDefined(x);
-        for (URI uri : resolver.keySet()) {
+        for (URI uri : importedModules.keySet()) {
             Module mm = getModuleMap().get(uri);
             if (mm != null) {
                 boolean y = mm.getState().isDefined(x);

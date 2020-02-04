@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.state.NamespaceResolver.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:48 AM
  */
 public abstract class FunctionState extends VariableState {
-    public FunctionState(NamespaceResolver resolver,
+    public FunctionState(ImportManager resolver,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
@@ -73,7 +73,7 @@ public abstract class FunctionState extends VariableState {
 
 
          } else {
-             if (!getResolver().hasImports()) {
+             if (!getImportedModules().hasImports()) {
                  // Nothing imported, so nothing to look through.
                  frs.state = this;
                  if (argCount == -1) {
@@ -106,10 +106,10 @@ public abstract class FunctionState extends VariableState {
 
     public TreeSet<String> listFunctions() {
         TreeSet<String> out = getFunctionTable().listFunctions();
-        for (URI key : getResolver().keySet()) {
+        for (URI key : getImportedModules().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions();
             for (String x : uqVars) {
-                out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;
@@ -117,10 +117,10 @@ public abstract class FunctionState extends VariableState {
 
     public List<String> listDocumentation() {
         List<String> out = getFunctionTable().listDoxx();
-        for (URI key : getResolver().keySet()) {
+        for (URI key : getImportedModules().keySet()) {
             List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();
             for (String x : uqVars) {
-                out.add(getResolver().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;
@@ -138,11 +138,11 @@ public abstract class FunctionState extends VariableState {
                 }
                 return out;
             }
-            if (!resolver.hasAlias(alias)) {
+            if (!importedModules.hasAlias(alias)) {
                 // so they asked for something that didn't exist
                 return new ArrayList<>();
             }
-            URI ns = resolver.getByAlias(alias);
+            URI ns = importedModules.getByAlias(alias);
             List<String> docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
             if (docs == null) {
                 return new ArrayList<>();
@@ -152,7 +152,7 @@ public abstract class FunctionState extends VariableState {
 
         }
         // No imports, not qualified, hand back whatever we have
-        if (!resolver.hasImports()) {
+        if (!importedModules.hasImports()) {
             List<String> out = getFunctionTable().getDocumentation(fname, argCount);
             if (out == null) {
                 return new ArrayList<>();
@@ -164,9 +164,9 @@ public abstract class FunctionState extends VariableState {
         if (out == null) {
             out = new ArrayList<>();
         }
-        for (URI key : getResolver().keySet()) {
+        for (URI key : getImportedModules().keySet()) {
             if (getModuleMap().get(key).getState().getFunctionTable().get(fname, argCount) != null) {
-                String caput = getResolver().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
+                String caput = getImportedModules().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
 
                 List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
                         argCount);

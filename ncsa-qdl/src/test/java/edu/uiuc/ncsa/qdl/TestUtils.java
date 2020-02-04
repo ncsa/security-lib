@@ -20,13 +20,13 @@ public class TestUtils {
         return _instance;
     }
 
-    NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
+    ImportManager namespaceResolver = ImportManager.getResolver();
 
     public State getNewState() {
         SymbolTableImpl st = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(st);
-        State state = new State(namespaceResolver,
+        State state = new State(new ImportManager(),
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),

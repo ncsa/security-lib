@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.generated.QDLParserLexer;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.Element;
@@ -48,8 +48,8 @@ public class QDLParserDriver {
 
     public QDLParserDriver(XProperties environment) {
         this.environment = environment;
-        NamespaceResolver namespaceResolver = NamespaceResolver.getResolver();
-        this.state = new State(NamespaceResolver.getResolver(),
+        ImportManager namespaceResolver = ImportManager.getResolver();
+        this.state = new State(ImportManager.getResolver(),
                 new SymbolStack(),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),

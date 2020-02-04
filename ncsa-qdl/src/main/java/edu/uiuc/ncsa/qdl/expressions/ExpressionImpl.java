@@ -102,4 +102,10 @@ public abstract class ExpressionImpl implements ExpressionNode {
     }
 
     String sourceCode;
+
+    @Override
+    public String toString() {
+        return "exp=" +
+                "\"" + sourceCode + '\"';
+    }
 }

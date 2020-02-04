@@ -107,7 +107,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 doExcludeKeys(polyad, state);
                 return true;
             case RENAME_KEYS_TYPE:
-                doRenamekeys(polyad, state);
+                doRenameKeys(polyad, state);
                 return true;
             case TO_STEM_TYPE:
                 doToStem(polyad, state);
@@ -359,7 +359,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param polyad
      * @param state
      */
-    protected void doRenamekeys(Polyad polyad, State state) {
+    protected void doRenameKeys(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: the " + RENAME_KEYS + " function requires 2 arguments");
         }

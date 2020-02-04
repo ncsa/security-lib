@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
-import edu.uiuc.ncsa.qdl.state.NamespaceResolver;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -258,7 +258,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param polyad
      */
     protected void doImport(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() != 1) {
+        if (polyad.getArgumments().size() == 0 ) {
             throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0,state);;
@@ -267,7 +267,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         String alias = null;
         if (polyad.getArgumments().size() == 2) {
-            Object arg2 = polyad.evalArg(0,state);;
+            Object arg2 = polyad.evalArg(1,state);;
             if (arg2 == null || !isString(arg2)) {
                 throw new MissingArgumentException("Error: You must supply a valid alias import.");
             }
@@ -289,7 +289,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         Module module = state.getModuleMap().get(moduleName);
 
-        NamespaceResolver resolver = state.getResolver();
+        ImportManager resolver = state.getImportedModules();
         if (alias == null) {
             // No alias specified, so just import it with its default alias.
             resolver.addImport(moduleName, module.getAlias());

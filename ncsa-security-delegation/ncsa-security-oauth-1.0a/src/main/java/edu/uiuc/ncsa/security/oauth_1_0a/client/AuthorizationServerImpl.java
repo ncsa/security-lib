@@ -239,7 +239,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
                         String parameterValue = arrTempParameter[1];
                         if (parameterKey.toLowerCase().equals(DEBUG_STACKTRACE_KEY)) {
                             try {
-                                parameterValue = new String(Base64.decodeBase64(parameterValue));
+                                parameterValue = new String(Base64.decodeBase64(parameterValue.getBytes()));
                             } catch (Throwable x) {
                                 // System.out.println("Could not decode stack trace for cause " + x.getClass().getName() + " msg=\"" + x.getMessage() + "\", trace:" + parameterValue);
                                 parameterValue = "(none)";

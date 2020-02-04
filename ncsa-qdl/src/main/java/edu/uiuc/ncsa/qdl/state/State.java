@@ -9,14 +9,14 @@ import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 /**
  * This is a facade for the various stateful components we have to track. 
- * Represents the internal state of the system. It has the {@link NamespaceResolver},
+ * Represents the internal state of the system. It has the {@link ImportManager},
  * {@link SymbolTable}, {@link edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator} and such.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
  */
 public class State extends FunctionState {
 
-    public State(NamespaceResolver resolver,
+    public State(ImportManager resolver,
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
@@ -32,7 +32,7 @@ public class State extends FunctionState {
 
 
     public State newStateNoImports() {
-        NamespaceResolver nr = new NamespaceResolver();
+        ImportManager nr = new ImportManager();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
         State newState = new State(nr,
                 newStack,
@@ -54,7 +54,7 @@ public class State extends FunctionState {
     public State newStateWithImports() {
         //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack( symbolStack.getParentTables());
-        State newState = new State(resolver,
+        State newState = new State(importedModules,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -71,7 +71,7 @@ public class State extends FunctionState {
      */
     public State newModuleState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        NamespaceResolver r = new NamespaceResolver();
+        ImportManager r = new ImportManager();
         SymbolStack newStack = new SymbolStack();
         newStack.addParent(new SymbolTableImpl());
         State newState = new State(r,

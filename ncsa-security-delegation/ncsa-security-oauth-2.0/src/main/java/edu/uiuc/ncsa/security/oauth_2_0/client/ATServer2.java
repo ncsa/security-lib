@@ -58,12 +58,14 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
     public ATServer2(ServiceClient serviceClient,
                      String wellKnown,
                      boolean oidcEnabled,
+                     long expiresIn,
                      boolean useBasicAuth) {
         super(serviceClient, wellKnown, oidcEnabled);
         this.useBasicAuth = useBasicAuth;
     }
 
     boolean useBasicAuth = false;
+    long expiresIn = 0L;
 
     /**
      * Processes access token request
@@ -159,6 +161,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
             }
             params.put(ID_TOKEN, idToken);
+            params.put(EXPIRES_IN, expiresIn/1000 ); //convert to seconds.
             ServletDebugUtil.trace(this, "Adding idTokenEntry with id = " + at.getToken() + " to the ID Token store. Store has " + getIDTokenStore().size() + " entries");
             getIDTokenStore().put(at.getToken(), idTokenEntry);
             ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());
