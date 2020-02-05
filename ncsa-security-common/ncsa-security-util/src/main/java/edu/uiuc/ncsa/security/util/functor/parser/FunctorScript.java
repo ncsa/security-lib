@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.logic.FunctorMap;
 import edu.uiuc.ncsa.security.util.functor.parser.event.*;
+import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
 import net.sf.json.JSONObject;
 
 import java.io.File;
@@ -16,20 +17,10 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 3/7/19 at  6:52 PM
  */
-public abstract class AbstractScript {
-    /*
-        public Script(JFunctorFactory functorFactory, JSONObject rawContent) {
-        this.functorFactory = functorFactory;
-        this.rawContent = rawContent;
+public abstract class FunctorScript implements ScriptInterface {
 
-    }
 
-    public Script(JFunctorFactory functorFactory) {
-        this.functorFactory = functorFactory;
-    }
-     */
-
-    public AbstractScript(JFunctorFactory functorFactory) {
+    public FunctorScript(JFunctorFactory functorFactory) {
         this.functorFactory = functorFactory;
     }
 

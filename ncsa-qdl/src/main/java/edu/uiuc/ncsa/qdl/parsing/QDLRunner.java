@@ -1,14 +1,7 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
-import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.statements.Element;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 
@@ -21,20 +14,8 @@ import java.util.List;
  * on 1/22/20 at  6:15 AM
  */
 public class QDLRunner {
-    ImportManager namespaceResolver = ImportManager.getResolver();
 
     public State getState() {
-        if (state == null) {
-            SymbolStack stack = new SymbolStack();
-            SymbolTableImpl symbolTable = new SymbolTableImpl();
-            stack.addParent(symbolTable);
-            state = new State(ImportManager.getResolver(),
-                    stack,
-                    new OpEvaluator(),
-                    MetaEvaluator.getInstance(),
-                    new FunctionTable(),
-                    new ModuleMap());
-        }
         return state;
     }
 

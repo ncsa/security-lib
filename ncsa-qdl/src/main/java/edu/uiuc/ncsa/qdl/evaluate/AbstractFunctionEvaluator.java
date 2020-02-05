@@ -18,15 +18,6 @@ import java.util.Set;
 public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
 
-    public boolean isServerMode() {
-        return serverMode;
-    }
-
-    public void setServerMode(boolean serverMode) {
-        this.serverMode = serverMode;
-    }
-
-    boolean serverMode = false;
     /**
      * This takes and expression (with an operator type) and returns true if is handled in this evaluator
      * and false otherwise.

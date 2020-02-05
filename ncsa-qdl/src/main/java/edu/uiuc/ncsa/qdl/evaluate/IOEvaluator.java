@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
@@ -45,7 +46,7 @@ public class IOEvaluator extends MathEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getOperatorType()) {
             case SAY_TYPE:
-                if (isServerMode()) return true;
+                if (state.isServerMode()) return true;
                 String result = "";
                 if (polyad.getArgumments().size() != 0) {
                     Object temp = polyad.evalArg(0, state);
@@ -70,7 +71,7 @@ public class IOEvaluator extends MathEvaluator {
                 polyad.setEvaluated(true);
                 return true;
             case SCAN_TYPE:
-                if (isServerMode()) return true;
+                if (state.isServerMode()) return true;
 
                 if (polyad.getArgumments().size() != 0) {
                     // This is the prompt.
@@ -98,6 +99,10 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doWriteFile(Polyad polyad, State state) {
+        if(state.isServerMode()){
+            throw new QDLServerModeException("File operations are not permitted in server mode");
+        }
+
         if ( polyad.getArgumments().size() < 2) {
             throw new IllegalArgumentException("Error: " + WRITE_FILE + " requires a two arguments.");
         }

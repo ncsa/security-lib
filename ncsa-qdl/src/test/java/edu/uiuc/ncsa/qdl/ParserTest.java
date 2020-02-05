@@ -354,7 +354,7 @@ public class ParserTest extends TestBase {
         addLine(script, set_b);
         addLine(script, "z. := mm(a.,b.);");
         addLine(script, "q := is_defined(c.);"); // double check internal state stays there
-        addLine(script, "w. := to_list(4);"); // We want w. to exist outside of the loop so we can test it.
+        addLine(script, "w. := indices(4);"); // We want w. to exist outside of the loop so we can test it.
         State state = testUtils.getNewState();
 
         QDLParser interpreter = new QDLParser(null, state);
@@ -544,11 +544,11 @@ public class ParserTest extends TestBase {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + to_list(5);];");
-        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + to_list(5);];");
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
+        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
-        addLine(script, "list. := to_list(10);");
+        addLine(script, "list. := indices(10);");
         addLine(script, "import('a:a');");
         addLine(script, "import('a:b');");
         addLine(script, "d := a#list.b#i;");
@@ -575,12 +575,12 @@ public class ParserTest extends TestBase {
 
           State state = testUtils.getNewState();
           StringBuffer script = new StringBuffer();
-          addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + to_list(5);];");
-          addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + to_list(5);];");
-          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := to_list(5);]");
+          addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
+          addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
+          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);]");
           addLine(script, "i:=0;");
           addLine(script, "j:=5;");
-          addLine(script, "list. := to_list(10);");
+          addLine(script, "list. := indices(10);");
           addLine(script, "import('a:a');");
           addLine(script, "import('b:b');");
           addLine(script, "import('a:b', 'd');");
@@ -751,7 +751,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "var. := random(5);");
-        addLine(script, "w. := to_list(10);");
+        addLine(script, "w. := indices(10);");
         addLine(script, "z. := has_keys(var., w.);");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());

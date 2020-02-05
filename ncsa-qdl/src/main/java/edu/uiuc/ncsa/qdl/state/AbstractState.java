@@ -4,8 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
-
-import java.io.Serializable;
+import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
 /**
  * This helps us organize the functionality of the state object. There are
@@ -16,7 +15,7 @@ import java.io.Serializable;
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:37 AM
  */
-public abstract class AbstractState implements Serializable {
+public abstract class AbstractState implements StateInterface {
     private static final long serialversionUID = 129348937L;
 
     public AbstractState(ImportManager importedModules,

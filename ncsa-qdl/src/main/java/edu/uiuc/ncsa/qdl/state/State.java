@@ -5,7 +5,11 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.scripting.QDLScript;
+import edu.uiuc.ncsa.qdl.scripting.ScriptProvider;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+
+import java.util.HashMap;
 
 /**
  * This is a facade for the various stateful components we have to track. 
@@ -21,16 +25,53 @@ public class State extends FunctionState {
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
                  FunctionTable functionTable,
-                 ModuleMap moduleMap) {
+                 ModuleMap moduleMap,
+                 boolean isServerMode) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 functionTable,
                 moduleMap);
+        this.serverMode = isServerMode;
     }
 
+    public boolean isServerMode() {
+         return serverMode;
+     }
 
+     public void setServerMode(boolean serverMode) {
+         this.serverMode = serverMode;
+     }
+
+     boolean serverMode = false;
+
+   HashMap<String, ScriptProvider> scriptProviders = new HashMap<>();
+   public void addScriptProvider(ScriptProvider scriptProvider){
+       scriptProviders.put(scriptProvider.getScheme(), scriptProvider);
+   }
+   public void removeScriptProvider(String scheme){
+       scriptProviders.remove(scheme);
+   }
+
+    /**
+     * Take a name, peel off any scheme and then check if there is
+     * @param fqName
+     * @return
+     */
+   public QDLScript getScriptFromProvider(String fqName){
+       if(scriptProviders.isEmpty()) return null;
+       String scheme = fqName.substring(0,fqName.indexOf(":") + 1);
+       if(scheme == null || scheme.isEmpty()) {return null;}
+       return scriptProviders.get(scheme).get(fqName);
+
+   }
+   public boolean hasScriptProviders(){
+       return !scriptProviders.isEmpty();
+   }
+   /*public QDLScript getScript(String fqPath){
+       scriptProviders.get
+   }*/
     public State newStateNoImports() {
         ImportManager nr = new ImportManager();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
@@ -39,7 +80,8 @@ public class State extends FunctionState {
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 getFunctionTable(),
-                getModuleMap());
+                getModuleMap(),
+                isServerMode());
         return newState;
 
     }
@@ -59,7 +101,8 @@ public class State extends FunctionState {
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 getFunctionTable(),
-                getModuleMap());
+                getModuleMap(),
+                isServerMode());
         return newState;
     }
 
@@ -79,7 +122,8 @@ public class State extends FunctionState {
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FunctionTable(),
-                getModuleMap());
+                getModuleMap(),
+                isServerMode());
         return newState;
     }
 

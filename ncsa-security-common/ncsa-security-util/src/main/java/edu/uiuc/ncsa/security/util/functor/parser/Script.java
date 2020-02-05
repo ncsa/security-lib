@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.util.functor.parser;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
+import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -34,7 +35,8 @@ import java.io.StringReader;
  * <p>Created by Jeff Gaynor<br>
  * on 9/24/18 at  1:49 PM
  */
-public class Script extends AbstractScript {
+public class Script extends FunctorScript {
+
     public static String SCRIPT_KEY = "script";
     public static String VERSION_KEY = "version";
     public static final String VERSION_1_0 = "1.0";
@@ -119,5 +121,8 @@ public class Script extends AbstractScript {
         return logicBlocks;
     }
 
-
+    @Override
+    public void execute(StateInterface state) {
+        execute();
+    }
 }

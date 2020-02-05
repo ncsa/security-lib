@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil.CLAIM_POST_PROCESSING_KEY;
-import static edu.uiuc.ncsa.security.oauth_2_0.server.config.ClientConfigurationUtil.CLAIM_PRE_PROCESSING_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_POST_PROCESSING_KEY;
+import static edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor.ClientFunctorScriptsUtil.CLAIM_PRE_PROCESSING_KEY;
 
 /**
  * A utility that loads the configuration from a node and has the tags, etc. for it.

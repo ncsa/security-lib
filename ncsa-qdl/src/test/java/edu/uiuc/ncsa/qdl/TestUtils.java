@@ -31,7 +31,7 @@ public class TestUtils {
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FunctionTable(),
-                new ModuleMap());
+                new ModuleMap(), false);
         return state;
     }
 
@@ -46,7 +46,8 @@ public class TestUtils {
                    new OpEvaluator(),
                    MetaEvaluator.getInstance(),
                    new FunctionTable(),
-                   new ModuleMap());
+                   new ModuleMap(),
+                   false);
            return state;
        }
     public OpEvaluator getOpEvaluator() {

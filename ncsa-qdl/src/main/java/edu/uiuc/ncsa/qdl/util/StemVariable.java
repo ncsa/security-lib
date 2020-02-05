@@ -329,4 +329,10 @@ public class StemVariable extends HashMap<String, Object> {
         }
 
     }
+    public StemVariable union(StemVariable ... stemVariables){
+        for(StemVariable stemVariable : stemVariables){
+            this.putAll(stemVariable);
+        }
+        return this;
+    }
 }

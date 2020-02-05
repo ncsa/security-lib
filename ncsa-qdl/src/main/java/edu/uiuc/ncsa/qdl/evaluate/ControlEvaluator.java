@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
+import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
@@ -152,11 +153,28 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             localState = state.newModuleState();
         }
 
-        Object arg1 = polyad.evalArg(0,state);;
+        Object arg1 = polyad.evalArg(0, state);
+        ;
         try {
             QDLParser interpreter = new QDLParser(localState);
-            interpreter.execute(FileUtil.readFileAsString(arg1.toString()));
+            String resourceName = arg1.toString();
+            QDLScript script = null;
+            if (state.hasScriptProviders()) {
+                script = state.getScriptFromProvider(resourceName);
+            }
+            if (script != null) {
+                script.execute(state);
+            } else {
+                if(state.isServerMode()){
+                    throw new QDLServerModeException("File operations are not permitted in server mode");
+                }
+
+                interpreter.execute(FileUtil.readFileAsString(resourceName));
+            }
         } catch (Throwable t) {
+            if(t instanceof RuntimeException){
+                throw (RuntimeException) t;
+            }
             throw new QDLRuntimeException("Error running script \"" + arg1 + "\"", t);
         }
     }
@@ -165,14 +183,16 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgumments().size() == 0) {
             throw new IllegalArgumentException("Error:" + RAISE_ERROR + " requires at least a single argument");
         }
-        Object arg1 = polyad.evalArg(0,state);;
+        Object arg1 = polyad.evalArg(0, state);
+        ;
         if (arg1 == null) {
             arg1 = "(no message)";
         }
         Object arg2 = null;
         state.setValue("error_message", arg1.toString());
         if (polyad.getArgumments().size() == 2) {
-            arg2 = polyad.evalArg(1,state);;
+            arg2 = polyad.evalArg(1, state);
+            ;
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
             }
@@ -192,7 +212,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(Constant.NULL_TYPE);
                 break;
             case 1:
-                Object r = polyad.evalArg(0,state);;
+                Object r = polyad.evalArg(0, state);
+                ;
                 polyad.setResult(r);
                 polyad.setResultType(polyad.getArgumments().get(0).getResultType());
                 polyad.setEvaluated(true);
@@ -214,29 +235,46 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires a single argument. The full path to the module's file.");
         }
-        Object arg = polyad.evalArg(0,state);;
+        Object arg = polyad.evalArg(0, state);
+
         if (!isString(arg)) {
             throw new IllegalArgumentException("Error: The " + LOAD_MODULE + " command requires a string as its argument, not \"" + arg + "\"");
         }
-        File file = new File(arg.toString());
-        if (!file.exists()) {
-            throw new IllegalArgumentException("Error: file, \"" + arg + "\" does not exist");
+        String resourceName = arg.toString();
+        QDLScript script = null;
+        File file = null;
+        if (state.hasScriptProviders()) {
+            script = state.getScriptFromProvider(resourceName);
         }
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("Error: \"" + arg + "\" is not a file");
-        }
+        if (script == null) {
+            file = new File(resourceName);
+            if (!file.exists()) {
+                throw new IllegalArgumentException("Error: file, \"" + arg + "\" does not exist");
+            }
+            if (!file.isFile()) {
+                throw new IllegalArgumentException("Error: \"" + arg + "\" is not a file");
+            }
 
-        if (!file.canRead()) {
-            throw new IllegalArgumentException("Error: You do not have permission to read \"" + arg + "\".");
+            if (!file.canRead()) {
+                throw new IllegalArgumentException("Error: You do not have permission to read \"" + arg + "\".");
+            }
+
         }
         try {
-            FileReader fileReader = new FileReader(file);
             QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
             // Exceptional case where we just run it directly.
-            QDLRunner runner = new QDLRunner(parserDriver.parse(fileReader));
-            runner.setState(state);
-            runner.run();
-            //parserDriver.execute(fileReader);
+            if (script == null) {
+                if(state.isServerMode()){
+                    throw new QDLServerModeException("File operations are not permitted in server mode");
+                }
+                FileReader fileReader = new FileReader(file);
+                QDLRunner runner = new QDLRunner(parserDriver.parse(fileReader));
+                runner.setState(state);
+                runner.run();
+            } else {
+                script.execute(state);
+            }
+            //parserDriver.execute(Reader);
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             polyad.setResult(Boolean.TRUE);
             polyad.setEvaluated(true);
@@ -258,16 +296,18 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param polyad
      */
     protected void doImport(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() == 0 ) {
+        if (polyad.getArgumments().size() == 0) {
             throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
         }
-        Object arg = polyad.evalArg(0,state);;
+        Object arg = polyad.evalArg(0, state);
+        ;
         if (arg == null) {
             throw new MissingArgumentException("Error: You must supply a module name to import.");
         }
         String alias = null;
         if (polyad.getArgumments().size() == 2) {
-            Object arg2 = polyad.evalArg(1,state);;
+            Object arg2 = polyad.evalArg(1, state);
+            ;
             if (arg2 == null || !isString(arg2)) {
                 throw new MissingArgumentException("Error: You must supply a valid alias import.");
             }

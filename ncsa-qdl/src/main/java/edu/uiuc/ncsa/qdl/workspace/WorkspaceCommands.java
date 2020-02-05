@@ -869,7 +869,8 @@ public class WorkspaceCommands implements Logable {
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
                     new FunctionTable(),
-                    new ModuleMap());
+                    new ModuleMap(),
+                    false);// workspace is never in server mode
             // Experiment for a Java module
         }
         return state;

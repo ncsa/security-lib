@@ -404,7 +404,7 @@ public class StemFunctionsTest extends TestBase {
     @Test
     public void testmakeIndex() throws Exception {
         State state = testUtils.getNewState();
-        Polyad polyad = new Polyad(StemEvaluator.TO_LIST_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.MAKE_INDICES_TYPE);
         ConstantNode arg = new ConstantNode(new Long(4L), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -433,7 +433,7 @@ public class StemFunctionsTest extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setLongValue("int", new Long(5L));
 
-        Polyad polyad = new Polyad(StemEvaluator.TO_STEM_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.TO_LIST_TYPE);
         polyad.addArgument(new VariableNode("sourceStem."));
         polyad.addArgument(new VariableNode("int"));
         polyad.addArgument(new ConstantNode("foo", Constant.STRING_TYPE));
