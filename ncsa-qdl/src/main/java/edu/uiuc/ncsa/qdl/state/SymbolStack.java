@@ -291,4 +291,13 @@ public class SymbolStack extends AbstractSymbolTable {
     public Map getMap() {
         throw new NotImplementedException("Don't call this. It makes no sense in a stack");
     }
+
+    @Override
+    public int getSymbolCount() {
+        int count = 0;
+        for(SymbolTable symbolTable : getParentTables()){
+            count = count + symbolTable.getSymbolCount();
+        }
+        return count;
+    }
 }

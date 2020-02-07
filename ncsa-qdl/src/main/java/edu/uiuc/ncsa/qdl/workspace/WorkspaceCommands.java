@@ -6,10 +6,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
-import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
+import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.Logable;
@@ -29,8 +26,6 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -99,7 +94,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     public int execute(String inline) {
-        inline = TemplateUtil.replaceAll( inline, env); // allow replacements in commands too...
+        inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
 
         switch (inputLine.getCommand()) {
@@ -214,7 +209,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doEditLocal() {
-        if(localBuffer == null){
+        if (localBuffer == null) {
             say("New local buffer created.");
         }
         LineEditor lineEditor = new LineEditor(localBuffer.toString());
@@ -265,9 +260,9 @@ public class WorkspaceCommands implements Logable {
             case "set":
                 return doEnvSet(inputLine);
             case "name":
-                if(envFile == null){
+                if (envFile == null) {
                     say("No environment file has been set.");
-                }else{
+                } else {
                     say(envFile.getAbsolutePath());
                 }
                 return RC_CONTINUE;
@@ -349,10 +344,10 @@ public class WorkspaceCommands implements Logable {
         // REMEMBER that the getArgCount is the number of arguments and the 0th element is the command
         boolean isFirstPass = true;
         for (int i = FIRST_ARG_INDEX + 1; i < inputLine.getArgCount() + 1; i++) {
-            if(isFirstPass){
+            if (isFirstPass) {
                 value.append(inputLine.getArg(i));
                 isFirstPass = false;
-            }else{
+            } else {
                 value.append(" " + inputLine.getArg(i));
             }
         }
@@ -492,14 +487,14 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         File targetFile = resolveAgainstRoot(inputLine.getArg(1 + FIRST_ARG_INDEX));
-        if(targetFile.exists()){
-            if(!targetFile.isFile()){
+        if (targetFile.exists()) {
+            if (!targetFile.isFile()) {
                 say("Sorry, but \"" + targetFile.getAbsolutePath() + "\" is not a file and cannot be overwritten. Aborting...");
                 return RC_CONTINUE;
             }
-            if(!readline("\"" + targetFile.getAbsolutePath() + "\" exists. Do you want to overwrite it? (y/n):").equals("y")){
-                 say("aborting...");
-                 return RC_CONTINUE;
+            if (!readline("\"" + targetFile.getAbsolutePath() + "\" exists. Do you want to overwrite it? (y/n):").equals("y")) {
+                say("aborting...");
+                return RC_CONTINUE;
             }
         }
         try {
@@ -646,6 +641,9 @@ public class WorkspaceCommands implements Logable {
                 return doVarsList(inputLine);
             case "drop":
                 return doVarsDrop(inputLine);
+            case "size":
+                say(state.getStackSize() + " symbols defined.");
+                return RC_CONTINUE;
         }
         say("Unknown variable command.");
         return RC_CONTINUE;
@@ -729,17 +727,10 @@ public class WorkspaceCommands implements Logable {
             }
             String fName = inputLine.getArg(FIRST_ARG_INDEX);
             FileOutputStream fos = new FileOutputStream(fName);
-            GZIPOutputStream gos = new GZIPOutputStream(fos);
-            ObjectOutputStream out = new ObjectOutputStream(gos);
-
-            // Method for serialization of object
-            out.writeObject(state);
-            out.flush();
-            out.close();
+            StateUtils.save(state, fos);
             say("workspace saved at " + (new Date()));
         } catch (Throwable t) {
             say("would not save the workspace");
-
             t.printStackTrace();
         }
         return RC_NO_OP;
@@ -749,15 +740,9 @@ public class WorkspaceCommands implements Logable {
         try {
             long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
-            GZIPInputStream gis = new GZIPInputStream(fis);
-            ObjectInputStream in = new ObjectInputStream(gis);
-
-            // Method for deserialization of object
-            state = (State) in.readObject();
-
+            state = StateUtils.load(fis);
             interpreter = new QDLParser(env, state);
 
-            in.close();
             currentWorkspace = f;
             say("last saved " + new Date(lastModified));
         } catch (Throwable t) {
@@ -978,9 +963,10 @@ public class WorkspaceCommands implements Logable {
     BufferedReader bufferedReader;
 
     public String readline(String prompt) {
-         System.out.print(prompt);
-         return readline();
+        System.out.print(prompt);
+        return readline();
     }
+
     public String readline() {
         try {
             String x = getBufferedReader().readLine();

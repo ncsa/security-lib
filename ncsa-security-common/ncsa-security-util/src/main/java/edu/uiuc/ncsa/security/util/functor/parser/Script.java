@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor.parser;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.LogicBlock;
 import edu.uiuc.ncsa.security.util.functor.LogicBlocks;
@@ -36,6 +37,10 @@ import java.io.StringReader;
  * on 9/24/18 at  1:49 PM
  */
 public class Script extends FunctorScript {
+    @Override
+    public XProperties getProperties() {
+        return null;
+    }
 
     public static String SCRIPT_KEY = "script";
     public static String VERSION_KEY = "version";

@@ -273,4 +273,9 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
     public Map getMap() {
         return map;
     }
+
+    @Override
+    public int getSymbolCount() {
+        return map.size();
+    }
 }

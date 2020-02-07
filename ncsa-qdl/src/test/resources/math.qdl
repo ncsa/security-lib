@@ -1,0 +1,32 @@
+module[
+  'qdl:/math','math'
+  ]body[
+   define[sqrt(x)]body[
+   >> A function to compute the sqrt of a positive number x
+   >> Usage sqrt(x);
+   >> where 0 < x is a number.
+   >> The default is 10 iterations, which should give pretty good precision for most purposes.
+   >> This uses the Newton-Raphson method.
+      x0 := 1;
+      m := 10;
+      while[
+          for_next(j,m)
+        ]do[
+          x0 := (x0 + x/x0)/2;
+         ]; // end loop
+      return(x0);
+   ]; //end sqrt(1)
+     define[sqrt(x,m)]body[
+      >> A function to compute the sqrt of a positive number x and use m iterations
+      >> Usage sqrt(x,m);
+      >> where 0 < x is a number.
+      >> This uses the Newton-Raphson method.
+         x0 := 1;
+         while[
+             for_next(j,m)
+           ]do[
+             x0 := (x0 + x/x0)/2;
+            ]; // end loop
+         return(x0);
+      ]; //end sqrt(2)
+]; //end module

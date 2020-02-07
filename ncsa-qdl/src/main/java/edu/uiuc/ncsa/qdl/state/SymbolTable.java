@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 
 import java.io.Serializable;
@@ -39,6 +38,11 @@ public interface SymbolTable extends Serializable {
 
     Set<String> listVariables();
 
-
+    /**
+     * This exists internally to judge the size of the symbol table. It allows for
+     * setting limits in server mode.
+     * @return
+     */
+     int getSymbolCount();
     public Map getMap();
 }
