@@ -48,6 +48,9 @@ public class JavaModule extends Module {
             fr.qdlFunction = f;
             fr.argCount = f.getArgCount();
             fr.name = f.getName();
+            if(f.getDocumentation()!=null && !f.getDocumentation().isEmpty()) {
+                fr.documentation = f.getDocumentation();
+            }
             state.getFunctionTable().put(fr);
         }
 

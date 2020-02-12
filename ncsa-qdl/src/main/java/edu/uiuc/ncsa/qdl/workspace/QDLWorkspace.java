@@ -4,8 +4,8 @@ import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
-import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import java.io.IOException;
 import java.util.Vector;
@@ -33,13 +33,16 @@ public class QDLWorkspace {
     }
 
     protected void handleException(Throwable t) {
-
+        if(t instanceof ParseCancellationException){
+            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn()?t.getMessage():""));
+            return;
+        }
         if ((t instanceof IllegalStateException) | (t instanceof ParsingException)) {
-            workspaceCommands.say("syntax error");
+            workspaceCommands.say("syntax error" + (workspaceCommands.isDebugOn()?t.getMessage():""));
             return;
         }
         if (t instanceof IllegalArgumentException) {
-            workspaceCommands.say("illegal argument");
+            workspaceCommands.say("illegal argument:" + (workspaceCommands.isDebugOn()?t.getMessage():""));
             return;
         }
         if (t instanceof QDLException) {
@@ -51,11 +54,6 @@ public class QDLWorkspace {
 
 
     public void run(InputLine inputLine) throws Throwable {
-        workspaceCommands.say("*****************************************");
-        workspaceCommands.say("Welcome to the QDL Workspace");
-        workspaceCommands.say("Version " + QDLVersion.VERSION);
-        workspaceCommands.say("Type " + workspaceCommands.HELP_COMMAND + " for help.");
-        workspaceCommands.say("*****************************************");
         boolean isExit = false;
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
@@ -68,7 +66,7 @@ public class QDLWorkspace {
                 switch (workspaceCommands.execute(input)) {
                     case RC_EXIT_NOW:
                         isExit = true;
-                        break;
+                        return; // exit now, darnit.
                     case RC_NO_OP:
                     case RC_CONTINUE:
                         continue;

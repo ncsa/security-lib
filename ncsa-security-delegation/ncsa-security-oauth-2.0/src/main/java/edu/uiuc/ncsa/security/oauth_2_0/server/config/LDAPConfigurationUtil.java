@@ -111,21 +111,6 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         ldapConfiguration.setSslConfiguration(sslConfiguration);
         String tempServer = getNodeValue(ldapNode, LDAP_ADDRESS_TAG);
 
-/*
-        List<String> server = new LinkedList<>();
-        try{
-            // Assumption is that this is a JSON array format list, e.g. ["a","b"] and it will
-            // get converted to a JSONarray, then added to the server object
-                    server.addAll(JSONArray.fromObject(tempServer));
-        }catch(Throwable t){
-            // so its a string...
-            if(tempServer != null){
-                server.add(tempServer);
-                ldapConfiguration.setServer(server);
-
-            }
-        }
-*/
         ldapConfiguration.setServer(getNodeValue(ldapNode, LDAP_ADDRESS_TAG));
         String x = getNodeValue(ldapNode, LDAP_CONTEXT_NAME_TAG);
 
@@ -199,7 +184,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
     }
 
 
-    protected int getAuthType(String x) {
+    public int getAuthType(String x) {
         int rc = LDAP_AUTH_UNSPECIFIED_KEY; // default
         if (x != null) {
             // If specified, figure out what they want.

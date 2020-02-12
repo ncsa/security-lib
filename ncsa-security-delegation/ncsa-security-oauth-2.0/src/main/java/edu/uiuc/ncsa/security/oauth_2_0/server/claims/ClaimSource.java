@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.util.functor.parser.Script;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Collection;
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/15 at  2:28 PM
  */
-public interface ClaimSource {
+public interface ClaimSource  extends Serializable {
     /**
      * This passes in a {@link JSONObject} that is in turn used to configure the source. It is up to the implementaton
      * to make sense of this.
@@ -93,5 +94,5 @@ public interface ClaimSource {
      * @return
      */
     public Script getPostProcessor();
-
+    
 }

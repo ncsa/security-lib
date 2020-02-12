@@ -26,6 +26,5 @@ public class QDLLoaderImpl implements QDLLoader {
         ArrayList<Module> modules = new ArrayList<>();
         modules.add(javaModule);
         return modules;
-      //edu.uiuc.ncsa.qdl.QDLLoaderImpl
     }
 }

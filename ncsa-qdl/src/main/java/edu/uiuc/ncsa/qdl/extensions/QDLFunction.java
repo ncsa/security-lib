@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.extensions;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * A wrapper for a single Java method that can be invoked from QDL. It may indeed be a single utility, or it may
@@ -43,4 +44,12 @@ public interface QDLFunction extends Serializable {
      * @return
      */
     public QDLFunction getInstance();
+
+    /**
+     * Return documentation to be displayed in the workspace. Short version displays the first
+     * line (element of the list) so make sure that is informative. The long version should contain
+     * details of use.
+     * @return
+     */
+    List<String> getDocumentation();
 }

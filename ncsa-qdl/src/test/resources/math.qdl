@@ -7,7 +7,7 @@ module[
    >> where 0 < x is a number.
    >> The default is 10 iterations, which should give pretty good precision for most purposes.
    >> This uses the Newton-Raphson method.
-      x0 := 1;
+       x0 := 1;
       m := 10;
       while[
           for_next(j,m)
@@ -16,6 +16,7 @@ module[
          ]; // end loop
       return(x0);
    ]; //end sqrt(1)
+
      define[sqrt(x,m)]body[
       >> A function to compute the sqrt of a positive number x and use m iterations
       >> Usage sqrt(x,m);
@@ -29,4 +30,18 @@ module[
             ]; // end loop
          return(x0);
       ]; //end sqrt(2)
+
+           define[nroot(x,n)]body[
+            >> A function to compute the n-th root of a positive number x, so nroot(x,n)^n == x
+            >> Usage nroot(x,n);
+            >> where 0 < x is an integer, 1 < n.
+            >> This uses the Newton-Raphson method.
+               x0 := 1;
+               while[
+                   for_next(j,10)
+                 ]do[
+                   x0 := ((n-1)*x0 + x/x0^(n-1))/n;
+                  ]; // end loop
+               return(x0);
+            ]; //end nroot(2)
 ]; //end module

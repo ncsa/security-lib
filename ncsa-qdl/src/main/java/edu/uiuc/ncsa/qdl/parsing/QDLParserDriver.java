@@ -131,6 +131,11 @@ public class QDLParserDriver {
                 // to the console. Great for debugging, but very annoying for users who type in a boo-boo.
                 lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
                 parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
+                /*
+                 * To get an exception at parsing rather than having everything get piped to System.err
+                 * we have to implement a listener that throws an exception
+                 */
+                parser.addErrorListener(ParserExceptionListener.INSTANCE);
             }
 
 

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 7/23/18 at  8:44 AM
  */
-public class ClaimSourceConfiguration {
+public class ClaimSourceConfiguration implements Serializable {
     protected String name = "";
 
     /**

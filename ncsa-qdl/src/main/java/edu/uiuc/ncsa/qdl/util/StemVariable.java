@@ -62,6 +62,19 @@ public class StemVariable extends HashMap<String, Object> {
         return super.get(key);
     }
 
+    /**
+     * Adds a list of objects to this stem, giving them indices 0,1,...
+     * This is mostly a convenience for people writing in java to create lists
+     * programatically     LDAP
+     *
+     * @param list
+     */
+    public void addList(List<Object> list) {
+        for (int i = 0; i < list.size(); i++) {
+            put(Integer.toString(i), list.get(i));
+        }
+    }
+
     public Object get(StemMultiIndex w) {
         StemVariable currentStem = this;
         /**
@@ -79,7 +92,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (w.isStem()) {
             return currentStem.get(w.getLastComponent() + ".");
         } else {
-          return  currentStem.get(w.getLastComponent());
+            return currentStem.get(w.getLastComponent());
         }
     }
 
@@ -329,8 +342,9 @@ public class StemVariable extends HashMap<String, Object> {
         }
 
     }
-    public StemVariable union(StemVariable ... stemVariables){
-        for(StemVariable stemVariable : stemVariables){
+
+    public StemVariable union(StemVariable... stemVariables) {
+        for (StemVariable stemVariable : stemVariables) {
             this.putAll(stemVariable);
         }
         return this;

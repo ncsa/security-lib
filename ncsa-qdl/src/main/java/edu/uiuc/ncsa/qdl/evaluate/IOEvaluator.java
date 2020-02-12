@@ -48,22 +48,35 @@ public class IOEvaluator extends MathEvaluator {
             case SAY_TYPE:
                 if (state.isServerMode()) return true;
                 String result = "";
+                boolean prettyPrintForStems = false;
                 if (polyad.getArgumments().size() != 0) {
                     Object temp = polyad.evalArg(0, state);
-                    ;
+                    if (polyad.getArgumments().size() == 2) {
+                        // assume pretty print for stems.
+                        Object flag = polyad.evalArg(1, state);
+                        if (flag instanceof Boolean) {
+                            prettyPrintForStems = (Boolean) flag;
+                        }
+                    }
                     if (temp == null) {
                         result = "null";
 
                     } else {
-                        result = temp.toString();
+                        if (prettyPrintForStems) {
+                            if (temp instanceof StemVariable) {
+                                result = ((StemVariable) temp).toJSON().toString(1);
+                            }
+                        } else {
+                            result = temp.toString();
+                        }
                     }
                 }
                 System.out.println(result);
-                if(polyad.getArgumments().size() == 0){
+                if (polyad.getArgumments().size() == 0) {
                     polyad.setResult(null);
                     polyad.setResultType(Constant.NULL_TYPE);
 
-                }  else{
+                } else {
                     polyad.setResult(polyad.getArgumments().get(0).getResult());
                     polyad.setResultType(polyad.getArgumments().get(0).getResultType());
 
@@ -99,29 +112,29 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doWriteFile(Polyad polyad, State state) {
-        if(state.isServerMode()){
+        if (state.isServerMode()) {
             throw new QDLServerModeException("File operations are not permitted in server mode");
         }
 
-        if ( polyad.getArgumments().size() < 2) {
+        if (polyad.getArgumments().size() < 2) {
             throw new IllegalArgumentException("Error: " + WRITE_FILE + " requires a two arguments.");
         }
         Object obj = polyad.evalArg(0, state);
         Object obj2 = polyad.evalArg(1, state);
-        if(obj == null || !isString(obj)){
-            throw new IllegalArgumentException("Error: The first argument to \"" + WRITE_FILE + "\" must be a string that is the file name." );
+        if (obj == null || !isString(obj)) {
+            throw new IllegalArgumentException("Error: The first argument to \"" + WRITE_FILE + "\" must be a string that is the file name.");
         }
         String fileName = obj.toString();
-        if(obj2 == null){
-            throw new IllegalArgumentException("Error: The second argument to \"" + WRITE_FILE + "\" must be a string or a stem list." );
+        if (obj2 == null) {
+            throw new IllegalArgumentException("Error: The second argument to \"" + WRITE_FILE + "\" must be a string or a stem list.");
         }
         boolean isBase64 = false;
-        if(polyad.getArgumments().size() == 3){
+        if (polyad.getArgumments().size() == 3) {
             Object obj3 = polyad.evalArg(2, state);
-            if(!isBoolean(obj3)){
-                throw new IllegalArgumentException("Error: The third argument to \"" + WRITE_FILE + "\" must be a boolean." );
+            if (!isBoolean(obj3)) {
+                throw new IllegalArgumentException("Error: The third argument to \"" + WRITE_FILE + "\" must be a boolean.");
             }
-            isBase64 = (Boolean)obj3;
+            isBase64 = (Boolean) obj3;
         }
         try {
             boolean didIt = false;
@@ -129,23 +142,23 @@ public class IOEvaluator extends MathEvaluator {
                 FileUtil.writeStemToFile(fileName, (StemVariable) obj2);
                 didIt = true;
             }
-            if(isString(obj2)){
+            if (isString(obj2)) {
                 FileUtil.writeStringToFile(fileName, (String) obj2);
                 didIt = true;
             }
-            if(isBase64){
+            if (isBase64) {
                 FileUtil.writeFileAsBinary(fileName, (String) obj2);
                 didIt = true;
             }
-            if(!didIt){
+            if (!didIt) {
                 throw new IllegalArgumentException("Error: The argument to " + WRITE_FILE + " is an unecognized type");
             }
             polyad.setResult(Boolean.TRUE);
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             polyad.setEvaluated(true);
-        }catch(Throwable t){
-            if(t instanceof QDLException){
-                throw (RuntimeException)t;
+        } catch (Throwable t) {
+            if (t instanceof QDLException) {
+                throw (RuntimeException) t;
             }
             throw new QDLException("Error: could not write file \"" + fileName + "\":" + t.getMessage());
         }

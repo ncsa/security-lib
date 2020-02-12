@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
@@ -86,6 +87,7 @@ public abstract class FunctionState extends VariableState {
              // check for unqualified names.
              FR_WithState fr = new FR_WithState();
              fr.functionRecord = getFunctionTable().get(name, argCount);
+
              fr.state = this;
              for (URI ns : moduleMap.keySet()) {
                  if (fr.functionRecord == null) {
@@ -99,6 +101,9 @@ public abstract class FunctionState extends VariableState {
                          throw new ImportException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                      }
                  }
+             }
+             if(fr.functionRecord == null){
+                 throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount==1?".":"s."));
              }
              return fr;
          }

@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -25,6 +26,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
@@ -73,6 +75,14 @@ public class WorkspaceCommands implements Logable {
     protected int ACTION_INDEX = 1;
     protected int FIRST_ARG_INDEX = 2;
 
+    protected void splashScreen(){
+        say("*****************************************");
+        say("Welcome to the QDL Workspace");
+        say("Version " + QDLVersion.VERSION);
+        say("Type " + HELP_COMMAND + " for help.");
+        say("*****************************************");
+
+    }
     protected void showRunHelp() {
         say("This is the QDL (Quick and Dirty Language, pronounced 'quiddle') workspace.");
         sayi("You may enter commands and execute them much like any other interpreter.");
@@ -872,10 +882,13 @@ public class WorkspaceCommands implements Logable {
 
     CLA = Command Line Args. These are the switches used on the command line
      */
-    public static final String CLA_EXTENSIONS = "-ext";
+    public static final String CLA_EXTENSIONS = "-ext"; // multiple classes comma separated allowed
     public static final String CLA_ENVIRONMENT = "-env";
     public static final String CLA_HOME_DIR = "-qdlroot";
     public static final String CLA_LOG_DIR = "-log";
+    public static final String CLA_BOOT_SCRIPT = "-boot_script";
+    public static final String CLA_VERBOSE_ON = "-v";
+    public static final String CLA_DEBUG_ON = "-debug";
 
     protected File resolveAgainstRoot(String file) {
         File f = new File(file);
@@ -894,6 +907,15 @@ public class WorkspaceCommands implements Logable {
      * @param inputLine
      */
     public void init(InputLine inputLine) throws Throwable {
+        boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON);
+        if (isVerbose) {
+            say("Verbose mode enabled.");
+        }
+        boolean isDebug = inputLine.hasArg(CLA_DEBUG_ON);
+        if (isDebug) {
+            say("Debug mode enabled.");
+
+        }
         //   QDLLoaderImpl q = new QDLLoaderImpl();
         State state = getState();
         if (inputLine.hasArg(CLA_HOME_DIR)) {
@@ -937,14 +959,60 @@ public class WorkspaceCommands implements Logable {
                     true);
         }
         logger = loggerProvider.get();
+        // Do the splash screen here so any messages from a boot script are obvious.
+        splashScreen();
+        
         if (inputLine.hasArg(CLA_EXTENSIONS)) {
             // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl"
-            String loaderClass = inputLine.getNextArgFor("-ext");
-            Class klasse = state.getClass().forName(loaderClass);
-            QDLLoader loader = (QDLLoader) klasse.newInstance();
-            setupJavaModule(state, loader);
+            String loaderClasses = inputLine.getNextArgFor("-ext");
+            StringTokenizer st = new StringTokenizer(loaderClasses, ",");
+            String loaderClass;
+            String foundClasses = "";
+            boolean isFirst = true;
+            while (st.hasMoreTokens()) {
+                loaderClass = st.nextToken();
+                try {
+                    Class klasse = state.getClass().forName(loaderClass);
+                    QDLLoader loader = (QDLLoader) klasse.newInstance();
+                    setupJavaModule(state, loader);
+                    if (isVerbose) {
+                        say("loaded module:" + klasse.getSimpleName());
+                    }
+                    if (isFirst) {
+                        isFirst = false;
+                        foundClasses = loaderClass;
+                    } else {
+                        foundClasses = foundClasses + "," + loaderClass;
+                    }
+                } catch (Throwable t) {
+                    if (isDebug) {
+                        t.printStackTrace();
+                    }
+                    say("WARNING: module \"" + loaderClass + "\" coould not be loaded:" + t.getMessage());
+                }
+            }
+            if (!foundClasses.isEmpty()) {
+                env.put("externalModules", foundClasses);
+            }
         }
         interpreter = new QDLParser(env, getState());
+        if (inputLine.hasArg(CLA_BOOT_SCRIPT)) {
+            String bootFile = inputLine.getNextArgFor(CLA_BOOT_SCRIPT);
+            try {
+                String bootScript = FileUtil.readFileAsString(bootFile);
+                interpreter.execute(bootScript);
+                if (isVerbose) {
+                    say("loaded boot script " + bootFile);
+                }
+                env.put("boot_script", bootFile);
+            } catch (Throwable t) {
+                if (isDebug) {
+                    t.printStackTrace();
+                }
+                say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
+            }
+        }
+        //   interpreter.setDebugOn(true);
     }
 
     File rootDir;

@@ -293,8 +293,8 @@ public class ParserTest extends TestBase {
     public void testMatrixMultiply1() throws Throwable {
         // Takes x.i.j, y.i.j and returns the matrix product z.i.j
 
-        String set_a = "a.0.0:=1; a.0.1 := 2; a.1.0 := 3 a.1.1 := 4";
-        String set_b = "b.0.0:=5; b.0.1 := 4; b.1.0 := 3 b.1.1 := 2";
+        String set_a = "a.0.0:=1; a.0.1 := 2; a.1.0 := 3; a.1.1 := 4;";
+        String set_b = "b.0.0:=5; b.0.1 := 4; b.1.0 := 3; b.1.1 := 2;";
         String set_c00 = "c.0.0 := x.0.0*y.0.0 + x.0.1*y.1.0;\n";
         String set_c10 = "c.1.0 := x.1.0*y.0.0 + x.1.1*y.1.0;\n";
         String set_c01 = "c.0.1 := x.0.0*y.0.1 + x.0.1*y.1.1;\n";
@@ -336,8 +336,8 @@ public class ParserTest extends TestBase {
     public void testMatrixLoop() throws Throwable {
         // Takes x.i.j, y.i.j and returns the matrix product z.i.j
 
-        String set_a = "a.0.0:=1; a.0.1 := 2; a.1.0 := 3 a.1.1 := 4";
-        String set_b = "b.0.0:=5; b.0.1 := 4; b.1.0 := 3 b.1.1 := 2";
+        String set_a = "a.0.0:=1; a.0.1 := 2; a.1.0 := 3; a.1.1 := 4;";
+        String set_b = "b.0.0:=5; b.0.1 := 4; b.1.0 := 3; b.1.1 := 2;";
         String set_c00 = "c.0.0 := x.0.0*y.0.0 + x.0.1*y.1.0;\n";
         String set_c10 = "c.1.0 := x.1.0*y.0.0 + x.1.1*y.1.0;\n";
         String set_c01 = "c.0.1 := x.0.0*y.0.1 + x.0.1*y.1.1;\n";
@@ -414,7 +414,7 @@ public class ParserTest extends TestBase {
 
         // all that is set up. Now put in some values and try to evaluate it
         script = new StringBuffer();
-        addLine(script, "x :=-3");
+        addLine(script, "x :=-3;");
         addLine(script, "y := 5;");
         addLine(script, "z := f(x,y);");
         try {
@@ -577,7 +577,7 @@ public class ParserTest extends TestBase {
           StringBuffer script = new StringBuffer();
           addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
           addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
-          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);]");
+          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);];");
           addLine(script, "i:=0;");
           addLine(script, "j:=5;");
           addLine(script, "list. := indices(10);");
@@ -788,10 +788,11 @@ public class ParserTest extends TestBase {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "execute('var := \\'abc\\' + \\'def\\');'");
+        addLine(script, "    execute('var := \\'abc\\' + \\'def\\';');");
+        addLine(script, "    say(var);");
+        System.out.println("\n\n"+script.toString());
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        System.out.println(state.getValue("var"));
         assert state.getValue("var").equals("abcdef");
 
     }
