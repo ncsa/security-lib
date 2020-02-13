@@ -18,21 +18,19 @@ import java.io.StringReader;
 public class QDLScript implements ScriptInterface {
 
     public QDLScript(Reader script, XProperties properties) {
-        this.rawScript = script;
         this.properties = properties;
+        getText(script); // too many variables for finding the reader is closed later.
     }
 
     State state;
 
-    public Reader getRawScript() {
-        return rawScript;
-    }
 
-    public void setRawScript(Reader rawScript) {
-        this.rawScript = rawScript;
+    public String getText() {
+        return text;
     }
 
     String text = null; // the text representation
+
 
     /**
      * Returns a text representation. <b>NOTE:</b> reading a {@link Reader} generally only works once.
@@ -41,7 +39,7 @@ public class QDLScript implements ScriptInterface {
      * mark() and reset() generally. Sorry. Best we can do...
      * @return
      */
-    public String getText() {
+    protected String getText(Reader rawScript) {
         if(text == null) {
             try {
                 char[] arr = new char[8 * 1024];
@@ -66,7 +64,7 @@ public class QDLScript implements ScriptInterface {
         return text;
     }
 
-    Reader rawScript;
+
 
     /**
      * These properties are for external systems that must manage when or how the scripts are run.
@@ -89,7 +87,7 @@ public class QDLScript implements ScriptInterface {
     public void execute(StateInterface state)  {
         QDLParser parser = new QDLParser((State)state);
         try {
-            parser.execute(rawScript);
+            parser.execute(getText());
         }catch(Throwable t){
             if(t instanceof RuntimeException){
                 throw (RuntimeException)t;
@@ -98,48 +96,7 @@ public class QDLScript implements ScriptInterface {
         }
     }
 
-    /**
-     * Generally if at all possible, run this with {@link #execute(StateInterface)} rather than setting the state and trying to run it.
-     * If you set the state then run it, you may end up with stale state at some point which can
-     * make bugs that are very hard to track down.
-     */
-  /*  public void execute() {
-        try {
-            if (state == null) {
-                throw new QDLException("Error: The state has not been set prior to execution");
-            }
-            execute(state);
-        } catch (Throwable t) {
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-            throw new QDLException("Error: Could not execute script: " + t.getMessage());
-        }
 
-    }
-*//*
-    public void execute(File file) {
-        try {
-            rawScript = new FileReader(file);
-        } catch (Throwable t) {
-            throw new QDLException("Error: could not load file \"" + file.getAbsolutePath() + "\":" + t.getMessage());
-        }
-        execute();
-    }
-
-    public void execute(List<String> commands) {
-        StringBuffer stringBuffer = new StringBuffer();
-        for (String x : commands) {
-            stringBuffer.append(x + "\n");
-        }
-        rawScript = new StringReader(stringBuffer.toString());
-        execute();
-    }
-
-    public void execute(Reader reader) {
-        rawScript = reader;
-        execute();
-    }*/
 
     @Override
     public String toString() {

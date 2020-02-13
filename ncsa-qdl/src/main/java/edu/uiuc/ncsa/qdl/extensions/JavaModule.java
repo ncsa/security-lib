@@ -25,10 +25,7 @@ public class JavaModule extends Module {
     }
 
     public void addFunctions(List<QDLFunction> functions) {
-        for (QDLFunction f : functions) {
             funcs.addAll(functions);
-        }
-
     }
 
     protected List<QDLVariable> vars = new ArrayList<>();

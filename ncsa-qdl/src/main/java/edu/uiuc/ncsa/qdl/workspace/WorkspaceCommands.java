@@ -988,7 +988,7 @@ public class WorkspaceCommands implements Logable {
                     if (isDebug) {
                         t.printStackTrace();
                     }
-                    say("WARNING: module \"" + loaderClass + "\" coould not be loaded:" + t.getMessage());
+                    say("WARNING: module \"" + loaderClass + "\" could not be loaded:" + t.getMessage());
                 }
             }
             if (!foundClasses.isEmpty()) {

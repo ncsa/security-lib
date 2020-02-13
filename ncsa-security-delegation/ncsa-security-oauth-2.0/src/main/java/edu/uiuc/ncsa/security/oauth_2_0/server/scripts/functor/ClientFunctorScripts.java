@@ -1,19 +1,19 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor;
 
 import edu.uiuc.ncsa.security.oauth_2_0.server.scripts.ClientScripts;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/5/20 at  2:15 PM
  */
-public class ClientFunctorScripts<V extends Script> extends ScriptSet<V> implements ClientScripts  {
-    public void setRuntime(Script runtime) {
+public class ClientFunctorScripts<V extends FunctorScript> extends ScriptSet<V> implements ClientScripts  {
+    public void setRuntime(FunctorScript runtime) {
            this.runtime = runtime;
        }
 
-       public Script getRuntime(){
+       public FunctorScript getRuntime(){
            return runtime;
        }
 
@@ -28,5 +28,5 @@ public class ClientFunctorScripts<V extends Script> extends ScriptSet<V> impleme
            }
            return false;
        }
-    Script runtime;
+    FunctorScript runtime;
 }

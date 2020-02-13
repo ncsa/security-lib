@@ -32,7 +32,7 @@ public class ClientJSONConfigUtil {
      * This method returns the JSON array <code>[X]</code>. Another example:
      * <pre>
      *  Z=   {"key0":{
-     *         "key1':[X,Y,z]
+     *         "key1':[X,y,z]
      *        }
      *     }
      * </pre>

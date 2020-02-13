@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.util.cli;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -88,7 +88,7 @@ public class ParserCommands extends CommonCommands {
                 }
             }
         }
-        Script script = new Script(getFunctorFactory());
+        FunctorScript script = new FunctorScript(getFunctorFactory());
         script.execute(currentFile);
     }
 

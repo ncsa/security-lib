@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.server.claims;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.oauth_2_0.UserInfo;
 import edu.uiuc.ncsa.security.oauth_2_0.server.UnsupportedScopeException;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import net.sf.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -87,12 +87,12 @@ public interface ClaimSource  extends Serializable {
      * constructed on the fly from the current state of the claims.
      * @return
      */
-   public Script getPreProcessor();
+   public FunctorScript getPreProcessor();
 
     /**
      * See comment in {@link #getPreProcessor()}.
      * @return
      */
-    public Script getPostProcessor();
+    public FunctorScript getPostProcessor();
     
 }

@@ -2,11 +2,13 @@ package edu.uiuc.ncsa.security.util.scripting;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
+import java.io.Serializable;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/4/20 at  11:14 AM
  */
-public interface ScriptInterface {
+public interface ScriptInterface extends Serializable {
     /**
      * Run this script with the given state.
      * @param state

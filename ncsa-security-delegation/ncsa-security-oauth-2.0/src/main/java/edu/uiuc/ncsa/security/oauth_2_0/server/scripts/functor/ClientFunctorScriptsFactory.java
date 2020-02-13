@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server.scripts.functor;
 
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSetFactory;
 import net.sf.json.JSONObject;
 
@@ -27,7 +27,7 @@ public class ClientFunctorScriptsFactory<V extends ClientFunctorScripts> extends
      */
     public V newInstance() {
         V cc = get();
-        cc.setRuntime(new Script(functorFactory, ClientFunctorScriptsUtil.getRuntime(getConfig())));
+        cc.setRuntime(new FunctorScript(functorFactory, ClientFunctorScriptsUtil.getRuntime(getConfig())));
         return cc;
     }
 

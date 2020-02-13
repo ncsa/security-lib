@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.security.core.exceptions.FunctorRuntimeException;
 import edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.AbstractHandler;
-import edu.uiuc.ncsa.security.util.functor.parser.Script;
+import edu.uiuc.ncsa.security.util.functor.parser.FunctorScript;
 import edu.uiuc.ncsa.security.util.functor.parser.event.ConditionalHandler;
 import edu.uiuc.ncsa.security.util.functor.parser.event.EventDrivenParser;
 import edu.uiuc.ncsa.security.util.functor.parser.event.FunctorHandler;
@@ -401,7 +401,7 @@ public class FunctorParserTest extends TestBase {
         array.add("   ]");
         array.add(" };");
         jsonScript.put("script", array);
-        Script script = new Script(createFunctorFactory(), jsonScript);
+        FunctorScript script = new FunctorScript(createFunctorFactory(), jsonScript);
         script.execute();
         assert script.getHandlers().size() == 1;
         SwitchHandler switchHandler = (SwitchHandler) script.getHandlers().get(0);
@@ -438,7 +438,7 @@ public class FunctorParserTest extends TestBase {
           array.add("   ]");
           array.add(" }"); // <--- ONLY difference with previous test initialization.
           jsonScript.put("script", array);
-          Script script = new Script(createFunctorFactory(), jsonScript);
+          FunctorScript script = new FunctorScript(createFunctorFactory(), jsonScript);
         try {
             script.execute();
             assert false : "Missing line termination should have caused reading JSON to fail.";
@@ -536,7 +536,7 @@ public class FunctorParserTest extends TestBase {
         FileReader fileReader = new FileReader(f);
         JFunctorFactory functorFactory = createFunctorFactory();
         functorFactory.setVerboseOn(true); //enable output to console.
-        Script script = new Script(functorFactory);
+        FunctorScript script = new FunctorScript(functorFactory);
         script.execute(fileReader);
         assert functorFactory.getEnvironment().containsKey("key0") : "Missing key";
         assert functorFactory.getEnvironment().get("key0").equals("value0") : "Incorrect sotred value. Expected \"value0\" and got \"" + functorFactory.getEnvironment().get("key0") + "\"";
@@ -550,7 +550,7 @@ public class FunctorParserTest extends TestBase {
            FileReader fileReader = new FileReader(f);
            JFunctorFactory functorFactory = createFunctorFactory();
            functorFactory.setVerboseOn(true); //enable output to console.
-           Script script = new Script(functorFactory);
+           FunctorScript script = new FunctorScript(functorFactory);
            script.execute(fileReader);
            assert functorFactory.getEnvironment().containsKey("foo") : "Missing key";
            assert functorFactory.getEnvironment().get("fnord").equals("baz") : "Incorrect sotred value. Expected \"baz\" and got \"" + functorFactory.getEnvironment().get("fnord") + "\"";
