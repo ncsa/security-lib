@@ -20,6 +20,10 @@ public class JSONScriptUtil {
 
     public static void addScript(JSONObject config, QDLScript script){
         JSONObject j = Scripts.toJSON(script);
+        if(!config.containsKey(SCRIPTS_TAG)){
+            JSONArray array = new JSONArray();
+            config.put(SCRIPTS_TAG, array);
+        }
          config.getJSONArray(SCRIPTS_TAG).add(j);
     }
 

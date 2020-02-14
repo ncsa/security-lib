@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -185,8 +184,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Object arg1 = polyad.evalArg(0,state);;
         Object arg2 = polyad.evalArg(1,state);;
-        if(arg1 == null) throw new UnknownSymbolException();
-        if(arg2 == null) throw new UnknownSymbolException();
+
         Object[] argList = new Object[polyad.getArgumments().size()];
         argList[0] = arg1;
         argList[1] = arg2;

@@ -12,6 +12,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -560,6 +561,22 @@ public class StemFunctionsTest extends TestBase {
         StemVariable stemVariable = new StemVariable();
         stemVariable.fromJSON(jsonObject);
         System.out.println(stemVariable.toString());
+
+    }
+
+    @Test
+    public void testAddList() throws Throwable{
+        StemVariable s = new StemVariable();
+        ArrayList<Object> list = new ArrayList<>();
+        int max = 6;
+        for(int i = 0; i < max; i++){
+               list.add(i+10L); // so we have different values from keys
+        }
+        s.addList(list);
+        for(int i = 0; i < max; i++){
+            Long v = i + 10L;
+               assert s.get(Integer.toString(i)).equals(v) : "expected " + v + " and got " + s.get(Integer.toString(i));
+        }
 
     }
 }

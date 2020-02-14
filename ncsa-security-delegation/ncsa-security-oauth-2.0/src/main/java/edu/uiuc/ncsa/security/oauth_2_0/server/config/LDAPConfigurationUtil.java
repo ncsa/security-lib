@@ -13,6 +13,7 @@ import net.sf.json.JSONNull;
 import net.sf.json.JSONObject;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -65,7 +66,7 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         return LDAP_TAG;
     }
 
-    public static class AttributeEntry {
+    public static class AttributeEntry implements Serializable {
         public AttributeEntry(String sourceName, String targetName, boolean isList, boolean isGroup) {
             this.isList = isList;
             this.sourceName = sourceName;
@@ -183,6 +184,17 @@ public class LDAPConfigurationUtil extends ClaimSourceConfigurationUtil {
         return ldapConfiguration;
     }
 
+    public String getAuthName(int authType) {
+        switch (authType) {
+            case LDAP_AUTH_NONE_KEY:
+                return LDAP_AUTH_NONE;
+            case LDAP_AUTH_SIMPLE_KEY:
+                return LDAP_AUTH_SIMPLE;
+            case LDAP_AUTH_STRONG_KEY:
+                return LDAP_AUTH_STRONG;
+        }
+        return "";
+    }
 
     public int getAuthType(String x) {
         int rc = LDAP_AUTH_UNSPECIFIED_KEY; // default

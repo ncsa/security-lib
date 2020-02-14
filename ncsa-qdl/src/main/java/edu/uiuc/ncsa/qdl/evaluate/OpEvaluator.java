@@ -263,10 +263,18 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     // just do object comparison
                     switch (dyad.getOperatorType()) {
                         case EQUALS_VALUE:
-                            r.result = objects[0].equals(objects[1]);
+                            if(objects[0] == null){
+                                r.result = objects[1] == objects[0];
+                            }else {
+                                r.result = objects[0].equals(objects[1]);
+                            }
                             break;
                         case NOT_EQUAL_VALUE:
-                            r.result = !objects[0].equals(objects[1]);
+                            if(objects[0] == null){
+                                r.result = objects[1] != objects[0];
+                            }else {
+                                r.result = !objects[0].equals(objects[1]);
+                            }
                             break;
                     }//end switch
                 }

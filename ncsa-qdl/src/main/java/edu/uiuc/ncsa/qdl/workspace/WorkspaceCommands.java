@@ -708,6 +708,8 @@ public class WorkspaceCommands implements Logable {
                 return doWSSave(inputLine);
             case "clear":
                 return doWSClear(inputLine);
+            case "echo":
+                return doEchoMode(inputLine);
             case "id":
                 if (currentWorkspace == null) {
                     say("No workspace loaded");
@@ -716,9 +718,31 @@ public class WorkspaceCommands implements Logable {
                     say(currentWorkspace.getName());
                 }
                 return RC_CONTINUE;
+            case "memory":
+                say("memory used = " + (Runtime.getRuntime().totalMemory()/(1024*1024)) +
+                        " MB, free = " + (Runtime.getRuntime().freeMemory()/(1024*1024)) +
+                        " MB, processors = " + Runtime.getRuntime().availableProcessors());
+                return RC_CONTINUE;
+
         }
         return RC_NO_OP;
 
+    }
+
+    private int doEchoMode(InputLine inputLine) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            say("echo mode currently " + (isEchoModeOn()?"on":"off"));
+            return RC_CONTINUE;
+        }
+        String onOrOff = inputLine.getArg(FIRST_ARG_INDEX);
+        if(onOrOff.toLowerCase().equals("on")){
+            setEchoModeOn(true);
+            say("echo mode on");
+        }else{
+            setEchoModeOn(false);
+            say("echo mode off");
+        }
+        return RC_CONTINUE;
     }
 
     private int doWSClear(InputLine inputLine) {
@@ -996,6 +1020,7 @@ public class WorkspaceCommands implements Logable {
             }
         }
         interpreter = new QDLParser(env, getState());
+        interpreter.setEchoModeOn(true);
         if (inputLine.hasArg(CLA_BOOT_SCRIPT)) {
             String bootFile = inputLine.getNextArgFor(CLA_BOOT_SCRIPT);
             try {
@@ -1035,6 +1060,15 @@ public class WorkspaceCommands implements Logable {
         return readline();
     }
 
+    public boolean isEchoModeOn() {
+        return echoModeOn;
+    }
+
+    public void setEchoModeOn(boolean echoModeOn) {
+        this.echoModeOn = echoModeOn;
+    }
+
+    boolean echoModeOn = true;
     public String readline() {
         try {
             String x = getBufferedReader().readLine();

@@ -38,6 +38,16 @@ public class QDLParser {
 
     State state;
 
+    public boolean isEchoModeOn() {
+        return echoModeOn;
+    }
+
+    public void setEchoModeOn(boolean echoModeOn) {
+        this.echoModeOn = echoModeOn;
+    }
+
+    boolean echoModeOn = false;
+
     /**
      * Creates a new parser. NOTE Antlr <b>really</b> sucks at unbuffered input, so the official way to try and do this
      * is to create a new parser each time, but we manage the state in between. For working directly from
@@ -53,6 +63,7 @@ public class QDLParser {
         driver.setDebugOn(isDebugOn());
         QDLRunner runner = new QDLRunner(driver.parse(r));
         runner.setState(state);
+        runner.setEchoModeOn(isEchoModeOn());
         runner.run();
 
     }

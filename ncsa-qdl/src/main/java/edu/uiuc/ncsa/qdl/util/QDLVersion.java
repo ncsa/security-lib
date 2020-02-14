@@ -6,4 +6,6 @@ package edu.uiuc.ncsa.qdl.util;
  */
 public interface QDLVersion {
     static String VERSION = "1.0";
+    static String LANGUAGE_NAME = "qdl";
+    static String DEFAULT_FILE_EXTENSION = ".qdl"; // for scripts
 }

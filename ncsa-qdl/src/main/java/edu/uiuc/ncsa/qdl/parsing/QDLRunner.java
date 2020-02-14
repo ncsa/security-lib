@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
@@ -14,6 +17,15 @@ import java.util.List;
  * on 1/22/20 at  6:15 AM
  */
 public class QDLRunner {
+    public boolean isEchoModeOn() {
+        return echoModeOn;
+    }
+
+    public void setEchoModeOn(boolean echoModeOn) {
+        this.echoModeOn = echoModeOn;
+    }
+
+    boolean echoModeOn = false;
 
     public State getState() {
         return state;
@@ -54,6 +66,18 @@ public class QDLRunner {
                     ModuleStatement ms = (ModuleStatement) stmt;
                     ms.evaluate(currentState);
                 } else {
+                    if (isEchoModeOn()) {
+                        // used by the workspace to print each statement's result to the console.
+                        if ((stmt instanceof ExpressionImpl)) {
+                            ExpressionImpl expression = (ExpressionImpl) stmt;
+                            if (expression.getOperatorType() != currentState.getMetaEvaluator().getType("say")) {
+                                Polyad p = new Polyad("say");
+                                p.setOperatorType(IOEvaluator.SAY_TYPE);
+                                p.addArgument(expression);
+                                stmt = p;
+                            }
+                        }
+                    }
                     stmt.evaluate(currentState);
                 }
             }

@@ -65,7 +65,7 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * Adds a list of objects to this stem, giving them indices 0,1,...
      * This is mostly a convenience for people writing in java to create lists
-     * programatically     LDAP
+     * programatically
      *
      * @param list
      */

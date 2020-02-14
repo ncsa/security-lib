@@ -37,10 +37,12 @@ public class Assignment implements Statement {
         result = argument.evaluate(state);
         resultType = argument.getResultType();
         switch (argument.getResultType()) {
+
             case Constant.STEM_TYPE:
             case Constant.STRING_TYPE:
             case Constant.BOOLEAN_TYPE:
             case Constant.LONG_TYPE:
+            case Constant.NULL_TYPE:
             case Constant.DECIMAL_TYPE:
                 state.setValue(variableReference, result);
                 break;

@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -571,23 +570,25 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stemVariable;
 
-        try {
             polyad.evalArg(0, state);
             Object r = polyad.getArgumments().get(0).getResult();
-            if (!isStem(r)) {
-                throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
-            }
-            stemVariable = (StemVariable) r;
+            if(r == null){
+                // this does not exist, create it
+                stemVariable = new StemVariable();
+                VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
+                state.setValue(variableNode.getVariableReference(), stemVariable);
+            }else{
+                // Other option is that this exists, so check that the person is trying to set the default
+                // for a stem and not something else.
 
-        } catch (UnknownSymbolException usx) {
-            // in this case, they are setting the default value for a stem that does not exist -- yet.
-            // Fix it.
-            stemVariable = new StemVariable();
-            VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
-            state.setValue(variableNode.getVariableReference(), stemVariable);
-        }
+                if (!isStem(r)) {
+                    throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
+                }
+                stemVariable = (StemVariable) r;
+            }
+
         polyad.evalArg(1, state);
-        ;
+        
         Object defaultValue = polyad.getArgumments().get(1).getResult();
         if (isStem(defaultValue)) {
             throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts only a scalar as its second argument.");

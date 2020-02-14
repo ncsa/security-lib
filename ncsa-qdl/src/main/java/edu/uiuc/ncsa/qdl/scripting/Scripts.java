@@ -2,10 +2,12 @@ package edu.uiuc.ncsa.qdl.scripting;
 
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.StringReader;
+import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
@@ -38,6 +40,10 @@ public class Scripts {
      * The language this script is written in
      */
     public static final String LANGUAGE = "language";
+    /**
+     * ISO 8601 timestamp when this was created.
+     */
+    public static final String CREATE_TIME = "create_ts";
     /**
      * (Required!) The identifier for this script.
      */
@@ -104,6 +110,7 @@ public class Scripts {
          xp.put(LANG_VERSION, QDLVersion.VERSION);
          xp.put(LANGUAGE,"qdl");
          xp.put(ID,"functions.qdl");
+         xp.put(CREATE_TIME, Iso8601.date2String(new Date()));
          QDLScript s = new QDLScript(new StringReader(script.toString()), xp);
          System.out.println(toJSON(s).toString(2));
          String rawJSON = "{\""+SCRIPT +"\": {\n" +

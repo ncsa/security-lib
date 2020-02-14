@@ -162,7 +162,8 @@ public abstract class VariableState extends NamespaceAwareState {
         switch (op) {
             case OP_GET:
                 if (stem == null) {
-                    throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
+                 //   throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
+                    return null;
                 }
                 if (w.isEmpty()) {
                     return stem;

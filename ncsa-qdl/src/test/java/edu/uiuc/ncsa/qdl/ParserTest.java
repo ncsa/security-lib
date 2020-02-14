@@ -537,7 +537,8 @@ public class ParserTest extends TestBase {
 
     /**
      * Make modules with the same variables, import then use NS qualification on the stem and its
-     * indices to access them. 
+     * indices to access them.
+     *
      * @throws Throwable
      */
     public void testNSAndStem() throws Throwable {
@@ -568,34 +569,36 @@ public class ParserTest extends TestBase {
     /**
      * In this case, modules have, of course, unique namespaces, but the aliases conflict so that is
      * changed in import.
+     *
      * @throws Throwable
      */
     @Test
     public void testImportAndAlias() throws Throwable {
 
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
-          addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
-          addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);];");
-          addLine(script, "i:=0;");
-          addLine(script, "j:=5;");
-          addLine(script, "list. := indices(10);");
-          addLine(script, "import('a:a');");
-          addLine(script, "import('b:b');");
-          addLine(script, "import('a:b', 'd');");
-          addLine(script, "d := d#list.b#i;");
-          addLine(script, "e := b#list.d#i;");
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
+        addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
+        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);];");
+        addLine(script, "i:=0;");
+        addLine(script, "j:=5;");
+        addLine(script, "list. := indices(10);");
+        addLine(script, "import('a:a');");
+        addLine(script, "import('b:b');");
+        addLine(script, "import('a:b', 'd');");
+        addLine(script, "d := d#list.b#i;");
+        addLine(script, "e := b#list.d#i;");
 
 
-          QDLParser interpreter = new QDLParser(null, state);
-          interpreter.execute(script.toString());
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
 
-          Long d = getLongValue("d", state);
-          Long e = getLongValue("e", state);
-          assert d.equals(1L);
-          assert e.equals(-19l);
-      }
+        Long d = getLongValue("d", state);
+        Long e = getLongValue("e", state);
+        assert d.equals(1L);
+        assert e.equals(-19l);
+    }
+
     /*
     Conenience getters for testing
      */
@@ -783,17 +786,59 @@ public class ParserTest extends TestBase {
 
     }
 
+    /**
+     * Shows that variables can be set to null and that they exist in the symbol table.
+     * @throws Throwable
+     */
+    @Test
+    public void testNullAssignments() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := null;");
+        addLine(script, "a. := null;");
+        addLine(script, "a0 := a == null;");
+        addLine(script, "a1 := a. == null;");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("a") == null;
+        assert state.getValue("a.") == null;
+        assert (Boolean) state.getValue("a0");
+        assert (Boolean) state.getValue("a1");
+
+    }
+
     @Test
     public void testExecute() throws Throwable {
-
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "    execute('var := \\'abc\\' + \\'def\\';');");
         addLine(script, "    say(var);");
-        System.out.println("\n\n"+script.toString());
+        System.out.println("\n\n" + script.toString());
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("var").equals("abcdef");
 
+    }
+
+    /**
+     * Tests that setting a variable to null outside of a block then setting the value inside
+     * the block (which has its own state) results in the variable being set and accessible.
+     * @throws Throwable
+     */
+    @Test
+    public void testVariableScope() throws Throwable{
+        State state = testUtils.getNewState();
+             StringBuffer script = new StringBuffer();
+             addLine(script, "a := null;");
+             addLine(script, "if[2 < 3]then[a :=2;];");
+
+             QDLParser interpreter = new QDLParser(null, state);
+             interpreter.execute(script.toString());
+
+             assert state.getValue("a") != null;
+             assert ((Long) state.getValue("a")).equals(2L);
     }
 }

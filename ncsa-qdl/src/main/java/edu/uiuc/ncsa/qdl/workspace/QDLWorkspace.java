@@ -80,9 +80,13 @@ public class QDLWorkspace {
                 }
             }
             try {
+                // Turn off echo mode if running a buffer or very strange things can result
                 if (executeLocalBuffer) {
                     if (workspaceCommands.getLocalBuffer() != null) {
+                        boolean echoMode = workspaceCommands.isEchoModeOn();
+                        workspaceCommands.setEchoModeOn(false);
                         workspaceCommands.getInterpreter().execute(workspaceCommands.getLocalBuffer().toString());
+                        workspaceCommands.setEchoModeOn(echoMode);
                         continue;
                     }
                 }
@@ -90,12 +94,19 @@ public class QDLWorkspace {
                     if (workspaceCommands.getExternalBuffer() != null) {
                         try {
                             String xb = FileUtil.readFileAsString(workspaceCommands.getExternalBuffer().getAbsolutePath());
+                            boolean echoMode = workspaceCommands.isEchoModeOn();
+                            workspaceCommands.setEchoModeOn(false);
                             workspaceCommands.getInterpreter().execute(xb);
+                            workspaceCommands.setEchoModeOn(echoMode);
+
                         } catch (IOException t) {
                             workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
                         }
                     }
                     continue;
+                }
+                if(workspaceCommands.isEchoModeOn() && !input.endsWith(";")){
+                    input = input + ";"; // add it since they forgot
                 }
                 workspaceCommands.getInterpreter().execute(input);
             } catch (Throwable t) {
