@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.TreeSet;
 
 /**
  * Class the will evaluate and expression
@@ -65,6 +66,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     int numericDigits = 50; // default precision for decimals.
 
+    /**
+     * No listing for these yet since they are not the standard func() pattern, e.g. a < b.
+     * @return
+     */
+    public TreeSet<String> listFunctions() {
+          TreeSet<String> names = new TreeSet<>();
+          return names;
+      }
     /**
      * Given an operator, this will return the integer value associated with it for lookups later.
      * {@link ExpressionNode}s store the value, not the operator.

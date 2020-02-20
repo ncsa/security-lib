@@ -5,8 +5,10 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.scripting.LibraryEntry;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.ScriptProvider;
+import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 import java.util.HashMap;
@@ -63,12 +65,20 @@ public class State extends FunctionState {
      * @return
      */
     public QDLScript getScriptFromProvider(String fqName) {
+        LibraryEntry entry = getFileFromProvider(fqName);
+        if(entry.getType().equals(Scripts.SCRIPT)){
+            return (QDLScript)entry;
+        }
+        return null;
+    }
+
+    public LibraryEntry getFileFromProvider(String fqName) {
         if (scriptProviders.isEmpty()) return null;
         String scheme = fqName.substring(0, fqName.indexOf(":") + 1);
         if (scheme == null || scheme.isEmpty()) {
             return null;
         }
-        return scriptProviders.get(scheme).get(fqName);
+        return  scriptProviders.get(scheme).get(fqName);
 
     }
 

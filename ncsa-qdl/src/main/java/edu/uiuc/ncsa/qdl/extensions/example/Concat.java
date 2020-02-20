@@ -16,8 +16,8 @@ public class Concat implements QDLFunction {
     }
 
     @Override
-    public int getArgCount() {
-        return 2;
+    public int[] getArgCount() {
+        return new int[]{2};
     }
 
     @Override

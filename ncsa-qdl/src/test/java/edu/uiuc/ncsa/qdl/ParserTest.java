@@ -786,8 +786,27 @@ public class ParserTest extends TestBase {
 
     }
 
+    @Test
+    public void testListAppend() throws Throwable {
+        /*
+
+  list_append(my_stem., indices(5))
+
+         */
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "my_stem.help := 'this is my stem';");
+        addLine(script, "list_append(my_stem., indices(5));");
+        addLine(script, "say(my_stem., true);");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+    }
+
     /**
      * Shows that variables can be set to null and that they exist in the symbol table.
+     *
      * @throws Throwable
      */
     @Test
@@ -826,19 +845,20 @@ public class ParserTest extends TestBase {
     /**
      * Tests that setting a variable to null outside of a block then setting the value inside
      * the block (which has its own state) results in the variable being set and accessible.
+     *
      * @throws Throwable
      */
     @Test
-    public void testVariableScope() throws Throwable{
+    public void testVariableScope() throws Throwable {
         State state = testUtils.getNewState();
-             StringBuffer script = new StringBuffer();
-             addLine(script, "a := null;");
-             addLine(script, "if[2 < 3]then[a :=2;];");
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := null;");
+        addLine(script, "if[2 < 3]then[a :=2;];");
 
-             QDLParser interpreter = new QDLParser(null, state);
-             interpreter.execute(script.toString());
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
 
-             assert state.getValue("a") != null;
-             assert ((Long) state.getValue("a")).equals(2L);
+        assert state.getValue("a") != null;
+        assert ((Long) state.getValue("a")).equals(2L);
     }
 }

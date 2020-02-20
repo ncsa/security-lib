@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * If we get a stem variable, this has the components to it
  */
@@ -13,7 +15,7 @@ public class StemMultiIndex {
      * @param newNameIndex
      */
     public StemMultiIndex(StemMultiIndex w, int newNameIndex) {
-        name = w.components[newNameIndex] + "."; // make sure it has the period
+        name = w.components[newNameIndex] + STEM_INDEX_MARKER; // make sure it has the period
         components = new String[w.getRealLength() - newNameIndex - 1]; // starts at name of stem
         System.arraycopy(w.components, newNameIndex+1 , components, 0, components.length);
         realLength = components.length;
@@ -27,17 +29,15 @@ public class StemMultiIndex {
          return getRealLength() == 0 || (getRealLength() == 1 && (getComponents()[0].isEmpty()));
       }
     public StemMultiIndex(String variable) {
-        int first_index = variable.indexOf(".");
-        int last_index = variable.length();
+        int first_index = variable.indexOf(STEM_INDEX_MARKER);
 
-        name = variable.substring(0, first_index) + ".";
-        if (variable.endsWith(".")) {
+        name = variable.substring(0, first_index) + STEM_INDEX_MARKER;
+        if (variable.endsWith(STEM_INDEX_MARKER)) {
             // account for trailing "."
             isStem = true;
-            last_index = last_index - 1;
         }
 
-        this.components = variable.substring(first_index + 1).split("\\.");
+        this.components = variable.substring(first_index + 1).split("\\" + STEM_INDEX_MARKER);
         realLength = components.length;
     }
 

@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.scripting.FileEntry;
+import edu.uiuc.ncsa.qdl.scripting.LibraryEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
@@ -11,6 +13,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -29,7 +32,14 @@ public class IOEvaluator extends MathEvaluator {
 
     public static String WRITE_FILE = "write_file";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
-
+    public static String[]  FUNC_NAMES= new String[]{SAY_FUNCTION,PRINT_FUNCTION,SCAN_FUNCTION,READ_FILE,WRITE_FILE};
+    public TreeSet<String> listFunctions() {
+          TreeSet<String> names = new TreeSet<>();
+          for (String key : FUNC_NAMES) {
+              names.add(key + "()");
+          }
+          return names;
+      }
 
     @Override
     public int getType(String name) {
@@ -166,6 +176,9 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doReadFile(Polyad polyad, State state) {
+        if(state.isServerMode()){
+            throw new QDLServerModeException("Error: reading files is not supported in server mode");
+        }
         if (0 == polyad.getArgumments().size()) {
             throw new IllegalArgumentException("Error: " + READ_FILE + " requires a file name to read.");
         }
@@ -190,6 +203,14 @@ public class IOEvaluator extends MathEvaluator {
             switch (op) {
                 case 1:
                     // binary file. Read it and base64 encode it
+                    if(state.isServerMode()){
+                        LibraryEntry libraryEntry = state.getFileFromProvider(fileName);
+                        if(libraryEntry.getType().equals(FileEntry.TYPE)){
+                            FileEntry fileEntry = (FileEntry)libraryEntry;
+                            
+                        }
+                        return;
+                    }
                     polyad.setResult(FileUtil.readFileAsBinary(fileName));
                     polyad.setResultType(Constant.STRING_TYPE);
                     polyad.setEvaluated(true);

@@ -7,16 +7,28 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  12:09 PM
  */
 public class StemVariable extends HashMap<String, Object> {
+    public static final String STEM_INDEX_MARKER = ".";
+
+    public StemList<StemEntry> getStemList() {
+        if (stemList == null) {
+            stemList = new StemList();
+        }
+        return stemList;
+    }
+
+    public void setStemList(StemList<StemEntry> stemList) {
+        this.stemList = stemList;
+    }
+
+    StemList<StemEntry> stemList;
+
     // Convenience methods.
     public Long getLong(String key) {
         return (Long) get(key);
@@ -54,26 +66,61 @@ public class StemVariable extends HashMap<String, Object> {
         return defaultValue != null;
     }
 
-    @Override
-    public Object get(Object key) {
+    public Object get(String key) {
+        // TODO -- Horribly inefficient. This should be improved but that may take some serious work, so deferring
+        if (isLongIndex(key)) {
+            return get(Long.parseLong(key));
+        }
+
         if (!containsKey(key) && defaultValue != null) {
             return defaultValue;
         }
         return super.get(key);
     }
 
+    public Object remove(Long key) {
+        StemEntry stemEntry = new StemEntry(key);
+        getStemList().remove(stemEntry);
+        return null;
+    }
+
+    public Object remove(String key) {
+        if (isLongIndex(key)) {
+            return remove(Long.parseLong(key.toString()));
+        }
+        return super.remove(key);
+    }
+
+    public Object get(Long key) {
+        StemEntry index = new StemEntry(key);
+        if (!getStemList().contains(index) && defaultValue != null) {
+            return defaultValue;
+        }
+        if (getStemList().contains(index)) {
+            return getStemList().floor(index).entry;
+        }
+        return null;
+    }
+
     /**
-     * Adds a list of objects to this stem, giving them indices 0,1,...
+     * Adds a list of objects to this stem, giving them indices appropriate indices
      * This is mostly a convenience for people writing in java to create lists
      * programatically
      *
      * @param list
      */
     public void addList(List<Object> list) {
+        StemList list1 = new StemList();
+        long startIndex = -1L;
+        if (!getStemList().isEmpty()) {
+            startIndex = getStemList().last().index;
+        }
         for (int i = 0; i < list.size(); i++) {
-            put(Integer.toString(i), list.get(i));
+            StemEntry stemEntry = new StemEntry(i + startIndex + 1, list.get(i));
+            getStemList().add(stemEntry);
         }
     }
+
 
     public Object get(StemMultiIndex w) {
         StemVariable currentStem = this;
@@ -81,16 +128,16 @@ public class StemVariable extends HashMap<String, Object> {
          * Drill down, checking everything exists.
          */
         for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + ".";
+            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + "\".");
+                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
             }
             currentStem = nextStem;
         }
         // for last one. May be a variable or a stem
         if (w.isStem()) {
-            return currentStem.get(w.getLastComponent() + ".");
+            return currentStem.get(w.getLastComponent() + STEM_INDEX_MARKER);
         } else {
             return currentStem.get(w.getLastComponent());
         }
@@ -103,7 +150,7 @@ public class StemVariable extends HashMap<String, Object> {
          * the ones in between.
          */
         for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + ".";
+            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
                 nextStem = new StemVariable();
@@ -113,7 +160,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         // for last one
         if (w.isStem()) {
-            currentStem.put(w.getLastComponent() + ".", value);
+            currentStem.put(w.getLastComponent() + STEM_INDEX_MARKER, value);
         } else {
             currentStem.put(w.getLastComponent(), value);
         }
@@ -125,16 +172,16 @@ public class StemVariable extends HashMap<String, Object> {
          * Drill down, checking everything exists.
          */
         for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + ".";
+            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + "\".");
+                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
             }
             currentStem = nextStem;
         }
         // for last one. May be a variable or a stem
         if (w.isStem()) {
-            currentStem.remove(w.getLastComponent() + ".");
+            currentStem.remove(w.getLastComponent() + STEM_INDEX_MARKER);
         } else {
             currentStem.remove(w.getLastComponent());
         }
@@ -149,13 +196,14 @@ public class StemVariable extends HashMap<String, Object> {
      * @param value
      * @return
      */
-    public StemVariable fillStem(StemVariable template, Object value) {
+ /*   public StemVariable fillStem(StemVariable template, Object value) {
         clear();
         for (String key : template.keySet()) {
             put(key, value);
         }
         return this;
     }
+*/
 
     /**
      * returns the set of keys common to this stem and its argument. The list may be empty.
@@ -286,6 +334,7 @@ public class StemVariable extends HashMap<String, Object> {
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.putAll(this);
+        jsonObject.putAll(getStemList().toJSON());
         return jsonObject;
     }
 
@@ -338,9 +387,35 @@ public class StemVariable extends HashMap<String, Object> {
     public void fromJSON(JSONObject jsonObject) {
         for (Object key : jsonObject.keySet()) {
             Object v = jsonObject.get(key);
-            put(key.toString(), convert(v));
+            if (key instanceof Long) {
+                put((Long) key, convert(v));
+            } else {
+                put(key.toString(), convert(v));
+            }
         }
 
+    }
+
+    String int_regex = "[1-9][0-9]*";
+
+    boolean isLongIndex(String key) {
+        // special case of index being zero!! Otherwise, no such indx can start with zero.
+        return key.equals("0") || key.matches(int_regex);
+    }
+
+    @Override
+    public Object put(String key, Object value) {
+        if (!key.endsWith(STEM_INDEX_MARKER) && isLongIndex(key)) {
+            return put(Long.parseLong(key), value);
+        }
+        return super.put(key, value);
+    }
+
+    public Object put(Long index, Object value) {
+        StemEntry stemEntry = new StemEntry(index, value);
+        getStemList().remove(stemEntry);
+        getStemList().add(stemEntry);
+        return null;
     }
 
     public StemVariable union(StemVariable... stemVariables) {
@@ -348,5 +423,212 @@ public class StemVariable extends HashMap<String, Object> {
             this.putAll(stemVariable);
         }
         return this;
+    }
+
+    @Override
+    public String toString() {
+        String output = "{";
+        boolean isFirst = true;
+        for (String key : keySet()) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ", ";
+            }
+            output = output + key + "=" + get(key);
+        }
+
+        return output + "}";
+        //return toJSON().toString();
+      /*  String nonList = super.toString();
+        if (nonList == null || nonList.isEmpty()) {
+            nonList = "(empty)";
+        }
+        return "StemVariable{" +
+                "defaultValue=" + (defaultValue == null ? "(none)" : defaultValue) +
+                "list values=" + (getStemList().isEmpty() ? "(empty)" : getStemList().toString()) +
+                ",non-list=" + nonList +
+                '}';*/
+    }
+
+    @Override
+    public Set<String> keySet() {
+        HashSet<String> keys = new HashSet<>();
+        keys.addAll(super.keySet()); // have to copy it since we cannot modify the key set of a map.
+        if (getStemList().isEmpty()) {
+            return keys;
+        }
+        for (StemEntry s : getStemList()) {
+            keys.add(Long.toString(s.index));
+        }
+        return keys;
+    }
+
+    @Override
+    public int size() {
+        return super.size() + getStemList().size();
+    }
+
+    public boolean containsKey(String key) {
+        if (isLongIndex(key)) {
+            StemEntry s = new StemEntry(Long.parseLong(key));
+            return getStemList().contains(s);
+        }
+        return super.containsKey(key);
+    }
+
+    @Override
+    public boolean containsValue(Object value) {
+
+        if (super.containsValue(value)) return true;
+        if (getStemList().isEmpty()) return false;
+        // *sigh* have to look for it
+        for (StemEntry s : getStemList()) {
+            if (s.entry.equals(value)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && getStemList().isEmpty();
+    }
+    // List operations follow
+
+    /**
+     * Append the list elements of the stem to this list.
+     *
+     * @param stemVariable
+     */
+    public void listAppend(StemVariable stemVariable) {
+        StemList<StemEntry> list = stemVariable.getStemList();
+        if (list.isEmpty()) return;
+        long startIndex = 0L;
+
+        if (!getStemList().isEmpty()) {
+            StemEntry last = getStemList().last();
+            startIndex = last.index + 1;
+            ;
+        }
+        for (StemEntry entry : list) {
+            getStemList().add(new StemEntry(startIndex++, entry.entry));
+        }
+    }
+
+    public void listAppend(Object value) {
+        getStemList().append(value);
+    }
+
+    /**
+     * Copies the elements from this list to the target list. Note that this will over-write any elements
+     * already in the target. If you need to insert elements, use the {@link #listInsertAt(StemVariable, long)}
+     * method.
+     *
+     * @param startIndex  first index in the source
+     * @param length      how many elements to take from the source
+     * @param target      that target to get the copy
+     * @param insertIndex where in the target to start copying.
+     */
+    public void listCopy(long startIndex, long length, StemVariable target, long insertIndex) {
+        if (length == 0L) return; // do nothing.
+        if (!target.getStemList().contains(new StemEntry(insertIndex))) {
+            throw new IllegalArgumentException("Error: The insertion index for the target of this copy does not exist.");
+        }
+
+        if (length + startIndex > getStemList().size()) {
+            throw new IllegalArgumentException("Error: the source does not have enough elements to copy.");
+        }
+        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), true, new StemEntry(startIndex + length), true);
+        long newIndex = 0L;
+        StemList<StemEntry> targetList = target.getStemList();
+        for (StemEntry s : sortedSet) {
+            StemEntry stemEntry = new StemEntry(insertIndex + newIndex++, s.entry);
+            targetList.remove(stemEntry);
+            targetList.add(stemEntry);
+        }
+    }
+
+    /**
+     * insert the list all the values of the stem list into this one at the starting index.
+     *
+     * @param insertIndex
+     * @return
+     */
+    public void listInsertAt(StemVariable target, long insertIndex) {
+        listInsertAt(0, size(), target, insertIndex);
+    }
+
+    /**
+     * Insert the current
+     *
+     * @param startIndex
+     * @param length
+     * @param target
+     * @param insertIndex
+     */
+    public void listInsertAt(long startIndex, long length, StemVariable target, long insertIndex) {
+        StemList<StemEntry> tSL = target.getStemList();
+        StemList<StemEntry> outSL = new StemList<>();
+        for (long i = 0; i < insertIndex; i++) {
+            outSL.append(tSL.get(i));
+        }
+        StemList<StemEntry> sSL = getStemList();
+        for (long i = startIndex; i < startIndex + length; i++) {
+            outSL.append(sSL.get(i));
+        }
+        for (long i = insertIndex; i < tSL.size(); i++) {
+            outSL.append(tSL.get(i));
+        }
+        target.setStemList(outSL);
+    }
+
+    /**
+     * Insert the whole argument in to the current stem, re-adjusting indices.
+     *
+     * @param arg
+     * @param startIndex
+     * @param length
+     */
+    public void oldListInsertAt(StemVariable arg, long startIndex, long length) {
+        if (arg.getStemList().size() < length) {
+            throw new IllegalArgumentException("Error: the given list is not long enough. It has length " +
+                    arg.getStemList().size() + " and you requested to copy " + length + " elements.");
+        }
+        StemList<StemEntry> currentSL = getStemList();
+        StemList<StemEntry> argSL = arg.getStemList();
+        StemList<StemEntry> newSL = new StemList<>();
+        for (long i = 0; i < startIndex; i++) {
+            newSL.add(new StemEntry(i, currentSL.get(i)));
+        }
+        for (long i = 0; i < length; i++) {
+            newSL.add(new StemEntry(i + startIndex, argSL.get(i)));
+        }
+        for (long i = 0; i < currentSL.size() - startIndex; i++) {
+            newSL.add(new StemEntry(i + startIndex + length, currentSL.get(startIndex + i)));
+        }
+        setStemList(newSL);
+    }
+
+    public StemVariable listSubset(long startIndex) {
+        return listSubset(startIndex, getStemList().size() - startIndex);
+    }
+
+    public StemVariable listSubset(long startIndex, long length) {
+        StemVariable stemVariable = new StemVariable();
+
+        if (getStemList().isEmpty()) return stemVariable;
+        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), new StemEntry(startIndex + length));
+        StemList<StemEntry> newStemList = new StemList<>();
+        long i = 0;
+        for (StemEntry s : sortedSet) {
+            // Now we have to adjust the indices since the tree set function returns the indices in the set
+            newStemList.add(new StemEntry(i++, s.entry));
+        }
+        stemVariable.setStemList(newStemList);
+        return stemVariable;
+    }
+
+    public boolean isList() {
+        return stemList.size() == size();
     }
 }

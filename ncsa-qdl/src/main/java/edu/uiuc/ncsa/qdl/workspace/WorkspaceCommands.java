@@ -75,7 +75,7 @@ public class WorkspaceCommands implements Logable {
     protected int ACTION_INDEX = 1;
     protected int FIRST_ARG_INDEX = 2;
 
-    protected void splashScreen(){
+    protected void splashScreen() {
         say("*****************************************");
         say("Welcome to the QDL Workspace");
         say("Version " + QDLVersion.VERSION);
@@ -83,6 +83,7 @@ public class WorkspaceCommands implements Logable {
         say("*****************************************");
 
     }
+
     protected void showRunHelp() {
         say("This is the QDL (Quick and Dirty Language, pronounced 'quiddle') workspace.");
         sayi("You may enter commands and execute them much like any other interpreter.");
@@ -584,6 +585,8 @@ public class WorkspaceCommands implements Logable {
                 return doFuncsHelp(inputLine);
             case "list":
                 return doFuncsList(inputLine);
+            case "system":
+                return doSystemFuncsList(inputLine);
         }
         return RC_CONTINUE;
     }
@@ -627,7 +630,45 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doFuncsList(InputLine inputLine) {
+    protected int doSystemFuncsList(InputLine inputLine) {
+        int displayWidth = 120; // just to keep thing simple
+        if (inputLine.hasArg("width")) {
+            try {
+                displayWidth = Integer.parseInt(inputLine.getNextArgFor("width"));
+            } catch (Throwable t) {
+                say("sorry, but " + inputLine.getArg(0) + " is not a number. Formatting for default width of " + displayWidth);
+            }
+        }
+
+        String blanks = "                                                                          "; // padding
+        TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions();
+        // Find longest entry
+        int width = 0;
+        for (String x : funcs) {
+            width = Math.max(width, x.length());
+        }
+        width = 2 + width; // so the widest + 2 chars to make it readable.
+        // number of columns are display / width, possibly plus 1 if there is a remainder
+        int colCount = displayWidth / width + (displayWidth % width == 0 ? 0 : 1);
+        int rowCount = funcs.size() / colCount;
+        String[] output = new String[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            output[i] = ""; // initialize it
+        }
+        int pointer = 0;
+        for (String func : funcs) {
+            int currentLine = pointer++ % rowCount;
+            output[currentLine] = output[currentLine] + func + blanks.substring(0, width - func.length());
+        }
+        for (String x : output) {
+            say(x);
+        }
+
+        return RC_CONTINUE;
+
+    }
+
+    protected int doFuncsList(InputLine inputLine) {
         String funs = getState().listFunctions().toString().trim();
         funs = funs.substring(1); // chop off lead [
         funs = funs.substring(0, funs.length() - 1);
@@ -719,8 +760,8 @@ public class WorkspaceCommands implements Logable {
                 }
                 return RC_CONTINUE;
             case "memory":
-                say("memory used = " + (Runtime.getRuntime().totalMemory()/(1024*1024)) +
-                        " MB, free = " + (Runtime.getRuntime().freeMemory()/(1024*1024)) +
+                say("memory used = " + (Runtime.getRuntime().totalMemory() / (1024 * 1024)) +
+                        " MB, free = " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) +
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
 
@@ -731,14 +772,14 @@ public class WorkspaceCommands implements Logable {
 
     private int doEchoMode(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            say("echo mode currently " + (isEchoModeOn()?"on":"off"));
+            say("echo mode currently " + (isEchoModeOn() ? "on" : "off"));
             return RC_CONTINUE;
         }
         String onOrOff = inputLine.getArg(FIRST_ARG_INDEX);
-        if(onOrOff.toLowerCase().equals("on")){
+        if (onOrOff.toLowerCase().equals("on")) {
             setEchoModeOn(true);
             say("echo mode on");
-        }else{
+        } else {
             setEchoModeOn(false);
             say("echo mode off");
         }
@@ -985,7 +1026,7 @@ public class WorkspaceCommands implements Logable {
         logger = loggerProvider.get();
         // Do the splash screen here so any messages from a boot script are obvious.
         splashScreen();
-        
+
         if (inputLine.hasArg(CLA_EXTENSIONS)) {
             // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl"
             String loaderClasses = inputLine.getNextArgFor("-ext");
@@ -1069,6 +1110,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean echoModeOn = true;
+
     public String readline() {
         try {
             String x = getBufferedReader().readLine();

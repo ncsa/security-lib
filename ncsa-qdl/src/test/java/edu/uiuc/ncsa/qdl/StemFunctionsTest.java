@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.util.StemEntry;
+import edu.uiuc.ncsa.qdl.util.StemList;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import net.sf.json.JSONArray;
@@ -540,8 +542,9 @@ public class StemFunctionsTest extends TestBase {
         assert !sourceStem.containsKey("foo");
 
     }
+
     @Test
-    public void testJSON() throws Exception{
+    public void testJSON() throws Exception {
         // This is not a test. It is me debugging whether I want to try and figure out how to convert stems to
         // JSON objects. Could be handy, but it's quite a rats nest.
         JSONObject jsonObject = new JSONObject();
@@ -549,7 +552,7 @@ public class StemFunctionsTest extends TestBase {
         JSONObject jsonObject2 = new JSONObject();
         JSONArray array = new JSONArray();
         int count = 10;
-        for(int i = 0; i< count; i++){
+        for (int i = 0; i < count; i++) {
             array.add(getRandomString(4));
         }
         jsonObject2.put("test_stem", array);
@@ -565,18 +568,174 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-    public void testAddList() throws Throwable{
+    public void testAddList() throws Throwable {
         StemVariable s = new StemVariable();
         ArrayList<Object> list = new ArrayList<>();
         int max = 6;
-        for(int i = 0; i < max; i++){
-               list.add(i+10L); // so we have different values from keys
+        for (int i = 0; i < max; i++) {
+            list.add(i + 10L); // so we have different values from keys
         }
         s.addList(list);
-        for(int i = 0; i < max; i++){
+        for (int i = 0; i < max; i++) {
             Long v = i + 10L;
-               assert s.get(Integer.toString(i)).equals(v) : "expected " + v + " and got " + s.get(Integer.toString(i));
+            assert s.get(Integer.toString(i)).equals(v) : "expected " + v + " and got " + s.get(Integer.toString(i));
         }
 
+    }
+
+    @Test
+    public void testListAppend() throws Throwable {
+        StemList<StemEntry> stemList1 = new StemList();
+        StemList<StemEntry> stemList2 = new StemList();
+        long count1 = 10L;
+        long count2 = 5L;
+        for (long i = 0L; i < count1; i++) {
+            stemList1.add(new StemEntry(i, i / 10.0));
+        }
+        for (long i = 0L; i < count2; i++) {
+            stemList2.add(new StemEntry(i, i * i));
+        }
+        StemVariable stem1 = new StemVariable();
+        StemVariable stem2 = new StemVariable();
+        stem1.setStemList(stemList1);
+        stem2.setStemList(stemList2);
+        stem1.listAppend(stem2);
+        StemList<StemEntry> result = stem1.getStemList();
+        // should return sorted set
+        Object expectedValues[] = new Object[]{0.0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 0L, 1L, 4L, 9L, 16L};
+        assert stem1.size() == count1 + count2;
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
+
+    @Test
+    public void testListCopy() throws Throwable {
+        StemList<StemEntry> stemList1 = new StemList();
+        StemList<StemEntry> stemList2 = new StemList();
+        long count1 = 10L;
+        long count2 = 5L;
+        for (long i = 0L; i < count1; i++) {
+            stemList1.add(new StemEntry(i, i / 10.0));
+        }
+        for (long i = 0L; i < count2; i++) {
+            stemList2.add(new StemEntry(i, i * i));
+        }
+        StemVariable stem1 = new StemVariable();
+        StemVariable stem2 = new StemVariable();
+        stem1.setStemList(stemList1);
+        stem2.setStemList(stemList2);
+        stem1.listCopy(3, 5, stem2, 2);
+        StemList<StemEntry> result = stem2.getStemList();
+        // should return sorted set
+        Object expectedValues[] = new Object[]{0L, 1L, .3, .4, .5, .6, .7};
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
+
+    @Test
+    public void oldTestListInsert() throws Throwable {
+        StemList<StemEntry> stemList1 = new StemList();
+        StemList<StemEntry> stemList2 = new StemList();
+        long count1 = 10L;
+        long count2 = 5L;
+        for (long i = 0L; i < count1; i++) {
+            stemList1.add(new StemEntry(i, i / 10.0));
+        }
+        for (long i = 0L; i < count2; i++) {
+            stemList2.add(new StemEntry(i, i * i));
+        }
+        StemVariable stem1 = new StemVariable();
+        StemVariable stem2 = new StemVariable();
+        stem1.setStemList(stemList1);
+        stem2.setStemList(stemList2);
+        stem1.oldListInsertAt(stem2, 4, 5);
+        StemList<StemEntry> result = stem1.getStemList();
+        System.out.println(result);
+        // should return sorted set
+        Object expectedValues[] = new Object[]{.0, .1, .2, .3, 0L, 1L, 4L, 9L, 16L, .4, .5, .6, .7, .8, .9};
+        assert result.size() == count1 + count2;
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
+
+    @Test
+    public void testListInsert() throws Throwable {
+        StemList<StemEntry> sourceSL = new StemList();
+        StemList<StemEntry> targetSL = new StemList();
+        long count1 = 10L;
+        long count2 = 5L;
+        for (long i = 0L; i < count1; i++) {
+            sourceSL.append(i / 10.0);
+        }
+        for (long i = 0L; i < count2; i++) {
+            targetSL.append(i * i);
+        }
+        StemVariable sourceStem = new StemVariable();
+        StemVariable targetStem = new StemVariable();
+        sourceStem.setStemList(sourceSL);
+        targetStem.setStemList(targetSL);
+        sourceStem.listInsertAt(2, 5, targetStem, 3);
+        StemList<StemEntry> result = targetStem.getStemList();
+        System.out.println(result);
+        // should return sorted set
+        Object expectedValues[] = new Object[]{0L, 1L, 4L, .2, .3, .4, .5, .6, 9L, 16L};
+        assert result.size() == count2 + 5; // original plus number inserted
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
+
+
+    @Test
+    public void testListSubset() throws Throwable {
+        StemList<StemEntry> sourceSL = new StemList();
+        long count1 = 10L;
+        for (long i = 0L; i < count1; i++) {
+            sourceSL.append(i + 20);
+        }
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.setStemList(sourceSL);
+        StemVariable targetStem = sourceStem.listSubset(2, 3);
+        StemList<StemEntry> result = targetStem.getStemList();
+        System.out.println(result);
+        // should return sorted set
+        Object expectedValues[] = new Object[]{22L, 23L, 24L};
+        assert result.size() == 3; // original plus number inserted
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
+
+    @Test
+       public void testListSubset2() throws Throwable {
+           StemList<StemEntry> sourceSL = new StemList();
+           long count1 = 10L;
+           for (long i = 0L; i < count1; i++) {
+               sourceSL.append(i + 20);
+           }
+           StemVariable sourceStem = new StemVariable();
+           sourceStem.setStemList(sourceSL);
+           // Test copying the tail of the list from the given index.
+           StemVariable targetStem = sourceStem.listSubset( 7);
+           StemList<StemEntry> result = targetStem.getStemList();
+           System.out.println(result);
+           // should return sorted set
+           Object expectedValues[] = new Object[]{27L, 28L, 29L};
+           assert result.size() == 3; // original plus number inserted
+           for (int i = 0; i < expectedValues.length; i++) {
+               assert result.get(i).equals(expectedValues[i]);
+           }
+       }
+
+
+    @Test
+    public void testobjectAppend() throws Throwable {
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.listAppend("foo");
+        assert stemVariable.size() == 1;
+        assert stemVariable.get(0L).equals("foo");
     }
 }

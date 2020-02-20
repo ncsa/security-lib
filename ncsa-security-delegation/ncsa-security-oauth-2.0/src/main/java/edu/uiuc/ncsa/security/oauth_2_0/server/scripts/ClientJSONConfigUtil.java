@@ -30,7 +30,7 @@ public class ClientJSONConfigUtil {
      *     }
      * </pre>
      * This method returns the JSON array <code>[X]</code>. Another example:
-     * <pre>
+     * <pre>                        OA2Coms
      *  Z=   {"key0":{
      *         "key1':[X,y,z]
      *        }

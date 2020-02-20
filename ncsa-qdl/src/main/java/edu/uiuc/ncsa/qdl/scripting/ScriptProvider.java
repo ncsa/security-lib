@@ -30,19 +30,19 @@ public interface ScriptProvider extends Serializable {
      * @param name
      * @return
      */
-    QDLScript get(String name);
+    LibraryEntry get(String name);
 
     /**
      * Add the script using the given FQ name.
      * @param name
      * @param script
      */
-    void put(String name, QDLScript script);
+    void put(String name, LibraryEntry script);
 
     /**
      * Checks if the FQ name can be resolved to a script by this provider.
      * @param name
      * @return
      */
-    boolean hasScript(String name);
+    boolean isScript(String name);
 }

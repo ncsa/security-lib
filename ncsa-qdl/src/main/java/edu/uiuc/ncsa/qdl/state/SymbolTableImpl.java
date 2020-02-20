@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/10/20 at  4:15 PM
@@ -236,7 +238,7 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
 
     @Override
     public void setStemVariable(String key, StemVariable stem) {
-        if (key.endsWith(".")) {
+        if (key.endsWith(STEM_INDEX_MARKER)) {
             // easy case -- just replace the entire stem.
             map.put(key, stem);
             return;

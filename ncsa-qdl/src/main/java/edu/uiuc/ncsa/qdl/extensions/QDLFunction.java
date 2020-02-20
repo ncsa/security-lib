@@ -22,11 +22,13 @@ public interface QDLFunction extends Serializable {
      * The contract is that when QDL invokes this method, it will faithfully give all of the arguments
      * as an array of Objects. Overloading is not possible in QDL (it is weakly typed)  except by argument count, so if this is
      * called "foo" and you have versions with 3 and 4 arguments, then f(a,b,c) would be executed with the
-     * arguments passed.
+     * arguments passed. To achieve overloading for Java methods, have the number of arguments this accepts
+     * as the elements of the array. So if this has a value of {1,2,3} then this function will be invoked
+     * if called with 1, 2 or 3 arguments and an error will be raised, if, say, 4 are passed.
      *
      * @return
      */
-    public int getArgCount();
+    public int[] getArgCount();
 
     /**
      * The method that is invoked by QDL. It will have the arguments evaluated and put in to the

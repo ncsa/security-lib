@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import java.io.Serializable;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -12,6 +13,6 @@ public interface EvaluatorInterface extends Serializable {
 
     int getType(String name);
 
-
+     TreeSet<String> listFunctions();
 
 }

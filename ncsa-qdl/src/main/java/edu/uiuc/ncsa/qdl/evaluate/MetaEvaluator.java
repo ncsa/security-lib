@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * This is charged with managing the build-in functions as well as any that the
@@ -125,4 +126,13 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
 
     }
+
+    public TreeSet<String> listFunctions() {
+          TreeSet<String> names = new TreeSet<>();
+          for(AbstractFunctionEvaluator evaluator: evaluators){
+              names.addAll(evaluator.listFunctions());
+          }
+          return names;
+      }
+
 }

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -111,7 +112,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 continue;
             }
                 // Check if current index is a stem and feed what's to the right to it as a multi-index
-                if (isDefined(newIndex + ".")) {
+                if (isDefined(newIndex + STEM_INDEX_MARKER)) {
                     StemMultiIndex ww = new StemMultiIndex(w, i);
                     Object v = gsrNSStemOp(ww, OP_GET, null);
                     if (v == null) {
@@ -302,6 +303,6 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     protected boolean isStem(String var) {
-        return var.contains(".");
+        return var.contains(STEM_INDEX_MARKER); // if ther eis an embedded period, needs to be resolved
     }
 }

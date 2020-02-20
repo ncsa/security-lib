@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * /**
  * This has a list of {@link SymbolTableImpl}s that are searched in a particular order. This
@@ -109,14 +111,14 @@ public class SymbolStack extends AbstractSymbolTable {
                 // this is not defined any place, so it gets a null.
                 return null;
             }
-            if (variableName.endsWith(".")) {
+            if (variableName.endsWith(STEM_INDEX_MARKER)) {
                 return findValueInATable(variableName);
             }
 
             String tail = getStemTail(variableName);
             // the real issue is that a stem like a.b.c.d.e may have each of the variables in
             // a different and effectively random symbol table. 
-            StringTokenizer tokenizer = new StringTokenizer(tail, ".");
+            StringTokenizer tokenizer = new StringTokenizer(tail, STEM_INDEX_MARKER);
             String[] vars = new String[tokenizer.countTokens()];
             for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
                 vars[i] = tokenizer.nextToken();
@@ -132,7 +134,7 @@ public class SymbolStack extends AbstractSymbolTable {
                     isFirstPass = false;
                     currentVariable = vars[i];
                 } else {
-                    currentVariable = vars[i] + "." + returnedValue.toString();
+                    currentVariable = vars[i] + STEM_INDEX_MARKER + returnedValue.toString();
                 }
                 Object obj = findValueInATable(currentVariable);
                 if (obj != null) {

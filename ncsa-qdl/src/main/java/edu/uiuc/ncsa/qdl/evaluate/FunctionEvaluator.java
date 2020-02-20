@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -23,10 +24,9 @@ import java.util.List;
  */
 public class FunctionEvaluator extends AbstractFunctionEvaluator {
     public static long serialVersionUID = 654768894456L;
-    List<FunctionTable> functionTables = new ArrayList<>();
     public static final int BASE_FUNCTION_VALUE = 6000;
     public static final String IS_FUNCTION = "is_function";
-    public static final int IS_FUNCTION_TYPE = 1 + 6000;
+    public static final int IS_FUNCTION_TYPE = 1 + BASE_FUNCTION_VALUE;
 
     @Override
     public int getType(String name) {
@@ -35,7 +35,14 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         // so call to this should ever get anything other than unknown value.
         return UNKNOWN_VALUE;
     }
-
+    public static String FUNC_NAMES[] =new String[]{IS_FUNCTION};
+    public TreeSet<String> listFunctions() {
+          TreeSet<String> names = new TreeSet<>();
+          for (String key : FUNC_NAMES) {
+              names.add(key + "()");
+          }
+          return names;
+      }
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getOperatorType()) {

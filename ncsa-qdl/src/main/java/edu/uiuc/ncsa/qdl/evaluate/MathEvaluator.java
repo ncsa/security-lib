@@ -12,6 +12,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -52,7 +53,15 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     public static String DATE_ISO = "date_iso";
     public static final int DATE_ISO_TYPE = 11 + MATH_FUNCTION_BASE_VALUE;
-
+    public static String FUNC_NAMES[] = new String[]{ABS_VALUE,RANDOM,RANDOM_STRING,HASH,TO_HEX,
+            FROM_HEX,DATE_MS,DATE_ISO,DECODE_B64,ENCODE_B64,MOD,DATE_ISO};
+    public TreeSet<String> listFunctions() {
+          TreeSet<String> names = new TreeSet<>();
+          for (String key : FUNC_NAMES) {
+              names.add(key + "()");
+          }
+          return names;
+      }
 
     @Override
     public int getType(String name) {

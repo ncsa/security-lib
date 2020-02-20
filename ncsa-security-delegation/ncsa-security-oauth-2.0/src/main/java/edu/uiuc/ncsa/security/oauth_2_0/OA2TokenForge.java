@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.delegation.server.MissingTokenException;
 import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ public class OA2TokenForge implements TokenForge {
 
     public OA2TokenForge(String server) {
         this.server = server;
-       // setup();
+        // setup();
     }
 
     /**
@@ -54,6 +55,11 @@ public class OA2TokenForge implements TokenForge {
         return verifierToken;
     }
 
+    protected String idToken(String... x) {
+        if (1 == x.length) idToken = x[0];
+        return idToken;
+    }
+
     public String getServer() {
         return server;
     }
@@ -63,6 +69,7 @@ public class OA2TokenForge implements TokenForge {
     public String accessToken = "accessToken";
     public String refreshToken = "refreshToken";
     public String verifierToken = "verifierToken";
+    public String idToken = "idToken";
 
     @Override
     public AccessToken getAccessToken(Map<String, String> parameters) {
@@ -80,6 +87,41 @@ public class OA2TokenForge implements TokenForge {
         return getAccessToken(authCode);
     }
 
+    public static final int TYPE_AUTH_GRANT = 1;
+    public static final int TYPE_ACCESS_TOKEN = 10;
+    public static final int TYPE_REFRESH_TOKEN = 100;
+    public static final int TYPE_UNKNOWN = 0;
+
+
+    /**
+     * Given a token string, return the type of token this is or a unknown
+     *
+     * @param x
+     * @return
+     */
+    public int getType(String x) {
+        String s = getServer();
+        if (!s.endsWith("/")) {
+            s = s + "/"; // just making sure
+        }
+        if (!x.startsWith(s)) {
+            return TYPE_UNKNOWN;
+        }
+        // be sure it is conformable to the spec
+        try {
+            URI uri = URI.create(x);
+        } catch (Throwable t) {
+            return TYPE_UNKNOWN;
+
+        }
+        x = x.substring(s.length()); //whack off server, next component tells us what it is.
+        if (x.startsWith(accessToken() + "/")) return TYPE_ACCESS_TOKEN;
+        if (x.startsWith(authzGrant() + "/")) return TYPE_AUTH_GRANT;
+        if (x.startsWith(refreshToken() + "/")) return TYPE_REFRESH_TOKEN;
+        return TYPE_UNKNOWN; // booby prize.
+
+    }
+
     @Override
     public AuthorizationGrant getAuthorizationGrant(Map<String, String> parameters) {
         String token = parameters.get(OA2Constants.AUTHORIZATION_CODE);
@@ -88,6 +130,7 @@ public class OA2TokenForge implements TokenForge {
         }
         return getAuthorizationGrant(token);
     }
+
 
     @Override
     public AuthorizationGrant getAuthorizationGrant(HttpServletRequest request) {
@@ -109,6 +152,17 @@ public class OA2TokenForge implements TokenForge {
         }
     }
 
+
+    public TokenImpl getIDToken(String... tokens) {
+        switch (tokens.length) {
+            case 0:
+                return new TokenImpl(getIDTokenProvider().get().getUri(), null);
+
+            default:
+                return new TokenImpl(tokens[0] == null ? null : URI.create(tokens[0]), null);
+        }
+    }
+
     @Override
     public AccessToken getAccessToken(HttpServletRequest request) {
         try {
@@ -119,9 +173,9 @@ public class OA2TokenForge implements TokenForge {
     }
 
     public IdentifierProvider<Identifier> getAgIdProvider() {
-        if(agIdProvider == null){
+        if (agIdProvider == null) {
             agIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), authzGrant(), true) {
-        };
+            };
         }
         return agIdProvider;
     }
@@ -131,9 +185,9 @@ public class OA2TokenForge implements TokenForge {
     }
 
     public IdentifierProvider<Identifier> getAtIdProvider() {
-        if(atIdProvider == null){
+        if (atIdProvider == null) {
             atIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), accessToken(), true) {
-                   };
+            };
         }
         return atIdProvider;
     }
@@ -143,9 +197,9 @@ public class OA2TokenForge implements TokenForge {
     }
 
     public IdentifierProvider<Identifier> getRefreshTokenProvider() {
-        if(refreshTokenProvider == null){
+        if (refreshTokenProvider == null) {
             refreshTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), refreshToken(), true) {
-        };
+            };
         }
         return refreshTokenProvider;
     }
@@ -154,10 +208,22 @@ public class OA2TokenForge implements TokenForge {
         this.refreshTokenProvider = refreshTokenProvider;
     }
 
+    public IdentifierProvider<Identifier> getIDTokenProvider() {
+        if (idTokenprovider == null) {
+            idTokenprovider = new IdentifierProvider<edu.uiuc.ncsa.security.core.Identifier>(URI.create(getServer()),
+                    idToken(), true) {
+
+            };
+        }
+        return idTokenprovider;
+    }
+
+    IdentifierProvider<Identifier> idTokenprovider = null;
+
     public IdentifierProvider<Identifier> getVerifierTokenProvider() {
-        if(verifierTokenProvider == null){
+        if (verifierTokenProvider == null) {
             verifierTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), verifierToken(), true) {
-        };
+            };
         }
         return verifierTokenProvider;
     }
@@ -175,13 +241,14 @@ public class OA2TokenForge implements TokenForge {
     IdentifierProvider<Identifier> refreshTokenProvider;
     IdentifierProvider<Identifier> verifierTokenProvider;
 
-    protected URI getURI(String token){
-        try{
-          return URI.create(token);
-        }catch(Throwable t){
+    protected URI getURI(String token) {
+        try {
+            return URI.create(token);
+        } catch (Throwable t) {
             throw new InvalidTokenException("Invalid token \"" + token + "\"", t);
         }
     }
+
     public RefreshToken getRefreshToken(String... tokens) {
         switch (tokens.length) {
             case 0:

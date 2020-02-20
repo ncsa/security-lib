@@ -16,6 +16,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
+import java.util.TreeSet;
 
 /**
  * For ocntrol structure in loops, conditionals etc.
@@ -67,7 +68,16 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public static String LOAD_COMMAND = "load_script";
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
+    public static String FUNC_NAMES[] = new String[]{CONTINUE, BREAK, FOR_KEYS, FOR_NEXT, CHECK_AFTER, RETURN, IMPORT, LOAD_MODULE,
+            RAISE_ERROR, RUN_COMMAND, LOAD_COMMAND};
 
+    public TreeSet<String> listFunctions() {
+        TreeSet<String> names = new TreeSet<>();
+        for (String key : FUNC_NAMES) {
+            names.add(key + "()");
+        }
+        return names;
+    }
 
     @Override
     public int getType(String name) {
@@ -145,6 +155,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("Error: reading files is not supported in server mode");
+        }
+
         if (polyad.getArgumments().size() == 0) {
             throw new IllegalArgumentException("Error: The" + commandName + " requires at least a single argument");
         }
@@ -165,14 +179,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             if (script != null) {
                 script.execute(state);
             } else {
-                if(state.isServerMode()){
+                if (state.isServerMode()) {
                     throw new QDLServerModeException("File operations are not permitted in server mode");
                 }
 
                 interpreter.execute(FileUtil.readFileAsString(resourceName));
             }
         } catch (Throwable t) {
-            if(t instanceof RuntimeException){
+            if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }
             throw new QDLRuntimeException("Error running script \"" + arg1 + "\"", t);
@@ -232,6 +246,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doLoadModule(Polyad polyad, State state) {
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("Error: reading files is not supported in server mode");
+        }
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires a single argument. The full path to the module's file.");
         }
@@ -264,7 +281,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
             // Exceptional case where we just run it directly.
             if (script == null) {
-                if(state.isServerMode()){
+                if (state.isServerMode()) {
                     throw new QDLServerModeException("File operations are not permitted in server mode");
                 }
                 FileReader fileReader = new FileReader(file);

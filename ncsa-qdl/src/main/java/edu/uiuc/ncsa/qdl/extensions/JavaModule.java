@@ -41,14 +41,17 @@ public class JavaModule extends Module {
             state.setValue(v.getName(), v.getValue());
         }
         for(QDLFunction f : funcs){
-            QDLFunctionRecord fr = new QDLFunctionRecord();
-            fr.qdlFunction = f;
-            fr.argCount = f.getArgCount();
-            fr.name = f.getName();
-            if(f.getDocumentation()!=null && !f.getDocumentation().isEmpty()) {
-                fr.documentation = f.getDocumentation();
+            for(int i : f.getArgCount()){
+                QDLFunctionRecord fr = new QDLFunctionRecord();
+                fr.qdlFunction = f;
+                fr.argCount = i;
+                fr.name = f.getName();
+                if(f.getDocumentation()!=null && !f.getDocumentation().isEmpty()) {
+                    fr.documentation = f.getDocumentation();
+                }
+                state.getFunctionTable().put(fr);
+
             }
-            state.getFunctionTable().put(fr);
         }
 
     }

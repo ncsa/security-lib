@@ -9,6 +9,7 @@ public interface OA2Constants {
     public static String ACCESS_TOKEN = "access_token";
     public static String ACCESS_TYPE = "access_type";
     public static String AUTHORIZATION_CODE = "code";
+    public static String REFRESH_LIFETIME = "rt_lifetime";
     public static String CERT_LIFETIME = "certlifetime";
     public static String CERT_REQ = "certreq";
     public static String CLIENT_ID = "client_id";
@@ -24,6 +25,7 @@ public interface OA2Constants {
     public static String MAX_AGE = "max_age";
     public static String ID_TOKEN_HINT = "id_token_hint";
     public static String ID_TOKEN = "id_token";
+    public static String ID_TOKEN_IDENTIFIER = "token_id";
     public static String RAW_ID_TOKEN = "raw_id_token";
     public static String REQUEST = "request";
     public static String REQUEST_URI = "request_uri";

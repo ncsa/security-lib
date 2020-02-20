@@ -25,22 +25,26 @@ public class QDLScriptLibrary implements ScriptProvider {
 
 
     @Override
-    public QDLScript get(String name) {
+    public LibraryEntry get(String name) {
         return map.get(name);
     }
 
     @Override
-    public void put(String name, QDLScript script) {
-        if(!checkScheme(name)){
+    public void put(String name, LibraryEntry script) {
+        if (!checkScheme(name)) {
             throw new QDLException("Error: The script must have an FQ (fully qualified with the scheme) name to be added.");
         }
-          map.put(name, script);
+        map.put(name, script);
     }
 
     @Override
-    public boolean hasScript(String name) {
-        return map.containsKey(name);
+    public boolean isScript(String name) {
+        if (map.containsKey(name) && map.get(name).getType().equals(Scripts.SCRIPT)) {
+            return true;
+        }
+        return false;
     }
-    HashMap<String, QDLScript> map = new HashMap<>();
+
+    HashMap<String, LibraryEntry> map = new HashMap<>();
     String scheme;
 }

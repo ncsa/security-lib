@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * The interface for access to symboles (a.a variables) in QDL. Note that this is not assumed
  * to be namespace aware at all. It is not the task of this component to understand or resolve
@@ -22,11 +24,11 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     }
 
     protected String getStemHead(String stem) {
-        return getHead(stem, ".");
+        return getHead(stem, STEM_INDEX_MARKER);
     }
 
     protected String getStemTail(String stem) {
-        return getTail(stem, ".");
+        return getTail(stem, STEM_INDEX_MARKER);
     }
 
     
@@ -40,7 +42,7 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     }
 
     protected boolean isStem(String variable) {
-        return variable.contains(".");
+        return variable.contains(STEM_INDEX_MARKER);
     }
 
     /**
@@ -49,7 +51,7 @@ public abstract class AbstractSymbolTable implements SymbolTable {
      * @return
      */
     protected boolean isCompoundStem(String var) {
-        return isStem(var) && (var.indexOf(".") != var.lastIndexOf("."));
+        return isStem(var) && (var.indexOf(STEM_INDEX_MARKER) != var.lastIndexOf(STEM_INDEX_MARKER));
     }
 
     /**
@@ -58,6 +60,6 @@ public abstract class AbstractSymbolTable implements SymbolTable {
      * @return
      */
     protected boolean isTotalStem(String var){
-        return isStem(var) && var.endsWith(".") && !isCompoundStem(var);
+        return isStem(var) && var.endsWith(STEM_INDEX_MARKER) && !isCompoundStem(var);
     }
 }
