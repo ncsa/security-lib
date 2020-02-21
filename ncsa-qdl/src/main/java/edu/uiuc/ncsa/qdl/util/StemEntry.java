@@ -39,4 +39,5 @@ public class StemEntry implements Comparable, Serializable {
     public boolean equals(Object obj) {
         return compareTo(obj) == 0;
     }
+
 }

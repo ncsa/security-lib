@@ -351,10 +351,12 @@ public class StemVariable extends HashMap<String, Object> {
 
     protected StemVariable convert(JSONArray array) {
         StemVariable out = new StemVariable();
-        for (int i = 0; i < array.size(); i++) {
-            out.put(Integer.toString(i), convert(array.get(i)));
+        StemList<StemEntry> stemList = new StemList<>();
 
+        for (int i = 0; i < array.size(); i++) {
+            stemList.append(new StemEntry(i, convert(array.get(i))));
         }
+        out.setStemList(stemList);
         return out;
     }
 
@@ -399,7 +401,8 @@ public class StemVariable extends HashMap<String, Object> {
     String int_regex = "[1-9][0-9]*";
 
     boolean isLongIndex(String key) {
-        // special case of index being zero!! Otherwise, no such indx can start with zero.
+        // special case of index being zero!! Otherwise, no such index can start with zero,
+        // so a key of "01" is a string, not the number 1. Sorry, best we can do. 
         return key.equals("0") || key.matches(int_regex);
     }
 
@@ -425,6 +428,68 @@ public class StemVariable extends HashMap<String, Object> {
         return this;
     }
 
+    public String toString(int indentFactor, String currentIndent) {
+        String blanks = "                                                           ";
+        blanks = blanks + blanks + blanks + blanks; // lots of blanks
+        String output = currentIndent + "{\n";
+        boolean isFirst = true;
+        String newIndent = currentIndent + blanks.substring(0, indentFactor);
+        for (String key : super.keySet()) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ",\n";
+            }
+            Object o = get(key);
+            if (o instanceof StemVariable) {
+                output = output + newIndent + key + "=\n" + ((StemVariable) o).toString(indentFactor, newIndent);
+            } else {
+
+                output = output + newIndent + key + "=" + convert(o);
+
+            }
+
+        }
+        // now for any list
+        for (StemEntry entry : getStemList()) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ",\n";
+            }
+            output = output + newIndent + entry.index + "=" + convert(entry.entry);
+        }
+        return output + "\n" + currentIndent + "}";
+
+    }
+
+    public static void main(String[] arg) {
+        StemVariable s = new StemVariable();
+        StemVariable s2 = new StemVariable();
+        StemVariable s3 = new StemVariable();
+        s.put("a", "b");
+        s.put("s", "n");
+        s.put("d", "m");
+        s.put("0", "foo");
+        s.put("1", "bar");
+        s2.put(0L, "qwe");
+        s2.put(1L, "eee");
+        s2.put(2L, "rrr");
+        s2.put("rty", "456");
+        s2.put("tyu", "ftfgh");
+        s2.put("ghjjh", "456456");
+        s3.put("a3rty", "456222");
+        s3.put("a3tyu", "ftf222gh");
+        s3.put("a3ghjjh", "422256456");
+        s2.put("woof.", s3);
+        s.put("foo.", s2);
+        System.out.println(s.toString(1));
+    }
+
+    public String toString(int indentFactor) {
+        return toString(indentFactor, "");
+    }
+
     @Override
     public String toString() {
         String output = "{";
@@ -439,16 +504,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
 
         return output + "}";
-        //return toJSON().toString();
-      /*  String nonList = super.toString();
-        if (nonList == null || nonList.isEmpty()) {
-            nonList = "(empty)";
-        }
-        return "StemVariable{" +
-                "defaultValue=" + (defaultValue == null ? "(none)" : defaultValue) +
-                "list values=" + (getStemList().isEmpty() ? "(empty)" : getStemList().toString()) +
-                ",non-list=" + nonList +
-                '}';*/
+
     }
 
     @Override

@@ -778,9 +778,11 @@ public class WorkspaceCommands implements Logable {
         String onOrOff = inputLine.getArg(FIRST_ARG_INDEX);
         if (onOrOff.toLowerCase().equals("on")) {
             setEchoModeOn(true);
+            getInterpreter().setEchoModeOn(true);
             say("echo mode on");
         } else {
             setEchoModeOn(false);
+            getInterpreter().setEchoModeOn(false);
             say("echo mode off");
         }
         return RC_CONTINUE;
@@ -811,13 +813,14 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
-    private void doRealSave(File f) {
+    private void doRealLoad(File f) {
         try {
             long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
             state = StateUtils.load(fis);
             interpreter = new QDLParser(env, state);
-
+            interpreter.setEchoModeOn(isEchoModeOn());
+            interpreter.setDebugOn(isDebugOn());
             currentWorkspace = f;
             say("last saved " + new Date(lastModified));
         } catch (Throwable t) {
@@ -833,14 +836,14 @@ public class WorkspaceCommands implements Logable {
             if (currentWorkspace == null) {
                 say("Sorry, no file given and no workspace has been loaded.");
             } else {
-                doRealSave(currentWorkspace);
+                doRealLoad(currentWorkspace);
             }
             return RC_CONTINUE;
         }
 
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
         File f = new File(fName);
-        doRealSave(f);
+        doRealLoad(f);
         return RC_CONTINUE;
     }
 
