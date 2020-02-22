@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.qdl.util.StemEntry;
 import edu.uiuc.ncsa.qdl.util.StemList;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -89,10 +91,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String TO_LIST = "to_list";
     public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;
 
+    // Conversions to/from JSON.
+    public static String TO_JSON = "to_json";
+    public static final int TO_JSON_TYPE = 300 + STEM_FUNCTION_BASE_VALUE;
+
+    public static String FROM_JSON = "from_json";
+    public static final int FROM_JSON_TYPE = 301 + STEM_FUNCTION_BASE_VALUE;
+
 
     public static String FUNC_NAMES[] = new String[]{SIZE, MAKE_INDICES, REMOVE, IS_DEFINED,
             SET_DEFAULT, BOX, UNBOX, UNION, COMMON_KEYS, EXCLUDE_KEYS, GET_KEYS, HAS_KEYS, INCLUDE_KEYS, RENAME_KEYS, MASK,
-            LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST};
+            LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST, TO_JSON, FROM_JSON};
 
     public TreeSet<String> listFunctions() {
         TreeSet<String> names = new TreeSet<>();
@@ -125,6 +134,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (name.equals(LIST_SUBSET)) return LIST_SUBSET_TYPE;
         if (name.equals(LIST_COPY)) return LIST_COPY_TYPE;
         if (name.equals(TO_LIST)) return TO_LIST_TYPE;
+        if (name.equals(TO_JSON)) return TO_JSON_TYPE;
+        if (name.equals(FROM_JSON)) return FROM_JSON_TYPE;
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -195,8 +206,69 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case UNION_TYPE:
                 doUnion(polyad, state);
                 return true;
+            case TO_JSON_TYPE:
+                doToJSON(polyad, state);
+                return true;
+            case FROM_JSON_TYPE:
+                doFromJSON(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    protected void doFromJSON(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() != 1) {
+            throw new IllegalArgumentException("Error: " + FROM_JSON + " requires an argument");
+        }
+        Object arg = polyad.evalArg(0, state);
+        if (!isString(arg)) {
+            throw new IllegalArgumentException("Error: " + FROM_JSON + " requires a string as its argument");
+        }
+        JSONObject jsonObject = null;
+        StemVariable output = new StemVariable();
+        try {
+            jsonObject = JSONObject.fromObject((String) arg);
+            output.fromJSON(jsonObject);
+        } catch (Throwable t) {
+            try {
+                JSONArray array = JSONArray.fromObject((String) arg);
+                output.fromJSON(array);
+            } catch (Throwable tt) {
+                // ok, so this is not valid JSON.
+                throw new IllegalArgumentException("Error: " + FROM_JSON + " could not parse the argument as valid JSON");
+            }
+        }
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+
+    }
+
+    protected void doToJSON(Polyad polyad, State state) {
+        if (0 == polyad.getArgumments().size() ) {
+            throw new IllegalArgumentException("Error: " + TO_JSON + " requires an argument");
+        }
+        Object arg1 = polyad.evalArg(0, state);
+        if (!isStem(arg1)) {
+            throw new IllegalArgumentException("Error: " + TO_JSON + " requires a stem as its first argument");
+        }
+        int indent = -1;
+        if (polyad.getArgumments().size() == 2) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (!isLong(arg2)) {
+                throw new IllegalArgumentException("Error: " + TO_JSON + " requires an integer as its second argument");
+            }
+            Long argL = (Long) arg2;
+            indent = argL.intValue(); // best we can do
+        }
+        JSONObject j = ((StemVariable) arg1).toJSON();
+        if (0 < indent) {
+            polyad.setResult(j.toString(indent));
+        } else {
+            polyad.setResult(j.toString());
+        }
+        polyad.setResultType(Constant.STRING_TYPE);
+        polyad.setEvaluated(true);
     }
 
 

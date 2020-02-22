@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.util.TreeSet;
 
 /**
@@ -48,18 +48,27 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         return output + "}";
     }
 
-    public JSONObject toJSON() {
-        JSONObject output = new JSONObject();
-        for (long i = 0; i < size(); i++) {
-            Object v = get(i);
-            if (get(i) instanceof BigDecimal) {
-                v = v.toString(); // make sure this ends up as a big decimal
+    /**
+     * This exports the current list as a {@link JSONArray}. Note that there is no
+     * analog for importing one -- use the {@link StemVariable#fromJSON(JSONObject)}
+     * to do that, since the result will in general be a stem (if one element of the
+     * array is a JSONObject, then the index has to make it a stem -- this is just how the
+     * bookkeeping is done).
+     * @return
+     */
+    public JSONArray toJSON() {
+        JSONArray array = new JSONArray();
+        for(StemEntry s : this){
+            Object v = s.entry;
+            if(v instanceof StemVariable){
+                array.add(((StemVariable )v).toJSON());
+            }else{
+                array.add(v);
             }
-
-            output.put(i, v);
         }
-        return output;
+        return array;
     }
+
 
   /*  public void fromJSON(JSONObject json) {
         // This has issues. For one thing, saving a bunch of big decimals might mean they are strings.

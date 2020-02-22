@@ -74,7 +74,7 @@ public class IOEvaluator extends MathEvaluator {
                     } else {
                         if (prettyPrintForStems) {
                             if (temp instanceof StemVariable) {
-                                result = ((StemVariable) temp).toJSON().toString(1);
+                                result = ((StemVariable) temp).toString(1);
                             }
                         } else {
                             result = temp.toString();

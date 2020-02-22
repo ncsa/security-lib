@@ -332,10 +332,25 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSONObject toJSON() {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.putAll(this);
-        jsonObject.putAll(getStemList().toJSON());
-        return jsonObject;
+        JSONObject json = new JSONObject();
+        for(String key : super.keySet()){
+               if(key.endsWith(STEM_INDEX_MARKER)){
+                   // compound object
+                   StemVariable x = (StemVariable) get(key);
+                   json.put(key.substring(0,key.length()-1), x.toJSON());
+
+               }else{
+                   json.put(key, get(key));
+               }
+        }
+        // now for the messy bit -- lists
+        JSONArray array = getStemList().toJSON();
+        if(!array.isEmpty()){
+             for(int i = 0; i < array.size(); i++){
+                 json.put(i, array.get(i));
+             }
+        }
+        return json;
     }
 
     protected StemVariable convert(JSONObject object) {
@@ -385,17 +400,47 @@ public class StemVariable extends HashMap<String, Object> {
      * Populate this from a JSON object. Note that JSON arrays are turned in to stem lists.
      *
      * @param jsonObject
+     * return this object, populated
      */
-    public void fromJSON(JSONObject jsonObject) {
-        for (Object key : jsonObject.keySet()) {
-            Object v = jsonObject.get(key);
-            if (key instanceof Long) {
-                put((Long) key, convert(v));
-            } else {
-                put(key.toString(), convert(v));
+    public StemVariable fromJSON(JSONObject jsonObject) {
+        for (Object k : jsonObject.keySet()) {
+            String key = k.toString();
+
+            Object v = jsonObject.get(k);
+            if(v instanceof JSONObject){
+                StemVariable x = new StemVariable();
+                put(key + STEM_INDEX_MARKER, x.fromJSON((JSONObject)v));
+            }else{
+                if(v instanceof JSONArray){
+                    StemVariable x = new StemVariable();
+
+                    put(key + STEM_INDEX_MARKER, x.fromJSON((JSONArray)v));
+                }else{
+                    put(key, v);
+                }
             }
         }
+       return this;
+    }
 
+    public StemVariable fromJSON(JSONArray array){
+        StemList<StemEntry> sl = new StemList<>();
+        for(int i = 0; i < array.size(); i++){
+            Object v = array.get(i);
+            if(v instanceof JSONObject){
+                StemVariable x = new StemVariable();
+                put( i + STEM_INDEX_MARKER, x.fromJSON((JSONObject)v));
+            }else{
+                if(v instanceof JSONArray){
+                    StemVariable x = new StemVariable();
+                    put(i + STEM_INDEX_MARKER, x.fromJSON((JSONArray)v));
+                }else{
+                    sl.add(new StemEntry(i, v));
+                }
+            }
+        }
+        setStemList(sl);
+        return this;
     }
 
     String int_regex = "[1-9][0-9]*";
@@ -442,13 +487,10 @@ public class StemVariable extends HashMap<String, Object> {
             }
             Object o = get(key);
             if (o instanceof StemVariable) {
-                output = output + newIndent + key + "=\n" + ((StemVariable) o).toString(indentFactor, newIndent);
+                output = output + newIndent + key + "=" + ((StemVariable) o).toString(indentFactor, newIndent);
             } else {
-
                 output = output + newIndent + key + "=" + convert(o);
-
             }
-
         }
         // now for any list
         for (StemEntry entry : getStemList()) {
@@ -484,6 +526,7 @@ public class StemVariable extends HashMap<String, Object> {
         s2.put("woof.", s3);
         s.put("foo.", s2);
         System.out.println(s.toString(1));
+        System.out.println(s.toJSON().toString());
     }
 
     public String toString(int indentFactor) {

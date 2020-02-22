@@ -33,16 +33,16 @@ public class QDLWorkspace {
     }
 
     protected void handleException(Throwable t) {
-        if(t instanceof ParseCancellationException){
-            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn()?t.getMessage():""));
+        if((t instanceof ParseCancellationException) | (t instanceof ParsingException)){
+            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn()?t.getMessage():"could not parse input"));
             return;
         }
-        if ((t instanceof IllegalStateException) | (t instanceof ParsingException)) {
-            workspaceCommands.say("syntax error" + (workspaceCommands.isDebugOn()?t.getMessage():""));
+        if (t instanceof IllegalStateException) {
+            workspaceCommands.say("syntax error:" + t.getMessage());
             return;
         }
         if (t instanceof IllegalArgumentException) {
-            workspaceCommands.say("illegal argument:" + (workspaceCommands.isDebugOn()?t.getMessage():""));
+            workspaceCommands.say("illegal argument:" + t.getMessage());
             return;
         }
         if (t instanceof QDLException) {
