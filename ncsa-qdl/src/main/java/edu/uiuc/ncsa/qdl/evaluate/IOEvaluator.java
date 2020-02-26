@@ -1,10 +1,11 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.scripting.FileEntry;
-import edu.uiuc.ncsa.qdl.scripting.LibraryEntry;
+import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
+import edu.uiuc.ncsa.qdl.scripting.VFSPassThruFileProvider;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
@@ -32,14 +33,30 @@ public class IOEvaluator extends MathEvaluator {
 
     public static String WRITE_FILE = "write_file";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
-    public static String[]  FUNC_NAMES= new String[]{SAY_FUNCTION,PRINT_FUNCTION,SCAN_FUNCTION,READ_FILE,WRITE_FILE};
+
+    public static String VFS_MOUNT = "vfs_mount";
+    public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
+
+
+    public static String VFS_UNMOUNT = "vfs_unmount";
+    public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
+
+    public static String[] FUNC_NAMES = new String[]{
+            SAY_FUNCTION,
+            PRINT_FUNCTION,
+            SCAN_FUNCTION,
+            READ_FILE,
+            WRITE_FILE,
+            VFS_MOUNT,
+            VFS_UNMOUNT};
+
     public TreeSet<String> listFunctions() {
-          TreeSet<String> names = new TreeSet<>();
-          for (String key : FUNC_NAMES) {
-              names.add(key + "()");
-          }
-          return names;
-      }
+        TreeSet<String> names = new TreeSet<>();
+        for (String key : FUNC_NAMES) {
+            names.add(key + "()");
+        }
+        return names;
+    }
 
     @Override
     public int getType(String name) {
@@ -48,6 +65,8 @@ public class IOEvaluator extends MathEvaluator {
         if (name.equals(SCAN_FUNCTION)) return SCAN_TYPE;
         if (name.equals(READ_FILE)) return READ_FILE_TYPE;
         if (name.equals(WRITE_FILE)) return WRITE_FILE_TYPE;
+        if (name.equals(VFS_MOUNT)) return VFS_MOUNT_TYPE;
+        if (name.equals(VFS_UNMOUNT)) return VFS_UNMOUNT_TYPE;
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -56,7 +75,12 @@ public class IOEvaluator extends MathEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getOperatorType()) {
             case SAY_TYPE:
-                if (state.isServerMode()) return true;
+                if (state.isServerMode()) {
+                    polyad.setResult(null);
+                    polyad.setResultType(Constant.NULL_TYPE);
+                    polyad.setEvaluated(true);
+                    return true;
+                }
                 String result = "";
                 boolean prettyPrintForStems = false;
                 if (polyad.getArgumments().size() != 0) {
@@ -94,7 +118,9 @@ public class IOEvaluator extends MathEvaluator {
                 polyad.setEvaluated(true);
                 return true;
             case SCAN_TYPE:
-                if (state.isServerMode()) return true;
+                if (state.isServerMode()) {
+                    throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
+                }
 
                 if (polyad.getArgumments().size() != 0) {
                     // This is the prompt.
@@ -117,8 +143,38 @@ public class IOEvaluator extends MathEvaluator {
             case WRITE_FILE_TYPE:
                 doWriteFile(polyad, state);
                 return true;
+            case VFS_MOUNT_TYPE:
+                vfsMount(polyad, state);
+                return true;
+            case VFS_UNMOUNT_TYPE:
+                vfsUnmount(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    protected void vfsUnmount(Polyad polyad, State state) {
+
+    }
+
+    protected void vfsMount(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() != 3) {
+            throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires 3 arguments");
+        }
+        Object arg1 = polyad.evalArg(0, state);
+        Object arg2 = polyad.evalArg(1, state);
+        Object arg3 = polyad.evalArg(2, state);
+        if (isString(arg1) && isString(arg2) && isString(arg3)) {
+            // TODO - make sure there is not another one of these?
+            // TODO - check that mount points don't conflict.
+            VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(arg1.toString(), arg2.toString(), arg3.toString());
+            state.addScriptProvider(vfs);
+            polyad.setResult(null);
+            polyad.setResult(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires that all arguments be strings.");
     }
 
     protected void doWriteFile(Polyad polyad, State state) {
@@ -176,14 +232,11 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doReadFile(Polyad polyad, State state) {
-        if(state.isServerMode()){
-            throw new QDLServerModeException("Error: reading files is not supported in server mode");
-        }
+
         if (0 == polyad.getArgumments().size()) {
             throw new IllegalArgumentException("Error: " + READ_FILE + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
-        ;
         if (obj == null || !isString(obj)) {
             throw new IllegalArgumentException("Error: The " + READ_FILE + " command requires a string for its first argument.");
         }
@@ -199,32 +252,45 @@ public class IOEvaluator extends MathEvaluator {
                 throw new IllegalArgumentException("Error: The " + READ_FILE + " command's second argument must have value of 1 or 0.");
             }
         }
+        VFSEntry vfsEntry = null;
+        boolean hasVF = false;
+        if (state.isVFSFile(fileName)) {
+            vfsEntry = resolveResourceToFile(fileName, state);
+            if (vfsEntry == null) {
+                throw new QDLException("Error: The resource \"" + fileName + "\" was not found in the virtual file system");
+            }
+            hasVF = true;
+        }
         try {
             switch (op) {
-                case 1:
+                case FILE_OP_BINARY:
                     // binary file. Read it and base64 encode it
-                    if(state.isServerMode()){
-                        LibraryEntry libraryEntry = state.getFileFromProvider(fileName);
-                        if(libraryEntry.getType().equals(FileEntry.TYPE)){
-                            FileEntry fileEntry = (FileEntry)libraryEntry;
-                            
-                        }
-                        return;
+                    if (hasVF) {
+                        polyad.setResult(vfsEntry.getText());// if this is binary, the contents are a single base64 encoded string.
+                    } else {
+                        polyad.setResult(FileUtil.readFileAsBinary(fileName));
                     }
-                    polyad.setResult(FileUtil.readFileAsBinary(fileName));
                     polyad.setResultType(Constant.STRING_TYPE);
                     polyad.setEvaluated(true);
                     return;
-                case 0:
+                case FILE_OP_TEXT_STEM:
+                    if (hasVF) {
+                        polyad.setResult(vfsEntry.convertToStem());// if this is binary, the contents are a single base64 encoded string.
+                    } else {
+                        polyad.setResult(FileUtil.readFileAsStem(fileName));
+                    }
                     // Read as lines, put in a stem
-                    polyad.setResult(FileUtil.readFileAsStem(fileName));
                     polyad.setResultType(Constant.STEM_TYPE);
                     polyad.setEvaluated(true);
                     return;
                 default:
-                case -1:
+                case FILE_OP_TEXT_STRING:
                     // read it as a long string.
-                    polyad.setResult(FileUtil.readFileAsString(fileName));
+                    if (hasVF) {
+                        polyad.setResult(vfsEntry.getText());
+                    } else {
+                        polyad.setResult(FileUtil.readFileAsString(fileName));
+                    }
                     polyad.setResultType(Constant.STRING_TYPE);
                     polyad.setEvaluated(true);
                     return;

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.util;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -331,25 +332,51 @@ public class StemVariable extends HashMap<String, Object> {
      *
      * @return
      */
-    public JSONObject toJSON() {
+    public JSON toJSON() {
         JSONObject json = new JSONObject();
-        for(String key : super.keySet()){
-               if(key.endsWith(STEM_INDEX_MARKER)){
-                   // compound object
-                   StemVariable x = (StemVariable) get(key);
-                   json.put(key.substring(0,key.length()-1), x.toJSON());
+        StemList<StemEntry> localSL = getStemList();
 
-               }else{
-                   json.put(key, get(key));
-               }
+        // Special case of a JSON array of objects that has been turned in to a stem list.
+        // We want to recover this since it is a very common construct.
+        for (String key : super.keySet()) {
+
+            if (key.endsWith(STEM_INDEX_MARKER)) {
+                StemVariable x = (StemVariable) get(key);
+
+                // compound object
+                String newKey = key.substring(0, key.length() - 1);
+                if (isLongIndex(newKey)) {
+                    StemEntry stemEntry = new StemEntry(Long.parseLong(newKey));
+                    if (!localSL.contains(stemEntry)) {
+                        stemEntry.entry = x;
+                        localSL.add(stemEntry);
+                    } else {
+                        throw new IndexError("Error: The stem contains a list element \"" + newKey + "\" " +
+                                "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
+                    }
+                } else {
+                    json.put(newKey, x.toJSON());
+                }
+
+            } else {
+                json.put(key, get(key));
+            }
+        }
+        if (json.isEmpty()) {
+            // no other values.
+            if (localSL.isEmpty()) {
+                return json;
+            }
+            return getStemList().toJSON();
         }
         // now for the messy bit -- lists
         JSONArray array = getStemList().toJSON();
-        if(!array.isEmpty()){
-             for(int i = 0; i < array.size(); i++){
-                 json.put(i, array.get(i));
-             }
+        if (!array.isEmpty()) {
+            for (int i = 0; i < array.size(); i++) {
+                json.put(i, array.get(i));
+            }
         }
+
         return json;
     }
 
@@ -377,7 +404,7 @@ public class StemVariable extends HashMap<String, Object> {
 
     /**
      * Does the grunt work of taking an entry from a JSON object and converting it to something QDL can
-     * understand.
+     * understand. Used mostly in the toString methods.
      *
      * @param obj
      * @return
@@ -399,47 +426,48 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * Populate this from a JSON object. Note that JSON arrays are turned in to stem lists.
      *
-     * @param jsonObject
-     * return this object, populated
+     * @param jsonObject return this object, populated
      */
     public StemVariable fromJSON(JSONObject jsonObject) {
         for (Object k : jsonObject.keySet()) {
             String key = k.toString();
 
             Object v = jsonObject.get(k);
-            if(v instanceof JSONObject){
+            if (v instanceof JSONObject) {
                 StemVariable x = new StemVariable();
-                put(key + STEM_INDEX_MARKER, x.fromJSON((JSONObject)v));
-            }else{
-                if(v instanceof JSONArray){
+                put(key + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+            } else {
+                if (v instanceof JSONArray) {
                     StemVariable x = new StemVariable();
 
-                    put(key + STEM_INDEX_MARKER, x.fromJSON((JSONArray)v));
-                }else{
+                    put(key + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                } else {
                     put(key, v);
                 }
             }
         }
-       return this;
+
+        return this;
     }
 
-    public StemVariable fromJSON(JSONArray array){
+    public StemVariable fromJSON(JSONArray array) {
         StemList<StemEntry> sl = new StemList<>();
-        for(int i = 0; i < array.size(); i++){
+        for (int i = 0; i < array.size(); i++) {
             Object v = array.get(i);
-            if(v instanceof JSONObject){
+            if (v instanceof JSONObject) {
                 StemVariable x = new StemVariable();
-                put( i + STEM_INDEX_MARKER, x.fromJSON((JSONObject)v));
-            }else{
-                if(v instanceof JSONArray){
+                put(i + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+            } else {
+                if (v instanceof JSONArray) {
                     StemVariable x = new StemVariable();
-                    put(i + STEM_INDEX_MARKER, x.fromJSON((JSONArray)v));
-                }else{
+                    put(i + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                } else {
                     sl.add(new StemEntry(i, v));
                 }
             }
         }
         setStemList(sl);
+
         return this;
     }
 

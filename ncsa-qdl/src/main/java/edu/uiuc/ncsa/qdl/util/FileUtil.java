@@ -79,6 +79,13 @@ public class FileUtil {
 
     }
 
+    public static List<String> readFileAsLines(String fileName) throws Throwable {
+           checkFile(fileName);
+           StringBuffer stringBuffer = new StringBuffer();
+           Path path = Paths.get(fileName);
+           return Files.readAllLines(path);
+       }
+
     /**
      * Note that this is a stem list or the ouotput is random.
      *

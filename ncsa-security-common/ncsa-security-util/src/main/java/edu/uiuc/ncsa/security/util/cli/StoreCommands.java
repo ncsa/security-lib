@@ -66,6 +66,8 @@ public abstract class StoreCommands extends CommonCommands {
 
     Store store;
 
+
+
     protected void showUpdateHelp() {
         say("Updates an entry, that is to say, allows you to edit the values stored for an entry");
         say("Syntax:\n");
@@ -371,7 +373,8 @@ public abstract class StoreCommands extends CommonCommands {
         say("If no number is supplied, then a complete list of all elements with numbering will be displayed.");
         say("If a number has been supplied, a detailed report on that item is shown.");
     }
-
+   protected String LONG_LIST_COMMAND1 = "-l";
+   protected String LONG_LIST_COMMAND2 = "-la";
     public void ls(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showLSHelp();
@@ -394,9 +397,7 @@ public abstract class StoreCommands extends CommonCommands {
             longFormat(identifiable);
             return;
         }
-
-        boolean longForm = false;
-        if (inputLine.getArg(1).contains("l")) longForm = true;
+        boolean longForm = inputLine.hasArg(LONG_LIST_COMMAND1) || inputLine.hasArg(LONG_LIST_COMMAND2);
 
         if (longForm) {
             listAll(true, inputLine.getArg(1));

@@ -105,10 +105,14 @@ public class QDLWorkspace {
                     }
                     continue;
                 }
-                if(workspaceCommands.isEchoModeOn() && !input.endsWith(";")){
-                    input = input + ";"; // add it since they forgot
+                if(input != null && !input.isEmpty()){
+                    // if you try to evaluate only a ";" then you will get a syntax exception from
+                    // the parser for an empty statement.
+                    if(workspaceCommands.isEchoModeOn() && !input.endsWith(";")){
+                        input = input + ";"; // add it since they forgot
+                    }
+                    workspaceCommands.getInterpreter().execute(input);
                 }
-                workspaceCommands.getInterpreter().execute(input);
             } catch (Throwable t) {
                 handleException(t);
             }

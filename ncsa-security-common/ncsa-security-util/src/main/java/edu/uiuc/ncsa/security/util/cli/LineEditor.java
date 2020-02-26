@@ -52,6 +52,7 @@ public class LineEditor {
     public LineEditor(StringBuffer buffer) {
         this(buffer.toString());
     }
+
     public LineEditor(List<String> buffer) {
         this.buffer = buffer;
     }
@@ -170,11 +171,15 @@ public class LineEditor {
                 sayv("bye-bye...");
                 break;
             }
+            if (eil.isCommand(APPEND_COMMAND, APPEND_COMMAND_LONG)) {
+                isUnkownCommand = false;
+                doInsert(eil);
+                saved = false;
+            }
             if (eil.isCommand(INSERT_COMMAND, INSERT_COMMAND_LONG)) {
                 isUnkownCommand = false;
                 doInsert(eil);
                 saved = false;
-
             }
             if (eil.isCommand(PRINT_COMMAND, PRINT_COMMAND_LONG)) {
                 isUnkownCommand = false;
@@ -471,6 +476,22 @@ public class LineEditor {
         } catch (IOException x) {
             say("There was an error. File not written. \"" + x.getMessage() + "\"");
         }
+    }
+
+
+    protected void doAppendtHelp() {
+        say(APPEND_COMMAND + "|" + APPEND_COMMAND_LONG + " append to the end of the buffer.");
+        say("        Input continues until a single \"" + END_COMMAND + "\" is entered");
+        say("        No arguments are accepted, it is just a convenience.");
+    }
+
+    protected void doAppend(EditorInputLine eil) throws IOException {
+        if (showHelp(eil)) {
+            doAppendtHelp();
+            return;
+        }
+        eil = new EditorInputLine(INSERT_COMMAND); // This just causes it to insert at the end.
+        doInsert(eil);
     }
 
     protected void doInsertHelp() {

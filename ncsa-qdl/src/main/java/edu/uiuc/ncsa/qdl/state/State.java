@@ -5,10 +5,10 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.scripting.LibraryEntry;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
-import edu.uiuc.ncsa.qdl.scripting.ScriptProvider;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
+import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
+import edu.uiuc.ncsa.qdl.scripting.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 
 import java.util.HashMap;
@@ -48,9 +48,9 @@ public class State extends FunctionState {
 
     boolean serverMode = false;
 
-    HashMap<String, ScriptProvider> scriptProviders = new HashMap<>();
+    HashMap<String, VFSFileProvider> scriptProviders = new HashMap<>();
 
-    public void addScriptProvider(ScriptProvider scriptProvider) {
+    public void addScriptProvider(VFSFileProvider scriptProvider) {
         scriptProviders.put(scriptProvider.getScheme(), scriptProvider);
     }
 
@@ -59,36 +59,38 @@ public class State extends FunctionState {
     }
 
     /**
-     * Take a name, peel off any scheme and then check if there is
+     * Convenience to get a script from the VFS. This takes any file and tries to turn it in to a script,
+     * so tjhe "onus is on the app" to make sure this is a script.
      *
      * @param fqName
      * @return
      */
-    public QDLScript getScriptFromProvider(String fqName) {
-        LibraryEntry entry = getFileFromProvider(fqName);
+    public QDLScript getScriptFromVFS(String fqName) throws Throwable {
+        VFSEntry entry = getFileFromVFS(fqName);
         if(entry.getType().equals(Scripts.SCRIPT)){
             return (QDLScript)entry;
         }
-        return null;
+        QDLScript s = new QDLScript(entry.getLines(), entry.getProperties());
+        return s;
     }
 
-    public LibraryEntry getFileFromProvider(String fqName) {
+    public VFSEntry getFileFromVFS(String fqName) throws Throwable {
         if (scriptProviders.isEmpty()) return null;
         String scheme = fqName.substring(0, fqName.indexOf(":") + 1);
         if (scheme == null || scheme.isEmpty()) {
             return null;
         }
         return  scriptProviders.get(scheme).get(fqName);
-
     }
 
-    public boolean hasScriptProviders() {
+    public boolean hasVFSProviders() {
         return !scriptProviders.isEmpty();
     }
-
-    /*public QDLScript getScript(String fqPath){
-        scriptProviders.get
-    }*/
+     public boolean isVFSFile(String path){
+        if(path.startsWith("file:")) return false; // legit this is a file uri, not a virtual one
+         return 0 < path.indexOf(":");
+     }
+ 
     public State newStateNoImports() {
         ImportManager nr = new ImportManager();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());

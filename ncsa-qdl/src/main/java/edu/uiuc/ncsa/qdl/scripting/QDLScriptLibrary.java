@@ -7,8 +7,9 @@ import java.util.HashMap;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/5/20 at  8:06 AM
+ * @deprecated  DO NOT USE.
  */
-public class QDLScriptLibrary implements ScriptProvider {
+public class QDLScriptLibrary implements VFSFileProvider {
     public QDLScriptLibrary(String scheme) {
         this.scheme = scheme;
     }
@@ -23,14 +24,18 @@ public class QDLScriptLibrary implements ScriptProvider {
         return name.startsWith(scheme);
     }
 
+    @Override
+    public String getMountPoint() {
+        return null;
+    }
 
     @Override
-    public LibraryEntry get(String name) {
+    public VFSEntry get(String name) {
         return map.get(name);
     }
 
     @Override
-    public void put(String name, LibraryEntry script) {
+    public void put(String name, VFSEntry script) {
         if (!checkScheme(name)) {
             throw new QDLException("Error: The script must have an FQ (fully qualified with the scheme) name to be added.");
         }
@@ -45,6 +50,6 @@ public class QDLScriptLibrary implements ScriptProvider {
         return false;
     }
 
-    HashMap<String, LibraryEntry> map = new HashMap<>();
+    HashMap<String, VFSEntry> map = new HashMap<>();
     String scheme;
 }

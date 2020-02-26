@@ -7,6 +7,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -45,6 +46,8 @@ public class Scripts {
      * ISO 8601 timestamp when this was created.
      */
     public static final String CREATE_TIME = "create_ts";
+
+    public static final String LAST_MODIFIED = "last_modified";
     /**
      * (Required!) The identifier for this script.
      */
@@ -84,11 +87,11 @@ public class Scripts {
         content.remove(CODE);
         XProperties xProperties= new XProperties();
         xProperties.putAll(content);
-        StringBuffer stringBuffer = new StringBuffer();
+        ArrayList<String> lines = new ArrayList<>();
         for(int i =0; i < code.size(); i++){
-            stringBuffer.append(code.getString(i) + "\n");
+            lines.add(code.getString(i));
         }
-        QDLScript script = new QDLScript(new StringReader(stringBuffer.toString()), xProperties);
+        QDLScript script = new QDLScript(lines, xProperties);
         return script;
     }
     public static void  main(String[] args){
@@ -112,6 +115,7 @@ public class Scripts {
          xp.put(LANGUAGE,"qdl");
          xp.put(ID,"functions.qdl");
          xp.put(CREATE_TIME, Iso8601.date2String(new Date()));
+         xp.put(LAST_MODIFIED, Iso8601.date2String(new Date()));
          QDLScript s = new QDLScript(new StringReader(script.toString()), xp);
          System.out.println(toJSON(s).toString(2));
          String rawJSON = "{\""+SCRIPT +"\": {\n" +

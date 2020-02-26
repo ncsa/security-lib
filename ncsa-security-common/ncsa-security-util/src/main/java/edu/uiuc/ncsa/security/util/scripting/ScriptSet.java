@@ -1,7 +1,10 @@
 package edu.uiuc.ncsa.security.util.scripting;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 /**
  * This contains a set of scripts. Scripts generally have attached properties which allows for selecting
@@ -9,7 +12,11 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/20 at  12:26 PM
  */
-public class ScriptSet<V extends ScriptInterface> {
+public class ScriptSet<V extends ScriptInterface> implements Iterable<V>{
+    public List<V> getScripts() {
+        return scripts;
+    }
+
     protected List<V> scripts = new ArrayList();
     public void add(V script){scripts.add(script);}
 
@@ -26,5 +33,26 @@ public class ScriptSet<V extends ScriptInterface> {
             }
         }
         return null;
+    }
+    public boolean isEmpty(){
+        return scripts.isEmpty();
+    }
+    public int size(){
+        return scripts.size();
+    }
+
+    @Override
+    public void forEach(Consumer<? super V> action) {
+
+    }
+
+    @Override
+    public Spliterator<V> spliterator() {
+        return null;
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+        return scripts.iterator();
     }
 }

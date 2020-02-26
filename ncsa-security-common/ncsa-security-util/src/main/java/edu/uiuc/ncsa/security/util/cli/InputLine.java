@@ -24,6 +24,16 @@ public class InputLine {
 
     }
 
+    public String getOriginalLine() {
+        return originalLine;
+    }
+
+    public void setOriginalLine(String originalLine) {
+        this.originalLine = originalLine;
+    }
+
+    String originalLine = "";
+
     /**
      * This returns this as a string
      *
@@ -147,7 +157,7 @@ public class InputLine {
         try {
             return Integer.parseInt(getArg(index));
         } catch (NumberFormatException nfx) {
-            throw new ArgumentNotFoundException("Error: the argument /" + getArg(index) + "/ cannot be parsed as an integer");
+            throw new ArgumentNotFoundException("Error: the argument /" + getArg(index) + "/ cannot be parsed. Did you forget the object index?");
         }
     }
 

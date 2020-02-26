@@ -1,10 +1,15 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -41,12 +46,13 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return obj instanceof Boolean;
     }
 
-    protected boolean areAllBoolean(Object... objects){
-        for(Object arg : objects){
-            if(!isBoolean(arg)) return false;
+    protected boolean areAllBoolean(Object... objects) {
+        for (Object arg : objects) {
+            if (!isBoolean(arg)) return false;
         }
         return true;
     }
+
     protected boolean areAllStems(Object... objects) {
         for (Object arg : objects) {
             if (!isStem(arg)) return false;
@@ -78,42 +84,46 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         return true;
     }
-       protected boolean isNumber(Object arg){
-           return (arg instanceof Long) || (arg instanceof BigDecimal);
-       }
 
-       protected boolean isBigDecimal(Object obj){
+    protected boolean isNumber(Object arg) {
+        return (arg instanceof Long) || (arg instanceof BigDecimal);
+    }
+
+    protected boolean isBigDecimal(Object obj) {
         return obj instanceof BigDecimal;
-       }
-       protected boolean areAnyBigDecimals(Object... objects){
-        for(Object arg : objects){
-                if(isBigDecimal(arg)) return true;
+    }
+
+    protected boolean areAnyBigDecimals(Object... objects) {
+        for (Object arg : objects) {
+            if (isBigDecimal(arg)) return true;
         }
         return false;
-       }
+    }
 
     /**
      * How to compare two big decimals requires some work.
+     *
      * @param a
      * @param b
      * @return
      */
-       protected boolean bdEquals(BigDecimal a, BigDecimal b){
+    protected boolean bdEquals(BigDecimal a, BigDecimal b) {
         BigDecimal r = a.subtract(b);
         return r.compareTo(BigDecimal.ZERO) == 0;
-       }
+    }
 
     protected boolean areAllNumbers(Object... objects) {
-          for (Object arg : objects) {
-              if (!isNumber(arg)) return false;
-          }
-          return true;
-      }
-    protected BigDecimal toBD(Object obj){
-        if(!isNumber(obj)) throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
-        if(obj instanceof BigDecimal) return (BigDecimal) obj;
-        if(obj instanceof Long) return new BigDecimal((Long) obj);
-        if(obj instanceof Integer) return new BigDecimal((Integer) obj);
+        for (Object arg : objects) {
+            if (!isNumber(arg)) return false;
+        }
+        return true;
+    }
+
+    protected BigDecimal toBD(Object obj) {
+        if (!isNumber(obj)) throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
+        if (obj instanceof BigDecimal) return (BigDecimal) obj;
+        if (obj instanceof Long) return new BigDecimal((Long) obj);
+        if (obj instanceof Integer) return new BigDecimal((Integer) obj);
         throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
     }
 
@@ -132,7 +142,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     public static class fpResult {
-       public Object result;
+        public Object result;
         public int resultType;
     }
 
@@ -150,7 +160,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
-        Object arg1 = polyad.evalArg(0,state);;
+        Object arg1 = polyad.evalArg(0, state);
+        ;
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -170,8 +181,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             fPointer pointer,
                             String name,
                             State state
-                            ) {
-                process2(polyad,pointer,name,state,false);
+    ) {
+        process2(polyad, pointer, name, state, false);
     }
 
     protected void process2(ExpressionImpl polyad,
@@ -182,14 +193,16 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (!optionalArgs && polyad.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
-        Object arg1 = polyad.evalArg(0,state);;
-        Object arg2 = polyad.evalArg(1,state);;
+        Object arg1 = polyad.evalArg(0, state);
+        ;
+        Object arg2 = polyad.evalArg(1, state);
+        ;
 
         Object[] argList = new Object[polyad.getArgumments().size()];
         argList[0] = arg1;
         argList[1] = arg2;
-        if(optionalArgs){
-            for(int i = 2; i < polyad.getArgumments().size(); i++){
+        if (optionalArgs) {
+            for (int i = 2; i < polyad.getArgumments().size(); i++) {
                 argList[i] = polyad.getArgumments().get(i).evaluate(state);
             }
         }
@@ -206,17 +219,17 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         // so all this is basically to figure out how to loop over what.
         for (String key : keys) {
             fpResult r;
-            if(optionalArgs){
+            if (optionalArgs) {
                 Object[] objects = new Object[polyad.getArgumments().size()];
                 objects[0] = stem1.get(key);
                 objects[1] = stem2.get(key);
-                for(int i = 2; i < objects.length; i++){
+                for (int i = 2; i < objects.length; i++) {
                     objects[i] = polyad.getArgumments().get(i).getResult();
                 }
                 r = pointer.process(objects);
 
-            }else{
-                 r = pointer.process(stem1.get(key), stem2.get(key));
+            } else {
+                r = pointer.process(stem1.get(key), stem2.get(key));
             }
             outStem.put(key, r.result);
         }
@@ -232,9 +245,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if (polyad.getArgumments().size() != 3) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
         }
-        Object arg1 = polyad.evalArg(0,state);;
-        Object arg2 = polyad.evalArg(1,state);;
-        Object arg3 = polyad.evalArg(2,state);;
+        Object arg1 = polyad.evalArg(0, state);
+        ;
+        Object arg2 = polyad.evalArg(1, state);
+        ;
+        Object arg3 = polyad.evalArg(2, state);
+        ;
 
         if (areNoneStems(arg1, arg2, arg3)) {
             fpResult result = pointer.process(arg1, arg2, arg3);
@@ -292,4 +308,84 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         return foundKeys;
     }
+
+    /**
+     * This will take an {@link ExpressionImpl} that should contain a stem, check the reference and it the stem
+     * does nto exist, create and put it in the symbol table. If the stem exists, it just returns it.
+     * This lets you do things like issue:
+     * <pre>
+     *     foo. := null
+     *     if[
+     *        some_condition
+     *     ]then[
+     *        list_append(foo., 4);
+     *     // ... other stuff
+     *     ];
+     * </pre>
+     * and not get a null pointer exception. This is needed especially if a the command is issued in a different scope,
+     * e.g. in a conditional block to assign the value.<br/><br/>
+     * This <b><i>WILL</i></b> throw an exception if the argument is not a stem!! So this is invoked where
+     * there is a required stem that is missing and should be there.
+     *
+     * @param node
+     * @param state
+     * @param informativeMessage
+     * @return
+     */
+    protected StemVariable getOrCreateStem(ExpressionNode node, State state, String informativeMessage) {
+        StemVariable stem1 = null;
+        if (node instanceof VariableNode) {
+            VariableNode vn = (VariableNode) node;
+            String varName = vn.getVariableReference();
+            if (!state.isDefined(varName)) {
+                if (!varName.endsWith(StemVariable.STEM_INDEX_MARKER)) {
+                    throw new IllegalArgumentException(informativeMessage);
+                }
+                stem1 = new StemVariable();
+                state.setValue(varName, stem1);
+            } else {
+                Object arg1 = node.evaluate(state);
+                if (!isStem(arg1)) {
+                    throw new IllegalArgumentException(informativeMessage);
+                }
+                stem1 = (StemVariable) arg1;
+            }
+        }
+        if (stem1 == null) {
+            throw new NFWException("Internal error: the supplied node is not a variable node. You probably supplied the wrong argument");
+        }
+        return stem1;
+    }
+
+    /**
+     * This will look at the resource name and decide if it is in a VFS and resolve it against that.
+     * If not, it will try to resolve it as a file name against the file system if this
+     * is not in server mode. This merely returns a null if there is no such resource. It will
+     * throw an exception if the resource refers to a virtual file and there are no providers
+     * for that namespace.
+     *
+     * @param resourceName
+     * @param state
+     * @return
+     */
+    protected VFSEntry resolveResourceToFile(String resourceName,  State state) {
+        if (state.isVFSFile(resourceName)) {
+            if (!state.hasVFSProviders()) {
+                throw new QDLException("Error: unkonwn virtual file system for resource \"" + resourceName + "\"");
+            }
+            try {
+                return state.getFileFromVFS(resourceName);
+            }catch (Throwable t){
+                if(t instanceof RuntimeException){
+                    throw (RuntimeException)t;
+                }
+                throw new QDLException("Error: could not file from VFS:" + t.getMessage(), t);
+            }
+        }
+        return null;
+    }
+
+    public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
+    public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
+    public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
 }

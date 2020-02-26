@@ -150,7 +150,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     }
 
     Map<Object, Object> globalEnv;
-
+    String currentEnvFile = null;
     protected void readEnv(String path) {
         // All errors loading the environment are benign.
         File f = new File(path);
@@ -201,6 +201,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             }
             say("Could not parse envirnoment file.");
         }
+        currentEnvFile = path;
     }
 
     /**

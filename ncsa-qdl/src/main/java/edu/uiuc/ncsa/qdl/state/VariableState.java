@@ -36,6 +36,11 @@ public abstract class VariableState extends NamespaceAwareState {
                 moduleMap);
     }
 
+    /**
+     * Checks if a symbol is defined. Note that this does do stem tail resolution and namespace resolution.
+     * @param symbol
+     * @return
+     */
     public boolean isDefined(String symbol) {
         try {
             return getValue(symbol) != null;

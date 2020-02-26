@@ -127,12 +127,14 @@ public abstract class CommonCommands implements Commands {
     }
 
     /**
-     * Double indent -- useful for lists. 
+     * Double indent -- useful for lists.
+     *
      * @param x
      */
     protected void sayii(String x) {
-         say(INDENT + INDENT + x);
-     }
+        say(INDENT + INDENT + x);
+    }
+
     /**
      * Output the string without any linefeed. This is used for prompts.
      *
@@ -283,6 +285,8 @@ public abstract class CommonCommands implements Commands {
 
     }
 
+    String curentEnvFile = null;
+
     public void read_env(InputLine inputline) throws Exception {
         if (showHelp(inputline)) {
             printReadEnvHelp();
@@ -293,6 +297,7 @@ public abstract class CommonCommands implements Commands {
         }
         Map map = null;
         String inputFile = inputline.getNextArgFor(CL_INPUT_FILE_FLAG);
+        curentEnvFile = inputFile;
         File f = new File(inputFile);
         if (!f.isFile()) {
             sayv("Sorry but the file \"" + f + "\" does not exist.");
@@ -331,15 +336,20 @@ public abstract class CommonCommands implements Commands {
             printSaveEnvHelp();
             return;
         }
-        if (!inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
-            say("Sorry, no file specified.");
+        String envFile = curentEnvFile;
+        if (inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
+            envFile = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
             return;
         }
         if (!getDriver().hasEnv()) {
             // nix to do
             return;
         }
-        File f = new File(inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG));
+        if (envFile == null) {
+            say("Sorry, no file specified.");
+            return;
+        }
+        File f = new File(envFile);
         boolean isJSON = inputLine.hasArg(ENV_JSON_FLAG);
 
         if (isJSON) {
@@ -350,7 +360,7 @@ public abstract class CommonCommands implements Commands {
             fileWriter.write(out);
             fileWriter.flush();
             fileWriter.close();
-        }else{
+        } else {
             XProperties xp = new XProperties();
             xp.putAll(getDriver().getEnv());
             FileOutputStream fos = new FileOutputStream(f);
@@ -368,6 +378,11 @@ public abstract class CommonCommands implements Commands {
 
     public void print_env(InputLine inputLine) throws Exception {
         if (getDriver().hasEnv()) {
+            if (curentEnvFile == null) {
+                say("no current environment file");
+            } else {
+                say("current environment file is:" + curentEnvFile);
+            }
             XProperties xProperties = new XProperties();
             xProperties.putAll(getDriver().getEnv());
             say(xProperties.toString(2));
@@ -388,7 +403,7 @@ public abstract class CommonCommands implements Commands {
             clearEnvHelp();
             return;
         }
-        if(inputLine.hasArg(ENV_KEY_FLAG)){
+        if (inputLine.hasArg(ENV_KEY_FLAG)) {
             getDriver().getEnv().remove(inputLine.getNextArgFor(ENV_KEY_FLAG));
             return;
         }

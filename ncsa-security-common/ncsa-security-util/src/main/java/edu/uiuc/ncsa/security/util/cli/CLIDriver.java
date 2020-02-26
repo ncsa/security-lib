@@ -314,25 +314,13 @@ public class CLIDriver {
             }
         }
     }
-
-
-    /**
-     * So that various other programs can call this as needed
-     *
-     * @param cmds
-     * @return
-     */
-    public int execute(String[] cmds) {
-        Vector cmdV = new Vector();
-        for (String x : cmds) {
-            cmdV.add(x);
-        }
-        return execute(cmdV);
-    }
+    
 
     public int execute(String cmdLine) {
         Vector cmdV = CLT.tokenize(cmdLine);
-        return execute(cmdV);
+        InputLine cliAV = new InputLine(cmdV);
+         cliAV.setOriginalLine(cmdLine);
+        return execute(cliAV);
     }
 
     /**
@@ -340,14 +328,14 @@ public class CLIDriver {
      * also throw a shutdown exception if the user asks it to..
      * Otherwise it returns false;
      *
-     * @param cmdV
+     * @param cliAV
      * @return
      */
 
-    public int execute(Vector cmdV) {
+    public int execute(InputLine cliAV) {
         try {
-            if (cmdV.size() > 0) {
-                String cmdS = ((String) cmdV.elementAt(0));
+            if (!cliAV.isEmpty()) {
+                String cmdS = cliAV.getCommand();
                 if (cmdS.toLowerCase().equals("exit") ||
                         cmdS.toLowerCase().equals("quit")) {
                     // This intercepts quitting so we don't have to jump through hoops to exit.
@@ -357,7 +345,6 @@ public class CLIDriver {
                     //    commands[0].help();
                     return HELP_RC;
                 }
-                InputLine cliAV = new InputLine(cmdV);
                 for (int i = 0; i < getCLICommands().length; i++) {
                     try {
                         invokeMethod(commands[i], cmdS, cliAV);

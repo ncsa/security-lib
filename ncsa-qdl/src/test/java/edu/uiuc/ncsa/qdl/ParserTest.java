@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
+import net.sf.json.JSONObject;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -860,5 +861,63 @@ public class ParserTest extends TestBase {
 
         assert state.getValue("a") != null;
         assert ((Long) state.getValue("a")).equals(2L);
+    }
+
+    /**
+     * Tests that to_ and from_ json are inverses for suitably
+     * well-behaved JSON. "Well-behaved" = no integers used as keys.
+     * Or there is a conflict with deserializing stems since a stem
+     * might have an entry like stem.0 (in a list) and stem.0. (which is
+     * a stem). Such a stem cannot be turned in to a JSON Object (and an
+     * {@link edu.uiuc.ncsa.qdl.exceptions.IndexError} is thrown.
+     * <br/><br/>
+     * So it should always work turning a JSON object in to a stem
+     * Turning it back might not but the former is all we can guarantee.
+     * Now, if the stem follows a few guidelines of not replicating
+     * integer indices as lists (it's fine to have stem.0. be an entry and
+     * the stem entry will be deserialized) but not both stem.0. and stem.0
+     * and as long as this is observed, there should be no problems mapping
+     * stems to JSON and back.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testJSONInvariance() throws Throwable {
+        String rawJSON = "{\n" +
+                " \"sub\": \"jeff\",\n" +
+                " \"aud\": \"ashigaru:command.line2\",\n" +
+                " \"uid\": \"jgaynor\",\n" +
+                " \"uidNumber\": \"25939\",\n" +
+                " \"isMemberOf\":  [\n" +
+                "    {\n" +
+                "   \"name\": \"org_ici\",\n" +
+                "   \"id\": 1282\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"list_apcs\",\n" +
+                "   \"id\": 1898\n" +
+                "  }\n" +
+                " ]\n" +
+                "}\n";
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j := '" + rawJSON + "';");
+        addLine(script, "claims. := from_json(j);");
+        addLine(script, "j2 := to_json(from_json(to_json(from_json(to_json(from_json(j))))));");
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("j2") != null;
+        String j2 = (String) state.getValue("j2");
+        JSONObject jsonObject = JSONObject.fromObject(rawJSON);
+        JSONObject result = JSONObject.fromObject(j2);
+        assert jsonObject.size() == result.size();
+        for (Object k : jsonObject.keySet()) {
+            String key = k.toString();
+            assert jsonObject.getString(key).equals(result.getString(key)) : "JSON equality failed for key=" + key;
+        }
+
+
     }
 }

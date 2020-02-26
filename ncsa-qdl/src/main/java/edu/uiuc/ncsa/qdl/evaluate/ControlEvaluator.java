@@ -155,10 +155,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("Error: reading files is not supported in server mode");
-        }
-
         if (polyad.getArgumments().size() == 0) {
             throw new IllegalArgumentException("Error: The" + commandName + " requires at least a single argument");
         }
@@ -168,13 +164,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg1 = polyad.evalArg(0, state);
-        ;
         try {
             QDLParser interpreter = new QDLParser(localState);
             String resourceName = arg1.toString();
             QDLScript script = null;
-            if (state.hasScriptProviders()) {
-                script = state.getScriptFromProvider(resourceName);
+            if(state.isVFSFile(resourceName)){
+                if (state.hasVFSProviders() ) {
+                    script = state.getScriptFromVFS(resourceName);
+                }
             }
             if (script != null) {
                 script.execute(state);
@@ -182,7 +179,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 if (state.isServerMode()) {
                     throw new QDLServerModeException("File operations are not permitted in server mode");
                 }
-
                 interpreter.execute(FileUtil.readFileAsString(resourceName));
             }
         } catch (Throwable t) {
@@ -198,7 +194,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error:" + RAISE_ERROR + " requires at least a single argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        ;
         if (arg1 == null) {
             arg1 = "(no message)";
         }
@@ -206,7 +201,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         state.setValue("error_message", arg1.toString());
         if (polyad.getArgumments().size() == 2) {
             arg2 = polyad.evalArg(1, state);
-            ;
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
             }
@@ -227,7 +221,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 break;
             case 1:
                 Object r = polyad.evalArg(0, state);
-                ;
                 polyad.setResult(r);
                 polyad.setResultType(polyad.getArgumments().get(0).getResultType());
                 polyad.setEvaluated(true);
@@ -260,8 +253,15 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         String resourceName = arg.toString();
         QDLScript script = null;
         File file = null;
-        if (state.hasScriptProviders()) {
-            script = state.getScriptFromProvider(resourceName);
+        if (state.hasVFSProviders()) {
+            try {
+                script = state.getScriptFromVFS(resourceName);
+            }catch(Throwable t){
+                if(t instanceof RuntimeException){
+                    throw (RuntimeException)t;
+                }
+                throw new QDLException("Error reading script from VFS:" + t.getMessage(), t);
+            }
         }
         if (script == null) {
             file = new File(resourceName);
