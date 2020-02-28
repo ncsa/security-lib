@@ -1,8 +1,12 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.util.PoolException;
+import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  * /**
@@ -50,6 +54,27 @@ public class SQLDatabase {
 
     public ConnectionPool getConnectionPool() {
         return connectionPool;
+    }
+
+    /**
+       * Take the values in the current row and stash them in a map, keyed by column name.
+       *
+       * @param rs
+       * @return
+       * @throws SQLException
+       */
+
+    protected ColumnMap rsToMap(ResultSet rs) throws SQLException {
+        ColumnMap map = new ColumnMap();
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int numberOfColumns = rsmd.getColumnCount();
+        for (int i = 1; i <= numberOfColumns; i++) {
+            String colName = rsmd.getColumnName(i);
+            Object obj = null;
+            obj = rs.getObject(colName);
+            map.put(colName, obj);
+        }
+        return map;
     }
 
 }

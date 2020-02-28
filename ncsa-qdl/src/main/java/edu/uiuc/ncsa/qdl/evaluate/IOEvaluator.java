@@ -154,21 +154,35 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void vfsUnmount(Polyad polyad, State state) {
-
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
+        }
     }
 
     protected void vfsMount(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() != 3) {
-            throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires 3 arguments");
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
+        }
+        if (3 <= polyad.getArgumments().size() && polyad.getArgumments().size() <= 4) {
+            throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires 3 or 4arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
         Object arg2 = polyad.evalArg(1, state);
         Object arg3 = polyad.evalArg(2, state);
-        if (isString(arg1) && isString(arg2) && isString(arg3)) {
+        Object arg4 = "r"; // mount in read only mode
+        if (polyad.getArgumments().size() == 4) {
+            arg4 = polyad.evalArg(2, state);
+        }
+        if (isString(arg1) && isString(arg2) && isString(arg3) && isString(arg4)) {
             // TODO - make sure there is not another one of these?
             // TODO - check that mount points don't conflict.
-            VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(arg1.toString(), arg2.toString(), arg3.toString());
-            state.addScriptProvider(vfs);
+            String permissions = arg4.toString();
+            VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(arg1.toString(),
+                    arg2.toString(),
+                    arg3.toString(),
+                    permissions.contains("r"),
+                    permissions.contains("w"));
+            state.addVFSProvider(vfs);
             polyad.setResult(null);
             polyad.setResult(Constant.NULL_TYPE);
             polyad.setEvaluated(true);

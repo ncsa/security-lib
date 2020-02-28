@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.scripting;
+package edu.uiuc.ncsa.qdl.vfs;
 
 import java.io.Serializable;
 
@@ -8,6 +8,10 @@ import java.io.Serializable;
  * resolved and the script is returned. You add these to the {@link edu.uiuc.ncsa.qdl.state.State}
  * load/run commands resolve against any script libraries then fall through to the local file system
  * (unless it is running in server mode).
+ * <br/><br/>
+ * Why not just use the Java {@link java.io.FileSystem}? Because that allows for access to the underlying
+ * native file system and in a scripting environment, we want to severely restrict access to just
+ * read-only virtual file systems which can e.g., make libraries available.
  * <p>Created by Jeff Gaynor<br>
  * on 2/5/20 at  7:43 AM
  */

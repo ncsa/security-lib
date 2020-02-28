@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
@@ -38,13 +39,14 @@ public abstract class VariableState extends NamespaceAwareState {
 
     /**
      * Checks if a symbol is defined. Note that this does do stem tail resolution and namespace resolution.
+     *
      * @param symbol
      * @return
      */
     public boolean isDefined(String symbol) {
         try {
             return getValue(symbol) != null;
-        }catch(UnknownSymbolException u){
+        } catch (UnknownSymbolException u) {
             // Can happen if the request is for a stem that eventually does not resolve.
             return false;
         }
@@ -116,22 +118,21 @@ public abstract class VariableState extends NamespaceAwareState {
                 w.getComponents()[i] = newIndex;
                 continue;
             }
-                // Check if current index is a stem and feed what's to the right to it as a multi-index
-                if (isDefined(newIndex + STEM_INDEX_MARKER)) {
-                    StemMultiIndex ww = new StemMultiIndex(w, i);
-                    Object v = gsrNSStemOp(ww, OP_GET, null);
-                    if (v == null) {
-                        throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value");
-                    }
-                    w.getComponents()[i] = v.toString();
-                    w.setRealLength(i + 1);
-                }else{
-                    w.getComponents()[i] = newIndex;
+            // Check if current index is a stem and feed what's to the right to it as a multi-index
+            if (isDefined(newIndex + STEM_INDEX_MARKER)) {
+                StemMultiIndex ww = new StemMultiIndex(w, i);
+                Object v = gsrNSStemOp(ww, OP_GET, null);
+                if (v == null) {
+                    throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value");
                 }
+                w.getComponents()[i] = v.toString();
+                w.setRealLength(i + 1);
+            } else {
+                w.getComponents()[i] = newIndex;
             }
+        }
         return w.truncate();
     }
-
 
 
     /**
@@ -146,7 +147,7 @@ public abstract class VariableState extends NamespaceAwareState {
         checkNSClash(w.name);
         w = resolveStemIndices(w);
         String variableName;
-        StemVariable stem;
+        StemVariable stem = null;
         boolean isNSQ = false;
         URI uri = null;
         if (isNSQname(w.name)) {
@@ -163,12 +164,29 @@ public abstract class VariableState extends NamespaceAwareState {
             }
             SymbolTable st = getSymbolStack().getRightST(variableName);
             stem = (StemVariable) st.resolveValue(getFQName(variableName));
+            // most likely place for it was in the main symbol table. But since there is
+            // no name clash, look for it in the modules.
+            if (stem == null) {
+                if (importedModules.hasImports()) {
+                    for (URI key : importedModules.keySet()) {
+                        Module m = getModuleMap().get(key);
+                        if (m != null) {
+                            Object obj = m.getState().getValue(variableName);
+                            if (obj != null && (obj instanceof StemVariable)) {
+                                stem = (StemVariable) obj;
+                                break;
+                            }
+
+                        }
+                    }
+                }
+            }
         }
         // Then this is of the form #foo and they are accessing local state explicitly
         switch (op) {
             case OP_GET:
                 if (stem == null) {
-                 //   throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
+                    //   throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
                     return null;
                 }
                 if (w.isEmpty()) {
@@ -203,13 +221,13 @@ public abstract class VariableState extends NamespaceAwareState {
                 if (stem == null) {
                     throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
                 }
-                if(w.isEmpty()){
+                if (w.isEmpty()) {
                     if (isNSQ) {
                         getModuleMap().get(uri).getState().getSymbolStack().getLocalST().remove(variableName);
                     } else {
                         getSymbolStack().getLocalST().remove(variableName);
                     }
-                }else {
+                } else {
                     stem.remove(w);
                 }
                 return null;
@@ -243,7 +261,22 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = getSymbolStack().getRightST(variableName);
         switch (op) {
             case OP_GET:
-                return st.resolveValue(variableName);
+                Object v = st.resolveValue(variableName);
+                if (v == null) {
+                    if (importedModules.hasImports()) {
+                        for (URI key : importedModules.keySet()) {
+                            Module m = getModuleMap().get(key);
+                            if (m != null) {
+                                Object obj = m.getState().getValue(variableName);
+                                if (obj != null) {
+                                    return obj;
+                                }
+
+                            }
+                        }
+                    }
+                }
+                return v;
             case OP_SET:
                 st.setValue(variableName, value);
                 return null;
@@ -257,7 +290,6 @@ public abstract class VariableState extends NamespaceAwareState {
     static final int OP_SET = 0;
     static final int OP_GET = 1;
     static final int OP_REMOVE = 2;
-
 
 
     public static class ResolveState {

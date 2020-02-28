@@ -216,6 +216,7 @@ public class Configurations {
      * @return
      */
     public static String getNodeValue(ConfigurationNode node, String name, String defaultValue) {
+        if(node == null) return defaultValue;
         String x = getNodeValue(node, name);
         return x == null ? defaultValue : x;
     }

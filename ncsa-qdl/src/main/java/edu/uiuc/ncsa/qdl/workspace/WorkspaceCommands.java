@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
@@ -20,7 +23,9 @@ import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.ExitException;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.*;
 import java.net.URI;
@@ -29,6 +34,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
+import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
@@ -940,9 +947,12 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    protected void setupJavaModule(State state, QDLLoader loader) {
+    protected void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
         for (Module m : loader.load()) {
             state.addModule(m); // done!
+            if (importASAP) {
+                state.getImportedModules().addImport(m.getNamespace(), m.getAlias());
+            }
         }
     }
 
@@ -969,12 +979,82 @@ public class WorkspaceCommands implements Logable {
 
     File envFile; // this is the name of the file holding the environment variables
 
+    protected void fromConfigFile(InputLine inputLine) throws Throwable {
+        String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
+        ConfigurationNode node = ConfigUtil.findConfiguration(
+                inputLine.getNextArgFor(CONFIG_FILE_FLAG),
+                cfgname, CONFIG_TAG_NAME);
+        QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
+
+        QDLEnvironment config = loader.load();
+        setEchoModeOn(config.isEchoModeOn());
+        boolean isVerbose = config.isWSVerboseOn();
+        logger = config.getMyLogger();
+        if (!config.getWSHomeDir().isEmpty()) {
+            rootDir = new File(config.getWSHomeDir());
+        } else {
+            String currentDirectory = System.getProperty("user.dir");
+            rootDir = new File(inputLine.getNextArgFor(currentDirectory));
+        }
+        State state = getState(); // This sets it for the class it will be  put in the interpreter below.
+        if (!config.getWSEnv().isEmpty()) {
+            // try and see if the file resolves first.
+            envFile = resolveAgainstRoot(config.getWSEnv());
+            env = new XProperties();
+
+            if (envFile.exists()) {
+                env.load(envFile);
+            }
+            // set some useful things.
+            env.put("qdl_root", rootDir.getAbsolutePath());
+        }
+        splashScreen();
+        QDLConfigurationLoaderUtils.setupVFS(config, getState());
+
+        setEchoModeOn(config.isEchoModeOn());
+        String[] foundModules = setupModules(config,  getState());
+        // Just so the user can see it in the properties after load.
+        if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
+            if (isVerbose) {
+                say("loaded java modules: " + foundModules[JAVA_MODULE_INDEX]);
+            }
+            env.put("java_modules", foundModules[JAVA_MODULE_INDEX]);
+        }
+        if (foundModules[QDL_MODULE_INDEX] != null && !foundModules[QDL_MODULE_INDEX].isEmpty()) {
+            if (isVerbose) {
+                say("loaded QDL modules: " + foundModules[QDL_MODULE_INDEX]);
+            }
+
+            env.put("qdl_modules", foundModules[QDL_MODULE_INDEX]);
+        }
+        String bf = QDLConfigurationLoaderUtils.runBootScript(config, getState());
+        if (bf != null) {
+            if (isVerbose) {
+                say("loaded boot script \"" + bf + "\"");
+            }
+            env.put("boot_script", bf);
+        }
+        interpreter = new QDLParser(env, getState());
+        interpreter.setEchoModeOn(config.isEchoModeOn());
+
+    }
+
     /**
      * Bootstraps the whole thing.
      *
      * @param inputLine
      */
     public void init(InputLine inputLine) throws Throwable {
+        if (inputLine.hasArg(CONFIG_FILE_FLAG)) {
+            fromConfigFile(inputLine);
+            return;
+        }
+        // Old input line
+        // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl" -qdlroot /home/ncsa/dev/qdl -env etc/qdl.properties -log log/qdl.log -v
+        fromCommandLine(inputLine);
+    }
+
+    protected void fromCommandLine(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON);
         if (isVerbose) {
             say("Verbose mode enabled.");
@@ -1042,7 +1122,8 @@ public class WorkspaceCommands implements Logable {
                 try {
                     Class klasse = state.getClass().forName(loaderClass);
                     QDLLoader loader = (QDLLoader) klasse.newInstance();
-                    setupJavaModule(state, loader);
+                    // Do not import everything on start as default so user can set up aliases.
+                    setupJavaModule(state, loader, false);
                     if (isVerbose) {
                         say("loaded module:" + klasse.getSimpleName());
                     }
@@ -1081,7 +1162,6 @@ public class WorkspaceCommands implements Logable {
                 say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
             }
         }
-        //   interpreter.setDebugOn(true);
     }
 
     File rootDir;

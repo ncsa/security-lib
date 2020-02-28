@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.scripting;
+package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.qdl.util.FileUtil;
  * <p>Created by Jeff Gaynor<br>
  * on 2/26/20 at  1:05 PM
  */
-public class VFSPassThruFileProvider implements VFSFileProvider {
+public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
     public VFSPassThruFileProvider(String rootDir,
                                    String scheme,
                                    String mountPoint,
@@ -41,7 +41,6 @@ public class VFSPassThruFileProvider implements VFSFileProvider {
 
     protected String makeFileName(String head, String rawPath) {
         return rootDir + rawPath.substring(head.length());
-
     }
 
     @Override

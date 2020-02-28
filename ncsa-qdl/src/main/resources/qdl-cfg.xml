@@ -1,0 +1,37 @@
+<config>
+    <qdl name="test"
+         enabled="true"
+         debug="trace"
+         server_mode="false">
+        <virtual_file_systems>
+            <vfs type="pass_through"
+                 access="rw">
+                <root_dir>/home/ncsa/qdl/scripts</root_dir>
+                <scheme><![CDATA[qdl-vfs]]></scheme>
+                <mount_point>/</mount_point>
+            </vfs>
+        </virtual_file_systems>
+        <modules>
+            <module type="java"
+                    import_on_start="true">
+                <class_name>edu.uiuc.ncsa.qdl.extensions.QDLLoaderImp</class_name>
+            </module>
+            <module type="qdl">
+                <path>relative/path/module.qdl</path>
+            </module>
+        </modules>
+        <boot_script>/home/ncsa/dev/qdl/boot.qdl</boot_script>
+        <workspace verbose="true"
+                   echoModeOn="true">
+            <home_dir>/home/ncsa/dev/qdl</home_dir>
+            <env>etc/qdl.properties</env>
+        </workspace>
+        <logging
+                logFileName="log/qdl.log"
+                logName="qdl"
+                logSize="100000"
+                logFileCount="2"
+                debug="false"/>
+    </qdl>
+
+</config>

@@ -566,6 +566,45 @@ public class ParserTest extends TestBase {
         assert e.equals(-20l);
     }
 
+    /**
+     * If a variable is in a module and that module is imported, you should be able
+     * to access the variable without a namespace if it has been imported and there
+     * are no clashes
+     *
+     * @throws Throwable
+     */
+    public void testNSAndVariableResolution() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','a']body[i:=2;list. := -10 + indices(5);];");
+        addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + indices(5);];");
+        addLine(script, "import('a:a');");
+        addLine(script, "import('a:b');");
+        addLine(script, "p := i;");
+        addLine(script, "q := list.0;");
+        addLine(script, "r := j;");
+        addLine(script, "s := list2.0;");
+        // Note that if we want to change the value, we need to qualify it still, however.
+        // Since an unqualified name gets created in the local state, not the module.
+        // May want to revisit how this is done in the design though....
+        addLine(script, "a#i := 5;");
+
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        Long p = getLongValue("p", state);
+        Long q = getLongValue("q", state);
+        Long r = getLongValue("r", state);
+        Long s = getLongValue("s", state);
+        Long i = getLongValue("i", state);
+        assert q.equals(-10L);
+        assert s.equals(-20l);
+        assert p.equals(2L);
+        assert r.equals(4L);
+        assert i.equals(5L);
+    }
 
     /**
      * In this case, modules have, of course, unique namespaces, but the aliases conflict so that is

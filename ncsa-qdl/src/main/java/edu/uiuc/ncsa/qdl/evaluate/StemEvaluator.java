@@ -806,25 +806,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 state,
                 "Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
 
-/*
-        polyad.evalArg(0, state);
-        Object r = polyad.getArgumments().get(0).getResult();
-        if (r == null) {
-            // this does not exist, create it
-            stemVariable = new StemVariable();
-            VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
-            state.setValue(variableNode.getVariableReference(), stemVariable);
-        } else {
-            // Other option is that this exists, so check that the person is trying to set the default
-            // for a stem and not something else.
-
-            if (!isStem(r)) {
-                throw new IllegalArgumentException("Error: the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
-            }
-            stemVariable = (StemVariable) r;
-        }
-*/
-
         polyad.evalArg(1, state);
 
         Object defaultValue = polyad.getArgumments().get(1).getResult();

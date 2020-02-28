@@ -107,7 +107,6 @@ public abstract class NamespaceAwareState extends AbstractState {
                     }
                 }
             }
-
         }
     }
 

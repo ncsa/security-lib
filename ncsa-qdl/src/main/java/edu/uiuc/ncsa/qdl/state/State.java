@@ -50,7 +50,7 @@ public class State extends FunctionState {
 
     HashMap<String, VFSFileProvider> scriptProviders = new HashMap<>();
 
-    public void addScriptProvider(VFSFileProvider scriptProvider) {
+    public void addVFSProvider(VFSFileProvider scriptProvider) {
         scriptProviders.put(scriptProvider.getScheme(), scriptProvider);
     }
 

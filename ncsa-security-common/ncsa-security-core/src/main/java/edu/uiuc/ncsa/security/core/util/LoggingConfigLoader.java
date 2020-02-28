@@ -32,13 +32,13 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     protected void loadDebug() {
         String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
         try {
-            System.err.println(this.getClass().getSimpleName() + ".load: setting debug for \"" + rawDebug + "\"");
+            DebugUtil.trace(this, ".load: setting debug for \"" + rawDebug + "\"");
             if (rawDebug == null || rawDebug.isEmpty()) {
                 DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
             } else {
                 DebugUtil.setDebugLevel(rawDebug);
             }
-            System.err.println(this.getClass().getSimpleName() + ".load: set debug to level " + DebugUtil.getDebugLevel());
+            DebugUtil.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
 
         } catch (Throwable t) {
             // ok, so that didn't work, fall back to the old way
@@ -85,7 +85,6 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
         }
         // yes, dump it to the console.
         String startupVersion = getVersionString() + " startup on " + (new Date());
-        System.out.println(startupVersion);
         this.myLogger = loggerProvider.get();
         // now we have a log to stick it in.
         info(startupVersion);

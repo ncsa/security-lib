@@ -317,14 +317,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
-        ;
         if (arg == null) {
             throw new MissingArgumentException("Error: You must supply a module name to import.");
         }
         String alias = null;
         if (polyad.getArgumments().size() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            ;
             if (arg2 == null || !isString(arg2)) {
                 throw new MissingArgumentException("Error: You must supply a valid alias import.");
             }
