@@ -70,9 +70,18 @@ public class QDLRunner {
                         // used by the workspace to print each statement's result to the console.
                         if ((stmt instanceof ExpressionImpl)) {
                             ExpressionImpl expression = (ExpressionImpl) stmt;
-                            if (expression.getOperatorType() != currentState.getMetaEvaluator().getType("say")) {
-                                Polyad p = new Polyad("say");
-                                p.setOperatorType(IOEvaluator.SAY_TYPE);
+                            if (expression instanceof Polyad) {
+                                // so if this is already a print statement, don't wrap it in one
+                                boolean isPrint = ((Polyad) expression).getName().equals(IOEvaluator.SAY_FUNCTION) ||
+                                        ((Polyad) expression).getName().equals(IOEvaluator.PRINT_FUNCTION);
+                                if (!isPrint) {
+                                    Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
+                                    p.addArgument(expression);
+                                    stmt = p;
+
+                                }
+                            } else {
+                                Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
                                 p.addArgument(expression);
                                 stmt = p;
                             }

@@ -20,38 +20,38 @@ import java.util.TreeSet;
  */
 public class MathEvaluator extends AbstractFunctionEvaluator {
     public static final int MATH_FUNCTION_BASE_VALUE = 1000;
-    public static String ABS_VALUE = "abs";
+    public static final String ABS_VALUE = "abs";
     public static final int ABS_VALUE_TYPE = 1 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String RANDOM = "random";
+    public static final String RANDOM = "random";
     public static final int RANDOM_TYPE = 2 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String RANDOM_STRING = "random_string";
+    public static final String RANDOM_STRING = "random_string";
     public static final int RANDOM_STRING_TYPE = 3 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String HASH = "hash";
+    public static final String HASH = "hash";
     public static final int HASH_TYPE = 4 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String TO_HEX = "to_hex";
+    public static final String TO_HEX = "to_hex";
     public static final int TO_HEX_TYPE = 5 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String FROM_HEX = "from_hex";
+    public static final String FROM_HEX = "from_hex";
     public static final int FROM_HEX_TYPE = 6 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String DATE_MS = "date_ms";
+    public static final String DATE_MS = "date_ms";
     public static final int DATE_MS_TYPE = 7 + MATH_FUNCTION_BASE_VALUE;
 
 
-    public static String DECODE_B64 = "decode_b64";
+    public static final String DECODE_B64 = "decode_b64";
     public static final int DECODE_B64_TYPE = 8 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String ENCODE_B64 = "encode_b64";
+    public static final String ENCODE_B64 = "encode_b64";
     public static final int ENCODE_B64_TYPE = 9 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String MOD = "mod";
+    public static final String MOD = "mod";
     public static final int MOD_TYPE = 10 + MATH_FUNCTION_BASE_VALUE;
 
-    public static String DATE_ISO = "date_iso";
+    public static final String DATE_ISO = "date_iso";
     public static final int DATE_ISO_TYPE = 11 + MATH_FUNCTION_BASE_VALUE;
     public static String FUNC_NAMES[] = new String[]{ABS_VALUE,RANDOM,RANDOM_STRING,HASH,TO_HEX,
             FROM_HEX,DATE_MS,DATE_ISO,DECODE_B64,ENCODE_B64,MOD,DATE_ISO};
@@ -62,58 +62,74 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
           }
           return names;
       }
-
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
     @Override
     public int getType(String name) {
-        if (name.equals(ABS_VALUE)) return ABS_VALUE_TYPE;
-        if (name.equals(RANDOM)) return RANDOM_TYPE;
-        if (name.equals(RANDOM_STRING)) return RANDOM_STRING_TYPE;
-        if (name.equals(HASH)) return HASH_TYPE;
-        if (name.equals(TO_HEX)) return TO_HEX_TYPE;
-        if (name.equals(FROM_HEX)) return FROM_HEX_TYPE;
-        if (name.equals(ENCODE_B64)) return ENCODE_B64_TYPE;
-        if (name.equals(DECODE_B64)) return DECODE_B64_TYPE;
-        if (name.equals(DATE_MS)) return DATE_MS_TYPE;
-        if (name.equals(DATE_ISO)) return DATE_ISO_TYPE;
-        if (name.equals(MOD)) return MOD_TYPE;
+        switch (name) {
+                case ABS_VALUE:
+                    return ABS_VALUE_TYPE;
+                case RANDOM:
+                    return RANDOM_TYPE;
+                case RANDOM_STRING:
+                    return RANDOM_STRING_TYPE;
+                case HASH:
+                    return HASH_TYPE;
+                case TO_HEX:
+                    return TO_HEX_TYPE;
+                case FROM_HEX:
+                    return FROM_HEX_TYPE;
+                case ENCODE_B64:
+                    return ENCODE_B64_TYPE;
+                case DECODE_B64:
+                    return DECODE_B64_TYPE;
+                case DATE_MS:
+                    return DATE_MS_TYPE;
+                case DATE_ISO:
+                    return DATE_ISO_TYPE;
+                case MOD:
+                    return MOD_TYPE;
+            }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case ABS_VALUE_TYPE:
+        switch (polyad.getName()) {
+            case ABS_VALUE:
                 doAbs(polyad, state);
                 return true;
-            case RANDOM_TYPE:
+            case RANDOM:
                 doRandom(polyad, state);
                 return true;
-            case RANDOM_STRING_TYPE:
+            case RANDOM_STRING:
                 doRandomString(polyad, state);
                 return true;
-            case HASH_TYPE:
+            case HASH:
                 doHash(polyad, state);
                 return true;
-            case TO_HEX_TYPE:
+            case TO_HEX:
                 toFromhex(polyad, state, true);
                 return true;
-            case FROM_HEX_TYPE:
+            case FROM_HEX:
                 toFromhex(polyad, state, false);
                 return true;
-            case ENCODE_B64_TYPE:
+            case ENCODE_B64:
                 doB64(polyad, state, true);
                 return true;
-            case DECODE_B64_TYPE:
+            case DECODE_B64:
                 doB64(polyad, state, false);
                 return true;
-            case DATE_MS_TYPE:
+            case DATE_MS:
                 doDates(polyad, state, true);
                 return true;
-            case DATE_ISO_TYPE:
+            case DATE_ISO:
                 doDates(polyad, state, false);
                 return true;
-            case MOD_TYPE:
+            case MOD:
                 doModulus(polyad, state);
                 return true;
         }

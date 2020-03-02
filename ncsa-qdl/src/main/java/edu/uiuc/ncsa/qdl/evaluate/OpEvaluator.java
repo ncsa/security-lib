@@ -56,6 +56,11 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int POWER_VALUE = 211;
     public static final int INTEGER_DIVIDE_VALUE = 212;
 
+    @Override
+    public String[] getFunctionNames() {
+        return new String[0];
+    }
+
     public int getNumericDigits() {
         return numericDigits;
     }

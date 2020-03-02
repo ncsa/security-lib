@@ -38,9 +38,10 @@ public class FileEntries {
         XProperties xp = new XProperties();
         Date ts = new Date();
         ts.setTime(f.lastModified());
-        xp.put(Scripts.CREATE_TIME, Iso8601.date2String(ts));
-        xp.put(Scripts.LAST_MODIFIED, Iso8601.date2String(ts));
-        xp.put(Scripts.ID, id);
+        xp.put(FileEntryConstants.CREATE_TIME, Iso8601.date2String(ts));
+        xp.put(FileEntryConstants.LAST_MODIFIED, Iso8601.date2String(ts));
+        xp.put(FileEntryConstants.LENGTH, f.length());
+        xp.put(FileEntryConstants.ID, id);
         List<String> contents;
         if (isBinary(f)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);

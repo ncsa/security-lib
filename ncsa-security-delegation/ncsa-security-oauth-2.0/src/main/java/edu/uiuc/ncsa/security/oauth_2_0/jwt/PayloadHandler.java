@@ -75,6 +75,8 @@ public interface PayloadHandler {
      */
     JSONObject getClaims()  throws Throwable;
 
+    JSONObject getExtendedAttributes() throws Throwable;
+
     /**
      * This sets the accounting information (such as the expiration and such) for a token.
      * This is called when a token is created or refreshed. 

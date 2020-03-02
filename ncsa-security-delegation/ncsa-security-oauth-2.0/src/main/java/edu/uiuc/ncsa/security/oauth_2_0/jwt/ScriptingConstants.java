@@ -20,6 +20,7 @@ public interface ScriptingConstants {
     String SRE_REQ_SCOPES = "scopes";
     String SRE_REQ_FLOW_STATES = "flow_states";
     String SRE_REQ_CLAIM_SOURCES = "claim_sources";
+    String SRE_REQ_EXTENDED_ATTRIBUTES = "eas";
     String[] SRE_PHASES = {
             SRE_EXEC_INIT,
             SRE_PRE_AUTH,

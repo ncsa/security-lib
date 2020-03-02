@@ -10,8 +10,10 @@ import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -24,52 +26,60 @@ import java.util.TreeSet;
  * on 1/18/20 at  11:49 AM
  */
 public class ControlEvaluator extends AbstractFunctionEvaluator {
+
+    public static final String EXECUTE = "execute";
+
     public static final int CONTROL_BASE_VALUE = 5000;
     // Looping stuff
-    public static String CONTINUE = "continue";
+    public static final String CONTINUE = "continue";
     public static final int CONTINUE_TYPE = 1 + CONTROL_BASE_VALUE;
 
-    public static String BREAK = "break";
+    public static final String BREAK = "break";
     public static final int BREAK_TYPE = 2 + CONTROL_BASE_VALUE;
 
-    public static String FOR_KEYS = "for_keys";
+    public static final String FOR_KEYS = "for_keys";
     public static final int FOR_KEYS_TYPE = 3 + CONTROL_BASE_VALUE;
 
-    public static String FOR_NEXT = "for_next";
+    public static final String FOR_NEXT = "for_next";
     public static final int FOR_NEXT_TYPE = 4 + CONTROL_BASE_VALUE;
 
-    public static String CHECK_AFTER = "check_after";
+    public static final String CHECK_AFTER = "check_after";
     public static final int CHECK_AFTER_TYPE = 5 + CONTROL_BASE_VALUE;
 
 
     // function stuff
-    public static String RETURN = "return";
+    public static final String RETURN = "return";
     public static final int RETURN_TYPE = 100 + CONTROL_BASE_VALUE;
 
 
-    public static String IMPORT = "import";
+    public static final String IMPORT = "import";
     public static final int IMPORT_TYPE = 203 + CONTROL_BASE_VALUE;
 
     /*  public static String SET_ALIAS = "set_alias";
       public static final int SET_ALIAS_TYPE = 204 + CONTROL_BASE_VALUE;
   */
-    public static String LOAD_MODULE = "load_module";
+    public static final String LOAD_MODULE = "load_module";
     public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
 
     // try ... catch
 
-    public static String RAISE_ERROR = "raise_error";
+    public static final String RAISE_ERROR = "raise_error";
     public static final int RAISE_ERROR_TYPE = 300 + CONTROL_BASE_VALUE;
 
     // For external programs
 
-    public static String RUN_COMMAND = "run_script";
+    public static final String RUN_COMMAND = "run_script";
     public static final int RUN_COMMAND_TYPE = 400 + CONTROL_BASE_VALUE;
 
-    public static String LOAD_COMMAND = "load_script";
+    public static final String LOAD_COMMAND = "load_script";
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
     public static String FUNC_NAMES[] = new String[]{CONTINUE, BREAK, FOR_KEYS, FOR_NEXT, CHECK_AFTER, RETURN, IMPORT, LOAD_MODULE,
             RAISE_ERROR, RUN_COMMAND, LOAD_COMMAND};
+
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
 
     public TreeSet<String> listFunctions() {
         TreeSet<String> names = new TreeSet<>();
@@ -81,59 +91,73 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public int getType(String name) {
-        if (name.equals(CONTINUE)) return CONTINUE_TYPE;
-        if (name.equals(BREAK)) return BREAK_TYPE;
-        if (name.equals(RETURN)) return RETURN_TYPE;
-        // NOTE NOTE NOTE!!! The next 3 functions are NOT evaluated here. Their type is set and in
-        // the WhileLoop class they are picked apart for their contents and the correct looping strategy is
-        // done.
-        if (name.equals(FOR_KEYS)) return FOR_KEYS_TYPE;
-        if (name.equals(FOR_NEXT)) return FOR_NEXT_TYPE;
-        if (name.equals(CHECK_AFTER)) return CHECK_AFTER_TYPE;
-        // Module stuff
-        if (name.equals(IMPORT)) return IMPORT_TYPE;
-        if (name.equals(LOAD_MODULE)) return LOAD_MODULE_TYPE;
-
-        if (name.equals(RAISE_ERROR)) return RAISE_ERROR_TYPE;
-        if (name.equals(RUN_COMMAND)) return RUN_COMMAND_TYPE;
-        if (name.equals(LOAD_COMMAND)) return LOAD_COMMAND_TYPE;
+        switch (name) {
+            case CONTINUE:
+                return CONTINUE_TYPE;
+            case BREAK:
+                return BREAK_TYPE;
+            case RETURN:
+                return RETURN_TYPE;
+            case FOR_KEYS:
+                return FOR_KEYS_TYPE;
+            case FOR_NEXT:
+                return FOR_NEXT_TYPE;
+            case CHECK_AFTER:
+                return CHECK_AFTER_TYPE;
+            // Module stuff
+            case IMPORT:
+                return IMPORT_TYPE;
+            case LOAD_MODULE:
+                return LOAD_MODULE_TYPE;
+            case RAISE_ERROR:
+                return RAISE_ERROR_TYPE;
+            case RUN_COMMAND:
+                return RUN_COMMAND_TYPE;
+            case LOAD_COMMAND:
+                return LOAD_COMMAND_TYPE;
+        }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case BREAK_TYPE:
+        // NOTE NOTE NOTE!!! The for_next, has_keys, check_after functions are NOT evaluated here. In
+        // the WhileLoop class they are picked apart for their contents and the correct looping strategy is
+        // done. Look at the WhileLoop's evaluate method. All this evaluator
+        // does is mark them as built in functions.
+
+        switch (polyad.getName()) {
+            case BREAK:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new BreakException();
-            case CONTINUE_TYPE:
+            case CONTINUE:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new ContinueException();
-            case RETURN_TYPE:
+            case RETURN:
                 doReturn(polyad, state);
                 return true;
-            case RUN_COMMAND_TYPE:
+            case RUN_COMMAND:
                 runScript(polyad, state);
                 return true;
-            case LOAD_COMMAND_TYPE:
+            case LOAD_COMMAND:
                 loadScript(polyad, state);
                 return true;
 
-            case IMPORT_TYPE:
+            case IMPORT:
                 doImport(polyad, state);
                 return true;
-           /* case SET_ALIAS_TYPE:
-                doSetAlias(polyad, state);
-                return true;*/
-            case LOAD_MODULE_TYPE:
+            case LOAD_MODULE:
                 doLoadModule(polyad, state);
                 return true;
-            case RAISE_ERROR_TYPE:
+            case RAISE_ERROR:
                 doRaiseError(polyad, state);
+                return true;
+            case EXECUTE:
+                doExecute(polyad, state);
                 return true;
         }
         return false;
@@ -168,8 +192,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             QDLParser interpreter = new QDLParser(localState);
             String resourceName = arg1.toString();
             QDLScript script = null;
-            if(state.isVFSFile(resourceName)){
-                if (state.hasVFSProviders() ) {
+            if (state.isVFSFile(resourceName)) {
+                if (state.hasVFSProviders()) {
                     script = state.getScriptFromVFS(resourceName);
                 }
             }
@@ -256,9 +280,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (state.hasVFSProviders()) {
             try {
                 script = state.getScriptFromVFS(resourceName);
-            }catch(Throwable t){
-                if(t instanceof RuntimeException){
-                    throw (RuntimeException)t;
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
                 }
                 throw new QDLException("Error reading script from VFS:" + t.getMessage(), t);
             }
@@ -355,4 +379,46 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
+
+    protected void doExecute(Polyad polyad, State state) {
+        // execute a string.
+        if (polyad.getArgumments().size() != 1) {
+            throw new IllegalArgumentException("Error. Wrong number of arguments. " +
+                    "This requires a single argument that is a string or a list of them.");
+        }
+        Object result = polyad.evalArg(0, state);
+        ;
+        StemVariable stem = null;
+
+        if (isString(result)) {
+            stem = new StemVariable();
+            stem.put("0", result); // dummy argument
+        }
+        if (isStemList(result)) {
+            stem = (StemVariable) result;
+        }
+        if (stem == null) {
+            throw new IllegalArgumentException("No executable argument found.");
+        }
+
+
+        QDLParser p = new QDLParser(new XProperties(), state);
+        for (int i = 0; i < stem.size(); i++) {
+            String currentIndex = Integer.toString(i);
+            if (!stem.containsKey(currentIndex)) {
+                return;
+            }
+            try {
+                p.execute(stem.getString(Integer.toString(i)));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+                throw new GeneralException("Error during execution at index " + i + ".", throwable);
+            }
+        }
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setResult(Boolean.TRUE);
+        polyad.setEvaluated(true);
+
+    }
+
 }

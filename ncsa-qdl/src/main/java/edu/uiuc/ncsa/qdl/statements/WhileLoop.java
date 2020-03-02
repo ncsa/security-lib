@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.qdl.statements;
 
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.BreakException;
 import edu.uiuc.ncsa.qdl.exceptions.ContinueException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
@@ -12,6 +12,8 @@ import edu.uiuc.ncsa.qdl.util.StemVariable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -42,16 +44,23 @@ public class WhileLoop implements Statement {
     @Override
     public Object evaluate(State state) {
         State localState = state.newStateWithImports();
-        if (conditional.getOperatorType() == ControlEvaluator.CHECK_AFTER_TYPE) {
-            return doPostLoop(localState);
-        }
-        if (conditional.getOperatorType() == ControlEvaluator.FOR_NEXT_TYPE) {
-            return doForLoop(localState);
+        if(conditional instanceof Polyad){
+           Polyad p = (Polyad )conditional;
+           if(p.isBuiltIn()){
+               switch(p.getName()){
+                   case FOR_KEYS:
+                       return hasKeysLoop(localState);
+                   case FOR_NEXT:
+                       return doForLoop(localState);
+                   case CHECK_AFTER:
+                       return doPostLoop(localState);
+               }
+           }
         }
 
-        if (conditional.getOperatorType() == ControlEvaluator.FOR_KEYS_TYPE) {
-            return hasKeysLoop(localState);
-        }
+        // No built in looping function, so it is just some ordinary conditional,
+        // like i < 5, or a user-defined function.
+        // Just evaluate it.
         return doBasicWhile(localState);
 
     }
@@ -119,7 +128,7 @@ public class WhileLoop implements Statement {
                 loopArg = node.getVariableReference();
                 break;
             default:
-                throw new IllegalArgumentException("Error: incorrect number of arguments for " + ControlEvaluator.FOR_NEXT + ".");
+                throw new IllegalArgumentException("Error: incorrect number of arguments for " + FOR_NEXT + ".");
         }
         // while[for_next(j,0,10,-1)]do[say(j);];  // test statememt
         SymbolTable localST = localState.getSymbolStack().getLocalST();
@@ -166,7 +175,7 @@ public class WhileLoop implements Statement {
      */
     protected Object hasKeysLoop(State localState) {
         if (conditional.getArgumments().size() != 2) {
-            throw new IllegalArgumentException("Error: You must supply two arguments for " + ControlEvaluator.FOR_KEYS);
+            throw new IllegalArgumentException("Error: You must supply two arguments for " + FOR_KEYS);
         }
         String loopVar = null;
         StemVariable stemVariable = null;

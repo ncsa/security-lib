@@ -20,31 +20,31 @@ functions rather than a massive single class. So the inheritence is just encapsu
  */
 public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final int STRING_FUNCTION_BASE_VALUE = 3000;
-    public static String CONTAINS = "contains";
+    public static final String CONTAINS = "contains";
     public static final int CONTAINS_TYPE = 1 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String TO_LOWER = "to_lower";
+    public static final String TO_LOWER = "to_lower";
     public static final int TO_LOWER_TYPE = 2 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String TO_UPPER = "to_upper";
+    public static final String TO_UPPER = "to_upper";
     public static final int TO_UPPER_TYPE = 3 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String TRIM = "trim";
+    public static final String TRIM = "trim";
     public static final int TRIM_TYPE = 4 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String INSERT = "insert";
+    public static final String INSERT = "insert";
     public static final int INSERT_TYPE = 5 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String SUBSTRING = "substring";
+    public static final String SUBSTRING = "substring";
     public static final int SUBSTRING_TYPE = 6 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String REPLACE = "replace";
+    public static final String REPLACE = "replace";
     public static final int REPLACE_TYPE = 7 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String INDEX_OF = "index_of";
+    public static final String INDEX_OF = "index_of";
     public static final int INDEX_OF_TYPE = 8 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String TOKENIZE = "tokenize";
+    public static final String TOKENIZE = "tokenize";
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
     public static String FUNC_NAMES[] = new String[]{CONTAINS,TO_LOWER,TO_UPPER,TRIM,INSERT,SUBSTRING,REPLACE,INDEX_OF,TOKENIZE};
 
@@ -55,6 +55,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
           }
           return names;
       }
+
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
 
     @Override
     public int getType(String name) {
@@ -70,7 +75,42 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         return UNKNOWN_VALUE;
     }
 
+    @Override
+       public boolean evaluate(Polyad polyad, State state) {
+           switch (polyad.getName()) {
+               case CONTAINS:
+                   doContains(polyad, state);
+                   return true;
+               case TRIM:
+                   doTrim(polyad, state);
+                   return true;
+               case INDEX_OF:
+                   doIndexOf(polyad, state);
+                   return true;
+               case TO_LOWER:
+                   doSwapCase(polyad, state, true);
+                   return true;
+               case TO_UPPER:
+                   doSwapCase(polyad, state, false);
+                   return true;
+               case REPLACE:
+                   doReplace(polyad, state);
+                   return true;
+               case INSERT:
+                   doInsert(polyad, state);
+                   return true;
+               case TOKENIZE:
+                   doTokenize(polyad, state);
+                   return true;
+               case SUBSTRING:
+                   doSubstring(polyad, state);
+                   return true;
+           }
+           return false;
+       }
 
+
+/*
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getOperatorType()) {
@@ -104,6 +144,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         }
         return false;
     }
+*/
 
     protected void doSubstring(Polyad polyad, State state) {
         fPointer pointer = new fPointer() {

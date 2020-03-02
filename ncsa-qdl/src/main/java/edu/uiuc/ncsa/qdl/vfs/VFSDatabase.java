@@ -57,19 +57,27 @@ public class VFSDatabase extends SQLDatabase {
         }
         return t;
     }
+    protected void update(FileEntry fileEntry){
 
+    }
     public void put(FileEntry fileEntry) {
         Connection c = getConnection();
         FileEntry t = null;
         try {
-            String statement = "insert into " + fqTablename + " (" + EA + ", " + CONTENT + " ) values (?,?)";
+            String statement = "insert into " + fqTablename + " (" +
+                    PATH_NAME + "," +
+                    FILE_NAME + "," +
+                    EA + ", " +
+                    CONTENT + " ) values (?,?, ?, ?) ";
             PreparedStatement stmt = c.prepareStatement(statement);
             StringWriter stringWriter = new StringWriter();
             fileEntry.getProperties().store(stringWriter, "");
             JSONArray array = new JSONArray();
             array.addAll(fileEntry.getLines());
-            stmt.setString(1, stringWriter.toString());
-            stmt.setString(2, array.toString());
+            stmt.setString(1, "path");
+            stmt.setString(2, "fname");
+            stmt.setString(3, stringWriter.toString());
+            stmt.setString(4, array.toString());
             stmt.executeQuery();
             ResultSet rs = stmt.getResultSet();
             // Now we have to pull in all the values.

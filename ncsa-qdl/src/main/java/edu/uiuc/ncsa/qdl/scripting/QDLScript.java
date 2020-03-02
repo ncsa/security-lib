@@ -16,7 +16,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/4/20 at  5:09 PM
  */
-public class QDLScript extends FileEntry implements ScriptInterface  {
+public class QDLScript extends FileEntry implements ScriptInterface {
     public QDLScript(List<String> lines, XProperties xp) {
         super(lines, xp);
     }
@@ -42,15 +42,17 @@ public class QDLScript extends FileEntry implements ScriptInterface  {
             try {
                 BufferedReader bufferedReader = new BufferedReader(rawScript);
                 String line = bufferedReader.readLine();
-                getLines().add(line); // the getText method will add new lines later as needed
+
+                while (line != null) {
+                    getLines().add(line);
+                    line = bufferedReader.readLine();
+                }
                 bufferedReader.close();
             } catch (IOException ox) {
                 throw new QDLException("Error: Could not read the script:" + ox.getMessage());
             }
         }
     }
-
-
 
 
     public void execute(StateInterface state) {

@@ -163,7 +163,10 @@ public class QDLListener implements QDLParserListener {
             name = name.substring(0, name.length() - 1);
         }
         polyad.setName(name);
-        polyad.setOperatorType(state.getFunctionType(name));
+        // Generally built-in functions are resolved by their name. This next line figures out
+        // if the given function is not a built-in and flags it. If this is not set
+        // then no user-defined functions are going to be available.
+        polyad.setBuiltIn(state.getMetaEvaluator().isBuiltInFunction(name));
         ParseTree kids = ctx.getChild(1); //
         for (int i = 0; i < kids.getChildCount(); i++) {
             ParseTree kid = kids.getChild(i);

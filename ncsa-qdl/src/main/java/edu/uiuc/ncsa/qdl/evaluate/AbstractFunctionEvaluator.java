@@ -21,7 +21,13 @@ import java.util.Set;
  */
 public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
-
+    public abstract String[] getFunctionNames();
+    public boolean isBuiltInFunction(String name){
+         for(String x : getFunctionNames()){
+             if(x.equals(name)) return  true;
+         }
+         return false;
+    }
     /**
      * This takes and expression (with an operator type) and returns true if is handled in this evaluator
      * and false otherwise.
@@ -194,9 +200,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        ;
         Object arg2 = polyad.evalArg(1, state);
-        ;
 
         Object[] argList = new Object[polyad.getArgumments().size()];
         argList[0] = arg1;
@@ -246,11 +250,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        ;
         Object arg2 = polyad.evalArg(1, state);
-        ;
         Object arg3 = polyad.evalArg(2, state);
-        ;
 
         if (areNoneStems(arg1, arg2, arg3)) {
             fpResult result = pointer.process(arg1, arg2, arg3);

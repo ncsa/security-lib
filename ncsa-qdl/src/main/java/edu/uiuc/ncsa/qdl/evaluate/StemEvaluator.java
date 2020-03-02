@@ -21,88 +21,96 @@ import java.util.TreeSet;
  */
 public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int STEM_FUNCTION_BASE_VALUE = 2000;
-    public static String SIZE = "size";
+    public static final String SIZE = "size";
     public static final int SIZE_TYPE = 1 + STEM_FUNCTION_BASE_VALUE;
 
 
-    public static String MAKE_INDICES = "indices";
+    public static final String MAKE_INDICES = "indices";
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String REMOVE = "remove";
+    public static final String REMOVE = "remove";
     public static final int REMOVE_TYPE = 5 + STEM_FUNCTION_BASE_VALUE;
 
 
-    public static String IS_DEFINED = "is_defined";
+    public static final String IS_DEFINED = "is_defined";
     public static final int IS_DEFINED_TYPE = 6 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String SET_DEFAULT = "set_default";
+    public static final String SET_DEFAULT = "set_default";
     public static final int SET_DEFAULT_TYPE = 7 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String BOX = "box";
+    public static final String BOX = "box";
     public static final int BOX_TYPE = 8 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String UNBOX = "unbox";
+    public static final String UNBOX = "unbox";
     public static final int UNBOX_TYPE = 9 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String UNION = "union";
+    public static final String UNION = "union";
     public static final int UNION_TYPE = 10 + STEM_FUNCTION_BASE_VALUE;
 
     // Key functions
-    public static String COMMON_KEYS = "common_keys";
+    public static final String COMMON_KEYS = "common_keys";
     public static final int COMMON_KEYS_TYPE = 100 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String EXCLUDE_KEYS = "exclude_keys";
+    public static final String EXCLUDE_KEYS = "exclude_keys";
     public static final int EXCLUDE_KEYS_TYPE = 101 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String GET_KEYS = "get_keys";
+    public static final String GET_KEYS = "get_keys";
     public static final int GET_KEYS_TYPE = 102 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String HAS_KEYS = "has_keys";
+    public static final String HAS_KEYS = "has_keys";
     public static final int HAS_KEYS_TYPE = 103 + STEM_FUNCTION_BASE_VALUE;
 
 
-    public static String INCLUDE_KEYS = "include_keys";
+    public static final String INCLUDE_KEYS = "include_keys";
     public static final int INCLUDE_KEYS_TYPE = 104 + STEM_FUNCTION_BASE_VALUE;
 
 
-    public static String RENAME_KEYS = "rename_keys";
+    public static final String RENAME_KEYS = "rename_keys";
     public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String MASK = "mask";
+    public static final String MASK = "mask";
     public static final int MASK_TYPE = 106 + STEM_FUNCTION_BASE_VALUE;
 
     // list functions
 
 
-    public static String LIST_APPEND = "list_append";
+    public static final String LIST_APPEND = "list_append";
     public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String LIST_INSERT_AT = "list_insert_at";
+    public static final String LIST_INSERT_AT = "list_insert_at";
     public static final int LIST_INSERT_AT_TYPE = 201 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String LIST_SUBSET = "list_subset";
+    public static final String LIST_SUBSET = "list_subset";
     public static final int LIST_SUBSET_TYPE = 202 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String LIST_COPY = "list_copy";
+    public static final String LIST_COPY = "list_copy";
     public static final int LIST_COPY_TYPE = 203 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String IS_LIST = "is_list";
+    public static final String IS_LIST = "is_list";
     public static final int IS_LIST_TYPE = 204 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String TO_LIST = "to_list";
+    public static final String TO_LIST = "to_list";
     public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;
 
     // Conversions to/from JSON.
-    public static String TO_JSON = "to_json";
+    public static final String TO_JSON = "to_json";
     public static final int TO_JSON_TYPE = 300 + STEM_FUNCTION_BASE_VALUE;
 
-    public static String FROM_JSON = "from_json";
+    public static final String FROM_JSON = "from_json";
     public static final int FROM_JSON_TYPE = 301 + STEM_FUNCTION_BASE_VALUE;
 
-
+    /**
+     * A list of the names that this Evaluator knows about. NOTE that this must be kept in sync
+     * by the developer since it is used to determine if a function is built in or a user-defined function.
+     */
     public static String FUNC_NAMES[] = new String[]{SIZE, MAKE_INDICES, REMOVE, IS_DEFINED,
             SET_DEFAULT, BOX, UNBOX, UNION, COMMON_KEYS, EXCLUDE_KEYS, GET_KEYS, HAS_KEYS, INCLUDE_KEYS, RENAME_KEYS, MASK,
             LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST, TO_JSON, FROM_JSON};
+
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
 
     public TreeSet<String> listFunctions() {
         TreeSet<String> names = new TreeSet<>();
@@ -114,103 +122,128 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public int getType(String name) {
-        if (name.equals(SIZE)) return SIZE_TYPE;
-        if (name.equals(MASK)) return MASK_TYPE;
-        if (name.equals(SET_DEFAULT)) return SET_DEFAULT_TYPE;
-        if (name.equals(COMMON_KEYS)) return COMMON_KEYS_TYPE;
-        if (name.equals(EXCLUDE_KEYS)) return EXCLUDE_KEYS_TYPE;
-        if (name.equals(GET_KEYS)) return GET_KEYS_TYPE;
-        if (name.equals(HAS_KEYS)) return HAS_KEYS_TYPE;
-        if (name.equals(INCLUDE_KEYS)) return INCLUDE_KEYS_TYPE;
-        if (name.equals(RENAME_KEYS)) return RENAME_KEYS_TYPE;
-        if (name.equals(MAKE_INDICES)) return MAKE_INDICES_TYPE;
-        if (name.equals(REMOVE)) return REMOVE_TYPE;
-        if (name.equals(IS_DEFINED)) return IS_DEFINED_TYPE;
-        if (name.equals(BOX)) return BOX_TYPE;
-        if (name.equals(UNBOX)) return UNBOX_TYPE;
-        if (name.equals(UNION)) return UNION_TYPE;
-        if (name.equals(IS_LIST)) return IS_LIST_TYPE;
-        if (name.equals(LIST_APPEND)) return LIST_APPEND_TYPE;
-        if (name.equals(LIST_INSERT_AT)) return LIST_INSERT_AT_TYPE;
-        if (name.equals(LIST_SUBSET)) return LIST_SUBSET_TYPE;
-        if (name.equals(LIST_COPY)) return LIST_COPY_TYPE;
-        if (name.equals(TO_LIST)) return TO_LIST_TYPE;
-        if (name.equals(TO_JSON)) return TO_JSON_TYPE;
-        if (name.equals(FROM_JSON)) return FROM_JSON_TYPE;
+        switch (name) {
+                 case SIZE:
+                     return SIZE_TYPE;
+                 case SET_DEFAULT:
+                     return SET_DEFAULT_TYPE;
+                 case MASK:
+                     return MASK_TYPE;
+                 case COMMON_KEYS:
+                     return COMMON_KEYS_TYPE;
+                 case GET_KEYS:
+                     return GET_KEYS_TYPE;
+                 case HAS_KEYS:
+                     return HAS_KEYS_TYPE;
+                 case INCLUDE_KEYS:
+                     return INCLUDE_KEYS_TYPE;
+                 case EXCLUDE_KEYS:
+                     return EXCLUDE_KEYS_TYPE;
+                 case RENAME_KEYS:
+                     return RENAME_KEYS_TYPE;
+                 case IS_LIST:
+                     return IS_LIST_TYPE;
+                 case TO_LIST:
+                     return TO_LIST_TYPE;
+                 case LIST_APPEND:
+                     return LIST_APPEND_TYPE;
+                 case LIST_COPY:
+                     return LIST_COPY_TYPE;
+                 case LIST_INSERT_AT:
+                     return LIST_INSERT_AT_TYPE;
+                 case LIST_SUBSET:
+                     return LIST_SUBSET_TYPE;
+                 case MAKE_INDICES:
+                     return MAKE_INDICES_TYPE;
+                 case REMOVE:
+                     return REMOVE_TYPE;
+                 case BOX:
+                     return BOX_TYPE;
+                 case UNBOX:
+                     return UNBOX_TYPE;
+                 case IS_DEFINED:
+                     return IS_DEFINED_TYPE;
+                 case UNION:
+                     return UNION_TYPE;
+                 case TO_JSON:
+                     return TO_JSON_TYPE;
+                 case FROM_JSON:
+                     return FROM_JSON_TYPE;
+             }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case SIZE_TYPE:
+        switch (polyad.getName()) {
+            case SIZE:
                 doSize(polyad, state);
                 return true;
-            case SET_DEFAULT_TYPE:
+            case SET_DEFAULT:
                 doSetDefault(polyad, state);
                 return true;
-            case MASK_TYPE:
+            case MASK:
                 doMask(polyad, state);
                 return true;
-            case COMMON_KEYS_TYPE:
+            case COMMON_KEYS:
                 doCommonKeys(polyad, state);
                 return true;
-            case GET_KEYS_TYPE:
+            case GET_KEYS:
                 doGetKeys(polyad, state);
                 return true;
-            case HAS_KEYS_TYPE:
+            case HAS_KEYS:
                 doHasKeys(polyad, state);
                 return true;
-            case INCLUDE_KEYS_TYPE:
+            case INCLUDE_KEYS:
                 doIncludeKeys(polyad, state);
                 return true;
-            case EXCLUDE_KEYS_TYPE:
+            case EXCLUDE_KEYS:
                 doExcludeKeys(polyad, state);
                 return true;
-            case RENAME_KEYS_TYPE:
+            case RENAME_KEYS:
                 doRenameKeys(polyad, state);
                 return true;
-            case IS_LIST_TYPE:
+            case IS_LIST:
                 doIsList(polyad, state);
                 return true;
-            case TO_LIST_TYPE:
+            case TO_LIST:
                 doToList(polyad, state);
                 return true;
-            case LIST_APPEND_TYPE:
+            case LIST_APPEND:
                 doListAppend(polyad, state);
                 return true;
-            case LIST_COPY_TYPE:
+            case LIST_COPY:
                 doListCopyOrInsert(polyad, state, false);
                 return true;
-            case LIST_INSERT_AT_TYPE:
+            case LIST_INSERT_AT:
                 doListCopyOrInsert(polyad, state, true);
                 return true;
-            case LIST_SUBSET_TYPE:
+            case LIST_SUBSET:
                 doListSubset(polyad, state);
                 return true;
-            case MAKE_INDICES_TYPE:
+            case MAKE_INDICES:
                 doMakeIndex(polyad, state);
                 return true;
-            case REMOVE_TYPE:
+            case REMOVE:
                 doRemove(polyad, state);
                 return true;
-            case BOX_TYPE:
+            case BOX:
                 doBox(polyad, state);
                 return true;
-            case UNBOX_TYPE:
+            case UNBOX:
                 doUnBox(polyad, state);
                 return true;
-            case IS_DEFINED_TYPE:
+            case IS_DEFINED:
                 isDefined(polyad, state);
                 return true;
-            case UNION_TYPE:
+            case UNION:
                 doUnion(polyad, state);
                 return true;
-            case TO_JSON_TYPE:
+            case TO_JSON:
                 doToJSON(polyad, state);
                 return true;
-            case FROM_JSON_TYPE:
+            case FROM_JSON:
                 doFromJSON(polyad, state);
                 return true;
         }

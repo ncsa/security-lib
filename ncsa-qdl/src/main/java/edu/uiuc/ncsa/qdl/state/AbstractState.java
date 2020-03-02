@@ -96,9 +96,9 @@ public abstract class AbstractState implements StateInterface {
         return getOpEvaluator().getType(name);
     }
 
-    public int getFunctionType(String name) {
+/*    public int getFunctionType(String name) {
         return getMetaEvaluator().getType(name);
-    }
+    }*/
 
     public abstract State newModuleState();
 

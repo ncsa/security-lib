@@ -20,7 +20,7 @@ public class IOFunctionTest extends TestBase {
         // This has to be run in the CLIRunner class in this package, not
         // as a unit test, because jUnit will hang since it does not process input
         // right during testing.
-        Polyad polyad = new Polyad(IOEvaluator.SCAN_TYPE);
+        Polyad polyad = new Polyad(IOEvaluator.SCAN_FUNCTION);
         ConstantNode prompt = new ConstantNode("sayit>", Constant.STRING_TYPE);
         polyad.getArgumments().add(prompt);
         polyad.evaluate(state);
@@ -30,7 +30,7 @@ public class IOFunctionTest extends TestBase {
     @Test
     public void testSay() throws Exception {
         State state = testUtils.getNewState();
-        Polyad polyad = new Polyad(IOEvaluator.SAY_TYPE);
+        Polyad polyad = new Polyad(IOEvaluator.SAY_FUNCTION);
         String testString = "These are the droids you are looking for";
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
         polyad.getArgumments().add(prompt);

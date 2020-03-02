@@ -37,7 +37,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-        Polyad polyad = new Polyad(StemEvaluator.SIZE_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SIZE);
         VariableNode arg = new VariableNode("sourceStem.");
 
         polyad.addArgument(arg);
@@ -58,7 +58,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
 
         polyad.addArgument(arg);
@@ -77,7 +77,7 @@ public class StemFunctionsTest extends TestBase {
 
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StemEvaluator.SIZE_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SIZE);
         ConstantNode arg = new ConstantNode(input, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -88,7 +88,7 @@ public class StemFunctionsTest extends TestBase {
     public void testSizeLong() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StemEvaluator.SIZE_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SIZE);
         ConstantNode arg = new ConstantNode(new Long(123456L), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -108,7 +108,7 @@ public class StemFunctionsTest extends TestBase {
         sourceStem.put("bind", "and in the darkness bind them");
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -146,7 +146,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("sourceStem2.", sourceStem2);
-        Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("sourceStem2.");
         polyad.addArgument(arg);
@@ -184,7 +184,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
         polyad.addArgument(arg);
@@ -218,7 +218,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.RENAME_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.RENAME_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
         polyad.addArgument(arg);
@@ -254,7 +254,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
         polyad.addArgument(arg);
@@ -288,7 +288,7 @@ public class StemFunctionsTest extends TestBase {
 
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
         polyad.addArgument(arg);
@@ -318,7 +318,7 @@ public class StemFunctionsTest extends TestBase {
 
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
         polyad.addArgument(arg);
@@ -352,7 +352,7 @@ public class StemFunctionsTest extends TestBase {
         }
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
         polyad.addArgument(arg);
@@ -395,7 +395,7 @@ public class StemFunctionsTest extends TestBase {
         }
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
         polyad.addArgument(arg);
@@ -407,7 +407,7 @@ public class StemFunctionsTest extends TestBase {
     @Test
     public void testmakeIndex() throws Exception {
         State state = testUtils.getNewState();
-        Polyad polyad = new Polyad(StemEvaluator.MAKE_INDICES_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.MAKE_INDICES);
         ConstantNode arg = new ConstantNode(new Long(4L), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -436,7 +436,7 @@ public class StemFunctionsTest extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setLongValue("int", new Long(5L));
 
-        Polyad polyad = new Polyad(StemEvaluator.TO_LIST_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.TO_LIST);
         polyad.addArgument(new VariableNode("sourceStem."));
         polyad.addArgument(new VariableNode("int"));
         polyad.addArgument(new ConstantNode("foo", Constant.STRING_TYPE));
@@ -462,7 +462,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-        Polyad polyad = new Polyad(StemEvaluator.REMOVE_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.REMOVE);
         VariableNode arg = new VariableNode("sourceStem.");
 
         polyad.addArgument(arg);
@@ -484,7 +484,7 @@ public class StemFunctionsTest extends TestBase {
 
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT);
         Long expectedResult = new Long(42L);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(expectedResult, Constant.LONG_TYPE);
@@ -511,7 +511,7 @@ public class StemFunctionsTest extends TestBase {
 
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.addArgument(arg); // set second to be a stem so it fails
@@ -527,7 +527,7 @@ public class StemFunctionsTest extends TestBase {
     public void testDefault_NoStem() throws Exception {
         State state = testUtils.getNewState();
         Long expectedResult = new Long(42L);
-        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT_TYPE);
+        Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(expectedResult, Constant.LONG_TYPE);
 

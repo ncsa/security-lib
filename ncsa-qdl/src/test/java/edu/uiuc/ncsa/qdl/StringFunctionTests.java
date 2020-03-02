@@ -21,7 +21,7 @@ public class StringFunctionTests extends TestBase {
     public void testContainsStringString() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         ConstantNode left = new ConstantNode("abcdef", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("de", Constant.STRING_TYPE);
 
@@ -47,7 +47,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("snippets.", snippets);
         symbolTable.setStringValue("source", source);
 
-        Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("source");
         VariableNode right = new VariableNode("snippets.");
 
@@ -89,7 +89,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStringValue("targetString", targetString);
 
-        Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode right = new VariableNode("targetString");
 
@@ -122,7 +122,7 @@ public class StringFunctionTests extends TestBase {
            symbolTable.setStemVariable("sourceStem.", sourceStem);
            symbolTable.setStringValue("targetString", targetString);
 
-           Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+           Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
            VariableNode left = new VariableNode("sourceStem.");
            VariableNode right = new VariableNode("targetString");
            ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
@@ -161,7 +161,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("targetStem.", targetStem);
 
-        Polyad polyad = new Polyad(StringEvaluator.CONTAINS_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode right = new VariableNode("targetStem.");
 
@@ -184,7 +184,7 @@ public class StringFunctionTests extends TestBase {
         String arg = "   my   my   my    ";
         symbolTable.setStringValue("arg", arg);
         String result = arg.trim();
-        Polyad polyad = new Polyad(StringEvaluator.TRIM_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
 
         polyad.addArgument(left);
@@ -200,7 +200,7 @@ public class StringFunctionTests extends TestBase {
 
         Long arg = System.currentTimeMillis();
         symbolTable.setLongValue("arg", arg);
-        Polyad polyad = new Polyad(StringEvaluator.TRIM_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
 
         polyad.addArgument(left);
@@ -220,7 +220,7 @@ public class StringFunctionTests extends TestBase {
         stem.put("warp", "foo           ");
         stem.put("9", "       foo           ");
         symbolTable.setStemVariable("stem.", stem);
-        Polyad polyad = new Polyad(StringEvaluator.TRIM_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("stem.");
 
         polyad.addArgument(left);
@@ -237,7 +237,7 @@ public class StringFunctionTests extends TestBase {
     public void testIndexOfStringString() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         ConstantNode left = new ConstantNode("abcdef", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("de", Constant.STRING_TYPE);
         polyad.addArgument(left);
@@ -262,7 +262,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("snippets.", snippets);
         symbolTable.setStringValue("source", source);
 
-        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("source");
         VariableNode right = new VariableNode("snippets.");
 
@@ -291,7 +291,8 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStringValue("targetString", targetString);
 
-        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
+        polyad.setName(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode right = new VariableNode("targetString");
 
@@ -321,7 +322,7 @@ public class StringFunctionTests extends TestBase {
          symbolTable.setStemVariable("sourceStem.", sourceStem);
          symbolTable.setStringValue("targetString", targetString);
 
-         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
          VariableNode left = new VariableNode("sourceStem.");
          VariableNode right = new VariableNode("targetString");
         ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
@@ -357,7 +358,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("targetStem.", targetStem);
 
-        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode right = new VariableNode("targetStem.");
 
@@ -378,7 +379,7 @@ public class StringFunctionTests extends TestBase {
         String arg = "mairzy doats";
         symbolTable.setStringValue("arg", arg);
         String result = "MAIRZY DOATS";
-        Polyad polyad = new Polyad(StringEvaluator.TO_UPPER_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TO_UPPER);
         VariableNode left = new VariableNode("arg");
 
         polyad.addArgument(left);
@@ -394,7 +395,7 @@ public class StringFunctionTests extends TestBase {
         String arg = "MAIRZY DOATS";
         symbolTable.setStringValue("arg", arg);
         String result = "mairzy doats";
-        Polyad polyad = new Polyad(StringEvaluator.TO_LOWER_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TO_LOWER);
         VariableNode left = new VariableNode("arg");
 
         polyad.addArgument(left);
@@ -417,7 +418,7 @@ public class StringFunctionTests extends TestBase {
         stem.put("warp", arg3);
         stem.put("9", arg4);
         symbolTable.setStemVariable("stem.", stem);
-        Polyad polyad = new Polyad(StringEvaluator.TO_LOWER_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TO_LOWER);
         VariableNode left = new VariableNode("stem.");
 
         polyad.addArgument(left);
@@ -444,7 +445,7 @@ public class StringFunctionTests extends TestBase {
         stem.put("warp", arg3);
         stem.put("9", arg4);
         symbolTable.setStemVariable("stem.", stem);
-        Polyad polyad = new Polyad(StringEvaluator.TO_UPPER_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.TO_UPPER);
         VariableNode left = new VariableNode("stem.");
 
         polyad.addArgument(left);
@@ -461,7 +462,7 @@ public class StringFunctionTests extends TestBase {
     public void testAllStringReplace() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StringEvaluator.REPLACE_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.REPLACE);
         ConstantNode source = new ConstantNode("abcdef", Constant.STRING_TYPE);
         ConstantNode oldValue = new ConstantNode("de", Constant.STRING_TYPE);
         ConstantNode newValue = new ConstantNode("holy cow", Constant.STRING_TYPE);
@@ -494,7 +495,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("targetStem.", targetStem);
 
-        Polyad polyad = new Polyad(StringEvaluator.REPLACE_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.REPLACE);
         VariableNode source = new VariableNode("sourceStem.");
         VariableNode old = new VariableNode("targetStem.");
         ConstantNode newValue = new ConstantNode("two", Constant.STRING_TYPE);
@@ -512,7 +513,7 @@ public class StringFunctionTests extends TestBase {
     public void testInsertStringString() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(StringEvaluator.INSERT_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INSERT);
         ConstantNode left = new ConstantNode("abcdef", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("GAAH!", Constant.STRING_TYPE);
         ConstantNode index = new ConstantNode(new Long(3L), Constant.LONG_TYPE);
@@ -547,7 +548,7 @@ public class StringFunctionTests extends TestBase {
         /**/
         symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-        Polyad polyad = new Polyad(StringEvaluator.INSERT_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INSERT);
         VariableNode source = new VariableNode("sourceStem.");
         polyad.addArgument(source);
         polyad.addArgument(snippet);
@@ -589,7 +590,7 @@ public class StringFunctionTests extends TestBase {
         symbolTable.setStemVariable("snippets.", snippets);
         symbolTable.setStemVariable("indices.", indices);
 
-        Polyad polyad = new Polyad(StringEvaluator.INSERT_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.INSERT);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode snippetVar = new VariableNode("snippets.");
         VariableNode indexVar = new VariableNode("indices.");

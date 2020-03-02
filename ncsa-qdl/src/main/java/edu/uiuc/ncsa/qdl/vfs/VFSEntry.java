@@ -21,4 +21,5 @@ public interface VFSEntry extends Serializable {
     String getType();
     boolean isBinaryType();
     StemVariable convertToStem();
+    VFSPath getPath();
 }

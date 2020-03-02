@@ -22,23 +22,23 @@ import java.util.TreeSet;
  */
 public class IOEvaluator extends MathEvaluator {
     public static final int IO_FUNCTION_BASE_VALUE = 4000;
-    public static String SAY_FUNCTION = "say";
-    public static String PRINT_FUNCTION = "print";
+    public static final String SAY_FUNCTION = "say";
+    public static final String PRINT_FUNCTION = "print";
     public static final int SAY_TYPE = 1 + IO_FUNCTION_BASE_VALUE;
-    public static String SCAN_FUNCTION = "scan";
+    public static final String SCAN_FUNCTION = "scan";
     public static final int SCAN_TYPE = 2 + IO_FUNCTION_BASE_VALUE;
 
-    public static String READ_FILE = "read_file";
+    public static final String READ_FILE = "read_file";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
-    public static String WRITE_FILE = "write_file";
+    public static final String WRITE_FILE = "write_file";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
-    public static String VFS_MOUNT = "vfs_mount";
+    public static final String VFS_MOUNT = "vfs_mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
 
 
-    public static String VFS_UNMOUNT = "vfs_unmount";
+    public static final String VFS_UNMOUNT = "vfs_unmount";
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
     public static String[] FUNC_NAMES = new String[]{
@@ -49,7 +49,10 @@ public class IOEvaluator extends MathEvaluator {
             WRITE_FILE,
             VFS_MOUNT,
             VFS_UNMOUNT};
-
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
     public TreeSet<String> listFunctions() {
         TreeSet<String> names = new TreeSet<>();
         for (String key : FUNC_NAMES) {
@@ -73,8 +76,9 @@ public class IOEvaluator extends MathEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case SAY_TYPE:
+        switch (polyad.getName()) {
+            case PRINT_FUNCTION:
+            case SAY_FUNCTION:
                 if (state.isServerMode()) {
                     polyad.setResult(null);
                     polyad.setResultType(Constant.NULL_TYPE);
@@ -117,7 +121,7 @@ public class IOEvaluator extends MathEvaluator {
                 }
                 polyad.setEvaluated(true);
                 return true;
-            case SCAN_TYPE:
+            case SCAN_FUNCTION:
                 if (state.isServerMode()) {
                     throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
                 }
@@ -137,16 +141,16 @@ public class IOEvaluator extends MathEvaluator {
                 polyad.setResultType(Constant.STRING_TYPE);
                 polyad.setEvaluated(true);
                 return true;
-            case READ_FILE_TYPE:
+            case READ_FILE:
                 doReadFile(polyad, state);
                 return true;
-            case WRITE_FILE_TYPE:
+            case WRITE_FILE:
                 doWriteFile(polyad, state);
                 return true;
-            case VFS_MOUNT_TYPE:
+            case VFS_MOUNT:
                 vfsMount(polyad, state);
                 return true;
-            case VFS_UNMOUNT_TYPE:
+            case VFS_UNMOUNT:
                 vfsUnmount(polyad, state);
                 return true;
         }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.qdl.vfs.FileEntryConstants;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
@@ -12,10 +13,12 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
+ * Utilities for converting a single {@link QDLScript} to or from JSON. If you need to work with
+ * {@link edu.uiuc.ncsa.security.util.scripting.ScriptSet}s, then consult {@link JSONScriptUtil}.
  * <p>Created by Jeff Gaynor<br>
  * on 2/5/20 at  11:06 AM
  */
-public class Scripts {
+public class Scripts extends FileEntryConstants {
 
     /**
      * Identifies the JSON array of line sof code
@@ -42,16 +45,7 @@ public class Scripts {
      * The language this script is written in
      */
     public static final String LANGUAGE = "language";
-    /**
-     * ISO 8601 timestamp when this was created.
-     */
-    public static final String CREATE_TIME = "create_ts";
 
-    public static final String LAST_MODIFIED = "last_modified";
-    /**
-     * (Required!) The identifier for this script.
-     */
-    public static final String ID = "id";
 
     /**
      * Returns a script object of the form {"script" : {"key0" : "value0",..., "code":[lines]}}

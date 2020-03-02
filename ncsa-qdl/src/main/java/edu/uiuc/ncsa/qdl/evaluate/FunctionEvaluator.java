@@ -10,12 +10,9 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.FR_WithState;
 import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -35,14 +32,22 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         // so call to this should ever get anything other than unknown value.
         return UNKNOWN_VALUE;
     }
-    public static String FUNC_NAMES[] =new String[]{IS_FUNCTION};
+
+    public static String FUNC_NAMES[] = new String[]{IS_FUNCTION};
+
+    @Override
+    public String[] getFunctionNames() {
+        return FUNC_NAMES;
+    }
+
     public TreeSet<String> listFunctions() {
-          TreeSet<String> names = new TreeSet<>();
-          for (String key : FUNC_NAMES) {
-              names.add(key + "()");
-          }
-          return names;
-      }
+        TreeSet<String> names = new TreeSet<>();
+        for (String key : FUNC_NAMES) {
+            names.add(key + "()");
+        }
+        return names;
+    }
+
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getOperatorType()) {
@@ -50,7 +55,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 if (polyad.getArgumments().size() != 1) {
                     throw new IllegalArgumentException("Error: You must supply at least one argument.");
                 }
-                Object object = polyad.evalArg(0,state);;
+                Object object = polyad.evalArg(0, state);
+                ;
                 if (object == null) {
                     throw new MissingArgumentException("Error: You must supply an argument for the " + IS_FUNCTION + " command.");
                 }
@@ -60,7 +66,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 String name = object.toString();
                 int argCount = -1; // default -- get any
                 if (polyad.getArgumments().size() == 2) {
-                    Object object2 = polyad.evalArg(1,state);;
+                    Object object2 = polyad.evalArg(1, state);
+                    ;
                     if (!isLong(object2)) {
                         throw new IllegalArgumentException("Error: The argument count must be a number.");
                     }
@@ -71,10 +78,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setEvaluated(true);
                 return true;
-            case UNKNOWN_VALUE:
-                figureOutEvaluation(polyad, state);
-                return true;
-
+        }
+        if (!polyad.isBuiltIn()) {
+            figureOutEvaluation(polyad, state);
+            return true;
         }
         return false;
     }

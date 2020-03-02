@@ -29,7 +29,15 @@ public class Polyad extends ExpressionImpl {
         this.name = name;
     }
 
+    public boolean isBuiltIn() {
+        return builtIn;
+    }
 
+    public void setBuiltIn(boolean builtIn) {
+        this.builtIn = builtIn;
+    }
+
+    boolean builtIn = true;
 
     public Polyad(int operatorType) {
         super(operatorType);
@@ -55,6 +63,7 @@ public class Polyad extends ExpressionImpl {
     @Override
     public ExpressionNode makeCopy() {
         Polyad polyad = new Polyad(operatorType);
+        polyad.setName(getName());
         for(ExpressionNode arg: getArgumments()){
             polyad.addArgument(arg.makeCopy());
         }

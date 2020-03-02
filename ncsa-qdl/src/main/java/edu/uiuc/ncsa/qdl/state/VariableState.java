@@ -238,7 +238,6 @@ public abstract class VariableState extends NamespaceAwareState {
 
     protected Object gsrNSScalarOp(String variableName, int op, Object value) {
         checkNSClash(variableName); // just check first since its quick
-
         if (isNSQname(variableName)) {
             // get the module, hand back the value.
             URI uri = importedModules.getByAlias(getAlias(variableName));
@@ -259,23 +258,23 @@ public abstract class VariableState extends NamespaceAwareState {
             variableName = variableName.substring(1); // whack off first bit
         }
         SymbolTable st = getSymbolStack().getRightST(variableName);
-        switch (op) {
-            case OP_GET:
-                Object v = st.resolveValue(variableName);
-                if (v == null) {
-                    if (importedModules.hasImports()) {
-                        for (URI key : importedModules.keySet()) {
-                            Module m = getModuleMap().get(key);
-                            if (m != null) {
-                                Object obj = m.getState().getValue(variableName);
-                                if (obj != null) {
-                                    return obj;
-                                }
-
-                            }
+        Object v = st.resolveValue(variableName);
+        if (v == null) {
+            if (importedModules.hasImports()) {
+                for (URI key : importedModules.keySet()) {
+                    Module m = getModuleMap().get(key);
+                    if (m != null) {
+                        Object obj = m.getState().getValue(variableName);
+                        if (obj != null) {
+                            v = obj;
                         }
+
                     }
                 }
+            }
+        }
+        switch (op) {
+            case OP_GET:
                 return v;
             case OP_SET:
                 st.setValue(variableName, value);

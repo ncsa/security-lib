@@ -21,7 +21,7 @@ public class MathFunctionsTest extends TestBase {
     public void testAbsoluteValue() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE);
         ConstantNode left = new ConstantNode(new Long(-5), Constant.LONG_TYPE);
         polyad.addArgument(left);
         polyad.evaluate(state);
@@ -42,7 +42,7 @@ public class MathFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("arg.", arg);
         VariableNode argNode = new VariableNode("arg.");
-        Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE);
         polyad.addArgument(argNode);
         polyad.evaluate(state);
         StemVariable r = (StemVariable) polyad.getResult();
@@ -57,7 +57,7 @@ public class MathFunctionsTest extends TestBase {
     public void testRandomValue() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(MathEvaluator.RANDOM_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.RANDOM);
         polyad.evaluate(state);
         System.out.println("A single generated random number = " + polyad.getResult());
         assert polyad.getResult() instanceof Long;
@@ -68,7 +68,7 @@ public class MathFunctionsTest extends TestBase {
         long count = 5L;
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(MathEvaluator.RANDOM_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.RANDOM);
         ConstantNode left = new ConstantNode(new Long(count), Constant.LONG_TYPE);
         polyad.addArgument(left);
         polyad.evaluate(state);
@@ -84,7 +84,7 @@ public class MathFunctionsTest extends TestBase {
     public void testRandomString() throws Exception {
         State state = testUtils.getNewState();
 
-        Polyad polyad = new Polyad(MathEvaluator.RANDOM_STRING_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.RANDOM_STRING);
         polyad.evaluate(state);
         System.out.println("A single generated random string = " + polyad.getResult());
         assert polyad.getResult() instanceof String;
@@ -95,7 +95,7 @@ public class MathFunctionsTest extends TestBase {
         State state = testUtils.getNewState();
 
         Long size = 32L;
-        Polyad polyad = new Polyad(MathEvaluator.RANDOM_STRING_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.RANDOM_STRING);
         ConstantNode arg = new ConstantNode(new Long(size), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -108,7 +108,7 @@ public class MathFunctionsTest extends TestBase {
         State state = testUtils.getNewState();
 
         String expectedResult = "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12";
-        Polyad polyad = new Polyad(MathEvaluator.HASH_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.HASH);
         ConstantNode arg = new ConstantNode("The quick brown fox jumps over the lazy dog", Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -133,7 +133,7 @@ public class MathFunctionsTest extends TestBase {
         expected.put("3", "830b0c398047d0d3ac4834508eb1bb87ea7f9ba9");
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         VariableNode arg = new VariableNode("sourceStem.");
-        Polyad polyad = new Polyad(MathEvaluator.HASH_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.HASH);
         polyad.addArgument(arg);
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
@@ -149,7 +149,7 @@ public class MathFunctionsTest extends TestBase {
 
         String original = "The quick brown fox jumps over the lazy dog";
         String expectedResult = "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw";
-        Polyad polyad = new Polyad(MathEvaluator.ENCODE_B64_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.ENCODE_B64);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -162,7 +162,7 @@ public class MathFunctionsTest extends TestBase {
 
         String expectedResult = "The quick brown fox jumps over the lazy dog";
         String original = "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw";
-        Polyad polyad = new Polyad(MathEvaluator.DECODE_B64_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.DECODE_B64);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -175,7 +175,7 @@ public class MathFunctionsTest extends TestBase {
 
         String original = "The quick brown fox jumps over the lazy dog";
         String expectedResult = "54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67";
-        Polyad polyad = new Polyad(MathEvaluator.TO_HEX_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.TO_HEX);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -188,7 +188,7 @@ public class MathFunctionsTest extends TestBase {
 
         String expectedResult = "The quick brown fox jumps over the lazy dog";
         String original = "54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67";
-        Polyad polyad = new Polyad(MathEvaluator.FROM_HEX_TYPE);
+        Polyad polyad = new Polyad(MathEvaluator.FROM_HEX);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
