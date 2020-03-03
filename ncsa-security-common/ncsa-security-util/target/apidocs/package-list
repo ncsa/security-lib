@@ -13,5 +13,6 @@ edu.uiuc.ncsa.security.util.jwk
 edu.uiuc.ncsa.security.util.mail
 edu.uiuc.ncsa.security.util.pkcs
 edu.uiuc.ncsa.security.util.python
+edu.uiuc.ncsa.security.util.scripting
 edu.uiuc.ncsa.security.util.ssl
 edu.uiuc.ncsa.security.util.testing
