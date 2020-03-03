@@ -48,6 +48,12 @@ public interface OA2Constants {
     public static String TOKEN_TYPE = "token_type";
     public static String BEARER_TOKEN_TYPE = "Bearer";
     public static String AUTHORIZATION_CODE_VALUE = "authorization_code";
+    /**
+     * as per <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">the open id spec</a>
+     */
+    public static String RESPONSE_MODE = "response_mode";
+    public static String RESPONSE_MODE_QUERY = "query";
+    public static String RESPONSE_MODE_FRAGMENT = "fragment";
 
     public static String FORM_ENCODING = "application/x-www-form-urlencoded";
 
