@@ -20,7 +20,8 @@ import org.junit.runners.Suite;
         StringFunctionTests.class,
         MathFunctionsTest.class,
         StemFunctionsTest.class,
-        ParserTest.class
+        ParserTest.class,
+        VFSTest.class
    
 })
 public class TestSuite extends junit.framework.TestSuite {

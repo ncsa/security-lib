@@ -7,9 +7,10 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
-import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
-import edu.uiuc.ncsa.qdl.scripting.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
+import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
+import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 
 import java.util.HashMap;
 
@@ -48,14 +49,18 @@ public class State extends FunctionState {
 
     boolean serverMode = false;
 
-    HashMap<String, VFSFileProvider> scriptProviders = new HashMap<>();
+    public HashMap<String, VFSFileProvider> getVfsFileProviders() {
+        return vfsFileProviders;
+    }
+
+    HashMap<String, VFSFileProvider> vfsFileProviders = new HashMap<>();
 
     public void addVFSProvider(VFSFileProvider scriptProvider) {
-        scriptProviders.put(scriptProvider.getScheme(), scriptProvider);
+        vfsFileProviders.put(scriptProvider.getScheme() + VFSPaths.SCHEME_DELIMITER + scriptProvider.getMountPoint(), scriptProvider);
     }
 
     public void removeScriptProvider(String scheme) {
-        scriptProviders.remove(scheme);
+        vfsFileProviders.remove(scheme);
     }
 
     /**
@@ -67,30 +72,40 @@ public class State extends FunctionState {
      */
     public QDLScript getScriptFromVFS(String fqName) throws Throwable {
         VFSEntry entry = getFileFromVFS(fqName);
-        if(entry.getType().equals(Scripts.SCRIPT)){
-            return (QDLScript)entry;
+        if (entry.getType().equals(Scripts.SCRIPT)) {
+            return (QDLScript) entry;
         }
         QDLScript s = new QDLScript(entry.getLines(), entry.getProperties());
         return s;
     }
 
     public VFSEntry getFileFromVFS(String fqName) throws Throwable {
-        if (scriptProviders.isEmpty()) return null;
-        String scheme = fqName.substring(0, fqName.indexOf(":") + 1);
-        if (scheme == null || scheme.isEmpty()) {
+        if (vfsFileProviders.isEmpty()) return null;
+        VFSFileProvider vfsFileProvider = null;
+        for(String key : vfsFileProviders.keySet()){
+            // key is of the form scheme#/mounpoint/ -- note trailing slash! This lets us tell
+            // things like A#/a/b from A#/abc
+            if(fqName.startsWith(key)){
+                vfsFileProvider = vfsFileProviders.get(key);
+                break;
+            }
+        }
+        if(vfsFileProvider == null){
             return null;
         }
-        return  scriptProviders.get(scheme).get(fqName);
+        return vfsFileProvider.get(fqName);
     }
 
     public boolean hasVFSProviders() {
-        return !scriptProviders.isEmpty();
+        return !vfsFileProviders.isEmpty();
     }
-     public boolean isVFSFile(String path){
-        if(path.startsWith("file:")) return false; // legit this is a file uri, not a virtual one
-         return 0 < path.indexOf(":");
-     }
- 
+
+    public boolean isVFSFile(String path) {
+        if (path.startsWith(VFSPaths.SCHEME_DELIMITER) || path.indexOf(VFSPaths.SCHEME_DELIMITER) == -1)
+        {return false;} // legit this is a file uri, not a virtual one
+        return 0 < path.indexOf(VFSPaths.SCHEME_DELIMITER);
+    }
+
     public State newStateNoImports() {
         ImportManager nr = new ImportManager();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
@@ -155,8 +170,8 @@ public class State extends FunctionState {
 
     }
 
-    public int getStackSize(){
-      return getSymbolStack().getSymbolCount();
+    public int getStackSize() {
+        return getSymbolStack().getSymbolCount();
     }
 
 

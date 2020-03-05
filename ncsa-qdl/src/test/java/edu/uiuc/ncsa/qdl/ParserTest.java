@@ -718,6 +718,11 @@ public class ParserTest extends TestBase {
         assert state.getValue("e").equals(Boolean.TRUE);
     }
 
+    /**
+     * Tests that the contents of the string (with single quotes, double quotes and such)
+     * are treated as strings and not interpreted otherwise.
+     * @throws Throwable
+     */
     @Test
     public void testString() throws Throwable {
         String test = getRandomString(100) + "\\'!@#$%^&*()-_=+[{]}`~;:,<.>";
@@ -730,7 +735,7 @@ public class ParserTest extends TestBase {
     }
 
     /**
-     * In order to handle "-expression" in the parser, there has to be a wrapper. This'
+     * In order to handle "-expression" in the parser, there has to be a wrapper. This
      * tests that it does the right thing.
      *
      * @throws Throwable

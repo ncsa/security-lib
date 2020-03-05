@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
+
 import java.io.Serializable;
 
 /**
@@ -9,15 +11,19 @@ import java.io.Serializable;
  * load/run commands resolve against any script libraries then fall through to the local file system
  * (unless it is running in server mode).
  * <br/><br/>
- * Why not just use the Java {@link java.io.FileSystem}? Because that allows for access to the underlying
+ * Why not just use the Java {@link java.nio.file.FileSystem}? Because that allows for access to the underlying
  * native file system and in a scripting environment, we want to severely restrict access to just
  * read-only virtual file systems which can e.g., make libraries available.
  * <p>Created by Jeff Gaynor<br>
  * on 2/5/20 at  7:43 AM
  */
 public interface VFSFileProvider extends Serializable {
-    String SCHEME_DELIMITER = ":";
-    String PATH_SEPARATOR = "/";
+    /**
+     * mostly this is so when information is being displayed to the user they can see the origin of the provider.
+     * @return
+     */
+    String getType();
+
     /**
      * The scheme that uniquely identifies this provider
      * @return
@@ -47,19 +53,48 @@ public interface VFSFileProvider extends Serializable {
     VFSEntry get(String name) throws Throwable;
 
     /**
-     * Add the script using the given FQ name.
-     * @param name
-     * @param script
+     * Add the using the path. If and entry exists therem it will be over-written.
+     * @param newPath
+     * @param entry
      */
-    void put(String name, VFSEntry script) throws Throwable;
+    void put(String newPath, VFSEntry entry) throws Throwable;
+
+    /**
+     * Put this in the store at its current path
+     * @param entry
+     * @throws Throwable
+     */
+    void put(VFSEntry entry) throws Throwable;
 
     /**
      * Checks if the FQ name can be resolved to a script by this provider.
-     * @param name
+     * @param path
      * @return
      */
-    boolean isScript(String name);
+    boolean isScript(String path);
 
     boolean canRead();
+
     boolean canWrite();
+
+    /**
+     * A delete is a type of write. If the store is not writeable, it cannot delete files.
+     * @param path
+     * @throws Throwable
+     */
+    void delete(String path) throws Throwable;
+
+    /**
+     * Contains is a type of read. If the store is not readable, it cannot tell if it contains an entry.
+     * @param path
+     * @return
+     * @throws Throwable
+     */
+    boolean contains(String path) throws Throwable;
+
+    XProperties getFileInfo(String path) throws Throwable;
+
+    String getCurrentDir();
+    void setCurrentDir(String path);
+    String[] dir(String path);
 }

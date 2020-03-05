@@ -1,68 +1,81 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.storage.sql.SQLDatabase;
-import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/20 at  7:17 AM
  */
 public class VFSMySQLProvider extends AbstractVFSFileProvider {
+    public VFSMySQLProvider(VFSDatabase db, String scheme, String mountPoint, boolean canRead, boolean canWrite) {
+        super(scheme, mountPoint, canRead, canWrite);
+        this.db = db;
+    }
+
+    public VFSMySQLProvider(String scheme, String mountPoint, String currentDir, boolean canRead, boolean canWrite) {
+        super(scheme, mountPoint, currentDir, canRead, canWrite);
+    }
+
     VFSDatabase db;
-    String scheme;
-    @Override
-    public String getScheme() {
-        return scheme;
-    }
 
-    String mountPoint;
     @Override
-    public String getMountPoint() {
-        return mountPoint;
+    protected String getRealPath(String path) {
+        return VFSPaths.PATH_SEPARATOR + super.getRealPath(path);
     }
 
     @Override
-    public boolean checkScheme(String name) {
-        return false;
+    public VFSEntry get(String path) throws Throwable {
+        super.get(path);
+        return db.get(getPrimaryKey(path));
+    }
+
+    public static int PATH_INDEX = 0;
+    public static int FILENAME_INDEX = 1;
+
+    protected String[] getPrimaryKey(String path) {
+
+        path = getRealPath(VFSPaths.normalize(path));
+        path = unqualifyPath(path); // no schemes in database.
+        String[] output = new String[2];
+        output[PATH_INDEX] = VFSPaths.getParentPath(path);
+        output[FILENAME_INDEX] = VFSPaths.getFileName(path);
+        return output;
     }
 
     @Override
-    public VFSEntry get(String name) throws Throwable {
-        if(!canRead()){
-                throw new QDLException("Error: You do not have permission to read from the virtual file system");
-            }
-            String head = getScheme() + getMountPoint() ;
-            if (!name.startsWith(head)) {
-                return null;
-            }
+    public void put(String path, VFSEntry entry) throws Throwable {
+        super.put(path, entry);
+        String[] key = getPrimaryKey(path);
+        if (db.containsEntry(key)) {
+            db.update(key, entry);
+        } else {
+            db.put(key, entry);
+        }
+    }
 
-           return null;
+
+    @Override
+    public void delete(String path) throws Throwable {
+        super.delete(path);
+        db.remove(getPrimaryKey(path));
+
     }
 
     @Override
-    public void put(String name, VFSEntry script) throws Throwable {
+    public boolean contains(String path) throws Throwable {
+        super.contains(path);
+        return db.containsEntry(getPrimaryKey(path));
+    }
 
+
+    @Override
+    public String[] dir(String path) {
+        super.dir(path);
+        return new String[0];
     }
 
     @Override
-    public boolean isScript(String name) {
-        return false;
-    }
-
-    @Override
-    public boolean canRead() {
-        return false;
-    }
-
-    @Override
-    public boolean canWrite() {
-        return false;
+    public String getType() {
+        return QDLConfigurationConstants.VFS_TYPE_MYSQL;
     }
 }

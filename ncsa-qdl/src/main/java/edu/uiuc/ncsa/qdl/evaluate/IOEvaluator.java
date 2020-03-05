@@ -4,12 +4,12 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
-import edu.uiuc.ncsa.qdl.scripting.VFSPassThruFileProvider;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
+import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;

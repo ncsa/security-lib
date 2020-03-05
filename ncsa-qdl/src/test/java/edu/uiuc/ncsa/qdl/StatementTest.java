@@ -16,6 +16,11 @@ import org.junit.Test;
 public class StatementTest {
     TestUtils testUtils = TestUtils.newInstance();
 
+    /**
+     * Basic regression test that the assignment reolves its variable and places the result in to the state
+     * as it should.
+     * @throws Exception
+     */
     @Test
     public void testAssignment() throws Exception {
         State state = testUtils.getNewState();

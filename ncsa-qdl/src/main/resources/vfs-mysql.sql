@@ -13,7 +13,8 @@
   ea = extended attributes. So all the accounting information.
   content = the contents of the file as a text blob.
   Just put this in the right database and scheme as needed.
-
+  
+  Be SURE you set the grant to the right user or there will be no access to this database!
  */
 create table qdl_vfs(
    path VARCHAR(768),
@@ -22,3 +23,5 @@ create table qdl_vfs(
    content TEXT,
    PRIMARY KEY(path, name)
    );
+
+GRANT All  ON qdl_vfs TO 'user'@'server';

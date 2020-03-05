@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.scripting.FileEntry.*;
+import static edu.uiuc.ncsa.qdl.vfs.FileEntry.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>

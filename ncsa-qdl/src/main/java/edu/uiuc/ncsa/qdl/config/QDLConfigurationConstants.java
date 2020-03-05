@@ -39,12 +39,12 @@ public interface QDLConfigurationConstants {
     String VFS_ATTR_TYPE = "type";
     String VFS_ATTR_ACCESS = "access";
 
-    String VFS_TYPE_PASS_THRU = "pass_through";
     String VFS_ROOT_DIR_TAG = "root_dir";
     String VFS_SCHEME_TAG = "scheme";
     String VFS_MOUNT_POINT_TAG = "mount_point";
-    String VFS_TYPE_PASS_THROUGH = "pass_through";
-    String VFS_TYPE_MYSQL = "mysql";
+    String  VFS_TYPE_PASS_THROUGH = "pass_through";
+    String  VFS_TYPE_MYSQL = "mysql";
+    String VFS_TYPE_MEMORY = "memory";
 
     /*
             <!ELEMENT modules (module)*>

@@ -114,13 +114,13 @@ public class FileEntry implements VFSEntry {
     }
 
     @Override
-    public VFSPath getPath() {
+    public String getPath() {
         return path;
     }
 
-    public void setPath(VFSPath path) {
+    public void setPath(String path) {
         this.path = path;
     }
 
-    VFSPath path;
+    String path;
 }

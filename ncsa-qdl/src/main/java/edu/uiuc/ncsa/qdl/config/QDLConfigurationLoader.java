@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.config;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -11,6 +12,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
 
@@ -26,6 +28,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     /**
      * Use only in those cases where the logger is constructed elsewhere. This will override the logging
      * configuration and use this logger instead.
+     *
      * @param node
      * @param logger
      */
@@ -71,39 +74,88 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isEnabled() {
         return getFirstBooleanValue(cn, CONFG_ATTR_ENABLED, true);
     }
-    protected String getName(){
-        String name =  getFirstAttribute(cn, CONFG_ATTR_NAME);
-        if(name == null || name.isEmpty()){
+
+    protected String getName() {
+        String name = getFirstAttribute(cn, CONFG_ATTR_NAME);
+        if (name == null || name.isEmpty()) {
             return "(none)";
         }
         return name;
 
     }
+
     protected boolean isServerModeOn() {
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
     }
 
-    protected boolean isEchoModeOn(){
+    protected boolean isEchoModeOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
     }
+
     protected List<VFSConfig> getVFSConfigs() {
         ArrayList<VFSConfig> configs = new ArrayList<>();
         ConfigurationNode vNode = getFirstNode(cn, VIRTUAL_FILE_SYSTEMS_TAG_NAME);
         // need to snoop through children and create VFSEntries.
         for (ConfigurationNode kid : vNode.getChildren()) {
-            if (getFirstAttribute(kid, VFS_ATTR_TYPE).equals(VFS_TYPE_PASS_THRU)) {
-                VFSPassThroughConfig v = new VFSPassThroughConfig();
-                v.rootDir = getNodeValue(kid, VFS_ROOT_DIR_TAG);
-                v.scheme = getNodeValue(kid, VFS_SCHEME_TAG);
-                v.mountPoint = getNodeValue(kid, VFS_MOUNT_POINT_TAG);
-                String access = getFirstAttribute(kid, VFS_ATTR_ACCESS);
-                v.writeable = access.contains("w");
-                v.readable = access.contains("r");
-                configs.add(v);
-            } else {
-                throw new QDLException("Error: unsupported VFS type of " + getFirstAttribute(kid, VFS_ATTR_TYPE));
+            String access = getFirstAttribute(kid, VFS_ATTR_ACCESS);
+            VFSAbstractConfig v = null;
+            switch (getFirstAttribute(kid, VFS_ATTR_TYPE)) {
+                case VFS_TYPE_PASS_THROUGH:
+                    v = new VFSPassThroughConfig(
+                            getNodeValue(kid, VFS_ROOT_DIR_TAG),
+                            getNodeValue(kid, VFS_SCHEME_TAG),
+                            getNodeValue(kid, VFS_MOUNT_POINT_TAG),
+                            access.contains("r"),
+                            access.contains("w")
+                    );
+                    break;
+                case VFS_TYPE_MYSQL:
+                    VFSSQLConfig vv = new VFSSQLConfig(
+                            getNodeValue(kid, VFS_SCHEME_TAG),
+                            getNodeValue(kid, VFS_MOUNT_POINT_TAG),
+                            access.contains("r"),
+                            access.contains("w")
+                    );
+                    ConfigurationNode myNode = getFirstNode(kid, StorageConfigurationTags.MYSQL_STORE);
+                    // stash everything into the map.
+                    Map<String,String> map = vv.getConnectionParameters();
+                    for(ConfigurationNode attr : myNode.getAttributes()){
+                         map.put(attr.getName(), attr.getValue().toString());
+                    }
+                    // Add the defaults here if they are missing
+                        v = vv;
+                    /*
+                        /*
+      MySQLConnectionParameters params = new MySQLConnectionParameters(
+                "oa4mp-server",
+                "c9SW5SuspuMU",
+                "oauth2",
+                "oauth2",
+                "localhost",
+                3306,
+                "com.mysql.jdbc.Driver",
+                false,
+                "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
+        );
+     */
+
+
+                    break;
+                case VFS_TYPE_MEMORY:
+                    v = new VFSMemoryConfig(
+                            getNodeValue(kid, VFS_SCHEME_TAG),
+                            getNodeValue(kid, VFS_MOUNT_POINT_TAG),
+                            access.contains("r"),
+                            access.contains("w")
+                    );
+                    break;
+                default:
+                    throw new QDLException("Error: unsupported VFS type of " + getFirstAttribute(kid, VFS_ATTR_TYPE));
+
             }
+            configs.add(v);
+
         }
         return configs;
     }

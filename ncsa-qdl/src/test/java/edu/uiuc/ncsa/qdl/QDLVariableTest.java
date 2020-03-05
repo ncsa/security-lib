@@ -37,7 +37,7 @@ public class QDLVariableTest extends TestBase {
     }
 
     /**
-     * Test that xtem variables get resolved right, so foo.i resolves to foo.0 if i:=0.
+     * Test that stem variables get resolved right, so foo.i resolves to foo.0 if i:=0.
      *
      * @throws Exception
      */
@@ -74,7 +74,8 @@ public class QDLVariableTest extends TestBase {
 
     /**
      * We allow for multiple stems like a.b.c.d if all the tails resolve. In point of fact
-     * we only allow for single stems, so a. exists, but a.b. is disallowed. This test
+     * we only allow for single stems, so a. exists, but a.b. is disallowed (b. can be a stem, but not an index)
+     * This test
      * defines a sequence of stem variables and then tests that they resolve.
      *
      * @throws Exception

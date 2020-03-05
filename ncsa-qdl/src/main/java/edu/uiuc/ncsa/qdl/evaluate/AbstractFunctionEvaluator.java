@@ -5,10 +5,10 @@ import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.scripting.VFSEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.math.BigDecimal;
@@ -369,7 +369,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param state
      * @return
      */
-    protected VFSEntry resolveResourceToFile(String resourceName,  State state) {
+    protected VFSEntry resolveResourceToFile(String resourceName, State state) {
         if (state.isVFSFile(resourceName)) {
             if (!state.hasVFSProviders()) {
                 throw new QDLException("Error: unkonwn virtual file system for resource \"" + resourceName + "\"");

@@ -1,7 +1,13 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
+import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+
+import java.io.File;
+
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -13,77 +19,76 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
                                    String mountPoint,
                                    boolean canRead,
                                    boolean canWrite) {
-
-        this.rootDir = rootDir + (rootDir.endsWith(PATH_SEPARATOR)?"":PATH_SEPARATOR);
-        this.scheme = scheme + (scheme.endsWith(SCHEME_DELIMITER)?"":SCHEME_DELIMITER);
-        this.mountPoint = mountPoint + (mountPoint.endsWith(PATH_SEPARATOR)?"":PATH_SEPARATOR);
-        this.canRead = canRead;
-        this.canWrite = canWrite;
-    }
-
-    @Override
-    public String getMountPoint() {
-        return mountPoint;
+        super(scheme, mountPoint, canRead, canWrite);
+        this.rootDir = rootDir + (rootDir.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
     }
 
     String rootDir = null;
-    String scheme = null;
-    String mountPoint = null;
-    @Override
-    public String getScheme() {
-        return scheme;
-    }
 
     @Override
-    public boolean checkScheme(String name) {
-        return name.startsWith(getScheme() + SCHEME_DELIMITER);
+    public VFSEntry get(String path) throws Throwable {
+       super.get(path);
+        String realPath = getRealPath(path);
+        return FileEntries.fileToEntry(realPath);
     }
 
-    protected String makeFileName(String head, String rawPath) {
-        return rootDir + rawPath.substring(head.length());
+
+    protected String getRealPath(String path) {
+        return rootDir + super.getRealPath(path);
     }
 
-    @Override
-    public VFSEntry get(String name) throws Throwable {
-        if(!canRead()){
-            throw new QDLException("Error: You do not have permission to read from the virtual file system");
-        }
-        String head = getScheme() + getMountPoint() ;
-        if (!name.startsWith(head)) {
-            return null;
-        }
-        return FileEntries.fileToEntry(makeFileName(head, name));
-    }
 
     @Override
-    public void put(String name, VFSEntry entry) throws Throwable{
-        if(!canWrite()){
-            throw new QDLException("Error: You do not have permission to write to the virtual file system");
-        }
-        String head = getScheme() + SCHEME_DELIMITER + getMountPoint() + PATH_SEPARATOR;
-        if (!name.startsWith(head)) {
-            throw new QDLException("Error: Could not write file");
-        }
-        if(entry.isBinaryType()){
-            FileUtil.writeFileAsBinary(makeFileName(head, name), entry.getText());
-        }else{
-            FileUtil.writeStringToFile(makeFileName(head, name), entry.getText());
+    public void put(String path, VFSEntry entry) throws Throwable {
+        super.put(path, entry);
+
+        if (entry.isBinaryType()) {
+            FileUtil.writeFileAsBinary(getRealPath(path), entry.getText());
+        } else {
+            FileUtil.writeStringToFile(getRealPath(path), entry.getText());
         }
     }
 
     @Override
-    public boolean isScript(String name) {
-        return false;
+    public void put(VFSEntry entry) throws Throwable {
+        put(entry.getPath(), entry);
     }
-        boolean canRead = false;
-    boolean canWrite = false;
+
+
     @Override
-    public boolean canRead() {
-        return canRead;
+    public void delete(String path) throws Throwable {
+        super.delete(path);
+        File f = new File(getRealPath(path));
+        if (!f.exists()) return; //nothing to do
+        if (f.isDirectory()) {
+            throw new QDLIOException("Error: \"" + path + "\" is a directory.");
+        }
+        f.delete(); // we don't care if a real file was deleted. The contract is that if this is a file, its gone now.
     }
 
     @Override
-    public boolean canWrite() {
-        return canWrite;
+    public boolean contains(String path) throws Throwable {
+        super.contains(path);
+        String realPath = getRealPath(path);
+        File f = new File(realPath);
+        return f.exists();
+    }
+
+
+    @Override
+    public String[] dir(String path) {
+        super.dir(path);
+        String realPath = getRealPath(path);
+        File f = new File(realPath);
+        String[] fileList = f.list();
+        for (int i = 0; i < fileList.length; i++) {
+            fileList[i] = getScheme() + SCHEME_DELIMITER + fileList[i];
+        }
+        return fileList;
+    }
+
+    @Override
+    public String getType() {
+        return QDLConfigurationConstants.VFS_TYPE_PASS_THROUGH;
     }
 }

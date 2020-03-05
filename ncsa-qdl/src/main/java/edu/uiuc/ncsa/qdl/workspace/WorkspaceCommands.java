@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -136,6 +137,9 @@ public class WorkspaceCommands implements Logable {
             case MODULES_COMMAND:
                 return doModulesCommand(inputLine);
             case OFF_COMMAND:
+                if(inputLine.hasArg("y")){
+                    return RC_EXIT_NOW;
+                }
                 if (readline("Do you want to exit? (y/n)").equals("y")) {
                     return RC_EXIT_NOW;
                 }
@@ -771,10 +775,32 @@ public class WorkspaceCommands implements Logable {
                         " MB, free = " + (Runtime.getRuntime().freeMemory() / (1024 * 1024)) +
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
+            case "vfs":
+                say("Installed virtual file systems");
+                String indent = "                           "; // 25 blanks
+                String shortSpaces = "           "; // 12 blanks
+                for (String x : state.getVfsFileProviders().keySet()) {
+                    String output = "";
+                    VFSFileProvider y = state.getVfsFileProviders().get(x);
+                    output += makeColumn(indent, "type:" + y.getType());
+                    output += makeColumn(shortSpaces, "access:" + (y.canRead() ? "r" : "") + (y.canWrite() ? "w" : ""));
+                    output += makeColumn(indent, "scheme: " + y.getScheme());
+                    output += makeColumn(indent, "mount point:" + y.getMountPoint());
+                    output += makeColumn(indent, "current dir:" + (y.getCurrentDir() == null ? "(none)" : y.getCurrentDir()));
+                    sayi(output);
+                }
+                return RC_CONTINUE;
 
         }
         return RC_NO_OP;
 
+    }
+
+    String makeColumn(String spaces, String text) {
+        if (spaces.length() < text.length()){
+            return text;
+        }
+        return text + spaces.substring(0, spaces.length() - text.length());
     }
 
     private int doEchoMode(InputLine inputLine) {
@@ -1012,7 +1038,7 @@ public class WorkspaceCommands implements Logable {
         QDLConfigurationLoaderUtils.setupVFS(config, getState());
 
         setEchoModeOn(config.isEchoModeOn());
-        String[] foundModules = setupModules(config,  getState());
+        String[] foundModules = setupModules(config, getState());
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
             if (isVerbose) {

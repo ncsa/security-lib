@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.scripting;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.vfs.FileEntry;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;

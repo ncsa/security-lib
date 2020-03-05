@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.vfs.FileEntry;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.scripting.FileEntry.*;
+import static edu.uiuc.ncsa.qdl.vfs.FileEntry.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
