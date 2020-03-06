@@ -357,7 +357,9 @@ public class XProperties extends Properties {
      * @return
      */
     public String getString(String key) {
-        return getProperty(key);
+        Object obj =  get(key);
+        if(obj == null) return "null";
+        return obj.toString();
     }
 
 

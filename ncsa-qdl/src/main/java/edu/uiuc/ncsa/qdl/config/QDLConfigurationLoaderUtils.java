@@ -48,6 +48,15 @@ public class QDLConfigurationLoaderUtils {
                         config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
                         break;
+                    case VFS_TYPE_ZIP:
+                        VFSZipFileConfig zc = (VFSZipFileConfig)vfsConfig;
+                        provider = new VFSZipFile(zc.getZipFilePath(), zc.getScheme(),zc.getMountPoint(),
+                                zc.canRead(), zc.canWrite());
+                        state.addVFSProvider(provider);
+                        config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
+                                VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
+
+                        break;
                     default:
                         config.getMyLogger().warn("VFS mount: Unknown VFS type " + vfsConfig.getType() + ", scheme= " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());

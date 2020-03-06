@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -9,9 +10,11 @@ import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
+import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.TreeSet;
@@ -29,15 +32,23 @@ public class IOEvaluator extends MathEvaluator {
     public static final int SCAN_TYPE = 2 + IO_FUNCTION_BASE_VALUE;
 
     public static final String READ_FILE = "read_file";
+    public static final String IO_READ_FILE = "io#read";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
+    public static final String IO_WRITE_FILE = "io#write";
     public static final String WRITE_FILE = "write_file";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
+    public static final String IO_DIR = "io#dir";
+    public static final String DIR = "dir";
+    public static final int DIR_TYPE = 5 + IO_FUNCTION_BASE_VALUE;
+
+    public static final String IO_VFS_MOUNT = "io#mount";
     public static final String VFS_MOUNT = "vfs_mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
 
 
+    public static final String IO_VFS_UNMOUNT = "io#unmount";
     public static final String VFS_UNMOUNT = "vfs_unmount";
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
@@ -47,12 +58,15 @@ public class IOEvaluator extends MathEvaluator {
             SCAN_FUNCTION,
             READ_FILE,
             WRITE_FILE,
+            DIR,
             VFS_MOUNT,
             VFS_UNMOUNT};
+
     @Override
     public String[] getFunctionNames() {
         return FUNC_NAMES;
     }
+
     public TreeSet<String> listFunctions() {
         TreeSet<String> names = new TreeSet<>();
         for (String key : FUNC_NAMES) {
@@ -66,6 +80,7 @@ public class IOEvaluator extends MathEvaluator {
         if (name.equals(SAY_FUNCTION)) return SAY_TYPE;
         if (name.equals(PRINT_FUNCTION)) return SAY_TYPE;
         if (name.equals(SCAN_FUNCTION)) return SCAN_TYPE;
+        if (name.equals(DIR)) return DIR_TYPE;
         if (name.equals(READ_FILE)) return READ_FILE_TYPE;
         if (name.equals(WRITE_FILE)) return WRITE_FILE_TYPE;
         if (name.equals(VFS_MOUNT)) return VFS_MOUNT_TYPE;
@@ -141,20 +156,88 @@ public class IOEvaluator extends MathEvaluator {
                 polyad.setResultType(Constant.STRING_TYPE);
                 polyad.setEvaluated(true);
                 return true;
+            case IO_DIR:
+            case DIR:
+                doDir(polyad, state);
+                return true;
+            case IO_READ_FILE:
             case READ_FILE:
                 doReadFile(polyad, state);
                 return true;
+            case IO_WRITE_FILE:
             case WRITE_FILE:
                 doWriteFile(polyad, state);
                 return true;
+            case IO_VFS_MOUNT:
             case VFS_MOUNT:
                 vfsMount(polyad, state);
                 return true;
+            case IO_VFS_UNMOUNT:
             case VFS_UNMOUNT:
                 vfsUnmount(polyad, state);
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Quick note. This is a directory command. That means that it will list the things in a directory.
+     * This is not like, e.g., the unix ls command. The ls command <i>lists</i> information so<br/><br/>
+     * <code>ls filename</code>
+     * <br/><br/>
+     * returns the file name. This command returns what is in the directory. So <code>dir(filename)</code>
+     * returns null since the name is not a directory.
+     * @param polyad
+     * @param state
+     */
+    protected void doDir(Polyad polyad, State state) {
+        if (0 == polyad.getArgumments().size()) {
+            throw new IllegalArgumentException("Error: " + DIR + " requires a file name to read.");
+        }
+        Object obj = polyad.evalArg(0, state);
+        if (obj == null || !isString(obj)) {
+            throw new IllegalArgumentException("Error: The " + DIR + " command requires a string for its first argument.");
+        }
+        String fileName = obj.toString();
+        int op = -1; // default
+
+        VFSFileProvider vfs = null;
+        String[] entries = null;
+        boolean hasVF = false;
+        if (state.isVFSFile(fileName)) {
+            try {
+                vfs = state.getVFS(fileName);
+                if (vfs != null) {
+                    entries = vfs.dir(fileName);
+                }
+
+            } catch (Throwable throwable) {
+                throw new QDLIOException("Error; Coould not resolve virtual file system for \"" + fileName + "\"");
+            }
+        } else {
+            // So its just a file.
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
+            File f = new File(fileName);
+            entries = f.list();
+        }
+        if (entries == null) {
+            // Then this is not a directory the request was made for a file.
+            // The result should be null
+            polyad.setEvaluated(true);
+            polyad.setResult(null);
+            polyad.setResultType(Constant.NULL_TYPE);
+            return;
+        }
+        StemVariable dir = new StemVariable();
+        for (String x : entries) {
+            dir.getStemList().append(x);
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(dir);
+        polyad.setResultType(Constant.STEM_TYPE);
+
     }
 
     protected void vfsUnmount(Polyad polyad, State state) {

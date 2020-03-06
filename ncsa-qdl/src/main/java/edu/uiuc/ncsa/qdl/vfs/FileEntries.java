@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.ZipEntry;
 
 import static edu.uiuc.ncsa.qdl.vfs.FileEntry.*;
 
@@ -31,6 +33,44 @@ public class FileEntries {
         props.put(CONTENT, array);
         json.put(TYPE, props);
         return json;
+    }
+
+    public static FileEntry toEntry(ZipEntry zipEntry, byte[] content) throws Throwable {
+        XProperties xp = new XProperties();
+        Date ts = new Date();
+        if (zipEntry.getLastModifiedTime() != null) {
+            ts.setTime(zipEntry.getLastModifiedTime().toMillis());
+        }
+        xp.put(FileEntryConstants.LAST_MODIFIED, Iso8601.date2String(ts));
+
+        ts = new Date();
+        if (zipEntry.getCreationTime() != null) {
+            ts.setTime(zipEntry.getCreationTime().toMillis());
+        }
+        xp.put(FileEntryConstants.CREATE_TIME, Iso8601.date2String(ts));
+
+        xp.put(FileEntryConstants.ID, zipEntry.getName());
+        File f = new File(zipEntry.getName());
+        List<String> contents;
+        int length = 0;
+        if (isBinary(f)) {
+            xp.put(CONTENT_TYPE, BINARY_TYPE);
+            contents = new ArrayList<>();
+            contents.add(Base64.encodeBase64String(content));  // one string
+            length = contents.get(0).length();
+        } else {
+            xp.put(CONTENT_TYPE, TEXT_TYPE);
+            String c = new String(content);
+            contents = new ArrayList<>();
+
+            for (String x : c.split("\n")) {
+                contents.add(x);
+                length = length + x.length();
+            }
+        }
+        xp.put(FileEntryConstants.LENGTH, length);
+
+        return new FileEntry(contents, xp);
     }
 
     public static JSONObject toJSON(String id, File f) throws Throwable {
@@ -59,9 +99,14 @@ public class FileEntries {
         return toJSON(f.getName(), f);
     }
 
+    public static FileEntry fileToEntry(File file) throws Throwable {
+        return fromJSON(toJSON(file));
+
+    }
+
     public static FileEntry fileToEntry(String path) throws Throwable {
         File f = new File(path);
-        return fromJSON(toJSON(f));
+        return fileToEntry(f);
     }
 
     /**
@@ -80,7 +125,7 @@ public class FileEntries {
         return fileEntry;
     }
 
-    protected static boolean isBinary(File f) throws IOException {
+    public static boolean isBinary(File f) throws IOException {
         String ftype = Files.probeContentType(f.toPath());
         if (ftype == null) return true; // just in case
         if (ftype.startsWith("text") ||

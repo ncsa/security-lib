@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
+import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -13,8 +14,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
+/** Note that all of the arguments to this database for keys are assumed to be normalized, resolved,
+ * etc., etc. so that no such logic is present here. The {@link VFSFileProvider} implementation
+ * that has an instance of this is charged with that.
  * <p>Created by Jeff Gaynor<br>
  * on 2/28/20 at  5:09 PM
  */
@@ -33,6 +38,72 @@ public class VFSDatabase extends SQLDatabase {
         this.fqTablename = fqTablename;
     }
 
+    /**
+     * This takes a path of the form a/b/c/.../d/ (note normalization with ending slash) and returns
+     * the entries for it
+     * @param path
+     * @return
+     */
+    public List<String> selectByPath(String path){
+        ArrayList<String> paths = new ArrayList<>();
+        String statement = " select " + FILE_NAME + " from " + fqTablename + " where " + PATH_NAME + " =?";
+        Connection c = getConnection();
+            FileEntry t = null;
+            try {
+                PreparedStatement stmt = c.prepareStatement(statement);
+                stmt.setString(1, path);
+
+                stmt.executeQuery();
+                ResultSet rs = stmt.getResultSet();
+
+                // Now we have to pull in all the values.
+                if (!rs.next()) {
+                    rs.close();
+                    stmt.close();
+                    releaseConnection(c);
+                    return paths;
+                }
+                while(rs.next()){
+                    paths.add(rs.getString(FILE_NAME));
+                }
+                rs.close();
+                stmt.close();
+                releaseConnection(c);
+            } catch (SQLException e) {
+                destroyConnection(c);
+                throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+            }
+return paths;
+    }
+    public List<String> getDistinctPaths(){
+        String statement = " select DISTINCT(" + PATH_NAME + ") from " + fqTablename;
+        ArrayList<String> paths = new ArrayList<>();
+        Connection c = getConnection();
+            FileEntry t = null;
+            try {
+                PreparedStatement stmt = c.prepareStatement(statement);
+                stmt.executeQuery();
+                ResultSet rs = stmt.getResultSet();
+
+                // Now we have to pull in all the values.
+                if (!rs.next()) {
+                    rs.close();
+                    stmt.close();
+                    releaseConnection(c);
+                    return paths;
+                }
+                while(rs.next()){
+                    paths.add(rs.getString(PATH_NAME));
+                }
+                rs.close();
+                stmt.close();
+                releaseConnection(c);
+            } catch (SQLException e) {
+                destroyConnection(c);
+                throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+            }
+            return paths;
+    }
     public FileEntry get(String[] key) {
         String path = key[VFSMySQLProvider.PATH_INDEX];
         String filename = key[VFSMySQLProvider.FILENAME_INDEX];
@@ -58,7 +129,14 @@ public class VFSDatabase extends SQLDatabase {
             rs.close();
             stmt.close();
             XProperties eas = new XProperties(map.getString(EA));
-            JSONArray array = JSONArray.fromObject(map.getString(CONTENT));
+            JSONArray array;
+            try {
+                array = JSONArray.fromObject(map.getString(CONTENT));
+            }catch(Throwable tt){
+                // if it is not a JSON array, then stick it in one.
+                array = new JSONArray();
+                array.add(map.getString(CONTENT));
+            }
             t = new FileEntry(array, eas);
             releaseConnection(c);
         } catch (SQLException e) {

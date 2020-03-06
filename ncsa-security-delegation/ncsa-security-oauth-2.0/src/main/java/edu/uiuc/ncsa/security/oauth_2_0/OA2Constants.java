@@ -54,6 +54,13 @@ public interface OA2Constants {
     public static String RESPONSE_MODE = "response_mode";
     public static String RESPONSE_MODE_QUERY = "query";
     public static String RESPONSE_MODE_FRAGMENT = "fragment";
+    /**
+     * Supports <a href="https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html">form post</a>.
+     */
+    /*
+       Part of CIL-592.
+     */
+    public static String RESPONSE_MODE_FORM_POST = "form_post";
 
     public static String FORM_ENCODING = "application/x-www-form-urlencoded";
 

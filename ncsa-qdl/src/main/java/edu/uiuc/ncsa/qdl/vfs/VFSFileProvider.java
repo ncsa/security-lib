@@ -20,26 +20,43 @@ import java.io.Serializable;
 public interface VFSFileProvider extends Serializable {
     /**
      * mostly this is so when information is being displayed to the user they can see the origin of the provider.
+     *
      * @return
      */
     String getType();
 
     /**
      * The scheme that uniquely identifies this provider
+     *
      * @return
      */
     String getScheme();
 
     /**
+     * The scheme is does not end with the scheme delimiter and should be normalized here.
+     *
+     * @param scheme
+     */
+    void setScheme(String scheme);
+
+    /**
      * This is the mount point for the virtual file system.
+     *
      * @return
      */
     String getMountPoint();
 
-
+    /**
+     * The mount point <i>does</i> <b>both</b> start and end with the path separator since we always need it.
+     * The mount point should be normalized in the setter.
+     *
+     * @param mountPoint
+     */
+    void setMountPoint(String mountPoint);
 
     /**
      * Checks if the name has the scheme for this provider.
+     *
      * @param name
      * @return
      */
@@ -47,6 +64,7 @@ public interface VFSFileProvider extends Serializable {
 
     /**
      * Get the named item. Note that all of the names are qualified.
+     *
      * @param name
      * @return
      */
@@ -54,6 +72,7 @@ public interface VFSFileProvider extends Serializable {
 
     /**
      * Add the using the path. If and entry exists therem it will be over-written.
+     *
      * @param newPath
      * @param entry
      */
@@ -61,6 +80,7 @@ public interface VFSFileProvider extends Serializable {
 
     /**
      * Put this in the store at its current path
+     *
      * @param entry
      * @throws Throwable
      */
@@ -68,17 +88,21 @@ public interface VFSFileProvider extends Serializable {
 
     /**
      * Checks if the FQ name can be resolved to a script by this provider.
+     *
      * @param path
      * @return
      */
     boolean isScript(String path);
 
     boolean canRead();
+    void setRead(boolean newValue);
 
     boolean canWrite();
+    void setWrite(boolean newValue);
 
     /**
      * A delete is a type of write. If the store is not writeable, it cannot delete files.
+     *
      * @param path
      * @throws Throwable
      */
@@ -86,6 +110,7 @@ public interface VFSFileProvider extends Serializable {
 
     /**
      * Contains is a type of read. If the store is not readable, it cannot tell if it contains an entry.
+     *
      * @param path
      * @return
      * @throws Throwable
@@ -95,6 +120,8 @@ public interface VFSFileProvider extends Serializable {
     XProperties getFileInfo(String path) throws Throwable;
 
     String getCurrentDir();
+
     void setCurrentDir(String path);
-    String[] dir(String path);
+
+    String[] dir(String path) throws Throwable;
 }

@@ -6,8 +6,7 @@ import edu.uiuc.ncsa.qdl.util.FileUtil;
 
 import java.io.File;
 
-import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
-import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -27,7 +26,7 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
 
     @Override
     public VFSEntry get(String path) throws Throwable {
-       super.get(path);
+        super.get(path);
         String realPath = getRealPath(path);
         return FileEntries.fileToEntry(realPath);
     }
@@ -76,14 +75,12 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
 
 
     @Override
-    public String[] dir(String path) {
+    public String[] dir(String path) throws Throwable {
         super.dir(path);
         String realPath = getRealPath(path);
+
         File f = new File(realPath);
         String[] fileList = f.list();
-        for (int i = 0; i < fileList.length; i++) {
-            fileList[i] = getScheme() + SCHEME_DELIMITER + fileList[i];
-        }
         return fileList;
     }
 

@@ -79,6 +79,26 @@ public class State extends FunctionState {
         return s;
     }
 
+    /**
+     * Given a fully qualified path, find the VFS corresponding to the mount point and
+     * return it or null if no such mount point exists
+     * @param fqName
+     * @return
+     * @throws Throwable
+     */
+    public VFSFileProvider getVFS(String fqName) throws Throwable{
+        if (vfsFileProviders.isEmpty()) return null;
+        VFSFileProvider vfsFileProvider = null;
+
+        for(String mountPoint : vfsFileProviders.keySet()) {
+            // key is of the form scheme#/mounpoint/ -- note trailing slash! This lets us tell
+            // things like A#/a/b from A#/abc
+            if (fqName.startsWith(mountPoint)) {
+                return vfsFileProviders.get(mountPoint);
+            }
+        }
+         return null;
+    }
     public VFSEntry getFileFromVFS(String fqName) throws Throwable {
         if (vfsFileProviders.isEmpty()) return null;
         VFSFileProvider vfsFileProvider = null;

@@ -110,6 +110,13 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                             access.contains("w")
                     );
                     break;
+                case VFS_TYPE_ZIP:
+                    v = new VFSZipFileConfig(getNodeValue(kid, VFS_ZIP_FILE_PATH),
+                            getNodeValue(kid, VFS_SCHEME_TAG),
+                            getNodeValue(kid, VFS_MOUNT_POINT_TAG),
+                            access.contains("r"),
+                            false);
+                    break;
                 case VFS_TYPE_MYSQL:
                     VFSSQLConfig vv = new VFSSQLConfig(
                             getNodeValue(kid, VFS_SCHEME_TAG),
@@ -119,28 +126,12 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                     );
                     ConfigurationNode myNode = getFirstNode(kid, StorageConfigurationTags.MYSQL_STORE);
                     // stash everything into the map.
-                    Map<String,String> map = vv.getConnectionParameters();
-                    for(ConfigurationNode attr : myNode.getAttributes()){
-                         map.put(attr.getName(), attr.getValue().toString());
+                    Map<String, String> map = vv.getConnectionParameters();
+                    for (ConfigurationNode attr : myNode.getAttributes()) {
+                        map.put(attr.getName(), attr.getValue().toString());
                     }
                     // Add the defaults here if they are missing
-                        v = vv;
-                    /*
-                        /*
-      MySQLConnectionParameters params = new MySQLConnectionParameters(
-                "oa4mp-server",
-                "c9SW5SuspuMU",
-                "oauth2",
-                "oauth2",
-                "localhost",
-                3306,
-                "com.mysql.jdbc.Driver",
-                false,
-                "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
-        );
-     */
-
-
+                    v = vv;
                     break;
                 case VFS_TYPE_MEMORY:
                     v = new VFSMemoryConfig(

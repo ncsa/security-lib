@@ -1,6 +1,11 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
+import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
+
+import java.util.List;
+
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -38,6 +43,7 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
         path = unqualifyPath(path); // no schemes in database.
         String[] output = new String[2];
         output[PATH_INDEX] = VFSPaths.getParentPath(path);
+        output[PATH_INDEX] =output[PATH_INDEX] +  (output[PATH_INDEX].endsWith(PATH_SEPARATOR)?"":PATH_SEPARATOR);
         output[FILENAME_INDEX] = VFSPaths.getFileName(path);
         return output;
     }
@@ -69,9 +75,44 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
 
 
     @Override
-    public String[] dir(String path) {
+    public String[] dir(String path) throws Throwable {
         super.dir(path);
-        return new String[0];
+
+        String relPath = VFSPaths.relativize(getStoreRoot(), path);
+        relPath = relPath + (relPath.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
+        relPath = VFSPaths.getUnqPath(relPath);
+        boolean isRoot = relPath.equals(PATH_SEPARATOR);
+        List<String> output = db.selectByPath(PATH_SEPARATOR + relPath);
+        // should be at most one, actually.
+        if (output.size() == 0) {
+            // nothing in this directory
+            throw new QDLIOException("Error: The directory \"" + path + "\" does not exist.");
+        }
+         List<String> distinctPaths = db.getDistinctPaths();;
+       String[] components = VFSPaths.toPathComponents(relPath);
+        for (String key : distinctPaths) {
+                  if (isChildOf(components, key, isRoot)) {
+                      if (isRoot) {
+                          // no surgery on root nodes.
+                          output.add(key);
+                      } else {
+                          // Datanbase paths are of the form /a/b/c/ so they start and end with slashes.
+                          // This cuts off the lead slash so the returned directory relative
+                          output.add(key.substring(1+ relPath.length()));
+                      }
+                  }
+              }
+        String[] fileList = new String[output.size()];
+        int i = 0;
+
+        for (String x : output) {
+            if (!x.isEmpty()) {
+                fileList[i++] = x;
+            }
+        }
+
+        return fileList;
+
     }
 
     @Override

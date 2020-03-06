@@ -349,5 +349,8 @@ public class VFSPaths {
         // need a path in the jar
         Path meow = fileSystem.getPath(pathInsideTheJar);
         Files.list(meow).forEach((path) -> System.out.println(path.getFileName()));
+
+
+
     }
 }

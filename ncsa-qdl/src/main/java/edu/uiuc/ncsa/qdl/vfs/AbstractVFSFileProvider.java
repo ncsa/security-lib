@@ -35,15 +35,30 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
                                    boolean canWrite
     ) {
         this.currentDir = currentDir;
-        this.scheme = (scheme.endsWith(SCHEME_DELIMITER) ? scheme.substring(0, scheme.length() - 1) : scheme);
-        this.mountPoint = mountPoint + (mountPoint.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
-        this.canRead = canRead;
-        this.canWrite = canWrite;
+        // use setters since there is clean up done in them.
+        setScheme(scheme);
+        setMountPoint(mountPoint);
+        setRead(canRead);
+        setWrite(canWrite);
     }
 
     @Override
     public String getMountPoint() {
         return mountPoint;
+    }
+
+
+    @Override
+    public void setScheme(String scheme) {
+        this.scheme = (scheme.endsWith(SCHEME_DELIMITER) ? scheme.substring(0, scheme.length() - 1) : scheme);
+        storeRoot = null;
+    }
+
+
+    @Override
+    public void setMountPoint(String mountPoint) {
+        this.mountPoint = (mountPoint.startsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR) + mountPoint + (mountPoint.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
+        storeRoot = null;
     }
 
     String scheme = null;
@@ -70,6 +85,16 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
     @Override
     public boolean canWrite() {
         return canWrite;
+    }
+
+    @Override
+    public void setRead(boolean newValue) {
+        this.canRead = newValue;
+    }
+
+    @Override
+    public void setWrite(boolean newValue) {
+        this.canWrite = newValue;
     }
 
     @Override
@@ -120,14 +145,28 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
             }
         }
         rPath = VFSPaths.relativize(getStoreRoot(), path);
-        return unqualifyPath(rPath); // don't need scheme any more.
+        rPath = unqualifyPath(rPath); // don't need scheme any more.
+        if (rPath.endsWith("..")) {
+            // Edge case from relativize method that if this resolved to the root of the
+            // current store, /, it would get turned in to a ".." which might let certain
+            // stores pass outside of their mount point and access other directories.
+            // A common hackey (innocent) thing people do is if they are a few levels down
+            // and want to get to the root directory issue a path like ../../../../..
+            // which they assume will stop at the root. We should too.
+            // Therefore
+            // this always stops at the root.
+            rPath = PATH_SEPARATOR;
+        }
 
+        return rPath;
     }
 
     String storeRoot = null;
 
     protected String unqualifyPath(String x) {
-        if(x.indexOf(SCHEME_DELIMITER) == -1){return  x;} // already unqualified
+        if (x.indexOf(SCHEME_DELIMITER) == -1) {
+            return x;
+        } // already unqualified
         return x.substring((getScheme() + SCHEME_DELIMITER).length()); // chop off scheme since we don't want it now.
     }
 
@@ -155,7 +194,7 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
 
     @Override
     public void put(String newPath, VFSEntry entry) throws Throwable {
-        if (!canRead()) {
+        if (!canWrite()) {
             throw new QDLIOException("Error: You do not have permission to write to the virtual file system");
         }
         checkPath(newPath);
@@ -163,12 +202,16 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
 
     @Override
     public void put(VFSEntry entry) throws Throwable {
+        if (!canWrite()) {
+            throw new QDLIOException("Error: You do not have permission to write to the virtual file system");
+        }
+
         put(entry.getPath(), entry);
     }
 
     @Override
     public void delete(String path) throws Throwable {
-        if (!canRead()) {
+        if (!canWrite()) {
             throw new QDLIOException("Error: You do not have permission to write to the virtual file system");
         }
         checkPath(path);
@@ -185,11 +228,35 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
     }
 
     @Override
-    public String[] dir(String path) {
+    public String[] dir(String path) throws Throwable {
         if (!canRead()) {
             throw new QDLIOException("Error: You do not have permission to read from the virtual file system");
         }
         checkPath(path);
         return new String[0];
     }
+
+    /**
+       * Use this for stores that keep everything in a flat list (like a database table or hash map of file
+       * paths.) You use {@link VFSPaths#toPathComponents(String)} on the argument to the {@link #dir(String)}command
+       * and specify if it is the root node (since figuring that out is store dependent). This then compares
+       * paths by lengths to give back the right one.
+       * @param top
+       * @param target
+       * @param isRoot
+       * @return
+       */
+      protected boolean isChildOf(String[] top, String target, boolean isRoot) {
+          String[] other = VFSPaths.toPathComponents(target);
+          if (isRoot) {
+              // Special case of the root directory
+              if (other.length == 1) return true;
+          }
+          if (top.length + 1 != other.length) return false;
+          for (int i = 0; i < top.length; i++) {
+              if (!top[i].equals(other[i])) return false;
+          }
+          return true;
+      }
+
 }

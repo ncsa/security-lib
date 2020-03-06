@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
-import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,65 +28,35 @@ public class VFSMemoryFileProvider extends AbstractVFSFileProvider {
     @Override
     public VFSEntry get(String path) throws Throwable {
         super.get(path);
-        if (VFSPaths.isAbsolute(path)) {
-            return map.get(path);
-        }
-        return map.get(resolvePath(path));
-    }
-
-    protected String resolvePath(String relativePath) {
-        if (getCurrentDir() == null) {
-            throw new QDLIOException("Error: No current directory is set for this store");
-        }
-        String p = VFSPaths.resolve(getCurrentDir(), relativePath);
-        return p;
+        return map.get(getRealPath(path));
     }
 
     @Override
     public void put(String newPath, VFSEntry entry) throws Throwable {
         super.put(newPath, entry);
-        if (VFSPaths.isAbsolute(newPath)) {
-            entry.setPath(newPath);
-            map.put(newPath, entry);
-            return;
-        }
-        String p = resolvePath(newPath);
-        entry.setPath(p);
-        map.put(p, entry);
-
+        String rPath = getRealPath(newPath);
+        entry.setPath(VFSPaths.normalize(newPath));
+        map.put(rPath, entry);
     }
-
-
 
     @Override
     public void delete(String path) throws Throwable {
         super.delete(path);
-        if (VFSPaths.isAbsolute(path)) {
-            map.remove(path);
-        }
-        map.remove(resolvePath(path));
-
+        map.remove(getRealPath(path));
     }
 
     @Override
     public boolean contains(String path) throws Throwable {
         super.contains(path);
-        if (VFSPaths.isAbsolute(path)) {
-            return map.containsKey(path);
-        }
-        return map.containsKey(resolvePath(path));
+        return map.containsKey(getRealPath(path));
     }
 
     @Override
-    public String[] dir(String path) {
+    public String[] dir(String path) throws Throwable{
         super.dir(path);
         ArrayList<String> fileList = new ArrayList<>();
-        String realPath;
-        if (VFSPaths.isAbsolute(path)) {
-            realPath = path;
-        } else {
-            realPath = resolvePath(path);
-        }
+        String realPath = getRealPath(path);
+
         for (String key : map.keySet()) {
             if (VFSPaths.startsWith(key, realPath)) {
                 fileList.add(key);
