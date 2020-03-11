@@ -32,8 +32,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static String NOT_EQUAL = "!=";
     public static String LESS_THAN = "<";
     public static String LESS_THAN_EQUAL = "<=";
+    public static String LESS_THAN_EQUAL2 = "=<";
     public static String MORE_THAN = ">";
     public static String MORE_THAN_EQUAL = ">=";
+    public static String MORE_THAN_EQUAL2 = "=>";
     public static String NOT = "!";
 
 
@@ -92,10 +94,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         if (oo.equals(AND)) return AND_VALUE;
         if (oo.equals(EQUALS)) return EQUALS_VALUE;
         if (oo.equals(LESS_THAN)) return LESS_THAN_VALUE;
-        if (oo.equals(LESS_THAN_EQUAL)) return LESS_THAN_EQUAL_VALUE;
+        if (oo.equals(LESS_THAN_EQUAL) || oo.equals(LESS_THAN_EQUAL2)) return LESS_THAN_EQUAL_VALUE;
         if (oo.equals(MINUS)) return MINUS_VALUE;
         if (oo.equals(MORE_THAN)) return MORE_THAN_VALUE;
-        if (oo.equals(MORE_THAN_EQUAL)) return MORE_THAN_EQUAL_VALUE;
+        if (oo.equals(MORE_THAN_EQUAL) || oo.equals(MORE_THAN_EQUAL2)) return MORE_THAN_EQUAL_VALUE;
         if (oo.equals(NOT_EQUAL)) return NOT_EQUAL_VALUE;
         if (oo.equals(OR)) return OR_VALUE;
         if (oo.equals(PLUS)) return PLUS_VALUE;

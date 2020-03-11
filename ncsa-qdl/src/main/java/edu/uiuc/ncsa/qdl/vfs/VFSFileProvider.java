@@ -124,4 +124,27 @@ public interface VFSFileProvider extends Serializable {
     void setCurrentDir(String path);
 
     String[] dir(String path) throws Throwable;
+
+    /**
+     * Make a set of directories. This will make a given directory and any intermediate directories.
+     * @param path
+     * @return
+     */
+    boolean mkdir(String path);
+
+    /**
+     * This will remove a directory. Note that this requires that the directory be empty of
+     * all files.
+     * @param path
+     * @return
+     * @throws Throwable
+     */
+    boolean rmdir(String path) throws Throwable;
+
+    /**
+     * Remove a file from the store.
+     * @param path
+     * @throws Throwable
+     */
+    void rm(String path) throws Throwable;
 }

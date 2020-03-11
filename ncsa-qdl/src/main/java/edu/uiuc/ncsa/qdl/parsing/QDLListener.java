@@ -125,14 +125,76 @@ public class QDLListener implements QDLParserListener {
     }
 
     @Override
-    public void exitAssignment(QDLParserParser.AssignmentContext ctx) {
-        Assignment assignment = (Assignment) parsingMap.getStatementFromContext(ctx);
-        // The variable is the 0th child, the argument is the 2nd.
-        assignment.setVariableReference(ctx.children.get(0).getText());
-        ParseTree valueNode = ctx.children.get(2);
-        ExpressionNode arg = (ExpressionNode) resolveChild(ctx.children.get(2));
-        assignment.setArgument(arg);
-        assignment.setSourceCode(ctx.getText());
+    public void exitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
+        Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
+        Assignment topNode = currentA;
+        topNode.setSourceCode(assignmentContext.getText());
+        Assignment nextA = null;
+        // The variable is the 0th child, the argument is the last child (it is an expression and ends up in the symbol table).
+        int exprIndex = assignmentContext.children.size() - 1;
+        for (int i = 0; i < exprIndex; i++) {
+            String currentVar = assignmentContext.children.get(i).getText();
+            // The general pattern (i.e.  the children of assignmentContext) is
+            //   V0 op0 V1 op1 V2 op2 V3 op3 Expr
+            // (The final argument must always be an expression). So this gets
+            //   V0 op0 V1
+            //  and increments the loop once, so the next iteration it gets
+            //   V1 op1 V2
+            // In this way it has enough information at each iteration to make the
+            // right type of assignment operator.
+            currentA.setVariableReference(currentVar);
+            String op = assignmentContext.children.get(++i).getText(); // this is the operator
+            String nextVar;
+            if (currentA.getSourceCode() == null) {
+                currentA.setSourceCode(currentVar + op + assignmentContext.children.get(i + 1).getText());
+            }
+
+            nextA = new Assignment();
+            nextVar = assignmentContext.children.get(i + 1).getText();
+            nextA.setVariableReference(nextVar);
+            if (op.equals(":=")) {
+                if (i + 1 == exprIndex) {
+                    Statement arg = resolveChild(assignmentContext.children.get(i + 1));
+                    currentA.setArgument(arg);
+                    return;
+                    // test for this. q and A should have the value 'abc', B == 'bc'
+                    //  A := 'a'; B := 'b';
+                    // q := A += B += 'c';
+                }
+                currentA.setArgument(nextA);
+            } else {
+                Dyad d = new Dyad(getAssignmentType(op));
+                d.setLeftArgument(new VariableNode(currentVar));
+                d.setRightArgument(new AssignmentNode(nextA));
+                currentA.setArgument(d);
+            }
+            if (i + 1 == exprIndex) {
+                Statement arg = resolveChild(assignmentContext.children.get(i + 1));
+                nextA.setArgument(arg);
+                return;
+                //  A := 'a'; B := 'b';
+                // q := A += B += 'c';
+            }
+            currentA = nextA;
+        } //end for
+    }
+
+    protected int getAssignmentType(String op) {
+        switch (op) {
+            case "+=":
+                return OpEvaluator.PLUS_VALUE;
+            case "-=":
+                return OpEvaluator.MINUS_VALUE;
+            case "*=":
+                return OpEvaluator.TIMES_VALUE;
+            case "/=":
+                return OpEvaluator.DIVIDE_VALUE;
+            case "%=":
+                return OpEvaluator.INTEGER_DIVIDE_VALUE;
+            case "^=":
+                return OpEvaluator.POWER_VALUE;
+        }
+        return OpEvaluator.UNKNOWN_VALUE;
     }
 
     @Override
@@ -400,10 +462,10 @@ public class QDLListener implements QDLParserListener {
             value = value.substring(0, value.length() - 1);
         }
 
-       value =  value.replace("\\'", "'");
-   //    value =  value.replace("\\n", "\n");
-   //    value =  value.replace("\\t", "\t");
-   //    value =  value.replace("\\r", "\r");
+        value = value.replace("\\'", "'");
+        //    value =  value.replace("\\n", "\n");
+        //    value =  value.replace("\\t", "\t");
+        //    value =  value.replace("\\r", "\r");
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
         node.setSourceCode(ctx.getText());
         stash(ctx, node);
@@ -633,7 +695,7 @@ public class QDLListener implements QDLParserListener {
             String allArgs = argListContext.getText();
 
             StringTokenizer st = new StringTokenizer(allArgs, ",");
-            while(st.hasMoreElements()){
+            while (st.hasMoreElements()) {
                 functionRecord.argNames.add(st.nextToken());
             }
         }

@@ -45,11 +45,11 @@ public abstract class ExpressionImpl implements ExpressionNode {
     }
 
     protected Object result;
-
+    @Override
     public boolean isEvaluated() {
         return evaluated;
     }
-
+    @Override
     public void setEvaluated(boolean evaluated) {
         this.evaluated = evaluated;
     }

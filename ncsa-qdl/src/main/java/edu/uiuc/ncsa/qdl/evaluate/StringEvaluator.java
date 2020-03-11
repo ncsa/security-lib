@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -46,7 +47,16 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     public static final String TOKENIZE = "tokenize";
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
-    public static String FUNC_NAMES[] = new String[]{CONTAINS,TO_LOWER,TO_UPPER,TRIM,INSERT,SUBSTRING,REPLACE,INDEX_OF,TOKENIZE};
+
+    public static final String ENCODE = "vencode";
+        public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
+
+    public static final String DECODE = "vdecode";
+        public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
+
+    public static String FUNC_NAMES[] = new String[]{CONTAINS,TO_LOWER,TO_UPPER,TRIM,INSERT,
+            SUBSTRING,REPLACE,INDEX_OF,TOKENIZE,
+    ENCODE, DECODE};
 
    public TreeSet<String> listFunctions() {
           TreeSet<String> names = new TreeSet<>();
@@ -72,6 +82,8 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         if (name.equals(TRIM)) return TRIM_TYPE;
         if (name.equals(INDEX_OF)) return INDEX_OF_TYPE;
         if (name.equals(TOKENIZE)) return TOKENIZE_TYPE;
+        if (name.equals(ENCODE)) return ENCODE_TYPE;
+        if (name.equals(DECODE)) return DECODE_TYPE;
         return UNKNOWN_VALUE;
     }
 
@@ -105,46 +117,56 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                case SUBSTRING:
                    doSubstring(polyad, state);
                    return true;
+               case ENCODE:
+                   doEncode(polyad, state);
+                   return true;
+               case DECODE:
+                   doDecode(polyad, state);
+                   return true;
            }
            return false;
        }
 
+    protected void doDecode(Polyad polyad, State state) {
+        QDLCodec codec = new QDLCodec();
+        fPointer pointer = new fPointer() {
+                  @Override
+                  public fpResult process(Object... objects) {
+                      fpResult r = new fpResult();
+                      if (objects[0] instanceof String) {
+                          r.result = codec.decode(objects[0].toString());
+                          r.resultType = Constant.STRING_TYPE;
+                      } else {
+                          r.result = objects[0];
+                          r.resultType = polyad.getArgumments().get(0).getResultType();
+                      }
+                      return r;
+                  }
+              };
+              process1(polyad, pointer, TRIM, state);
 
-/*
-    @Override
-    public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case CONTAINS_TYPE:
-                doContains(polyad, state);
-                return true;
-            case TRIM_TYPE:
-                doTrim(polyad, state);
-                return true;
-            case INDEX_OF_TYPE:
-                doIndexOf(polyad, state);
-                return true;
-            case TO_LOWER_TYPE:
-                doSwapCase(polyad, state, true);
-                return true;
-            case TO_UPPER_TYPE:
-                doSwapCase(polyad, state, false);
-                return true;
-            case REPLACE_TYPE:
-                doReplace(polyad, state);
-                return true;
-            case INSERT_TYPE:
-                doInsert(polyad, state);
-                return true;
-            case TOKENIZE_TYPE:
-                doTokenize(polyad, state);
-                return true;
-            case SUBSTRING_TYPE:
-                doSubstring(polyad, state);
-                return true;
-        }
-        return false;
     }
-*/
+
+    protected void doEncode(Polyad polyad, State state) {
+        QDLCodec codec = new QDLCodec();
+        fPointer pointer = new fPointer() {
+                  @Override
+                  public fpResult process(Object... objects) {
+                      fpResult r = new fpResult();
+                      if (objects[0] instanceof String) {
+                          r.result = codec.encode(objects[0].toString());
+                          r.resultType = Constant.STRING_TYPE;
+                      } else {
+                          r.result = objects[0];
+                          r.resultType = polyad.getArgumments().get(0).getResultType();
+                      }
+                      return r;
+                  }
+              };
+              process1(polyad, pointer, TRIM, state);
+    }
+
+
 
     protected void doSubstring(Polyad polyad, State state) {
         fPointer pointer = new fPointer() {

@@ -17,7 +17,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Note that all of the arguments to this database for keys are assumed to be normalized, resolved,
+/**
+ * Note that all of the arguments to this database for keys are assumed to be normalized, resolved,
  * etc., etc. so that no such logic is present here. The {@link VFSFileProvider} implementation
  * that has an instance of this is charged with that.
  * <p>Created by Jeff Gaynor<br>
@@ -40,70 +41,74 @@ public class VFSDatabase extends SQLDatabase {
 
     /**
      * This takes a path of the form a/b/c/.../d/ (note normalization with ending slash) and returns
-     * the entries for it
+     * the entries (i.e. file names) for it. A single entry denotes this is a directory, effectively.
+     * No entries means this is not in the database.
+     *
      * @param path
      * @return
      */
-    public List<String> selectByPath(String path){
+    public List<String> selectByPath(String path) {
         ArrayList<String> paths = new ArrayList<>();
         String statement = " select " + FILE_NAME + " from " + fqTablename + " where " + PATH_NAME + " =?";
         Connection c = getConnection();
-            FileEntry t = null;
-            try {
-                PreparedStatement stmt = c.prepareStatement(statement);
-                stmt.setString(1, path);
+        FileEntry t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, path);
 
-                stmt.executeQuery();
-                ResultSet rs = stmt.getResultSet();
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
 
-                // Now we have to pull in all the values.
-                if (!rs.next()) {
-                    rs.close();
-                    stmt.close();
-                    releaseConnection(c);
-                    return paths;
-                }
-                while(rs.next()){
-                    paths.add(rs.getString(FILE_NAME));
-                }
+            // Now we have to pull in all the values.
+            if (!rs.next()) {
                 rs.close();
                 stmt.close();
                 releaseConnection(c);
-            } catch (SQLException e) {
-                destroyConnection(c);
-                throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+                return paths;
             }
-return paths;
+            while (rs.next()) {
+                paths.add(rs.getString(FILE_NAME));
+            }
+            rs.close();
+            stmt.close();
+            releaseConnection(c);
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+        }
+        return paths;
     }
-    public List<String> getDistinctPaths(){
+
+    public List<String> getDistinctPaths() {
         String statement = " select DISTINCT(" + PATH_NAME + ") from " + fqTablename;
         ArrayList<String> paths = new ArrayList<>();
         Connection c = getConnection();
-            FileEntry t = null;
-            try {
-                PreparedStatement stmt = c.prepareStatement(statement);
-                stmt.executeQuery();
-                ResultSet rs = stmt.getResultSet();
+        FileEntry t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
 
-                // Now we have to pull in all the values.
-                if (!rs.next()) {
-                    rs.close();
-                    stmt.close();
-                    releaseConnection(c);
-                    return paths;
-                }
-                while(rs.next()){
-                    paths.add(rs.getString(PATH_NAME));
-                }
+            // Now we have to pull in all the values.
+            if (!rs.next()) {
                 rs.close();
                 stmt.close();
                 releaseConnection(c);
-            } catch (SQLException e) {
-                destroyConnection(c);
-                throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+                return paths;
             }
-            return paths;
+            while (rs.next()) {
+                paths.add(rs.getString(PATH_NAME));
+            }
+            rs.close();
+            stmt.close();
+            releaseConnection(c);
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
+        }
+        return paths;
     }
+
     public FileEntry get(String[] key) {
         String path = key[VFSMySQLProvider.PATH_INDEX];
         String filename = key[VFSMySQLProvider.FILENAME_INDEX];
@@ -132,7 +137,7 @@ return paths;
             JSONArray array;
             try {
                 array = JSONArray.fromObject(map.getString(CONTENT));
-            }catch(Throwable tt){
+            } catch (Throwable tt) {
                 // if it is not a JSON array, then stick it in one.
                 array = new JSONArray();
                 array.add(map.getString(CONTENT));
@@ -228,6 +233,45 @@ return paths;
             destroyConnection(c);
             throw new GeneralException("Error saving file", e);
         }
+    }
+
+
+    /**
+     * Make a directory. NOTE you must check elsewhere if this exists before trying to create it.
+     * @param key
+     * @return
+     */
+    public boolean mkdir(String[] key) {
+        String path = key[VFSMySQLProvider.PATH_INDEX];
+        String fileName = key[VFSMySQLProvider.FILENAME_INDEX];
+        if (!fileName.isEmpty()) {
+            return false;
+        }
+
+        path = (path.startsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR)
+                + path
+                + (path.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR); // make SURE it starts and ends with /
+        Connection c = getConnection();
+        try {
+            String statement = "insert into " + fqTablename + " (" +
+                    PATH_NAME + "," +
+                    FILE_NAME + "," +
+                    EA + ", " +
+                    CONTENT + " ) values (?,?, ?, ?) ";
+            PreparedStatement stmt = c.prepareStatement(statement);
+            stmt.setString(1, path);
+            stmt.setString(2, "");
+            stmt.setString(3, "");
+            stmt.setString(4, "");
+
+            stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
+            stmt.close();
+            releaseConnection(c);
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new GeneralException("Error creating directory", e);
+        }
+        return true;
     }
 
     public FileEntry remove(String[] key) throws Exception {

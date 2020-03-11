@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
@@ -9,8 +10,42 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  5:08 PM
  */
-public class Assignment implements Statement {
+public class Assignment implements Statement, HasResultInterface {
     Object result;
+
+    public Object getResult() {
+        if(!isEvaluated()){
+            throw new UnevaluatedExpressionException();
+        }
+        return result;
+    }
+
+    public int getResultType() {
+        return resultType;
+    }
+
+    @Override
+    public void setResult(Object object) {
+        this.result = object;
+    }
+
+    @Override
+    public void setResultType(int type) {
+        this.resultType = type;
+    }
+
+    protected boolean evaluated;
+
+    @Override
+    public boolean isEvaluated() {
+        return evaluated;
+    }
+
+    @Override
+    public void setEvaluated(boolean evaluated) {
+        this.evaluated = evaluated;
+    }
+
     int resultType;
 
     public String getVariableReference() {
@@ -21,22 +56,28 @@ public class Assignment implements Statement {
         this.variableReference = variableReference;
     }
 
-    public ExpressionNode getArgument() {
+    public Statement getArgument() {
         return argument;
     }
 
-    public void setArgument(ExpressionNode argument) {
+    public void setArgument(Statement argument) {
         this.argument = argument;
     }
 
     String variableReference;
-    ExpressionNode argument;
-
+    Statement argument;
+    // just a case
+    protected HasResultInterface getHRI(){return (HasResultInterface) argument;}
     public Object evaluate(State state) {
-
         result = argument.evaluate(state);
-        resultType = argument.getResultType();
-        switch (argument.getResultType()) {
+        getHRI().setEvaluated(true);
+        setResult(getHRI().getResult());
+        evaluated = true;
+        resultType = getHRI().getResultType();
+        // Now the real work -- set the value of the variable in the symbol table.
+        // Mostly this just traps if some how we get an unknown type, but this is the
+        // right place to do it, before it gets in to the symbol table.
+        switch (resultType) {
 
             case Constant.STEM_TYPE:
             case Constant.STRING_TYPE:
@@ -47,7 +88,7 @@ public class Assignment implements Statement {
                 state.setValue(variableReference, result);
                 break;
             default:
-                throw new IllegalArgumentException("error, the type of the value \"" + argument.getResult() + "\" is unknown");
+                throw new IllegalArgumentException("error, the type of the value \"" + getHRI().getResult() + "\" is unknown");
         }
         return result;
     }
@@ -71,5 +112,5 @@ public class Assignment implements Statement {
         this.sourceCode = sourceCode;
     }
 
-    String sourceCode;
+    String sourceCode = null;
 }

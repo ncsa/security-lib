@@ -259,4 +259,30 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
           return true;
       }
 
+    @Override
+    public boolean mkdir(String path) {
+        if (!canWrite()) {
+            throw new QDLIOException("Error: You do not have permissions make directories in the virtual file system");
+        }
+        checkPath(path);
+        return false;
+    }
+
+    @Override
+    public boolean rmdir(String path) throws Throwable {
+        if (!canWrite()) {
+            throw new QDLIOException("Error: You do not have permissions to remove directories in the virtual file system");
+        }
+        checkPath(path);
+        return false;
+    }
+
+    @Override
+    public void rm(String path) throws Throwable {
+        if (!canWrite()) {
+            throw new QDLIOException("Error: You do not have permissions to remove this file in the virtual file system");
+        }
+        checkPath(path);
+
+    }
 }

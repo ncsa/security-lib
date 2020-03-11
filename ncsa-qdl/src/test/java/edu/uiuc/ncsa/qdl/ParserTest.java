@@ -721,6 +721,7 @@ public class ParserTest extends TestBase {
     /**
      * Tests that the contents of the string (with single quotes, double quotes and such)
      * are treated as strings and not interpreted otherwise.
+     *
      * @throws Throwable
      */
     @Test
@@ -922,6 +923,9 @@ public class ParserTest extends TestBase {
      * the stem entry will be deserialized) but not both stem.0. and stem.0
      * and as long as this is observed, there should be no problems mapping
      * stems to JSON and back.
+     * <br/>
+     * This also has JSON keys that are not simply ascii, so the encoding of those
+     * to and from QDL should work.
      *
      * @throws Throwable
      */
@@ -930,6 +934,8 @@ public class ParserTest extends TestBase {
         String rawJSON = "{\n" +
                 " \"sub\": \"jeff\",\n" +
                 " \"aud\": \"ashigaru:command.line2\",\n" +
+                " \"Jäger-Groß\": \"test value\",\n" +
+                " \"你浣\": \"test value2\",\n" +
                 " \"uid\": \"jgaynor\",\n" +
                 " \"uidNumber\": \"25939\",\n" +
                 " \"isMemberOf\":  [\n" +
@@ -961,7 +967,22 @@ public class ParserTest extends TestBase {
             String key = k.toString();
             assert jsonObject.getString(key).equals(result.getString(key)) : "JSON equality failed for key=" + key;
         }
+    }
 
+    @Test
+    public void testMultipleAssignments() throws Throwable {
 
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "A := 'a'; B := 'b'; C := 'pqrc';");
+        addLine(script, "q := A += B += C -= 'pqr';");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("q").equals("abc");
+        assert state.getValue("A").equals("abc");
+        assert state.getValue("B").equals("bc");
+        assert state.getValue("C").equals("c");
     }
 }

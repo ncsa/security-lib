@@ -121,7 +121,7 @@ public class LineEditor {
         say("    start = the starting index, always 0 or greater");
         say("    stop = the ending index. All operations are inclusive of this line number");
         say("    target = where to apply the [start,stop] interval. E.g. the insertion point for copying text.");
-        say("arg0, arg1,... = list of strings, possible in quotes if needed that are arguments to the command.");
+        say("arg0, arg1,... = list of strings, possibly in quotes if needed, that are arguments to the command.");
         say("\nTo see help on a specific command, type ? after the command, e.g. to get help on the insert command type");
         say("i ?");
         say("List of commands");

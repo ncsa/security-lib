@@ -1062,6 +1062,7 @@ public class WorkspaceCommands implements Logable {
         }
         interpreter = new QDLParser(env, getState());
         interpreter.setEchoModeOn(config.isEchoModeOn());
+     //   interpreter.setDebugOn(true);
 
     }
 

@@ -123,53 +123,53 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
-                 case SIZE:
-                     return SIZE_TYPE;
-                 case SET_DEFAULT:
-                     return SET_DEFAULT_TYPE;
-                 case MASK:
-                     return MASK_TYPE;
-                 case COMMON_KEYS:
-                     return COMMON_KEYS_TYPE;
-                 case GET_KEYS:
-                     return GET_KEYS_TYPE;
-                 case HAS_KEYS:
-                     return HAS_KEYS_TYPE;
-                 case INCLUDE_KEYS:
-                     return INCLUDE_KEYS_TYPE;
-                 case EXCLUDE_KEYS:
-                     return EXCLUDE_KEYS_TYPE;
-                 case RENAME_KEYS:
-                     return RENAME_KEYS_TYPE;
-                 case IS_LIST:
-                     return IS_LIST_TYPE;
-                 case TO_LIST:
-                     return TO_LIST_TYPE;
-                 case LIST_APPEND:
-                     return LIST_APPEND_TYPE;
-                 case LIST_COPY:
-                     return LIST_COPY_TYPE;
-                 case LIST_INSERT_AT:
-                     return LIST_INSERT_AT_TYPE;
-                 case LIST_SUBSET:
-                     return LIST_SUBSET_TYPE;
-                 case MAKE_INDICES:
-                     return MAKE_INDICES_TYPE;
-                 case REMOVE:
-                     return REMOVE_TYPE;
-                 case BOX:
-                     return BOX_TYPE;
-                 case UNBOX:
-                     return UNBOX_TYPE;
-                 case IS_DEFINED:
-                     return IS_DEFINED_TYPE;
-                 case UNION:
-                     return UNION_TYPE;
-                 case TO_JSON:
-                     return TO_JSON_TYPE;
-                 case FROM_JSON:
-                     return FROM_JSON_TYPE;
-             }
+            case SIZE:
+                return SIZE_TYPE;
+            case SET_DEFAULT:
+                return SET_DEFAULT_TYPE;
+            case MASK:
+                return MASK_TYPE;
+            case COMMON_KEYS:
+                return COMMON_KEYS_TYPE;
+            case GET_KEYS:
+                return GET_KEYS_TYPE;
+            case HAS_KEYS:
+                return HAS_KEYS_TYPE;
+            case INCLUDE_KEYS:
+                return INCLUDE_KEYS_TYPE;
+            case EXCLUDE_KEYS:
+                return EXCLUDE_KEYS_TYPE;
+            case RENAME_KEYS:
+                return RENAME_KEYS_TYPE;
+            case IS_LIST:
+                return IS_LIST_TYPE;
+            case TO_LIST:
+                return TO_LIST_TYPE;
+            case LIST_APPEND:
+                return LIST_APPEND_TYPE;
+            case LIST_COPY:
+                return LIST_COPY_TYPE;
+            case LIST_INSERT_AT:
+                return LIST_INSERT_AT_TYPE;
+            case LIST_SUBSET:
+                return LIST_SUBSET_TYPE;
+            case MAKE_INDICES:
+                return MAKE_INDICES_TYPE;
+            case REMOVE:
+                return REMOVE_TYPE;
+            case BOX:
+                return BOX_TYPE;
+            case UNBOX:
+                return UNBOX_TYPE;
+            case IS_DEFINED:
+                return IS_DEFINED_TYPE;
+            case UNION:
+                return UNION_TYPE;
+            case TO_JSON:
+                return TO_JSON_TYPE;
+            case FROM_JSON:
+                return FROM_JSON_TYPE;
+        }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -287,15 +287,47 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + TO_JSON + " requires a stem as its first argument");
         }
         int indent = -1;
+        boolean convertNames = true;
+        /*
+        Two args means the second is either a boolean for conversion or it an  int as the indent factor.
+         */
         if (polyad.getArgumments().size() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            if (!isLong(arg2)) {
-                throw new IllegalArgumentException("Error: " + TO_JSON + " requires an integer as its second argument");
+            boolean argOK = false; // got a valid input, boolean or long.
+            if (isBoolean(arg2)) {
+                argOK = true;
+                convertNames = (Boolean) arg2;
             }
-            Long argL = (Long) arg2;
+
+            if (isLong(arg2)) {
+                Long argL = (Long) arg2;
+                indent = argL.intValue(); // best we can do
+
+            }
+            if (!argOK) {
+                throw new IllegalArgumentException("Error: " + TO_JSON + " requires an integer or boolean as its second argument");
+            }
+        }
+        /*
+        3 arguments means second is the flag for conversion, 3rd is the indent factor
+         */
+        if (polyad.getArgumments().size() == 3) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (isBoolean(arg2)) {
+                convertNames = (Boolean) arg2;
+            }else{
+                throw new IllegalArgumentException("Error: " + TO_JSON + " with 3 arguments requires a boolean as its second argument");
+            }
+
+            Object arg3 = polyad.evalArg(2, state);
+            if (!isLong(arg3)) {
+                throw new IllegalArgumentException("Error: " + TO_JSON + " requires an integer as its third argument");
+            }
+            Long argL = (Long) arg3;
             indent = argL.intValue(); // best we can do
         }
-        JSON j = ((StemVariable) arg1).toJSON();
+
+        JSON j = ((StemVariable) arg1).toJSON(convertNames);
         if (0 < indent) {
             polyad.setResult(j.toString(indent));
         } else {
@@ -568,7 +600,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 */
         StemVariable targetStem = getOrCreateStem(polyad.getArgumments().get(3),
-                state,"Error: " + LIST_COPY + " requires a stem as its fourth argument"
+                state, "Error: " + LIST_COPY + " requires a stem as its fourth argument"
         );
 
         Object arg5 = polyad.evalArg(4, state);

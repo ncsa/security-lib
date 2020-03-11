@@ -43,6 +43,18 @@ public class IOEvaluator extends MathEvaluator {
     public static final String DIR = "dir";
     public static final int DIR_TYPE = 5 + IO_FUNCTION_BASE_VALUE;
 
+    public static final String IO_MKDIR = "io#mkdir";
+    public static final String MKDIR = "mkdir";
+    public static final int MKDIR_TYPE = 6 + IO_FUNCTION_BASE_VALUE;
+
+    public static final String IO_RMDIR = "io#rmdir";
+    public static final String RMDIR = "rmdir";
+    public static final int RMDIR_TYPE = 7 + IO_FUNCTION_BASE_VALUE;
+
+    public static final String IO_RM_FILE = "io#rm";
+    public static final String RM_FILE = "rm";
+    public static final int RM_FILE_TYPE = 8 + IO_FUNCTION_BASE_VALUE;
+
     public static final String IO_VFS_MOUNT = "io#mount";
     public static final String VFS_MOUNT = "vfs_mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
@@ -81,6 +93,9 @@ public class IOEvaluator extends MathEvaluator {
         if (name.equals(PRINT_FUNCTION)) return SAY_TYPE;
         if (name.equals(SCAN_FUNCTION)) return SCAN_TYPE;
         if (name.equals(DIR)) return DIR_TYPE;
+        if (name.equals(RMDIR)) return RMDIR_TYPE;
+        if (name.equals(RM_FILE)) return RM_FILE_TYPE;
+        if (name.equals(MKDIR)) return MKDIR_TYPE;
         if (name.equals(READ_FILE)) return READ_FILE_TYPE;
         if (name.equals(WRITE_FILE)) return WRITE_FILE_TYPE;
         if (name.equals(VFS_MOUNT)) return VFS_MOUNT_TYPE;
@@ -160,6 +175,18 @@ public class IOEvaluator extends MathEvaluator {
             case DIR:
                 doDir(polyad, state);
                 return true;
+            case IO_MKDIR:
+            case MKDIR:
+                doMkDir(polyad, state);
+                return true;
+            case IO_RM_FILE:
+            case RM_FILE:
+                doRMFile(polyad, state);
+                return true;
+            case IO_RMDIR:
+            case RMDIR:
+                doRMDir(polyad, state);
+                return true;
             case IO_READ_FILE:
             case READ_FILE:
                 doReadFile(polyad, state);
@@ -180,6 +207,131 @@ public class IOEvaluator extends MathEvaluator {
         return false;
     }
 
+    protected void doRMDir(Polyad polyad, State state) {
+        if (0 == polyad.getArgumments().size()) {
+                     throw new IllegalArgumentException("Error: " + RMDIR + " requires a file name to read.");
+                 }
+                 Object obj = polyad.evalArg(0, state);
+                 if (obj == null || !isString(obj)) {
+                     throw new IllegalArgumentException("Error: The " + RMDIR + " command requires a string for its first argument.");
+                 }
+                 String fileName = obj.toString();
+
+                 VFSFileProvider vfs = null;
+                 Boolean rc = false;
+                 boolean hasVF = false;
+                 if (state.isVFSFile(fileName)) {
+                     try {
+                         vfs = state.getVFS(fileName);
+                         if (vfs != null) {
+                             rc = vfs.rmdir(fileName);
+                         }
+
+                     } catch (Throwable throwable) {
+                         throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                     }
+                 } else {
+                     // So its just a file.
+                     if (state.isServerMode()) {
+                         throw new QDLServerModeException("File system operations not permitted in server mode.");
+                     }
+                     File f = new File(fileName);
+                     if(!f.isDirectory()){
+                         throw new QDLIOException("Error: the requested object \"" + f + "\" is not a directory on this system.");
+                     }
+                     if(f.list() != null &&  f.list().length != 0){
+                         throw new QDLIOException("Error: The directory \"" + f + "\" is not empty.");
+                     }
+                     rc = f.delete();
+                 }
+                 polyad.setEvaluated(true);
+                 polyad.setResult(rc);
+                 polyad.setResultType(Constant.BOOLEAN_TYPE);
+    }
+
+    protected void doRMFile(Polyad polyad, State state) {
+        if (0 == polyad.getArgumments().size()) {
+                throw new IllegalArgumentException("Error: " + RM_FILE + " requires a file name to read.");
+            }
+            Object obj = polyad.evalArg(0, state);
+            if (obj == null || !isString(obj)) {
+                throw new IllegalArgumentException("Error: The " + RM_FILE + " command requires a string for its first argument.");
+            }
+            String fileName = obj.toString();
+
+            VFSFileProvider vfs = null;
+            Boolean rc = false;
+            boolean hasVF = false;
+            if (state.isVFSFile(fileName)) {
+                try {
+                    vfs = state.getVFS(fileName);
+                    if (vfs != null) {
+                        vfs.rm(fileName);
+                        rc = true;
+                    }
+
+                } catch (Throwable throwable) {
+                    if(throwable instanceof RuntimeException){
+                         throw (RuntimeException) throwable;
+                     }
+                    throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                }
+            } else {
+                // So its just a file.
+                if (state.isServerMode()) {
+                    throw new QDLServerModeException("File system operations not permitted in server mode.");
+                }
+                File f = new File(fileName);
+                if(!f.isFile()){
+                    throw new QDLIOException("Error: the requested object \"" + f + "\" is not a file on this system.");
+                }
+                rc = f.delete();
+            }
+            polyad.setEvaluated(true);
+            polyad.setResult(rc);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+    }
+
+    protected void doMkDir(Polyad polyad, State state) {
+        if (0 == polyad.getArgumments().size()) {
+            throw new IllegalArgumentException("Error: " + MKDIR + " requires a file name to read.");
+        }
+        Object obj = polyad.evalArg(0, state);
+        if (obj == null || !isString(obj)) {
+            throw new IllegalArgumentException("Error: The " + MKDIR + " command requires a string for its first argument.");
+        }
+        String fileName = obj.toString();
+
+        VFSFileProvider vfs = null;
+        Boolean rc = false;
+        boolean hasVF = false;
+        if (state.isVFSFile(fileName)) {
+            try {
+                vfs = state.getVFS(fileName);
+                if (vfs != null) {
+                    rc = vfs.mkdir(fileName);
+                }
+
+            } catch (Throwable throwable) {
+                if(throwable instanceof RuntimeException){
+                    throw (RuntimeException) throwable;
+                }
+                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+            }
+        } else {
+            // So its just a file.
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
+            File f = new File(fileName);
+            rc = f.mkdirs();
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(rc);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+
+    }
+
     /**
      * Quick note. This is a directory command. That means that it will list the things in a directory.
      * This is not like, e.g., the unix ls command. The ls command <i>lists</i> information so<br/><br/>
@@ -187,6 +339,7 @@ public class IOEvaluator extends MathEvaluator {
      * <br/><br/>
      * returns the file name. This command returns what is in the directory. So <code>dir(filename)</code>
      * returns null since the name is not a directory.
+     *
      * @param polyad
      * @param state
      */
@@ -212,7 +365,10 @@ public class IOEvaluator extends MathEvaluator {
                 }
 
             } catch (Throwable throwable) {
-                throw new QDLIOException("Error; Coould not resolve virtual file system for \"" + fileName + "\"");
+                if(throwable instanceof RuntimeException){
+                     throw (RuntimeException) throwable;
+                 }
+                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
             }
         } else {
             // So its just a file.

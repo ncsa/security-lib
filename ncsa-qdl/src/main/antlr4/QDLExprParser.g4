@@ -5,7 +5,7 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-assignment : variable op=ASSIGN  expression;
+assignment : (variable op=ASSIGN)+  expression;
    argList : expression (',' expression)*;
   function : FuncStart argList* ')';
 
@@ -14,25 +14,25 @@ assignment : variable op=ASSIGN  expression;
 
 expression
  :
-   function                                             #functions
- | expression postfix=('++' | '--')                     #postfix
- | prefix=('++'|'--') expression                        #prefix
- | '-' expression                                       #unaryMinusExpression
- | '!' expression                                       #notExpression
- | expression '^' expression                            #powerExpression
- | expression op=('*' | '/' | '%') expression           #multiplyExpression
- | expression op=('+' | '-') expression                 #addExpression
- | expression op=('<' | '>' | '<=' | '>=') expression   #compExpression
- | expression op=('==' | '!=') expression               #eqExpression
- | expression '&&' expression                           #andExpression
- | expression '||' expression                           #orExpression
- | '(' expression ')'                                   #association
- | LeftBracket                                          #leftBracket
- | number                                               #numbers
- | variable                                             #variables
- | Bool                                                 #logical
- | Null                                                 #null
- | STRING                                               #strings
- | ';'                                                  #semi_for_empty_expressions
+   function                                                              #functions
+ | expression postfix=('++' | '--')                                      #postfix
+ | prefix=('++'|'--') expression                                         #prefix
+ | '-' expression                                                        #unaryMinusExpression
+ | '!' expression                                                        #notExpression
+ | expression '^' expression                                             #powerExpression
+ | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression
+ | expression op=('+' | '-' ) expression                                 #addExpression
+ | expression op=('<' | '>' | '<=' | '>=' | '=<' | '=>' ) expression     #compExpression
+ | expression op=('==' | '!=') expression                                #eqExpression
+ | expression '&&' expression                                            #andExpression
+ | expression '||' expression                                            #orExpression
+ | '(' expression ')'                                                    #association
+ | LeftBracket                                                           #leftBracket
+ | number                                                                #numbers
+ | variable                                                              #variables
+ | Bool                                                                  #logical
+ | Null                                                                  #null
+ | STRING                                                                #strings
+ | ';'                                                                   #semi_for_empty_expressions
  ;
 

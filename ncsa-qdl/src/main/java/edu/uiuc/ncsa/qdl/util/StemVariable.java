@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.util;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
+import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -328,13 +329,32 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     /**
-     * Convert this to JSON.
-     *
+     * Converts this to a JSON object. Names of stem components are decoded. So if you have a stem, a.,
+     * with component $23foo, then a.$23foo yields
+     * <pre>
+     *     {"#foo":...}
+     * </pre> I.e. the $23 is treated as an escaped name
+     * and converted back. If you do not want stem names escaped when converting to JSON, then use
+     * {@link #toJSON(boolean)} with the argument being <b>false</b>. In that case the outputted JSON would be
+     * <pre>
+     *     {"$23foo":...}
+     * </pre>
      * @return
      */
     public JSON toJSON() {
+            return toJSON(true); //
+    }
+
+    /**
+     * Convert this to JSON.
+     *
+     * @param escapeNames -- whether or not to escape stem names when creating tje JSON object.
+     * @return
+     */
+    public JSON toJSON(boolean escapeNames) {
         JSONObject json = new JSONObject();
         StemList<StemEntry> localSL = getStemList();
+        QDLCodec codec = new QDLCodec();
 
         // Special case of a JSON array of objects that has been turned in to a stem list.
         // We want to recover this since it is a very common construct.
@@ -355,11 +375,11 @@ public class StemVariable extends HashMap<String, Object> {
                                 "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
                     }
                 } else {
-                    json.put(newKey, x.toJSON());
+                    json.put(escapeNames?codec.decode(newKey):newKey, x.toJSON());
                 }
 
             } else {
-                json.put(key, get(key));
+                json.put(escapeNames?codec.decode(key):key, get(key));
             }
         }
         if (json.isEmpty()) {
@@ -385,7 +405,6 @@ public class StemVariable extends HashMap<String, Object> {
         StemVariable out = new StemVariable();
         for (Object key : object.keySet()) {
             Object obj = object.get(key);
-
             out.put(key.toString(), convert(obj));
         }
         return out;
@@ -429,20 +448,21 @@ public class StemVariable extends HashMap<String, Object> {
      * @param jsonObject return this object, populated
      */
     public StemVariable fromJSON(JSONObject jsonObject) {
+        QDLCodec codec = new QDLCodec();
         for (Object k : jsonObject.keySet()) {
             String key = k.toString();
 
             Object v = jsonObject.get(k);
             if (v instanceof JSONObject) {
                 StemVariable x = new StemVariable();
-                put(key + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+                put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
             } else {
                 if (v instanceof JSONArray) {
                     StemVariable x = new StemVariable();
 
-                    put(key + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                    put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
                 } else {
-                    put(key, v);
+                    put(codec.encode(key), v);
                 }
             }
         }

@@ -77,6 +77,7 @@ public class VFSTest extends TestBase {
     }
 
     protected void runVFSTests(VFSFileProvider vfs) throws Throwable {
+        testMkdir(vfs);
         testMultipleSchemes(vfs);
         testMultipleMount(vfs);
         testMultipleSchemesAndMountPoint(vfs);
@@ -85,30 +86,69 @@ public class VFSTest extends TestBase {
         testReadable(vfs);
     }
 
+    protected void testMkdir(VFSFileProvider vfs) throws Throwable {
+        String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
+        if (!vfs.canWrite()) {
+            // If it si not writeable ALL of these should get intercepted before any othe processing
+            // takes place.
+            try {
+                vfs.mkdir(testHeadPath + "a/b/c/d/e/f");
+                assert false : "Error: Could create directory in not writeable VFS";
+            } catch (QDLIOException q) {
+                assert true;
+            }
+            try {
+                vfs.rmdir(testHeadPath + "a/");
+                assert false : "Error: Could remove directory in not writeable VFS";
+            } catch (QDLIOException q) {
+                assert true;
+            }
+            try {
+                vfs.rm(testHeadPath + "a/foo");
+                assert false : "Error: Could remove file in not writeable VFS";
+            } catch (QDLIOException q) {
+                assert true;
+            }
+
+            return;
+        }
+        vfs.mkdir(testHeadPath + "VFS_TEST/a/b/c/d");
+        assert vfs.dir(testHeadPath + "VFS_TEST/a/b/c/d").length == 0;
+        vfs.rmdir(testHeadPath + "VFS_TEST/a/b/c/d");
+        assert vfs.dir(testHeadPath + "VFS_TEST/a/b/c").length == 0;
+
+        vfs.rmdir(testHeadPath + "VFS_TEST/a/b/c");
+        assert vfs.dir(testHeadPath + "VFS_TEST/a/b").length == 0;
+        vfs.rmdir(testHeadPath + "VFS_TEST/a/b");
+        assert vfs.dir(testHeadPath + "VFS_TEST/a").length == 0;
+        vfs.rmdir(testHeadPath + "VFS_TEST/a");
+        assert vfs.dir(testHeadPath + "VFS_TEST").length == 0;
+        vfs.rmdir(testHeadPath + "VFS_TEST");
+    }
+
     protected void testReadable(VFSFileProvider vfs) throws Throwable {
         boolean orig = vfs.canRead();
         vfs.setRead(false);
-        VFSEntry fileEntry = makeFE();
         String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         String testFileName = "foo.txt";
         String p = testHeadPath + testFileName;
 
         try {
             vfs.get(p);
-            assert false : "Was able to read from a nont readable store";
+            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
             assert true;
         }
         try {
             vfs.contains(p);
-            assert false : "Was able to read from a nont readable store";
+            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
             assert true;
         }
 
         try {
             vfs.dir(p);
-            assert false : "Was able to read from a nont readable store";
+            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
             assert true;
         }
@@ -328,7 +368,6 @@ public class VFSTest extends TestBase {
         VFSMemoryFileProvider vfs = new VFSMemoryFileProvider(
                 "qdl-vfs", "/", true, true
         );
-
         runVFSTests(vfs);
 
     }
@@ -360,6 +399,7 @@ public class VFSTest extends TestBase {
                 true,
                 true);
 
+
         runVFSTests(vfs);
     }
 
@@ -367,6 +407,7 @@ public class VFSTest extends TestBase {
      * Hmmm This tests it. But... Performance is slow and there is just not a good way to improve it
      * since it is a zip file. Mostly mounting zip file is a convenience for the programmer who needs to
      * navigate a file and pull out an entry or two.
+     *
      * @throws Throwable
      */
     @Test
@@ -397,15 +438,15 @@ public class VFSTest extends TestBase {
         String[] dir = vfs.dir(storeRoot + "root");
 
         assert dir.length == 3;
-        List<String> dirList =  Arrays.asList(dir);
+        List<String> dirList = Arrays.asList(dir);
         assert dirList.contains("readme.txt");
         assert dirList.contains("scripts/");
         assert dirList.contains("other/");
 
         dir = vfs.dir(storeRoot);
-         for(String x : dir){
-             System.out.println(x);
-         }
+        for (String x : dir) {
+            System.out.println(x);
+        }
 
         assert vfs.contains(storeRoot + fileInZip);
         VFSEntry e = vfs.get(storeRoot + fileInZip);
@@ -413,5 +454,6 @@ public class VFSTest extends TestBase {
         System.out.println(e.getText());
         System.out.println(e.getProperties().toString(2));
         assert e.getText().equals("2+2 =4\n"); // contains a single line of text.
+        testMkdir(vfs);
     }
 }

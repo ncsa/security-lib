@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 
 import java.io.Serializable;
@@ -13,13 +14,27 @@ import java.util.Set;
  * on 1/21/20 at  7:13 AM
  */
 public class ImportManager implements Serializable {
-    private static final long serialversionUID =  129348938L;
+    public static String[] RESERVED_ALIAS = new String[]{"io", "sys"};
+
+    protected void checkAlias(String alias) {
+        if (alias == null || alias.isEmpty()) {
+            throw new ImportException("Error: the alias is empty or null.");
+        }
+        for (String x : RESERVED_ALIAS) {
+            if (alias.equals(x)) {
+                throw new ImportException("Error: the alias \"" + alias + "\" is reserved for system use.");
+            }
+        }
+    }
+
+    private static final long serialversionUID = 129348938L;
     /**
-     * Delimiter for namespaces
+     * Delimiter for namespaces. Change this and you will probably break then entire system...
      */
     public static final String NS_DELIMITER = "#";
 
     public void addImport(URI moduleName, String alias) {
+        checkAlias(alias);
         // If there is already an entry, overwrite it in case the alias changed.
         map.put(moduleName, alias);
     }
@@ -45,7 +60,8 @@ public class ImportManager implements Serializable {
     }
 
     static ImportManager resolver;
-    public boolean hasImports(){
+
+    public boolean hasImports() {
         return !map.isEmpty();
     }
 
@@ -68,7 +84,7 @@ public class ImportManager implements Serializable {
         map.remove(namespace);
     }
 
-    public Set<URI> keySet(){
+    public Set<URI> keySet() {
         return map.keySet();
     }
 }

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:02 PM
  */
-public interface ExpressionNode extends Statement {
+public interface ExpressionNode extends Statement, HasResultInterface {
 
     ArrayList<ExpressionNode> getArgumments(); // need this to preserver order of lists
 
@@ -24,15 +24,7 @@ public interface ExpressionNode extends Statement {
 
     void setOperatorType(int operatorType);
 
-    Object getResult();
-
-    void setResult(Object object);
-
-    int getResultType();
-
-    void setResultType(int type);
-
-    Object evaluate(State state);
+    //Object evaluate(State state);
 
     public ExpressionNode makeCopy(); // would prefer clone, but there is a conflict in packages because it has protected access
 }

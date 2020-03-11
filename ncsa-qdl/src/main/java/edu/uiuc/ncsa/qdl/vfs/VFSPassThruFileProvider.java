@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.util.FileUtil;
 
 import java.io.File;
 
-import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.*;
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -87,5 +87,41 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
     @Override
     public String getType() {
         return QDLConfigurationConstants.VFS_TYPE_PASS_THROUGH;
+    }
+
+    @Override
+    public boolean mkdir(String path) {
+        super.mkdir(path);
+        String realPath = getRealPath(path);
+
+        File f = new File(realPath);
+        if (f.isFile()) {
+            return false;
+        }
+        return f.mkdirs();
+    }
+
+    @Override
+    public boolean rmdir(String path) throws Throwable {
+        super.rmdir(path);
+        String realPath = getRealPath(path);
+
+        File f = new File(realPath);
+        if (f.isFile()) {
+            return false;
+        }
+        return f.delete();
+    }
+
+    @Override
+    public void rm(String path) throws Throwable {
+        super.rm(path);
+        String realPath = getRealPath(path);
+
+        File f = new File(realPath);
+        if (!f.isFile()) {
+            return;
+        }
+        f.delete();
     }
 }

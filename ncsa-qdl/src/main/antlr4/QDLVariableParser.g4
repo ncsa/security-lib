@@ -21,7 +21,7 @@ grammar QDLVariableParser;
      Number : ([0-9]+ ('.')? [0-9]*)|('.'[0-9]+);
          ID : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;
        Bool : BOOL_TRUE | BOOL_FALSE;
-     ASSIGN : ':=';
+     ASSIGN : ':=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=';
    FuncStart: ID '(';
    BOOL_TRUE: 'true';
    BOOL_FALSE: 'false';
