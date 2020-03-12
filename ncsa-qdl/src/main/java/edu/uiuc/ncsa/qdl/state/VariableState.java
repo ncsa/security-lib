@@ -338,7 +338,7 @@ public abstract class VariableState extends NamespaceAwareState {
         return out;
     }
 
-    protected boolean isStem(String var) {
+    public boolean isStem(String var) {
         return var.contains(STEM_INDEX_MARKER); // if ther eis an embedded period, needs to be resolved
     }
 }

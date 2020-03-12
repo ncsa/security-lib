@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
+import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * Once evaluated, this will return its value as the result.
  * <p>Created by Jeff Gaynor<br>
@@ -80,11 +82,24 @@ public class Assignment implements Statement, HasResultInterface {
         switch (resultType) {
 
             case Constant.STEM_TYPE:
+                if(!getVariableReference().endsWith(STEM_INDEX_MARKER)){
+                    throw new IllegalArgumentException("Error: Cannot set the stem to a non-stem variable");
+                }
+                state.setValue(variableReference, result);
+                break;
+            case Constant.NULL_TYPE:
+                // Can set any variable to null
+                state.setValue(variableReference, result);
+                break;
+
             case Constant.STRING_TYPE:
             case Constant.BOOLEAN_TYPE:
             case Constant.LONG_TYPE:
-            case Constant.NULL_TYPE:
             case Constant.DECIMAL_TYPE:
+                if(getVariableReference().endsWith(STEM_INDEX_MARKER)){
+                    throw new IllegalArgumentException("Error: Cannot set the scalar value to a stem variable");
+                }
+
                 state.setValue(variableReference, result);
                 break;
             default:

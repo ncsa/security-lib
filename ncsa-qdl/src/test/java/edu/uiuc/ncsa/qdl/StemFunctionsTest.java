@@ -46,7 +46,7 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-    public void testGetKeys() throws Exception {
+    public void testListKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
 
@@ -58,7 +58,7 @@ public class StemFunctionsTest extends TestBase {
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS);
+        Polyad polyad = new Polyad(StemEvaluator.LIST_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
 
         polyad.addArgument(arg);
@@ -70,6 +70,34 @@ public class StemFunctionsTest extends TestBase {
             assert sourceStem.containsKey(result.get(key));
         }
     }
+
+    @Test
+      public void testKeys() throws Exception {
+          State state = testUtils.getNewState();
+          SymbolTable symbolTable = state.getSymbolStack();
+
+          StemVariable sourceStem = new StemVariable();
+          sourceStem.put("rule", "One Ring to rule them all");
+          sourceStem.put("find", "One Ring to find them");
+          sourceStem.put("bring", "One Ring to bring them all");
+          sourceStem.put("bind", "and in the darkness bind them");
+
+          symbolTable.setStemVariable("sourceStem.", sourceStem);
+
+          Polyad polyad = new Polyad(StemEvaluator.KEYS);
+          VariableNode arg = new VariableNode("sourceStem.");
+
+          polyad.addArgument(arg);
+          polyad.evaluate(state);
+          assert polyad.getResult() instanceof StemVariable;
+
+          StemVariable result = (StemVariable) polyad.getResult();
+          assert result.size() == sourceStem.size();
+          for (String key : sourceStem.keySet()) {
+              assert result.containsKey(result.get(key));
+              assert result.get(key).equals(key);
+          }
+      }
 
     @Test
     public void testSizeString() throws Exception {
@@ -108,7 +136,7 @@ public class StemFunctionsTest extends TestBase {
         sourceStem.put("bind", "and in the darkness bind them");
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        Polyad polyad = new Polyad(StemEvaluator.GET_KEYS);
+        Polyad polyad = new Polyad(StemEvaluator.LIST_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.evaluate(state);

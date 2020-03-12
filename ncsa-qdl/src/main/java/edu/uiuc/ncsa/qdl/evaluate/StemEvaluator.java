@@ -54,8 +54,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String EXCLUDE_KEYS = "exclude_keys";
     public static final int EXCLUDE_KEYS_TYPE = 101 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String GET_KEYS = "get_keys";
-    public static final int GET_KEYS_TYPE = 102 + STEM_FUNCTION_BASE_VALUE;
+    public static final String LIST_KEYS = "list_keys";
+    public static final int LIST_KEYS_TYPE = 102 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String HAS_KEYS = "has_keys";
     public static final int HAS_KEYS_TYPE = 103 + STEM_FUNCTION_BASE_VALUE;
@@ -70,6 +70,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     public static final String MASK = "mask";
     public static final int MASK_TYPE = 106 + STEM_FUNCTION_BASE_VALUE;
+
+    public static final String KEYS = "keys";
+        public static final int KEYS_TYPE = 107 + STEM_FUNCTION_BASE_VALUE;
 
     // list functions
 
@@ -104,7 +107,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * by the developer since it is used to determine if a function is built in or a user-defined function.
      */
     public static String FUNC_NAMES[] = new String[]{SIZE, MAKE_INDICES, REMOVE, IS_DEFINED,
-            SET_DEFAULT, BOX, UNBOX, UNION, COMMON_KEYS, EXCLUDE_KEYS, GET_KEYS, HAS_KEYS, INCLUDE_KEYS, RENAME_KEYS, MASK,
+            SET_DEFAULT, BOX, UNBOX, UNION, COMMON_KEYS, EXCLUDE_KEYS, LIST_KEYS, HAS_KEYS, INCLUDE_KEYS, RENAME_KEYS, MASK,
             LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST, TO_JSON, FROM_JSON};
 
     @Override
@@ -131,8 +134,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return MASK_TYPE;
             case COMMON_KEYS:
                 return COMMON_KEYS_TYPE;
-            case GET_KEYS:
-                return GET_KEYS_TYPE;
+            case KEYS:
+                        return KEYS_TYPE;
+
+            case LIST_KEYS:
+                return LIST_KEYS_TYPE;
             case HAS_KEYS:
                 return HAS_KEYS_TYPE;
             case INCLUDE_KEYS:
@@ -189,8 +195,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case COMMON_KEYS:
                 doCommonKeys(polyad, state);
                 return true;
-            case GET_KEYS:
-                doGetKeys(polyad, state);
+            case KEYS:
+                doKeys(polyad, state);
+                return true;
+            case LIST_KEYS:
+                doListKeys(polyad, state);
                 return true;
             case HAS_KEYS:
                 doHasKeys(polyad, state);
@@ -465,9 +474,42 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
-    protected void doGetKeys(Polyad polyad, State state) {
+    /**
+     * Return a stem of nothing key the keys, so the final stem is of the form
+     * <pre>
+     *     {key0=key0,key1=key1,...}
+     * </pre>
+     * This is useful in conjunction with the rename keys call, so you can get the keys and do some
+     * operations on them then rename the keys in the original stem.
+     * @param polyad
+     * @param state
+     */
+    protected void doKeys(Polyad polyad, State state) {
+           if (polyad.getArgumments().size() != 1) {
+               throw new IllegalArgumentException("Error: the " + LIST_KEYS + " function requires 1 argument");
+           }
+           polyad.evalArg(0, state);
+           Object arg = polyad.getArgumments().get(0).getResult();
+           long size = 0;
+           if (!isStem(arg)) {
+               polyad.setResult(new StemVariable()); // just an empty stem
+               polyad.setResultType(Constant.STEM_TYPE);
+               polyad.setEvaluated(true);
+               return;
+           }
+           StemVariable stemVariable = (StemVariable) arg;
+           StemVariable out = new StemVariable();
+           for (String key : stemVariable.keySet()) {
+               out.put(key, key);
+           }
+           polyad.setResult(out);
+           polyad.setResultType(Constant.STEM_TYPE);
+           polyad.setEvaluated(true);
+
+       }
+    protected void doListKeys(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 1) {
-            throw new IllegalArgumentException("Error: the " + GET_KEYS + " function requires 1 argument");
+            throw new IllegalArgumentException("Error: the " + LIST_KEYS + " function requires 1 argument");
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgumments().get(0).getResult();
