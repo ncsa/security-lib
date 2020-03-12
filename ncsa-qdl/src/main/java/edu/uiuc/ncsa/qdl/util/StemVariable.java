@@ -273,16 +273,22 @@ public class StemVariable extends HashMap<String, Object> {
         for (String key : newKeys.keySet()) {
             if (containsKey(key)) {
                 String newKey = newKeys.getString(key);
-                if (containsKey(newKey)) {
-                    throw new IllegalArgumentException("Error: The current stem already has a key named \"" + newKeys.getString(key)
-                            + "\". This operation does not replace values, it only renames existing keys.");
+                if (!containsKey(newKey)) {
+                    put(newKey, get(key));
+                    remove(key);
+
                 }
-                put(newKey, get(key));
-                remove(key);
             }
         }
     }
 
+    /*  Quick example of rename.
+          b.OA2_foo := 'a';
+          b.OA2_woof := 'b';
+          b.OA2_arf := 'c';
+          b.fnord := 'd';
+          rename_keys(b., keys(b.)-'OA2_')
+     */
     public StemVariable excludeKeys(StemVariable keyList) {
         StemVariable result = new StemVariable();
         for (String key : keySet()) {
@@ -339,10 +345,11 @@ public class StemVariable extends HashMap<String, Object> {
      * <pre>
      *     {"$23foo":...}
      * </pre>
+     *
      * @return
      */
     public JSON toJSON() {
-            return toJSON(true); //
+        return toJSON(true); //
     }
 
     /**
@@ -375,11 +382,11 @@ public class StemVariable extends HashMap<String, Object> {
                                 "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
                     }
                 } else {
-                    json.put(escapeNames?codec.decode(newKey):newKey, x.toJSON());
+                    json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
                 }
 
             } else {
-                json.put(escapeNames?codec.decode(key):key, get(key));
+                json.put(escapeNames ? codec.decode(key) : key, get(key));
             }
         }
         if (json.isEmpty()) {
