@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * The interface for access to symboles (a.a variables) in QDL. Note that this is not assumed

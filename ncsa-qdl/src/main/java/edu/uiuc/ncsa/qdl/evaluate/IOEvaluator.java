@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;

@@ -2,10 +2,14 @@ package edu.uiuc.ncsa.qdl.extensions;
 
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 
 /**
  * This will let you create your own extensions to QDL in Java. Simply implement the interfaces
@@ -34,10 +38,16 @@ public class JavaModule extends Module {
     public void addVariables(List<QDLVariable> variables) {
         vars.addAll(variables);
     }
-
+     Pattern pattern = Pattern.compile(var_regex);
     public void init(State state) {
         setState(state);
         for (QDLVariable v : vars) {
+            if(Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE){
+                throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");
+            }
+            if(!pattern.matcher(v.getName()).matches()){
+                throw new IllegalArgumentException("Error: The variable name \"" + v.getName() + "\" is not a legal variable name.") ;
+            }
             state.setValue(v.getName(), v.getValue());
         }
         for(QDLFunction f : funcs){

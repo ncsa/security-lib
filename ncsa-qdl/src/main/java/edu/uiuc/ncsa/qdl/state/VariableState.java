@@ -8,7 +8,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.net.URI;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>

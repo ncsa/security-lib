@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.extensions.example;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.math.BigDecimal;
 import java.util.Date;

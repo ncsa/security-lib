@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
 import java.io.Serializable;

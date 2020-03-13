@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import org.apache.commons.codec.binary.Base64;

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * /**

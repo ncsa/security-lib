@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.util;
+package edu.uiuc.ncsa.qdl.variables;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

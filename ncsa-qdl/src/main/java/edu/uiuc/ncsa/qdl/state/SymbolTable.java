@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.util.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -45,4 +45,11 @@ public interface SymbolTable extends Serializable {
      */
      int getSymbolCount();
     public Map getMap();
+
+    /**
+     * This is used by various classes to check if a variable is legal. Compile this using {@link java.util.regex.Pattern}
+     * then
+     */
+    String var_regex = "^[a-zA-Z0-9_$]+[a-zA-Z0-9_$\\.]*";
+
 }

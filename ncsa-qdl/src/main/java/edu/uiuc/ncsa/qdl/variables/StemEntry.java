@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.util;
+package edu.uiuc.ncsa.qdl.variables;
 
 import java.io.Serializable;
 

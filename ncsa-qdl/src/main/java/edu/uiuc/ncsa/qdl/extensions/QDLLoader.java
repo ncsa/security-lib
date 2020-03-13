@@ -14,5 +14,9 @@ import java.util.List;
  * on 1/27/20 at  5:47 PM
  */
 public interface QDLLoader extends Serializable {
+    /**
+     * This will do all the work for creating modules and will return a list of them.
+     * @return
+     */
     List<Module> load();
 }

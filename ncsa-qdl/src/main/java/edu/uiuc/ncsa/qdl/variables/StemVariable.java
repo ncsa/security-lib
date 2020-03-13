@@ -1,8 +1,7 @@
-package edu.uiuc.ncsa.qdl.util;
+package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
-import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -11,6 +10,8 @@ import net.sf.json.JSONObject;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -500,7 +501,6 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     String int_regex = "[1-9][0-9]*";
-    static String var_regex = "^[a-zA-Z0-9_$]+[a-zA-Z0-9_$\\.]*";
 
     boolean isLongIndex(String key) {
         // special case of index being zero!! Otherwise, no such index can start with zero,

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * Once evaluated, this will return its value as the result.

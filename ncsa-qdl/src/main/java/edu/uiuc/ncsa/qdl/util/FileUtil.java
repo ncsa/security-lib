@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;

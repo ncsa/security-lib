@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.qdl.variables;
 
-import edu.uiuc.ncsa.qdl.util.StemVariable;
-
 import java.math.BigDecimal;
 
 /**

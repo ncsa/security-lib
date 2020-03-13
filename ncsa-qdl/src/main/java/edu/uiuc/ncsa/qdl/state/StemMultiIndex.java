@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import static edu.uiuc.ncsa.qdl.util.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * If we get a stem variable, this has the components to it
