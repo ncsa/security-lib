@@ -53,45 +53,56 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     public static final String DATE_ISO = "date_iso";
     public static final int DATE_ISO_TYPE = 11 + MATH_FUNCTION_BASE_VALUE;
-    public static String FUNC_NAMES[] = new String[]{ABS_VALUE,RANDOM,RANDOM_STRING,HASH,TO_HEX,
-            FROM_HEX,DATE_MS,DATE_ISO,DECODE_B64,ENCODE_B64,MOD,DATE_ISO};
+
+    public static final String NUMERIC_DIGITS = "numeric_digits";
+    public static final int NUMERIC_DIGITS_TYPE = 12 + MATH_FUNCTION_BASE_VALUE;
+
+
+
+    public static String FUNC_NAMES[] = new String[]{ABS_VALUE, RANDOM, RANDOM_STRING, HASH, TO_HEX,
+            FROM_HEX, DATE_MS, DATE_ISO, NUMERIC_DIGITS, DECODE_B64, ENCODE_B64, MOD, DATE_ISO};
+
     public TreeSet<String> listFunctions() {
-          TreeSet<String> names = new TreeSet<>();
-          for (String key : FUNC_NAMES) {
-              names.add(key + "()");
-          }
-          return names;
-      }
+        TreeSet<String> names = new TreeSet<>();
+        for (String key : FUNC_NAMES) {
+            names.add(key + "()");
+        }
+        return names;
+    }
+
     @Override
     public String[] getFunctionNames() {
         return FUNC_NAMES;
     }
+
     @Override
     public int getType(String name) {
         switch (name) {
-                case ABS_VALUE:
-                    return ABS_VALUE_TYPE;
-                case RANDOM:
-                    return RANDOM_TYPE;
-                case RANDOM_STRING:
-                    return RANDOM_STRING_TYPE;
-                case HASH:
-                    return HASH_TYPE;
-                case TO_HEX:
-                    return TO_HEX_TYPE;
-                case FROM_HEX:
-                    return FROM_HEX_TYPE;
-                case ENCODE_B64:
-                    return ENCODE_B64_TYPE;
-                case DECODE_B64:
-                    return DECODE_B64_TYPE;
-                case DATE_MS:
-                    return DATE_MS_TYPE;
-                case DATE_ISO:
-                    return DATE_ISO_TYPE;
-                case MOD:
-                    return MOD_TYPE;
-            }
+            case ABS_VALUE:
+                return ABS_VALUE_TYPE;
+            case RANDOM:
+                return RANDOM_TYPE;
+            case RANDOM_STRING:
+                return RANDOM_STRING_TYPE;
+            case HASH:
+                return HASH_TYPE;
+            case TO_HEX:
+                return TO_HEX_TYPE;
+            case NUMERIC_DIGITS:
+                return NUMERIC_DIGITS_TYPE;
+            case FROM_HEX:
+                return FROM_HEX_TYPE;
+            case ENCODE_B64:
+                return ENCODE_B64_TYPE;
+            case DECODE_B64:
+                return DECODE_B64_TYPE;
+            case DATE_MS:
+                return DATE_MS_TYPE;
+            case DATE_ISO:
+                return DATE_ISO_TYPE;
+            case MOD:
+                return MOD_TYPE;
+        }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -116,6 +127,9 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case FROM_HEX:
                 toFromhex(polyad, state, false);
+                return true;
+            case NUMERIC_DIGITS:
+                doNumericDigits(polyad, state);
                 return true;
             case ENCODE_B64:
                 doB64(polyad, state, true);
@@ -167,7 +181,8 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         int resultType = 0;
 
         // if the argument is a number return that many random numbers in a stem variable.
-        Object arg = polyad.evalArg(0,state);;
+        Object arg = polyad.evalArg(0, state);
+        ;
         if (arg instanceof Long) {
             int size = ((Long) arg).intValue();
             StemVariable stemVariable = new StemVariable();
@@ -187,10 +202,30 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    protected void doNumericDigits(Polyad polyad, State state) {
+        Long oldND = new Long((long) state.getOpEvaluator().getNumericDigits());
+        polyad.setResult(oldND);
+        polyad.setResultType(Constant.LONG_TYPE);
+
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setEvaluated(true);
+        } else {
+            Object arg1 = polyad.evalArg(0, state);
+            if (!isLong(arg1)) {
+                throw new IllegalArgumentException("Error: the supplied arguments was not an integer");
+            }
+            Long newND = (Long) arg1;
+            state.getOpEvaluator().setNumericDigits(newND.intValue());
+            polyad.setEvaluated(true);
+        }
+        return;
+    }
+
     protected void doRandomString(Polyad polyad, State state) {
         int length = 16;
         if (polyad.getArgumments().size() == 1) {
-            polyad.evalArg(0,state);;
+            polyad.evalArg(0, state);
+            ;
             Object obj = polyad.getArgumments().get(0).getResult();
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();

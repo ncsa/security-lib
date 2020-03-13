@@ -13,6 +13,10 @@
     <name>Parent module for everything of interest.</name>
     <packaging>pom</packaging>
     <description>Generic security code for delegation.</description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+    </properties>
     <url>http://www.ncsa.illinois.edu</url>
     <scm>
         <developerConnection>
@@ -35,10 +39,7 @@
             <email>gaynor@illinois.edu</email>
         </developer>
     </developers>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <additionalparam>-Xdoclint:none</additionalparam>
-    </properties>
+ 
     <modules>
         <module>ncsa-security-common</module>
 	<module>ncsa-security-delegation</module>

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.config;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
@@ -85,6 +86,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     }
 
     protected boolean isServerModeOn() {
+
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
     }
 
@@ -93,9 +95,24 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
     }
 
+    protected int getNumericDigits(){
+        String raw= getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
+        if(raw == null || raw.isEmpty()){
+            return OpEvaluator.numericDigits;
+        }
+        try{
+           return Integer.parseInt(raw);
+        }catch(Throwable t){
+            return OpEvaluator.numericDigits;
+        }
+    }
+
     protected List<VFSConfig> getVFSConfigs() {
         ArrayList<VFSConfig> configs = new ArrayList<>();
         ConfigurationNode vNode = getFirstNode(cn, VIRTUAL_FILE_SYSTEMS_TAG_NAME);
+        if(vNode == null){
+            return new ArrayList<>();
+        }
         // need to snoop through children and create VFSEntries.
         for (ConfigurationNode kid : vNode.getChildren()) {
             String access = getFirstAttribute(kid, VFS_ATTR_ACCESS);
@@ -154,6 +171,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected List<ModuleConfig> getModuleConfigs() {
         ArrayList<ModuleConfig> configs = new ArrayList<>();
         ConfigurationNode vNode = getFirstNode(cn, MODULES_TAG_NAME);
+        if(vNode == null){
+            return new ArrayList<>();
+        }
         // need to snoop through children and create VFSEntries.
         for (ConfigurationNode kid : vNode.getChildren()) {
             if (getFirstAttribute(kid, MODULE_ATTR_TYPE).equals(MODULE_TYPE_JAVA)) {
@@ -179,6 +199,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getName(),
                 isEnabled(),
                 isServerModeOn(),
+                getNumericDigits(),
                 getBootScript(),
                 getWSHomeDir(),
                 getWSEnvFile(),

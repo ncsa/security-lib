@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.config;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -24,6 +25,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String name,
                           boolean isEnabled,
                           boolean isServerModeOn,
+                          int numericDigits,
                           String bootScript,
                           String wsHomeDir,
                           String wsEnv,
@@ -42,8 +44,19 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.vfsConfigs = vfsConfigs;
         this.moduleConfigs = moduleConfigs;
         this.echoModeOn = echoModeOn;
+        this.numericDigits = numericDigits;
+
     }
 
+    public int getNumericDigits() {
+        return numericDigits;
+    }
+
+    public void setNumericDigits(int numericDigits) {
+        this.numericDigits = numericDigits;
+    }
+
+    int numericDigits = OpEvaluator.numericDigits;
     public String getName() {
         return name;
     }

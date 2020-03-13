@@ -1014,6 +1014,7 @@ public class WorkspaceCommands implements Logable {
 
         QDLEnvironment config = loader.load();
         setEchoModeOn(config.isEchoModeOn());
+
         boolean isVerbose = config.isWSVerboseOn();
         logger = config.getMyLogger();
         if (!config.getWSHomeDir().isEmpty()) {
@@ -1023,6 +1024,7 @@ public class WorkspaceCommands implements Logable {
             rootDir = new File(inputLine.getNextArgFor(currentDirectory));
         }
         State state = getState(); // This sets it for the class it will be  put in the interpreter below.
+        state.getOpEvaluator().setNumericDigits(config.getNumericDigits());
         if (!config.getWSEnv().isEmpty()) {
             // try and see if the file resolves first.
             envFile = resolveAgainstRoot(config.getWSEnv());

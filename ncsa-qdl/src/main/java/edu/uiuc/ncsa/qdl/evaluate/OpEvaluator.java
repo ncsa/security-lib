@@ -71,7 +71,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         this.numericDigits = numericDigits;
     }
 
-    int numericDigits = 50; // default precision for decimals.
+   public static int numericDigits = 50; // default precision for decimals.
 
     /**
      * No listing for these yet since they are not the standard func() pattern, e.g. a < b.

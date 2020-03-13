@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.util.StemEntry;
 import edu.uiuc.ncsa.qdl.util.StemList;
 import edu.uiuc.ncsa.qdl.util.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -23,6 +24,9 @@ import java.util.Date;
  */
 public class StemFunctionsTest extends TestBase {
     TestUtils testUtils = TestUtils.newInstance();
+    protected String geter(){
+        return enc(getRandomString());
+    }
 
     @Test
     public void testSizeStem() throws Exception {
@@ -72,32 +76,32 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-      public void testKeys() throws Exception {
-          State state = testUtils.getNewState();
-          SymbolTable symbolTable = state.getSymbolStack();
+    public void testKeys() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
-          StemVariable sourceStem = new StemVariable();
-          sourceStem.put("rule", "One Ring to rule them all");
-          sourceStem.put("find", "One Ring to find them");
-          sourceStem.put("bring", "One Ring to bring them all");
-          sourceStem.put("bind", "and in the darkness bind them");
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "One Ring to rule them all");
+        sourceStem.put("find", "One Ring to find them");
+        sourceStem.put("bring", "One Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
 
-          symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
 
-          Polyad polyad = new Polyad(StemEvaluator.KEYS);
-          VariableNode arg = new VariableNode("sourceStem.");
+        Polyad polyad = new Polyad(StemEvaluator.KEYS);
+        VariableNode arg = new VariableNode("sourceStem.");
 
-          polyad.addArgument(arg);
-          polyad.evaluate(state);
-          assert polyad.getResult() instanceof StemVariable;
+        polyad.addArgument(arg);
+        polyad.evaluate(state);
+        assert polyad.getResult() instanceof StemVariable;
 
-          StemVariable result = (StemVariable) polyad.getResult();
-          assert result.size() == sourceStem.size();
-          for (String key : sourceStem.keySet()) {
-              assert result.containsKey(result.get(key));
-              assert result.get(key).equals(key);
-          }
-      }
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == sourceStem.size();
+        for (String key : sourceStem.keySet()) {
+            assert result.containsKey(result.get(key));
+            assert result.get(key).equals(key);
+        }
+    }
 
     @Test
     public void testSizeString() throws Exception {
@@ -201,12 +205,13 @@ public class StemFunctionsTest extends TestBase {
         StemVariable keys = new StemVariable();
         int count = 5;
         int j = 0;
+        QDLCodec codec = new QDLCodec();
         for (int i = 0; i < 2 * count; i++) {
-            String key = getRandomString();
+            String key = geter();
             if (0 == i % 2) {
                 keys.put(Integer.toString(j++), key);
             }
-            sourceStem.put(key, getRandomString());
+            sourceStem.put(key, geter());
         }
 
 
@@ -237,12 +242,14 @@ public class StemFunctionsTest extends TestBase {
         StemVariable sourceStem = new StemVariable();
         StemVariable keys = new StemVariable();
         int count = 5;
-        for (int i = 0; i < 2 * count; i++) {
+        QDLCodec codec = new QDLCodec();
+        randomStem(sourceStem, 2*count);
+      /*  for (int i = 0; i < 2 * count; i++) {
             String key = getRandomString();
             sourceStem.put(key, getRandomString());
-            keys.put(key, getRandomString());
+            keys.put(key, codec.encode(getRandomString()));
         }
-
+*/
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
@@ -272,11 +279,11 @@ public class StemFunctionsTest extends TestBase {
         int count = 5;
         int j = 0;
         for (int i = 0; i < 2 * count; i++) {
-            String key = getRandomString();
+            String key = geter();
             if (0 == i % 2) {
                 keys.put(Integer.toString(j++), key);
             }
-            sourceStem.put(key, getRandomString());
+            sourceStem.put(key,geter());
         }
 
 
@@ -305,13 +312,13 @@ public class StemFunctionsTest extends TestBase {
 
         StemVariable sourceStem = new StemVariable();
         StemVariable keys = new StemVariable();
-        String targetKey = getRandomString();
+        String targetKey = geter();
 
-        sourceStem.put(targetKey, getRandomString());
+        sourceStem.put(targetKey, geter());
         int count = 5;
         for (int i = 0; i < count; i++) {
-            String key = getRandomString();
-            sourceStem.put(key, getRandomString());
+            String key = geter();
+            sourceStem.put(key, geter());
         }
 
 
@@ -327,6 +334,39 @@ public class StemFunctionsTest extends TestBase {
         assert !result.containsKey(targetKey);
     }
 
+    /**
+     * Make a new stem filled with legal variable keys and values.
+     *
+     * @param count
+     * @return
+     */
+    protected StemVariable randomStem(int count) {
+        StemVariable s = new StemVariable();
+        randomStem(s, count);
+        return s;
+    }
+
+    /**
+     * Add a given number of random legal varaables to a stem
+     *
+     * @param s
+     * @param count
+     * @return
+     */
+    protected StemVariable randomStem(StemVariable s, int count) {
+        for (int i = 0; i < count; i++) {
+            s.put(geter(), geter());
+        }
+        return s;
+    }
+
+    QDLCodec codec = new QDLCodec();
+    protected String enc(String x){
+        return codec.encode(x);
+    }
+    protected String dec(String x){
+        return codec.decode(x);
+    }
     @Test
     public void testIncludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
@@ -334,15 +374,12 @@ public class StemFunctionsTest extends TestBase {
 
 
         StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
-        String targetKey = getRandomString();
 
-        sourceStem.put(targetKey, getRandomString());
+        String targetKey = geter();
+
+        sourceStem.put(targetKey, geter());
         int count = 5;
-        for (int i = 0; i < count; i++) {
-            String key = getRandomString();
-            sourceStem.put(key, getRandomString());
-        }
+        randomStem(sourceStem, count);
 
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
@@ -364,19 +401,19 @@ public class StemFunctionsTest extends TestBase {
 
 
         StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
         int count = 5;
+        StemVariable keys = new StemVariable();
         int j = 0;
         for (int i = 0; i < 2 * count; i++) {
-            String key = getRandomString();
+            String key = geter();
             if (0 == i % 2) {
                 keys.put(Integer.toString(j++), key);
             }
-            sourceStem.put(key, getRandomString());
+            sourceStem.put(key, geter());
         }
         // add a few that aren't in the target stem.
         for (int i = 0; i < count; i++) {
-            keys.put(Integer.toString(j++), getRandomString());
+            keys.put(Integer.toString(j++), geter());
         }
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
@@ -407,19 +444,19 @@ public class StemFunctionsTest extends TestBase {
         StemVariable sourceStem = new StemVariable();
         StemVariable keys = new StemVariable();
         int count = 5;
-        String targetKey = getRandomString();
-        sourceStem.put(targetKey, getRandomString());
+        String targetKey = geter();
+        sourceStem.put(targetKey, geter());
         int j = 0;
         for (int i = 0; i < count; i++) {
-            String key = getRandomString();
+            String key = geter();
             if (0 == i % 2) {
                 keys.put(Integer.toString(j++), key);
             }
-            sourceStem.put(key, getRandomString());
+            sourceStem.put(key, geter());
         }
         // add a few that aren't in the target stem.
         for (int i = 0; i < count; i++) {
-            keys.put(Integer.toString(j++), getRandomString());
+            keys.put(Integer.toString(j++), geter());
         }
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
@@ -738,25 +775,25 @@ public class StemFunctionsTest extends TestBase {
     }
 
     @Test
-       public void testListSubset2() throws Throwable {
-           StemList<StemEntry> sourceSL = new StemList();
-           long count1 = 10L;
-           for (long i = 0L; i < count1; i++) {
-               sourceSL.append(i + 20);
-           }
-           StemVariable sourceStem = new StemVariable();
-           sourceStem.setStemList(sourceSL);
-           // Test copying the tail of the list from the given index.
-           StemVariable targetStem = sourceStem.listSubset( 7);
-           StemList<StemEntry> result = targetStem.getStemList();
-           System.out.println(result);
-           // should return sorted set
-           Object expectedValues[] = new Object[]{27L, 28L, 29L};
-           assert result.size() == 3; // original plus number inserted
-           for (int i = 0; i < expectedValues.length; i++) {
-               assert result.get(i).equals(expectedValues[i]);
-           }
-       }
+    public void testListSubset2() throws Throwable {
+        StemList<StemEntry> sourceSL = new StemList();
+        long count1 = 10L;
+        for (long i = 0L; i < count1; i++) {
+            sourceSL.append(i + 20);
+        }
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.setStemList(sourceSL);
+        // Test copying the tail of the list from the given index.
+        StemVariable targetStem = sourceStem.listSubset(7);
+        StemList<StemEntry> result = targetStem.getStemList();
+        System.out.println(result);
+        // should return sorted set
+        Object expectedValues[] = new Object[]{27L, 28L, 29L};
+        assert result.size() == 3; // original plus number inserted
+        for (int i = 0; i < expectedValues.length; i++) {
+            assert result.get(i).equals(expectedValues[i]);
+        }
+    }
 
 
     @Test

@@ -108,7 +108,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
     public static String FUNC_NAMES[] = new String[]{SIZE, MAKE_INDICES, REMOVE, IS_DEFINED,
             SET_DEFAULT, BOX, UNBOX, UNION, COMMON_KEYS, EXCLUDE_KEYS, LIST_KEYS, HAS_KEYS, INCLUDE_KEYS, RENAME_KEYS, MASK,
-            LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST, TO_JSON, FROM_JSON};
+            KEYS,LIST_APPEND, LIST_INSERT_AT, LIST_SUBSET, LIST_COPY, IS_LIST, TO_LIST, TO_JSON, FROM_JSON};
 
     @Override
     public String[] getFunctionNames() {

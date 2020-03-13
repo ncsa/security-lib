@@ -1,0 +1,57 @@
+<!DOCTYPE config [
+        <!ELEMENT config (qdl)*>
+        <!ELEMENT qdl (workspace|virtual_file_systems|modules|boot_script|logging)*>
+        <!ATTLIST qdl
+                debug CDATA #IMPLIED
+                enabled CDATA #IMPLIED
+                name CDATA #REQUIRED
+                numeric_digits CDATA #IMPLIED
+                server_mode CDATA #IMPLIED>
+        <!ELEMENT workspace (home_dir|env)*>
+        <!ATTLIST workspace
+                echoModeOn CDATA #REQUIRED
+                verbose CDATA #REQUIRED>
+        <!ELEMENT home_dir (#PCDATA)>
+        <!ELEMENT env (#PCDATA)>
+        <!ELEMENT virtual_file_systems (vfs)*>
+        <!ELEMENT vfs (root_dir|scheme|mount_point|zip_file|mysql)*>
+        <!ATTLIST vfs
+                access CDATA #REQUIRED
+                type CDATA #REQUIRED>
+        <!ELEMENT root_dir (#PCDATA)>
+        <!ELEMENT scheme (#PCDATA)>
+        <!ELEMENT mount_point (#PCDATA)>
+        <!ELEMENT modules (module)*>
+        <!ELEMENT module (class_name|path)*>
+        <!ATTLIST module
+                import_on_start CDATA #IMPLIED
+                type CDATA #REQUIRED>
+        <!ELEMENT class_name (#PCDATA)>
+        <!ELEMENT path (#PCDATA)>
+        <!ELEMENT boot_script (#PCDATA)>
+        <!ELEMENT logging (#PCDATA)>
+        <!ATTLIST logging
+                debug CDATA #REQUIRED
+                disableLog4j CDATA #IMPLIED
+                logFileCount CDATA #REQUIRED
+                logFileName CDATA #REQUIRED
+                logName CDATA #REQUIRED
+                logSize CDATA #REQUIRED>
+        <!ELEMENT zip_file (#PCDATA)>
+        <!ELEMENT mysql (#PCDATA)>
+        <!ATTLIST mysql
+                username CDATA #REQUIRED
+                password CDATA #REQUIRED
+                schema CDATA #REQUIRED
+                tablename CDATA #REQUIRED
+                parameters CDATA #REQUIRED>
+        ]>
+<config>
+    <qdl name="minimal">
+        <workspace verbose="true"
+                   echoModeOn="true">
+            <home_dir>/home/ncsa/dev/qdl</home_dir>
+            <env>etc/qdl.properties</env>
+        </workspace>
+    </qdl>
+ </config>

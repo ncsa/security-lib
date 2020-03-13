@@ -10,6 +10,7 @@ import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -37,7 +38,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public String getString(String key) {
-        return (String) get(key);
+        return get(key).toString();
     }
 
     public Boolean getBoolean(String key) {
@@ -499,16 +500,29 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     String int_regex = "[1-9][0-9]*";
+    static String var_regex = "^[a-zA-Z0-9_$]+[a-zA-Z0-9_$\\.]*";
 
     boolean isLongIndex(String key) {
         // special case of index being zero!! Otherwise, no such index can start with zero,
         // so a key of "01" is a string, not the number 1. Sorry, best we can do. 
         return key.equals("0") || key.matches(int_regex);
     }
+      Pattern var_pattern = Pattern.compile(var_regex);
+      Pattern int_pattern = Pattern.compile(int_regex);
+   protected  boolean isVar(String var){
+        return var_pattern.matcher(var).matches();
+    }
+
+    protected  boolean isIntVar(String var){
+         return var.equals("0") || int_pattern.matcher(var).matches();
+     }
 
     @Override
     public Object put(String key, Object value) {
-        if (!key.endsWith(STEM_INDEX_MARKER) && isLongIndex(key)) {
+        if(!isVar(key)){
+            throw new IllegalArgumentException("Error: " + key + " is not a legal varaible name");
+        }
+        if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);
         }
         return super.put(key, value);
