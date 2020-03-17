@@ -21,7 +21,7 @@ import java.net.URI;
 import java.util.TreeSet;
 
 /**
- * For ocntrol structure in loops, conditionals etc.
+ * For control structure in loops, conditionals etc.
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/20 at  11:49 AM
  */

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<faqs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://maven.apache.org/FML/1.0"
+      xsi:schemaLocation="https://maven.apache.org/FML/1.0 https://maven.apache.org/xsd/fml-1.0.xsd"
+      id="General FAQ">
+    <part id="General">
+        <faq id="meaning">
+            <question>What does QDL mean?</question>
+            <answer>It refers to navigational bearings (taken in a regular and precise way
+                and are essential for proper aviation.) It is so easy to code quickly and easily that
+                it also is humorously referred to as "quick and dirty" language.
+            </answer>
+        </faq>
+        <faq id="where">
+            <question>Where did QDL come from?</question>
+            <answer>
+                <p>
+                    QDL originated as a server-side scripting tool for Open Authorization
+                    servers. There, the protocols are fixed and dictate various information flows,
+                    but can be messy to implement. On top of this there any
+                    number of special cases are requirements in how the protocol is used. So either (a) one is
+                    constantly
+                    tweaking the server code or (b) fixes that to run the bare-bone protocol and has a scripting
+                    language
+                    that can be invoked at regular intervals in processing to handle the special cases.
+                </p>
+            </answer>
+        </faq>
+        <faq id="why not other languages">
+            <question>Server side scripting. Hey, use Python (or Java or something else)!</question>
+            <answer>
+                <p>On an OAuth server, there are many -- possibly thousands -- of clients. Under OA4MP, which
+                    handles identity management and single sign-on, each of these may have imposing
+                    institutional uses, restrictions and
+                    requirements. So, allowing clients to upload their Java code (OA4MP is written in Java) to the
+                    server
+                    is a non-starter. QDL behaves very nicely as a security policy langugage.
+                </p>
+                <p>Unlike SAML, it is a language,
+                    because it may require quite specific decision making -- to use SAML would require some way of
+                    creating valid SAML on the fly which means eventually creating some other language just for that.
+                    Work is a conserved quantity.
+                </p>
+                <p>
+                    As such, most server-side code is quite terse (very good for an administrator too look at and vet
+                    before accepting it) and quite easy to write. Most QDL on a server is a couple of line and
+                    implicit looping plus aggregate operations allow a lot to be done by more or less making
+                    qualitative statements about the data.
+                </p>
+            </answer>
+        </faq>
+        <faq id="philosophy">
+            <question>Philosophy</question>
+            <answer>
+                <p>The basic philosophies are:
+                    <br/>
+                    * Small is beautiful
+                    <br/>
+                    * Aim at probabilities (what you are likely to do) vs. possibilities (edge cases)
+                    <br/>
+                    * Simple things should be simple
+                    <br/>
+                </p>
+            </answer>
+        </faq>
+    </part>
+</faqs>

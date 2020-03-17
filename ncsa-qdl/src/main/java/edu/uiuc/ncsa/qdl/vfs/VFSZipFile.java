@@ -21,7 +21,8 @@ import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
  * This is experimental. Part of the issue is that the file has to be read in one go (can be quite time consuming)
  * and stashed then managed.
  * This means making a virtual file system and managing it potentially. Need to think about how to do
- * this more efficiently.
+ * this more efficiently. It is not practical to mount zip file sin any other than read only mode for now
+ * since the Java classes that manage this require the entire file get re-written for any changes.
  * <p>Created by Jeff Gaynor<br>
  * on 3/5/20 at  7:36 AM
  */

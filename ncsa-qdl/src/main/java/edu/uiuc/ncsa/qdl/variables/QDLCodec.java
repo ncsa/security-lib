@@ -6,8 +6,15 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.net.URLCodec;
 
 /**
- * This will convert a string and encode or decode all characters that are not [a-z][A-Z]_
- *
+ * This will convert a string and encode or decode all characters that are not [a-z][A-Z]_. The encoding
+ * is URL standard escaping in which the "%" is replaced by a "$" so that it forms a valid
+ * variable.  E.g.,
+ * <pre>
+ *       ab&(*c -->  ab$26$28$2Ac
+ * </pre>
+ * Note that unlike certain forms of URL encoding, a blank is not turned in to a "+" but
+ * encoded as "$20". Many utilities that claim to URL encode strings do not, but actually do
+ * URL form encoding which permits that.
  * <p>Created by Jeff Gaynor<br>
  * on 3/9/20 at  6:13 AM
  */

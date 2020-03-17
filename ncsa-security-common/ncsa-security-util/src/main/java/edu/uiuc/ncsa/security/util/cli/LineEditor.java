@@ -72,7 +72,7 @@ public class LineEditor {
 
     CommandLineTokenizer CLT = new CommandLineTokenizer();
 
-    public static String PROMPT = "edit >";
+    public static String PROMPT = "edit>";
     public static final String END_COMMAND = "."; // end input to buffer
     public static final String APPEND_COMMAND = "a"; // append to end of file
     public static final String APPEND_COMMAND_LONG = "append"; // append to end of file

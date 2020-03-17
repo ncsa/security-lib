@@ -386,7 +386,7 @@ public class VFSTest extends TestBase {
                 "oauth2",
                 "localhost",
                 3306,
-                "com.mysql.jdbc.Driver",
+                "com.mysql.cj.jdbc.Driver",
                 false,
                 "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
         );

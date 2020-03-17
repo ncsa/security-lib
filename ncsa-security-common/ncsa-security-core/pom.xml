@@ -8,10 +8,14 @@
         <artifactId>ncsa-security-common</artifactId>
         <version>4.4-SNAPSHOT</version>
     </parent>
-
     <artifactId>ncsa-security-core</artifactId>
     <packaging>jar</packaging>
     <name>NCSA security core code.</name>
+    <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+         <additionalparam>-Xdoclint:none</additionalparam>
+     </properties>
+
     <dependencies>
         <dependency>
             <groupId>commons-configuration</groupId>

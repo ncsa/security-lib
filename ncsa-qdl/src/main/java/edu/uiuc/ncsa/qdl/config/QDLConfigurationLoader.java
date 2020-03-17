@@ -60,7 +60,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
         if (node == null) return defaultValue;
         try {
-            return Boolean.parseBoolean(getFirstAttribute(node, attrib));
+            String x = getFirstAttribute(node, attrib);
+            if(x == null || x.isEmpty()){return defaultValue;} //  Null argument returns false.
+            return Boolean.parseBoolean(x);
         } catch (Throwable t) {
 
         }
@@ -70,6 +72,11 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isWSVerboseOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_VERBOSE, false);
+    }
+
+    protected boolean showBanner() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_ATTR_SHOW_BANNER, true);
     }
 
     protected boolean isEnabled() {
@@ -95,14 +102,14 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
     }
 
-    protected int getNumericDigits(){
-        String raw= getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
-        if(raw == null || raw.isEmpty()){
+    protected int getNumericDigits() {
+        String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
+        if (raw == null || raw.isEmpty()) {
             return OpEvaluator.numericDigits;
         }
-        try{
-           return Integer.parseInt(raw);
-        }catch(Throwable t){
+        try {
+            return Integer.parseInt(raw);
+        } catch (Throwable t) {
             return OpEvaluator.numericDigits;
         }
     }
@@ -110,7 +117,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected List<VFSConfig> getVFSConfigs() {
         ArrayList<VFSConfig> configs = new ArrayList<>();
         ConfigurationNode vNode = getFirstNode(cn, VIRTUAL_FILE_SYSTEMS_TAG_NAME);
-        if(vNode == null){
+        if (vNode == null) {
             return new ArrayList<>();
         }
         // need to snoop through children and create VFSEntries.
@@ -171,7 +178,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected List<ModuleConfig> getModuleConfigs() {
         ArrayList<ModuleConfig> configs = new ArrayList<>();
         ConfigurationNode vNode = getFirstNode(cn, MODULES_TAG_NAME);
-        if(vNode == null){
+        if (vNode == null) {
             return new ArrayList<>();
         }
         // need to snoop through children and create VFSEntries.
@@ -205,6 +212,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getWSEnvFile(),
                 isEchoModeOn(),
                 isWSVerboseOn(),
+                showBanner(),
                 getVFSConfigs(),
                 getModuleConfigs());
     }

@@ -26,6 +26,8 @@ public class Dyad extends ExpressionImpl {
         getArgumments().add(rightNode);
     }
 
+  
+
     @Override
     public Object evaluate(State state) {
         state.getOpEvaluator().evaluate(this, state);

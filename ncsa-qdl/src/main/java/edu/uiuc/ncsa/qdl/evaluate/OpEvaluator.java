@@ -11,7 +11,7 @@ import java.math.RoundingMode;
 import java.util.TreeSet;
 
 /**
- * Class the will evaluate and expression
+ * Class charged with evaluating algebraic expressions.
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:20 PM
  */
@@ -186,11 +186,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
-                        double dd = Math.pow((Long) objects[0], (Long) objects[1]);
-                        // wee bit of cenversion since this only returns doubles, not longs
-                        BigDecimal bd = new BigDecimal(dd);
-                        r.result = bd;
-                        r.resultType = Constant.DECIMAL_TYPE;
+                        Double dd = Math.pow((Long) objects[0], (Long) objects[1]);
+                        // wee bit of conversion since this only returns doubles, not longs
+                        r.result = dd.longValue();
+                        r.resultType = Constant.LONG_TYPE;
                     } else {
                         BigDecimal left = toBD(objects[0]);
                         int n = ((Long) objects[1]).intValue();

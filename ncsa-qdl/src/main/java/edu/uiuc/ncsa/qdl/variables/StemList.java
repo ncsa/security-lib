@@ -6,6 +6,7 @@ import net.sf.json.JSONObject;
 import java.util.TreeSet;
 
 /**
+ * This is used internally by a stem to store its entries that have integer indices.
  * <p>Created by Jeff Gaynor<br>
  * on 2/20/20 at  8:39 AM
  */

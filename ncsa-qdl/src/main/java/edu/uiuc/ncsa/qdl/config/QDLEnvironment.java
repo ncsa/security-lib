@@ -31,6 +31,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String wsEnv,
                           boolean echoModeOn,
                           boolean verboseOn,
+                          boolean showBanner,
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs) {
         super(myLogger);
@@ -45,8 +46,14 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.moduleConfigs = moduleConfigs;
         this.echoModeOn = echoModeOn;
         this.numericDigits = numericDigits;
-
+        this.showBanner = showBanner;
     }
+
+    public boolean isShowBanner() {
+        return showBanner;
+    }
+
+    boolean showBanner;
 
     public int getNumericDigits() {
         return numericDigits;
@@ -57,11 +64,13 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     int numericDigits = OpEvaluator.numericDigits;
+
     public String getName() {
         return name;
     }
 
     String name = null;
+
     public boolean isEchoModeOn() {
         return echoModeOn;
     }
@@ -72,6 +81,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     public List<VFSConfig> getVFSConfigurations() {
         return vfsConfigs;
     }
+
     List<ModuleConfig> moduleConfigs;
 
     public List<ModuleConfig> getModuleConfigs() {

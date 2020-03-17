@@ -158,7 +158,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         node.setEvaluated(true);
     }
 
-    // ToDO make a processN method from these. Just have to scratch head about certian bookkeeping.
+    // ToDO make a processN method from these. Just have to scratch head about certain bookkeeping.
     protected void process1(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,

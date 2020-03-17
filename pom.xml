@@ -13,10 +13,8 @@
     <name>Parent module for everything of interest.</name>
     <packaging>pom</packaging>
     <description>Generic security code for delegation.</description>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <additionalparam>-Xdoclint:none</additionalparam>
-    </properties>
+
+
     <url>http://www.ncsa.illinois.edu</url>
     <scm>
         <developerConnection>
@@ -39,11 +37,17 @@
             <email>gaynor@illinois.edu</email>
         </developer>
     </developers>
- 
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <additionalparam>-Xdoclint:none</additionalparam>
+    </properties>
+
     <modules>
         <module>ncsa-security-common</module>
-	<module>ncsa-security-delegation</module>
-	<module>ncsa-qdl</module>
+        <module>ncsa-security-delegation</module>
+        <module>ncsa-qdl</module>
+        <module>ncsa-qdl-website</module>
     </modules>
     <dependencies>
         <dependency>
@@ -115,21 +119,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Java 8 specific or empty javadoc tags make the build fail -->
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
+                <version>3.1.1</version>
 
-                    </execution>
-                </executions>
-
+                <configuration>
+                    <includeDependencySources>true</includeDependencySources>
+                    <failOnError>false</failOnError>
+                    <excludePackageNames>org.*;com.*</excludePackageNames>
+                </configuration>
             </plugin>
 
         </plugins>

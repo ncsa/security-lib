@@ -41,6 +41,7 @@ public interface QDLConfigurationConstants {
     String BOOT_SCRIPT_TAG = "boot_script";
     String WS_TAG = "workspace";
     String WS_ATTR_VERBOSE = "verbose";
+    String WS_ATTR_SHOW_BANNER = "showBanner";
     String WS_ATTR_ECHO_MODE_ON = "echoModeOn";
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";

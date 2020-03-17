@@ -1,0 +1,27 @@
+   ------
+   Title
+   QD Language
+   ------
+   Author
+   Jeff Gaynor
+   ------
+   Date
+   March 16 2020
+
+The QD Language
+
+    The QD Language is a general purpose scripting language that is designed to work on aggregate
+    objects. It includes the usual constructs for a language such as looping, conditionals,
+    switch statements and encapsulation.
+
+Documentation
+
+    *{{{./docs/qdl_reference.pdf}QDL Reference Manual}}
+
+    *{{{./docs/qdl_configuration.pdf}QDL Configuration Reference Manual}}
+
+    *{{{./docs/qdl_workspace.pdf}QDL Workspace Reference Manual}}
+
+    *{{{./docs/qdl_extensions.pdf}Writing your own extensions to QDL}}
+
+    *{{{./apidocs/index.html}Javadoc for the QDL implementation}}

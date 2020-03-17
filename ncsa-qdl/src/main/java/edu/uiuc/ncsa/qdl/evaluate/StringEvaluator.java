@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
+ * This evaluates all string functions. 
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:17 AM
  */

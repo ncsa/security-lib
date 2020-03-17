@@ -74,7 +74,7 @@ public class QDLConfigurationLoaderUtils {
         int port = 3306; // means use default
         boolean useSSL = false; // also default
         if(!map.containsKey(DRIVER)){
-            map.put(DRIVER,"com.mysql.jdbc.Driver" );
+            map.put(DRIVER,"com.mysql.cj.jdbc.Driver" );
         }
         if(!map.containsKey(HOST)){
             map.put(HOST, "localhost");

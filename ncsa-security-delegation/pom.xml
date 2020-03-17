@@ -12,7 +12,10 @@
     <artifactId>ncsa-security-delegation</artifactId>
     <packaging>pom</packaging>
     <name>NCSA delegation parent module.</name>
-
+    <properties>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+         <additionalparam>-Xdoclint:none</additionalparam>
+     </properties>
     <modules>
         <module>ncsa-security-delegation-common</module>
         <module>ncsa-security-delegation-client</module>

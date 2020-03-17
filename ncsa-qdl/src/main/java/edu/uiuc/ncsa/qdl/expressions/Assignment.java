@@ -83,7 +83,7 @@ public class Assignment implements Statement, HasResultInterface {
 
             case Constant.STEM_TYPE:
                 if(!getVariableReference().endsWith(STEM_INDEX_MARKER)){
-                    throw new IllegalArgumentException("Error: Cannot set the stem to a non-stem variable");
+                    throw new IllegalArgumentException("Error: Cannot set the stem \"" + getVariableReference() +"\" to a non-stem variable");
                 }
                 state.setValue(variableReference, result);
                 break;

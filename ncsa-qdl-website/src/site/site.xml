@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="${artifactId}"
+  xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+  <bannerLeft>
+    <name>${artifactId}</name>
+    <src>https://maven.apache.org/images/apache-maven-project.png</src>
+    <href>https://www.apache.org/</href>
+  </bannerLeft>
+
+  <bannerRight>
+    <src>images/qdl-logo-color.png</src>
+<!--    <href>https://cilogon.org/</href> -->
+  </bannerRight>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.7</version>
+  </skin>
+
+  <body>
+
+
+    <menu name="Quick reference">
+      <item name="FAQ" href="faq.html"/>
+      <item name="Language Reference" href="docs/qdl_reference.pdf"/>
+      <item name="Configuration Reference" href="docs/qdl_configuration.pdf"/>
+      <item name="Workspace Reference" href="docs/qdl_workspace.pdf"/>
+    </menu>
+
+    <menu ref="reports" />
+  </body>
+</project>

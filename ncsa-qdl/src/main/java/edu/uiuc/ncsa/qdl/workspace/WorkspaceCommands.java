@@ -84,32 +84,46 @@ public class WorkspaceCommands implements Logable {
     protected int FIRST_ARG_INDEX = 2;
 
     protected void splashScreen() {
-        say("*****************************************");
-        say("Welcome to the QDL Workspace");
-        say("Version " + QDLVersion.VERSION);
-        say("Type " + HELP_COMMAND + " for help.");
-        say("*****************************************");
-
+        if(showBanner) {
+            say(banner);
+            say("*****************************************");
+            say("Welcome to the QDL Workspace");
+            say("Version " + QDLVersion.VERSION);
+            say("Type " + HELP_COMMAND + " for help.");
+            say("*****************************************");
+        }else{
+            say("QDL Workspace, version " + QDLVersion.VERSION);
+        }
     }
+      boolean showBanner = true;
+    String banner =
+            "- - . -  / - . .  / . - . . \n" +  // morse code for Q D L
+            "(  ___  )(  __  \\ ( \\      \n" +
+            "| (   ) || (  \\  )| (      \n" +
+            "| |   | || |   | || |      \n" +
+            "| | /\\| || |   ) || |      \n" +
+            "| (_\\ \\ || (__/  )| (____/\\\n" +
+            "(____\\/_)(______/ (_______/\n" +
+            "- - . -  / - . .  / . - . . ";
 
     protected void showRunHelp() {
-        say("This is the QDL (Quick and Dirty Language, pronounced 'quiddle') workspace.");
-        sayi("You may enter commands and execute them much like any other interpreter.");
-        sayi("There are several commands available to help you manage this workspace.");
-        sayi("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
-        sayi("Here is a quick summary of what they are and do.");
-        sayii(BUFFER_COMMAND);
-        sayii(CLEAR_COMMAND + " -- Clear the state of the workspace. All variables, functions etc. will be lost.");
-        sayii(EDIT_COMMAND);
-        sayii(ENV_COMMAND);
-        sayii(EXECUTE_COMMAND);
-        sayii(FUNCS_COMMAND + " -- List all of the imported and user defined functions this workspace knows about.");
-        sayii(HELP_COMMAND + " -- This message.");
-        sayii(MODULES_COMMAND + " -- Lists all the imported modules this workspace knows about.");
-        sayii(OFF_COMMAND + " -- Exit the workspace without saving.");
-        sayii(LOAD_COMMAND + " file -- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayii(VARS_COMMAND + " -- Lists all of the variables this workspace knows about.");
-        sayii(WS_COMMAND);
+        say("This is the QDL (pronounced 'quiddle') workspace.");
+        say("You may enter commands and execute them much like any other interpreter.");
+        say("There are several commands available to help you manage this workspace.");
+        say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
+        say("Here is a quick summary of what they are and do.");
+        sayi(BUFFER_COMMAND + " -- commands relating to using buffers.");
+        sayi(CLEAR_COMMAND + " -- clear the state of the workspace. All variables, functions etc. will be lost.");
+        sayi(EDIT_COMMAND + " -- commands relating to running the line editor.");
+        sayi(ENV_COMMAND + " -- commands relating to environment variables in this workspace.");
+        sayi(EXECUTE_COMMAND + "     -- short hand to execute whatever is in the current buffer.");
+        sayi(FUNCS_COMMAND + " -- list all of the imported and user defined functions this workspace knows about.");
+        sayi(HELP_COMMAND + " -- this message.");
+        sayi(MODULES_COMMAND + " -- lists all the imported modules this workspace knows about.");
+        sayi(OFF_COMMAND + " -- exit the workspace.");
+        sayi(LOAD_COMMAND + " file -- Load a file of QDL commands and execute it immediately in the current workspace.");
+        sayi(VARS_COMMAND + " -- lists all of the variables this workspace knows about.");
+        sayi(WS_COMMAND + " -- commands relating to this workspace.");
     }
 
     public int execute(String inline) {
@@ -688,7 +702,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     /**
-     * Either show all varialbes (no arg or argument of "list") or <br/><br/>
+     * Either show all variables (no arg or argument of "list") or <br/><br/>
      * drop name -- remove the given symbol from the local symbol table. This does not effect modules.
      *
      * @param inputLine
@@ -992,6 +1006,7 @@ public class WorkspaceCommands implements Logable {
     public static final String CLA_LOG_DIR = "-log";
     public static final String CLA_BOOT_SCRIPT = "-boot_script";
     public static final String CLA_VERBOSE_ON = "-v";
+    public static final String CLA_NO_BANNER = "-noBanner";
     public static final String CLA_DEBUG_ON = "-debug";
 
     protected File resolveAgainstRoot(String file) {
@@ -1012,22 +1027,23 @@ public class WorkspaceCommands implements Logable {
                 cfgname, CONFIG_TAG_NAME);
         QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
 
-        QDLEnvironment config = loader.load();
-        setEchoModeOn(config.isEchoModeOn());
+        QDLEnvironment qe = loader.load();
+        setEchoModeOn(qe.isEchoModeOn());
 
-        boolean isVerbose = config.isWSVerboseOn();
-        logger = config.getMyLogger();
-        if (!config.getWSHomeDir().isEmpty()) {
-            rootDir = new File(config.getWSHomeDir());
+        boolean isVerbose = qe.isWSVerboseOn();
+        showBanner = qe.isShowBanner();
+        logger = qe.getMyLogger();
+        if (!qe.getWSHomeDir().isEmpty()) {
+            rootDir = new File(qe.getWSHomeDir());
         } else {
             String currentDirectory = System.getProperty("user.dir");
             rootDir = new File(inputLine.getNextArgFor(currentDirectory));
         }
         State state = getState(); // This sets it for the class it will be  put in the interpreter below.
-        state.getOpEvaluator().setNumericDigits(config.getNumericDigits());
-        if (!config.getWSEnv().isEmpty()) {
+        state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
+        if (!qe.getWSEnv().isEmpty()) {
             // try and see if the file resolves first.
-            envFile = resolveAgainstRoot(config.getWSEnv());
+            envFile = resolveAgainstRoot(qe.getWSEnv());
             env = new XProperties();
 
             if (envFile.exists()) {
@@ -1037,10 +1053,10 @@ public class WorkspaceCommands implements Logable {
             env.put("qdl_root", rootDir.getAbsolutePath());
         }
         splashScreen();
-        QDLConfigurationLoaderUtils.setupVFS(config, getState());
+        QDLConfigurationLoaderUtils.setupVFS(qe, getState());
 
-        setEchoModeOn(config.isEchoModeOn());
-        String[] foundModules = setupModules(config, getState());
+        setEchoModeOn(qe.isEchoModeOn());
+        String[] foundModules = setupModules(qe, getState());
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
             if (isVerbose) {
@@ -1055,7 +1071,7 @@ public class WorkspaceCommands implements Logable {
 
             env.put("qdl_modules", foundModules[QDL_MODULE_INDEX]);
         }
-        String bf = QDLConfigurationLoaderUtils.runBootScript(config, getState());
+        String bf = QDLConfigurationLoaderUtils.runBootScript(qe, getState());
         if (bf != null) {
             if (isVerbose) {
                 say("loaded boot script \"" + bf + "\"");
@@ -1063,7 +1079,7 @@ public class WorkspaceCommands implements Logable {
             env.put("boot_script", bf);
         }
         interpreter = new QDLParser(env, getState());
-        interpreter.setEchoModeOn(config.isEchoModeOn());
+        interpreter.setEchoModeOn(qe.isEchoModeOn());
      //   interpreter.setDebugOn(true);
 
     }
@@ -1091,9 +1107,8 @@ public class WorkspaceCommands implements Logable {
         boolean isDebug = inputLine.hasArg(CLA_DEBUG_ON);
         if (isDebug) {
             say("Debug mode enabled.");
-
         }
-        //   QDLLoaderImpl q = new QDLLoaderImpl();
+        showBanner = !inputLine.hasArg(CLA_NO_BANNER);
         State state = getState();
         if (inputLine.hasArg(CLA_HOME_DIR)) {
             rootDir = new File(inputLine.getNextArgFor(CLA_HOME_DIR));

@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -56,7 +56,6 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     public static final String NUMERIC_DIGITS = "numeric_digits";
     public static final int NUMERIC_DIGITS_TYPE = 12 + MATH_FUNCTION_BASE_VALUE;
-
 
 
     public static String FUNC_NAMES[] = new String[]{ABS_VALUE, RANDOM, RANDOM_STRING, HASH, TO_HEX,
@@ -223,21 +222,54 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     protected void doRandomString(Polyad polyad, State state) {
         int length = 16;
-        if (polyad.getArgumments().size() == 1) {
+
+        if (0 < polyad.getArgumments().size()) {
             polyad.evalArg(0, state);
-            ;
             Object obj = polyad.getArgumments().get(0).getResult();
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();
+            } else {
+                throw new IllegalArgumentException("Error: The first argument must be an integer.");
+
             }
         }
-        byte[] ba = new byte[length];
+        // Second optional argument is number of strings.
+        int returnCount = 1;
+        if (polyad.getArgumments().size() == 2) {
+            polyad.evalArg(1, state);
+            Object obj = polyad.getArgumments().get(1).getResult();
+            if (!isLong(obj)) {
+                throw new IllegalArgumentException("Error: The second argument must be an integer.");
+            }
+
+            if (obj instanceof Long) {
+                returnCount = ((Long) obj).intValue();
+                if (returnCount <= 0) {
+                    returnCount = 1;
+                }
+            }
+        }
+
+        byte[] ba = new byte[length * returnCount];
         secureRandom.nextBytes(ba);
         // now we need to make a string.
         BigInteger bigInteger = new BigInteger(ba);
         bigInteger = bigInteger.abs();
-        polyad.setResult(bigInteger.toString(16).toUpperCase());
-        polyad.setResultType(Constant.STRING_TYPE);
+        if (returnCount == 1) {
+            polyad.setResult(bigInteger.toString(16).toUpperCase());
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        // so more than one.
+        String rc = bigInteger.toString(16).toUpperCase();
+        length = rc.length()/returnCount;
+        StemVariable stem = new StemVariable();
+        for (int i = 0; i < returnCount; i++) {
+            stem.put((long) i, rc.substring(i * length, (i+1) * length));
+        }
+        polyad.setResult(stem);
+        polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
         return;
     }

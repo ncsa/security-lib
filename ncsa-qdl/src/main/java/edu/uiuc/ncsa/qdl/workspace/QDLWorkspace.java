@@ -33,8 +33,8 @@ public class QDLWorkspace {
     }
 
     protected void handleException(Throwable t) {
-        if((t instanceof ParseCancellationException) | (t instanceof ParsingException)){
-            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn()?t.getMessage():"could not parse input"));
+        if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
+            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn() ? t.getMessage() : "could not parse input"));
             return;
         }
         if (t instanceof IllegalStateException) {
@@ -55,6 +55,9 @@ public class QDLWorkspace {
 
     public void run(InputLine inputLine) throws Throwable {
         boolean isExit = false;
+        String lastCommand = "";
+
+
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
@@ -62,6 +65,11 @@ public class QDLWorkspace {
             boolean executeExternalFile = false;
             System.out.print(INDENT);
             String input = workspaceCommands.readline().trim();
+            if (input.equals("%")) {
+                input = lastCommand;
+            } else {
+                lastCommand = input;
+            }
             if (input.startsWith(")")) {
                 switch (workspaceCommands.execute(input)) {
                     case RC_EXIT_NOW:
@@ -105,10 +113,10 @@ public class QDLWorkspace {
                     }
                     continue;
                 }
-                if(input != null && !input.isEmpty()){
+                if (input != null && !input.isEmpty()) {
                     // if you try to evaluate only a ";" then you will get a syntax exception from
                     // the parser for an empty statement.
-                    if(workspaceCommands.isEchoModeOn() && !input.endsWith(";")){
+                    if (workspaceCommands.isEchoModeOn() && !input.endsWith(";")) {
                         input = input + ";"; // add it since they forgot
                     }
                     workspaceCommands.getInterpreter().execute(input);

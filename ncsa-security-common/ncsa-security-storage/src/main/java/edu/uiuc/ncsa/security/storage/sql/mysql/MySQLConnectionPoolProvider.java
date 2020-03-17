@@ -29,7 +29,7 @@ public class MySQLConnectionPoolProvider extends ConnectionPoolProvider<MySQLCon
      */
      public MySQLConnectionPoolProvider(String database, String schema) {
          super(database, schema);
-         driver = "com.mysql.jdbc.Driver";
+         driver = "com.mysql.cj.jdbc.Driver";
          port = 3306;
          host = "localhost";
     }

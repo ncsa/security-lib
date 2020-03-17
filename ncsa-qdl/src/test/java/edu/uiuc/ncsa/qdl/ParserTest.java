@@ -42,10 +42,16 @@ public class ParserTest extends TestBase {
      * Tests the rational function<br/><br/>
      * f(x,y)=(x^3 + x*y^2 - 3*x*y + 1)/(x^4 + y^2 +2)<br/><br/>
      * With values
-     * f(3, -5) ==   1.37037037037037
-     * f(3/2, -5/2) ==  1.87793427230047
-     * f(3/3, -5/3) ==   1.69230769230769
-     * f(3/4, -5/4) ==  1.39375629405841
+     * <ul>
+     *     <li>f(3, -5) ==   1.37037037037037    </li>
+     *     <li>f(3/2, -5/2) ==  1.87793427230047 </li>
+     *     <li>f(3/3, -5/3) ==   1.69230769230769</li>
+     *     <li>f(3/4, -5/4) ==  1.39375629405841 </li>
+     * </ul>
+     *
+     *
+     *
+     *
      *
      * @throws Throwable
      */
@@ -90,11 +96,16 @@ public class ParserTest extends TestBase {
      * Test the rational function of three variables <br/><br/>
      * f(x,y,z) = (x*y^2*z^3 - x/y^2 + z^4)/(1-(x*y*(1-z))^2)
      * <p>
-     * In[48]:= For[i=1,i<5,i++,Print[N[q2[-5/i,3/i,5/i ],15]]]
-     * f(-5, 3, 5) == 1.38912043468865
-     * f(-5/2, 3/2, 5/2) == 1.55731202901014
-     * f(-5/3, 1, 5/3) == -7.10526315789474
-     * f(-5/4, 3/4, 5/4) == 3.48158672751801
+     *     <ul>
+     *         <li>f(-5, 3, 5) == 1.38912043468865      </li>
+     *         <li>f(-5/2, 3/2, 5/2) == 1.55731202901014</li>
+     *         <li>f(-5/3, 1, 5/3) == -7.10526315789474 </li>
+     *         <li>f(-5/4, 3/4, 5/4) == 3.48158672751801</li>
+     *     </ul>
+     *
+     *
+     *
+     *
      *
      * @throws Throwable
      */
@@ -493,12 +504,13 @@ public class ParserTest extends TestBase {
      * <p>
      * = (8 + 5*x^2)/(5 + 3*x^2)
      * <p>
-     * 2
-     * 8 + 5 x
+     *  <pre>
+     *          2
+     *   8 + 5 x
      * = --------
-     * 2
-     * 5 + 3 x
-     *
+     *          2
+     *   5 + 3 x
+     * </pre>
      * @throws Throwable
      */
     @Test
@@ -680,6 +692,88 @@ public class ParserTest extends TestBase {
         assert state.getValue("c").equals(new Long(-5L));
     }
 
+    /**
+     * Aside from the basic assignment of := there are several other assignment operators. This tests them
+     * @throws Throwable
+     */
+
+    @Test
+    public void testAssignments() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := indices(6);");
+        addLine(script, "b := 3;");
+        addLine(script, "a.0+=b;"); // 0 + 3 = 3
+        addLine(script, "a.1-=b;"); // 1 - 3 = -2
+        addLine(script, "a.2*=b;"); // 2 * 6 =  6
+        addLine(script, "a.3/=b;"); //   3/3 =  1
+        addLine(script, "a.4%=b;"); //   4%3 =  1
+        addLine(script, "a.5^=b;"); //   5^3 =  125
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("a.0").equals(new Long(3L));
+        assert state.getValue("a.1").equals(new Long(-2L));
+        assert state.getValue("a.2").equals(new Long(6L));
+        assert state.getValue("a.3").equals(new Long(1L));
+        assert state.getValue("a.4").equals(new Long(1L));
+        assert state.getValue("a.5").equals(new Long(125L));
+    }
+
+    /**
+     * Tests that multiple assignments on one line are processed correctly.
+     * @throws Throwable
+     */
+    @Test
+    public void testMultipleAssignments() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "A := 'a'; B := 'b'; C := 'pqrc';");
+        addLine(script, "q := A += B += C -= 'pqr';");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("q").equals("abc");
+        assert state.getValue("A").equals("abc");
+        assert state.getValue("B").equals("bc");
+        assert state.getValue("C").equals("c");
+    }
+    /**
+     * Tests that all the standard comparisons work.
+     * @throws Throwable
+     */
+    @Test
+    public void testComparisons() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 5;");
+        addLine(script, "b := 3;");
+        addLine(script, "a.0 := a<b;"); //F
+        addLine(script, "a.1 := a>b;"); // T
+        addLine(script, "a.2 := a==b;"); //F
+        addLine(script, "a.3 := a!=b;"); // T
+        addLine(script, "a.4 := a<=a;"); //T
+        addLine(script, "a.5 := a=<a;"); //T
+        addLine(script, "a.6 := b>=b;"); //T
+        addLine(script, "a.7 := b=>b;"); //T
+        addLine(script, "a.8 := a==a;"); //T
+        addLine(script, "a.9 := a!=a;"); //F
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("a.0").equals(Boolean.FALSE);
+        assert state.getValue("a.1").equals(Boolean.TRUE);
+        assert state.getValue("a.2").equals(Boolean.FALSE);
+        assert state.getValue("a.3").equals(Boolean.TRUE);
+        assert state.getValue("a.4").equals(Boolean.TRUE);
+        assert state.getValue("a.5").equals(Boolean.TRUE);
+        assert state.getValue("a.6").equals(Boolean.TRUE);
+        assert state.getValue("a.7").equals(Boolean.TRUE);
+        assert state.getValue("a.8").equals(Boolean.TRUE);
+        assert state.getValue("a.9").equals(Boolean.FALSE);
+    }
+
+
     @Test
     public void testLogic() throws Throwable {
         State state = testUtils.getNewState();
@@ -748,11 +842,15 @@ public class ParserTest extends TestBase {
         addLine(script, "a:=-4;");
         addLine(script, "b:=11;");
         addLine(script, "c:=-(11+2*a);");
+        addLine(script, "d.:=-indices(3);");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a").equals(new Long(-4L));
         assert state.getValue("b").equals(new Long(11L));
         assert state.getValue("c").equals(new Long(-3L));
+        assert state.getValue("d.0").equals(new Long(0L));
+        assert state.getValue("d.1").equals(new Long(-1L));
+        assert state.getValue("d.2").equals(new Long(-2L));
     }
 
     @Test
@@ -773,7 +871,7 @@ public class ParserTest extends TestBase {
 
     @Test
     public void testPostMinuses() throws Throwable {
-        // This tests multiple decrements. NOTE that the values are multipled as it decrements,
+        // This tests multiple decrements. NOTE that the values are multiplied as it decrements,
         // so the effect is to compute the factorial in this case. Post decr. means the previous value
         // is returned and the new one is stored, so this is 4!
         State state = testUtils.getNewState();
@@ -834,11 +932,6 @@ public class ParserTest extends TestBase {
 
     @Test
     public void testListAppend() throws Throwable {
-        /*
-
-  list_append(my_stem., indices(5))
-
-         */
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "my_stem.help := 'this is my stem';");
@@ -925,7 +1018,8 @@ public class ParserTest extends TestBase {
      * stems to JSON and back.
      * <br/>
      * This also has JSON keys that are not simply ascii, so the encoding of those
-     * to and from QDL should work.
+     * to and from QDL should work. Since the keys after round-tripping are checked against the
+     * ones before any conversion, this tests that everything is converted as it should be.
      *
      * @throws Throwable
      */
@@ -969,20 +1063,5 @@ public class ParserTest extends TestBase {
         }
     }
 
-    @Test
-    public void testMultipleAssignments() throws Throwable {
 
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "A := 'a'; B := 'b'; C := 'pqrc';");
-        addLine(script, "q := A += B += C -= 'pqr';");
-
-        QDLParser interpreter = new QDLParser(null, state);
-        interpreter.execute(script.toString());
-
-        assert state.getValue("q").equals("abc");
-        assert state.getValue("A").equals("abc");
-        assert state.getValue("B").equals("bc");
-        assert state.getValue("C").equals("c");
-    }
 }
