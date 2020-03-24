@@ -21,8 +21,10 @@ import org.junit.runners.Suite;
         MathFunctionsTest.class,
         StemFunctionsTest.class,
         ParserTest.class,
+        // Without the VFS tests, all other tests (125 of them) take 829 ms.
+        // This adds 2 full seconds for the initial database connection
         VFSTest.class
-   
+
 })
 public class TestSuite extends junit.framework.TestSuite {
 }

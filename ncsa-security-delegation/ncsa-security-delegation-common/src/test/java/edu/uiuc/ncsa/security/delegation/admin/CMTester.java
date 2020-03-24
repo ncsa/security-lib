@@ -1,10 +1,8 @@
 package edu.uiuc.ncsa.security.delegation.admin;
 
-import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
+import edu.uiuc.ncsa.security.core.util.BitSetUtil;
 
 import java.math.BigInteger;
-import java.net.URI;
 import java.util.BitSet;
 
 /**
@@ -13,24 +11,30 @@ import java.util.BitSet;
  */
 public class CMTester {
     public static void main(String[] args){
-        BigInteger bigInteger = new BigInteger("1101",2);
+        BigInteger bigInteger = new BigInteger("11100",2);
+        System.out.println( new BigInteger("111110",2));
+        System.out.println( new BigInteger("100000",2));
         System.out.println(bigInteger);
         int n = 28;
         BitSet bs = BitSet.valueOf(new long[]{n});
-        BitSet bs1 = BitSet.valueOf(new long[]{n});
-        System.out.println(bs);
-        System.out.println(bs.equals(bs1));
+        BitSet bs1 = BitSet.valueOf(new long[]{16L});
+        System.out.println("28->" + bs);
+        System.out.println("16->" + bs1);
+        bs.and(bs1);
+        System.out.println("and:" + bs);
+        // or compress
+        BitSet bs62 = BitSet.valueOf(new long[]{62}); // all 1's except zeroth
+        BitSet bs32 = BitSet.valueOf(new long[]{32}); // only last one
 
+        System.out.println("62 = " + bs62);
+        System.out.println("or 62 = " + BitSetUtil.orCompress(bs62));
+        System.out.println("and 62 = " + BitSetUtil.andCompress(bs62));
+        System.out.println("or 32 = " + BitSetUtil.orCompress(bs32));
+        System.out.println("and 32 = " + BitSetUtil.andCompress(bs32));
+        System.out.println("and 1 = " + BitSetUtil.andCompress(BitSet.valueOf(new long[]{1})));
+        System.out.println("or 2 = " + BitSetUtil.orCompress(BitSet.valueOf(new long[]{2})));
+        System.out.println("to int " + BitSetUtil.toInt(bs62));
 
-        String var_regex = "^[a-zA-Z0-9_$]+[a-zA-Z0-9_$\\.]*";
-        System.out.println("-abc.ds$s.asd.".matches(var_regex));
-        System.out.println("_$2E$4Fabc.ds$s.asd.".matches(var_regex));
-        System.out.println("0".matches(var_regex));
-       String x = "_8c3ca7828fd90b76d574ac8c210a2cb1";
-       URI uri = URI.create(x);
-        Identifier xx = BasicIdentifier.newID(x);
-        System.out.println(xx);
-        System.out.println(uri);
     }
 
 }

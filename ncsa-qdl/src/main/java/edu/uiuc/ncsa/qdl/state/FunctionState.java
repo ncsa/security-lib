@@ -109,10 +109,10 @@ public abstract class FunctionState extends VariableState {
          }
      } // )load module_example.qdl
 
-    public TreeSet<String> listFunctions() {
-        TreeSet<String> out = getFunctionTable().listFunctions();
+    public TreeSet<String> listFunctions(String regex) {
+        TreeSet<String> out = getFunctionTable().listFunctions(regex);
         for (URI key : getImportedModules().keySet()) {
-            TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions();
+            TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions(regex);
             for (String x : uqVars) {
                 out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
             }

@@ -33,14 +33,21 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
         return super.containsKey(createKey(var, argCount));
     }
 
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(String regex) {
         TreeSet<String> names = new TreeSet<>();
 
         for (String key : keySet()) {
             String name = key.substring(0, key.indexOf(munger)); // de-munge
             FunctionRecord fr = get(key);
-            name = name + "(" + fr.getArgCount() + ")";
-            names.add(name);
+            if(regex != null && !regex.isEmpty()){
+                if(name.matches(regex)) {
+                    name = name + "(" + fr.getArgCount() + ")";
+                    names.add(name);
+                }
+            }else {
+                name = name + "(" + fr.getArgCount() + ")";
+                names.add(name);
+            }
         }
         return names;
     }

@@ -79,9 +79,9 @@ public class WorkspaceCommands implements Logable {
     )ws load filename
     The next constants just name them so there aren't any boo-boos
      */
-    protected int COMMAND_INDEX = 0;
-    protected int ACTION_INDEX = 1;
-    protected int FIRST_ARG_INDEX = 2;
+    protected int COMMAND_INDEX = 0; // e.g:   )ws
+    protected int ACTION_INDEX = 1; // e.g:    load
+    protected int FIRST_ARG_INDEX = 2; //e.g:  filename
 
     protected void splashScreen() {
         if(showBanner) {
@@ -612,6 +612,8 @@ public class WorkspaceCommands implements Logable {
                 return doFuncsList(inputLine);
             case "system":
                 return doSystemFuncsList(inputLine);
+            default:
+                say("sorry, unrecognized command.");
         }
         return RC_CONTINUE;
     }
@@ -694,7 +696,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int doFuncsList(InputLine inputLine) {
-        String funs = getState().listFunctions().toString().trim();
+        String regex = null;
+        if(FIRST_ARG_INDEX < inputLine.size()){
+            regex = inputLine.getArg(FIRST_ARG_INDEX);
+        }
+        String funs = getState().listFunctions(regex).toString().trim();
         funs = funs.substring(1); // chop off lead [
         funs = funs.substring(0, funs.length() - 1);
         say(funs);

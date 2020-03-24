@@ -9,7 +9,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
-import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.TreeSet;
@@ -250,23 +249,23 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             }
         }
 
-        byte[] ba = new byte[length * returnCount];
-        secureRandom.nextBytes(ba);
-        // now we need to make a string.
-        BigInteger bigInteger = new BigInteger(ba);
-        bigInteger = bigInteger.abs();
+
+        byte[] ba = new byte[length];
         if (returnCount == 1) {
-            polyad.setResult(bigInteger.toString(16).toUpperCase());
+            secureRandom.nextBytes(ba);
+            String rc = Base64.encodeBase64URLSafeString(ba);
+            polyad.setResult(rc);
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        // so more than one.
-        String rc = bigInteger.toString(16).toUpperCase();
-        length = rc.length()/returnCount;
+        // so more than one string needs to be returned.
+
         StemVariable stem = new StemVariable();
         for (int i = 0; i < returnCount; i++) {
-            stem.put((long) i, rc.substring(i * length, (i+1) * length));
+            secureRandom.nextBytes(ba);
+            String rc = Base64.encodeBase64URLSafeString(ba);
+            stem.put((long) i, rc);
         }
         polyad.setResult(stem);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -330,7 +329,6 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                         try {
                             byte[] decoded = Hex.decodeHex(objects[0].toString().toCharArray());
                             r.result = new String(decoded);
-
                         } catch (Throwable t) {
                             r.result = "(error)";
                         }
