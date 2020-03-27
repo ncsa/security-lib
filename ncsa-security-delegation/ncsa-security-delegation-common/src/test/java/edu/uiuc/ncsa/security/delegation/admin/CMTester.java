@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.admin;
 
 import edu.uiuc.ncsa.security.core.util.BitSetUtil;
+import net.sf.json.JSONObject;
 
 import java.math.BigInteger;
 import java.util.BitSet;
@@ -11,6 +12,9 @@ import java.util.BitSet;
  */
 public class CMTester {
     public static void main(String[] args){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("dn_state",1);
+        System.out.println(jsonObject);
         BigInteger bigInteger = new BigInteger("11100",2);
         System.out.println( new BigInteger("111110",2));
         System.out.println( new BigInteger("100000",2));

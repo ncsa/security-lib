@@ -21,9 +21,6 @@ public class VFSMemoryFileProvider extends AbstractVFSFileProvider {
         super(scheme, mountPoint, canRead, canWrite);
     }
 
-    public VFSMemoryFileProvider(String scheme, String mountPoint, String currentDir, boolean canRead, boolean canWrite) {
-        super(scheme, mountPoint, currentDir, canRead, canWrite);
-    }
 
     HashMap<String, VFSEntry> map = new HashMap<>();
 

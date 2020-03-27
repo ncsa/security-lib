@@ -26,23 +26,19 @@ import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
  * <p>Created by Jeff Gaynor<br>
  * on 3/5/20 at  7:36 AM
  */
-public class VFSZipFile extends AbstractVFSFileProvider {
+public class VFSZipFileProvider extends AbstractVFSFileProvider {
     @Override
     public String getType() {
         return QDLConfigurationConstants.VFS_TYPE_ZIP;
     }
 
-    public VFSZipFile(String pathToZip, String scheme, String mountPoint, boolean canRead, boolean canWrite) {
+    public VFSZipFileProvider(String pathToZip, String scheme, String mountPoint, boolean canRead, boolean canWrite) {
         super(scheme, mountPoint, canRead, canWrite);
         this.pathToZip = pathToZip;
         init();
     }
 
-    public VFSZipFile(String pathToZip, String scheme, String mountPoint, String currentDir, boolean canRead, boolean canWrite) {
-        super(scheme, mountPoint, currentDir, canRead, canWrite);
-        this.pathToZip = pathToZip;
-        init();
-    }
+
 
     String pathToZip;
     FileSystem fileSystem;

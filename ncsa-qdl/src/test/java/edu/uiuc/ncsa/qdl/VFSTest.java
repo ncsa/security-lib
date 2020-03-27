@@ -424,7 +424,7 @@ public class VFSTest extends TestBase {
         String fileInZip = mountPoint + "root/other/sub-folder1/math.txt";
         String pathInsideTheZip = mountPoint + "root/other/sub-folder1";
         String testPath = scheme + SCHEME_DELIMITER + pathInsideTheZip;
-        VFSZipFile vfs = new VFSZipFile(pathToZip,
+        VFSZipFileProvider vfs = new VFSZipFileProvider(pathToZip,
                 scheme,
                 mountPoint,
                 true,

@@ -49,10 +49,6 @@ public class ParserTest extends TestBase {
      *     <li>f(3/4, -5/4) ==  1.39375629405841 </li>
      * </ul>
      *
-     *
-     *
-     *
-     *
      * @throws Throwable
      */
     @Test
@@ -96,16 +92,12 @@ public class ParserTest extends TestBase {
      * Test the rational function of three variables <br/><br/>
      * f(x,y,z) = (x*y^2*z^3 - x/y^2 + z^4)/(1-(x*y*(1-z))^2)
      * <p>
-     *     <ul>
-     *         <li>f(-5, 3, 5) == 1.38912043468865      </li>
-     *         <li>f(-5/2, 3/2, 5/2) == 1.55731202901014</li>
-     *         <li>f(-5/3, 1, 5/3) == -7.10526315789474 </li>
-     *         <li>f(-5/4, 3/4, 5/4) == 3.48158672751801</li>
-     *     </ul>
-     *
-     *
-     *
-     *
+     * <ul>
+     *     <li>f(-5, 3, 5) == 1.38912043468865      </li>
+     *     <li>f(-5/2, 3/2, 5/2) == 1.55731202901014</li>
+     *     <li>f(-5/3, 1, 5/3) == -7.10526315789474 </li>
+     *     <li>f(-5/4, 3/4, 5/4) == 3.48158672751801</li>
+     * </ul>
      *
      * @throws Throwable
      */
@@ -504,13 +496,14 @@ public class ParserTest extends TestBase {
      * <p>
      * = (8 + 5*x^2)/(5 + 3*x^2)
      * <p>
-     *  <pre>
+     * <pre>
      *          2
      *   8 + 5 x
      * = --------
      *          2
      *   5 + 3 x
      * </pre>
+     *
      * @throws Throwable
      */
     @Test
@@ -694,6 +687,7 @@ public class ParserTest extends TestBase {
 
     /**
      * Aside from the basic assignment of := there are several other assignment operators. This tests them
+     *
      * @throws Throwable
      */
 
@@ -721,6 +715,7 @@ public class ParserTest extends TestBase {
 
     /**
      * Tests that multiple assignments on one line are processed correctly.
+     *
      * @throws Throwable
      */
     @Test
@@ -729,7 +724,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "A := 'a'; B := 'b'; C := 'pqrc';");
-        addLine(script, "q := A += B += C -= 'pqr';");
+        addLine(script, "q := A += B += D := C -= 'pqr';");
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
@@ -738,9 +733,12 @@ public class ParserTest extends TestBase {
         assert state.getValue("A").equals("abc");
         assert state.getValue("B").equals("bc");
         assert state.getValue("C").equals("c");
+        assert state.getValue("D").equals("c");
     }
+
     /**
      * Tests that all the standard comparisons work.
+     *
      * @throws Throwable
      */
     @Test
@@ -928,6 +926,21 @@ public class ParserTest extends TestBase {
             assert true;
         }
 
+    }
+
+    @Test
+    public void testCheckSymbolTableAssignment() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 'aaa';");
+        addLine(script, "a += 'qqq';");
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("a").equals("aaaqqq");
+        // Either of these indicate the logic for parsing op + assignment is broken. Regression tests.
+        assert !state.isDefined("qqq") : "Check parser in exitAssignment call.";
+        assert !state.isDefined("'qqq'") : "Check parser in exitAssignment call.";
     }
 
     @Test

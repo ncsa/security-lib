@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
@@ -50,7 +51,7 @@ public class QDLConfigurationLoaderUtils {
                         break;
                     case VFS_TYPE_ZIP:
                         VFSZipFileConfig zc = (VFSZipFileConfig)vfsConfig;
-                        provider = new VFSZipFile(zc.getZipFilePath(), zc.getScheme(),zc.getMountPoint(),
+                        provider = new VFSZipFileProvider(zc.getZipFilePath(), zc.getScheme(),zc.getMountPoint(),
                                 zc.canRead(), zc.canWrite());
                         state.addVFSProvider(provider);
                         config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
@@ -66,50 +67,55 @@ public class QDLConfigurationLoaderUtils {
             }
         }
     }
+     public static VFSDatabase setupMySQLDatabase(MyLoggingFacade logger, Map<String, String> map){
+         int port = 3306; // means use default
+         boolean useSSL = false; // also default
+         if(!map.containsKey(DRIVER)){
+             map.put(DRIVER,"com.mysql.cj.jdbc.Driver" );
+         }
+         if(!map.containsKey(HOST)){
+             map.put(HOST, "localhost");
+         }
+         if(!map.containsKey(DATABASE)){
+             map.put(DATABASE, map.get(SCHEMA));
+         }
+         try{
+             if(map.containsKey(PORT)) {
+                 port = Integer.parseInt(map.get(PORT));
+             }
+         }catch(Throwable t){
+             if(logger != null)
+             logger.warn("VFS mount: Could not determine port from value " + map.get(PORT));
+         }
+         try{
+             if(map.containsKey(USE_SSL)) {
+                 useSSL = Boolean.parseBoolean(map.get(USE_SSL));
+             }
+         }catch(Throwable t){
+             if(logger!=null)
+             logger.warn("VFS mount: Could not determine whether or not to use SSL from value " + map.get(USE_SSL));
+         }
+         MySQLConnectionParameters parameters = new MySQLConnectionParameters(
+             map.get(USERNAME),
+             map.get(PASSWORD),
+             map.get(DATABASE),
+             map.get(SCHEMA),
+             map.get(HOST),
+             port,
+             map.get(DRIVER),
+             useSSL,
+             map.get(PARAMETERS)
+         );
+         MySQLConnectionPool connectionPool = new MySQLConnectionPool(parameters);
 
-    protected static VFSFileProvider setupMySQLVFS(QDLEnvironment config, VFSSQLConfig vfsConfig) {
+         return new VFSDatabase(connectionPool, map.get(StorageConfigurationTags.SQL_TABLENAME));
+
+     }
+    protected static VFSFileProvider setupMySQLVFS(QDLEnvironment config, VFSSQLConfig myCfg) {
         VFSFileProvider provider;
-        VFSSQLConfig myCfg = vfsConfig;
         Map<String,String> map = myCfg.getConnectionParameters();
-        int port = 3306; // means use default
-        boolean useSSL = false; // also default
-        if(!map.containsKey(DRIVER)){
-            map.put(DRIVER,"com.mysql.cj.jdbc.Driver" );
-        }
-        if(!map.containsKey(HOST)){
-            map.put(HOST, "localhost");
-        }
-        if(!map.containsKey(DATABASE)){
-            map.put(DATABASE, map.get(SCHEMA));
-        }
-        try{
-            if(map.containsKey(PORT)) {
-                port = Integer.parseInt(map.get(PORT));
-            }
-        }catch(Throwable t){
-            config.getMyLogger().warn("VFS mount: Could not determine port from value " + map.get(PORT));
-        }
-        try{
-            if(map.containsKey(USE_SSL)) {
-                useSSL = Boolean.parseBoolean(map.get(USE_SSL));
-            }
-        }catch(Throwable t){
-            config.getMyLogger().warn("VFS mount: Could not determine whether or not to use SSL from value " + map.get(USE_SSL));
-        }
-        MySQLConnectionParameters parameters = new MySQLConnectionParameters(
-            map.get(USERNAME),
-            map.get(PASSWORD),
-            map.get(DATABASE),
-            map.get(SCHEMA),
-            map.get(HOST),
-            port,
-            map.get(DRIVER),
-            useSSL,
-            map.get(PARAMETERS)
-        );
-        MySQLConnectionPool connectionPool = new MySQLConnectionPool(parameters);
 
-        VFSDatabase db = new VFSDatabase(connectionPool, map.get(StorageConfigurationTags.SQL_TABLENAME));
+        VFSDatabase db = setupMySQLDatabase(config.getMyLogger(), map);
         provider = new VFSMySQLProvider(db,
                 myCfg.getScheme(),myCfg.mountPoint, myCfg.canRead(),myCfg.canWrite());
         return provider;

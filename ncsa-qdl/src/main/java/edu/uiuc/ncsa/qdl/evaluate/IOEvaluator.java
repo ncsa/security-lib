@@ -7,17 +7,20 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
-import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
-import edu.uiuc.ncsa.qdl.vfs.VFSPassThruFileProvider;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.vfs.*;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
+import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.setupMySQLDatabase;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -209,87 +212,87 @@ public class IOEvaluator extends MathEvaluator {
 
     protected void doRMDir(Polyad polyad, State state) {
         if (0 == polyad.getArgumments().size()) {
-                     throw new IllegalArgumentException("Error: " + RMDIR + " requires a file name to read.");
-                 }
-                 Object obj = polyad.evalArg(0, state);
-                 if (obj == null || !isString(obj)) {
-                     throw new IllegalArgumentException("Error: The " + RMDIR + " command requires a string for its first argument.");
-                 }
-                 String fileName = obj.toString();
+            throw new IllegalArgumentException("Error: " + RMDIR + " requires a file name to read.");
+        }
+        Object obj = polyad.evalArg(0, state);
+        if (obj == null || !isString(obj)) {
+            throw new IllegalArgumentException("Error: The " + RMDIR + " command requires a string for its first argument.");
+        }
+        String fileName = obj.toString();
 
-                 VFSFileProvider vfs = null;
-                 Boolean rc = false;
-                 boolean hasVF = false;
-                 if (state.isVFSFile(fileName)) {
-                     try {
-                         vfs = state.getVFS(fileName);
-                         if (vfs != null) {
-                             rc = vfs.rmdir(fileName);
-                         }
+        VFSFileProvider vfs = null;
+        Boolean rc = false;
+        boolean hasVF = false;
+        if (state.isVFSFile(fileName)) {
+            try {
+                vfs = state.getVFS(fileName);
+                if (vfs != null) {
+                    rc = vfs.rmdir(fileName);
+                }
 
-                     } catch (Throwable throwable) {
-                         throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
-                     }
-                 } else {
-                     // So its just a file.
-                     if (state.isServerMode()) {
-                         throw new QDLServerModeException("File system operations not permitted in server mode.");
-                     }
-                     File f = new File(fileName);
-                     if(!f.isDirectory()){
-                         throw new QDLIOException("Error: the requested object \"" + f + "\" is not a directory on this system.");
-                     }
-                     if(f.list() != null &&  f.list().length != 0){
-                         throw new QDLIOException("Error: The directory \"" + f + "\" is not empty.");
-                     }
-                     rc = f.delete();
-                 }
-                 polyad.setEvaluated(true);
-                 polyad.setResult(rc);
-                 polyad.setResultType(Constant.BOOLEAN_TYPE);
+            } catch (Throwable throwable) {
+                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+            }
+        } else {
+            // So its just a file.
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
+            File f = new File(fileName);
+            if (!f.isDirectory()) {
+                throw new QDLIOException("Error: the requested object \"" + f + "\" is not a directory on this system.");
+            }
+            if (f.list() != null && f.list().length != 0) {
+                throw new QDLIOException("Error: The directory \"" + f + "\" is not empty.");
+            }
+            rc = f.delete();
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(rc);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     protected void doRMFile(Polyad polyad, State state) {
         if (0 == polyad.getArgumments().size()) {
-                throw new IllegalArgumentException("Error: " + RM_FILE + " requires a file name to read.");
-            }
-            Object obj = polyad.evalArg(0, state);
-            if (obj == null || !isString(obj)) {
-                throw new IllegalArgumentException("Error: The " + RM_FILE + " command requires a string for its first argument.");
-            }
-            String fileName = obj.toString();
+            throw new IllegalArgumentException("Error: " + RM_FILE + " requires a file name to read.");
+        }
+        Object obj = polyad.evalArg(0, state);
+        if (obj == null || !isString(obj)) {
+            throw new IllegalArgumentException("Error: The " + RM_FILE + " command requires a string for its first argument.");
+        }
+        String fileName = obj.toString();
 
-            VFSFileProvider vfs = null;
-            Boolean rc = false;
-            boolean hasVF = false;
-            if (state.isVFSFile(fileName)) {
-                try {
-                    vfs = state.getVFS(fileName);
-                    if (vfs != null) {
-                        vfs.rm(fileName);
-                        rc = true;
-                    }
+        VFSFileProvider vfs = null;
+        Boolean rc = false;
+        boolean hasVF = false;
+        if (state.isVFSFile(fileName)) {
+            try {
+                vfs = state.getVFS(fileName);
+                if (vfs != null) {
+                    vfs.rm(fileName);
+                    rc = true;
+                }
 
-                } catch (Throwable throwable) {
-                    if(throwable instanceof RuntimeException){
-                         throw (RuntimeException) throwable;
-                     }
-                    throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+            } catch (Throwable throwable) {
+                if (throwable instanceof RuntimeException) {
+                    throw (RuntimeException) throwable;
                 }
-            } else {
-                // So its just a file.
-                if (state.isServerMode()) {
-                    throw new QDLServerModeException("File system operations not permitted in server mode.");
-                }
-                File f = new File(fileName);
-                if(!f.isFile()){
-                    throw new QDLIOException("Error: the requested object \"" + f + "\" is not a file on this system.");
-                }
-                rc = f.delete();
+                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
             }
-            polyad.setEvaluated(true);
-            polyad.setResult(rc);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
+        } else {
+            // So its just a file.
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
+            File f = new File(fileName);
+            if (!f.isFile()) {
+                throw new QDLIOException("Error: the requested object \"" + f + "\" is not a file on this system.");
+            }
+            rc = f.delete();
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(rc);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     protected void doMkDir(Polyad polyad, State state) {
@@ -313,7 +316,7 @@ public class IOEvaluator extends MathEvaluator {
                 }
 
             } catch (Throwable throwable) {
-                if(throwable instanceof RuntimeException){
+                if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
                 throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
@@ -365,9 +368,9 @@ public class IOEvaluator extends MathEvaluator {
                 }
 
             } catch (Throwable throwable) {
-                if(throwable instanceof RuntimeException){
-                     throw (RuntimeException) throwable;
-                 }
+                if (throwable instanceof RuntimeException) {
+                    throw (RuntimeException) throwable;
+                }
                 throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
             }
         } else {
@@ -406,32 +409,80 @@ public class IOEvaluator extends MathEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
         }
-        if (3 <= polyad.getArgumments().size() && polyad.getArgumments().size() <= 4) {
-            throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires 3 or 4arguments");
+        if (polyad.getArgumments().size() != 1) {
+            throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires one argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        Object arg2 = polyad.evalArg(1, state);
-        Object arg3 = polyad.evalArg(2, state);
-        Object arg4 = "r"; // mount in read only mode
-        if (polyad.getArgumments().size() == 4) {
-            arg4 = polyad.evalArg(2, state);
+        if (!isStem(arg1)) {
+            throw new IllegalArgumentException("Error: The argument must be a stem");
         }
-        if (isString(arg1) && isString(arg2) && isString(arg3) && isString(arg4)) {
-            // TODO - make sure there is not another one of these?
-            // TODO - check that mount points don't conflict.
-            String permissions = arg4.toString();
-            VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(arg1.toString(),
-                    arg2.toString(),
-                    arg3.toString(),
-                    permissions.contains("r"),
-                    permissions.contains("w"));
-            state.addVFSProvider(vfs);
-            polyad.setResult(null);
-            polyad.setResult(Constant.NULL_TYPE);
-            polyad.setEvaluated(true);
-            return;
+        StemVariable cfg = (StemVariable) arg1;
+        if (!cfg.containsKey(VFS_ATTR_TYPE)) {
+            // create a memory store
+            cfg.put(VFS_ATTR_TYPE, VFS_TYPE_MEMORY);
         }
-        throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires that all arguments be strings.");
+        // Now grab defaults
+        String mountPoint = null;
+        if (!cfg.containsKey(VFS_MOUNT_POINT_TAG)) {
+            throw new IllegalArgumentException("Error: No " + VFS_MOUNT_POINT_TAG + "  specified for VFS");
+        } else {
+            mountPoint = cfg.getString(VFS_MOUNT_POINT_TAG);
+        }
+        String scheme = null;
+        if (!cfg.containsKey(VFS_SCHEME_TAG)) {
+            throw new IllegalArgumentException("Error: No " + VFS_SCHEME_TAG + " specified for VFS");
+        } else {
+            scheme = cfg.getString(VFS_SCHEME_TAG);
+        }
+        String access = "r";
+        if (!cfg.containsKey(VFS_ATTR_ACCESS)) {
+            access = cfg.getString(VFS_ATTR_ACCESS);
+        }
+
+        VFSFileProvider vfs = null;
+        switch (cfg.getString(VFS_ATTR_TYPE)) {
+            case VFS_TYPE_MEMORY:
+                vfs = new VFSMemoryFileProvider(scheme, mountPoint, access.contains("r"), access.contains("w"));
+                break;
+            case VFS_TYPE_PASS_THROUGH:
+                if (!cfg.containsKey(VFS_ROOT_DIR_TAG)) {
+                    throw new IllegalArgumentException("Error: VFS type of " + VFS_TYPE_PASS_THROUGH + " requires a " + VFS_ROOT_DIR_TAG);
+                }
+                vfs = new VFSPassThruFileProvider(cfg.getString(VFS_ROOT_DIR_TAG),
+                        scheme,
+                        mountPoint,
+                        access.contains("r"),
+                        access.contains("w"));
+                break;
+            case VFS_TYPE_MYSQL:
+                Map<String, String> myCfg = new HashMap<>();
+                for (String key : cfg.keySet()) {
+                    myCfg.put(key, cfg.getString(key));
+                }
+                VFSDatabase db = setupMySQLDatabase(null, myCfg);
+                vfs = new VFSMySQLProvider(db,
+                        scheme, mountPoint, access.contains("r"), access.contains("w"));
+                break;
+
+            case VFS_TYPE_ZIP:
+                if (!cfg.containsKey(VFS_ZIP_FILE_PATH)) {
+                    throw new IllegalArgumentException("Error: VFS type of " + VFS_TYPE_ZIP + " requires a " + VFS_ZIP_FILE_PATH);
+                }
+                vfs = new VFSZipFileProvider(cfg.getString(VFS_ZIP_FILE_PATH),
+                        scheme,
+                        mountPoint,
+                        access.contains("r"),
+                        access.contains("w"));
+                break;
+            default:
+                throw new IllegalArgumentException("Error: unknown VFS type \"" + cfg.getString(VFS_ATTR_TYPE) + "\"");
+
+        }
+        state.addVFSProvider(vfs);
+        polyad.setResult(null);
+        polyad.setResult(Constant.NULL_TYPE);
+        polyad.setEvaluated(true);
+        return;
     }
 
     protected void doWriteFile(Polyad polyad, State state) {

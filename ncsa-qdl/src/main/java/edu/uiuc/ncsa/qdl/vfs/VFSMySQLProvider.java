@@ -17,9 +17,6 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
         this.db = db;
     }
 
-    public VFSMySQLProvider(String scheme, String mountPoint, String currentDir, boolean canRead, boolean canWrite) {
-        super(scheme, mountPoint, currentDir, canRead, canWrite);
-    }
 
     VFSDatabase db;
 

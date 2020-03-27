@@ -152,6 +152,7 @@ public class QDLListener implements QDLParserListener {
             nextA = new Assignment();
             nextVar = assignmentContext.children.get(i + 1).getText();
             nextA.setVariableReference(nextVar);
+
             if (op.equals(":=")) {
                 if (i + 1 == exprIndex) {
                     Statement arg = resolveChild(assignmentContext.children.get(i + 1));
@@ -170,10 +171,15 @@ public class QDLListener implements QDLParserListener {
             }
             if (i + 1 == exprIndex) {
                 Statement arg = resolveChild(assignmentContext.children.get(i + 1));
+                // If this is not here, you will create a variable with the name of the argument,
+                // e.g. 'qqq'
+                nextA.setVariableReference(currentA.getVariableReference());
                 nextA.setArgument(arg);
                 return;
                 //  A := 'a'; B := 'b';
                 // q := A += B += 'c';
+            } else{
+                // Chain them together if there are more to come
             }
             currentA = nextA;
         } //end for
