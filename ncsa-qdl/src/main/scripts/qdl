@@ -1,0 +1,8 @@
+# The script to invoke the QDL interpreter.
+$QDL_HOME=""
+$JAR_LIB="$QDL_HOME/lib/cp"
+$CFG_FILE="$QDL_HOME/etc/qdl-cfg.xml"
+$CFG_NAME="default"
+$QDL_JAR="$QDL_HOME/lib/qdl.jar"
+
+java -cp "$JAR_LIB/*" -jar $QDL_JAR  -cfg  $CFG_FILE -name $CFG_NAME

@@ -15,6 +15,7 @@
   Just put this in the right database and scheme as needed.
   
   Be SURE you set the grant to the right user or there will be no access to this database!
+  You may need to create the user for this database too, but that is not part of this script.
  */
 create table qdl_vfs(
    path VARCHAR(768),

@@ -84,27 +84,28 @@ public class WorkspaceCommands implements Logable {
     protected int FIRST_ARG_INDEX = 2; //e.g:  filename
 
     protected void splashScreen() {
-        if(showBanner) {
+        if (showBanner) {
             say(banner);
             say("*****************************************");
             say("Welcome to the QDL Workspace");
             say("Version " + QDLVersion.VERSION);
             say("Type " + HELP_COMMAND + " for help.");
             say("*****************************************");
-        }else{
+        } else {
             say("QDL Workspace, version " + QDLVersion.VERSION);
         }
     }
-      boolean showBanner = true;
+
+    boolean showBanner = true;
     String banner =
             "- - . -  / - . .  / . - . . \n" +  // morse code for Q D L
-            "(  ___  )(  __  \\ ( \\      \n" +
-            "| (   ) || (  \\  )| (      \n" +
-            "| |   | || |   | || |      \n" +
-            "| | /\\| || |   ) || |      \n" +
-            "| (_\\ \\ || (__/  )| (____/\\\n" +
-            "(____\\/_)(______/ (_______/\n" +
-            "- - . -  / - . .  / . - . . ";
+                    "(  ___  )(  __  \\ ( \\      \n" +
+                    "| (   ) || (  \\  )| (      \n" +
+                    "| |   | || |   | || |      \n" +
+                    "| | /\\| || |   ) || |      \n" +
+                    "| (_\\ \\ || (__/  )| (____/\\\n" +
+                    "(____\\/_)(______/ (_______/\n" +
+                    "- - . -  / - . .  / . - . . ";
 
     protected void showRunHelp() {
         say("This is the QDL (pronounced 'quiddle') workspace.");
@@ -151,7 +152,7 @@ public class WorkspaceCommands implements Logable {
             case MODULES_COMMAND:
                 return doModulesCommand(inputLine);
             case OFF_COMMAND:
-                if(inputLine.hasArg("y")){
+                if (inputLine.hasArg("y")) {
                     return RC_EXIT_NOW;
                 }
                 if (readline("Do you want to exit? (y/n)").equals("y")) {
@@ -697,7 +698,7 @@ public class WorkspaceCommands implements Logable {
 
     protected int doFuncsList(InputLine inputLine) {
         String regex = null;
-        if(FIRST_ARG_INDEX < inputLine.size()){
+        if (FIRST_ARG_INDEX < inputLine.size()) {
             regex = inputLine.getArg(FIRST_ARG_INDEX);
         }
         String funs = getState().listFunctions(regex).toString().trim();
@@ -817,7 +818,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     String makeColumn(String spaces, String text) {
-        if (spaces.length() < text.length()){
+        if (spaces.length() < text.length()) {
             return text;
         }
         return text + spaces.substring(0, spaces.length() - text.length());
@@ -1014,6 +1015,7 @@ public class WorkspaceCommands implements Logable {
     public static final String CLA_VERBOSE_ON = "-v";
     public static final String CLA_NO_BANNER = "-noBanner";
     public static final String CLA_DEBUG_ON = "-debug";
+    public static final String CLA_RUN_SCRIPT_ON = "-run";
 
     protected File resolveAgainstRoot(String file) {
         File f = new File(file);
@@ -1035,7 +1037,10 @@ public class WorkspaceCommands implements Logable {
 
         QDLEnvironment qe = loader.load();
         setEchoModeOn(qe.isEchoModeOn());
-
+        isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
+        if (isRunScript) {
+            runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
+        }
         boolean isVerbose = qe.isWSVerboseOn();
         showBanner = qe.isShowBanner();
         logger = qe.getMyLogger();
@@ -1058,7 +1063,9 @@ public class WorkspaceCommands implements Logable {
             // set some useful things.
             env.put("qdl_root", rootDir.getAbsolutePath());
         }
-        splashScreen();
+        if(!isRunScript()) {
+            splashScreen();
+        }
         QDLConfigurationLoaderUtils.setupVFS(qe, getState());
 
         setEchoModeOn(qe.isEchoModeOn());
@@ -1086,8 +1093,8 @@ public class WorkspaceCommands implements Logable {
         }
         interpreter = new QDLParser(env, getState());
         interpreter.setEchoModeOn(qe.isEchoModeOn());
-     //   interpreter.setDebugOn(true);
-
+        //   interpreter.setDebugOn(true);
+      runScript(); // run any script if that mode is enabled.
     }
 
     /**
@@ -1105,6 +1112,13 @@ public class WorkspaceCommands implements Logable {
         fromCommandLine(inputLine);
     }
 
+    public boolean isRunScript() {
+        return isRunScript;
+    }
+
+    boolean isRunScript = false;
+    String runScriptPath = null;
+
     protected void fromCommandLine(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON);
         if (isVerbose) {
@@ -1113,6 +1127,10 @@ public class WorkspaceCommands implements Logable {
         boolean isDebug = inputLine.hasArg(CLA_DEBUG_ON);
         if (isDebug) {
             say("Debug mode enabled.");
+        }
+        isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
+        if (isRunScript) {
+            runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
         }
         showBanner = !inputLine.hasArg(CLA_NO_BANNER);
         State state = getState();
@@ -1158,7 +1176,10 @@ public class WorkspaceCommands implements Logable {
         }
         logger = loggerProvider.get();
         // Do the splash screen here so any messages from a boot script are obvious.
-        splashScreen();
+        if (!isRunScript()) {
+            // But no screen of any sort if running a single script.
+            splashScreen();
+        }
 
         if (inputLine.hasArg(CLA_EXTENSIONS)) {
             // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl"
@@ -1210,6 +1231,22 @@ public class WorkspaceCommands implements Logable {
                     t.printStackTrace();
                 }
                 say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
+            }
+        }
+        runScript(); // If there is a script, run it.
+    }
+
+    private void runScript() {
+        if (isRunScript) {
+            try {
+                String runScript = FileUtil.readFileAsString(runScriptPath);
+                if (runScript != null && !runScript.isEmpty()) {
+                    interpreter.execute(runScript);
+                    System.exit(0); // make sure to use this so external programs (like shell scripts) know all is ok
+                }
+            } catch (Throwable t) {
+                say("Error executing script \"" + runScriptPath + "\".");
+                System.exit(1); // So external prgrams can tell that something didn't work right.
             }
         }
     }

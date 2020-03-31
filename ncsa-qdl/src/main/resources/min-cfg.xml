@@ -1,0 +1,27 @@
+<config>
+    <qdl name="default" alias="minimum"/>
+    <!--
+    Most minimal configuration possible: nothing. This uses the current directory as
+    the root. Not great. Look at the one called example for more ideas and be sure to read
+    the documentation on the main website: https://cilogon.github.io/qdl/docs/qdl_configuration.pdf
+    -->
+    <qdl name="default" />
+    <!-- A more complete example. Set your root directory properly -->
+    <qdl name="example"
+             enabled="true"
+             server_mode="false">
+        <workspace verbose="true"
+                   echoModeOn="true">
+            <home_dir>/home/ncsa/dev/qdl</home_dir>
+            <env>etc/qdl.properties</env>
+        </workspace>
+        <logging
+                logFileName="log/qdl.log"
+                logName="qdl"
+                logSize="100000"
+                logFileCount="2"
+                debug="false"/>
+
+    </qdl>
+
+</config>

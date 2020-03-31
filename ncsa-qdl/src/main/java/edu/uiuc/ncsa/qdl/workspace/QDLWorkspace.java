@@ -137,7 +137,9 @@ public class QDLWorkspace {
         InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
         WorkspaceCommands workspaceCommands = new WorkspaceCommands();
         workspaceCommands.init(argLine);
-
+        if(workspaceCommands.isRunScript()){
+            return;
+        }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
 
         qc.run(new InputLine(new Vector()));
