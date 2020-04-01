@@ -1,5 +1,4 @@
 <config>
-    <qdl name="default" alias="minimum"/>
     <!--
     Most minimal configuration possible: nothing. This uses the current directory as
     the root. Not great. Look at the one called example for more ideas and be sure to read

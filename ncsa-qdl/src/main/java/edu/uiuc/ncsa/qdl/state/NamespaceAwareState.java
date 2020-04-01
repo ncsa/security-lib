@@ -34,7 +34,7 @@ public abstract class NamespaceAwareState extends AbstractState {
     }
 
     /**
-     * Takes any name -- variable or function -- and looks for the NS delimiter, returning a module if there
+     * Takes any function and looks for the NS delimiter, returning a module if there
      * is one.
      *
      * @param rawName
@@ -45,11 +45,11 @@ public abstract class NamespaceAwareState extends AbstractState {
         if (alias == null || alias.isEmpty()) {
             throw new UnknownSymbolException(("Internal error: The alias has not set"));
         }
-        if (!getImportedModules().hasAlias(alias)) {
+        if (!getImportManager().hasAlias(alias)) {
             throw new UnknownSymbolException("Error: No such alias exists");
         }
-        URI moduleURI = getImportedModules().getByAlias(alias);
-        return getModuleMap().get(moduleURI);
+        return getImportedModules().get(alias);
+
     }
 
     public boolean isNSQname(String x) {
@@ -81,19 +81,19 @@ public abstract class NamespaceAwareState extends AbstractState {
         if (isNSQname(x) || isNSQLocalName(x)) return;
         // so it has no qualification.
         if (isNSQname(x)) {
-            if (getImportedModules().hasImports()) {
+            if (getImportManager().hasImports()) {
                 return;
             } else {
                 throw new ImportException("Error: The variable \"" + x + "\" is qualified but no modules have been imported.");
             }
         }
-        if(!getImportedModules().hasImports()){
+        if (!getImportManager().hasImports()) {
             // no imports mean no clashes.
             return;
         }
         // so we look at all imported modules for the name.
         boolean isFound = getSymbolStack().isDefined(x);
-        for (URI uri : importedModules.keySet()) {
+        for (URI uri : importManager.keySet()) {
             Module mm = getModuleMap().get(uri);
             if (mm != null) {
                 boolean y = mm.getState().isDefined(x);

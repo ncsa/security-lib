@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
-import edu.uiuc.ncsa.security.core.util.DoubleHashMap;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Set;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Keeps imported namespaces and their aliases. It is assumed that both of these are unique.
@@ -36,7 +36,7 @@ public class ImportManager implements Serializable {
     public void addImport(URI moduleName, String alias) {
         checkAlias(alias);
         // If there is already an entry, overwrite it in case the alias changed.
-        map.put(moduleName, alias);
+        surjection.put(alias,moduleName);
     }
 
     public ImportManager() {
@@ -62,29 +62,29 @@ public class ImportManager implements Serializable {
     static ImportManager resolver;
 
     public boolean hasImports() {
-        return !map.isEmpty();
+        return !surjection.isEmpty();
     }
 
-    protected DoubleHashMap<URI, String> map = new DoubleHashMap<>();
+    protected Surjection<String,URI> surjection = new Surjection<>();
 
 
     public URI getByAlias(String alias) {
-        return map.getByValue(alias);
+        return surjection.get(alias);
     }
 
-    public String getAlias(URI namespace) {
-        return map.get(namespace);
+    public List<String> getAlias(URI namespace) {
+        return surjection.getByURI(namespace);
     }
 
     public boolean hasAlias(String alias) {
-        return map.getByValue(alias) != null;
+        return surjection.containsKey(alias);
     }
 
     public void remove(URI namespace) {
-        map.remove(namespace);
+        surjection.remove(namespace);
     }
 
-    public Set<URI> keySet() {
-        return map.keySet();
+    public Collection<URI> keySet() {
+        return surjection.values();
     }
 }

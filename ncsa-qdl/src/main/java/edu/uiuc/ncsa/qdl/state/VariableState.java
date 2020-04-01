@@ -154,7 +154,7 @@ public abstract class VariableState extends NamespaceAwareState {
             // easy case. Everything is qualified
             isNSQ = true;
             variableName = getFQName(w.name);
-            uri = importedModules.getByAlias(getAlias(w.name));
+            uri = importManager.getByAlias(getAlias(w.name));
             stem = (StemVariable) getModuleMap().get(uri).getState().getSymbolStack().resolveValue(variableName);
         } else {
             // Local variables. Remove lead # if needed.
@@ -167,8 +167,8 @@ public abstract class VariableState extends NamespaceAwareState {
             // most likely place for it was in the main symbol table. But since there is
             // no name clash, look for it in the modules.
             if (stem == null) {
-                if (importedModules.hasImports()) {
-                    for (URI key : importedModules.keySet()) {
+                if (importManager.hasImports()) {
+                    for (URI key : importManager.keySet()) {
                         Module m = getModuleMap().get(key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
@@ -240,15 +240,15 @@ public abstract class VariableState extends NamespaceAwareState {
         checkNSClash(variableName); // just check first since its quick
         if (isNSQname(variableName)) {
             // get the module, hand back the value.
-            URI uri = importedModules.getByAlias(getAlias(variableName));
+            Module module = getImportedModules().get(getAlias(variableName));
             switch (op) {
                 case OP_GET:
-                    return getModuleMap().get(uri).getState().getValue(getFQName(variableName));
+                    return module.getState().getValue(getFQName(variableName));
                 case OP_SET:
-                    getModuleMap().get(uri).getState().setValue(getFQName(variableName), value);
+                    module.getState().setValue(getFQName(variableName), value);
                     return null;
                 case OP_REMOVE:
-                    getModuleMap().get(uri).getState().resolveStemIndex(getFQName(variableName));
+                    module.getState().resolveStemIndex(getFQName(variableName));
 
             }
             return null;
@@ -260,9 +260,9 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = getSymbolStack().getRightST(variableName);
         Object v = st.resolveValue(variableName);
         if (v == null) {
-            if (importedModules.hasImports()) {
-                for (URI key : importedModules.keySet()) {
-                    Module m = getModuleMap().get(key);
+            if (!getImportedModules().isEmpty()) {
+                for (String key : getImportedModules().keySet()) {
+                    Module m = getImportedModules().get(key);
                     if (m != null) {
                         Object obj = m.getState().getValue(variableName);
                         if (obj != null) {
@@ -329,10 +329,10 @@ public abstract class VariableState extends NamespaceAwareState {
 
     public TreeSet<String> listVariables() {
         TreeSet<String> out = getSymbolStack().listVariables();
-        for (URI key : getImportedModules().keySet()) {
+        for (URI key : getImportManager().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listVariables();
             for (String x : uqVars) {
-                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;

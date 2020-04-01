@@ -567,11 +567,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doModuleImports(InputLine inputLine) {
-        if (!state.getImportedModules().hasImports()) {
+        if (!state.getImportManager().hasImports()) {
             say("(no imports)");
         } else {
-            for (URI uri : state.getImportedModules().keySet()) {
-                say(uri + " = " + state.getImportedModules().getAlias(uri));
+            for (URI uri : state.getImportManager().keySet()) {
+                say(uri + " = " + state.getImportManager().getAlias(uri));
             }
         }
         return RC_CONTINUE;
@@ -579,8 +579,8 @@ public class WorkspaceCommands implements Logable {
 
     private int doModulesList(InputLine inputLine) {
         TreeSet<String> m = new TreeSet<>();
-        for (URI key : getState().getModuleMap().keySet()) {
-            m.add(key + " = " + getState().getModuleMap().get(key).getAlias());
+        for (URI key : getState().getImportManager().keySet()) {
+            m.add(key + " = " + getState().getImportManager().getAlias(key));
         }
         String modules = m.toString();
         modules = modules.substring(1); // chop off lead [
@@ -797,6 +797,10 @@ public class WorkspaceCommands implements Logable {
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
             case "vfs":
+                if(state.getVfsFileProviders().isEmpty()){
+                    say("No installed virtual file systems");
+                    return RC_CONTINUE;
+                }
                 say("Installed virtual file systems");
                 String indent = "                           "; // 25 blanks
                 String shortSpaces = "           "; // 12 blanks
@@ -998,7 +1002,7 @@ public class WorkspaceCommands implements Logable {
         for (Module m : loader.load()) {
             state.addModule(m); // done!
             if (importASAP) {
-                state.getImportedModules().addImport(m.getNamespace(), m.getAlias());
+                state.getImportManager().addImport(m.getNamespace(), m.getAlias());
             }
         }
     }
@@ -1033,6 +1037,11 @@ public class WorkspaceCommands implements Logable {
         ConfigurationNode node = ConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
+         if(inputLine.hasArg("-home_dir")){
+             // The user might set the home directory here.
+             // This is overridden by the configuration file.
+             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
+         }
         QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
 
         QDLEnvironment qe = loader.load();
@@ -1047,22 +1056,26 @@ public class WorkspaceCommands implements Logable {
         if (!qe.getWSHomeDir().isEmpty()) {
             rootDir = new File(qe.getWSHomeDir());
         } else {
-            String currentDirectory = System.getProperty("user.dir");
-            rootDir = new File(inputLine.getNextArgFor(currentDirectory));
+            if(rootDir == null) {
+                // So no home directory was set on the command line either. Use the invocation directory
+                String currentDirectory = System.getProperty("user.dir");
+                rootDir = new File(inputLine.getNextArgFor(currentDirectory));
+            }
         }
         State state = getState(); // This sets it for the class it will be  put in the interpreter below.
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
+        env = new XProperties();
+
         if (!qe.getWSEnv().isEmpty()) {
             // try and see if the file resolves first.
             envFile = resolveAgainstRoot(qe.getWSEnv());
-            env = new XProperties();
 
             if (envFile.exists()) {
                 env.load(envFile);
             }
             // set some useful things.
-            env.put("qdl_root", rootDir.getAbsolutePath());
         }
+        env.put("home_dir", rootDir.getAbsolutePath());
         if(!isRunScript()) {
             splashScreen();
         }
@@ -1251,7 +1264,7 @@ public class WorkspaceCommands implements Logable {
         }
     }
 
-    File rootDir;
+    File rootDir = null;
 
     protected BufferedReader getBufferedReader() {
         if (bufferedReader == null) {

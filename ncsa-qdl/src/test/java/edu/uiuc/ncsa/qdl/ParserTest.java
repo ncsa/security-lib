@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -385,8 +385,8 @@ public class ParserTest extends TestBase {
 
     /**
      * Identical setup to {@link #testCalledFunctions()} but puts g and h into modules which are then imported
-     * outside the function and called. This should <b>FAIL</b> since imports are not visible to
-     * the function.
+     * outside the function and called. g is defined outside the module.
+     * This should <b>FAIL</b> since there are multiple definitions of g
      *
      * @throws Throwable
      */
@@ -407,6 +407,7 @@ public class ParserTest extends TestBase {
         String f_xy = "define[f(x,y)]body[return(" + f_body + ");];";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
+        addLine(script, g_x);
         addLine(script, g_module);
         addLine(script, h_module);
         addLine(script, import_g);
@@ -423,8 +424,9 @@ public class ParserTest extends TestBase {
         addLine(script, "z := f(x,y);");
         try {
             interpreter.execute(script.toString());
+            System.out.println( state.getValue("z"));
             assert false : "Was able to access imported functions inside another function without importing it";
-        } catch (UndefinedFunctionException ufx) {
+        } catch (ImportException ufx) {
             assert true;
         }
 
@@ -480,15 +482,33 @@ public class ParserTest extends TestBase {
     }
 
     /**
-     * Identical setup to {@link #testCalledFunctions()} but puts g and h into modules which are then imported
-     * <b>inside</b> the function.
+     * Import the same module several times and show that the state of each
+     * is kept separate.
      *
      * @throws Throwable
      */
     @Test
-    public void testFunctionAndModules2() throws Throwable {
-
+    public void testMultipleModuleImport() throws Throwable {
+        String g_x = "define[g(x)]body[return(x+1);];";
+        String h_y = "define[h(y)]body[return(y-1);];";
+        String g_module = "module['a:a','a']body[q:=2;w:=3;" + g_x + h_y + "];";
+        String import_g = "import('a:a');";
+        String import_g1 = "import('a:a', 'b');";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, g_module);
+        addLine(script, import_g);
+        addLine(script, import_g1);
+        addLine(script, "a#q:=10;");
+        addLine(script, "b#q:=11;");
+        // It will ingest the function fine. It is attempting to use it later that will cause the error
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("a#q").equals(10L);
+        assert state.getValue("b#q").equals(11L);
     }
+
+
 
     /**
      * We test the Fibonacci continued (partial) fraction
@@ -1076,5 +1096,64 @@ public class ParserTest extends TestBase {
         }
     }
 
+    /**
+     * Create a module, then import it to another module. The variables should be resolvable transitively
+     * and the states should all be separate.
+     * @throws Throwable
+     */
+    @Test
+    public void testNestedVariableImport() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/a','a']body[q:=1;];");
+        addLine(script, "import('a:/a');");
+        addLine(script, "import('a:/a','b');");
+        addLine(script, "module['q:/q','w']body[import('a:/a');zz:=a#q+2;];");
+        addLine(script, "a#q:=10;");
+        addLine(script, "b#q:=11;");
+        // Make sure that some of the state has changed to detect state management issues.
+        addLine(script, "import('q:/q');");
+        addLine(script, "w#a#q:=3;");
+        State state = testUtils.getNewState();
 
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("a#q").equals(10L);
+        assert state.getValue("b#q").equals(11L);
+        assert state.getValue("w#a#q").equals(3L);
+
+    }
+      /*
+      Define a function then define variants in modules.  Values are checked to track whether the state
+      gets corrupted. This can be put into a QDL workspace to check manually
+      
+          define[f(x)]body[return(x+100);];
+          module['a:/t','a']body[define[f(x)]body[return(x+1);];];
+          module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
+          import('q:/z');
+          w#a#f(3)
+          w#g(2)
+       */
+    @Test
+    public void testNestedFunctionImport() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[f(x)]body[return(x+100);];");
+        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
+        addLine(script, "module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
+        addLine(script, "test_f:=f(1);");
+        addLine(script, "import('a:/t');");
+        addLine(script, "test_a:=a#f(1);");
+        // Make sure that some of the state has changed to detect state management issues.
+        addLine(script, "import('q:/z');");
+        addLine(script, "test_waf := w#a#f(2);");
+        addLine(script, "test_wg := w#g(2);");
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("test_f").equals(101L);
+        assert state.getValue("test_a").equals(2L);
+        assert state.getValue("test_waf").equals(3L);
+        assert state.getValue("test_wg").equals(6L);
+
+    }
 }

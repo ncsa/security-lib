@@ -25,6 +25,7 @@ cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/target/classes/edu/uiuc/ncsa/qd
 
 # Now make the directories
 mkdir "bin"
+cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/scripts/qdl bin
 mkdir "docs"
 cp /home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs/*.pdf docs
 mkdir "etc"
@@ -36,4 +37,4 @@ mkdir "lib/cp"
 mkdir "var"
 mkdir "var/ws"
 # jar cmf manifest-file jar-file input-files
-jar cmf installer.mf install.jar edu/uiuc/ncsa/qdl/install/Installer.class lib "version.txt" bin etc  docs
+jar cmf installer.mf install.jar edu/uiuc/ncsa/qdl/install/Installer.class "version.txt" bin docs etc lib log var

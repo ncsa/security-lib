@@ -2,9 +2,13 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This helps us organize the functionality of the state object. There are
@@ -18,19 +22,18 @@ import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 public abstract class AbstractState implements StateInterface {
     private static final long serialversionUID = 129348937L;
 
-    public AbstractState(ImportManager importedModules,
+    public AbstractState(ImportManager importManager,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FunctionTable functionTable,
                          ModuleMap moduleMap) {
-        this.importedModules = importedModules;
+        this.importManager = importManager;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.moduleMap = moduleMap;
         this.functionTable = functionTable;
-        //metaEvaluator.addFunctionTable(functionTable);
     }
 
     public FunctionTable getFunctionTable() {
@@ -46,26 +49,45 @@ public abstract class AbstractState implements StateInterface {
     public ModuleMap getModuleMap() {
         return moduleMap;
     }
-
+    /*
+    How's it work?
+    ModuleMap has the templates keyed by uri.
+    ImportedModules has instances from the ModuleMap with their own state, keyed by alias
+    ImportManager lets us look up which alias goes with which MS without having to slog through all the modules
+     */
     public void setModuleMap(ModuleMap moduleMap) {
         this.moduleMap = moduleMap;
     }
 
     protected ModuleMap moduleMap;
-    ImportManager importedModules;
+    ImportManager importManager;
 
-    public ImportManager getImportedModules() {
-        return importedModules;
+    public ImportManager getImportManager() {
+        return importManager;
     }
 
-    public void setImportedModules(ImportManager importedModules) {
-        this.importedModules = importedModules;
+    public void setImportManager(ImportManager importManager) {
+        this.importManager = importManager;
     }
 
     public SymbolStack getSymbolStack() {
         return symbolStack;
 
     }
+
+    /**
+     * Modules (with their state) that have been imported and are keyed by alias.
+     * @return
+     */
+    public Map<String, Module> getImportedModules() {
+        return importedModules;
+    }
+
+    public void setImportedModules(Map<String, Module> importedModules) {
+        this.importedModules = importedModules;
+    }
+
+    Map<String, Module> importedModules = new HashMap<>();
 
     public void setSymbolStack(SymbolStack symbolStack) {
         this.symbolStack = symbolStack;

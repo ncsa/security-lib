@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
@@ -49,72 +50,89 @@ public abstract class FunctionState extends VariableState {
     }
 
     public FR_WithState resolveFunction(String name, int argCount) {
-         FR_WithState frs = new FR_WithState();
-         if (name == null || name.isEmpty()) {
-             throw new NFWException(("Internal error: The function has not been named"));
-         }
+        FR_WithState frs = new FR_WithState();
+        if (name == null || name.isEmpty()) {
+            throw new NFWException(("Internal error: The function has not been named"));
+        }
 
-         if (name.contains(NS_DELIMITER)) {
-             if (name.startsWith(NS_DELIMITER)) {
-                 // case is that it is directly qualified for the top leve. Check it, return what is there.
-                 frs.functionRecord = getFunctionTable().get(name.substring(1), argCount);
-                 frs.state = this;
-                 return frs;
-             }
-             String resolvedName = name.substring(name.indexOf(NS_DELIMITER) + 1);
-             Module module = resolveRawNameToModule(name);
-             if (argCount == -1) {
-                 frs.functionRecord = module.getState().getFunctionTable().getSomeFunction(resolvedName);
-             } else {
-                 frs.functionRecord = module.getState().getFunctionTable().get(resolvedName, argCount);
-             }
-             frs.state = module.getState();
-             frs.isExternalModule = module.isExternal();
-             return frs;
+        if (name.contains(NS_DELIMITER)) {
+            if (name.startsWith(NS_DELIMITER)) {
+                // case is that it is directly qualified for the top leve. Check it, return what is there.
+                frs.functionRecord = getFunctionTable().get(name.substring(1), argCount);
+                frs.state = this;
+                return frs;
+            }
+            StringTokenizer st = new StringTokenizer(name, NS_DELIMITER);
+            ArrayList<String> arrayList = new ArrayList<>();
+            while (st.hasMoreTokens()) {
+                arrayList.add(st.nextToken());
+            }
+            String resolvedName = arrayList.get(arrayList.size() - 1);// last one is name
+            arrayList.remove(arrayList.size() - 1); // remove it
+
+            Module currentModule = getImportedModules().get(arrayList.get(0));// there is at least one.
+            arrayList.remove(0);
+            Module nextModule = null;
+            for (String aa : arrayList) {
+                nextModule = currentModule.getState().getImportedModules().get(aa);
+                currentModule = nextModule;
+            }
+
+            Module module = currentModule;
 
 
-         } else {
-             if (!getImportedModules().hasImports()) {
-                 // Nothing imported, so nothing to look through.
-                 frs.state = this;
-                 if (argCount == -1) {
-                     frs.functionRecord = getFunctionTable().getSomeFunction(name);
-                 } else {
-                     frs.functionRecord = getFunctionTable().get(name, argCount);
-                 }
-                 return frs;
-             }
-             // check for unqualified names.
-             FR_WithState fr = new FR_WithState();
-             fr.functionRecord = getFunctionTable().get(name, argCount);
+            if (argCount == -1) {
+                frs.functionRecord = module.getState().getFunctionTable().getSomeFunction(resolvedName);
+            } else {
+                frs.functionRecord = module.getState().getFunctionTable().get(resolvedName, argCount);
+            }
+            frs.state = module.getState();
+            frs.isExternalModule = module.isExternal();
+            return frs;
 
-             fr.state = this;
-             for (URI ns : moduleMap.keySet()) {
-                 if (fr.functionRecord == null) {
-                     FunctionRecord tempFR = moduleMap.get(ns).getState().getFunctionTable().get(name, argCount);
-                     fr.functionRecord = tempFR;
-                     fr.state = moduleMap.get(ns).getState();
-                     fr.isExternalModule = moduleMap.get(ns).isExternal();
-                 } else {
-                     FunctionRecord tempFR = moduleMap.get(ns).getState().getFunctionTable().get(name, argCount);
-                     if (tempFR != null) {
-                         throw new ImportException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
-                     }
-                 }
-             }
-             if(fr.functionRecord == null){
-                 throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount==1?".":"s."));
-             }
-             return fr;
-         }
-     } // )load module_example.qdl
+
+        } else {
+            if (!getImportManager().hasImports()) {
+                // Nothing imported, so nothing to look through.
+                frs.state = this;
+                if (argCount == -1) {
+                    frs.functionRecord = getFunctionTable().getSomeFunction(name);
+                } else {
+                    frs.functionRecord = getFunctionTable().get(name, argCount);
+                }
+                return frs;
+            }
+            // check for unqualified names.
+            FR_WithState fr = new FR_WithState();
+            fr.functionRecord = getFunctionTable().get(name, argCount);
+
+            fr.state = this;
+            for (String alias : getImportedModules().keySet()) {
+                if (fr.functionRecord == null) {
+                    FunctionRecord tempFR = getImportedModules().get(alias).getState().getFunctionTable().get(name, argCount);
+                    fr.functionRecord = tempFR;
+                    fr.state = getImportedModules().get(alias).getState();
+                    fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                } else {
+                    FunctionRecord tempFR = importedModules.get(alias).getState().getFunctionTable().get(name, argCount);
+                    if (tempFR != null) {
+                        throw new ImportException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
+                    }
+                }
+            }
+            if (fr.functionRecord == null) {
+                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
+            }
+            return fr;
+        }
+    } // )load module_example.qdl
 
     public TreeSet<String> listFunctions(String regex) {
         TreeSet<String> out = getFunctionTable().listFunctions(regex);
-        for (URI key : getImportedModules().keySet()) {
+        for (URI key : getImportManager().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions(regex);
             for (String x : uqVars) {
-                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;
@@ -122,10 +140,10 @@ public abstract class FunctionState extends VariableState {
 
     public List<String> listDocumentation() {
         List<String> out = getFunctionTable().listDoxx();
-        for (URI key : getImportedModules().keySet()) {
+        for (URI key : getImportManager().keySet()) {
             List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();
             for (String x : uqVars) {
-                out.add(getImportedModules().getAlias(key) + NS_DELIMITER + x);
+                out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
             }
         }
         return out;
@@ -143,11 +161,11 @@ public abstract class FunctionState extends VariableState {
                 }
                 return out;
             }
-            if (!importedModules.hasAlias(alias)) {
+            if (!importManager.hasAlias(alias)) {
                 // so they asked for something that didn't exist
                 return new ArrayList<>();
             }
-            URI ns = importedModules.getByAlias(alias);
+            URI ns = importManager.getByAlias(alias);
             List<String> docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
             if (docs == null) {
                 return new ArrayList<>();
@@ -157,7 +175,7 @@ public abstract class FunctionState extends VariableState {
 
         }
         // No imports, not qualified, hand back whatever we have
-        if (!importedModules.hasImports()) {
+        if (!importManager.hasImports()) {
             List<String> out = getFunctionTable().getDocumentation(fname, argCount);
             if (out == null) {
                 return new ArrayList<>();
@@ -169,9 +187,9 @@ public abstract class FunctionState extends VariableState {
         if (out == null) {
             out = new ArrayList<>();
         }
-        for (URI key : getImportedModules().keySet()) {
+        for (URI key : getImportManager().keySet()) {
             if (getModuleMap().get(key).getState().getFunctionTable().get(fname, argCount) != null) {
-                String caput = getImportedModules().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
+                String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
 
                 List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
                         argCount);

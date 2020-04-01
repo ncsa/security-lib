@@ -2,7 +2,9 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
@@ -14,6 +16,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -323,7 +326,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             polyad.setResult(Boolean.FALSE);
             polyad.setEvaluated(true);
-            //throw new GeneralException("Error: could not load file \"" + arg + "\"", t);
         }
     }
 
@@ -342,39 +344,60 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         Object arg = polyad.evalArg(0, state);
         if (arg == null) {
-            throw new MissingArgumentException("Error: You must supply a module name to import.");
+            throw new MissingArgumentException("Error: You must supply at least the module namespace to import.");
         }
-        String alias = null;
-        if (polyad.getArgumments().size() == 2) {
-            Object arg2 = polyad.evalArg(1, state);
-            if (arg2 == null || !isString(arg2)) {
-                throw new MissingArgumentException("Error: You must supply a valid alias import.");
-            }
-            alias = arg2.toString();
-        }
+        URI moduleNS = null;
 
-        URI moduleName = null;
         try {
-            moduleName = URI.create(arg.toString());
+            moduleNS = URI.create(arg.toString());
         } catch (Throwable t) {
             polyad.setResult(null);
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(false);
             throw new QDLException("Error: the module name must be a uri");
         }
+        Module m = state.getModuleMap().get(moduleNS);
 
-        if (!state.getModuleMap().containsKey(moduleName)) {
-            throw new ImportException("Error: module \"" + moduleName + "\" not found. You must load it before importing it.");
-        }
-        Module module = state.getModuleMap().get(moduleName);
+        if(m==null){
+                  throw new IllegalStateException("Error: no such module \"" + moduleNS + "\"");
+              }
+        String alias = null;
+        Module newInstance = null;
 
-        ImportManager resolver = state.getImportedModules();
-        if (alias == null) {
-            // No alias specified, so just import it with its default alias.
-            resolver.addImport(moduleName, module.getAlias());
-        } else {
-            resolver.addImport(moduleName, alias);
+        if(m instanceof QDLModule){
+            State moduleState = state.newModuleState();
+            QDLParser p = new QDLParser(new XProperties(), moduleState);
+            try {
+                p.execute(((QDLModule)m).getModuleStatement().getSourceCode());
+                 newInstance = moduleState.getModuleMap().get(moduleNS);
+
+            } catch (Throwable throwable) {
+                if(throwable instanceof RuntimeException){
+                    throw (RuntimeException)throwable;
+                }
+                throw new QDLException("Error: Could not create module:" + throwable.getMessage(), throwable);
+            }
+
         }
+        if(m instanceof JavaModule){
+            throw new NotImplementedException("Implement me!");
+        }
+        if (polyad.getArgumments().size() == 2) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (arg2 == null || !isString(arg2)) {
+                throw new MissingArgumentException("Error: You must supply a valid alias import.");
+            }
+            alias = arg2.toString();
+        }else{
+            // no new alias supplied, so use the default in the module definition.
+
+            alias = m.getAlias();
+        }
+
+      
+        ImportManager resolver = state.getImportManager();
+        resolver.addImport(moduleNS, alias);
+        state.getImportedModules().put(alias, newInstance);
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
@@ -387,7 +410,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     "This requires a single argument that is a string or a list of them.");
         }
         Object result = polyad.evalArg(0, state);
-        ;
         StemVariable stem = null;
 
         if (isString(result)) {

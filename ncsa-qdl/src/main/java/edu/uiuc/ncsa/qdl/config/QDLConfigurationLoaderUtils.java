@@ -189,7 +189,7 @@ public class QDLConfigurationLoaderUtils {
         for (Module m : loader.load()) {
             state.addModule(m); // done!
             if (importASAP) {
-                state.getImportedModules().addImport(m.getNamespace(), m.getAlias());
+                state.getImportManager().addImport(m.getNamespace(), m.getAlias());
             }
         }
     }

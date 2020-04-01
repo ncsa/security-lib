@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
-import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -766,7 +766,7 @@ public class QDLListener implements QDLParserListener {
     }
 
     boolean isModule = false;
-    Module currentModule = null;
+    QDLModule currentModule = null;
     ModuleStatement moduleStatement = null;
 
     @Override
@@ -783,7 +783,7 @@ public class QDLListener implements QDLParserListener {
 
         isModule = true;
         State localState = state.newModuleState();
-        currentModule = new Module();
+        currentModule = new QDLModule();
         currentModule.setState(localState);
         moduleStatement.setLocalState(localState);
         // keep the top. level module but don't let the system try to turn anything else in to statements.
@@ -800,8 +800,7 @@ public class QDLListener implements QDLParserListener {
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
         currentModule.setNamespace(namespace);
         currentModule.setAlias(alias);
-        state.getModuleMap().put(currentModule);
-
+        state.getModuleMap().put(namespace, currentModule);
         for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
             // Issue is that resolving children as we do gets the function definitions.
             // that are in any define contexts. So if this is a define context,
@@ -817,7 +816,10 @@ public class QDLListener implements QDLParserListener {
             }
             //}
         }
-        moduleStatement.setSourceCode(moduleContext.getText());
+        // Parser strips off trailing ; which in turn causes a parser error later when we are runnign the import command.
+        moduleStatement.setSourceCode(moduleContext.getText() + (moduleContext.getText().endsWith(";")?"":";"));
+        currentModule.setModuleStatement(moduleStatement);
+
         parsingMap.endMark();
         parsingMap.rollback();
         parsingMap.clearMark();

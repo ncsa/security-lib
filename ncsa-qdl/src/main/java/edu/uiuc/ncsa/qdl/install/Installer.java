@@ -2,28 +2,30 @@ package edu.uiuc.ncsa.qdl.install;
 
 import java.io.*;
 import java.net.URI;
-import java.nio.file.FileSystem;
+import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.MAX_VALUE;
 
 /**
+ * really simple installer. This gets copied to your jar and will just copy everything in the jar to
+ * a given directory (including sub directories). So make the tree you want, jar it up with this
+ * and run it. This is a completely stand alone class because otherwise you have to manage dependencies
+ * for this installer program which can get out of hand. The idea is that this is lean.
  * <p>Created by Jeff Gaynor<br>
  * on 3/30/20 at  7:23 AM
  */
 public class Installer {
-    public static String[] allDirs = new String[]{"bin", "docs", "etc", "lib", "lib/cp", "var", "var/ws", "log"};
 
     public static void main(String[] args) {
         try {
-
-            // ==============
             Installer installer = new Installer();
-            installer.doIt();
+            installer.init();
             installer.copyFiles();
         } catch (Exception ex) {
             ex.printStackTrace(); //handle an exception here
@@ -32,42 +34,57 @@ public class Installer {
 
     protected void copyFiles() throws Exception {
 
-        URI uri = Installer.class.getResource("/lib").toURI(); // start with something we know is there
+        // Start with a path we know is there. Annoyingly this fails for "/".
+        URI uri = Installer.class.getResource("/lib").toURI();
         Path myPath;
         if (uri.getScheme().equals("jar")) {
-            System.out.println("got uri=" + uri);
             FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.<String, Object>emptyMap());
             myPath = fileSystem.getPath("/");
         } else {
             myPath = Paths.get(uri);
         }
 
-        System.out.println("myPath=" + myPath);
-
         Stream<Path> walk = Files.walk(myPath, MAX_VALUE);
         for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
             Path current = it.next();
+            // Omit the installer itself and the manifest for the jar. everything else gets copied.
             if (!current.startsWith("/edu/") && !current.startsWith("/META-INF/")) {
-                // so it's not a directory and not one of the installer files.
-                System.out.println("got file = " + current);
-                 String target = rootDir.getAbsolutePath() + current;
+                String cString = current.toString();
+                boolean isDir = cString.endsWith(File.separator); // best check if it is a directory.
+                String target = rootDir.getAbsolutePath() + current;
                 File f = new File(target);
-                System.out.println("   canonical path = " + f.getCanonicalPath());
-
-                 if(current.endsWith(File.separator)){
-                     System.out.println("   got directory");
-                 }else{
-                     System.out.println("   got file");
-                     f.getParentFile().mkdirs();
-
-                 }
-
+                if (isDir) {
+                    f.mkdirs();
+                } else {
+                    InputStream is = Installer.class.getResourceAsStream(cString); // start with something we know is there
+                    Files.copy(is, f.toPath());
+                }
+                if(cString.endsWith("bin/qdl")){
+                    doSetupExec(f);
+                }
             }
         }
 
     }
 
-    protected void doIt() throws Exception {
+    /**
+     * Read the executable file (the one they invoke to run QDL) and set the root directory in it,
+     * then set it to be executable.
+     * @param f
+     */
+    private void doSetupExec(File f) throws IOException {
+        List<String> lines = Files.readAllLines(f.toPath());
+        for(int i = 0; i < lines.size(); i++){
+            if(lines.get(i).startsWith("QDL_HOME")){
+                lines.set(i, "QDL_HOME=\"" + rootDir.getCanonicalPath() + "\"");
+                break;
+            }
+        }
+        Files.write(f.toPath(),lines, Charset.defaultCharset());
+        f.setExecutable(true);
+    }
+
+    protected void init() throws Exception {
         say("Welcome to the QDL the installer.");
         String lineIn = readline("Enter the target path. This is where QDL will be installed:");
         rootDir = new File(lineIn);
@@ -76,34 +93,11 @@ public class Installer {
             return;
         }
         rootDir.mkdirs();
-
-/*
-        InputStream inputStream = Installer.class.getResourceAsStream("/version.txt");
-        copy(inputStream, "version.txt");
-        inputStream = Installer.class.getResourceAsStream("/lib/qdl.jar");
-        copy(inputStream, "lib/qdl.jar");
-        inputStream = Installer.class.getResourceAsStream("/etc/qdl-cfg.xml");
-        copy(inputStream, "etc/qdl-cfg.xml");
-*/
-
     }
 
     File rootDir = null;
 
-    protected void mkdirs(File root) throws Exception {
-        say("making directories");
-        for (String x : allDirs) {
-            File f = new File(root, x);
-            f.mkdirs();
-        }
-        say("...done!");
-    }
 
-    protected void copy(InputStream inputStream, File targetFile) throws Exception {
-        FileOutputStream fileOutputStream = new FileOutputStream(targetFile);
-        Files.copy(inputStream, targetFile.toPath());
-
-    }
 
     protected BufferedReader getBufferedReader() {
         if (bufferedReader == null) {
@@ -127,19 +121,7 @@ public class Installer {
         System.out.println(x);
     }
 
-    /*
-    mkdir "bin"
-    mkdir "docs"
-    cp /home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs/*.pdf docs
-    mkdir "etc"
-    cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/min-cfg.xml etc/min-cfg.xml
-    mkdir "lib"
-    cp "$QDL_ROOT/target/qdl.jar" lib
-    mkdir "log"
-    mkdir "lib/cp"
-    mkdir "var"
-    mkdir "var/ws"
-     */
+
     protected HashMap<String, String> getFileList() {
         HashMap<String, String> fileList = new HashMap<>();
         //  fileList.put("")

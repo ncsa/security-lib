@@ -39,6 +39,9 @@ public class State extends FunctionState {
         this.serverMode = isServerMode;
     }
 
+
+
+
     public boolean isServerMode() {
         return serverMode;
     }
@@ -150,13 +153,14 @@ public class State extends FunctionState {
     public State newStateWithImports() {
         //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = new State(importedModules,
+        State newState = new State(importManager,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 getFunctionTable(),
                 getModuleMap(),
                 isServerMode());
+        newState.setImportedModules(getImportedModules());
         return newState;
     }
 
@@ -181,12 +185,15 @@ public class State extends FunctionState {
         return newState;
     }
 
-
+    /**
+     * Add the module under the default alias
+     * @param module
+     */
     public void addModule(Module module) {
         if (module instanceof JavaModule) {
             ((JavaModule) module).init(this.newModuleState());
         }
-        getModuleMap().put(module);
+        getModuleMap().put(module.getNamespace(), module);
 
     }
 

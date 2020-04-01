@@ -118,7 +118,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             throw new UndefinedFunctionException("Error: the function \"" + polyad.getName() + "\" with "
                     + polyad.getArgumments().size() + " arguments was not found.");
         }
-        State localState = frs.state.newStateNoImports();
+        State localState = (State) frs.state.newStateWithImports();
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getLocalST();
