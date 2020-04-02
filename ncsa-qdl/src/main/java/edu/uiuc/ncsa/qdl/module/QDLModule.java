@@ -1,6 +1,10 @@
 package edu.uiuc.ncsa.qdl.module;
 
+import edu.uiuc.ncsa.qdl.exceptions.ModuleInstantiationException;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -17,4 +21,18 @@ public class QDLModule extends Module {
     }
 
     ModuleStatement moduleStatement;
+
+    @Override
+    public Module newInstance(State state) {
+        QDLParser p = new QDLParser(new XProperties(), state);
+        try {
+            p.execute(getModuleStatement().getSourceCode());
+            return state.getModuleMap().get(getNamespace());
+        } catch (Throwable throwable) {
+            if (throwable instanceof RuntimeException) {
+                throw (RuntimeException) throwable;
+            }
+            throw new ModuleInstantiationException("Error: Could not create module:" + throwable.getMessage(), throwable);
+        }
+    }
 }

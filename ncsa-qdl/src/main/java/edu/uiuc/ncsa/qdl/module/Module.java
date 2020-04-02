@@ -10,7 +10,7 @@ import java.net.URI;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  11:03 AM
  */
-public class Module implements Serializable {
+public abstract class Module implements Serializable {
     /**
      * This returns true only if the module is from another language than a QDL module.
      * @return
@@ -77,4 +77,14 @@ public class Module implements Serializable {
                 ", alias='" + alias + '\'' +
                 '}';
     }
+
+    /**
+     * Modules are effectively templates. This passes in the state of the parser at the point a new
+     * module is required and the contract is to create a new instance of this module with the state.
+     * Note that the state passed in may have nothing to do with the state here. You are creating
+     * a new module for the given state using this as a template.
+     * @param state
+     * @return
+     */
+    public abstract Module newInstance(State state);
 }

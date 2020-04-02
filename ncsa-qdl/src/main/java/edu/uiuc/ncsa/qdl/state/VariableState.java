@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,13 +29,15 @@ public abstract class VariableState extends NamespaceAwareState {
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FunctionTable functionTable,
-                         ModuleMap moduleMap) {
+                         ModuleMap moduleMap,
+                         MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 functionTable,
-                moduleMap);
+                moduleMap,
+                myLoggingFacade);
     }
 
     /**

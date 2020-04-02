@@ -94,7 +94,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             argList[i] = polyad.getArgumments().get(i).evaluate(state);
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
-        Object result = qfr.qdlFunction.getInstance().evaluate(argList);
+        //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
+        Object result = qfr.qdlFunction.evaluate(argList);
         polyad.setResult(result);
         polyad.setEvaluated(true);
         polyad.setResultType(Constant.getType(result));

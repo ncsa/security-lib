@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.qdl.workspace;
 
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
@@ -27,12 +27,14 @@ public class QDLWorkspace {
 
     WorkspaceCommands workspaceCommands;
 
-
-    protected State getState() {
-        return workspaceCommands.getState();
-    }
+     protected MyLoggingFacade getLogger(){
+         return workspaceCommands.logger;
+     }
 
     protected void handleException(Throwable t) {
+        if (getLogger() != null) {
+            getLogger().error(t);
+        }
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
             workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn() ? t.getMessage() : "could not parse input"));
             return;
@@ -49,7 +51,11 @@ public class QDLWorkspace {
             workspaceCommands.say(t.getMessage());
             return;
         }
-        workspaceCommands.say("error: " + t.getMessage());
+        if (t.getMessage() == null) {
+            workspaceCommands.say("error!");
+        } else {
+            workspaceCommands.say("error: " + t.getMessage());
+        }
     }
 
 
@@ -137,7 +143,7 @@ public class QDLWorkspace {
         InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
         WorkspaceCommands workspaceCommands = new WorkspaceCommands();
         workspaceCommands.init(argLine);
-        if(workspaceCommands.isRunScript()){
+        if (workspaceCommands.isRunScript()) {
             return;
         }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);

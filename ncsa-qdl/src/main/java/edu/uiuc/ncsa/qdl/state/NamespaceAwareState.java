@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.net.URI;
 
@@ -24,13 +25,15 @@ public abstract class NamespaceAwareState extends AbstractState {
                                OpEvaluator opEvaluator,
                                MetaEvaluator metaEvaluator,
                                FunctionTable functionTable,
-                               ModuleMap moduleMap) {
+                               ModuleMap moduleMap,
+                               MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 functionTable,
-                moduleMap);
+                moduleMap,
+                myLoggingFacade);
     }
 
     /**

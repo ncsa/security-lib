@@ -68,7 +68,14 @@ public class StateUtils {
 
     public static void main(String[] args){
         try {
-            State state = new State(new ImportManager(), new SymbolStack(), new OpEvaluator(), new MetaEvaluator(), new FunctionTable(), new ModuleMap(), false);
+            State state = new State(new ImportManager(),
+                    new SymbolStack(),
+                    new OpEvaluator(),
+                    new MetaEvaluator(),
+                    new FunctionTable(),
+                    new ModuleMap(),
+                    null,
+                    false);
             state.setValue("foo", 42L);
             String b = saveb64(state);
             System.out.println("b = " + b);

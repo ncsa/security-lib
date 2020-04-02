@@ -49,7 +49,6 @@ public class WorkspaceCommands implements Logable {
 
     XProperties env;
 
-
     CommandLineTokenizer CLT = new CommandLineTokenizer();
     protected static final String FUNCS_COMMAND = ")funcs";
     protected static final String HELP_COMMAND = ")help"; // show various types of help
@@ -797,7 +796,7 @@ public class WorkspaceCommands implements Logable {
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
             case "vfs":
-                if(state.getVfsFileProviders().isEmpty()){
+                if (state.getVfsFileProviders().isEmpty()) {
                     say("No installed virtual file systems");
                     return RC_CONTINUE;
                 }
@@ -991,6 +990,7 @@ public class WorkspaceCommands implements Logable {
                     MetaEvaluator.getInstance(),
                     new FunctionTable(),
                     new ModuleMap(),
+                    logger,
                     false);// workspace is never in server mode
             // Experiment for a Java module
         }
@@ -1003,6 +1003,7 @@ public class WorkspaceCommands implements Logable {
             state.addModule(m); // done!
             if (importASAP) {
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
+                state.getImportedModules().put(m.getAlias(), m);
             }
         }
     }
@@ -1037,11 +1038,11 @@ public class WorkspaceCommands implements Logable {
         ConfigurationNode node = ConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
-         if(inputLine.hasArg("-home_dir")){
-             // The user might set the home directory here.
-             // This is overridden by the configuration file.
-             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
-         }
+        if (inputLine.hasArg("-home_dir")) {
+            // The user might set the home directory here.
+            // This is overridden by the configuration file.
+            rootDir = new File(inputLine.getNextArgFor("-home_dir"));
+        }
         QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
 
         QDLEnvironment qe = loader.load();
@@ -1056,7 +1057,7 @@ public class WorkspaceCommands implements Logable {
         if (!qe.getWSHomeDir().isEmpty()) {
             rootDir = new File(qe.getWSHomeDir());
         } else {
-            if(rootDir == null) {
+            if (rootDir == null) {
                 // So no home directory was set on the command line either. Use the invocation directory
                 String currentDirectory = System.getProperty("user.dir");
                 rootDir = new File(inputLine.getNextArgFor(currentDirectory));
@@ -1076,7 +1077,7 @@ public class WorkspaceCommands implements Logable {
             // set some useful things.
         }
         env.put("home_dir", rootDir.getAbsolutePath());
-        if(!isRunScript()) {
+        if (!isRunScript()) {
             splashScreen();
         }
         QDLConfigurationLoaderUtils.setupVFS(qe, getState());
@@ -1107,7 +1108,7 @@ public class WorkspaceCommands implements Logable {
         interpreter = new QDLParser(env, getState());
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         //   interpreter.setDebugOn(true);
-      runScript(); // run any script if that mode is enabled.
+        runScript(); // run any script if that mode is enabled.
     }
 
     /**
@@ -1146,26 +1147,8 @@ public class WorkspaceCommands implements Logable {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
         }
         showBanner = !inputLine.hasArg(CLA_NO_BANNER);
-        State state = getState();
-        if (inputLine.hasArg(CLA_HOME_DIR)) {
-            rootDir = new File(inputLine.getNextArgFor(CLA_HOME_DIR));
-        } else {
-            String currentDirectory = System.getProperty("user.dir");
-            rootDir = new File(inputLine.getNextArgFor(currentDirectory));
-        }
-
-        if (inputLine.hasArg(CLA_ENVIRONMENT)) {
-            // try and see if the file resolves first.
-            envFile = resolveAgainstRoot(inputLine.getNextArgFor(CLA_ENVIRONMENT));
-            env = new XProperties();
-
-            if (envFile.exists()) {
-                env.load(envFile);
-            }
-            // set some useful things.
-            env.put("qdl_root", rootDir.getAbsolutePath());
-        }
-
+        // Make sure logging is in place before actually setting up the state,
+        // so the state has logging.
         LoggerProvider loggerProvider = null;
         if (inputLine.hasArg(CLA_LOG_DIR)) {
             // create the logger for this
@@ -1188,6 +1171,27 @@ public class WorkspaceCommands implements Logable {
                     true);
         }
         logger = loggerProvider.get();
+        State state = getState();
+        if (inputLine.hasArg(CLA_HOME_DIR)) {
+            rootDir = new File(inputLine.getNextArgFor(CLA_HOME_DIR));
+        } else {
+            String currentDirectory = System.getProperty("user.dir");
+            rootDir = new File(inputLine.getNextArgFor(currentDirectory));
+        }
+
+        if (inputLine.hasArg(CLA_ENVIRONMENT)) {
+            // try and see if the file resolves first.
+            envFile = resolveAgainstRoot(inputLine.getNextArgFor(CLA_ENVIRONMENT));
+            env = new XProperties();
+
+            if (envFile.exists()) {
+                env.load(envFile);
+            }
+            // set some useful things.
+            env.put("qdl_root", rootDir.getAbsolutePath());
+        }
+
+
         // Do the splash screen here so any messages from a boot script are obvious.
         if (!isRunScript()) {
             // But no screen of any sort if running a single script.

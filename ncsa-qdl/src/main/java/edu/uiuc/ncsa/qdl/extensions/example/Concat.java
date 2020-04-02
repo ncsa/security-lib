@@ -26,11 +26,6 @@ public class Concat implements QDLFunction {
     }
 
     @Override
-    public QDLFunction getInstance() {
-        return this; // Sometimes you want to produce a new instance of this class. Not here.
-    }
-
-    @Override
     public List<String> getDocumentation() {
         ArrayList<String> docs = new ArrayList<>();
         docs.add("concat(string, string) will concatenate the two arguments");

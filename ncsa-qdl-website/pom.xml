@@ -8,10 +8,9 @@
     <artifactId>ncsa-qdl-website</artifactId>
     <version>4.4-SNAPSHOT</version>
 
-    <name>Maven</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://maven.apache.org/</url>
-    <inceptionYear>2001</inceptionYear>
+    <name>NCSA QDL Website</name>
+    <url>http://cilogon.github.io/</url>
+    <inceptionYear>2020</inceptionYear>
 
     <distributionManagement>
         <site>

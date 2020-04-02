@@ -18,13 +18,24 @@ import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
  * <p>Created by Jeff Gaynor<br>
  * on 1/27/20 at  12:03 PM
  */
-public class JavaModule extends Module {
+public abstract  class JavaModule extends Module {
+    /**
+     * Used by {@link QDLLoader}
+     */
+    public JavaModule() {
+    }
+
     @Override
     public boolean isExternal() {
         return true;
     }
 
-    public JavaModule(URI namespace, String alias) {
+    /**
+     * Used by the factory method {@link #newInstance(State)}
+     * @param namespace
+     * @param alias
+     */
+    protected JavaModule(URI namespace, String alias) {
         super(namespace, alias, null); // no state here -- it is injected later
     }
 
@@ -39,6 +50,7 @@ public class JavaModule extends Module {
         vars.addAll(variables);
     }
      Pattern pattern = Pattern.compile(var_regex);
+
     public void init(State state) {
         setState(state);
         for (QDLVariable v : vars) {
@@ -63,7 +75,6 @@ public class JavaModule extends Module {
 
             }
         }
-
     }
 
 }

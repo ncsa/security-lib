@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.security.core.Logable;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
 import java.util.HashMap;
@@ -19,7 +21,17 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:37 AM
  */
-public abstract class AbstractState implements StateInterface {
+public abstract class AbstractState implements StateInterface, Logable {
+    public MyLoggingFacade getLogger() {
+        return logger;
+    }
+
+    public void setLogger(MyLoggingFacade logger) {
+        this.logger = logger;
+    }
+
+    MyLoggingFacade logger;
+
     private static final long serialversionUID = 129348937L;
 
     public AbstractState(ImportManager importManager,
@@ -27,13 +39,15 @@ public abstract class AbstractState implements StateInterface {
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FunctionTable functionTable,
-                         ModuleMap moduleMap) {
+                         ModuleMap moduleMap,
+                         MyLoggingFacade myLoggingFacade) {
         this.importManager = importManager;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.moduleMap = moduleMap;
         this.functionTable = functionTable;
+        this.logger = myLoggingFacade;
     }
 
     public FunctionTable getFunctionTable() {
@@ -49,6 +63,7 @@ public abstract class AbstractState implements StateInterface {
     public ModuleMap getModuleMap() {
         return moduleMap;
     }
+
     /*
     How's it work?
     ModuleMap has the templates keyed by uri.
@@ -77,6 +92,7 @@ public abstract class AbstractState implements StateInterface {
 
     /**
      * Modules (with their state) that have been imported and are keyed by alias.
+     *
      * @return
      */
     public Map<String, Module> getImportedModules() {
@@ -118,9 +134,6 @@ public abstract class AbstractState implements StateInterface {
         return getOpEvaluator().getType(name);
     }
 
-/*    public int getFunctionType(String name) {
-        return getMetaEvaluator().getType(name);
-    }*/
 
     public abstract State newModuleState();
 
@@ -128,5 +141,64 @@ public abstract class AbstractState implements StateInterface {
 
     public abstract State newStateNoImports();
 
+    @Override
+    public boolean isDebugOn() {
+        if (hasLogging()) {
+            return false;
+        }
+        return logger.isDebugOn();
+    }
 
+    @Override
+    public void setDebugOn(boolean setOn) {
+        if (hasLogging()) {
+            logger.setDebugOn(setOn);
+        }
+    }
+
+    @Override
+    public void debug(String x) {
+        if (hasLogging()) {
+            logger.debug(x);
+        }
+
+    }
+
+    @Override
+    public void info(String x) {
+        if (hasLogging()) {
+            logger.info(x);
+        }
+
+    }
+
+    public boolean hasLogging() {
+        return logger != null;
+    }
+
+    @Override
+    public void warn(String x) {
+        if (hasLogging()) {
+            logger.warn(x);
+        }
+    }
+
+    public void error(Throwable t) {
+        if (hasLogging()) {
+            logger.error(t);
+        }
+    }
+
+    public void error(String message, Throwable t) {
+        if (hasLogging()) {
+            logger.error(message, t);
+        }
+    }
+
+    @Override
+    public void error(String x) {
+        if (hasLogging()) {
+            logger.error(x);
+        }
+    }
 }

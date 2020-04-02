@@ -38,14 +38,6 @@ public interface QDLFunction extends Serializable {
      */
     public Object evaluate(Object[] objects);
 
-    /**
-     * This passes along the instance of this that you want to evaluate. This may mean just creating a new instance
-     * and handing it back, or it may just pass a reference to this class. The former pattern is used if there is
-     * to be no state preserved between calls. The latter is used if this class needs to preserve some sort of
-     * state, in which case it is up to you to communicate to any users that this is stateful.
-     * @return
-     */
-    public QDLFunction getInstance();
 
     /**
      * Return documentation to be displayed in the workspace. Short version displays the first

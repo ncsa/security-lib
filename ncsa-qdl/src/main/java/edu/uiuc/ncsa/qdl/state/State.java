@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.HashMap;
 
@@ -29,13 +30,15 @@ public class State extends FunctionState {
                  MetaEvaluator metaEvaluator,
                  FunctionTable functionTable,
                  ModuleMap moduleMap,
+                 MyLoggingFacade myLoggingFacade,
                  boolean isServerMode) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 functionTable,
-                moduleMap);
+                moduleMap,
+                myLoggingFacade);
         this.serverMode = isServerMode;
     }
 
@@ -138,6 +141,7 @@ public class State extends FunctionState {
                 getMetaEvaluator(),
                 getFunctionTable(),
                 getModuleMap(),
+                getLogger(),
                 isServerMode());
         return newState;
 
@@ -159,6 +163,7 @@ public class State extends FunctionState {
                 getMetaEvaluator(),
                 getFunctionTable(),
                 getModuleMap(),
+                getLogger(),
                 isServerMode());
         newState.setImportedModules(getImportedModules());
         return newState;
@@ -181,6 +186,7 @@ public class State extends FunctionState {
                 getMetaEvaluator(),
                 new FunctionTable(),
                 getModuleMap(),
+                getLogger(),
                 isServerMode());
         return newState;
     }
@@ -194,7 +200,6 @@ public class State extends FunctionState {
             ((JavaModule) module).init(this.newModuleState());
         }
         getModuleMap().put(module.getNamespace(), module);
-
     }
 
     public int getStackSize() {

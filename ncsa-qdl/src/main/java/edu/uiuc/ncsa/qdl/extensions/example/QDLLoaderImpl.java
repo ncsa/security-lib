@@ -1,12 +1,8 @@
 package edu.uiuc.ncsa.qdl.extensions.example;
 
-import edu.uiuc.ncsa.qdl.extensions.JavaModule;
-import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
-import edu.uiuc.ncsa.qdl.extensions.QDLVariable;
 import edu.uiuc.ncsa.qdl.module.Module;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,23 +15,9 @@ import java.util.List;
 public class QDLLoaderImpl implements QDLLoader {
     @Override
     public List<Module> load(){
-        // Step 1: create the module with the URI and alias
-        JavaModule javaModule = new JavaModule(URI.create("qdl:/examples/java"), "java");
-        // Step 2: create a list of functions and populate it
-        ArrayList<QDLFunction> funcs = new ArrayList<>();
-        funcs.add(new Concat());
-        // Once the list of functions is populated, add the functions to the module
-        javaModule.addFunctions(funcs);
-
-        // Step 3: create a list of variables and populate it
-        ArrayList<QDLVariable> vars = new ArrayList<>();
-        vars.add(new EGStem());
-        // Once the list of variables is populated, add it to the module
-        javaModule.addVariables(vars);
-        // Step 4: Now that we have created all of our modules (one in this example),
-        // create the list of modules and add the module created here
+        MyModule myModule = new MyModule();
         ArrayList<Module> modules = new ArrayList<>();
-        modules.add(javaModule);
+        modules.add(myModule.newInstance(null));
         // Return this list of modules.
         return modules;
     }
