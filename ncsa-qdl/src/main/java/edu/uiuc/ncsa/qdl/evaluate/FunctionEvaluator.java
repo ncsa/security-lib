@@ -23,26 +23,29 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     public static long serialVersionUID = 654768894456L;
     public static final int BASE_FUNCTION_VALUE = 6000;
     public static final String IS_FUNCTION = "is_function";
+    public static final String FQ_IS_FUNCTION = SYS_FQ + "is_function";
     public static final int IS_FUNCTION_TYPE = 1 + BASE_FUNCTION_VALUE;
 
     @Override
     public int getType(String name) {
-        if (name.equals(IS_FUNCTION)) return IS_FUNCTION_TYPE;
+        if (name.equals(IS_FUNCTION) || name.equals(FQ_IS_FUNCTION)) return IS_FUNCTION_TYPE;
         // At parsing time, the function definition class sets the value manually,
         // so call to this should ever get anything other than unknown value.
         return UNKNOWN_VALUE;
     }
 
     public static String FUNC_NAMES[] = new String[]{IS_FUNCTION};
+    public static String FQ_FUNC_NAMES[] = new String[]{FQ_IS_FUNCTION};
 
     @Override
     public String[] getFunctionNames() {
         return FUNC_NAMES;
     }
 
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        for (String key : FUNC_NAMES) {
+        String[] fnames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+        for (String key : fnames) {
             names.add(key + "()");
         }
         return names;

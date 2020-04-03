@@ -77,7 +77,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * No listing for these yet since they are not the standard func() pattern, e.g. a < b.
      * @return
      */
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(boolean listFQ) {
           TreeSet<String> names = new TreeSet<>();
           return names;
       }

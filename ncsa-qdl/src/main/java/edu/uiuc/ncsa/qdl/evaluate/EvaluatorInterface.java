@@ -13,6 +13,6 @@ public interface EvaluatorInterface extends Serializable {
 
     int getType(String name);
 
-     TreeSet<String> listFunctions();
+     TreeSet<String> listFunctions(boolean listFQ);
 
 }

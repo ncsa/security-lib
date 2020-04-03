@@ -659,6 +659,7 @@ public class WorkspaceCommands implements Logable {
 
     protected int doSystemFuncsList(InputLine inputLine) {
         int displayWidth = 120; // just to keep thing simple
+        boolean listFQ = inputLine.hasArg("fq");
         if (inputLine.hasArg("width")) {
             try {
                 displayWidth = Integer.parseInt(inputLine.getNextArgFor("width"));
@@ -668,7 +669,7 @@ public class WorkspaceCommands implements Logable {
         }
 
         String blanks = "                                                                          "; // padding
-        TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions();
+        TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
         // Find longest entry
         int width = 0;
         for (String x : funcs) {

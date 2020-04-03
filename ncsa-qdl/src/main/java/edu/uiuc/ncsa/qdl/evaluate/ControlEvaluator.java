@@ -28,62 +28,95 @@ import java.util.TreeSet;
 public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public static final String EXECUTE = "execute";
+    public static final String FQ_EXECUTE = SYS_FQ + EXECUTE;
 
     public static final int CONTROL_BASE_VALUE = 5000;
     // Looping stuff
     public static final String CONTINUE = "continue";
+    public static final String FQ_CONTINUE = SYS_FQ + CONTINUE;
     public static final int CONTINUE_TYPE = 1 + CONTROL_BASE_VALUE;
 
     public static final String BREAK = "break";
+    public static final String FQ_BREAK = SYS_FQ + BREAK;
     public static final int BREAK_TYPE = 2 + CONTROL_BASE_VALUE;
 
     public static final String FOR_KEYS = "for_keys";
+    public static final String FQ_FOR_KEYS = SYS_FQ + FOR_KEYS;
     public static final int FOR_KEYS_TYPE = 3 + CONTROL_BASE_VALUE;
 
     public static final String FOR_NEXT = "for_next";
+    public static final String FQ_FOR_NEXT = SYS_FQ + FOR_NEXT;
     public static final int FOR_NEXT_TYPE = 4 + CONTROL_BASE_VALUE;
 
     public static final String CHECK_AFTER = "check_after";
+    public static final String FQ_CHECK_AFTER = SYS_FQ + CHECK_AFTER;
     public static final int CHECK_AFTER_TYPE = 5 + CONTROL_BASE_VALUE;
 
 
     // function stuff
     public static final String RETURN = "return";
+    public static final String FQ_RETURN = SYS_FQ + RETURN;
     public static final int RETURN_TYPE = 100 + CONTROL_BASE_VALUE;
 
 
     public static final String IMPORT = "import";
+    public static final String FQ_IMPORT = SYS_FQ + IMPORT;
     public static final int IMPORT_TYPE = 203 + CONTROL_BASE_VALUE;
 
-    /*  public static String SET_ALIAS = "set_alias";
-      public static final int SET_ALIAS_TYPE = 204 + CONTROL_BASE_VALUE;
-  */
     public static final String LOAD_MODULE = "load_module";
+    public static final String FQ_LOAD_MODULE = SYS_FQ + LOAD_MODULE;
     public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
 
     // try ... catch
 
     public static final String RAISE_ERROR = "raise_error";
+    public static final String FQ_RAISE_ERROR = SYS_FQ + RAISE_ERROR;
     public static final int RAISE_ERROR_TYPE = 300 + CONTROL_BASE_VALUE;
 
     // For external programs
 
     public static final String RUN_COMMAND = "run_script";
+    public static final String FQ_RUN_COMMAND = SYS_FQ + RUN_COMMAND;
     public static final int RUN_COMMAND_TYPE = 400 + CONTROL_BASE_VALUE;
 
     public static final String LOAD_COMMAND = "load_script";
+    public static final String FQ_LOAD_COMMAND = SYS_FQ + LOAD_COMMAND;
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
-    public static String FUNC_NAMES[] = new String[]{CONTINUE, BREAK, FOR_KEYS, FOR_NEXT, CHECK_AFTER, RETURN, IMPORT, LOAD_MODULE,
-            RAISE_ERROR, RUN_COMMAND, LOAD_COMMAND};
+    public static String FUNC_NAMES[] = new String[]{
+            CONTINUE,
+            BREAK,
+            FOR_KEYS,
+            FOR_NEXT,
+            CHECK_AFTER,
+            RETURN,
+            IMPORT,
+            LOAD_MODULE,
+            RAISE_ERROR,
+            RUN_COMMAND,
+            LOAD_COMMAND};
+
+    public static String FQ_FUNC_NAMES[] = new String[]{
+              FQ_CONTINUE,
+              FQ_BREAK,
+              FQ_FOR_KEYS,
+              FQ_FOR_NEXT,
+              FQ_CHECK_AFTER,
+              FQ_RETURN,
+              FQ_IMPORT,
+              FQ_LOAD_MODULE,
+              FQ_RAISE_ERROR,
+              FQ_RUN_COMMAND,
+              FQ_LOAD_COMMAND};
 
     @Override
     public String[] getFunctionNames() {
         return FUNC_NAMES;
     }
 
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        for (String key : FUNC_NAMES) {
+        String[] fnames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+        for (String key : fnames) {
             names.add(key + "()");
         }
         return names;
@@ -93,27 +126,38 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public int getType(String name) {
         switch (name) {
             case CONTINUE:
+            case FQ_CONTINUE:
                 return CONTINUE_TYPE;
             case BREAK:
+            case FQ_BREAK:
                 return BREAK_TYPE;
             case RETURN:
+            case FQ_RETURN:
                 return RETURN_TYPE;
             case FOR_KEYS:
+            case FQ_FOR_KEYS:
                 return FOR_KEYS_TYPE;
             case FOR_NEXT:
+            case FQ_FOR_NEXT:
                 return FOR_NEXT_TYPE;
             case CHECK_AFTER:
+            case FQ_CHECK_AFTER:
                 return CHECK_AFTER_TYPE;
             // Module stuff
             case IMPORT:
+            case FQ_IMPORT:
                 return IMPORT_TYPE;
             case LOAD_MODULE:
+            case FQ_LOAD_MODULE:
                 return LOAD_MODULE_TYPE;
             case RAISE_ERROR:
+            case FQ_RAISE_ERROR:
                 return RAISE_ERROR_TYPE;
             case RUN_COMMAND:
+            case FQ_RUN_COMMAND:
                 return RUN_COMMAND_TYPE;
             case LOAD_COMMAND:
+            case FQ_LOAD_COMMAND:
                 return LOAD_COMMAND_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
@@ -128,35 +172,44 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         switch (polyad.getName()) {
             case BREAK:
+            case FQ_BREAK:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new BreakException();
             case CONTINUE:
+            case FQ_CONTINUE:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new ContinueException();
             case RETURN:
+            case FQ_RETURN:
                 doReturn(polyad, state);
                 return true;
             case RUN_COMMAND:
+            case FQ_RUN_COMMAND:
                 runScript(polyad, state);
                 return true;
             case LOAD_COMMAND:
+            case FQ_LOAD_COMMAND:
                 loadScript(polyad, state);
                 return true;
 
             case IMPORT:
+            case FQ_IMPORT:
                 doImport(polyad, state);
                 return true;
             case LOAD_MODULE:
+            case FQ_LOAD_MODULE:
                 doLoadModule(polyad, state);
                 return true;
             case RAISE_ERROR:
+            case FQ_RAISE_ERROR:
                 doRaiseError(polyad, state);
                 return true;
             case EXECUTE:
+            case FQ_EXECUTE:
                 doExecute(polyad, state);
                 return true;
         }

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -20,6 +21,8 @@ import java.util.Set;
  * on 1/16/20 at  10:59 AM
  */
 public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
+    public static final String SYS_NAMESPACE = "sys";
+    public static final String SYS_FQ = SYS_NAMESPACE + ImportManager.NS_DELIMITER;
 
     public abstract String[] getFunctionNames();
     public boolean isBuiltInFunction(String name){

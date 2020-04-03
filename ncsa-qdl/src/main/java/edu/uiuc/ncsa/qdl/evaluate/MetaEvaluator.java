@@ -77,10 +77,10 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
         for (AbstractFunctionEvaluator evaluator : evaluators) {
-            names.addAll(evaluator.listFunctions());
+            names.addAll(evaluator.listFunctions(listFQ));
         }
         return names;
     }

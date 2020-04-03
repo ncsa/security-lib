@@ -21,47 +21,81 @@ This is driven by Java because it is better to have small classes that specializ
 functions rather than a massive single class. So the inheritence is just encapsulating the logic of this.
  */
 public class StringEvaluator extends AbstractFunctionEvaluator {
+
     public static final int STRING_FUNCTION_BASE_VALUE = 3000;
     public static final String CONTAINS = "contains";
+    public static final String SYS_CONTAINS = SYS_FQ + CONTAINS;
     public static final int CONTAINS_TYPE = 1 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_LOWER = "to_lower";
+    public static final String SYS_TO_LOWER = SYS_FQ + TO_LOWER;
     public static final int TO_LOWER_TYPE = 2 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_UPPER = "to_upper";
+    public static final String SYS_TO_UPPER = SYS_FQ +TO_UPPER;
     public static final int TO_UPPER_TYPE = 3 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TRIM = "trim";
+    public static final String SYS_TRIM = SYS_FQ + TRIM;
     public static final int TRIM_TYPE = 4 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INSERT = "insert";
+    public static final String SYS_INSERT = SYS_FQ + INSERT;
     public static final int INSERT_TYPE = 5 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String SUBSTRING = "substring";
+    public static final String SYS_SUBSTRING = SYS_FQ + SUBSTRING;
     public static final int SUBSTRING_TYPE = 6 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String REPLACE = "replace";
+    public static final String SYS_REPLACE = SYS_FQ + REPLACE;
     public static final int REPLACE_TYPE = 7 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INDEX_OF = "index_of";
+    public static final String SYS_INDEX_OF = SYS_FQ + INDEX_OF;
     public static final int INDEX_OF_TYPE = 8 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TOKENIZE = "tokenize";
+    public static final String SYS_TOKENIZE = SYS_FQ + TOKENIZE;
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String ENCODE = "vencode";
+    public static final String SYS_ENCODE = SYS_FQ + ENCODE;
         public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DECODE = "vdecode";
+    public static final String SYS_DECODE = SYS_FQ + DECODE;
         public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String FUNC_NAMES[] = new String[]{CONTAINS,TO_LOWER,TO_UPPER,TRIM,INSERT,
-            SUBSTRING,REPLACE,INDEX_OF,TOKENIZE,
-    ENCODE, DECODE};
+    public static String FUNC_NAMES[] = new String[]{
+            CONTAINS,
+            TO_LOWER,
+            TO_UPPER,
+            TRIM,
+            INSERT,
+            SUBSTRING,
+            REPLACE,
+            INDEX_OF,
+            TOKENIZE,
+            ENCODE,
+            DECODE};
+    public static String FQ_FUNC_NAMES[] = new String[]{
+            SYS_CONTAINS,
+            SYS_TO_LOWER,
+            SYS_TO_UPPER,
+            SYS_TRIM,
+            SYS_INSERT,
+            SYS_SUBSTRING,
+            SYS_REPLACE,
+            SYS_INDEX_OF,
+            SYS_TOKENIZE,
+            SYS_ENCODE,
+            SYS_DECODE};
 
-   public TreeSet<String> listFunctions() {
+   public TreeSet<String> listFunctions(boolean listFQ) {
           TreeSet<String> names = new TreeSet<>();
-          for (String key : FUNC_NAMES) {
+          String[] funcNames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+          for (String key : funcNames) {
               names.add(key + "()");
           }
           return names;
@@ -92,36 +126,47 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
        public boolean evaluate(Polyad polyad, State state) {
            switch (polyad.getName()) {
                case CONTAINS:
+               case SYS_CONTAINS:
                    doContains(polyad, state);
                    return true;
                case TRIM:
+               case SYS_TRIM:
                    doTrim(polyad, state);
                    return true;
                case INDEX_OF:
+               case SYS_INDEX_OF:
                    doIndexOf(polyad, state);
                    return true;
                case TO_LOWER:
+               case SYS_TO_LOWER:
                    doSwapCase(polyad, state, true);
                    return true;
                case TO_UPPER:
+               case SYS_TO_UPPER:
                    doSwapCase(polyad, state, false);
                    return true;
                case REPLACE:
+               case SYS_REPLACE:
                    doReplace(polyad, state);
                    return true;
                case INSERT:
+               case SYS_INSERT:
                    doInsert(polyad, state);
                    return true;
                case TOKENIZE:
+               case SYS_TOKENIZE:
                    doTokenize(polyad, state);
                    return true;
                case SUBSTRING:
+               case SYS_SUBSTRING:
                    doSubstring(polyad, state);
                    return true;
                case ENCODE:
+               case SYS_ENCODE:
                    doEncode(polyad, state);
                    return true;
                case DECODE:
+               case SYS_DECODE:
                    doDecode(polyad, state);
                    return true;
            }

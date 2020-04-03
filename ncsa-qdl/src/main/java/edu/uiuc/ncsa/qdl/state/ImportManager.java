@@ -1,5 +1,9 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.MathEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 
 import java.io.Serializable;
@@ -14,7 +18,12 @@ import java.util.List;
  * on 1/21/20 at  7:13 AM
  */
 public class ImportManager implements Serializable {
-    public static String[] RESERVED_ALIAS = new String[]{"io", "sys"};
+    public static String[] RESERVED_ALIAS = new String[]{
+            MathEvaluator.MATH_NAMESPACE,
+            AbstractFunctionEvaluator.SYS_NAMESPACE,
+            IOEvaluator.IO_NAMESPACE,
+            StemEvaluator.STEM_NAMESPACE
+    };
 
     protected void checkAlias(String alias) {
         if (alias == null || alias.isEmpty()) {

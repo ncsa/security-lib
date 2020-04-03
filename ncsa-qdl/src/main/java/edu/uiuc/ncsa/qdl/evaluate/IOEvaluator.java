@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -27,44 +28,51 @@ import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.setupMySQLDat
  * on 1/16/20 at  9:18 AM
  */
 public class IOEvaluator extends MathEvaluator {
+
+    public static final String IO_NAMESPACE = "io";
+    public static final String IO_FQ = IO_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int IO_FUNCTION_BASE_VALUE = 4000;
+
     public static final String SAY_FUNCTION = "say";
+    public static final String IO_SAY_FUNCTION = IO_FQ + SAY_FUNCTION;
     public static final String PRINT_FUNCTION = "print";
+    public static final String IO_PRINT_FUNCTION = IO_FQ + PRINT_FUNCTION;
     public static final int SAY_TYPE = 1 + IO_FUNCTION_BASE_VALUE;
     public static final String SCAN_FUNCTION = "scan";
+    public static final String IO_SCAN_FUNCTION = IO_FQ + SCAN_FUNCTION;
     public static final int SCAN_TYPE = 2 + IO_FUNCTION_BASE_VALUE;
 
     public static final String READ_FILE = "read_file";
-    public static final String IO_READ_FILE = "io#read";
+    public static final String IO_READ_FILE = IO_FQ + "read";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_WRITE_FILE = "io#write";
+    public static final String IO_WRITE_FILE = IO_FQ + "write";
     public static final String WRITE_FILE = "write_file";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_DIR = "io#dir";
     public static final String DIR = "dir";
+    public static final String IO_DIR = IO_FQ + DIR;
     public static final int DIR_TYPE = 5 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_MKDIR = "io#mkdir";
     public static final String MKDIR = "mkdir";
+    public static final String IO_MKDIR = IO_FQ + MKDIR;
     public static final int MKDIR_TYPE = 6 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_RMDIR = "io#rmdir";
     public static final String RMDIR = "rmdir";
+    public static final String IO_RMDIR = IO_FQ + RMDIR;
     public static final int RMDIR_TYPE = 7 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_RM_FILE = "io#rm";
     public static final String RM_FILE = "rm";
+    public static final String IO_RM_FILE = IO_FQ + RM_FILE;
     public static final int RM_FILE_TYPE = 8 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_VFS_MOUNT = "io#mount";
     public static final String VFS_MOUNT = "vfs_mount";
+    public static final String IO_VFS_MOUNT = IO_FQ + "mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
 
 
-    public static final String IO_VFS_UNMOUNT = "io#unmount";
     public static final String VFS_UNMOUNT = "vfs_unmount";
+    public static final String IO_VFS_UNMOUNT = IO_FQ + "unmount";
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
     public static String[] FUNC_NAMES = new String[]{
@@ -77,14 +85,25 @@ public class IOEvaluator extends MathEvaluator {
             VFS_MOUNT,
             VFS_UNMOUNT};
 
+    public static String[] FQ_FUNC_NAMES = new String[]{
+            IO_SAY_FUNCTION,
+            IO_PRINT_FUNCTION,
+            IO_SCAN_FUNCTION,
+            IO_READ_FILE,
+            IO_WRITE_FILE,
+            IO_DIR,
+            IO_VFS_MOUNT,
+            IO_VFS_UNMOUNT};
+
     @Override
     public String[] getFunctionNames() {
         return FUNC_NAMES;
     }
 
-    public TreeSet<String> listFunctions() {
+    public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        for (String key : FUNC_NAMES) {
+        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
+        for (String key : fnames) {
             names.add(key + "()");
         }
         return names;
@@ -92,17 +111,39 @@ public class IOEvaluator extends MathEvaluator {
 
     @Override
     public int getType(String name) {
-        if (name.equals(SAY_FUNCTION)) return SAY_TYPE;
-        if (name.equals(PRINT_FUNCTION)) return SAY_TYPE;
-        if (name.equals(SCAN_FUNCTION)) return SCAN_TYPE;
-        if (name.equals(DIR)) return DIR_TYPE;
-        if (name.equals(RMDIR)) return RMDIR_TYPE;
-        if (name.equals(RM_FILE)) return RM_FILE_TYPE;
-        if (name.equals(MKDIR)) return MKDIR_TYPE;
-        if (name.equals(READ_FILE)) return READ_FILE_TYPE;
-        if (name.equals(WRITE_FILE)) return WRITE_FILE_TYPE;
-        if (name.equals(VFS_MOUNT)) return VFS_MOUNT_TYPE;
-        if (name.equals(VFS_UNMOUNT)) return VFS_UNMOUNT_TYPE;
+        switch (name) {
+            case PRINT_FUNCTION:
+            case IO_PRINT_FUNCTION:
+            case IO_SAY_FUNCTION:
+            case SAY_FUNCTION:
+                return SAY_TYPE;
+            case SCAN_FUNCTION:
+            case IO_SCAN_FUNCTION:
+                return SCAN_TYPE;
+            case IO_DIR:
+                return DIR_TYPE;
+            case IO_MKDIR:
+            case MKDIR:
+                return MKDIR_TYPE;
+            case IO_RM_FILE:
+            case RM_FILE:
+                return RM_FILE_TYPE;
+            case IO_RMDIR:
+            case RMDIR:
+                return RMDIR_TYPE;
+            case IO_READ_FILE:
+            case READ_FILE:
+                return READ_FILE_TYPE;
+            case IO_WRITE_FILE:
+            case WRITE_FILE:
+                return WRITE_FILE_TYPE;
+            case IO_VFS_MOUNT:
+            case VFS_MOUNT:
+                return VFS_MOUNT_TYPE;
+            case IO_VFS_UNMOUNT:
+            case VFS_UNMOUNT:
+                return VFS_UNMOUNT_TYPE;
+        }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
@@ -111,6 +152,8 @@ public class IOEvaluator extends MathEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case PRINT_FUNCTION:
+            case IO_PRINT_FUNCTION:
+            case IO_SAY_FUNCTION:
             case SAY_FUNCTION:
                 if (state.isServerMode()) {
                     polyad.setResult(null);
@@ -155,6 +198,7 @@ public class IOEvaluator extends MathEvaluator {
                 polyad.setEvaluated(true);
                 return true;
             case SCAN_FUNCTION:
+            case IO_SCAN_FUNCTION:
                 if (state.isServerMode()) {
                     throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
                 }
