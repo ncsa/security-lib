@@ -37,4 +37,4 @@ mkdir "lib/cp"
 mkdir "var"
 mkdir "var/ws"
 # jar cmf manifest-file jar-file input-files
-jar cmf installer.mf install.jar edu/uiuc/ncsa/qdl/install/Installer.class "version.txt" bin docs etc lib log var
+jar cmf installer.mf install.jar edu/uiuc/ncsa/qdl/install/Installer.class version.txt bin docs etc lib log var
