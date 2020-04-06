@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
@@ -68,13 +69,14 @@ public class StateUtils {
 
     public static void main(String[] args){
         try {
+            // Just a quick test for this
             State state = new State(new ImportManager(),
                     new SymbolStack(),
                     new OpEvaluator(),
                     new MetaEvaluator(),
                     new FunctionTable(),
                     new ModuleMap(),
-                    null,
+                    new MyLoggingFacade("foo"),
                     false);
             state.setValue("foo", 42L);
             String b = saveb64(state);

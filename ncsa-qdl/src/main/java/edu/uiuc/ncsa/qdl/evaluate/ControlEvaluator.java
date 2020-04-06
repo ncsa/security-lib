@@ -330,7 +330,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         String resourceName = arg.toString();
         QDLScript script = null;
         File file = null;
-        if (state.hasVFSProviders()) {
+        if (state.hasVFSProviders() && resourceName.contains(ImportManager.NS_DELIMITER)) {
             try {
                 script = state.getScriptFromVFS(resourceName);
             } catch (Throwable t) {

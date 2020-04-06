@@ -30,10 +30,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.*;
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
@@ -45,6 +43,10 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 1/30/20 at  9:21 AM
  */
 public class WorkspaceCommands implements Logable {
+    public static final String DISPLAY_WIDTH_SWITCH = "-w";
+    public static final String FQ_SWITCH = "-fq";
+    public static final String REGEX_SWITCH = "-r";
+    public static final String COMPACT_ALIAS_SWITCH = "-compact";
     MyLoggingFacade logger;
 
     XProperties env;
@@ -119,7 +121,7 @@ public class WorkspaceCommands implements Logable {
         sayi(EXECUTE_COMMAND + "     -- short hand to execute whatever is in the current buffer.");
         sayi(FUNCS_COMMAND + " -- list all of the imported and user defined functions this workspace knows about.");
         sayi(HELP_COMMAND + " -- this message.");
-        sayi(MODULES_COMMAND + " -- lists all the imported modules this workspace knows about.");
+        sayi(MODULES_COMMAND + " -- lists all the loaded modules this workspace knows about.");
         sayi(OFF_COMMAND + " -- exit the workspace.");
         sayi(LOAD_COMMAND + " file -- Load a file of QDL commands and execute it immediately in the current workspace.");
         sayi(VARS_COMMAND + " -- lists all of the variables this workspace knows about.");
@@ -163,6 +165,14 @@ public class WorkspaceCommands implements Logable {
                 return doVars(inputLine);
             case WS_COMMAND:
                 return doWS(inputLine);
+            case SAVE_COMMAND:
+                inline = inline.replace(SAVE_COMMAND, WS_COMMAND + " save ");
+                inputLine = new InputLine(CLT.tokenize(inline));
+                return doWSSave(inputLine);
+            case LOAD_COMMAND:
+                inline = inline.replace(LOAD_COMMAND, WS_COMMAND + " load ");
+                inputLine = new InputLine(CLT.tokenize(inline));
+                return doWsLoad(inputLine);
         }
         say("Unknown command.");
         return RC_NO_OP;
@@ -557,6 +567,7 @@ public class WorkspaceCommands implements Logable {
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "list":
+            case DISPLAY_WIDTH_SWITCH:
                 return doModulesList(inputLine);
             case "imports":
                 return doModuleImports(inputLine);
@@ -568,12 +579,13 @@ public class WorkspaceCommands implements Logable {
     private int doModuleImports(InputLine inputLine) {
         if (!state.getImportManager().hasImports()) {
             say("(no imports)");
-        } else {
-            for (URI uri : state.getImportManager().keySet()) {
-                say(uri + " = " + state.getImportManager().getAlias(uri));
-            }
+            return RC_CONTINUE;
         }
-        return RC_CONTINUE;
+        TreeSet<String> aliases = new TreeSet<>();
+        for (URI uri : state.getImportManager().keySet()) {
+            aliases.add(uri + " = " + state.getImportManager().getAlias(uri));
+        }
+        return printList(inputLine, aliases);
     }
 
     private int doModulesList(InputLine inputLine) {
@@ -581,11 +593,7 @@ public class WorkspaceCommands implements Logable {
         for (URI key : getState().getImportManager().keySet()) {
             m.add(key + " = " + getState().getImportManager().getAlias(key));
         }
-        String modules = m.toString();
-        modules = modules.substring(1); // chop off lead [
-        modules = modules.substring(0, modules.length() - 1);
-        say(modules);
-        return RC_CONTINUE;
+        return printList(inputLine, m);
     }
 
     /**
@@ -609,6 +617,7 @@ public class WorkspaceCommands implements Logable {
             case "help":
                 return doFuncsHelp(inputLine);
             case "list":
+            case DISPLAY_WIDTH_SWITCH:
                 return doFuncsList(inputLine);
             case "system":
                 return doSystemFuncsList(inputLine);
@@ -657,55 +666,80 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    protected int doSystemFuncsList(InputLine inputLine) {
-        int displayWidth = 120; // just to keep thing simple
-        boolean listFQ = inputLine.hasArg("fq");
-        if (inputLine.hasArg("width")) {
+    protected int printList(InputLine inputLine, TreeSet<String> list) {
+        if (list.isEmpty()) {
+            return RC_CONTINUE;
+        }
+        if (list.size() == 1) {
+            say(list.first());
+            return RC_CONTINUE;
+        }
+        Pattern pattern = null;
+        if (inputLine.hasArg(REGEX_SWITCH)) {
             try {
-                displayWidth = Integer.parseInt(inputLine.getNextArgFor("width"));
+                pattern = Pattern.compile(inputLine.getNextArgFor(REGEX_SWITCH));
+                TreeSet<String> list2 = new TreeSet<>();
+                //pattern.
+                for (String x : list) {
+                    if (pattern.matcher(x).matches()) {
+                        list2.add(x);
+                    }
+                }
+                list = list2;
+            } catch (Throwable t) {
+                say("sorry but there was a problem with your regex \"" + inputLine.getNextArgFor(REGEX_SWITCH) + "\":" + t.getMessage());
+            }
+
+        }
+        int displayWidth = 120; // just to keep thing simple
+        if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
+            try {
+                displayWidth = Integer.parseInt(inputLine.getNextArgFor(DISPLAY_WIDTH_SWITCH));
             } catch (Throwable t) {
                 say("sorry, but " + inputLine.getArg(0) + " is not a number. Formatting for default width of " + displayWidth);
             }
         }
 
         String blanks = "                                                                          "; // padding
-        TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
         // Find longest entry
-        int width = 0;
-        for (String x : funcs) {
-            width = Math.max(width, x.length());
+        int maxWidth = 0;
+        for (String x : list) {
+            maxWidth = Math.max(maxWidth, x.length());
         }
-        width = 2 + width; // so the widest + 2 chars to make it readable.
+        maxWidth = 2 + maxWidth; // so the widest + 2 chars to make it readable.
         // number of columns are display / width, possibly plus 1 if there is a remainder
-        int colCount = displayWidth / width + (displayWidth % width == 0 ? 0 : 1);
-        int rowCount = funcs.size() / colCount;
+        //int colCount = displayWidth / maxWidth + (displayWidth % maxWidth == 0 ? 0 : 1);
+        int colCount = displayWidth / maxWidth;
+        int rowCount = list.size() / colCount;
+        if (rowCount == 0) {
+            rowCount = 1; // There must be at least one row or you will get a divide by zero below.
+        }
         String[] output = new String[rowCount];
         for (int i = 0; i < rowCount; i++) {
             output[i] = ""; // initialize it
         }
         int pointer = 0;
-        for (String func : funcs) {
+        for (String func : list) {
             int currentLine = pointer++ % rowCount;
-            output[currentLine] = output[currentLine] + func + blanks.substring(0, width - func.length());
+            output[currentLine] = output[currentLine] + func + blanks.substring(0, maxWidth - func.length());
         }
         for (String x : output) {
             say(x);
         }
 
         return RC_CONTINUE;
+    }
 
+    protected int doSystemFuncsList(InputLine inputLine) {
+        boolean listFQ = inputLine.hasArg(FQ_SWITCH);
+        TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
+        return printList(inputLine, funcs);
     }
 
     protected int doFuncsList(InputLine inputLine) {
-        String regex = null;
-        if (FIRST_ARG_INDEX < inputLine.size()) {
-            regex = inputLine.getArg(FIRST_ARG_INDEX);
-        }
-        String funs = getState().listFunctions(regex).toString().trim();
-        funs = funs.substring(1); // chop off lead [
-        funs = funs.substring(0, funs.length() - 1);
-        say(funs);
-        return RC_CONTINUE;
+        boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
+        TreeSet<String> funs = getState().listFunctions(useCompactNotation, null);
+        return printList(inputLine, funs);
     }
 
     /**
@@ -743,11 +777,8 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doVarsList(InputLine inputLine) {
-        String vars = getState().listVariables().toString().trim();
-        vars = vars.substring(1); // chop off lead [
-        vars = vars.substring(0, vars.length() - 1);
-        say(vars);
-        return RC_CONTINUE;
+        boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
+        return printList(inputLine, getState().listVariables(useCompactNotation));
     }
 
     /**
@@ -861,9 +892,22 @@ public class WorkspaceCommands implements Logable {
                 return RC_CONTINUE;
             }
             String fName = inputLine.getArg(FIRST_ARG_INDEX);
-            FileOutputStream fos = new FileOutputStream(fName);
+            File target = new File(fName);
+            if (target.isAbsolute()) {
+                if (saveDir == null) {
+                    saveDir = target.getParentFile();
+                    say("Default save path updated to " + saveDir.getCanonicalPath());
+                }
+            } else {
+                if (saveDir == null) {
+                    target = new File(rootDir, fName);
+                } else {
+                    target = new File(saveDir, fName);
+                }
+            }
+            FileOutputStream fos = new FileOutputStream(target);
             StateUtils.save(state, fos);
-            say("workspace saved at " + (new Date()));
+            say("workspace saved to " + target.getCanonicalPath() + " at " + (new Date()));
         } catch (Throwable t) {
             say("would not save the workspace");
             t.printStackTrace();
@@ -875,12 +919,21 @@ public class WorkspaceCommands implements Logable {
         try {
             long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
-            state = StateUtils.load(fis);
-            interpreter = new QDLParser(env, state);
+            State newState = StateUtils.load(fis);
+            /*
+            Now set the stuff that cannot be serialized.
+             */
+            newState.setLogger(getState().getLogger()); // set the logger to whatever the current one is
+            state.setVfsFileProviders(new HashMap<>()); // Make sure something is there before we add to it.
+            for (String name : getState().getVfsFileProviders().keySet()) {
+                newState.addVFSProvider(getState().getVfsFileProviders().get(name));
+            }
+            interpreter = new QDLParser(env, newState);
             interpreter.setEchoModeOn(isEchoModeOn());
             interpreter.setDebugOn(isDebugOn());
+            state = newState;
             currentWorkspace = f;
-            say("last saved " + new Date(lastModified));
+            say(f.getCanonicalPath() + " loaded. Last saved " + new Date(lastModified));
         } catch (Throwable t) {
             say("workspace not loaded.");
             t.printStackTrace();
@@ -901,6 +954,15 @@ public class WorkspaceCommands implements Logable {
 
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
         File f = new File(fName);
+        if (f.isAbsolute()) {
+            // don't change save directory on load. (???) May change this
+        } else {
+            if (saveDir == null) {
+                f = new File(rootDir, fName);
+            } else {
+                f = new File(saveDir, fName);
+            }
+        }
         doRealLoad(f);
         return RC_CONTINUE;
     }
@@ -1064,6 +1126,10 @@ public class WorkspaceCommands implements Logable {
                 rootDir = new File(inputLine.getNextArgFor(currentDirectory));
             }
         }
+        File testSaveDir = new File(rootDir, "var/ws");
+        if (testSaveDir.exists() && testSaveDir.isDirectory()) {
+            saveDir = testSaveDir;
+        }
         State state = getState(); // This sets it for the class it will be  put in the interpreter below.
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         env = new XProperties();
@@ -1077,7 +1143,14 @@ public class WorkspaceCommands implements Logable {
             }
             // set some useful things.
         }
-        env.put("home_dir", rootDir.getAbsolutePath());
+        env.put("home_dir", rootDir.getCanonicalPath());
+        if (testSaveDir == null) {
+            env.put("save_dir", "(empty)");
+
+        } else {
+            env.put("save_dir", testSaveDir.getCanonicalPath());
+
+        }
         if (!isRunScript()) {
             splashScreen();
         }
@@ -1270,6 +1343,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     File rootDir = null;
+    File saveDir = null;
 
     protected BufferedReader getBufferedReader() {
         if (bufferedReader == null) {

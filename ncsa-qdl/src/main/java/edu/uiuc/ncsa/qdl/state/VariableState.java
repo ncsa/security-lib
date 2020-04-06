@@ -330,12 +330,18 @@ public abstract class VariableState extends NamespaceAwareState {
         return resolveStemIndex(index, resolveState);
     }
 
-    public TreeSet<String> listVariables() {
+    public TreeSet<String> listVariables(boolean useCompactNotation) {
         TreeSet<String> out = getSymbolStack().listVariables();
         for (URI key : getImportManager().keySet()) {
-            TreeSet<String> uqVars = getModuleMap().get(key).getState().listVariables();
+            TreeSet<String> uqVars = getModuleMap().get(key).getState().listVariables(useCompactNotation);
             for (String x : uqVars) {
-                out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                if (useCompactNotation) {
+                    out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                } else {
+                    for (String alias : getImportManager().getAlias(key)) {
+                        out.add(alias + NS_DELIMITER + x);
+                    }
+                }
             }
         }
         return out;

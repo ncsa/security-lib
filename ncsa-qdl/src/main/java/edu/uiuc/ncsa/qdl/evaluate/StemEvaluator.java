@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -876,11 +877,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error: the " + IS_DEFINED + " function requires 1 argument");
         }
-
-        VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
-        // Don't evaluate this because it might not exist (that's what we are testing for). Just check
-        // if the name is defined.
-        boolean isDef = state.isDefined(variableNode.getVariableReference());
+        boolean isDef = false;
+        if (polyad.getArgumments().get(0) instanceof VariableNode) {
+            VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
+            // Don't evaluate this because it might not exist (that's what we are testing for). Just check
+            // if the name is defined.
+            isDef = state.isDefined(variableNode.getVariableReference());
+        }
+        if(polyad.getArgumments().get(0) instanceof ConstantNode){
+            ConstantNode variableNode = (ConstantNode) polyad.getArgumments().get(0);
+            Object x = variableNode.getResult();
+            if(x == null){
+                isDef = false;
+            }else{
+                isDef = state.isDefined(x.toString());
+            }
+        }
         polyad.setResult(isDef);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);

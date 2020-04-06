@@ -30,7 +30,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.logger = logger;
     }
 
-    MyLoggingFacade logger;
+  transient  MyLoggingFacade logger; // makes no sense to serialize a logger.
 
     private static final long serialversionUID = 129348937L;
 

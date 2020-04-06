@@ -52,8 +52,10 @@ public abstract class TokenAwareServer extends ASImpl {
     }
 
     protected JSONObject getAndCheckResponse(String response) {
+        // It is now ok to have empty responses as long as the status code was 200.
+        // If it gets to here, the status has been checked. 
         if (response == null || response.length() == 0) {
-            throw new GeneralException("Error: The server encountered an error and the response was empty.");
+            return new JSONObject();
         }
         if (response.startsWith("<") || response.startsWith("\n")) {
             // this is actually HTML

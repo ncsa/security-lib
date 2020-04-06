@@ -53,13 +53,13 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getOperatorType()) {
-            case IS_FUNCTION_TYPE:
+        switch (polyad.getName()) {
+            case IS_FUNCTION:
+            case FQ_IS_FUNCTION:
                 if (polyad.getArgumments().size() != 1) {
                     throw new IllegalArgumentException("Error: You must supply at least one argument.");
                 }
                 Object object = polyad.evalArg(0, state);
-                ;
                 if (object == null) {
                     throw new MissingArgumentException("Error: You must supply an argument for the " + IS_FUNCTION + " command.");
                 }

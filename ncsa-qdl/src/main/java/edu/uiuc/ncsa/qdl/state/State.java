@@ -59,7 +59,11 @@ public class State extends FunctionState {
         return vfsFileProviders;
     }
 
-    HashMap<String, VFSFileProvider> vfsFileProviders = new HashMap<>();
+    public void setVfsFileProviders(HashMap<String, VFSFileProvider> vfsFileProviders) {
+        this.vfsFileProviders = vfsFileProviders;
+    }
+
+    transient HashMap<String, VFSFileProvider> vfsFileProviders =new HashMap<>();
 
     public void addVFSProvider(VFSFileProvider scriptProvider) {
         vfsFileProviders.put(scriptProvider.getScheme() + VFSPaths.SCHEME_DELIMITER + scriptProvider.getMountPoint(), scriptProvider);
@@ -123,7 +127,8 @@ public class State extends FunctionState {
     }
 
     public boolean hasVFSProviders() {
-        return !vfsFileProviders.isEmpty();
+        if(vfsFileProviders == null) return false;
+        return  !vfsFileProviders.isEmpty();
     }
 
     public boolean isVFSFile(String path) {
