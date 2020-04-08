@@ -848,6 +848,22 @@ public class ParserTest extends TestBase {
     }
 
     /**
+     * test that a language with lots of diacriticals gets handled right in encode and decoding.
+     * @throws Throwable
+     */
+    @Test
+    public void testUTF8StringDecodeEncode() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // First line of the Vietnamese epic, the Tale of Kieu
+        addLine(script, "a :='Trăm năm trong cõi người ta, Chữ tài chữ mệnh khéo là ghét nhau.';");
+        addLine(script, "b := (a == vdecode(vencode(a)));");
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert state.getValue("b").equals(Boolean.TRUE);
+    }
+
+    /**
      * In order to handle "-expression" in the parser, there has to be a wrapper. This
      * tests that it does the right thing.
      *

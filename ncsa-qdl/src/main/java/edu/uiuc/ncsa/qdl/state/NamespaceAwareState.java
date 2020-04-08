@@ -102,7 +102,8 @@ public abstract class NamespaceAwareState extends AbstractState {
                 boolean y = mm.getState().isDefined(x);
                 if (isFound) {
                     if (y) {
-                        throw new NamespaceException("Error: The variable \"" + x + "\" is defined in multiple modules. You must fully qualify it to use it.");
+                        throw new NamespaceException("Error: The variable \"" + x + "\" is defined in multiple modules. " +
+                                "You must fully qualify it to use it.");
                     }
                 } else {
                     if (y) {

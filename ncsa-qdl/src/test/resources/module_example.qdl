@@ -1,5 +1,6 @@
 /*
-  This tests modules and how they are to work at a basic level.
+  This tests modules and how they are to work at a basic level. It creates a couple of modules
+  imports them multiple times and runs some stuff.
   Jeff Gaynor
   1/26/2020
 */
@@ -17,9 +18,14 @@ module[
     define[f(n)]body[return(n-1);];
 ]; // end
 
+/*
+     All in a line for reference:
+     module['a:a','a']body[foo := 'abar';define[f(n)]body[return(n+1);];];
+     module['b:b','b']body[ foo := 'bbar';define[f(n)]body[return(n-1);];];
+*/
 // Using it before import raises an error
 
-say('is function? ' + is_function('f'));
+say('is function before import? ' + is_function('f'));
 
 q := 42; // not in modules
 
@@ -36,3 +42,11 @@ say(b#f(1));
 say(a#f(1 + q*2));
 say(b#f(3*q - 1));
 
+import('a:a','c');
+import('a:a','d');
+import('b:b','c');
+import('b:b','woof');
+import('b:b','arf');
+
+say(b#f(3*q - 1) - woof#f(2*q+1)  + a#f(1 + q*2) - c#f(q+1) );
+say('module loaded!');

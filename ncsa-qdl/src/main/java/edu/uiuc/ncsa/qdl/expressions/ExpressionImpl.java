@@ -57,7 +57,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
     @Override
     public Object getResult() {
         if (!evaluated) {
-            throw new UnevaluatedExpressionException();
+            throw new UnevaluatedExpressionException("source=\"" + (getSourceCode()==null?"(none)":getSourceCode()) + "\"");
         }
         return result;
     }

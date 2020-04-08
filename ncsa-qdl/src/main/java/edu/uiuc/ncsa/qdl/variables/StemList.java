@@ -70,29 +70,4 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         return array;
     }
 
-
-  /*  public void fromJSON(JSONObject json) {
-        // This has issues. For one thing, saving a bunch of big decimals might mean they are strings.
-        for (Object key : json.keySet()) {
-            try {
-                Object v = json.get(key);
-                if (v instanceof Integer) {
-                    add((V) new StemEntry(Long.parseLong(key.toString()), json.getLong(key.toString())));
-                } else {
-                    if (v.toString().contains(".")) {
-                        try {
-                            BigDecimal bigDecimal = new BigDecimal(v.toString());
-                            add((V) new StemEntry(Long.parseLong(key.toString()), bigDecimal));
-                        }catch(Throwable t){
-                            add((V) new StemEntry(Long.parseLong(key.toString()), v)); // if not parseable,
-                        }
-                    } else {
-                        add((V) new StemEntry(Long.parseLong(key.toString()), v));
-                    }
-                }
-            } catch (Throwable t) {
-                throw new QDLException("Error: The key \"" + key + "\" could not be parsed as a long.");
-            }
-        }
-    }*/
 }

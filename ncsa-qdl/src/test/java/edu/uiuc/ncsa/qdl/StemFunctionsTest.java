@@ -6,11 +6,8 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.StemEntry;
-import edu.uiuc.ncsa.qdl.variables.StemList;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLCodec;
+import edu.uiuc.ncsa.qdl.variables.*;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -24,7 +21,8 @@ import java.util.Date;
  */
 public class StemFunctionsTest extends TestBase {
     TestUtils testUtils = TestUtils.newInstance();
-    protected String geter(){
+
+    protected String geter() {
         return enc(getRandomString());
     }
 
@@ -243,7 +241,7 @@ public class StemFunctionsTest extends TestBase {
         StemVariable keys = new StemVariable();
         int count = 5;
         QDLCodec codec = new QDLCodec();
-        randomStem(sourceStem, 2*count);
+        randomStem(sourceStem, 2 * count);
       /*  for (int i = 0; i < 2 * count; i++) {
             String key = getRandomString();
             sourceStem.put(key, getRandomString());
@@ -283,7 +281,7 @@ public class StemFunctionsTest extends TestBase {
             if (0 == i % 2) {
                 keys.put(Integer.toString(j++), key);
             }
-            sourceStem.put(key,geter());
+            sourceStem.put(key, geter());
         }
 
 
@@ -361,12 +359,15 @@ public class StemFunctionsTest extends TestBase {
     }
 
     QDLCodec codec = new QDLCodec();
-    protected String enc(String x){
+
+    protected String enc(String x) {
         return codec.encode(x);
     }
-    protected String dec(String x){
+
+    protected String dec(String x) {
         return codec.decode(x);
     }
+
     @Test
     public void testIncludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
@@ -605,6 +606,41 @@ public class StemFunctionsTest extends TestBase {
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
         assert !sourceStem.containsKey("foo");
+
+    }
+
+    /**
+     * Regression test for converting stems to JSON where there is a stem list of stems.
+     * Extra elements were being added.
+     * @throws Exception
+     */
+    @Test
+    public void testJSONArray() throws Exception {
+        String rawJSON = "{\n" +
+                "  \"isMemberOf\":   [" +
+                "  {\n" +
+                "      \"name\": \"all_users\",\n" +
+                "      \"id\": 13002\n" +
+                "    },\n" +
+                "        {\n" +
+                "      \"name\": \"staff_reporting\",\n" +
+                "      \"id\": 16405\n" +
+                "    },\n" +
+                "        {\n" +
+                "      \"name\": \"list_allbsu\",\n" +
+                "      \"id\": 18942\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.fromJSON(JSONObject.fromObject(rawJSON));
+
+        JSON j = stemVariable.toJSON();
+        StemVariable x = (StemVariable) stemVariable.get("isMemberOf.");
+        assert x.size() == 3;
+        assert !x.containsKey("0") : "Spurious element added to stem on serialization to JSON.";
+        assert !x.containsKey("1") : "Spurious element added to stem on serialization to JSON.";
+        assert !x.containsKey("2") : "Spurious element added to stem on serialization to JSON.";
 
     }
 

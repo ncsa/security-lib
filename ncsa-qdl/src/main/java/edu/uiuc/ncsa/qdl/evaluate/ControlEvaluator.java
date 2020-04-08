@@ -258,6 +258,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 }
                 interpreter.execute(FileUtil.readFileAsString(resourceName));
             }
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setResult(Boolean.TRUE);
+
         } catch (Throwable t) {
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;

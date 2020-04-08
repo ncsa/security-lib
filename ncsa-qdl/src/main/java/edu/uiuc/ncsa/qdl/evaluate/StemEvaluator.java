@@ -878,6 +878,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: the " + IS_DEFINED + " function requires 1 argument");
         }
         boolean isDef = false;
+        polyad.evalArg(0,state);
         if (polyad.getArgumments().get(0) instanceof VariableNode) {
             VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check

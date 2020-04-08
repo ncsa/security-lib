@@ -361,8 +361,12 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
+        if(getStemList().size() == size()){
+            return getStemList().toJSON(); // handles case of simple list of simple elements
+        }
         JSONObject json = new JSONObject();
-        StemList<StemEntry> localSL = getStemList();
+        StemList<StemEntry> localSL = new StemList<>();
+
         QDLCodec codec = new QDLCodec();
 
         // Special case of a JSON array of objects that has been turned in to a stem list.
@@ -391,15 +395,14 @@ public class StemVariable extends HashMap<String, Object> {
                 json.put(escapeNames ? codec.decode(key) : key, get(key));
             }
         }
-        if (json.isEmpty()) {
-            // no other values.
-            if (localSL.isEmpty()) {
-                return json;
-            }
-            return getStemList().toJSON();
+        if(localSL.size() == size()){
+            return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
         }
+
         // now for the messy bit -- lists
+        // At this point there were no collisions in the indices.
         JSONArray array = getStemList().toJSON();
+        array.addAll(localSL.toJSON());
         if (!array.isEmpty()) {
             for (int i = 0; i < array.size(); i++) {
                 json.put(i, array.get(i));
@@ -507,19 +510,21 @@ public class StemVariable extends HashMap<String, Object> {
         // so a key of "01" is a string, not the number 1. Sorry, best we can do. 
         return key.equals("0") || key.matches(int_regex);
     }
-      Pattern var_pattern = Pattern.compile(var_regex);
-      Pattern int_pattern = Pattern.compile(int_regex);
-   protected  boolean isVar(String var){
+
+    Pattern var_pattern = Pattern.compile(var_regex);
+    Pattern int_pattern = Pattern.compile(int_regex);
+
+    protected boolean isVar(String var) {
         return var_pattern.matcher(var).matches();
     }
 
-    protected  boolean isIntVar(String var){
-         return var.equals("0") || int_pattern.matcher(var).matches();
-     }
+    protected boolean isIntVar(String var) {
+        return var.equals("0") || int_pattern.matcher(var).matches();
+    }
 
     @Override
     public Object put(String key, Object value) {
-        if(!isVar(key)){
+        if (!isVar(key)) {
             throw new IllegalArgumentException("Error: " + key + " is not a legal varaible name");
         }
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
@@ -596,6 +601,29 @@ public class StemVariable extends HashMap<String, Object> {
         s.put("foo.", s2);
         System.out.println(s.toString(1));
         System.out.println(s.toJSON().toString());
+        String rawJSON = "{\n" +
+                "  \"isMemberOf\":   [" +
+                "  {\n" +
+                "      \"name\": \"all_users\",\n" +
+                "      \"id\": 13002\n" +
+                "    },\n" +
+                "        {\n" +
+                "      \"name\": \"staff_reporting\",\n" +
+                "      \"id\": 16405\n" +
+                "    },\n" +
+                "        {\n" +
+                "      \"name\": \"list_allbsu\",\n" +
+                "      \"id\": 18942\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.fromJSON(JSONObject.fromObject(rawJSON));
+
+        JSON j = stemVariable.toJSON();
+        System.out.println(j.toString(2));
+
+
     }
 
     public String toString(int indentFactor) {

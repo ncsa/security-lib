@@ -17,7 +17,7 @@ public class Assignment implements Statement, HasResultInterface {
 
     public Object getResult() {
         if(!isEvaluated()){
-            throw new UnevaluatedExpressionException();
+            throw new UnevaluatedExpressionException("source=\"" + (getSourceCode() == null?"(none)":getSourceCode()) + "\"");
         }
         return result;
     }

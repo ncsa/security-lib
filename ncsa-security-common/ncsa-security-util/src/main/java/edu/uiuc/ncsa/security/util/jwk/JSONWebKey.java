@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
+import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
@@ -10,7 +11,7 @@ import java.security.PublicKey;
  * <p>Created by Jeff Gaynor<br>
  * on 1/6/17 at  2:46 PM
  */
-public class JSONWebKey {
+public class JSONWebKey implements Serializable {
     public String id;
     public String algorithm;
     public String use;

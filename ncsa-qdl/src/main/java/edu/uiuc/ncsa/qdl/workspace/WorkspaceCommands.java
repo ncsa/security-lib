@@ -43,10 +43,13 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 1/30/20 at  9:21 AM
  */
 public class WorkspaceCommands implements Logable {
-    public static final String DISPLAY_WIDTH_SWITCH = "-w";
-    public static final String FQ_SWITCH = "-fq";
-    public static final String REGEX_SWITCH = "-r";
-    public static final String COMPACT_ALIAS_SWITCH = "-compact";
+
+    public static final String SWITCH = "-";
+    public static final String DISPLAY_WIDTH_SWITCH = SWITCH + "w";
+    public static final String FQ_SWITCH = SWITCH + "fq";
+    public static final String REGEX_SWITCH = SWITCH + "r";
+    public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
+    public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
     MyLoggingFacade logger;
 
     XProperties env;
@@ -562,12 +565,11 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doModulesCommand(InputLine inputLine) {
-        if (!inputLine.hasArgAt(ACTION_INDEX)) {
+        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
             return doModulesList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "list":
-            case DISPLAY_WIDTH_SWITCH:
                 return doModulesList(inputLine);
             case "imports":
                 return doModuleImports(inputLine);
@@ -583,7 +585,7 @@ public class WorkspaceCommands implements Logable {
         }
         TreeSet<String> aliases = new TreeSet<>();
         for (URI uri : state.getImportManager().keySet()) {
-            aliases.add(uri + " = " + state.getImportManager().getAlias(uri));
+            aliases.add(uri + "->" + state.getImportManager().getAlias(uri));
         }
         return printList(inputLine, aliases);
     }
@@ -591,7 +593,7 @@ public class WorkspaceCommands implements Logable {
     private int doModulesList(InputLine inputLine) {
         TreeSet<String> m = new TreeSet<>();
         for (URI key : getState().getImportManager().keySet()) {
-            m.add(key + " = " + getState().getImportManager().getAlias(key));
+            m.add(key.toString());
         }
         return printList(inputLine, m);
     }
@@ -608,7 +610,7 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doFuncs(InputLine inputLine) {
-        if (!inputLine.hasArgAt(ACTION_INDEX)) {
+        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
             return doFuncsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
@@ -617,7 +619,6 @@ public class WorkspaceCommands implements Logable {
             case "help":
                 return doFuncsHelp(inputLine);
             case "list":
-            case DISPLAY_WIDTH_SWITCH:
                 return doFuncsList(inputLine);
             case "system":
                 return doSystemFuncsList(inputLine);
@@ -691,6 +692,12 @@ public class WorkspaceCommands implements Logable {
             }
 
         }
+        if (inputLine.hasArg(COLUMNS_VIEW_SWITCH)) {
+            for (String func : list) {
+                say(func); // one per line
+            }
+            return RC_CONTINUE;
+        }
         int displayWidth = 120; // just to keep thing simple
         if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
             try {
@@ -710,10 +717,9 @@ public class WorkspaceCommands implements Logable {
         // number of columns are display / width, possibly plus 1 if there is a remainder
         //int colCount = displayWidth / maxWidth + (displayWidth % maxWidth == 0 ? 0 : 1);
         int colCount = displayWidth / maxWidth;
+        colCount = colCount + (colCount == 0 ? 1 : 0); // Make sure there is at least 1 columns
         int rowCount = list.size() / colCount;
-        if (rowCount == 0) {
-            rowCount = 1; // There must be at least one row or you will get a divide by zero below.
-        }
+        rowCount = rowCount + (rowCount == 0 ? 1 : 0); // and at least one row
         String[] output = new String[rowCount];
         for (int i = 0; i < rowCount; i++) {
             output[i] = ""; // initialize it
@@ -721,7 +727,12 @@ public class WorkspaceCommands implements Logable {
         int pointer = 0;
         for (String func : list) {
             int currentLine = pointer++ % rowCount;
-            output[currentLine] = output[currentLine] + func + blanks.substring(0, maxWidth - func.length());
+            if(rowCount == 1){
+                // single row, so don't pad
+                output[currentLine] = output[currentLine] + func + "  ";
+            }else{
+                output[currentLine] = output[currentLine] + func + blanks.substring(0, maxWidth - func.length());
+            }
         }
         for (String x : output) {
             say(x);
@@ -750,7 +761,7 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doVars(InputLine inputLine) {
-        if (!inputLine.hasArgs()) {
+        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
             return doVarsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
@@ -907,10 +918,9 @@ public class WorkspaceCommands implements Logable {
             }
             FileOutputStream fos = new FileOutputStream(target);
             StateUtils.save(state, fos);
-            say("workspace saved to " + target.getCanonicalPath() + " at " + (new Date()));
+            say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
         } catch (Throwable t) {
-            say("would not save the workspace");
-            t.printStackTrace();
+            say("could not save the workspace:" + t.getMessage());
         }
         return RC_NO_OP;
     }
@@ -933,7 +943,7 @@ public class WorkspaceCommands implements Logable {
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
-            say(f.getCanonicalPath() + " loaded. Last saved " + new Date(lastModified));
+            say(f.getCanonicalPath() + " loaded " + f.length() + " bytes. Last saved " + new Date(lastModified));
         } catch (Throwable t) {
             say("workspace not loaded.");
             t.printStackTrace();
