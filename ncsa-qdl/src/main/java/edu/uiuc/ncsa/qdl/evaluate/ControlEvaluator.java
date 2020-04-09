@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
@@ -11,6 +13,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -96,17 +99,17 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             LOAD_COMMAND};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
-              FQ_CONTINUE,
-              FQ_BREAK,
-              FQ_FOR_KEYS,
-              FQ_FOR_NEXT,
-              FQ_CHECK_AFTER,
-              FQ_RETURN,
-              FQ_IMPORT,
-              FQ_LOAD_MODULE,
-              FQ_RAISE_ERROR,
-              FQ_RUN_COMMAND,
-              FQ_LOAD_COMMAND};
+            FQ_CONTINUE,
+            FQ_BREAK,
+            FQ_FOR_KEYS,
+            FQ_FOR_NEXT,
+            FQ_CHECK_AFTER,
+            FQ_RETURN,
+            FQ_IMPORT,
+            FQ_LOAD_MODULE,
+            FQ_RAISE_ERROR,
+            FQ_RUN_COMMAND,
+            FQ_LOAD_COMMAND};
 
     @Override
     public String[] getFunctionNames() {
@@ -115,7 +118,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
         for (String key : fnames) {
             names.add(key + "()");
         }
@@ -297,7 +300,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getArgumments().size()) {
             case 0:
                 polyad.setEvaluated(true);
-                polyad.setResult(null);
+                polyad.setResult(new QDLNull());
                 polyad.setResultType(Constant.NULL_TYPE);
                 break;
             case 1:
@@ -318,13 +321,26 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         throw rx;
     }
 
+    static final int LOAD_FILE = 0;
+    static final int LOAD_JAVA = 1;
 
     protected void doLoadModule(Polyad polyad, State state) {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Error: reading files is not supported in server mode");
         }
-        if (polyad.getArgumments().size() != 1) {
-            throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires a single argument. The full path to the module's file.");
+        if (0 == polyad.getArgumments().size() ||3 <= polyad.getArgumments().size() ) {
+            throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires one or two arguments.");
+        }
+        int loadTarget = LOAD_FILE;
+        if (polyad.getArgumments().size() == 2) {
+            // Then this is probably a Jva module
+            Object arg2 = polyad.evalArg(1, state);
+            if (isString(arg2)) {
+                loadTarget = arg2.toString().equals("java") ? LOAD_JAVA : LOAD_FILE;
+            } else {
+                throw new IllegalArgumentException("Error: " + LOAD_MODULE + " requires a string as a second argument");
+            }
+
         }
         Object arg = polyad.evalArg(0, state);
 
@@ -332,6 +348,23 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: The " + LOAD_MODULE + " command requires a string as its argument, not \"" + arg + "\"");
         }
         String resourceName = arg.toString();
+        if (loadTarget == LOAD_JAVA) {
+            // first arg is the class name.
+            try {
+                Class klasse = state.getClass().forName(resourceName);
+                QDLLoader qdlLoader = (QDLLoader) klasse.newInstance();
+                QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
+                polyad.setResultType(Constant.BOOLEAN_TYPE);
+                polyad.setResult(Boolean.TRUE);
+                polyad.setEvaluated(true);
+                return;
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
+                }
+                throw new QDLException("Error: Could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
+            }
+        }
         QDLScript script = null;
         File file = null;
         if (state.hasVFSProviders() && resourceName.contains(ImportManager.NS_DELIMITER)) {
@@ -405,7 +438,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         try {
             moduleNS = URI.create(arg.toString());
         } catch (Throwable t) {
-            polyad.setResult(null);
+            polyad.setResult(new QDLNull());
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(false);
             throw new QDLException("Error: the module name must be a uri");

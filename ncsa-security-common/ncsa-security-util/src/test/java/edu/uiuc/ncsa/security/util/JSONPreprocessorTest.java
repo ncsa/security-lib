@@ -225,7 +225,6 @@ public class JSONPreprocessorTest extends TestBase {
         jsonObject2.put(IMPORT_DIRECTIVE, ID_OBJECT.toString());
         jsonObject1.put(key1, jsonObject2);
         jsonObject.put(key0, jsonObject1);
-        System.out.println(jsonObject.toString(2));
         PreProcessor pp = createPP();
         JSONObject returnedObject = (JSONObject) pp.execute(jsonObject);
         assert returnedObject.containsKey(key0);
@@ -234,7 +233,6 @@ public class JSONPreprocessorTest extends TestBase {
         JSONObject obj2 = obj1.getJSONObject(key1);
         assert obj2.containsKey("X");
         assert obj2.containsKey("Y");
-        System.out.println(returnedObject.toString(2));
     }
 
     /**
@@ -261,11 +259,9 @@ public class JSONPreprocessorTest extends TestBase {
         array2.add(createImportStmt(ID_ARRAY));
         array1.add(array2);
         array0.add(array1);
-        System.out.println(array0.toString(2));
         PreProcessor pp = createPP();
 
         JSONArray outputArray = (JSONArray) pp.execute(array0);
-        System.out.println(outputArray.toString(2));
         JSONArray z = outputArray.getJSONArray(0).getJSONArray(0); // nested 2 deep.
         assert z.contains("A");
         assert z.contains("B");
@@ -286,7 +282,6 @@ public class JSONPreprocessorTest extends TestBase {
         jsonObject2.put(IMPORT_DIRECTIVE, fakeID);
         jsonObject1.put(key1, jsonObject2);
         jsonObject.put(key0, jsonObject1);
-        System.out.println(jsonObject.toString(2));
         PreProcessor pp = createPP();
         JSONObject returnedObject = (JSONObject) pp.execute(jsonObject);
         assert returnedObject.containsKey(key0);
@@ -295,7 +290,6 @@ public class JSONPreprocessorTest extends TestBase {
         JSONObject obj2 = obj1.getJSONObject(key1);
         assert obj2.containsKey(IMPORT_DIRECTIVE);
         assert obj2.getString(IMPORT_DIRECTIVE).equals(fakeID);
-        System.out.println(returnedObject.toString(2));
     }
 
     /**
@@ -311,11 +305,9 @@ public class JSONPreprocessorTest extends TestBase {
         array2.add(createImportStmt(BasicIdentifier.newID(fakeID)));
         array1.add(array2);
         array0.add(array1);
-        System.out.println(array0.toString(2));
         PreProcessor pp = createPP();
 
         JSONArray outputArray = (JSONArray) pp.execute(array0);
-        System.out.println(outputArray.toString(2));
         JSONObject z = outputArray.getJSONArray(0).getJSONArray(0).getJSONObject(0); // nested 2 deep.
         assert z.containsKey(IMPORT_DIRECTIVE);
         assert z.getString(IMPORT_DIRECTIVE).equals(fakeID);
@@ -336,7 +328,6 @@ public class JSONPreprocessorTest extends TestBase {
         jsonObject2.put(IMPORT_DIRECTIVE, ID_CIRCULAR.toString());
         jsonObject1.put(key1, jsonObject2);
         jsonObject.put(key0, jsonObject1);
-        System.out.println(jsonObject.toString(2));
         PreProcessor pp = createPP();
         try {
             JSONObject returnedObject = (JSONObject) pp.execute(jsonObject);
@@ -358,7 +349,6 @@ public class JSONPreprocessorTest extends TestBase {
         array2.add(createImportStmt(ID_CIRCULAR));
         array1.add(array2);
         array0.add(array1);
-        System.out.println(array0.toString(2));
         PreProcessor pp = createPP();
 
         try {
@@ -455,9 +445,7 @@ public class JSONPreprocessorTest extends TestBase {
     public void testArrayImportStatement() throws Exception {
         JSONObject j = createImportStmt(ID_ARRAY);
         PreProcessor pp = createPP();
-        System.out.println("====\n" + j.toString(2));
         JSON jj = pp.execute(j);
-        System.out.println(jj.toString(2));
         assert jj.isArray();
         JSONArray array = (JSONArray) jj;
         assert array.size() == 2;
@@ -482,9 +470,7 @@ public class JSONPreprocessorTest extends TestBase {
     public void testObjectImportStatement() throws Exception {
         JSONObject j = createImportStmt(ID_OBJECT);
         PreProcessor pp = createPP();
-        System.out.println("====\n" + j.toString(2));
         JSON jj = pp.execute(j);
-        System.out.println(jj.toString(2));
         assert !jj.isArray();
         JSONObject jsonObject = (JSONObject) jj;
     }

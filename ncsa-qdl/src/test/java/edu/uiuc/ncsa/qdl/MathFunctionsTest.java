@@ -59,7 +59,6 @@ public class MathFunctionsTest extends TestBase {
 
         Polyad polyad = new Polyad(MathEvaluator.RANDOM);
         polyad.evaluate(state);
-        System.out.println("A single generated random number = " + polyad.getResult());
         assert polyad.getResult() instanceof Long;
     }
 
@@ -74,10 +73,6 @@ public class MathFunctionsTest extends TestBase {
         polyad.evaluate(state);
         StemVariable r = (StemVariable) polyad.getResult();
         assert r.size() == count;
-        System.out.println("Here are " + count + " random numbers:");
-        for (String key : r.keySet()) {
-            System.out.println("  var." + key + " == " + r.getLong(key));
-        }
     }
 
     @Test
@@ -86,7 +81,6 @@ public class MathFunctionsTest extends TestBase {
 
         Polyad polyad = new Polyad(MathEvaluator.RANDOM_STRING);
         polyad.evaluate(state);
-        System.out.println("A single generated random string = " + polyad.getResult());
         assert polyad.getResult() instanceof String;
     }
 
@@ -99,8 +93,8 @@ public class MathFunctionsTest extends TestBase {
         ConstantNode arg = new ConstantNode(new Long(size), Constant.LONG_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        System.out.println("A random string that is " + size + " bytes long = " + polyad.getResult());
         assert polyad.getResult() instanceof String;
+        assert polyad.getResult().toString().length() == 43;
     }
 
     @Test
@@ -192,7 +186,6 @@ public class MathFunctionsTest extends TestBase {
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        System.out.println(polyad.getResult());
         assert polyad.getResult().equals(expectedResult);
     }
 }

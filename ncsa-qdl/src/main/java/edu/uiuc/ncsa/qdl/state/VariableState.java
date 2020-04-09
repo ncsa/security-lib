@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -153,6 +154,8 @@ public abstract class VariableState extends NamespaceAwareState {
         StemVariable stem = null;
         boolean isNSQ = false;
         URI uri = null;
+        boolean isQDLNull = false;
+        SymbolTable st = null;
         if (isNSQname(w.name)) {
             // easy case. Everything is qualified
             isNSQ = true;
@@ -165,11 +168,17 @@ public abstract class VariableState extends NamespaceAwareState {
             if (isNSQLocalName(variableName)) {
                 variableName = variableName.substring(1); // whack off first bit
             }
-            SymbolTable st = getSymbolStack().getRightST(variableName);
-            stem = (StemVariable) st.resolveValue(getFQName(variableName));
+            st = getSymbolStack().getRightST(variableName);
+
+            Object object = st.resolveValue(getFQName(variableName));
+            if (object instanceof QDLNull) {
+                isQDLNull = true;
+            } else {
+                stem = (StemVariable) st.resolveValue(getFQName(variableName));
+            }
             // most likely place for it was in the main symbol table. But since there is
             // no name clash, look for it in the modules.
-            if (stem == null) {
+            if (stem == null && !isQDLNull) {
                 if (importManager.hasImports()) {
                     for (URI key : importManager.keySet()) {
                         Module m = getModuleMap().get(key);
@@ -188,9 +197,12 @@ public abstract class VariableState extends NamespaceAwareState {
         // Then this is of the form #foo and they are accessing local state explicitly
         switch (op) {
             case OP_GET:
-                if (stem == null) {
-                    //   throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
+                if (stem == null && !isQDLNull) {
+                     //  throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
                     return null;
+                }
+                if(isQDLNull){
+                    return new QDLNull();
                 }
                 if (w.isEmpty()) {
                     return stem;
@@ -207,8 +219,9 @@ public abstract class VariableState extends NamespaceAwareState {
                     }
 
                 } else {
-                    if (stem == null) {
+                    if (stem == null || isQDLNull) {
                         stem = new StemVariable();
+                        st.setValue(variableName,stem);
                     }
                     stem.set(w, value);
                     if (isNSQ) {
@@ -221,7 +234,7 @@ public abstract class VariableState extends NamespaceAwareState {
 
                 return null;
             case OP_REMOVE:
-                if (stem == null) {
+                if (stem == null && !isQDLNull) {
                     throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
                 }
                 if (w.isEmpty()) {
@@ -231,6 +244,7 @@ public abstract class VariableState extends NamespaceAwareState {
                         getSymbolStack().getLocalST().remove(variableName);
                     }
                 } else {
+                    
                     stem.remove(w);
                 }
                 return null;

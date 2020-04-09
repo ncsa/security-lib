@@ -13,7 +13,6 @@ import net.sf.json.JSONObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -149,7 +148,6 @@ public class StemFunctionsTest extends TestBase {
         assert keys.containsKey("2");
         assert keys.containsKey("3");
         for (String key : keys.keySet()) {
-            System.out.println("  var." + key + " == " + keys.get(key));
             assert sourceStem.containsKey(keys.get(key));
         }
     }
@@ -188,9 +186,7 @@ public class StemFunctionsTest extends TestBase {
         assert keys.containsValue("find");
         assert !keys.containsValue("bind");
         assert keys.containsValue("bring");
-        for (String key : keys.keySet()) {
-            System.out.println("  var." + key + " == " + keys.get(key));
-        }
+
     }
 
     @Test
@@ -224,8 +220,6 @@ public class StemFunctionsTest extends TestBase {
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == count;
         for (int i = 0; i < count; i++) {
-            System.out.println(" i = " + i);
-
             assert result.containsKey(keys.getString(Integer.toString(i)));
         }
     }
@@ -242,13 +236,6 @@ public class StemFunctionsTest extends TestBase {
         int count = 5;
         QDLCodec codec = new QDLCodec();
         randomStem(sourceStem, 2 * count);
-      /*  for (int i = 0; i < 2 * count; i++) {
-            String key = getRandomString();
-            sourceStem.put(key, getRandomString());
-            keys.put(key, codec.encode(getRandomString()));
-        }
-*/
-
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("keys.", keys);
         Polyad polyad = new Polyad(StemEvaluator.RENAME_KEYS);
@@ -296,8 +283,6 @@ public class StemFunctionsTest extends TestBase {
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == count;
         for (int i = 0; i < count; i++) {
-            System.out.println(" i = " + i);
-
             assert !result.containsKey(keys.getString(Integer.toString(i)));
         }
     }
@@ -511,9 +496,11 @@ public class StemFunctionsTest extends TestBase {
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == 5;
-        for (String key : result.keySet()) {
-            System.out.println("  var." + key + " == " + result.get(key));
-        }
+        assert result.get("0") instanceof StemVariable;
+        assert result.getLong("1") == 5L;
+        assert result.getString("2").equals("foo");
+        assert result.getString("3").equals("bar");
+        assert result.getString("4").equals("baz");
     }
 
     @Test
@@ -612,6 +599,7 @@ public class StemFunctionsTest extends TestBase {
     /**
      * Regression test for converting stems to JSON where there is a stem list of stems.
      * Extra elements were being added.
+     *
      * @throws Exception
      */
     @Test
@@ -644,29 +632,69 @@ public class StemFunctionsTest extends TestBase {
 
     }
 
+    /**
+     * Test that arrays are faithfully translated to and from stems
+     *
+     * @throws Exception
+     */
     @Test
-    public void testJSON() throws Exception {
-        // This is not a test. It is me debugging whether I want to try and figure out how to convert stems to
-        // JSON objects. Could be handy, but it's quite a rats nest.
-        JSONObject jsonObject = new JSONObject();
-        JSONObject jsonObject1 = new JSONObject();
-        JSONObject jsonObject2 = new JSONObject();
+    public void testJSONArray2() throws Exception {
         JSONArray array = new JSONArray();
-        int count = 10;
-        for (int i = 0; i < count; i++) {
-            array.add(getRandomString(4));
+        for (int i = 0; i < 2 * count; i++) {
+            array.add(makeRandomArray(i));
         }
-        jsonObject2.put("test_stem", array);
-        jsonObject1.put("date", new Date());
-        jsonObject1.put("long", System.currentTimeMillis());
-        jsonObject1.put("float", new Float("12.34"));
-        jsonObject.put("stem1", jsonObject1);
-        jsonObject.put("stem2", jsonObject2);
-        StemVariable stemVariable = new StemVariable();
-        stemVariable.fromJSON(jsonObject);
-        System.out.println(stemVariable.toString());
-
+        verifyJSONArrayRoundtrip(array);
     }
+
+    protected void verifyJSONArrayRoundtrip(JSONArray array) {
+        // options are this has single strings as elements or JSON Arrays of strings
+        StemVariable stemVariable = new StemVariable();
+        stemVariable.fromJSON(array);
+        JSON json = stemVariable.toJSON();
+        assert json instanceof JSONArray : "Did not get back a JSON array";
+        JSONArray array2 = (JSONArray) json;
+        for (int i = 0; i < array.size(); i++) {
+            Object temp = array.get(i);
+            if (temp instanceof JSONArray) {
+                JSONArray innerA = (JSONArray) temp;
+                for (int j = 0; j < innerA.size(); j++) {
+                    assert array2.getJSONArray(i).getString(j).equals(innerA.getString(j));
+                }
+
+            } else {
+                assert temp.equals(array2.get(i));
+            }
+        }
+    }
+
+    /**
+     * This tests a mixture of arrays of arrays and single items to show that order in
+     * the origina list is preserved.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testJSONArrayOrder() throws Exception {
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < 2 * count; i++) {
+            if (0 == i % 2) {
+                array.add(getRandomString());
+            } else {
+                array.add(makeRandomArray(i));
+            }
+        }
+        verifyJSONArrayRoundtrip(array);
+    }
+
+    protected JSONArray makeRandomArray(int n) {
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < n; i++) {
+            array.add(getRandomString());
+        }
+        return array;
+    }
+
+   
 
     @Test
     public void testAddList() throws Throwable {
@@ -753,7 +781,6 @@ public class StemFunctionsTest extends TestBase {
         stem2.setStemList(stemList2);
         stem1.oldListInsertAt(stem2, 4, 5);
         StemList<StemEntry> result = stem1.getStemList();
-        System.out.println(result);
         // should return sorted set
         Object expectedValues[] = new Object[]{.0, .1, .2, .3, 0L, 1L, 4L, 9L, 16L, .4, .5, .6, .7, .8, .9};
         assert result.size() == count1 + count2;
@@ -780,7 +807,6 @@ public class StemFunctionsTest extends TestBase {
         targetStem.setStemList(targetSL);
         sourceStem.listInsertAt(2, 5, targetStem, 3);
         StemList<StemEntry> result = targetStem.getStemList();
-        System.out.println(result);
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, 4L, .2, .3, .4, .5, .6, 9L, 16L};
         assert result.size() == count2 + 5; // original plus number inserted
@@ -801,7 +827,6 @@ public class StemFunctionsTest extends TestBase {
         sourceStem.setStemList(sourceSL);
         StemVariable targetStem = sourceStem.listSubset(2, 3);
         StemList<StemEntry> result = targetStem.getStemList();
-        System.out.println(result);
         // should return sorted set
         Object expectedValues[] = new Object[]{22L, 23L, 24L};
         assert result.size() == 3; // original plus number inserted
@@ -822,7 +847,6 @@ public class StemFunctionsTest extends TestBase {
         // Test copying the tail of the list from the given index.
         StemVariable targetStem = sourceStem.listSubset(7);
         StemList<StemEntry> result = targetStem.getStemList();
-        System.out.println(result);
         // should return sorted set
         Object expectedValues[] = new Object[]{27L, 28L, 29L};
         assert result.size() == 3; // original plus number inserted

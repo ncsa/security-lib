@@ -592,7 +592,7 @@ public class WorkspaceCommands implements Logable {
 
     private int doModulesList(InputLine inputLine) {
         TreeSet<String> m = new TreeSet<>();
-        for (URI key : getState().getImportManager().keySet()) {
+        for (URI key : getState().getModuleMap().keySet()) {
             m.add(key.toString());
         }
         return printList(inputLine, m);
@@ -646,7 +646,7 @@ public class WorkspaceCommands implements Logable {
         }
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
 
-        int argCount = 0;
+        int argCount = -1; // means return every similarly named function.
         String rawArgCount = null;
         if (inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
             rawArgCount = inputLine.getArg(1 + FIRST_ARG_INDEX);

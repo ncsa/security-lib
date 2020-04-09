@@ -416,6 +416,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + TO_JSON + " requires an argument");
         }
         Object arg1 = polyad.evalArg(0, state);
+        if(arg1 == null){
+            throw new IllegalArgumentException("Error: null argument passed to " + TO_JSON);
+        }
         if (!isStem(arg1)) {
             throw new IllegalArgumentException("Error: " + TO_JSON + " requires a stem as its first argument");
         }

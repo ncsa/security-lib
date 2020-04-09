@@ -4,6 +4,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
@@ -281,7 +282,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             if(objects[0] == null){
                                 r.result = objects[1] == objects[0];
                             }else {
-                                r.result = objects[0].equals(objects[1]);
+                                // dge case == null
+                                if(objects[1] instanceof QDLNull){
+                                    r.result = objects[0] instanceof QDLNull;
+                                }else {
+                                    r.result = objects[0].equals(objects[1]);
+                                }
                             }
                             break;
                         case NOT_EQUAL_VALUE:

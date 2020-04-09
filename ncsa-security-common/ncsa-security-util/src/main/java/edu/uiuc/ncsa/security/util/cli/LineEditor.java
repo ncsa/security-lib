@@ -135,7 +135,7 @@ public class LineEditor {
         say(CLEAR_COMMAND + " (" + CLEAR_COMMAND_LONG + ") clear the buffer (but not the clipboard)");
         say(MOVE_COMMAND + " (" + MOVE_COMMAND_LONG + ") move a block of text using the clipboard");
         say(PRINT_COMMAND + " (" + PRINT_COMMAND_LONG + ") print the buffer or a subset of it");
-        say(QUIT_COMMAND + " (" + QUIT_COMMAND_LONG + ") quit the editor");
+        say(QUIT_COMMAND + " (" + QUIT_COMMAND_LONG + ") quit the editor. If you supply a \"!\" as the argument, the buffer is cleared.");
         say(READ_COMMAND + " (" + READ_COMMAND_LONG + ") read a file into the buffer");
         say(SUBSITUTE_COMMAND + " (" + SUBSITUTE_COMMAND_LONG + ") substitute over a range of lines using a regex");
         say(PASTE_COMMAND + " (" + PASTE_COMMAND_LONG + ") paste the contents of the clipboard into the buffer");
@@ -168,7 +168,12 @@ public class LineEditor {
             if (eil.isCommand(QUIT_COMMAND, QUIT_COMMAND_LONG)) {
                 isDone = true;
                 isUnkownCommand = false;
-                sayv("bye-bye...");
+                if(eil.hasArg("!")){
+                    buffer = new LinkedList<>();
+                    sayv("Buffer cleared. bye-bye...");
+                }else{
+                    sayv("bye-bye...");
+                }
                 break;
             }
             if (eil.isCommand(APPEND_COMMAND, APPEND_COMMAND_LONG)) {
@@ -561,19 +566,23 @@ public class LineEditor {
     }
 
     protected void doPrintHelp() {
-        say(PRINT_COMMAND + "|" + PRINT_COMMAND_LONG + " [x,y] = print lines x through y inclusive. If you give a single number, a single line is printed");
-        say("          If you omit any numbers, the entire buffer is printed");
+        say(PRINT_COMMAND + "|" + PRINT_COMMAND_LONG + " [x,y] [" + PRINT_NO_LINE_NUMBERS_FLAG + "]= print lines x through y inclusive, with or without line numbers. " +
+                "If you give a single number, a single line is printed");
+        say("          If you omit any numbers, the entire buffer is printed. Omitting the flag means to print line numbers");
+        say("          Giving the flag means just the contents of the buffer are printed.");
     }
 
+    String PRINT_NO_LINE_NUMBERS_FLAG = "-noNumber";
     protected void doPrint(EditorInputLine eil) {
         if (showHelp(eil)) {
             doPrintHelp();
             return;
         }
-
+        boolean showLineNumbers = !eil.hasArg(PRINT_NO_LINE_NUMBERS_FLAG);
         int[] range = getRange(eil);
         for (int i = range[0]; i <= range[1]; i++) {
-            say(i + ": " + getBuffer().get(i));
+            String head = showLineNumbers?(i + ": "):("");
+            say(head  + getBuffer().get(i));
         }
     }
 

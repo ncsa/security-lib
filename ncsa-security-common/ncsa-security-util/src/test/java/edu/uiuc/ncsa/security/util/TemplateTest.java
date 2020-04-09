@@ -63,7 +63,6 @@ public class TemplateTest extends TestBase {
         String x = "ab ${x${y}}...";
         String result = "ab mairzey doats...";
         String rc = TemplateUtil.replaceAll(x, getReplacements());
-        System.out.println("rc=\"" + rc + "\"");
         assert result.equals(rc);
     }
 

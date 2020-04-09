@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
 import org.junit.Test;
@@ -17,26 +18,6 @@ import java.math.BigDecimal;
  */
 public class ParserTest extends TestBase {
     TestUtils testUtils = TestUtils.newInstance();
-    /*
-
-
-
-    cf[x_]:=1+(1/(1+1/(1+1/(1+1/(x^2+1)))))
-    For[i=1,i<5,i++,Print[N[cf[2/i],15]]]
-    1.64705882352941
-    1.625
-    1.6140350877193
-    1.60869565217391
-
-    cf2[x_,y_]:=1/(x+y/(x+y/(x+y/(x+y/(x^2+y^2+1)))))
-
-    In[55]:= For[i=1,i<6,i++,Print[N[cf2[2/i,-3/i],15]]]
-    0.415492957746479
-    3.35135135135135
-    -2.80739299610895
-    -1.30201342281879
-    -0.925538758443229
-     */
 
     /**
      * Tests the rational function<br/><br/>
@@ -384,6 +365,56 @@ public class ParserTest extends TestBase {
     }
 
     /**
+     * This checks that managing scope outside of a block works. Here a variable is set to
+     * null then set inside a loop and the values are updated correctly
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testListScope() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := null;");
+        addLine(script, "while[");
+        addLine(script, "    for_next(j,10)");
+        addLine(script, "]do[");
+        addLine(script, "   if[");
+        addLine(script, "      mod(j,2) == 0");
+        addLine(script, "   ]then[");
+        addLine(script, "     a.j := random_string();");
+        addLine(script, "   ]else[");
+        addLine(script, "     a.j. := random(3);");
+        addLine(script, "   ]; // end if");
+        addLine(script, "]; // end while");
+        addLine(script, "");
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        assert stemVariable.size() == 10; // Fingers and toes test.
+        assert stemVariable.containsKey("1."); // odds are stems
+        assert stemVariable.containsKey("0"); // evens are scalars
+    }
+
+    /*
+     a. := null;
+     while[for_next(j,10)
+     ]do[
+       if[
+          mod(j,2) == 0
+       ]then[
+        a.j := random_string();
+        say('a.j == ' + a.j);
+       ]else[
+        a.j. := random(3);
+        say('a.j. == ' + a.j.);
+       ]; // end if
+     ]; //end else
+     say(a.);
+
+     */
+
+    /**
      * Identical setup to {@link #testCalledFunctions()} but puts g and h into modules which are then imported
      * outside the function and called. g is defined outside the module.
      * This should <b>FAIL</b> since there are multiple definitions of g
@@ -424,7 +455,6 @@ public class ParserTest extends TestBase {
         addLine(script, "z := f(x,y);");
         try {
             interpreter.execute(script.toString());
-            System.out.println( state.getValue("z"));
             assert false : "Was able to access imported functions inside another function without importing it";
         } catch (ImportException ufx) {
             assert true;
@@ -507,7 +537,6 @@ public class ParserTest extends TestBase {
         assert state.getValue("a#q").equals(10L);
         assert state.getValue("b#q").equals(11L);
     }
-
 
 
     /**
@@ -842,6 +871,7 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a:='" + test + "';");
+        addLine(script, "say('test print chars:');");
         addLine(script, "say(a);");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
@@ -849,10 +879,11 @@ public class ParserTest extends TestBase {
 
     /**
      * test that a language with lots of diacriticals gets handled right in encode and decoding.
+     *
      * @throws Throwable
      */
     @Test
-    public void testUTF8StringDecodeEncode() throws Throwable{
+    public void testUTF8StringDecodeEncode() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         // First line of the Vietnamese epic, the Tale of Kieu
@@ -956,7 +987,6 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
         try {
             interpreter.execute(script.toString());
-            System.out.println(state.getValue("a"));
             assert false : "Was able to make an assignment with = not :=";
         } catch (Throwable t) {
             assert true;
@@ -983,13 +1013,19 @@ public class ParserTest extends TestBase {
     public void testListAppend() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "my_stem.help := 'this is my stem';");
-        addLine(script, "list_append(my_stem., indices(5));");
-        addLine(script, "say(my_stem., true);");
+        String phrase = "This is my stem " + getRandomString();
+        addLine(script, "my_stem.help := '" + phrase + "';");
+        addLine(script, "list_append(my_stem., 10 + indices(5));");
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-
+        StemVariable stem = getStemValue("my_stem.", state);
+        assert stem.getLong("0") == 10L;
+        assert stem.getLong("1") == 11L;
+        assert stem.getLong("2") == 12L;
+        assert stem.getLong("3") == 13L;
+        assert stem.getLong("4") == 14L;
+        assert stem.getString("help").equals(phrase);
     }
 
     /**
@@ -1010,8 +1046,8 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert state.getValue("a") == null;
-        assert state.getValue("a.") == null;
+        assert state.getValue("a") instanceof QDLNull;
+        assert state.getValue("a.") instanceof QDLNull;
         assert (Boolean) state.getValue("a0");
         assert (Boolean) state.getValue("a1");
 
@@ -1022,8 +1058,6 @@ public class ParserTest extends TestBase {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "    execute('var := \\'abc\\' + \\'def\\';');");
-        addLine(script, "    say(var);");
-        System.out.println("\n\n" + script.toString());
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("var").equals("abcdef");
@@ -1115,6 +1149,7 @@ public class ParserTest extends TestBase {
     /**
      * Create a module, then import it to another module. The variables should be resolvable transitively
      * and the states should all be separate.
+     *
      * @throws Throwable
      */
     @Test
@@ -1138,17 +1173,18 @@ public class ParserTest extends TestBase {
         assert state.getValue("w#a#q").equals(3L);
 
     }
-      /*
-      Define a function then define variants in modules.  Values are checked to track whether the state
-      gets corrupted. This can be put into a QDL workspace to check manually
-      
-          define[f(x)]body[return(x+100);];
-          module['a:/t','a']body[define[f(x)]body[return(x+1);];];
-          module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
-          import('q:/z');
-          w#a#f(3)
-          w#g(2)
-       */
+
+    /*
+    Define a function then define variants in modules.  Values are checked to track whether the state
+    gets corrupted. This can be put into a QDL workspace to check manually
+
+        define[f(x)]body[return(x+100);];
+        module['a:/t','a']body[define[f(x)]body[return(x+1);];];
+        module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
+        import('q:/z');
+        w#a#f(3)
+        w#g(2)
+     */
     @Test
     public void testNestedFunctionImport() throws Throwable {
         StringBuffer script = new StringBuffer();

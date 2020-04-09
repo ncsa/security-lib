@@ -43,7 +43,8 @@ public class WhileLoop implements Statement {
 
     @Override
     public Object evaluate(State state) {
-        State localState = state.newStateWithImports();
+       State localState = state.newStateWithImports();
+        //State localState = state.new;
         if(conditional instanceof Polyad){
            Polyad p = (Polyad )conditional;
            if(p.isBuiltIn()){
@@ -131,10 +132,10 @@ public class WhileLoop implements Statement {
                 throw new IllegalArgumentException("Error: incorrect number of arguments for " + FOR_NEXT + ".");
         }
         // while[for_next(j,0,10,-1)]do[say(j);];  // test statememt
-        SymbolTable localST = localState.getSymbolStack().getLocalST();
+       // SymbolTable localST = localState.getSymbolStack().getLocalST();
 
         for (int i = start; i != endValue; i = i + increment) {
-            localST.setLongValue(loopArg, (long) i);
+            localState.setValue(loopArg, (long) i);
             for (Statement statement : getStatements()) {
                 try {
                     statement.evaluate(localState);

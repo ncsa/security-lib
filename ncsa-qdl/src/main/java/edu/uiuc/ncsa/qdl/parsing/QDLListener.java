@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -73,9 +74,13 @@ public class QDLListener implements QDLParserListener {
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals("true")), Constant.BOOLEAN_TYPE);
             p.statement = cnode;
             cnode.setSourceCode(ctx.getText());
-        } else {
-            ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
+            return;
         }
+        if(ctx.getText().equals("null")){
+            p.statement = new QDLNull();
+            return;
+        }
+            ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
 
     }
 
@@ -444,12 +449,10 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterNull(QDLParserParser.NullContext ctx) {
-
     }
 
     @Override
     public void exitNull(QDLParserParser.NullContext ctx) {
-
     }
 
     @Override

@@ -444,15 +444,11 @@ public class VFSTest extends TestBase {
         assert dirList.contains("other/");
 
         dir = vfs.dir(storeRoot);
-        for (String x : dir) {
-            System.out.println(x);
-        }
+        assert dir[0].equals("root/");
 
         assert vfs.contains(storeRoot + fileInZip);
         VFSEntry e = vfs.get(storeRoot + fileInZip);
 
-        System.out.println(e.getText());
-        System.out.println(e.getProperties().toString(2));
         assert e.getText().equals("2+2 =4\n"); // contains a single line of text.
         testMkdir(vfs);
     }

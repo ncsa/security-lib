@@ -185,7 +185,7 @@ public class QDLConfigurationLoaderUtils {
         return x;
     }
 
-    protected static void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
+    public static void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
         for (Module m : loader.load()) {
             state.addModule(m); // done!
             if (importASAP) {

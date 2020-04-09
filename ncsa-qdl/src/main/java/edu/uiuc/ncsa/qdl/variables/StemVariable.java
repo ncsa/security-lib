@@ -366,7 +366,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         JSONObject json = new JSONObject();
         StemList<StemEntry> localSL = new StemList<>();
-
+        localSL.addAll(getStemList());
         QDLCodec codec = new QDLCodec();
 
         // Special case of a JSON array of objects that has been turned in to a stem list.
@@ -525,7 +525,7 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public Object put(String key, Object value) {
         if (!isVar(key)) {
-            throw new IllegalArgumentException("Error: " + key + " is not a legal varaible name");
+            throw new IllegalArgumentException("Error: " + key + " is not a legal variable name");
         }
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);

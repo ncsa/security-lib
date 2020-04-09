@@ -174,6 +174,20 @@ public class State extends FunctionState {
         return newState;
     }
 
+    public State newLoopState() {
+          //System.out.println("** State, creating new local state **");
+          SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
+          State newState = new State(importManager,
+                  newStack,
+                  getOpEvaluator(),
+                  getMetaEvaluator(),
+                  getFunctionTable(),
+                  getModuleMap(),
+                  getLogger(),
+                  isServerMode());
+          newState.setImportedModules(getImportedModules());
+          return newState;
+      }
     /**
      * For modules only. This copies the state except that no functions are inherited. The
      * contract is that modules only internal state that may be imported.

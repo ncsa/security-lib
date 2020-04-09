@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -89,7 +90,7 @@ public class Assignment implements Statement, HasResultInterface {
                 break;
             case Constant.NULL_TYPE:
                 // Can set any variable to null
-                state.setValue(variableReference, result);
+                state.setValue(variableReference, new QDLNull());
                 break;
 
             case Constant.STRING_TYPE:

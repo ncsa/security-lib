@@ -502,9 +502,6 @@ public class JFunctorTest extends TestBase {
         Object result = logicBlock.getConsequent().getResult();
         List<String> results = (List<String>) result;
         assert results.get(0).equals("FOO");
-        System.out.println(logicBlock.toJSON());
-        System.out.println(logicBlock);
-
     }
 
     /**
@@ -626,7 +623,6 @@ public class JFunctorTest extends TestBase {
         String errorMsg = "error message " + Long.toHexString(System.currentTimeMillis()); // something unique to test against.
         raiseError.addArg(errorMsg);
         String raw = raiseError.toJSON().toString();
-        System.out.println("Raw JSON for raise error = " + raw.toString());
         JFunctor functor = ff.create(raw);
         try{
             functor.execute();
