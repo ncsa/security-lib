@@ -23,6 +23,8 @@ import java.util.HashMap;
  * on 1/21/20 at  7:25 AM
  */
 public class State extends FunctionState {
+    private static final long serialversionUID = 4129348937L;
+
 
     public State(ImportManager resolver,
                  SymbolStack symbolStack,

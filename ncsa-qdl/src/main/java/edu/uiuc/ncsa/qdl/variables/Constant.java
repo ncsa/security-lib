@@ -9,7 +9,8 @@ import java.math.BigDecimal;
  */
 public class Constant {
     public static int getType(Object object){
-        if(object == null) return NULL_TYPE;
+
+        if(object instanceof QDLNull) return NULL_TYPE;
         if(object instanceof String) return STRING_TYPE;
         if(object instanceof Long) return LONG_TYPE;
         if(object instanceof Boolean) return BOOLEAN_TYPE;

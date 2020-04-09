@@ -657,7 +657,9 @@ public class StemVariable extends HashMap<String, Object> {
         for (StemEntry s : getStemList()) {
             keys.add(Long.toString(s.index));
         }
-        return keys;
+        TreeSet<String> sortedSet = new TreeSet<>();
+        sortedSet.addAll(keys);
+        return sortedSet;
     }
 
     @Override

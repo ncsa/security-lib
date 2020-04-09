@@ -30,7 +30,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.logger = logger;
     }
 
-  transient  MyLoggingFacade logger; // makes no sense to serialize a logger.
+    transient MyLoggingFacade logger; // makes no sense to serialize a logger.
 
     private static final long serialversionUID = 129348937L;
 
@@ -127,8 +127,8 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
     SymbolStack symbolStack;
-    MetaEvaluator metaEvaluator;
-    OpEvaluator opEvaluator;
+    transient MetaEvaluator metaEvaluator;
+    transient OpEvaluator opEvaluator;
 
     public int getOperatorType(String name) {
         return getOpEvaluator().getType(name);

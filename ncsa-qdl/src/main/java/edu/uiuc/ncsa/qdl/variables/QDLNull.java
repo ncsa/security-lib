@@ -15,5 +15,9 @@ public class QDLNull extends ConstantNode {
         setResult(this);
         setEvaluated(true);
     }
-    
+
+    @Override
+    public String toString() {
+        return "null";
+    }
 }

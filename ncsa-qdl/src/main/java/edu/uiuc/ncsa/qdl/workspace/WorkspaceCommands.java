@@ -500,7 +500,9 @@ public class WorkspaceCommands implements Logable {
                 useLocalBuffer = true;
                 return RC_CONTINUE;
             case "show":
-                if (localBuffer != null) {
+                if(localBuffer == null || localBuffer.length() == 0){
+                   say("(empty)");
+                }else{
                     say(localBuffer.toString());
                 }
                 return RC_CONTINUE;
@@ -824,7 +826,7 @@ public class WorkspaceCommands implements Logable {
             case "clear":
                 return doWSClear(inputLine);
             case "echo":
-                return doEchoMode(inputLine);
+                return doWSEchoMode(inputLine);
             case "id":
                 if (currentWorkspace == null) {
                     say("No workspace loaded");
@@ -870,7 +872,7 @@ public class WorkspaceCommands implements Logable {
         return text + spaces.substring(0, spaces.length() - text.length());
     }
 
-    private int doEchoMode(InputLine inputLine) {
+    private int doWSEchoMode(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("echo mode currently " + (isEchoModeOn() ? "on" : "off"));
             return RC_CONTINUE;
@@ -934,7 +936,9 @@ public class WorkspaceCommands implements Logable {
             Now set the stuff that cannot be serialized.
              */
             newState.setLogger(getState().getLogger()); // set the logger to whatever the current one is
-            state.setVfsFileProviders(new HashMap<>()); // Make sure something is there before we add to it.
+            newState.setMetaEvaluator(getState().getMetaEvaluator());
+            newState.setOpEvaluator(getState().getOpEvaluator());
+            state.setVfsFileProviders(new HashMap<>()); // Make sure something is in the current state before we muck with it.
             for (String name : getState().getVfsFileProviders().keySet()) {
                 newState.addVFSProvider(getState().getVfsFileProviders().get(name));
             }

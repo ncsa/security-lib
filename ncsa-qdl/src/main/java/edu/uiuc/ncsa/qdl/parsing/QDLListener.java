@@ -155,6 +155,12 @@ public class QDLListener implements QDLParserListener {
             }
 
             nextA = new Assignment();
+            if(assignmentContext.children.size() == i+1){
+                // no next element, implies the user sent something like a :=; so no rhs, OR the
+                // rhs was so munged the parser can't figure out what it is.
+                // Throw an  exception they can understand rather than an index out of bounds.
+                throw new IllegalArgumentException("Error: missing/unparseable expression for assignment");
+            }
             nextVar = assignmentContext.children.get(i + 1).getText();
             nextA.setVariableReference(nextVar);
 

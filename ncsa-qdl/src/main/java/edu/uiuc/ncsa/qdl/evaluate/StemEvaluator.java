@@ -59,6 +59,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_UNION = STEM_FQ + UNION;
     public static final int UNION_TYPE = 10 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String VAR_TYPE = "var_type";
+    public static final String FQ_VAR_TYPE = SYS_FQ + VAR_TYPE;
+    public static final int VAR_TYPE_TYPE = 11 + STEM_FUNCTION_BASE_VALUE;
+
     // Key functions
     public static final String COMMON_KEYS = "common_keys";
     public static final String FQ_COMMON_KEYS = STEM_FQ + COMMON_KEYS;
@@ -139,6 +143,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             MAKE_INDICES,
             REMOVE,
             IS_DEFINED,
+            VAR_TYPE,
             SET_DEFAULT,
             BOX,
             UNBOX,
@@ -164,6 +169,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_MAKE_INDICES,
             FQ_REMOVE,
             FQ_IS_DEFINED,
+            FQ_VAR_TYPE,
             FQ_SET_DEFAULT,
             FQ_BOX,
             FQ_UNBOX,
@@ -221,6 +227,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_KEYS:
             case FQ_LIST_KEYS:
                 return LIST_KEYS_TYPE;
+            case VAR_TYPE:
+            case FQ_VAR_TYPE:
+                return VAR_TYPE_TYPE;
             case HAS_KEYS:
             case FQ_HAS_KEYS:
                 return HAS_KEYS_TYPE;
@@ -283,6 +292,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case VAR_TYPE:
+            case FQ_VAR_TYPE:
+                doVarType(polyad, state);
+                return true;
             case SIZE:
             case FQ_SIZE:
                 doSize(polyad, state);
@@ -383,6 +396,37 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+    /**
+     * Get the type of the argument.
+     *
+     * @param polyad
+     * @param state
+     */
+    public void doVarType(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setResult(Constant.NULL_TYPE);
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        polyad.evalArg(0, state);
+        if (polyad.getArgumments().size() == 1) {
+            polyad.setResult(new Long(Constant.getType(polyad.getArgumments().get(0).getResult())));
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        StemVariable output = new StemVariable();
+        output.put(0L, new Long(Constant.getType(polyad.getArgumments().get(0).getResult())));
+        for (int i = 1; i < polyad.getArgumments().size(); i++) {
+            Object r = polyad.evalArg(i, state);
+            output.put(new Long(i), new Long(Constant.getType(r)));
+        }
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResult(output);
+        polyad.setEvaluated(true);
+    }
+
     protected void doFromJSON(Polyad polyad, State state) {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error: " + FROM_JSON + " requires an argument");
@@ -416,7 +460,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + TO_JSON + " requires an argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        if(arg1 == null){
+        if (arg1 == null) {
             throw new IllegalArgumentException("Error: null argument passed to " + TO_JSON);
         }
         if (!isStem(arg1)) {
@@ -618,7 +662,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgumments().get(0).getResult();
-        long size = 0;
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
             polyad.setResultType(Constant.STEM_TYPE);
@@ -881,19 +924,19 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: the " + IS_DEFINED + " function requires 1 argument");
         }
         boolean isDef = false;
-        polyad.evalArg(0,state);
+        polyad.evalArg(0, state);
         if (polyad.getArgumments().get(0) instanceof VariableNode) {
             VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
             // if the name is defined.
             isDef = state.isDefined(variableNode.getVariableReference());
         }
-        if(polyad.getArgumments().get(0) instanceof ConstantNode){
+        if (polyad.getArgumments().get(0) instanceof ConstantNode) {
             ConstantNode variableNode = (ConstantNode) polyad.getArgumments().get(0);
             Object x = variableNode.getResult();
-            if(x == null){
+            if (x == null) {
                 isDef = false;
-            }else{
+            } else {
                 isDef = state.isDefined(x.toString());
             }
         }

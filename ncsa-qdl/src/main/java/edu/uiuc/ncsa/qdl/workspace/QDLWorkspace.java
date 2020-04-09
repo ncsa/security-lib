@@ -36,7 +36,11 @@ public class QDLWorkspace {
             getLogger().error(t);
         }
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
-            workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn() ? t.getMessage() : "could not parse input"));
+            if(t.getMessage().contains("extraneous input")){
+                workspaceCommands.say("syntax error: Unexpected or illegal character.");
+            }else {
+                workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn() ? t.getMessage() : "could not parse input"));
+            }
             return;
         }
         if (t instanceof IllegalStateException) {
@@ -71,6 +75,7 @@ public class QDLWorkspace {
             boolean executeExternalFile = false;
             System.out.print(INDENT);
             String input = workspaceCommands.readline().trim();
+
             if (input.equals("%")) {
                 input = lastCommand;
             } else {
@@ -93,11 +98,12 @@ public class QDLWorkspace {
                         break;
                 }
             }
+            boolean echoMode = workspaceCommands.isEchoModeOn();
+
             try {
                 // Turn off echo mode if running a buffer or very strange things can result
                 if (executeLocalBuffer) {
                     if (workspaceCommands.getLocalBuffer() != null) {
-                        boolean echoMode = workspaceCommands.isEchoModeOn();
                         workspaceCommands.setEchoModeOn(false);
                         workspaceCommands.getInterpreter().execute(workspaceCommands.getLocalBuffer().toString());
                         workspaceCommands.setEchoModeOn(echoMode);
@@ -108,13 +114,13 @@ public class QDLWorkspace {
                     if (workspaceCommands.getExternalBuffer() != null) {
                         try {
                             String xb = FileUtil.readFileAsString(workspaceCommands.getExternalBuffer().getAbsolutePath());
-                            boolean echoMode = workspaceCommands.isEchoModeOn();
                             workspaceCommands.setEchoModeOn(false);
                             workspaceCommands.getInterpreter().execute(xb);
                             workspaceCommands.setEchoModeOn(echoMode);
 
                         } catch (IOException t) {
                             workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
+                            workspaceCommands.setEchoModeOn(echoMode);
                         }
                     }
                     continue;
@@ -128,6 +134,10 @@ public class QDLWorkspace {
                     workspaceCommands.getInterpreter().execute(input);
                 }
             } catch (Throwable t) {
+                // If there is an exception while local mode is running, we don't want to trash the user's
+                // echo mode, since that causes every subsequent command to fail at least until they
+                // figure it `out and turn it back on.
+                workspaceCommands.setEchoModeOn(echoMode);
                 handleException(t);
             }
         }

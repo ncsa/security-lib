@@ -1208,4 +1208,30 @@ public class ParserTest extends TestBase {
         assert state.getValue("test_wg").equals(6L);
 
     }
+    /*
+    Possible switch test?
+
+    a.0 := 42;
+    a.1. := random(3);
+    a.2 := 'foo';
+    a.4 := true;
+    a.5 := -34555.554345;
+    a.6 := null;
+
+    while[
+      for_keys(j, a.)
+    ]do[
+       type := var_type(a.j);
+       switch[
+         if[type == -1]then[say('undefined');];
+         if[type == 0]then[say('null');];
+         if[type == 1]then[say('boolean:' + a.j);];
+         if[type == 2]then[say('integer:' + a.j);];
+         if[type == 3]then[say('string:' + a.j);];
+         if[type == 4]then[say('stem:' + a.j);];
+         if[type == 5]then[say('decimal:' + a.j);];
+
+        ]; //end switch
+    ]; // end do
+     */
 }
