@@ -13,11 +13,11 @@ import org.junit.Test;
  * <p>Created by Jeff Gaynor<br>
  * on 1/14/20 at  10:57 AM
  */
-public class StatementTest {
+public class StatementTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     /**
-     * Basic regression test that the assignment reolves its variable and places the result in to the state
+     * Basic regression test that the assignment resolves its variable and places the result in to the state
      * as it should.
      * @throws Exception
      */

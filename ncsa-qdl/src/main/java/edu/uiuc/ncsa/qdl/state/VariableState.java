@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -41,6 +42,37 @@ public abstract class VariableState extends NamespaceAwareState {
                 myLoggingFacade);
     }
 
+    public static SymbolTableImpl getSystemVars() {
+        if (systemVars == null) {
+            systemVars = new SymbolTableImpl();
+        }
+        return systemVars;
+    }
+
+
+    static SymbolTableImpl systemVars;
+    static boolean sysConstantsInitialized = false;
+
+
+    protected void createSystemConstants() {
+        if (sysConstantsInitialized) {
+            return;
+        }
+        sysConstantsInitialized = true;
+        StemVariable systemConstants = new StemVariable();
+
+        StemVariable varTypes = new StemVariable();
+        varTypes.put("string", new Long(Constant.STRING_TYPE));
+        varTypes.put("stem", new Long(Constant.STEM_TYPE));
+        varTypes.put("boolean", new Long(Constant.BOOLEAN_TYPE));
+        varTypes.put("null", new Long(Constant.NULL_TYPE));
+        varTypes.put("integer", new Long(Constant.LONG_TYPE));
+        varTypes.put("decimal", new Long(Constant.DECIMAL_TYPE));
+        varTypes.put("undefined", new Long(Constant.UNKNOWN_TYPE));
+        systemConstants.put("var_types.", varTypes);
+        getSystemVars().setValue(MetaEvaluator.SYS_FQ + "constants.", systemConstants);
+    }
+
     /**
      * Checks if a symbol is defined. Note that this does do stem tail resolution and namespace resolution.
      *
@@ -65,6 +97,15 @@ public abstract class VariableState extends NamespaceAwareState {
      */
     public Object getValue(String variableName) {
         if (isStem(variableName)) {
+            if (variableName.startsWith(MetaEvaluator.SYS_FQ)) {
+                StemMultiIndex w = new StemMultiIndex(variableName);
+                variableName = getFQName(w.name);
+                StemVariable s = (StemVariable) systemVars.getMap().get(MetaEvaluator.SYS_FQ+variableName);
+                if (w.isEmpty()) {
+                    return s;
+                }
+                return s.get(w);
+            }
             StemMultiIndex w = new StemMultiIndex(variableName);
             return gsrNSStemOp(w, OP_GET, null);
         }
@@ -198,11 +239,11 @@ public abstract class VariableState extends NamespaceAwareState {
         switch (op) {
             case OP_GET:
                 if (stem == null && !isQDLNull) {
-                     //  throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
+                    //    throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot get its value.");
                     return null;
                 }
-                if(isQDLNull){
-                    return new QDLNull();
+                if (isQDLNull) {
+                    return QDLNull.getInstance();
                 }
                 if (w.isEmpty()) {
                     return stem;
@@ -215,19 +256,21 @@ public abstract class VariableState extends NamespaceAwareState {
                     if (isNSQ) {
                         getModuleMap().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, value);
                     } else {
-                        getSymbolStack().getLocalST().setValue(variableName, value);
+                        //getSymbolStack().getLocalST().setValue(variableName, value);
+                        st.setValue(variableName, value);
                     }
 
                 } else {
                     if (stem == null || isQDLNull) {
                         stem = new StemVariable();
-                        st.setValue(variableName,stem);
+                        st.setValue(variableName, stem);
                     }
                     stem.set(w, value);
                     if (isNSQ) {
                         getModuleMap().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, stem);
                     } else {
-                        getSymbolStack().getLocalST().setValue(variableName, stem);
+                        //getSymbolStack().getLocalST().setValue(variableName, stem);
+                        st.setValue(variableName, stem);
                     }
                 }
                 //  stash it in the right place. The value within the stem is set. The stack only manages top-level instances.
@@ -241,10 +284,11 @@ public abstract class VariableState extends NamespaceAwareState {
                     if (isNSQ) {
                         getModuleMap().get(uri).getState().getSymbolStack().getLocalST().remove(variableName);
                     } else {
-                        getSymbolStack().getLocalST().remove(variableName);
+                        //getSymbolStack().getLocalST().remove(variableName);
+                        st.remove(variableName);
                     }
                 } else {
-                    
+
                     stem.remove(w);
                 }
                 return null;

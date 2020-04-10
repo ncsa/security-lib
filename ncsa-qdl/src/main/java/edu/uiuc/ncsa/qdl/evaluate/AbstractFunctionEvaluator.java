@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -170,7 +171,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        ;
+        if(arg1 == null){
+             throw new UnknownSymbolException("Error: Unknown symbol");
+         }
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -204,7 +207,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Object arg1 = polyad.evalArg(0, state);
         Object arg2 = polyad.evalArg(1, state);
-
+        if(arg1 == null || arg2 == null){
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
         Object[] argList = new Object[polyad.getArgumments().size()];
         argList[0] = arg1;
         argList[1] = arg2;
@@ -255,7 +260,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         Object arg1 = polyad.evalArg(0, state);
         Object arg2 = polyad.evalArg(1, state);
         Object arg3 = polyad.evalArg(2, state);
-
+        if(arg1 == null || arg2 == null || arg3 == null){
+             throw new UnknownSymbolException("Error: Unknown symbol");
+         }
         if (areNoneStems(arg1, arg2, arg3)) {
             fpResult result = pointer.process(arg1, arg2, arg3);
             finishExpr(polyad, result);
@@ -315,7 +322,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
     /**
      * This will take an {@link ExpressionImpl} that should contain a stem, check the reference and it the stem
-     * does nto exist, create and put it in the symbol table. If the stem exists, it just returns it.
+     * does not exist, create and put it in the symbol table. If the stem exists, it just returns it.
      * This lets you do things like issue:
      * <pre>
      *     foo. := null

@@ -4,11 +4,21 @@ import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 
 /**
  * This represents when the user explicitly sets a variable to null. This just exists. It does nothing.
+ * Note that this is a static class -- there is exactly one null object in QDL.
  * <p>Created by Jeff Gaynor<br>
  * on 4/9/20 at  9:08 AM
  */
 public class QDLNull extends ConstantNode {
-    public QDLNull() {
+    static QDLNull qdlNull = null;
+
+    public static QDLNull getInstance() {
+        if (qdlNull == null) {
+            qdlNull = new QDLNull();
+        }
+        return qdlNull;
+    }
+
+    private QDLNull() {
         super(null, Constant.NULL_TYPE);  // Have to set since the result is QDLNode which does not exist yet.
         setSourceCode("null");
         setResultType(Constant.NULL_TYPE);

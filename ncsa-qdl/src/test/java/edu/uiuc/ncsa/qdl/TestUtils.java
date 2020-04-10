@@ -53,17 +53,7 @@ public class TestUtils {
                    false);
            return state;
        }
-    public OpEvaluator getOpEvaluator() {
-        return new OpEvaluator();
-    }
 
-    public MetaEvaluator getMetaEvaluator() {
-        return MetaEvaluator.getInstance();
-    }
-
-    public SymbolTable getSymbolTable() {
-        return new SymbolTableImpl();
-    }
 
     /**
      * This is a test symbol table that is pre-populated with values called string, long, boolean, stem.var
@@ -79,9 +69,9 @@ public class TestUtils {
         st.setRawValue("boolean", "true");
         st.setRawValue("stem.var", "'a stem variable'");
         // these are to be strings, hence need single quotes
-        st.setRawValue("random.0", "'" + TestBase.getRandomString() + "'");
-        st.setRawValue("random.1", "'" + TestBase.getRandomString() + "'");
-        st.setRawValue("random.2", "'" + TestBase.getRandomString() + "'");
+        st.setRawValue("random.0", "'" + AbstractQDLTester.getRandomString() + "'");
+        st.setRawValue("random.1", "'" + AbstractQDLTester.getRandomString() + "'");
+        st.setRawValue("random.2", "'" + AbstractQDLTester.getRandomString() + "'");
         SymbolStack stack = new SymbolStack();
         stack.addParent(st);
         return stack;

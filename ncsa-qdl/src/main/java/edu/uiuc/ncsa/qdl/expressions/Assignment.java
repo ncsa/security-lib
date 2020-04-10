@@ -90,7 +90,7 @@ public class Assignment implements Statement, HasResultInterface {
                 break;
             case Constant.NULL_TYPE:
                 // Can set any variable to null
-                state.setValue(variableReference, new QDLNull());
+                state.setValue(variableReference, QDLNull.getInstance());
                 break;
 
             case Constant.STRING_TYPE:

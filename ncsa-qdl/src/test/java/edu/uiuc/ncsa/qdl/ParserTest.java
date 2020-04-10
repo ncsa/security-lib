@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  11:27 AM
  */
-public class ParserTest extends TestBase {
+public class ParserTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     /**
@@ -63,7 +64,7 @@ public class ParserTest extends TestBase {
 
             BigDecimal bd = results[i - 1];
             BigDecimal c = (BigDecimal) state.getValue("c");
-            assert compare(c, bd, comparisonTolerance);
+            assert areEqual(c, bd);
         }
 
 
@@ -110,7 +111,7 @@ public class ParserTest extends TestBase {
             interpreter.execute(script.toString());
             BigDecimal bd = results[i - 1];
             BigDecimal d = (BigDecimal) state.getValue("d");
-            assert compare(d, bd, comparisonTolerance);
+            assert areEqual(d, bd);
         }
     }
 
@@ -170,7 +171,7 @@ public class ParserTest extends TestBase {
             addLine(script, "z := f(x,y);");
             interpreter.execute(script.toString());
             BigDecimal d = (BigDecimal) state.getValue("z");
-            assert compare(d, BigDecimal.ZERO, comparisonTolerance);
+            assert areEqual(d, BigDecimal.ZERO);
         }
     }
 
@@ -256,11 +257,10 @@ public class ParserTest extends TestBase {
             interpreter.execute(script.toString());
             BigDecimal bd = results[i - 1];
             BigDecimal d = getBDValue("z", state);
-            assert compare(d, bd, comparisonTolerance);
+            assert areEqual(d, bd);
         }
     }
 
-    BigDecimal comparisonTolerance = new BigDecimal(".0000000000001");
 
     /**
      * Test for multiplying two matrices with integer stems. Mostly this is a regression
@@ -507,7 +507,7 @@ public class ParserTest extends TestBase {
             interpreter.execute(script.toString());
             BigDecimal bd = results[i - 1];
             BigDecimal d = getBDValue("z", state);
-            assert compare(d, bd, comparisonTolerance);
+            assert areEqual(d, bd);
         }
     }
 
@@ -584,7 +584,7 @@ public class ParserTest extends TestBase {
             interpreter.execute(script.toString());
             BigDecimal d = getBDValue("z", state);
             BigDecimal r = results[i - 1];
-            assert compare(d, r, comparisonTolerance);
+            assert areEqual(d, r);
         }
 
 
@@ -693,32 +693,6 @@ public class ParserTest extends TestBase {
         assert e.equals(-19l);
     }
 
-    /*
-    Conenience getters for testing
-     */
-    protected BigDecimal getBDValue(String variable, State state) {
-        return (BigDecimal) state.getValue(variable);
-    }
-
-    protected Long getLongValue(String variable, State state) {
-        return (Long) state.getValue(variable);
-    }
-
-    protected String getStringValue(String variable, State state) {
-        return (String) state.getValue(variable);
-    }
-
-    protected Boolean getBooleanValue(String variable, State state) {
-        return (Boolean) state.getValue(variable);
-    }
-
-    protected StemVariable getStemValue(String variable, State state) {
-        return (StemVariable) state.getValue(variable);
-    }
-
-    protected boolean compare(BigDecimal x, BigDecimal y, BigDecimal comparisonTolerance) {
-        return x.subtract(y).abs().compareTo(comparisonTolerance) < 0;
-    }
 
     @Test
     public void testAssignment() throws Throwable {
@@ -729,9 +703,9 @@ public class ParserTest extends TestBase {
         addLine(script, "c:=a+b;");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a").equals(new Long(5L));
-        assert state.getValue("b").equals(new Long(-10L));
-        assert state.getValue("c").equals(new Long(-5L));
+        assert getLongValue("a",state) == 5L;
+        assert getLongValue("b",state) == -10L;
+        assert getLongValue("c",state) == -5L;
     }
 
     /**
@@ -754,12 +728,12 @@ public class ParserTest extends TestBase {
         addLine(script, "a.5^=b;"); //   5^3 =  125
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a.0").equals(new Long(3L));
-        assert state.getValue("a.1").equals(new Long(-2L));
-        assert state.getValue("a.2").equals(new Long(6L));
-        assert state.getValue("a.3").equals(new Long(1L));
-        assert state.getValue("a.4").equals(new Long(1L));
-        assert state.getValue("a.5").equals(new Long(125L));
+        assert getLongValue("a.0", state) ==3L;
+        assert getLongValue("a.1", state) ==-2L;
+        assert getLongValue("a.2", state) ==6L;
+        assert getLongValue("a.3", state) ==1L;
+        assert getLongValue("a.4", state) ==1L;
+        assert getLongValue("a.5", state) ==125L;
     }
 
     /**
@@ -778,11 +752,11 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert state.getValue("q").equals("abc");
-        assert state.getValue("A").equals("abc");
-        assert state.getValue("B").equals("bc");
-        assert state.getValue("C").equals("c");
-        assert state.getValue("D").equals("c");
+        assert getStringValue("q", state).equals("abc");
+        assert getStringValue("A", state).equals("abc");
+        assert getStringValue("B", state).equals("bc");
+        assert getStringValue("C", state).equals("c");
+        assert getStringValue("D", state).equals("c");
     }
 
     /**
@@ -808,16 +782,16 @@ public class ParserTest extends TestBase {
         addLine(script, "a.9 := a!=a;"); //F
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a.0").equals(Boolean.FALSE);
-        assert state.getValue("a.1").equals(Boolean.TRUE);
-        assert state.getValue("a.2").equals(Boolean.FALSE);
-        assert state.getValue("a.3").equals(Boolean.TRUE);
-        assert state.getValue("a.4").equals(Boolean.TRUE);
-        assert state.getValue("a.5").equals(Boolean.TRUE);
-        assert state.getValue("a.6").equals(Boolean.TRUE);
-        assert state.getValue("a.7").equals(Boolean.TRUE);
-        assert state.getValue("a.8").equals(Boolean.TRUE);
-        assert state.getValue("a.9").equals(Boolean.FALSE);
+        assert getBooleanValue("a.1",state);
+        assert getBooleanValue("a.3",state);
+        assert getBooleanValue("a.4",state);
+        assert getBooleanValue("a.5",state);
+        assert getBooleanValue("a.6",state);
+        assert getBooleanValue("a.7",state);
+        assert getBooleanValue("a.8",state);
+        assert !getBooleanValue("a.0",state);
+        assert !getBooleanValue("a.2",state);
+        assert !getBooleanValue("a.9",state);
     }
 
 
@@ -833,11 +807,11 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
 
         interpreter.execute(script.toString());
-        assert state.getValue("a").equals(new Long(5L));
-        assert state.getValue("b").equals(new Long(10L));
-        assert state.getValue("c").equals(new Long(-5L));
-        assert state.getValue("d").equals(Boolean.TRUE);
-        assert state.getValue("e").equals(Boolean.FALSE);
+        assert getLongValue("a", state) == 5L;
+        assert getLongValue("b", state) == 10L;
+        assert getLongValue("c", state) == -5L;
+        assert getBooleanValue("d", state);
+        assert !getBooleanValue("e", state);
     }
 
     @Test
@@ -852,11 +826,11 @@ public class ParserTest extends TestBase {
         addLine(script, "e:=!((a<--b)&&(c<a));");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a").equals(new Long(1L)); // got incremented
-        assert state.getValue("b").equals(new Long(-1L)); // got decremented twice
-        assert state.getValue("c").equals(new Long(2L));
-        assert state.getValue("d").equals(Boolean.FALSE);
-        assert state.getValue("e").equals(Boolean.TRUE);
+        assert getLongValue("a",state) ==1L;// got incremented
+        assert getLongValue("b",state) ==-1L; // got decremented twice
+        assert getLongValue("c",state) ==2L;
+        assert !getBooleanValue("d",state);
+        assert getBooleanValue("e",state);
     }
 
     /**
@@ -891,7 +865,7 @@ public class ParserTest extends TestBase {
         addLine(script, "b := (a == vdecode(vencode(a)));");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("b").equals(Boolean.TRUE);
+        assert getBooleanValue("b", state);
     }
 
     /**
@@ -910,12 +884,12 @@ public class ParserTest extends TestBase {
         addLine(script, "d.:=-indices(3);");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a").equals(new Long(-4L));
-        assert state.getValue("b").equals(new Long(11L));
-        assert state.getValue("c").equals(new Long(-3L));
-        assert state.getValue("d.0").equals(new Long(0L));
-        assert state.getValue("d.1").equals(new Long(-1L));
-        assert state.getValue("d.2").equals(new Long(-2L));
+        assert getLongValue("a"  , state)   == -4L;
+        assert getLongValue("b"  , state)   == 11L;
+        assert getLongValue("c"  , state)   == -3L;
+        assert getLongValue("d.0", state)  == 0L;
+        assert getLongValue("d.1", state) == -1L;
+        assert getLongValue("d.2", state) == -2L;
     }
 
     @Test
@@ -930,8 +904,8 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert state.getValue("a").equals(new Long(1L));
-        assert state.getValue("b").equals(new Long(-6L));
+        assert getLongValue("a", state) ==1L;
+        assert getLongValue("b", state) ==-6L;
     }
 
     @Test
@@ -946,8 +920,8 @@ public class ParserTest extends TestBase {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert state.getValue("a").equals(new Long(1L));
-        assert state.getValue("b").equals(new Long(-24L));
+        assert getLongValue("a",state) == 1L;
+        assert getLongValue("b",state) == -24L;
     }
 
     /**
@@ -969,17 +943,22 @@ public class ParserTest extends TestBase {
         interpreter.execute(script.toString());
         // so the first 5 entries are true, the next 5 are false.
         for (int i = 0; i < 5; i++) {
-            assert (Boolean) state.getValue("z." + i);
+            assert getBooleanValue("z." + i, state);
         }
 
         for (int i = 5; i < 10; i++) {
-            assert !(Boolean) state.getValue("z." + i);
+            assert !getBooleanValue("z." + i, state);
         }
 
     }
 
+    /**
+     * Shows making an assignment with '=' and not ':=' gets caught early as a parser error
+     * (rather than having it blow up elsewhere).
+     * @throws Throwable
+     */
     @Test
-    public void testBadAssignment() throws Throwable {
+    public void testBadAssignment() throws Throwable{
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -988,12 +967,19 @@ public class ParserTest extends TestBase {
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to make an assignment with = not :=";
-        } catch (Throwable t) {
+        } catch (ParseCancellationException t) {
             assert true;
         }
 
     }
 
+    /**
+     * Regression test that using compound assignment (like += ) does not create
+     * unwanted entries in the symbol table. Mostly this is to make sure
+     * that if some future change to the parser happens, this bug
+     * does not resurface since it was very hard to isolate.
+     * @throws Throwable
+     */
     @Test
     public void testCheckSymbolTableAssignment() throws Throwable {
 
@@ -1048,19 +1034,46 @@ public class ParserTest extends TestBase {
 
         assert state.getValue("a") instanceof QDLNull;
         assert state.getValue("a.") instanceof QDLNull;
-        assert (Boolean) state.getValue("a0");
-        assert (Boolean) state.getValue("a1");
+        assert getBooleanValue("a0", state);
+        assert getBooleanValue("a1", state);
 
+    }
+
+    /**
+     * Basic test that setting variables to null before entering a scope has them
+     * settable inside the scope and visible outside. This pattern is used
+     * for conditionals, loops, and switch statements. If this breaks it means that
+     * scope handling is broken generally.
+     * @throws Throwable
+     */
+    @Test
+    public void testNullAssignmentScope() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := null;");
+        addLine(script, "a. := null;");
+        addLine(script, "r := 42;");
+        addLine(script, "if[r < 100]then[a := 5;];");
+        addLine(script, "if[r < 57]then[a. := indices(2);];");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        assert getLongValue("a", state) == 5L;
+        StemVariable a = getStemValue("a.", state);
+        assert a.getLong("0") == 0L;
+        assert a.getLong("1") == 1L;
     }
 
     @Test
     public void testExecute() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "    execute('var := \\'abc\\' + \\'def\\';');");
+        addLine(script, "execute('var := \\'abc\\' + \\'def\\';');");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("var").equals("abcdef");
+        assert getStringValue("var", state).equals("abcdef");
 
     }
 
@@ -1081,7 +1094,7 @@ public class ParserTest extends TestBase {
         interpreter.execute(script.toString());
 
         assert state.getValue("a") != null;
-        assert ((Long) state.getValue("a")).equals(2L);
+        assert getLongValue("a", state) == 2L;
     }
 
     /**
@@ -1168,15 +1181,15 @@ public class ParserTest extends TestBase {
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("a#q").equals(10L);
-        assert state.getValue("b#q").equals(11L);
-        assert state.getValue("w#a#q").equals(3L);
+        assert getLongValue("a#q" , state)== 10L;
+        assert getLongValue("b#q" , state)== 11L;
+        assert getLongValue("w#a#q",state)== 3L;
 
     }
 
     /*
     Define a function then define variants in modules.  Values are checked to track whether the state
-    gets corrupted. This can be put into a QDL workspace to check manually
+    gets corrupted. This can be put into a QDL workspace to check manually:
 
         define[f(x)]body[return(x+100);];
         module['a:/t','a']body[define[f(x)]body[return(x+1);];];
@@ -1202,10 +1215,10 @@ public class ParserTest extends TestBase {
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert state.getValue("test_f").equals(101L);
-        assert state.getValue("test_a").equals(2L);
-        assert state.getValue("test_waf").equals(3L);
-        assert state.getValue("test_wg").equals(6L);
+        assert getLongValue("test_f",  state) == 101L;
+        assert getLongValue("test_a",  state) == 2L;
+        assert getLongValue("test_waf",state) == 3L;
+        assert getLongValue("test_wg", state) == 6L;
 
     }
     /*
@@ -1234,4 +1247,46 @@ public class ParserTest extends TestBase {
         ]; //end switch
     ]; // end do
      */
+
+    /**
+     * Common construction is to set a variable null (allocate where it is in which scope)
+     * then set it elsewhere inside another scope. This checks each type gets set and that a non-existent
+     * variable is also not just set.
+     * @throws Throwable
+     */
+    @Test
+    public void testNestedVariableScope() throws Throwable{
+        StringBuffer script = new StringBuffer();
+        State state = testUtils.getNewState();
+        addLine(script, "a := null;");
+        addLine(script, "stem. := null;");
+        addLine(script, "boolean := null;");
+        addLine(script, "integer := null;");
+        addLine(script, "string := null;");
+        addLine(script, "decimal := null;");
+        addLine(script, "while[                                         ");
+        addLine(script, "  for_next(j, 10)                              ");
+        addLine(script, "]do[                                           ");
+        addLine(script, "   switch[                                     ");
+        addLine(script, "     if[j == 0]then[stem.0 := 5;];          ");
+        addLine(script, "     if[j == 1]then[stem.1 := stem.0 + j;];");
+        addLine(script, "     if[j == 4]then[boolean := false;];");
+        addLine(script, "     if[j == 6]then[integer := j;]; ");
+        addLine(script, "     if[j == 8]then[string := 'fluffy'+j;];   ");
+        addLine(script, "     if[j == 9]then[decimal := j-0.4321;];");
+        addLine(script, "    ]; //end switch                            ");
+        addLine(script, "]; // end do                                   ");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stem = getStemValue("stem.", state);
+        assert stem.getLong("0") == 5L;
+        assert stem.getLong("1") == 6L;
+        assert !getBooleanValue("boolean", state);
+        assert getLongValue("integer", state) == 6L;
+        assert getStringValue("string", state).equals("fluffy8");
+        assert areEqual(getBDValue("decimal", state), new BigDecimal("8.5679"));
+        assert state.getValue("a") == QDLNull.getInstance(); // QDLNull is a singleton, so we can check with ==
+        assert state.getValue("A") == null;// This is what is returned for actual variables that are undefined.
+    }
 }

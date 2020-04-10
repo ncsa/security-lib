@@ -300,7 +300,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getArgumments().size()) {
             case 0:
                 polyad.setEvaluated(true);
-                polyad.setResult(new QDLNull());
+                polyad.setResult(QDLNull.getInstance());
                 polyad.setResultType(Constant.NULL_TYPE);
                 break;
             case 1:
@@ -438,7 +438,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         try {
             moduleNS = URI.create(arg.toString());
         } catch (Throwable t) {
-            polyad.setResult(new QDLNull());
+            polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(false);
             throw new QDLException("Error: the module name must be a uri");

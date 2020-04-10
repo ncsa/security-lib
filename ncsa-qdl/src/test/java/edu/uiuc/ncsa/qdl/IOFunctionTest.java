@@ -11,7 +11,7 @@ import org.junit.Test;
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  10:26 AM
  */
-public class IOFunctionTest extends TestBase {
+public class IOFunctionTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     public void scanExample() throws Exception {

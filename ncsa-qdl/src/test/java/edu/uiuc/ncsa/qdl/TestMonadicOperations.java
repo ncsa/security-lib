@@ -13,7 +13,7 @@ import org.junit.Test;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  7:18 PM
  */
-public class TestMonadicOperations extends TestBase {
+public class TestMonadicOperations extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     @Test

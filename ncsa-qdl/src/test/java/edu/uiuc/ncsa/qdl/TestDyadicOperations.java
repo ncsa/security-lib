@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  4:07 PM
  */
-public class TestDyadicOperations extends TestBase {
+public class TestDyadicOperations extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     @Test

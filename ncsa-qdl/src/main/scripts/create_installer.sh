@@ -1,8 +1,24 @@
 # This will create the installer (an executable jar file).
 # Be sure you have run the build scripts first so there is stuff to copy.
-QDL_ROOT="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl"
-# /src/main/java/edu/uiuc/ncsa/qdl"
-TARGET_ROOT="/home/ncsa/dev/temp-deploy/qdl"
+#
+DEFAULT_QDL_ROOT="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl"
+DEFAULT_TARGET_ROOT="/home/ncsa/dev/temp-deploy/qdl"
+DEFAULT_JAR_NAME="qdl-installer.jar"
+
+if [[  "$1" = "--help" ]];then
+  echo "create_installer.sh [qdl_root target_dir jar_name]"
+  echo "create the installable jar for qdl."
+  echo "No arguments means to use the qdl root (assumes there is already a qdl.jar there) named '$DEFAULT_QDL_ROOT'"
+   echo "and create the directories in   '$DEFAULT_TARGET_ROOT'"
+   echo "The result will be a jar named '$DEFAULT_JAR_NAME"
+  exit 1
+fi
+
+
+# **IF** there are arguments for the target of this, use them. Otherwise use the default
+QDL_ROOT=${1:-$DEFAULT_QDL_ROOT}
+TARGET_ROOT=${2:-$DEFAULT_TARGET_ROOT}
+JAR_NAME=${3:-$DEFAULT_JAR_NAME}
 
 echo "cleaning out old deploy in " $DEPLOY_ROOT
 if [ ! -d "$TARGET_ROOT" ]; then
@@ -37,4 +53,4 @@ mkdir "lib/cp"
 mkdir "var"
 mkdir "var/ws"
 # jar cmf manifest-file jar-file input-files
-jar cmf installer.mf qdl-install.jar edu/uiuc/ncsa/qdl/install/Installer.class version.txt bin docs etc lib log var
+jar cmf installer.mf $JAR_NAME edu/uiuc/ncsa/qdl/install/Installer.class version.txt bin docs etc lib log var

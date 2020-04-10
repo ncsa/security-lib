@@ -525,7 +525,7 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public Object put(String key, Object value) {
         if (!isVar(key)) {
-            throw new IllegalArgumentException("Error: " + key + " is not a legal variable name");
+            throw new IllegalArgumentException("Error: " + key + " is neither a legal variable name nor number.");
         }
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);

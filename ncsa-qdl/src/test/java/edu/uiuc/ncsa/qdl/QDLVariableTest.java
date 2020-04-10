@@ -8,10 +8,12 @@ import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import org.junit.Test;
 
 /**
+ * Test that directly test the functioning of variables and state. These typically create and manipulate stacks
+ * then check values. 
  * <p>Created by Jeff Gaynor<br>
  * on 1/10/20 at  2:43 PM
  */
-public class QDLVariableTest extends TestBase {
+public class QDLVariableTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
     QDLParserDriver runner;
 
@@ -141,12 +143,8 @@ public class QDLVariableTest extends TestBase {
         stack.addParent(st1);
         State state = testUtils.getNewState();
         state.setSymbolStack(stack);
-        // first test, i = 0, so foo.i should resolve to foo.0
         String stem = "A.w.x.y.z";
-        // so now we set the value.
-        // stack.setRawValue(stem, "6");
         Object output = state.getValue(stem);
-        // FYI Every integer in QDL is a long!!! so testing against an int fails.
         assert output.equals(5L) : "expected 5 and got " + stack.resolveValue(stem);
         assert state.isDefined(stem);
     }
@@ -181,7 +179,6 @@ public class QDLVariableTest extends TestBase {
         // so now we set the value.
         stack.setValue(stem, "6");
         Object output = stack.resolveValue(stem);
-        // FYI Every integer in QDL is a long!!! so testing against an int fails.
         assert output.equals("6") : "expected 6 and got " + stack.resolveValue(stem);
         assert stack.isDefined(stem);
     }

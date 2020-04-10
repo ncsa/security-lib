@@ -767,6 +767,8 @@ public class WorkspaceCommands implements Logable {
             return doVarsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "system":
+                return doVarsSystem(inputLine);
             case "list":
                 return doVarsList(inputLine);
             case "drop":
@@ -777,6 +779,12 @@ public class WorkspaceCommands implements Logable {
         }
         say("Unknown variable command.");
         return RC_CONTINUE;
+    }
+
+    protected int doVarsSystem(InputLine inputLine) {
+        TreeSet<String> sysVars = new TreeSet<>();
+        sysVars.addAll(getState().getSystemVars().listVariables());
+        return printList(inputLine, sysVars);
     }
 
     private int doVarsDrop(InputLine inputLine) {

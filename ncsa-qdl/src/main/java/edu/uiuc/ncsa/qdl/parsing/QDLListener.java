@@ -77,7 +77,7 @@ public class QDLListener implements QDLParserListener {
             return;
         }
         if(ctx.getText().equals("null")){
-            p.statement = new QDLNull();
+            p.statement = QDLNull.getInstance();
             return;
         }
             ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());

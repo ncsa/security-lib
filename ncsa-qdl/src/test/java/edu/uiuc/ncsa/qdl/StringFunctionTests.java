@@ -14,7 +14,7 @@ import org.junit.Test;
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  1:11 PM
  */
-public class StringFunctionTests extends TestBase {
+public class StringFunctionTests extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
     @Test

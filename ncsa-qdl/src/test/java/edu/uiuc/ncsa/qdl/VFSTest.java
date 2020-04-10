@@ -18,7 +18,7 @@ import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
  * <p>Created by Jeff Gaynor<br>
  * on 3/4/20 at  8:57 AM
  */
-public class VFSTest extends TestBase {
+public class VFSTest extends AbstractQDLTester {
     @Test
     public void testPaths() {
         String absFQPath1 = "A#/a/b/c";

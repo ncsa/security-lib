@@ -42,8 +42,8 @@ public class State extends FunctionState {
                 moduleMap,
                 myLoggingFacade);
         this.serverMode = isServerMode;
+        createSystemConstants();
     }
-
 
 
 
@@ -65,7 +65,7 @@ public class State extends FunctionState {
         this.vfsFileProviders = vfsFileProviders;
     }
 
-    transient HashMap<String, VFSFileProvider> vfsFileProviders =new HashMap<>();
+    transient HashMap<String, VFSFileProvider> vfsFileProviders = new HashMap<>();
 
     public void addVFSProvider(VFSFileProvider scriptProvider) {
         vfsFileProviders.put(scriptProvider.getScheme() + VFSPaths.SCHEME_DELIMITER + scriptProvider.getMountPoint(), scriptProvider);
@@ -94,48 +94,51 @@ public class State extends FunctionState {
     /**
      * Given a fully qualified path, find the VFS corresponding to the mount point and
      * return it or null if no such mount point exists
+     *
      * @param fqName
      * @return
      * @throws Throwable
      */
-    public VFSFileProvider getVFS(String fqName) throws Throwable{
+    public VFSFileProvider getVFS(String fqName) throws Throwable {
         if (vfsFileProviders.isEmpty()) return null;
         VFSFileProvider vfsFileProvider = null;
 
-        for(String mountPoint : vfsFileProviders.keySet()) {
+        for (String mountPoint : vfsFileProviders.keySet()) {
             // key is of the form scheme#/mounpoint/ -- note trailing slash! This lets us tell
             // things like A#/a/b from A#/abc
             if (fqName.startsWith(mountPoint)) {
                 return vfsFileProviders.get(mountPoint);
             }
         }
-         return null;
+        return null;
     }
+
     public VFSEntry getFileFromVFS(String fqName) throws Throwable {
         if (vfsFileProviders.isEmpty()) return null;
         VFSFileProvider vfsFileProvider = null;
-        for(String key : vfsFileProviders.keySet()){
+        for (String key : vfsFileProviders.keySet()) {
             // key is of the form scheme#/mounpoint/ -- note trailing slash! This lets us tell
             // things like A#/a/b from A#/abc
-            if(fqName.startsWith(key)){
+            if (fqName.startsWith(key)) {
                 vfsFileProvider = vfsFileProviders.get(key);
                 break;
             }
         }
-        if(vfsFileProvider == null){
+        if (vfsFileProvider == null) {
             return null;
         }
         return vfsFileProvider.get(fqName);
     }
 
     public boolean hasVFSProviders() {
-        if(vfsFileProviders == null) return false;
-        return  !vfsFileProviders.isEmpty();
+        if (vfsFileProviders == null) return false;
+        return !vfsFileProviders.isEmpty();
     }
 
     public boolean isVFSFile(String path) {
-        if (path.startsWith(VFSPaths.SCHEME_DELIMITER) || path.indexOf(VFSPaths.SCHEME_DELIMITER) == -1)
-        {return false;} // legit this is a file uri, not a virtual one
+        if (path.startsWith(VFSPaths.SCHEME_DELIMITER) || path.indexOf(VFSPaths.SCHEME_DELIMITER) == -1) {
+            return false;
+        } // legit this is a file uri, not a virtual one
         return 0 < path.indexOf(VFSPaths.SCHEME_DELIMITER);
     }
 
@@ -177,19 +180,20 @@ public class State extends FunctionState {
     }
 
     public State newLoopState() {
-          //System.out.println("** State, creating new local state **");
-          SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-          State newState = new State(importManager,
-                  newStack,
-                  getOpEvaluator(),
-                  getMetaEvaluator(),
-                  getFunctionTable(),
-                  getModuleMap(),
-                  getLogger(),
-                  isServerMode());
-          newState.setImportedModules(getImportedModules());
-          return newState;
-      }
+        //System.out.println("** State, creating new local state **");
+        SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
+        State newState = new State(importManager,
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                getFunctionTable(),
+                getModuleMap(),
+                getLogger(),
+                isServerMode());
+        newState.setImportedModules(getImportedModules());
+        return newState;
+    }
+
     /**
      * For modules only. This copies the state except that no functions are inherited. The
      * contract is that modules only internal state that may be imported.
@@ -214,6 +218,7 @@ public class State extends FunctionState {
 
     /**
      * Add the module under the default alias
+     *
      * @param module
      */
     public void addModule(Module module) {

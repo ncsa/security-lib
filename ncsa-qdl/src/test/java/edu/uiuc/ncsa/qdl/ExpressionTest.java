@@ -11,7 +11,7 @@ import org.junit.Test;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  8:11 PM
  */
-public class ExpressionTest extends TestBase {
+public class ExpressionTest extends AbstractQDLTester {
     @Test
     public void testExpression1() throws Exception {
         TestUtils testUtils = TestUtils.newInstance();
@@ -43,8 +43,12 @@ public class ExpressionTest extends TestBase {
     @Test
     public void testMakeCopy() throws Exception {
         TestUtils testUtils = TestUtils.newInstance();
-
-        // test !(a+2)<(b-3) for a = 10, b = 4. Should be TRUE
+        //
+        // a := 10;
+        // b := 4;
+        // !(a+2)<(b-3);
+        //
+        // Should be TRUE
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
         symbolTable.setLongValue("a", 10L);

@@ -18,12 +18,8 @@ import java.util.ArrayList;
  * <p>Created by Jeff Gaynor<br>
  * on 1/17/20 at  12:51 PM
  */
-public class StemFunctionsTest extends TestBase {
+public class StemFunctionsTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
-
-    protected String geter() {
-        return enc(getRandomString());
-    }
 
     @Test
     public void testSizeStem() throws Exception {
@@ -343,15 +339,7 @@ public class StemFunctionsTest extends TestBase {
         return s;
     }
 
-    QDLCodec codec = new QDLCodec();
 
-    protected String enc(String x) {
-        return codec.encode(x);
-    }
-
-    protected String dec(String x) {
-        return codec.decode(x);
-    }
 
     @Test
     public void testIncludeScalarKey() throws Exception {

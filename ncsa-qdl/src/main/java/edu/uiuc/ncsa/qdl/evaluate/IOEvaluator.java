@@ -157,7 +157,7 @@ public class IOEvaluator extends MathEvaluator {
             case IO_SAY_FUNCTION:
             case SAY_FUNCTION:
                 if (state.isServerMode()) {
-                    polyad.setResult(new QDLNull());
+                    polyad.setResult(QDLNull.getInstance());
                     polyad.setResultType(Constant.NULL_TYPE);
                     polyad.setEvaluated(true);
                     return true;
@@ -188,7 +188,7 @@ public class IOEvaluator extends MathEvaluator {
                 }
                 System.out.println(result);
                 if (polyad.getArgumments().size() == 0) {
-                    polyad.setResult(new QDLNull());
+                    polyad.setResult(QDLNull.getInstance());
                     polyad.setResultType(Constant.NULL_TYPE);
 
                 } else {
@@ -430,7 +430,7 @@ public class IOEvaluator extends MathEvaluator {
             // Then this is not a directory the request was made for a file.
             // The result should be null
             polyad.setEvaluated(true);
-            polyad.setResult(new QDLNull());
+            polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
             return;
         }
@@ -524,7 +524,7 @@ public class IOEvaluator extends MathEvaluator {
 
         }
         state.addVFSProvider(vfs);
-        polyad.setResult(new QDLNull());
+        polyad.setResult(QDLNull.getInstance());
         polyad.setResult(Constant.NULL_TYPE);
         polyad.setEvaluated(true);
         return;
