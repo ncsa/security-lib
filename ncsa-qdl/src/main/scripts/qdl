@@ -8,4 +8,4 @@ QDL_JAR="$QDL_HOME/lib/qdl.jar"
 cfgFile=${1:-$CFG_FILE}
 cfgName=${2:-$CFG_NAME}
 
-java -cp "$JAR_LIB/*" -jar $QDL_JAR  -cfg  $cfgFile -name $cfg_name -home_dir $QDL_HOME
+java -cp "$JAR_LIB/*" -jar $QDL_JAR  -cfg  $cfgFile -name $cfgName -home_dir $QDL_HOME

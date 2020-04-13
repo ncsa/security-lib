@@ -121,5 +121,15 @@ public class MyLoggingFacade implements Logable {
         getLogger().severe(getClassName() + "(" + (new Date()) + "): " + x);
     }
 
+    String fileName;
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
 
 }

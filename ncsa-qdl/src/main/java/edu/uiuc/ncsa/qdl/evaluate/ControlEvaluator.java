@@ -70,6 +70,17 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_LOAD_MODULE = SYS_FQ + LOAD_MODULE;
     public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
 
+    // For system constants
+    public static final String CONSTANTS = "constants";
+    public static final String FQ_CONSTANTS = SYS_FQ + CONSTANTS;
+    public static final int CONSTANTS_TYPE = 206 + CONTROL_BASE_VALUE;
+
+    // For system info
+      public static final String SYS_INFO = "info";
+      public static final String FQ_SYS_INFO = SYS_FQ + SYS_INFO;
+      public static final int SYS_INFO_TYPE = 207 + CONTROL_BASE_VALUE;
+
+
     // try ... catch
 
     public static final String RAISE_ERROR = "raise_error";
@@ -86,6 +97,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_LOAD_COMMAND = SYS_FQ + LOAD_COMMAND;
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
     public static String FUNC_NAMES[] = new String[]{
+            SYS_INFO,
+            CONSTANTS,
             CONTINUE,
             BREAK,
             FOR_KEYS,
@@ -99,6 +112,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             LOAD_COMMAND};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
+            FQ_SYS_INFO,
+            FQ_CONSTANTS,
             FQ_CONTINUE,
             FQ_BREAK,
             FQ_FOR_KEYS,
@@ -128,6 +143,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case SYS_INFO:
+            case FQ_SYS_INFO:
+                return SYS_INFO_TYPE;
+            case CONSTANTS:
+            case FQ_CONSTANTS:
+                return CONSTANTS_TYPE;
             case CONTINUE:
             case FQ_CONTINUE:
                 return CONTINUE_TYPE;
@@ -180,6 +201,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new BreakException();
+            case CONSTANTS:
+            case  FQ_CONSTANTS:
+                doConstants(polyad, state);
+                return true;
+            case SYS_INFO:
+            case FQ_SYS_INFO:
+                doSysInfo(polyad, state);
+                return true;
             case CONTINUE:
             case FQ_CONTINUE:
                 polyad.setEvaluated(true);
@@ -217,6 +246,24 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doSysInfo(Polyad polyad, State state) {
+        if(polyad.getArgumments().size() != 0){
+            throw new IllegalArgumentException("Error: No arguments for " + FQ_SYS_INFO );
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(state.getSystemInfo());
+        polyad.setResultType(Constant.STEM_TYPE);
+    }
+
+    protected void doConstants(Polyad polyad, State state) {
+        if(polyad.getArgumments().size() != 0){
+            throw new IllegalArgumentException("Error: No arguments for " + FQ_CONTINUE );
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(state.getSystemConstants());
+        polyad.setResultType(Constant.STEM_TYPE);
     }
 
     /**

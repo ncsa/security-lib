@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.List;
 
@@ -29,6 +31,15 @@ public class QDLRunner {
 
     public State getState() {
         return state;
+    }
+     Boolean prettyPrint = Boolean.FALSE;
+
+    public Boolean getPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(Boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
     }
 
     /**
@@ -77,12 +88,14 @@ public class QDLRunner {
                                 if (!isPrint) {
                                     Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
                                     p.addArgument(expression);
+                                    p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                                     stmt = p;
 
                                 }
                             } else {
                                 Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
                                 p.addArgument(expression);
+                                p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                                 stmt = p;
                             }
                         }

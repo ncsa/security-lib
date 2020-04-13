@@ -17,8 +17,17 @@ import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstA
  * on 4/11/12 at  5:39 PM
  */
 public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigurationTags {
+    public String getLogFile() {
+        return logFile;
+    }
+
     String logFile;
     boolean debugOn;
+
+    public String getLoggerName() {
+        return loggerName;
+    }
+
     String loggerName;
     int fileCount = -1;
     int maxFileSize = -1;
@@ -117,6 +126,7 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     logger.getLogger().addHandler(fileHandler);
                     logger.getLogger().setUseParentHandlers(false); // suppresses console output.
                     logger.info("Logging to file " + logFileName);
+                    logger.setFileName(logFileName);
                 } catch (IOException e) {
                     // Don't blow up. Let everything load and just dump messages into the system log.
                     //throw new GeneralException("Error: could not setup logging to file. Logging to console.");

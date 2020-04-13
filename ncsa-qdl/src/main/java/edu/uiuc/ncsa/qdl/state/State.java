@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
@@ -8,11 +9,18 @@ import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.statements.TryCatch;
+import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 
 /**
@@ -42,10 +50,147 @@ public class State extends FunctionState {
                 moduleMap,
                 myLoggingFacade);
         this.serverMode = isServerMode;
-        createSystemConstants();
+    }
+
+    public StemVariable getSystemConstants() {
+        return systemConstants;
+    }
+
+    StemVariable systemConstants = null;
+
+    public StemVariable getSystemInfo() {
+        return systemInfo;
+    }
+
+    StemVariable systemInfo = null;
+
+    public void createSystemInfo(QDLEnvironment qe) {
+        if (systemInfo != null) {
+            return;
+        }
+        systemInfo= new StemVariable();
+        // Add some from Java, if not in server mode.
+         if (!isServerMode()) {
+             StemVariable os = new StemVariable();
+             os.put("version", System.getProperty("os.version"));
+             os.put("name", System.getProperty("os.name"));
+             os.put("architecture", System.getProperty("os.arch"));
+             systemInfo.put("os.", os);
+             StemVariable system = new StemVariable();
+             system.put("jvm_version", System.getProperty("java.version"));
+             system.put("initial_memory", (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + " MB");
+             system.put("processors", Runtime.getRuntime().availableProcessors());
+             systemInfo.put("system.", system);
+             StemVariable user = new StemVariable();
+             user.put("working_dir", System.getProperty("user.dir"));
+             user.put("home_dir", System.getProperty("user.home"));
+             systemInfo.put("user.", user);
+         }
+
+         StemVariable versionInfo = addManifestConstants();
+         if (versionInfo != null) {
+             systemInfo.put("qdl_version.", versionInfo);
+         }
+         if (qe != null && qe.isEnabled()) {
+             StemVariable qdl_props = new StemVariable();
+             qdl_props.put("qdl_home", qe.getWSHomeDir());
+             if (!qe.getBootScript().isEmpty()) {
+                 qdl_props.put("boot_script", qe.getBootScript());
+             }
+             qdl_props.put("cfg_name", qe.getName());
+             qdl_props.put("cfg_file", qe.getCfgFile());
+             qdl_props.put("log_file", qe.getMyLogger().getFileName());
+             qdl_props.put("logging_name", qe.getMyLogger().getClassName());
+             systemInfo.put("boot.", qdl_props);
+         }
+
+    }
+    public void createSystemConstants() {
+        if (systemConstants != null) {
+            return;
+        }
+        // Start off with the actual constants that the system must have
+        systemConstants = new StemVariable();
+
+        StemVariable varTypes = new StemVariable();
+        varTypes.put("string", new Long(Constant.STRING_TYPE));
+        varTypes.put("stem", new Long(Constant.STEM_TYPE));
+        varTypes.put("boolean", new Long(Constant.BOOLEAN_TYPE));
+        varTypes.put("null", new Long(Constant.NULL_TYPE));
+        varTypes.put("integer", new Long(Constant.LONG_TYPE));
+        varTypes.put("decimal", new Long(Constant.DECIMAL_TYPE));
+        varTypes.put("undefined", new Long(Constant.UNKNOWN_TYPE));
+        systemConstants.put("var_types.", varTypes);
+        StemVariable errorCodes = new StemVariable();
+        errorCodes.put("system_error", TryCatch.RESERVED_ERROR_CODE);
+        systemConstants.put("error_codes.", errorCodes);
+
     }
 
 
+    /**
+     * If this is packaged in a jar, read off the information from the manifest file.
+     * If no manifest, skip this.
+     * @return
+     */
+    protected StemVariable addManifestConstants() {
+        InputStream is = getClass().getResourceAsStream("/META-INF/MANIFEST.MF");
+        if (is == null) {
+            return null;
+        }
+        StemVariable versionInfo = new StemVariable();
+        try {
+            if (is != null) {
+                InputStreamReader isr = new InputStreamReader(is);
+                BufferedReader bufferedInputStream = new BufferedReader(isr);
+                String linein = null;
+                while (null != (linein = bufferedInputStream.readLine())) {
+                    if (linein.startsWith("application-version:")) {
+                        // e.g.  application-version: 1.1-QDL-SNAPSHOT
+                        versionInfo.put("version", truncateLine("application-version:", linein));
+                    }
+                    if (linein.startsWith("Build-Jdk:")) {
+                        // e.g. Build-Jdk: 1.8.0_231
+                        versionInfo.put("build_jdk", truncateLine("Build-Jdk:", linein));
+                    }
+                    if (linein.startsWith("build-time:")) {
+                        // e.g. build-time: 1586726889841
+                        try {
+                            Long ts = Long.parseLong(truncateLine("build-time:", linein));
+                            versionInfo.put("build_time", Iso8601.date2String(ts));
+                        } catch (Throwable t) {
+                            versionInfo.put("build_time", "?");
+                        }
+                    }
+                    if (linein.startsWith("Created-By:")) {
+                        // e.g. Created-By: Apache Maven 3.6.0
+                        versionInfo.put("created_by", truncateLine("Created-By:", linein));
+                    }
+                    if (linein.startsWith("implementation-build:")) {
+                        // e.g.     implementation-build: Build: #21 (2020-04-12T16:28:09.841-05:00)
+                        String build = truncateLine("implementation-build:", linein);
+                        build = build.substring(0, build.indexOf("("));
+                        build = truncateLine("Build:", build);
+                        if (build.startsWith("#")) {
+                            build = build.substring(1);
+                        }
+                        versionInfo.put("build_nr", build);
+                    }
+                }
+                bufferedInputStream.close();
+            }
+        } catch (Throwable t) {
+            warn("Could not load version information:" + t.getMessage());
+        }
+        return versionInfo;
+    }
+
+    String truncateLine(String head, String line) {
+        if (line.startsWith(head)) {
+            return line.substring(head.length()).trim();
+        }
+        return line;
+    }
 
     public boolean isServerMode() {
         return serverMode;

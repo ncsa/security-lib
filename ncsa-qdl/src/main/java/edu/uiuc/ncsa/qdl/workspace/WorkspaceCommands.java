@@ -500,9 +500,9 @@ public class WorkspaceCommands implements Logable {
                 useLocalBuffer = true;
                 return RC_CONTINUE;
             case "show":
-                if(localBuffer == null || localBuffer.length() == 0){
-                   say("(empty)");
-                }else{
+                if (localBuffer == null || localBuffer.length() == 0) {
+                    say("(empty)");
+                } else {
                     say(localBuffer.toString());
                 }
                 return RC_CONTINUE;
@@ -643,8 +643,13 @@ public class WorkspaceCommands implements Logable {
 
     private int doFuncsHelp(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            // so they entered )funcs help  -- same as )funcs or )funcs list
-            return doFuncsList(inputLine);
+            // so they entered )funcs help Print off first lines of help
+            TreeSet<String> treeSet = new TreeSet<>();
+            treeSet.addAll(getState().listAllDocumentation());
+            for (String x : treeSet) {
+                say(x);
+            }
+            return RC_CONTINUE;
         }
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
 
@@ -729,10 +734,10 @@ public class WorkspaceCommands implements Logable {
         int pointer = 0;
         for (String func : list) {
             int currentLine = pointer++ % rowCount;
-            if(rowCount == 1){
+            if (rowCount == 1) {
                 // single row, so don't pad
                 output[currentLine] = output[currentLine] + func + "  ";
-            }else{
+            } else {
                 output[currentLine] = output[currentLine] + func + blanks.substring(0, maxWidth - func.length());
             }
         }
@@ -783,7 +788,7 @@ public class WorkspaceCommands implements Logable {
 
     protected int doVarsSystem(InputLine inputLine) {
         TreeSet<String> sysVars = new TreeSet<>();
-        sysVars.addAll(getState().getSystemVars().listVariables());
+        //  sysVars.addAll(getState().getSystemVars().listVariables());
         return printList(inputLine, sysVars);
     }
 
@@ -826,6 +831,10 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     protected int doWS(InputLine inputLine) {
+        if (!inputLine.hasArgs()) { // so no arguments
+            say("no command found");
+            return RC_CONTINUE;
+        }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "load":
                 return doWsLoad(inputLine);
@@ -880,20 +889,37 @@ public class WorkspaceCommands implements Logable {
         return text + spaces.substring(0, spaces.length() - text.length());
     }
 
+    public boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+    }
+
+    boolean prettyPrint = false;
+
     private int doWSEchoMode(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            say("echo mode currently " + (isEchoModeOn() ? "on" : "off"));
+            say("echo mode currently " + (isEchoModeOn() ? "on" : "off") + ", pretty print = " + (isPrettyPrint() ? "on" : "off"));
             return RC_CONTINUE;
         }
         String onOrOff = inputLine.getArg(FIRST_ARG_INDEX);
+        if (inputLine.hasArg("-pp")) {
+            String pp = inputLine.getNextArgFor("-pp").toLowerCase();
+            prettyPrint = pp.equals("true") || pp.equals("on");
+        }
+
         if (onOrOff.toLowerCase().equals("on")) {
             setEchoModeOn(true);
             getInterpreter().setEchoModeOn(true);
-            say("echo mode on");
+            getInterpreter().setPrettyPrint(prettyPrint);
+            say("echo mode on, pretty print = " + (prettyPrint ? "on" : "off"));
         } else {
             setEchoModeOn(false);
             getInterpreter().setEchoModeOn(false);
-            say("echo mode off");
+            getInterpreter().setPrettyPrint(prettyPrint);
+            say("echo mode off, pretty print = " + (prettyPrint ? "on" : "off"));
         }
         return RC_CONTINUE;
     }
@@ -1123,15 +1149,23 @@ public class WorkspaceCommands implements Logable {
         ConfigurationNode node = ConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
-        if (inputLine.hasArg("-home_dir")) {
-            // The user might set the home directory here.
-            // This is overridden by the configuration file.
-            rootDir = new File(inputLine.getNextArgFor("-home_dir"));
-        }
-        QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
+
+        QDLConfigurationLoader loader = new QDLConfigurationLoader(inputLine.getNextArgFor(CONFIG_FILE_FLAG), node);
 
         QDLEnvironment qe = loader.load();
+        if (inputLine.hasArg("-home_dir")) {
+            // The user might set the home directory here.
+            // This is overrides configuration file.
+            rootDir = new File(inputLine.getNextArgFor("-home_dir"));
+        }
+
+        if (rootDir != null) {
+            // This is where we let the command line override the configuration.
+            qe.setWsHomeDir(rootDir.getAbsolutePath());
+            qe.getMyLogger().info("Overriding the root directory in the configuration with the argument from the command line.");
+        }
         setEchoModeOn(qe.isEchoModeOn());
+        setPrettyPrint(qe.isPrettyPrint());
         isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
         if (isRunScript) {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
@@ -1139,20 +1173,21 @@ public class WorkspaceCommands implements Logable {
         boolean isVerbose = qe.isWSVerboseOn();
         showBanner = qe.isShowBanner();
         logger = qe.getMyLogger();
-        if (!qe.getWSHomeDir().isEmpty()) {
-            rootDir = new File(qe.getWSHomeDir());
+
+        if (qe.getWSHomeDir().isEmpty() && rootDir == null) {
+            // So no home directory was set on the command line either. Use the invocation directory
+            rootDir = new File(System.getProperty("user.dir"));
+            qe.setWsHomeDir(System.getProperty("user.dir"));
         } else {
-            if (rootDir == null) {
-                // So no home directory was set on the command line either. Use the invocation directory
-                String currentDirectory = System.getProperty("user.dir");
-                rootDir = new File(inputLine.getNextArgFor(currentDirectory));
-            }
+            rootDir = new File(qe.getWSHomeDir());
         }
         File testSaveDir = new File(rootDir, "var/ws");
         if (testSaveDir.exists() && testSaveDir.isDirectory()) {
             saveDir = testSaveDir;
         }
         State state = getState(); // This sets it for the class it will be  put in the interpreter below.
+        state.createSystemConstants();
+        state.createSystemInfo(qe);
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         env = new XProperties();
 
@@ -1165,7 +1200,7 @@ public class WorkspaceCommands implements Logable {
             }
             // set some useful things.
         }
-        env.put("home_dir", rootDir.getCanonicalPath());
+        //   env.put("home_dir", rootDir.getCanonicalPath());
         if (testSaveDir == null) {
             env.put("save_dir", "(empty)");
 
@@ -1179,6 +1214,7 @@ public class WorkspaceCommands implements Logable {
         QDLConfigurationLoaderUtils.setupVFS(qe, getState());
 
         setEchoModeOn(qe.isEchoModeOn());
+        setPrettyPrint(qe.isPrettyPrint());
         String[] foundModules = setupModules(qe, getState());
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
@@ -1203,6 +1239,7 @@ public class WorkspaceCommands implements Logable {
         }
         interpreter = new QDLParser(env, getState());
         interpreter.setEchoModeOn(qe.isEchoModeOn());
+        interpreter.setPrettyPrint(qe.isPrettyPrint());
         //   interpreter.setDebugOn(true);
         runScript(); // run any script if that mode is enabled.
     }

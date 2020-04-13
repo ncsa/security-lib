@@ -365,6 +365,35 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * Checks that creating a list then looping through the elements preserves order. 
+     * @throws Throwable
+     */
+    @Test
+    public void testLoopOrder() throws Throwable{
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := true;");
+        addLine(script, "a. := null;");
+        addLine(script, "while[");
+        addLine(script, "   for_next(j, 100)");
+        addLine(script, "]do[");
+        addLine(script, "  a.j := j;");
+        addLine(script, "];");
+        addLine(script, "// Now test that they work");
+        addLine(script, "while[");
+        addLine(script, "   for_next(j,100)");
+        addLine(script, "]do[");
+        addLine(script, "");
+        addLine(script, "  if[a.j != j]then[ok := false;]; " );
+        addLine(script, "]; // end while");
+
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Looping through a list was not done in order.";
+
+    }
+    /**
      * This checks that managing scope outside of a block works. Here a variable is set to
      * null then set inside a loop and the values are updated correctly
      *

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.inject.Provider;
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -14,20 +15,22 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 6/18/12 at  2:13 PM
  */
-public abstract class LoggingConfigLoader<T extends AbstractEnvironment> implements Serializable, Version,ConfigurationLoader<T> {
+public abstract class LoggingConfigLoader<T extends AbstractEnvironment> implements Serializable, Version, ConfigurationLoader<T> {
     /**
      * Returns a string that identifies the version of this server. This will be automatically written to the
      * log as one of the first bootup messages.
+     *
      * @return
      */
     public abstract String getVersionString();
+
     protected ConfigurationNode cn;
     protected Provider<MyLoggingFacade> loggerProvider;
     protected MyLoggingFacade myLogger = null;
 
     /**
      * Checks for and sets up the debugging for this loader. Once this is set up, you may have to tell any environments that
-     * use it that debugging is enabled. 
+     * use it that debugging is enabled.
      */
     protected void loadDebug() {
         String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
@@ -60,9 +63,19 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
         }
     }
 
-    public LoggingConfigLoader(ConfigurationNode node, MyLoggingFacade logger) {
+    public LoggingConfigLoader(String defaultFile,
+                               String defaultName,
+                               ConfigurationNode node, MyLoggingFacade logger) {
         this.cn = node;
+        if (defaultFile != null && !defaultFile.isEmpty()) {
+            File d = new File(defaultFile);
+            if (!d.isAbsolute()) {
 
+                File tempDir = new File(System.getProperty("java.io.tmpdir"));
+                d = new File(tempDir, defaultFile);
+                defaultFile = d.getAbsolutePath();
+            }
+        }
         List list = node.getChildren(LoggingConfigurationTags.LOGGING_COMPONENT);
         ConfigurationNode currentNode = null;
         if (!list.isEmpty()) {
@@ -72,8 +85,8 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
             if (currentNode != null) {
                 loggerProvider = new LoggerProvider(currentNode);
             } else {
-                loggerProvider = new LoggerProvider("delegation.xml",
-                        "NCSA Delegation",
+                loggerProvider = new LoggerProvider(defaultFile == null ? "delegation.xml" : defaultFile,
+                        defaultName == null ? "NCSA Delegation" : defaultName,
                         1,
                         1000000,
                         true,
@@ -89,16 +102,23 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
         // now we have a log to stick it in.
         info(startupVersion);
     }
+
+    public LoggingConfigLoader(ConfigurationNode node, MyLoggingFacade logger) {
+        this(null, null, node, logger);
+
+    }
+
     public LoggingConfigLoader(ConfigurationNode node) {
-           this(node, null);
-       }
+        this(node, null);
+    }
 
 
     protected void warn(Object infoString) {
-           if (myLogger != null) {
-               myLogger.warn(infoString.toString());
-           }
-       }
+        if (myLogger != null) {
+            myLogger.warn(infoString.toString());
+        }
+    }
+
     protected void info(Object infoString) {
         if (myLogger != null) {
             myLogger.info(infoString.toString());

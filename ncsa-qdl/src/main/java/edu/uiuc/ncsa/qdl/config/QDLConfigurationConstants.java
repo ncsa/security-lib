@@ -43,6 +43,7 @@ public interface QDLConfigurationConstants {
     String WS_ATTR_VERBOSE = "verbose";
     String WS_ATTR_SHOW_BANNER = "showBanner";
     String WS_ATTR_ECHO_MODE_ON = "echoModeOn";
+    String WS_ATTR_PRETTY_PRINT = "prettyPrint";
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";
 }

@@ -99,6 +99,7 @@ public class QDLWorkspace {
                 }
             }
             boolean echoMode = workspaceCommands.isEchoModeOn();
+            boolean prettyPrint = workspaceCommands.isPrettyPrint();
 
             try {
                 // Turn off echo mode if running a buffer or very strange things can result
@@ -117,10 +118,13 @@ public class QDLWorkspace {
                             workspaceCommands.setEchoModeOn(false);
                             workspaceCommands.getInterpreter().execute(xb);
                             workspaceCommands.setEchoModeOn(echoMode);
+                            workspaceCommands.setPrettyPrint(prettyPrint);
 
                         } catch (IOException t) {
                             workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
                             workspaceCommands.setEchoModeOn(echoMode);
+                            workspaceCommands.setPrettyPrint(prettyPrint);
+
                         }
                     }
                     continue;
@@ -138,6 +142,7 @@ public class QDLWorkspace {
                 // echo mode, since that causes every subsequent command to fail at least until they
                 // figure it `out and turn it back on.
                 workspaceCommands.setEchoModeOn(echoMode);
+                workspaceCommands.setPrettyPrint(prettyPrint);
                 handleException(t);
             }
         }

@@ -147,7 +147,7 @@ public abstract class FunctionState extends VariableState {
         return out;
     }
 
-    public List<String> listDocumentation() {
+    public List<String> listAllDocumentation() {
         List<String> out = getFunctionTable().listDoxx();
         for (URI key : getImportManager().keySet()) {
             List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();

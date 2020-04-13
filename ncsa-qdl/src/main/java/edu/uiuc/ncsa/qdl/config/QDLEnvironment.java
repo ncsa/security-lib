@@ -22,6 +22,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     public QDLEnvironment(MyLoggingFacade myLogger,
+                          String cfgFile,
                           String name,
                           boolean isEnabled,
                           boolean isServerModeOn,
@@ -30,11 +31,13 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String wsHomeDir,
                           String wsEnv,
                           boolean echoModeOn,
+                          boolean prettyPrint,
                           boolean verboseOn,
                           boolean showBanner,
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs) {
         super(myLogger);
+        this.cfgFile = cfgFile;
         this.name = name;
         this.enabled = isEnabled;
         this.serverModeOn = isServerModeOn;
@@ -45,10 +48,20 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.vfsConfigs = vfsConfigs;
         this.moduleConfigs = moduleConfigs;
         this.echoModeOn = echoModeOn;
+        this.prettyPrint = prettyPrint;
         this.numericDigits = numericDigits;
         this.showBanner = showBanner;
     }
 
+    public boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+    }
+
+    boolean prettyPrint = false;
     public boolean isShowBanner() {
         return showBanner;
     }
@@ -64,6 +77,12 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     int numericDigits = OpEvaluator.numericDigits;
+
+    public String getCfgFile() {
+        return cfgFile;
+    }
+
+    String cfgFile;
 
     public String getName() {
         return name;
@@ -107,6 +126,14 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
 
     public String getBootScript() {
         return bootScript;
+    }
+
+    /**
+     * Should be set in the constructor. The setter here is allowed if the user is overriding it from the command line.
+     * @param wsHomeDir
+     */
+    public void setWsHomeDir(String wsHomeDir) {
+        this.wsHomeDir = wsHomeDir;
     }
 
     String wsHomeDir = null;

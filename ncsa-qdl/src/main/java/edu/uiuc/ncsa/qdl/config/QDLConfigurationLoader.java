@@ -22,8 +22,9 @@ import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
  * on 2/27/20 at  7:37 AM
  */
 public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingConfigLoader<T> implements QDLConfigurationConstants, ConfigurationLoader<T> {
-    public QDLConfigurationLoader(ConfigurationNode node) {
-        super(node, null); // This makes it read the logging configuration and create the logger. Logging should just work
+    public QDLConfigurationLoader(String cfgFile, ConfigurationNode node) {
+        super("qdl.log","qdl", node, null); // This makes it read the logging configuration and create the logger. Logging should just work
+        configFile = cfgFile;
     }
 
     /**
@@ -33,8 +34,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
      * @param node
      * @param logger
      */
-    public QDLConfigurationLoader(ConfigurationNode node, MyLoggingFacade logger) {
-        super(node, logger);
+    public QDLConfigurationLoader(String cfgFile,ConfigurationNode node, MyLoggingFacade logger) {
+        // set defaults for the logger if none configured or you get references to NCSA Delegation
+        super("qdl.log","qdl",node, logger);
+        configFile = cfgFile;
     }
 
     @Override
@@ -43,6 +46,18 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return env;
     }
 
+    /**
+     * This is set to point to the configuration file (that information is not contained inside the file). It is optional.
+     * @param configFile
+     */
+    public void setConfigFile(String configFile) {
+        this.configFile = configFile;
+    }
+
+    protected String getConfigFile(){
+           return configFile;
+       }
+    String configFile = null;
     protected String getBootScript() {
         return getNodeValue(cn, BOOT_SCRIPT_TAG, "");
     }
@@ -89,8 +104,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
             return "(none)";
         }
         return name;
-
     }
+
 
     protected boolean isServerModeOn() {
 
@@ -101,6 +116,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
     }
+    protected boolean isPrettyPrint() {
+          ConfigurationNode node = getFirstNode(cn, WS_TAG);
+          return getFirstBooleanValue(node, WS_ATTR_PRETTY_PRINT, false);
+      }
 
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
@@ -202,7 +221,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     @Override
     public T createInstance() {
-        return (T) new QDLEnvironment(myLogger,
+        return (T) new QDLEnvironment(
+                myLogger,
+                getConfigFile(),
                 getName(),
                 isEnabled(),
                 isServerModeOn(),
@@ -211,6 +232,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getWSHomeDir(),
                 getWSEnvFile(),
                 isEchoModeOn(),
+                isPrettyPrint(),
                 isWSVerboseOn(),
                 showBanner(),
                 getVFSConfigs(),
@@ -226,7 +248,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     public static void main(String[] args) {
         String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/qdl-cfg.xml";
         ConfigurationNode node = ConfigUtil.findConfiguration(path, "test", QDLConfigurationConstants.CONFIG_TAG_NAME);
-        QDLConfigurationLoader loader = new QDLConfigurationLoader(node);
+        QDLConfigurationLoader loader = new QDLConfigurationLoader(path, node);
 
         QDLEnvironment config = loader.load();
         System.out.println("Root node = " + node.getName());
@@ -237,6 +259,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         System.out.println("ws home dir = " + config.getWSHomeDir());
         System.out.println("ws verbose = " + config.isWSVerboseOn());
         System.out.println("ws echo mode on = " + config.isEchoModeOn());
+        System.out.println("ws pretty print = " + config.isPrettyPrint());
         System.out.println("vfs config = " + config.getVFSConfigurations());
         System.out.println("module config = " + config.getModuleConfigs());
 

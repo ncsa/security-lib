@@ -42,7 +42,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 myLoggingFacade);
     }
 
-    public static SymbolTableImpl getSystemVars() {
+  /*  public static SymbolTableImpl getSystemVars() {
         if (systemVars == null) {
             systemVars = new SymbolTableImpl();
         }
@@ -52,26 +52,9 @@ public abstract class VariableState extends NamespaceAwareState {
 
     static SymbolTableImpl systemVars;
     static boolean sysConstantsInitialized = false;
+*/
 
 
-    protected void createSystemConstants() {
-        if (sysConstantsInitialized) {
-            return;
-        }
-        sysConstantsInitialized = true;
-        StemVariable systemConstants = new StemVariable();
-
-        StemVariable varTypes = new StemVariable();
-        varTypes.put("string", new Long(Constant.STRING_TYPE));
-        varTypes.put("stem", new Long(Constant.STEM_TYPE));
-        varTypes.put("boolean", new Long(Constant.BOOLEAN_TYPE));
-        varTypes.put("null", new Long(Constant.NULL_TYPE));
-        varTypes.put("integer", new Long(Constant.LONG_TYPE));
-        varTypes.put("decimal", new Long(Constant.DECIMAL_TYPE));
-        varTypes.put("undefined", new Long(Constant.UNKNOWN_TYPE));
-        systemConstants.put("var_types.", varTypes);
-        getSystemVars().setValue(MetaEvaluator.SYS_FQ + "constants.", systemConstants);
-    }
 
     /**
      * Checks if a symbol is defined. Note that this does do stem tail resolution and namespace resolution.
@@ -97,7 +80,11 @@ public abstract class VariableState extends NamespaceAwareState {
      */
     public Object getValue(String variableName) {
         if (isStem(variableName)) {
-            if (variableName.startsWith(MetaEvaluator.SYS_FQ)) {
+            /*
+            If we want to have system variables this is how to do it. A long as nothing is put there
+            this won't get evaluated.
+             */
+            /*if (!systemVars.getMap().isEmpty() && variableName.startsWith(MetaEvaluator.SYS_FQ)) {
                 StemMultiIndex w = new StemMultiIndex(variableName);
                 variableName = getFQName(w.name);
                 StemVariable s = (StemVariable) systemVars.getMap().get(MetaEvaluator.SYS_FQ+variableName);
@@ -105,7 +92,7 @@ public abstract class VariableState extends NamespaceAwareState {
                     return s;
                 }
                 return s.get(w);
-            }
+            }*/
             StemMultiIndex w = new StemMultiIndex(variableName);
             return gsrNSStemOp(w, OP_GET, null);
         }

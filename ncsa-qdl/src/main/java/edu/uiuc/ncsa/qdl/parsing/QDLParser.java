@@ -64,7 +64,18 @@ public class QDLParser {
         QDLRunner runner = new QDLRunner(driver.parse(r));
         runner.setState(state);
         runner.setEchoModeOn(isEchoModeOn());
+        runner.setPrettyPrint(isPrettyPrint());
         runner.run();
 
     }
+
+    public boolean isPrettyPrint() {
+        return prettyPrint;
+    }
+
+    public void setPrettyPrint(boolean prettyPrint) {
+        this.prettyPrint = prettyPrint;
+    }
+
+    boolean prettyPrint = false;
 }
