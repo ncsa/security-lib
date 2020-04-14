@@ -50,7 +50,7 @@ public class WhileLoop implements Statement {
            if(p.isBuiltIn()){
                switch(p.getName()){
                    case FOR_KEYS:
-                       return hasKeysLoop(localState);
+                       return forKeysLoop(localState);
                    case FOR_NEXT:
                        return doForLoop(localState);
                    case CHECK_AFTER:
@@ -152,20 +152,24 @@ public class WhileLoop implements Statement {
     }
 
     protected Object doBasicWhile(State localState) {
-        while ((Boolean) conditional.evaluate(localState)) {
-            for (Statement statement : getStatements()) {
-                try {
-                    statement.evaluate(localState);
-                } catch (BreakException b) {
-                    return Boolean.TRUE;
-                } catch (ContinueException cx) {
-                    // just continue.
-                } catch (ReturnException rx) {
-                    return Boolean.TRUE;
+        try {
+            while ((Boolean) conditional.evaluate(localState)) {
+                for (Statement statement : getStatements()) {
+                    try {
+                        statement.evaluate(localState);
+                    } catch (BreakException b) {
+                        return Boolean.TRUE;
+                    } catch (ContinueException cx) {
+                        // just continue.
+                    } catch (ReturnException rx) {
+                        return Boolean.TRUE;
+                    }
                 }
             }
+            return Boolean.TRUE;
+        }catch(ClassCastException cce){
+            throw new IllegalStateException("Error: You must have a boolean value for your conditional");
         }
-        return Boolean.TRUE;
     }
 
     /**
@@ -174,7 +178,7 @@ public class WhileLoop implements Statement {
      * @param localState
      * @return
      */
-    protected Object hasKeysLoop(State localState) {
+    protected Object forKeysLoop(State localState) {
         if (conditional.getArgumments().size() != 2) {
             throw new IllegalArgumentException("Error: You must supply two arguments for " + FOR_KEYS);
         }

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.functor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 

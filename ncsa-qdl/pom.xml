@@ -75,37 +75,6 @@
                     <forkMode>perTest</forkMode>
                 </configuration>
             </plugin>
-            <!--            <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jar-plugin</artifactId>
-                            <version>3.1.0</version>
-                            <executions>
-                                <execution>
-                                    <inherited>true</inherited>
-                                    <phase>package</phase>
-                                    <goals>
-                                        <goal>jar</goal>
-                                    </goals>
-                                </execution>
-                            </executions>
-
-                            <configuration>
-
-                                <archive>
-                                    <manifest>
-                                        <addClasspath>true</addClasspath>
-                                    </manifest>
-                                    <manifestEntries>
-                                        <application-version>${pom.version}</application-version>
-                                        <application-name>${pom.name}</application-name>
-                                        <build-time>${timestamp}</build-time>
-                                        <implementation-version>${project.version}</implementation-version>
-                                        <implementation-build>${buildNumber}</implementation-build>
-                                    </manifestEntries>
-                                </archive>
-
-                            </configuration>
-                        </plugin>-->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

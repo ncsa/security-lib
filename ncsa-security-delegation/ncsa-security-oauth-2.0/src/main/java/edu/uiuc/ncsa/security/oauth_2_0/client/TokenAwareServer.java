@@ -68,7 +68,7 @@ public abstract class TokenAwareServer extends ASImpl {
         } catch (Throwable t) {
             // it is at this point we may not have a JSON object because the request failed and the server returned an
             // error string. Throw an exception, print the response.
-            DebugUtil.dbg(this, "Response from server was not a JSON Object: " + response);
+            DebugUtil.trace(this, "Response from server was not a JSON Object: " + response);
             throw new GeneralException("Error: The server encountered an error and the response was not JSON:\n\"" + response + "\"", t);
         }
         if (!jsonObject.getString(TOKEN_TYPE).equals(BEARER_TOKEN_TYPE)) {

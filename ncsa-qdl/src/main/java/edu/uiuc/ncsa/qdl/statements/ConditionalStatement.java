@@ -47,7 +47,11 @@ public class ConditionalStatement implements Statement {
         State newState = state.newStateWithImports();
 
         Boolean result = false;
-        if ((Boolean) getConditional().evaluate(newState)) {
+        getConditional().evaluate(newState);
+        if (!(getConditional().getResult() instanceof Boolean)) {
+            throw new IllegalStateException("Error: You must have a boolean value for your conditional");
+        }
+        if ((Boolean) getConditional().getResult()) {
             result = true;
             for (Statement arg : ifArguments) {
                 arg.evaluate(newState);

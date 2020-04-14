@@ -365,7 +365,8 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
-     * Checks that creating a list then looping through the elements preserves order. 
+     * Checks that creating a list then looping through the elements preserves order. These elements are
+     * 0,1., 2, 3. (so alternating stems)
      * @throws Throwable
      */
     @Test
@@ -374,16 +375,16 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "ok := true;");
         addLine(script, "a. := null;");
         addLine(script, "while[");
-        addLine(script, "   for_next(j, 100)");
+        addLine(script, "   for_next(j, 4)");
         addLine(script, "]do[");
-        addLine(script, "  a.j := j;");
+        addLine(script, "  if[mod(j,2)==0]then[a.j := j;]else[a.j.:=indices(2);];");
         addLine(script, "];");
         addLine(script, "// Now test that they work");
         addLine(script, "while[");
-        addLine(script, "   for_next(j,100)");
+        addLine(script, "   for_keys(j,a.)");
         addLine(script, "]do[");
-        addLine(script, "");
-        addLine(script, "  if[a.j != j]then[ok := false;]; " );
+        addLine(script, "// say(j);" );
+        addLine(script, "say('j==' + j + ', type=' + var_type(a.j));");
         addLine(script, "]; // end while");
 
         State state = testUtils.getNewState();

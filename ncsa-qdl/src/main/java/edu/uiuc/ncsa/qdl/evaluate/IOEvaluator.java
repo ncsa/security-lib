@@ -179,12 +179,11 @@ public class IOEvaluator extends MathEvaluator {
                     } else {
                         if(temp instanceof StemVariable){
                             if (prettyPrintForStems) {
-                                if (temp instanceof StemVariable) {
                                     result = ((StemVariable) temp).toString(1);
-                                }
+                            }else{
+                                result = temp.toString();
                             }
                         }else {
-
                             result = temp.toString();
                         }
                     }

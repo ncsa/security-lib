@@ -642,14 +642,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int doFuncsHelp(InputLine inputLine) {
-        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
             // so they entered )funcs help Print off first lines of help
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(getState().listAllDocumentation());
-            for (String x : treeSet) {
-                say(x);
-            }
-            return RC_CONTINUE;
+            return printList(inputLine, treeSet);
         }
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
 
@@ -719,6 +716,13 @@ public class WorkspaceCommands implements Logable {
         int maxWidth = 0;
         for (String x : list) {
             maxWidth = Math.max(maxWidth, x.length());
+        }
+        // special case. If the longest element is too long, just print as columns
+        if(displayWidth <= maxWidth){
+            for(String x : list){
+                say(x);
+            }
+            return RC_CONTINUE;
         }
         maxWidth = 2 + maxWidth; // so the widest + 2 chars to make it readable.
         // number of columns are display / width, possibly plus 1 if there is a remainder
@@ -900,7 +904,12 @@ public class WorkspaceCommands implements Logable {
     boolean prettyPrint = false;
 
     private int doWSEchoMode(InputLine inputLine) {
-        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
+            if (inputLine.hasArg("-pp")) {
+                String pp = inputLine.getNextArgFor("-pp").toLowerCase();
+                prettyPrint = pp.equals("true") || pp.equals("on");
+                getInterpreter().setPrettyPrint(prettyPrint);
+            }
             say("echo mode currently " + (isEchoModeOn() ? "on" : "off") + ", pretty print = " + (isPrettyPrint() ? "on" : "off"));
             return RC_CONTINUE;
         }

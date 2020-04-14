@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.util.functor.system.jsetEnv;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
@@ -20,7 +21,7 @@ import static edu.uiuc.ncsa.security.util.functor.FunctorTypeImpl.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/27/18 at  9:07 AM
  */
-public class JFunctorFactory {
+public class JFunctorFactory implements Serializable {
 
     Map<String,String> environment = new HashMap<>();
 

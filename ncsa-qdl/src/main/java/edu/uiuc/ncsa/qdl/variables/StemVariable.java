@@ -7,6 +7,7 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -361,7 +362,7 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
-        if(getStemList().size() == size()){
+        if (getStemList().size() == size()) {
             return getStemList().toJSON(); // handles case of simple list of simple elements
         }
         JSONObject json = new JSONObject();
@@ -395,7 +396,7 @@ public class StemVariable extends HashMap<String, Object> {
                 json.put(escapeNames ? codec.decode(key) : key, get(key));
             }
         }
-        if(localSL.size() == size()){
+        if (localSL.size() == size()) {
             return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
         }
 
@@ -647,8 +648,92 @@ public class StemVariable extends HashMap<String, Object> {
 
     }
 
-    @Override
-    public Set<String> keySet() {
+    protected static class OrderedIndexEntry implements Comparable, Serializable {
+        public OrderedIndexEntry(long index, boolean hasStem) {
+            this.index = index;
+            this.hasStem = hasStem;
+        }
+
+        long index;
+        boolean hasScalar;
+        boolean hasStem;
+
+        @Override
+        public int compareTo(Object o) {
+            if (o instanceof OrderedIndexEntry) {
+                OrderedIndexEntry s = (OrderedIndexEntry) o;
+                if (index < s.index) return -1;
+                if (index == s.index) return 0;
+                if (index > s.index) return 1;
+            }
+            throw new ClassCastException("Error: the object \"" + o.getClass().getSimpleName() + "\" is not comparable.");
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return compareTo(obj) == 0;
+        }
+    }
+
+    Set<String> orderedkeySet() {
+        LinkedHashSet<String> h = new LinkedHashSet<>();
+        if (getStemList().isEmpty()) {
+            h.addAll(super.keySet());
+            return h;
+        }
+        if (super.keySet().isEmpty()) {
+            for (StemEntry s : getStemList()) {
+                h.add(Long.toString(s.index));
+            }
+            return h;
+        }
+
+        TreeSet<OrderedIndexEntry> stemKeys = new TreeSet<>();
+
+        Set<String> currentKeys = new HashSet<>();
+        currentKeys.addAll(super.keySet());
+        for (String k : super.keySet()) {
+            if (k.endsWith(STEM_INDEX_MARKER)) {
+                try {
+                    OrderedIndexEntry orderedIndexEntry = new OrderedIndexEntry(Long.parseLong(k.substring(0, k.length() - 1)), true);
+                    stemKeys.add(orderedIndexEntry);
+                    currentKeys.remove(k);
+                } catch (Throwable t) {
+
+                }
+            }
+        }
+
+        for (StemEntry s : getStemList()) {
+            OrderedIndexEntry orderedIndexEntry = new OrderedIndexEntry(s.index, false);
+            if (stemKeys.contains(orderedIndexEntry)) {
+                OrderedIndexEntry oie = stemKeys.floor(orderedIndexEntry);
+                oie.hasScalar = true;
+            } else {
+                orderedIndexEntry.hasScalar = true;
+                stemKeys.add(orderedIndexEntry);
+
+            }
+        }
+        for (OrderedIndexEntry oie : stemKeys) {
+            if (oie.hasScalar) {
+                h.add(Long.toString(oie.index));
+            }
+            if (oie.hasStem) {
+                h.add(oie.index + STEM_INDEX_MARKER);
+            }
+        }
+        h.addAll(currentKeys);
+        return h;
+
+    }
+
+    /**
+     * Gives back a completely unordered key set.
+     *
+     * @return
+     */
+    Set<String> unorderedKeySet() {
         HashSet<String> keys = new HashSet<>();
         keys.addAll(super.keySet()); // have to copy it since we cannot modify the key set of a map.
         if (getStemList().isEmpty()) {
@@ -657,9 +742,16 @@ public class StemVariable extends HashMap<String, Object> {
         for (StemEntry s : getStemList()) {
             keys.add(Long.toString(s.index));
         }
+
         TreeSet<String> sortedSet = new TreeSet<>();
         sortedSet.addAll(keys);
         return sortedSet;
+
+    }
+
+    @Override
+    public Set<String> keySet() {
+        return orderedkeySet();
     }
 
     @Override
