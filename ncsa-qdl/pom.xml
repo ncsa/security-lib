@@ -8,13 +8,13 @@
             edu.uiuc.ncsa.security
         </groupId>
         <artifactId>ncsa-security-all</artifactId>
-        <version>4.5-SNAPSHOT</version>
+        <version>4.4.0</version>
     </parent>
 
     <artifactId>ncsa-qdl</artifactId>
     <name>The QD Language</name>
     <packaging>jar</packaging>
-    <version>1.1-QDL-SNAPSHOT</version>
+    <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>
@@ -169,24 +169,24 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -202,34 +202,34 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-storage</artifactId>
-            <version>4.5-SNAPSHOT</version>
+            <version>4.4.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

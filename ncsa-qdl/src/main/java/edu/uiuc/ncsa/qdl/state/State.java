@@ -146,7 +146,7 @@ public class State extends FunctionState {
                 String linein = null;
                 while (null != (linein = bufferedInputStream.readLine())) {
                     if (linein.startsWith("application-version:")) {
-                        // e.g.  application-version: 1.1-QDL-SNAPSHOT
+                        // e.g.  application-version: 1.0.0
                         versionInfo.put("version", truncateLine("application-version:", linein));
                     }
                     if (linein.startsWith("Build-Jdk:")) {
