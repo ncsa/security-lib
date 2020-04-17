@@ -164,7 +164,7 @@ public abstract class CommonCommands implements Commands {
      * @return
      */
     protected boolean showHelp(InputLine inputLine) {
-        if ((1 < inputLine.size()) && inputLine.getArg(1).equals("--help")) return true;
+        if (inputLine.hasArg("--help")) return true;
         return false;
     }
 

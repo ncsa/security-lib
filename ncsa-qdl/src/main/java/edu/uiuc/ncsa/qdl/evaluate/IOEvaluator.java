@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.setupMySQLDatabase;
+import static edu.uiuc.ncsa.qdl.evaluate.StemEvaluator.STEM_FUNCTION_BASE_VALUE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -47,8 +48,8 @@ public class IOEvaluator extends MathEvaluator {
     public static final String IO_READ_FILE = IO_FQ + "read";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String IO_WRITE_FILE = IO_FQ + "write";
     public static final String WRITE_FILE = "write_file";
+    public static final String IO_WRITE_FILE = IO_FQ + WRITE_FILE;
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
     public static final String DIR = "dir";
@@ -67,6 +68,11 @@ public class IOEvaluator extends MathEvaluator {
     public static final String IO_RM_FILE = IO_FQ + RM_FILE;
     public static final int RM_FILE_TYPE = 8 + IO_FUNCTION_BASE_VALUE;
 
+    public static final String TO_STRING = "to_string";
+    public static final String FQ_TO_STRING = SYS_FQ + TO_STRING;
+    public static final int TO_STRING_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
+
+
     public static final String VFS_MOUNT = "vfs_mount";
     public static final String IO_VFS_MOUNT = IO_FQ + "mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
@@ -77,6 +83,7 @@ public class IOEvaluator extends MathEvaluator {
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
     public static String[] FUNC_NAMES = new String[]{
+            TO_STRING,
             SAY_FUNCTION,
             PRINT_FUNCTION,
             SCAN_FUNCTION,
@@ -87,6 +94,7 @@ public class IOEvaluator extends MathEvaluator {
             VFS_UNMOUNT};
 
     public static String[] FQ_FUNC_NAMES = new String[]{
+            FQ_TO_STRING,
             IO_SAY_FUNCTION,
             IO_PRINT_FUNCTION,
             IO_SCAN_FUNCTION,
@@ -113,6 +121,10 @@ public class IOEvaluator extends MathEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case TO_STRING:
+            case FQ_TO_STRING:
+                return TO_STRING_TYPE;
+
             case PRINT_FUNCTION:
             case IO_PRINT_FUNCTION:
             case IO_SAY_FUNCTION:
@@ -151,75 +163,22 @@ public class IOEvaluator extends MathEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+        boolean printIt = false;
         switch (polyad.getName()) {
+
             case PRINT_FUNCTION:
             case IO_PRINT_FUNCTION:
             case IO_SAY_FUNCTION:
             case SAY_FUNCTION:
-                if (state.isServerMode()) {
-                    polyad.setResult(QDLNull.getInstance());
-                    polyad.setResultType(Constant.NULL_TYPE);
-                    polyad.setEvaluated(true);
-                    return true;
-                }
-                String result = "";
-                boolean prettyPrintForStems = false;
-                if (polyad.getArgumments().size() != 0) {
-                    Object temp = polyad.evalArg(0, state);
-                    if (polyad.getArgumments().size() == 2) {
-                        // assume pretty print for stems.
-                        Object flag = polyad.evalArg(1, state);
-                        if (flag instanceof Boolean) {
-                            prettyPrintForStems = (Boolean) flag;
-                        }
-                    }
-                    if (temp == null || temp instanceof QDLNull) {
-                        result = "null";
+                printIt = true;
+            case TO_STRING:
+            case FQ_TO_STRING:
 
-                    } else {
-                        if(temp instanceof StemVariable){
-                            if (prettyPrintForStems) {
-                                    result = ((StemVariable) temp).toString(1);
-                            }else{
-                                result = temp.toString();
-                            }
-                        }else {
-                            result = temp.toString();
-                        }
-                    }
-                }
-                System.out.println(result);
-                if (polyad.getArgumments().size() == 0) {
-                    polyad.setResult(QDLNull.getInstance());
-                    polyad.setResultType(Constant.NULL_TYPE);
-
-                } else {
-                    polyad.setResult(polyad.getArgumments().get(0).getResult());
-                    polyad.setResultType(polyad.getArgumments().get(0).getResultType());
-
-                }
-                polyad.setEvaluated(true);
+                doPrint(polyad, state, printIt);
                 return true;
             case SCAN_FUNCTION:
             case IO_SCAN_FUNCTION:
-                if (state.isServerMode()) {
-                    throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
-                }
-
-                if (polyad.getArgumments().size() != 0) {
-                    // This is the prompt.
-                    System.out.print(polyad.evalArg(0, state));
-                }
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-                result = "";
-                try {
-                    result = bufferedReader.readLine().trim();
-                } catch (IOException e) {
-                    result = "(error)";
-                }
-                polyad.setResult(result);
-                polyad.setResultType(Constant.STRING_TYPE);
-                polyad.setEvaluated(true);
+                doScan(polyad, state);
                 return true;
             case IO_DIR:
             case DIR:
@@ -255,6 +214,85 @@ public class IOEvaluator extends MathEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doScan(Polyad polyad, State state) {
+        if (state.isServerMode()) {
+            throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
+        }
+
+        if (polyad.getArgumments().size() != 0) {
+            // This is the prompt.
+            System.out.print(polyad.evalArg(0, state));
+        }
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        String result = "";
+        try {
+            result = bufferedReader.readLine().trim();
+        } catch (IOException e) {
+            result = "(error)";
+        }
+        polyad.setResult(result);
+        polyad.setResultType(Constant.STRING_TYPE);
+        polyad.setEvaluated(true);
+    }
+
+    /**
+     * Does print, say and to_string commands. 
+     * @param polyad
+     * @param state
+     * @param printIt
+     */
+    protected void doPrint(Polyad polyad, State state, boolean printIt) {
+        if (printIt && state.isServerMode()) {
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        String result = "";
+        boolean prettyPrintForStems = false;
+        if (polyad.getArgumments().size() != 0) {
+            Object temp = polyad.evalArg(0, state);
+            if (polyad.getArgumments().size() == 2) {
+                // assume pretty print for stems.
+                Object flag = polyad.evalArg(1, state);
+                if (flag instanceof Boolean) {
+                    prettyPrintForStems = (Boolean) flag;
+                }
+            }
+            if (temp == null || temp instanceof QDLNull) {
+                result = "null";
+
+            } else {
+                if (temp instanceof StemVariable) {
+                    if (prettyPrintForStems) {
+                        result = ((StemVariable) temp).toString(1);
+                    } else {
+                        result = temp.toString();
+                    }
+                } else {
+                    result = temp.toString();
+                }
+            }
+        }
+        if (printIt) {
+            System.out.println(result);
+        }
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+        } else {
+            if (printIt) {
+                polyad.setResult(polyad.getArgumments().get(0).getResult());
+                polyad.setResultType(polyad.getArgumments().get(0).getResultType());
+
+            } else {
+                polyad.setResult(result);
+                polyad.setResultType(Constant.STRING_TYPE);
+            }
+        }
+        polyad.setEvaluated(true);
     }
 
     protected void doRMDir(Polyad polyad, State state) {

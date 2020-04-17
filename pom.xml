@@ -65,9 +65,8 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
-                    <forceJavacCompilerUse>true</forceJavacCompilerUse>
                 </configuration>
-                <version>3.5.1</version>
+                <version>3.8.1</version>
             </plugin>
 
             <plugin>

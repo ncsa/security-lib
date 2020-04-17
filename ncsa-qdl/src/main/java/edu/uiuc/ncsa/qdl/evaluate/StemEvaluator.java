@@ -63,6 +63,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_VAR_TYPE = SYS_FQ + VAR_TYPE;
     public static final int VAR_TYPE_TYPE = 11 + STEM_FUNCTION_BASE_VALUE;
 
+
     // Key functions
     public static final String COMMON_KEYS = "common_keys";
     public static final String FQ_COMMON_KEYS = STEM_FQ + COMMON_KEYS;
@@ -292,6 +293,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
+
             case VAR_TYPE:
             case FQ_VAR_TYPE:
                 doVarType(polyad, state);
@@ -396,6 +398,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+ 
     /**
      * Get the type of the argument.
      *

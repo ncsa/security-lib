@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -21,6 +22,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
+import java.util.Map;
 import java.util.TreeSet;
 
 /**
@@ -76,9 +78,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final int CONSTANTS_TYPE = 206 + CONTROL_BASE_VALUE;
 
     // For system info
-      public static final String SYS_INFO = "info";
-      public static final String FQ_SYS_INFO = SYS_FQ + SYS_INFO;
-      public static final int SYS_INFO_TYPE = 207 + CONTROL_BASE_VALUE;
+    public static final String SYS_INFO = "info";
+    public static final String FQ_SYS_INFO = SYS_FQ + SYS_INFO;
+    public static final int SYS_INFO_TYPE = 207 + CONTROL_BASE_VALUE;
+
+    // for os environment
+    public static final String OS_ENV = "os_env";
+    public static final String FQ_OS_ENV = SYS_INFO + OS_ENV;
+    public static final int OS_ENV_TYPE = 208 + CONTROL_BASE_VALUE;
 
 
     // try ... catch
@@ -98,6 +105,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
     public static String FUNC_NAMES[] = new String[]{
             SYS_INFO,
+            OS_ENV,
             CONSTANTS,
             CONTINUE,
             BREAK,
@@ -113,6 +121,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_SYS_INFO,
+            FQ_OS_ENV,
             FQ_CONSTANTS,
             FQ_CONTINUE,
             FQ_BREAK,
@@ -143,6 +152,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case OS_ENV:
+            case FQ_OS_ENV:
+                return OS_ENV_TYPE;
             case SYS_INFO:
             case FQ_SYS_INFO:
                 return SYS_INFO_TYPE;
@@ -202,12 +214,16 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResult(Boolean.TRUE);
                 throw new BreakException();
             case CONSTANTS:
-            case  FQ_CONSTANTS:
+            case FQ_CONSTANTS:
                 doConstants(polyad, state);
                 return true;
             case SYS_INFO:
             case FQ_SYS_INFO:
                 doSysInfo(polyad, state);
+                return true;
+            case OS_ENV:
+            case FQ_OS_ENV:
+                doOSEnv(polyad, state);
                 return true;
             case CONTINUE:
             case FQ_CONTINUE:
@@ -248,9 +264,61 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+
+    // Contract is
+    // no arg -- return all as stemm
+    // 1 or more, return environment variable for each. Single one returns the value, otherwise a stem
+    // Empty result at all times in server mode.
+    protected void doOSEnv(Polyad polyad, State state) {
+        if (state.isServerMode()) {
+            polyad.setResult("");
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        StemVariable env = new StemVariable();
+        QDLCodec codec = new QDLCodec();
+
+        int argCount = polyad.getArgumments().size();
+        if (argCount == 0) {
+            // system variables.
+            Map<String, String> map = System.getenv();
+            for (String key : map.keySet()) {
+                env.put(codec.encode(key), System.getenv(key));
+            }
+            polyad.setResult(env);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        for (int i = 0; i < argCount; i++) {
+            Object obj = polyad.evalArg(i, state);
+            if (!isString(obj)) {
+                throw new IllegalArgumentException("Error: argument with index " + i + " was not a string.");
+            }
+
+            String arg = (String) obj;
+            String value = System.getenv(arg);
+
+            if (argCount == 1) {
+                polyad.setEvaluated(true);
+                polyad.setResultType(Constant.STRING_TYPE);
+                polyad.setResult(value == null ? "" : value); // Don't return java null objects.
+                return;
+            }
+            if (value != null) {
+                env.put(codec.encode(arg), value);
+            }
+        }
+
+        polyad.setEvaluated(true);
+        polyad.setResult(env);
+        polyad.setResultType(Constant.STEM_TYPE);
+    }
+
     protected void doSysInfo(Polyad polyad, State state) {
-        if(polyad.getArgumments().size() != 0){
-            throw new IllegalArgumentException("Error: No arguments for " + FQ_SYS_INFO );
+        if (polyad.getArgumments().size() != 0) {
+            throw new IllegalArgumentException("Error: No arguments for " + FQ_SYS_INFO);
         }
         polyad.setEvaluated(true);
         polyad.setResult(state.getSystemInfo());
@@ -258,8 +326,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doConstants(Polyad polyad, State state) {
-        if(polyad.getArgumments().size() != 0){
-            throw new IllegalArgumentException("Error: No arguments for " + FQ_CONTINUE );
+        if (polyad.getArgumments().size() != 0) {
+            throw new IllegalArgumentException("Error: No arguments for " + FQ_CONTINUE);
         }
         polyad.setEvaluated(true);
         polyad.setResult(state.getSystemConstants());
@@ -375,7 +443,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Error: reading files is not supported in server mode");
         }
-        if (0 == polyad.getArgumments().size() ||3 <= polyad.getArgumments().size() ) {
+        if (0 == polyad.getArgumments().size() || 3 <= polyad.getArgumments().size()) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires one or two arguments.");
         }
         int loadTarget = LOAD_FILE;

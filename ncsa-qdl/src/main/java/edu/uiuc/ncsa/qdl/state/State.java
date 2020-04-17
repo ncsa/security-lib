@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
@@ -22,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This is a facade for the various stateful components we have to track.
@@ -75,6 +77,7 @@ public class State extends FunctionState {
              os.put("version", System.getProperty("os.version"));
              os.put("name", System.getProperty("os.name"));
              os.put("architecture", System.getProperty("os.arch"));
+
              systemInfo.put("os.", os);
              StemVariable system = new StemVariable();
              system.put("jvm_version", System.getProperty("java.version"));
@@ -85,6 +88,8 @@ public class State extends FunctionState {
              user.put("working_dir", System.getProperty("user.dir"));
              user.put("home_dir", System.getProperty("user.home"));
              systemInfo.put("user.", user);
+//             systemInfo.put("user.", user);
+
          }
 
          StemVariable versionInfo = addManifestConstants();
@@ -124,6 +129,12 @@ public class State extends FunctionState {
         StemVariable errorCodes = new StemVariable();
         errorCodes.put("system_error", TryCatch.RESERVED_ERROR_CODE);
         systemConstants.put("error_codes.", errorCodes);
+        StemVariable fileTypes = new StemVariable();
+        fileTypes.put("binary", new Long(IOEvaluator.FILE_OP_BINARY));
+        fileTypes.put("stem", new Long(IOEvaluator.FILE_OP_TEXT_STEM));
+        fileTypes.put("string", new Long(IOEvaluator.FILE_OP_TEXT_STRING));
+        systemConstants.put("file_types.", errorCodes);
+
 
     }
 

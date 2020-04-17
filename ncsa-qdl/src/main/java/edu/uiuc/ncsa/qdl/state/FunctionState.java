@@ -135,10 +135,10 @@ public abstract class FunctionState extends VariableState {
         for (URI key : getImportManager().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions(useCompactNotation, regex);
             for (String x : uqVars) {
-                if(useCompactNotation) {
+                if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
-                }else{
-                    for(String alias : getImportManager().getAlias(key)){
+                } else {
+                    for (String alias : getImportManager().getAlias(key)) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }
@@ -152,7 +152,13 @@ public abstract class FunctionState extends VariableState {
         for (URI key : getImportManager().keySet()) {
             List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();
             for (String x : uqVars) {
-                out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                List<String> aliases = getImportManager().getAlias(key);
+                if (aliases.size() == 1) {
+                    // don't put list notation in if there is no list.
+                    out.add(getImportManager().getAlias(key).get(0) + NS_DELIMITER + x);
+                } else {
+                    out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                }
             }
         }
         return out;

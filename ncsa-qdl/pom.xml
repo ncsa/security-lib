@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.1</version>
 
                 <!-- This next argument suppresses the built-in warnings that we are using Sun's
                  PKCS10 classes. -->

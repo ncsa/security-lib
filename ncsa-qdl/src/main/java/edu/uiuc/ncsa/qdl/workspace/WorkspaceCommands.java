@@ -117,20 +117,25 @@ public class WorkspaceCommands implements Logable {
         say("There are several commands available to help you manage this workspace.");
         say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
         say("Here is a quick summary of what they are and do.");
-        sayi(BUFFER_COMMAND + " -- commands relating to using buffers.");
-        sayi(CLEAR_COMMAND + " -- clear the state of the workspace. All variables, functions etc. will be lost.");
-        sayi(EDIT_COMMAND + " -- commands relating to running the line editor.");
-        sayi(ENV_COMMAND + " -- commands relating to environment variables in this workspace.");
-        sayi(EXECUTE_COMMAND + "     -- short hand to execute whatever is in the current buffer.");
-        sayi(FUNCS_COMMAND + " -- list all of the imported and user defined functions this workspace knows about.");
-        sayi(HELP_COMMAND + " -- this message.");
-        sayi(MODULES_COMMAND + " -- lists all the loaded modules this workspace knows about.");
-        sayi(OFF_COMMAND + " -- exit the workspace.");
-        sayi(LOAD_COMMAND + " file -- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayi(VARS_COMMAND + " -- lists all of the variables this workspace knows about.");
-        sayi(WS_COMMAND + " -- commands relating to this workspace.");
+        int length = 8;
+        sayi(padit(BUFFER_COMMAND ,length) + "- commands relating to using buffers.");
+        sayi(padit(CLEAR_COMMAND  ,length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
+        sayi(padit(EDIT_COMMAND   ,length) + "- commands relating to running the line editor.");
+        sayi(padit(ENV_COMMAND    ,length) + "- commands relating to environment variables in this workspace.");
+        sayi(padit(EXECUTE_COMMAND,length) + "- short hand to execute whatever is in the current buffer.");
+        sayi(padit(FUNCS_COMMAND  ,length) + "- list all of the imported and user defined functions this workspace knows about.");
+        sayi(padit(HELP_COMMAND   ,length) + "- this message.");
+        sayi(padit(MODULES_COMMAND,length) + "- lists all the loaded modules this workspace knows about.");
+        sayi(padit(OFF_COMMAND    ,length) + "- exit the workspace.");
+        sayi(padit(LOAD_COMMAND   ,length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
+        sayi(padit(VARS_COMMAND   ,length) + "- lists all of the variables this workspace knows about.");
+        sayi(padit(WS_COMMAND     ,length) + "- commands relating to this workspace.");
+        say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
     }
+    String padit(String x, int length){
+       return                 x + blanks.substring(0, length - x.length());
 
+    }
     public int execute(String inline) {
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
@@ -671,6 +676,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
+    /**
+     * Any list of string s(functions, variables, modules, etc.) is listed using this formatting function.
+     * If understands command line switches for width, columns and does some regex's too.
+     * @param inputLine
+     * @param list
+     * @return
+     */
     protected int printList(InputLine inputLine, TreeSet<String> list) {
         if (list.isEmpty()) {
             return RC_CONTINUE;
@@ -711,15 +723,14 @@ public class WorkspaceCommands implements Logable {
             }
         }
 
-        String blanks = "                                                                          "; // padding
         // Find longest entry
         int maxWidth = 0;
         for (String x : list) {
             maxWidth = Math.max(maxWidth, x.length());
         }
         // special case. If the longest element is too long, just print as columns
-        if(displayWidth <= maxWidth){
-            for(String x : list){
+        if (displayWidth <= maxWidth) {
+            for (String x : list) {
                 say(x);
             }
             return RC_CONTINUE;
@@ -739,10 +750,10 @@ public class WorkspaceCommands implements Logable {
         for (String func : list) {
             int currentLine = pointer++ % rowCount;
             if (rowCount == 1) {
-                // single row, so don't pad
+                // single row, so don't pad, just a blank between entries
                 output[currentLine] = output[currentLine] + func + "  ";
             } else {
-                output[currentLine] = output[currentLine] + func + blanks.substring(0, maxWidth - func.length());
+                output[currentLine] = output[currentLine] + padit(func , maxWidth );
             }
         }
         for (String x : output) {
@@ -751,6 +762,7 @@ public class WorkspaceCommands implements Logable {
 
         return RC_CONTINUE;
     }
+    String blanks = "                                                                          "; // padding
 
     protected int doSystemFuncsList(InputLine inputLine) {
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
@@ -1199,17 +1211,32 @@ public class WorkspaceCommands implements Logable {
         state.createSystemInfo(qe);
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
         env = new XProperties();
-
-        if (!qe.getWSEnv().isEmpty()) {
-            // try and see if the file resolves first.
-            envFile = resolveAgainstRoot(qe.getWSEnv());
-
-            if (envFile.exists()) {
-                env.load(envFile);
-            }
-            // set some useful things.
+        String loadEnv = null;
+        if (inputLine.hasArg("-env")) {
+            // overrides config file. Used by scripts e.g.
+            loadEnv = inputLine.getNextArgFor("-env");
+        } else {
+            loadEnv = qe.getWSEnv();
         }
-        //   env.put("home_dir", rootDir.getCanonicalPath());
+        if (loadEnv != null && !loadEnv.isEmpty()) {
+            envFile = resolveAgainstRoot(loadEnv);
+            if (envFile.exists()) {
+                if (envFile.isFile()) {
+                    if (envFile.canRead()) {
+                        env.load(envFile);
+                    } else {
+                        warn("The specified environment file " + loadEnv + " is not readable!");
+
+                    }
+                } else {
+                    warn("The specified environment file " + loadEnv + " is not a file!");
+
+                }
+            } else {
+                warn("The specified environment file " + loadEnv + " does not exist");
+
+            }
+        }
         if (testSaveDir == null) {
             env.put("save_dir", "(empty)");
 
