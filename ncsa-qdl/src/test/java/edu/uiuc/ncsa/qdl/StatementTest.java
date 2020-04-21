@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.Assignment;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -19,6 +21,7 @@ public class StatementTest extends AbstractQDLTester {
     /**
      * Basic regression test that the assignment resolves its variable and places the result in to the state
      * as it should.
+     *
      * @throws Exception
      */
     @Test
@@ -35,5 +38,101 @@ public class StatementTest extends AbstractQDLTester {
         assignmentNode.evaluate(state);
         assert st.isDefined("A");
         assert st.resolveValue("A").equals(3L);
+    }
+
+    /**
+     * Test a loop that has a basic conditional statement (with something that needs evaluated)
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testBasicLoop() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "i:=0;");
+        addLine(script, "j:=1;");
+        addLine(script, "while[");
+        addLine(script, "   i++ < 5");
+        addLine(script, "]do[");
+        addLine(script, "  j *= j+i;");
+        addLine(script, "]; // end while");
+        // Note the conditional for the loop has i = 0,1,2,3,4
+        // but inside the loop it has been incremented and is 1,2,3,4,5
+        // With the multiplication assignment to j, this results in fast exponential growth.
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("j", state).equals(65585696L) : "Loop did not execute properly.";
+    }
+
+    /**
+     * Test that a malformed loop (conditional statement is not a conditional) fails reasonably.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testBadLoop() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "i:=0;");
+        addLine(script, "while[");
+        addLine(script, "   i + 2");
+        addLine(script, "]do[");
+        addLine(script, "  say(i);");
+        addLine(script, "]; // end while");
+        // Note the conditional for the loop has i = 0,1,2,3,4
+        // but inside the loop it has been incremented and is 1,2,3,4,5
+        // With the multiplication assignment to j, this results in fast exponential growth.
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Was able to execute a loop without a valid conditional";
+        } catch (IllegalStateException isx) {
+            assert true;
+        }
+    }
+
+    /**
+     * Test that assigning a value to a keyword, e.g. false := true fails.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testReservedWordAssignments() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, QDLConstants.RESERVED_TRUE + " := 2;");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_TRUE + " a value";
+        } catch (IllegalArgumentException iax) {
+            assert true;
+        }
+
+        script = new StringBuffer();
+        addLine(script, QDLConstants.RESERVED_FALSE + " := 1;");
+
+        //QDLParser interpreter = new QDLParser(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
+        } catch (IllegalArgumentException iax) {
+            assert true;
+        }
+
+        script = new StringBuffer();
+        addLine(script, QDLConstants.RESERVED_NULL + " := 'foo';");
+
+        // QDLParser interpreter = new QDLParser(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_NULL + " a value";
+        } catch (IllegalArgumentException iax) {
+            assert true;
+        }
+
     }
 }

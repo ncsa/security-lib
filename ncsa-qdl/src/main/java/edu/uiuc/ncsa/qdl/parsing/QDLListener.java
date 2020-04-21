@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -68,15 +69,15 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitVariable(QDLParserParser.VariableContext ctx) {
         StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
-        if (ctx.getText().equals("true") || ctx.getText().equals("false")) {
+        if (ctx.getText().equals(QDLConstants.RESERVED_TRUE) || ctx.getText().equals(QDLConstants.RESERVED_FALSE)) {
             // SPECIAL CASE. The parse recognizes true and false, but does not know what to do with them.
             // We are here because it lumps them together with the variable values.
-            ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals("true")), Constant.BOOLEAN_TYPE);
+            ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals(QDLConstants.RESERVED_TRUE)), Constant.BOOLEAN_TYPE);
             p.statement = cnode;
             cnode.setSourceCode(ctx.getText());
             return;
         }
-        if(ctx.getText().equals("null")){
+        if(ctx.getText().equals(QDLConstants.RESERVED_NULL)){
             p.statement = QDLNull.getInstance();
             return;
         }

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -338,7 +339,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
         return s;
     }
-
 
 
     @Test
@@ -682,7 +682,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         return array;
     }
 
-   
 
     @Test
     public void testAddList() throws Throwable {
@@ -850,5 +849,31 @@ public class StemFunctionsTest extends AbstractQDLTester {
         stemVariable.listAppend("foo");
         assert stemVariable.size() == 1;
         assert stemVariable.get(0L).equals("foo");
+    }
+    //      x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.2.0 :='a'; w.2.1 :='b';
+
+    /**
+     * Make sure that w.z.y.x and w.z.y.x. (so long non-stem and long stem) resolutions work.
+     *  This creates two variables
+     *  <pre>
+     *      w.2
+     *      w.2.
+     *  </pre>
+     *  and has a complicated resolution to get this. This requires that the multi-indices work
+     *  and keep track of a fair amount of state.
+     * @throws Throwable
+     */
+    @Test
+    public void testMultiIndex() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.2.0 :='a'; w.2.1 :='b';");
+        addLine(script, "test := w.z.y.x;");
+        addLine(script, "test. := w.z.y.x.;");
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("test", state).equals(3L);
+        assert getStemValue("test.",state).size() == 2;
     }
 }

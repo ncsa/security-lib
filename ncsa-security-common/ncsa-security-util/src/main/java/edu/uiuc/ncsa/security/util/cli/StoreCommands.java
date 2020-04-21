@@ -358,7 +358,11 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         Identifiable x = findItem(inputLine);
+        //"Are you sure you want to remove this client(y/n)[n]:"
         getStore().remove(x.getIdentifier());
+        if(!"y".equals(getInput("Are you sure you want to remove this client(y/n)", "n"))){
+            say("remove aborted.");
+        }
         say("Done. object with id = " + x.getIdentifierString() + " has been removed from the store");
         info("Removed object " + x.getClass().getSimpleName() + " with id " + x.getIdentifierString());
         clearEntries();

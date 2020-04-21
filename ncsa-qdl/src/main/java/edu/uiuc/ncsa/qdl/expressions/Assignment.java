@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
@@ -72,6 +73,9 @@ public class Assignment implements Statement, HasResultInterface {
     // just a case
     protected HasResultInterface getHRI(){return (HasResultInterface) argument;}
     public Object evaluate(State state) {
+        if(QDLConstants.isReservedWord(variableReference)){
+            throw new IllegalArgumentException("Error: Cannnot use reserved word \"" + variableReference + "\" as a variable.");
+        }
         result = argument.evaluate(state);
         getHRI().setEvaluated(true);
         setResult(getHRI().getResult());

@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
@@ -317,21 +318,44 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doSysInfo(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() != 0) {
-            throw new IllegalArgumentException("Error: No arguments for " + FQ_SYS_INFO);
-        }
-        polyad.setEvaluated(true);
-        polyad.setResult(state.getSystemInfo());
-        polyad.setResultType(Constant.STEM_TYPE);
+        getConst(polyad,state,state.getSystemInfo());
     }
 
     protected void doConstants(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() != 0) {
-            throw new IllegalArgumentException("Error: No arguments for " + FQ_CONTINUE);
+        getConst(polyad,state,state.getSystemConstants());
+    }
+
+    protected void getConst(Polyad polyad, State state, StemVariable values){
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setEvaluated(true);
+            polyad.setResult(values);
+            polyad.setResultType(Constant.STEM_TYPE);
+            return;
+        }
+        Object obj = polyad.evalArg(0,state);
+        if(!isString(obj)){
+            throw new IllegalArgumentException("Error: This requires a string as its argument.");
+        }
+        // A little trickery here. The multi-index is assumed to be of the form
+        // stem.index0.index1....  so it will parse the first component as the name of the
+        // variable. Since the variable here is un-named, we put in a dummy value of sys. for it which is ignored.
+        StemMultiIndex multiIndex = new StemMultiIndex("sys."+obj.toString());
+        Object rc = null;
+        try{
+            rc = values.get(multiIndex);
+
+        }catch(IndexError ie){
+            // The user requested a non-existent property. Don't blow up, just return an empty string.
         }
         polyad.setEvaluated(true);
-        polyad.setResult(state.getSystemConstants());
-        polyad.setResultType(Constant.STEM_TYPE);
+
+        if(rc == null){
+            polyad.setResult("");
+            polyad.setResultType(Constant.STRING_TYPE);
+        }else{
+            polyad.setResult(rc);
+            polyad.setResultType(Constant.getType(rc));
+        }
     }
 
     /**

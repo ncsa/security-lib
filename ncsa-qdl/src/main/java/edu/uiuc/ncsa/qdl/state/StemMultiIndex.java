@@ -79,6 +79,7 @@ public class StemMultiIndex {
     public StemMultiIndex truncate(){
         if(realLength == components.length) return this;
         StemMultiIndex stemMultiIndex = new StemMultiIndex();
+        stemMultiIndex.isStem = isStem(); // don't lose if it's a stem!
         stemMultiIndex.components = new String[realLength];
         System.arraycopy(components, 0, stemMultiIndex.components, 0, this.realLength);
         stemMultiIndex.name = name;

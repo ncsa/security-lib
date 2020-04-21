@@ -23,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * This is a facade for the various stateful components we have to track.
@@ -32,7 +31,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
  */
-public class State extends FunctionState {
+public class State extends FunctionState implements QDLConstants{
     private static final long serialversionUID = 4129348937L;
 
 
@@ -74,39 +73,37 @@ public class State extends FunctionState {
         // Add some from Java, if not in server mode.
          if (!isServerMode()) {
              StemVariable os = new StemVariable();
-             os.put("version", System.getProperty("os.version"));
-             os.put("name", System.getProperty("os.name"));
-             os.put("architecture", System.getProperty("os.arch"));
+             os.put(SYS_INFO_OS_VERSION, System.getProperty("os.version"));
+             os.put(SYS_INFO_OS_NAME, System.getProperty("os.name"));
+             os.put(SYS_INFO_OS_ARCHITECTURE, System.getProperty("os.arch"));
 
-             systemInfo.put("os.", os);
+             systemInfo.put(SYS_INFO_OS, os);
              StemVariable system = new StemVariable();
-             system.put("jvm_version", System.getProperty("java.version"));
-             system.put("initial_memory", (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + " MB");
-             system.put("processors", Runtime.getRuntime().availableProcessors());
-             systemInfo.put("system.", system);
+             system.put(SYS_INFO_JVM_VERSION, System.getProperty("java.version"));
+             system.put(SYS_INFO_INIT_MEMORY, (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + " MB");
+             system.put(SYS_INFO_SYSTEM_PROCESSORS, Runtime.getRuntime().availableProcessors());
+             systemInfo.put(SYS_INFO_SYSTEM, system);
              StemVariable user = new StemVariable();
-             user.put("working_dir", System.getProperty("user.dir"));
-             user.put("home_dir", System.getProperty("user.home"));
-             systemInfo.put("user.", user);
-//             systemInfo.put("user.", user);
-
+             user.put(SYS_INFO_USER_INVOCATION_DIR, System.getProperty("user.dir"));
+             user.put(SYS_INFO_USER_HOME_DIR, System.getProperty("user.home"));
+             systemInfo.put(SYS_INFO_USER, user);
          }
 
          StemVariable versionInfo = addManifestConstants();
          if (versionInfo != null) {
-             systemInfo.put("qdl_version.", versionInfo);
+             systemInfo.put(SYS_QDL_VERSION, versionInfo);
          }
          if (qe != null && qe.isEnabled()) {
              StemVariable qdl_props = new StemVariable();
-             qdl_props.put("qdl_home", qe.getWSHomeDir());
+             qdl_props.put(SYS_BOOT_QDL_HOME, qe.getWSHomeDir());
              if (!qe.getBootScript().isEmpty()) {
-                 qdl_props.put("boot_script", qe.getBootScript());
+                 qdl_props.put(SYS_BOOT_BOOT_SCRIPT, qe.getBootScript());
              }
-             qdl_props.put("cfg_name", qe.getName());
-             qdl_props.put("cfg_file", qe.getCfgFile());
-             qdl_props.put("log_file", qe.getMyLogger().getFileName());
-             qdl_props.put("logging_name", qe.getMyLogger().getClassName());
-             systemInfo.put("boot.", qdl_props);
+             qdl_props.put(SYS_BOOT_CONFIG_NAME, qe.getName());
+             qdl_props.put(SYS_BOOT_CONFIG_FILE, qe.getCfgFile());
+             qdl_props.put(SYS_BOOT_LOG_FILE, qe.getMyLogger().getFileName());
+             qdl_props.put(SYS_BOOT_LOG_NAME, qe.getMyLogger().getClassName());
+             systemInfo.put(SYS_BOOT, qdl_props);
          }
 
     }
@@ -118,24 +115,22 @@ public class State extends FunctionState {
         systemConstants = new StemVariable();
 
         StemVariable varTypes = new StemVariable();
-        varTypes.put("string", new Long(Constant.STRING_TYPE));
-        varTypes.put("stem", new Long(Constant.STEM_TYPE));
-        varTypes.put("boolean", new Long(Constant.BOOLEAN_TYPE));
-        varTypes.put("null", new Long(Constant.NULL_TYPE));
-        varTypes.put("integer", new Long(Constant.LONG_TYPE));
-        varTypes.put("decimal", new Long(Constant.DECIMAL_TYPE));
-        varTypes.put("undefined", new Long(Constant.UNKNOWN_TYPE));
-        systemConstants.put("var_types.", varTypes);
+        varTypes.put(SYS_VAR_TYPE_STRING, new Long(Constant.STRING_TYPE));
+        varTypes.put(SYS_VAR_TYPE_STEM, new Long(Constant.STEM_TYPE));
+        varTypes.put(SYS_VAR_TYPE_BOOLEAN, new Long(Constant.BOOLEAN_TYPE));
+        varTypes.put(SYS_VAR_TYPE_NULL, new Long(Constant.NULL_TYPE));
+        varTypes.put(SYS_VAR_TYPE_INTEGER, new Long(Constant.LONG_TYPE));
+        varTypes.put(SYS_VAR_TYPE_DECIMAL, new Long(Constant.DECIMAL_TYPE));
+        varTypes.put(SYS_VAR_TYPE_UNDEFINED, new Long(Constant.UNKNOWN_TYPE));
+        systemConstants.put(SYS_VAR_TYPES, varTypes);
         StemVariable errorCodes = new StemVariable();
-        errorCodes.put("system_error", TryCatch.RESERVED_ERROR_CODE);
-        systemConstants.put("error_codes.", errorCodes);
+        errorCodes.put(SYS_ERROR_CODE_SYSTEM_ERROR, TryCatch.RESERVED_ERROR_CODE);
+        systemConstants.put(SYS_ERROR_CODES, errorCodes);
         StemVariable fileTypes = new StemVariable();
-        fileTypes.put("binary", new Long(IOEvaluator.FILE_OP_BINARY));
-        fileTypes.put("stem", new Long(IOEvaluator.FILE_OP_TEXT_STEM));
-        fileTypes.put("string", new Long(IOEvaluator.FILE_OP_TEXT_STRING));
-        systemConstants.put("file_types.", errorCodes);
-
-
+        fileTypes.put(SYS_FILE_TYPE_BINARY, new Long(IOEvaluator.FILE_OP_BINARY));
+        fileTypes.put(SYS_FILE_TYPE_STEM, new Long(IOEvaluator.FILE_OP_TEXT_STEM));
+        fileTypes.put(SYS_FILE_TYPE_STRING, new Long(IOEvaluator.FILE_OP_TEXT_STRING));
+        systemConstants.put(SYS_FILE_TYPES, fileTypes);
     }
 
 
@@ -158,24 +153,24 @@ public class State extends FunctionState {
                 while (null != (linein = bufferedInputStream.readLine())) {
                     if (linein.startsWith("application-version:")) {
                         // e.g.  application-version: 1.1-QDL-SNAPSHOT
-                        versionInfo.put("version", truncateLine("application-version:", linein));
+                        versionInfo.put(SYS_QDL_VERSION_VERSION, truncateLine("application-version:", linein));
                     }
                     if (linein.startsWith("Build-Jdk:")) {
                         // e.g. Build-Jdk: 1.8.0_231
-                        versionInfo.put("build_jdk", truncateLine("Build-Jdk:", linein));
+                        versionInfo.put(SYS_QDL_VERSION_BUILD_JDK, truncateLine("Build-Jdk:", linein));
                     }
                     if (linein.startsWith("build-time:")) {
                         // e.g. build-time: 1586726889841
                         try {
                             Long ts = Long.parseLong(truncateLine("build-time:", linein));
-                            versionInfo.put("build_time", Iso8601.date2String(ts));
+                            versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, Iso8601.date2String(ts));
                         } catch (Throwable t) {
-                            versionInfo.put("build_time", "?");
+                            versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, "?");
                         }
                     }
                     if (linein.startsWith("Created-By:")) {
                         // e.g. Created-By: Apache Maven 3.6.0
-                        versionInfo.put("created_by", truncateLine("Created-By:", linein));
+                        versionInfo.put(SYS_QDL_VERSION_CREATED_BY, truncateLine("Created-By:", linein));
                     }
                     if (linein.startsWith("implementation-build:")) {
                         // e.g.     implementation-build: Build: #21 (2020-04-12T16:28:09.841-05:00)
@@ -185,7 +180,7 @@ public class State extends FunctionState {
                         if (build.startsWith("#")) {
                             build = build.substring(1);
                         }
-                        versionInfo.put("build_nr", build);
+                        versionInfo.put(SYS_QDL_VERSION_BUILD_NUMBER, build);
                     }
                 }
                 bufferedInputStream.close();
