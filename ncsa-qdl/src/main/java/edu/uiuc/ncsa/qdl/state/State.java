@@ -152,7 +152,7 @@ public class State extends FunctionState implements QDLConstants{
                 String linein = null;
                 while (null != (linein = bufferedInputStream.readLine())) {
                     if (linein.startsWith("application-version:")) {
-                        // e.g.  application-version: 1.1-QDL-SNAPSHOT
+                        // e.g.  application-version: 1.0.1
                         versionInfo.put(SYS_QDL_VERSION_VERSION, truncateLine("application-version:", linein));
                     }
                     if (linein.startsWith("Build-Jdk:")) {
