@@ -39,12 +39,12 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
         for (String key : keySet()) {
             String name = key.substring(0, key.indexOf(munger)); // de-munge
             FunctionRecord fr = get(key);
-            if(regex != null && !regex.isEmpty()){
-                if(name.matches(regex)) {
+            if (regex != null && !regex.isEmpty()) {
+                if (name.matches(regex)) {
                     name = name + "(" + fr.getArgCount() + ")";
                     names.add(name);
                 }
-            }else {
+            } else {
                 name = name + "(" + fr.getArgCount() + ")";
                 names.add(name);
             }
@@ -64,7 +64,11 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
             FunctionRecord fr = get(key);
             name = name + "(" + fr.getArgCount() + ")";
             if (0 < fr.documentation.size()) {
-                name = name + ": " + fr.documentation.get(0);
+                if (!fr.documentation.get(0).contains(name)) {
+                    name = fr.documentation.get(0);
+                } else {
+                    name = name + ": " + fr.documentation.get(0);
+                }
             } else {
                 name = name + ": (none)";
 

@@ -19,16 +19,17 @@ public class EGStem implements QDLVariable {
     @Override
     public Object getValue() {
         StemVariable stemVariable = new StemVariable();
+        stemVariable.put("help", "This is an example stem variable that shows how to make one and  is shipped with the standard distro.");
         stemVariable.put("time", "Current time is " + new Date());
         stemVariable.put("long", 456456546L);
         stemVariable.put("decimal", new BigDecimal("3455476.987654567654567"));
         stemVariable.put("boolean", Boolean.TRUE);
         StemVariable nestedStem = new StemVariable();
-        nestedStem.put("0", 0L);
-        nestedStem.put("1", 1L);
-        nestedStem.put("2", 2L);
-        nestedStem.put("3", 3L);
-        stemVariable.put("list", nestedStem);
+        nestedStem.put("0", 10L);
+        nestedStem.put("1", 11L);
+        nestedStem.put("2", 12L);
+        nestedStem.put("3", "foo");
+        stemVariable.put("list.", nestedStem);
         return stemVariable;
     }
 }

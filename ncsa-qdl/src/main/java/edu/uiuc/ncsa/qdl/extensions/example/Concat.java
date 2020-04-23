@@ -26,10 +26,10 @@ public class Concat implements QDLFunction {
     }
 
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getDocumentation(int argCount) {
         ArrayList<String> docs = new ArrayList<>();
-        docs.add("concat(string, string) will concatenate the two arguments");
-        docs.add("This is identical in function to the built in '+' operator. It is just part of the");
+        docs.add(getName() + "(string, string) will concatenate the two arguments");
+        docs.add("This is identical in function to the built in '+' operator for two arguments. It is just part of the");
         docs.add("sample kit for writing a java extension to QDL that is shipped with the standard distro.");
         return docs;
     }

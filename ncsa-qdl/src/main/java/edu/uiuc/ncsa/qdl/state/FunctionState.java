@@ -205,13 +205,12 @@ public abstract class FunctionState extends VariableState {
         for (URI key : getImportManager().keySet()) {
             if (getModuleMap().get(key).getState().getFunctionTable().get(fname, argCount) != null) {
                 String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
-
                 List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
                         argCount);
                 if (doxx == null) {
                     out.add(caput + " none");
                 } else {
-                    out.add(caput);
+                    //out.add(caput);
                     out.addAll(doxx);
                 }
             }

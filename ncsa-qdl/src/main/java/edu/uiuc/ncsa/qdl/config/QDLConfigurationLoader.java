@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -76,7 +77,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         if (node == null) return defaultValue;
         try {
             String x = getFirstAttribute(node, attrib);
-            if(x == null || x.isEmpty()){return defaultValue;} //  Null argument returns false.
+            if(isTrivial(x)){return defaultValue;} //  Null argument returns false.
             return Boolean.parseBoolean(x);
         } catch (Throwable t) {
 
@@ -100,7 +101,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     protected String getName() {
         String name = getFirstAttribute(cn, CONFG_ATTR_NAME);
-        if (name == null || name.isEmpty()) {
+        if (isTrivial(name)) {
             return "(none)";
         }
         return name;
@@ -123,7 +124,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
-        if (raw == null || raw.isEmpty()) {
+        if (isTrivial(raw)) {
             return OpEvaluator.numericDigits;
         }
         try {

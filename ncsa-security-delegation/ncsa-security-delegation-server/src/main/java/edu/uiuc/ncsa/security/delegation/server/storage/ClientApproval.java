@@ -25,6 +25,7 @@ public class ClientApproval extends IdentifiableImpl {
     interface StatusValue {
         String getStatus();
     }
+
     /**
      * This status enum has values that the elements assume. This is to control their actual internal values so that
      * for instance, if the name changes, the associated value remains constant (which allows for much easier backwards
@@ -48,12 +49,12 @@ public class ClientApproval extends IdentifiableImpl {
             return status;
         }
 
-       public static Status resolveByStatusValue(String code) {
+        public static Status resolveByStatusValue(String code) {
             Status[] enumConstants = Status.class.getEnumConstants();
             for (Status entry : enumConstants) {
                 if (entry.getStatus().equals(code)) return entry;
             }
-           // no such value ==> return a null.
+            // no such value ==> return a null.
             return null;
         }
     }
@@ -81,7 +82,15 @@ public class ClientApproval extends IdentifiableImpl {
     }
 
     public void setApproved(boolean approved) {
+        boolean oldValue = approved;
         this.approved = approved;
+        if (approved) {
+            setStatus(Status.APPROVED);
+        } else {
+            if (oldValue) {
+                setStatus(Status.REVOKED);
+            }
+        }
     }
 
     public String getApprover() {
@@ -108,12 +117,21 @@ public class ClientApproval extends IdentifiableImpl {
     }
 
     @Override
+    public IdentifiableImpl clone() {
+        ClientApproval ca = new ClientApproval(getIdentifier());
+        ca.setApprover(getApprover());
+        ca.setStatus(getStatus());
+        ca.setApprovalTimestamp(getApprovalTimestamp());
+        setApproved(isApproved());
+        return ca;
+    }
+
+    @Override
     public String toString() {
         String x = getClass().getSimpleName() + "[approved=" + isApproved() + ", status=" + status +
                 ", approver=" + getApprover() + ", id=" + getIdentifierString() + ", on " + getApprovalTimestamp() + "]";
         return x;
     }
-
 
 
 }

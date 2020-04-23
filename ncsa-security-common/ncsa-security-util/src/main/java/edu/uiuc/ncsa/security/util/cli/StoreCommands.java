@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +54,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     @Override
     public String getPrompt() {
-        return getName() + " >";
+        return getName() + ">";
     }
 
     public Store getStore() {
@@ -67,14 +68,13 @@ public abstract class StoreCommands extends CommonCommands {
     Store store;
 
 
-
     protected void showUpdateHelp() {
         say("Updates an entry, that is to say, allows you to edit the values stored for an entry");
         say("Syntax:\n");
         say("update index");
 
     }
-  
+
     protected void showSerializeHelp() {
         say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
         say("serialize  [-file path] index");
@@ -104,19 +104,30 @@ public abstract class StoreCommands extends CommonCommands {
 
     public abstract void search(InputLine inputLine);
 
-   public abstract  void edit(InputLine inputLine);
+    public abstract void edit(InputLine inputLine);
 
     public void update(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
         }
-        if (inputLine.size() == 1) {
+/*        if (inputLine.size() == 1) {
+            say("You must supply the index or id of the item to update");
+            return;
+        }*/
+        Identifiable identifiable = findItem(inputLine);
+        if (identifiable == null) {
             say("You must supply the index or id of the item to update");
             return;
         }
-
-        Identifiable identifiable = findItem(inputLine);
+        for (int i = 0; i < inputLine.size(); i++) {
+            // now that people can specify keys and values, there are types. if there
+            // is a type, don't make the user jump through every property of their object.
+            if (inputLine.getArg(i).startsWith("-")) {
+                say("Unknown command line switch. Aborting.");
+                return;
+            }
+        }
         if (identifiable != null) {
             // Note that the contract should be that a clone is passed in and that is saved if the user
             // decides to.
@@ -132,7 +143,7 @@ public abstract class StoreCommands extends CommonCommands {
 
     }
 
-    public Identifiable createNew(){
+    public Identifiable createNew() {
         return this.getStore().create();
     }
 
@@ -169,9 +180,9 @@ public abstract class StoreCommands extends CommonCommands {
      * Give a long (multi-line) formatted object. This should allow users to see everything cleanly.
      *
      * @param identifiable
-     * @return
+     * @return the width of the left field when formatting (for consistent look and feel in overrides).
      */
-    protected abstract void longFormat(Identifiable identifiable);
+    protected abstract int longFormat(Identifiable identifiable);
 
     protected List<Identifiable> allEntries = null;
 
@@ -215,6 +226,7 @@ public abstract class StoreCommands extends CommonCommands {
         for (Identifiable x : allEntries) {
             if (useLongFormat) {
                 longFormat(x);
+                say("----");
             } else {
                 say((i++) + ". " + format(x));
             }
@@ -328,6 +340,61 @@ public abstract class StoreCommands extends CommonCommands {
         say("This removes the item with the given unique identifier from the current store, regardless of its position in the list command");
     }
 
+    Identifier id = null;
+
+    public void clear_id(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showClearIDHelp();
+            return;
+        }
+        id = null;
+    }
+
+    private void showClearIDHelp() {
+        say("clear_id - (no argument) clears the current defualt identifier.");
+        say("See also: set_id, get_id");
+
+    }
+
+    public void set_id(InputLine inputLine) throws Throwable {
+        if (showHelp(inputLine)) {
+            showSetIDHElp();
+            return;
+        }
+        id = BasicIdentifier.newID(inputLine.getLastArg());
+        if (id == null) {
+            say("warning: no identifier set");
+            return;
+        }
+        if (inputLine.getLastArg().startsWith("/")) {
+            say("warning: the identifier starts with a /. Did you intend this?");
+        }
+    }
+
+    private void showSetIDHElp() {
+        say("set_id id = sets the current identifier. The argument is exactly the id. All subsequent operations will ");
+        say("use this identifier unless it is cleared or you explicitly override it.");
+        say("See also: clear_id, get_id");
+    }
+
+    public void get_id(InputLine inputLine) {
+        if (showHelp(inputLine)) {
+            showGetIDHelp();
+            return;
+        }
+        if (id == null) {
+            say("no id set");
+            return;
+        }
+        say(id.toString());
+    }
+
+    private void showGetIDHelp() {
+        say("get_id - (no argument) show the current id if any.");
+        say("See also: clear_id, set_id");
+
+    }
+
     /**
      * Resolves the first argument of a command line into either a unique identifier
      *
@@ -336,20 +403,43 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected Identifiable findItem(InputLine inputLine) {
         // first case is one in which this does not apply since there is no argument.
+        // Second case is to try and interpret the last argument as an index or id.
+        // First look for overrides to local id
+
+        Identifier localID = null;
+        int index = -1;
+        if (inputLine.getLastArg().startsWith("/")) {
+            localID = BasicIdentifier.newID(inputLine.getLastArg().substring(1));
+        } else {
+            try {
+                index = Integer.parseInt(inputLine.getLastArg());
+            } catch (Throwable t) {
+                // rock on
+            }
+        }
+        if (localID == null) {
+            if (index != -1) {
+                if (allEntries == null || allEntries.isEmpty()) {
+                    loadAllEntries(); // just in case...
+                }
+                return allEntries.get(index);
+            }
+        } else {
+            return (Identifiable) getStore().get(localID);
+        }
+
+        if (hasId()) {
+            return (Identifiable) getStore().get(id);
+        }
+
+/*
         if (inputLine.size() <= 1) {
             return null;
         }
-        if (inputLine.getLastArg().startsWith("/")) {
-            // then try to process this as a unique identifier.
-            String arg = inputLine.getLastArg().substring(1);
-            Identifier id = BasicIdentifier.newID(arg);
-            return (Identifiable) getStore().get(id);
-        }
-        int choice = inputLine.getIntArg(inputLine.size() - 1);
-        if (allEntries == null || allEntries.isEmpty()) {
-            loadAllEntries(); // just in case...
-        }
-        return allEntries.get(choice);
+*/
+
+
+        return null;
     }
 
     public void rm(InputLine inputLine) {
@@ -359,56 +449,110 @@ public abstract class StoreCommands extends CommonCommands {
         }
         Identifiable x = findItem(inputLine);
         //"Are you sure you want to remove this client(y/n)[n]:"
-        getStore().remove(x.getIdentifier());
-        if(!"y".equals(getInput("Are you sure you want to remove this client(y/n)", "n"))){
+        if (!"y".equals(getInput("Are you sure you want to remove this client(y/n)", "n"))) {
             say("remove aborted.");
+            return;
         }
-        say("Done. object with id = " + x.getIdentifierString() + " has been removed from the store");
+
+        getStore().remove(x.getIdentifier());
+        if (x.getIdentifier().equals(id)) {
+            id = null;
+        }
+        say("Done. object with id = " + x.getIdentifierString() + " has been removed from the store.");
         info("Removed object " + x.getClass().getSimpleName() + " with id " + x.getIdentifierString());
         clearEntries();
     }
 
 
     protected void showLSHelp() {
-        say("lists the current store or lists details about an entry. Each entry is given a number of calls to other");
-        say("tools will use the most numbers from the most recent call to this.");
-        say("Synatx:\n");
-        say("ls [number]\n");
-        say("If no number is supplied, then a complete list of all elements with numbering will be displayed.");
-        say("If a number has been supplied, a detailed report on that item is shown.");
+        say("ls [flags] [number]");
+        say("flags are");
+        say(StringUtils.RJustify(LONG_LIST_COMMAND, 4) + " = " + "long list of an object or all objects.");
+        say(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " short format list of an item or all items.");
+        say(StringUtils.RJustify(ALL_LONG_LIST_COMMAND1, 4) + " = " + "long list of every object.");
+        say(StringUtils.RJustify(ALL_LONG_LIST_COMMAND2, 4) + " = " + "ditto");
+        say("If you have listed all objects you may use the index number as the argument. Or you can supply");
+        say("the identifier escaped with a /");
+        say("E.g.");
+        say("ls -la = long list entire store. This may be huge.");
+        say("ls -l  = long list of the currently active object.");
+        say("ls -a  = short list of the store.");
+        say("ls -l 4 = long list of the 4th item from the ls -a command");
+        say("ls -l /foo:bar = long list of the object with identifier foo:bar");
+        say("ls -l foo:bar = long list of the object with identifier foo:bar");
     }
-   protected String LONG_LIST_COMMAND1 = "-l";
-   protected String LONG_LIST_COMMAND2 = "-la";
+
+    protected final String LONG_LIST_COMMAND = "-l";
+    protected final String ALL_LIST_COMMAND = "-a";
+    protected final String ALL_LONG_LIST_COMMAND2 = "-la";
+    protected final String ALL_LONG_LIST_COMMAND1 = "-al";
+
+    protected boolean hasId() {
+        return id != null;
+    }
+
     public void ls(InputLine inputLine) {
         if (showHelp(inputLine)) {
             showLSHelp();
             return;
         }
+        // Any form of the all flag prints everything.
+        if (inputLine.hasArg(ALL_LIST_COMMAND)) {
+            if (inputLine.hasArg(LONG_LIST_COMMAND)) {
+                listAll(true, "");
+            } else {
+                listAll(false, "");
+            }
+            return;
+        }
+
+        if (inputLine.hasArg(ALL_LONG_LIST_COMMAND1) || inputLine.hasArg(ALL_LONG_LIST_COMMAND2)) {
+            listAll(true, "");
+            return;
+        }
+
+        if (hasId()) {
+            Identifiable identifiable = findItem(inputLine);
+            if (identifiable == null) {
+                say("Object not found.");
+                return;
+            }
+            if (inputLine.hasArg(LONG_LIST_COMMAND)) {
+                longFormat(identifiable);
+            } else {
+                say(format(identifiable));
+            }
+            return;
+        }
+
+        // No id set.
+
         if (1 == inputLine.size()) {
-            // lists everything.
+            // No id set , no args lists everything in short form
             listAll(false, "");
             return;
         }
-        //
-        // Size of input line includes the command itself as argument 0. This tell it to ignore all
-        // command line switches and just print out the long form of a single entry.
-        if (!inputLine.getLastArg().startsWith("-")) {
+
+
+        if (inputLine.getLastArg().startsWith("-")) {
+            // only possible case is if(in
+            if (inputLine.getLastArg().equalsIgnoreCase(LONG_LIST_COMMAND)) {
+                say("No id set. Please specify one or add the -a flag.");
+            }
+            return;
+        } else {
             Identifiable identifiable = findItem(inputLine);
             if (identifiable == null) {
                 say("Sorry, object not found.");
                 return;
             }
-            longFormat(identifiable);
-            return;
+            if (inputLine.hasArg(LONG_LIST_COMMAND)) {
+                longFormat(identifiable);
+            } else {
+                say(format(identifiable));
+            }
         }
-        boolean longForm = inputLine.hasArg(LONG_LIST_COMMAND1) || inputLine.hasArg(LONG_LIST_COMMAND2);
 
-        if (longForm) {
-            listAll(true, inputLine.getArg(1));
-        } else {
-            listAll(false, inputLine.getArg(1));
-        }
-        return;
     }
 
     protected void showSizeHelp() {

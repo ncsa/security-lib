@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.LJustify;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
@@ -64,7 +66,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String LOAD_COMMAND = ")load"; // grab a file and run it
     protected static final String SAVE_COMMAND = ")save";
     protected static final String CLEAR_COMMAND = ")clear";
-    protected static final String RUN_COMMAND = ")";
+    protected static final String IMPORTS_COMMAND = ")imports";
     protected static final String VARS_COMMAND = ")vars";
     protected static final String ENV_COMMAND = ")env";
     protected static final String WS_COMMAND = ")ws";
@@ -118,24 +120,22 @@ public class WorkspaceCommands implements Logable {
         say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
         say("Here is a quick summary of what they are and do.");
         int length = 8;
-        sayi(padit(BUFFER_COMMAND ,length) + "- commands relating to using buffers.");
-        sayi(padit(CLEAR_COMMAND  ,length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
-        sayi(padit(EDIT_COMMAND   ,length) + "- commands relating to running the line editor.");
-        sayi(padit(ENV_COMMAND    ,length) + "- commands relating to environment variables in this workspace.");
-        sayi(padit(EXECUTE_COMMAND,length) + "- short hand to execute whatever is in the current buffer.");
-        sayi(padit(FUNCS_COMMAND  ,length) + "- list all of the imported and user defined functions this workspace knows about.");
-        sayi(padit(HELP_COMMAND   ,length) + "- this message.");
-        sayi(padit(MODULES_COMMAND,length) + "- lists all the loaded modules this workspace knows about.");
-        sayi(padit(OFF_COMMAND    ,length) + "- exit the workspace.");
-        sayi(padit(LOAD_COMMAND   ,length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayi(padit(VARS_COMMAND   ,length) + "- lists all of the variables this workspace knows about.");
-        sayi(padit(WS_COMMAND     ,length) + "- commands relating to this workspace.");
+        sayi(RJustify(BUFFER_COMMAND ,length) + "- commands relating to using buffers.");
+        sayi(RJustify(CLEAR_COMMAND  ,length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
+        sayi(RJustify(EDIT_COMMAND   ,length) + "- commands relating to running the line editor.");
+        sayi(RJustify(ENV_COMMAND    ,length) + "- commands relating to environment variables in this workspace.");
+        sayi(RJustify(EXECUTE_COMMAND,length) + "- short hand to execute whatever is in the current buffer.");
+        sayi(RJustify(FUNCS_COMMAND  ,length) + "- list all of the imported and user defined functions this workspace knows about.");
+        sayi(RJustify(HELP_COMMAND   ,length) + "- this message.");
+        sayi(RJustify(MODULES_COMMAND,length) + "- lists all the loaded modules this workspace knows about.");
+        sayi(RJustify(OFF_COMMAND    ,length) + "- exit the workspace.");
+        sayi(RJustify(LOAD_COMMAND   ,length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
+        sayi(RJustify(VARS_COMMAND   ,length) + "- lists all of the variables this workspace knows about.");
+        sayi(RJustify(WS_COMMAND     ,length) + "- commands relating to this workspace.");
         say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
     }
-    String padit(String x, int length){
-       return                 x + blanks.substring(0, length - x.length());
 
-    }
+
     public int execute(String inline) {
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
@@ -156,6 +156,8 @@ public class WorkspaceCommands implements Logable {
                 return doEnvCommand(inputLine);
             case FUNCS_COMMAND:
                 return doFuncs(inputLine);
+            case IMPORTS_COMMAND:
+                return doModuleImports(inputLine);
             case HELP_COMMAND:
                 return doHelp(inputLine);
             case MODULES_COMMAND:
@@ -753,7 +755,7 @@ public class WorkspaceCommands implements Logable {
                 // single row, so don't pad, just a blank between entries
                 output[currentLine] = output[currentLine] + func + "  ";
             } else {
-                output[currentLine] = output[currentLine] + padit(func , maxWidth );
+                output[currentLine] = output[currentLine] + LJustify(func , maxWidth );
             }
         }
         for (String x : output) {
@@ -762,7 +764,6 @@ public class WorkspaceCommands implements Logable {
 
         return RC_CONTINUE;
     }
-    String blanks = "                                                                          "; // padding
 
     protected int doSystemFuncsList(InputLine inputLine) {
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);

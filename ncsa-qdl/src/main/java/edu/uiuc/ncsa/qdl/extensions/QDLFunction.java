@@ -45,5 +45,5 @@ public interface QDLFunction extends Serializable {
      * details of use.
      * @return
      */
-    List<String> getDocumentation();
+    List<String> getDocumentation(int argCount);
 }

@@ -153,6 +153,12 @@ public class InputLine {
         throw new ArgumentNotFoundException();
     }
 
+    /**
+     * Tries to get the index as an integer. If it is not an integer an
+     * {@link ArgumentNotFoundException} is thrown.
+     * @param index
+     * @return
+     */
     public int getIntArg(int index) {
         try {
             return Integer.parseInt(getArg(index));

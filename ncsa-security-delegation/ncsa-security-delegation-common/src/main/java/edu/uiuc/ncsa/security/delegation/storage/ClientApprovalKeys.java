@@ -41,9 +41,10 @@ public class ClientApprovalKeys extends SerializationKeys {
     @Override
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
-        allKeys.add(approved());
         allKeys.add(approvalTS());
+        allKeys.add(approved());
         allKeys.add(approver());
+        allKeys.add(status());
         return allKeys;
     }
 }

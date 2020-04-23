@@ -68,8 +68,8 @@ public abstract  class JavaModule extends Module {
                 fr.qdlFunction = f;
                 fr.argCount = i;
                 fr.name = f.getName();
-                if(f.getDocumentation()!=null && !f.getDocumentation().isEmpty()) {
-                    fr.documentation = f.getDocumentation();
+                if(f.getDocumentation(i)!=null && !f.getDocumentation(i).isEmpty()) {
+                    fr.documentation = f.getDocumentation(i);
                 }
                 state.getFunctionTable().put(fr);
 
