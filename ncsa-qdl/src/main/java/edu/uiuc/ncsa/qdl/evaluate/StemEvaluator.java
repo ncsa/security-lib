@@ -914,10 +914,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgumments().size() != 1) {
             throw new IllegalArgumentException("Error: the " + REMOVE + " function requires 1 argument");
         }
-        VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
-        variableNode.evaluate(state);
-        state.remove(variableNode.getVariableReference());
-        polyad.setResult(Boolean.TRUE);
+        polyad.evalArg(0, state);
+        String var = null;
+        if (polyad.getArgumments().get(0) instanceof VariableNode) {
+            VariableNode variableNode = (VariableNode) polyad.getArgumments().get(0);
+            // Don't evaluate this because it might not exist (that's what we are testing for). Just check
+            // if the name is defined.
+            var = variableNode.getVariableReference();
+        }
+        if (polyad.getArgumments().get(0) instanceof ConstantNode) {
+            ConstantNode variableNode = (ConstantNode) polyad.getArgumments().get(0);
+            Object x = variableNode.getResult();
+            if (x != null)  {
+                var = x.toString();
+            }
+        }
+        if(var == null){
+            polyad.setResult(Boolean.FALSE);
+        }else{
+            state.remove(var);
+            polyad.setResult(Boolean.TRUE);
+        }
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
@@ -959,14 +976,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: the " + INCLUDE_KEYS + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        ;
         Object arg = polyad.getArgumments().get(0).getResult();
         if (!isStem(arg)) {
             throw new IllegalArgumentException("Error: The " + INCLUDE_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
-        ;
         Object arg2 = polyad.getArgumments().get(1).getResult();
 
         if (!isStem(arg2)) {
