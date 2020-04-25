@@ -30,7 +30,7 @@ public class ConnectionPool extends Pool<Connection> {
             Connection con = DriverManager.getConnection(getConnectionParameters().getJdbcUrl());
             return con;
         } catch (Exception x) {
-            DebugUtil.dbg(this, "Connection failure, JDBC URL=" + getConnectionParameters().getJdbcUrl());
+            DebugUtil.trace(this, "Connection failure, JDBC URL=" + getConnectionParameters().getJdbcUrl());
             x.printStackTrace();
             throw new PoolException(x);
         }

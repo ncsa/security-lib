@@ -30,24 +30,24 @@ public class ServletMailUtil extends MailUtil {
     @Override
     public Session getSession(Properties props) throws NamingException {
         getMyLogger().info("Starting");
-        DebugUtil.dbg(this, "Starting to get the mail session");
+        DebugUtil.trace(this, "Starting to get the mail session");
         // next bit gets the right session object from Tomcat and ensures it is set up
         // right in this environment.
         Context initCtx = new InitialContext();
         Object obj = null;
         try {
-            DebugUtil.dbg(this, "Getting mail session");
+            DebugUtil.trace(this, "Getting mail session");
             Context envCtx = (Context) initCtx.lookup("java:comp/env");
             obj = envCtx.lookup("mail/Session");
         } catch (Throwable t) {
             t.printStackTrace();
-            DebugUtil.dbg(this, "Getting mail session #2, msg=" + t.getMessage());
+            DebugUtil.trace(this, "Getting mail session #2, msg=" + t.getMessage());
 
             try {
                 obj = initCtx.lookup("java:/comp/env/mail/Session");
             } catch (Throwable tt) {
                 tt.printStackTrace();
-                DebugUtil.dbg(this, "Completely failed to get mail session. msg=" + tt.getMessage());
+                DebugUtil.trace(this, "Completely failed to get mail session. msg=" + tt.getMessage());
             }
 
         }

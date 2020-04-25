@@ -118,7 +118,7 @@ public  class LogicBlocks<V extends LogicBlock> extends LinkedList<V> implements
         // is false and there is no else clause. Only do something if something happened.
 
         if (lb.getConsequent() != null) {
-            DebugUtil.dbg(this, "Got consequent, adding results to functor map:" + lb.getConsequent().getFunctorMap());
+            DebugUtil.trace(this, "Got consequent, adding results to functor map:" + lb.getConsequent().getFunctorMap());
             getFunctorMap().addAll(lb.getConsequent().getFunctorMap());
         }
     }

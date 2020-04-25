@@ -106,7 +106,7 @@ public class MyTrustManager implements X509TrustManager {
     }
 
     void dbg(String x) {
-      DebugUtil.dbg(this, x);
+      DebugUtil.trace(this, x);
     }
 
     String host;

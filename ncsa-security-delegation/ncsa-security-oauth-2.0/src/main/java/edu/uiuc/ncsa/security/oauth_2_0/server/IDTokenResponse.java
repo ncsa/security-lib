@@ -146,7 +146,7 @@ public abstract class IDTokenResponse extends IResponse2 {
                     idTokken = JWTUtil.createJWT(claims);
                 }
                 if (ServletDebugUtil.isEnabled()) {
-                    ServletDebugUtil.dbg(this, "raw ID_Token=" + idTokken);
+                    ServletDebugUtil.trace(this, "raw ID_Token=" + idTokken);
                 }
                 m.put(ID_TOKEN, idTokken);
             } catch (Throwable e) {

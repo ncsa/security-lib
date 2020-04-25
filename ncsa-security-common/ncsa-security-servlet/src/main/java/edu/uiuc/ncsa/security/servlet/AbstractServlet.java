@@ -136,7 +136,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
 
     ExceptionHandler exceptionHandler;
     protected boolean checkContentType(String rawContentType, String contentType){
-        ServletDebugUtil.dbg(this,"checking content type = "+ rawContentType);
+        ServletDebugUtil.trace(this,"checking content type = "+ rawContentType);
 
            // As per the spec, https://tools.ietf.org/html/rfc7231#section-3.1.1.1
            // there may be several things in the content type (such as the charset, boundary, etc.) all separated
@@ -145,9 +145,9 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
            boolean gotOne = false;
            while(tokenizer.hasMoreTokens()){
                String foo = tokenizer.nextToken().trim();
-               ServletDebugUtil.dbg(this,"checking encoding, next = " + foo);
+               ServletDebugUtil.trace(this,"checking encoding, next = " + foo);
                gotOne = gotOne || foo.equals(contentType);
-               ServletDebugUtil.dbg(this,"checking encoding, gotOne = " + gotOne);
+               ServletDebugUtil.trace(this,"checking encoding, gotOne = " + gotOne);
            }
            return gotOne;
 
@@ -181,19 +181,19 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
               Fixes CIL-517
              */
            String rawContentType = httpServletRequest.getContentType();
-           ServletDebugUtil.dbg(this,"in POST, raw content = "+ rawContentType);
+           ServletDebugUtil.trace(this,"in POST, raw content = "+ rawContentType);
             if(rawContentType == null || rawContentType.isEmpty()){
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                ServletDebugUtil.dbg(this,"in POST, raw content empty, throwing exception");
+                ServletDebugUtil.trace(this,"in POST, raw content empty, throwing exception");
                 throw new ServletException("Error: Missing content type for body of POST. Request rejected.");
             }
 
             if (!checkContentType(rawContentType, "application/x-www-form-urlencoded" )) {
                 httpServletResponse.setStatus(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                ServletDebugUtil.dbg(this,"in POST, did NOT get one, throwing exception");
+                ServletDebugUtil.trace(this,"in POST, did NOT get one, throwing exception");
                 throw new ServletException("Error: Unsupported encoding of \"" + httpServletRequest.getContentType() + "\" for body of POST. Request rejected.");
             }
-            ServletDebugUtil.dbg(this,"encoding ok, starting doIt()");
+            ServletDebugUtil.trace(this,"encoding ok, starting doIt()");
 
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {

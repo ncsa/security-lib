@@ -23,7 +23,8 @@ public interface PayloadHandler {
 
     /**
      * If the claims need to be updated (e.g. for a refresh and the timestamps need
-     * adjusting) this method needs to be called
+     * adjusting) this method needs to be called. It's contract is to reget all of the
+     * claims.
      */
     void refresh()  throws Throwable;
 
@@ -82,5 +83,12 @@ public interface PayloadHandler {
      * This is called when a token is created or refreshed. 
      */
     void setAccountingInformation();
-    
+
+    /**
+     * This is used on refresh only. It will reset all the standard accounting information
+     * (such as timestamps) for an existing claims object.
+     * <h4>Usage</h4>
+     * Create an instance of the handler with the constructor for any state, then invoke this method.
+     */
+    void refreshAccountingInformation();
 }

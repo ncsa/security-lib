@@ -159,7 +159,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
             agr.setParameters(m);
             return agr;
         } catch (Throwable e) {
-            DebugUtil.dbg(this, "Error getting auth grant", e);
+            DebugUtil.trace(this, "Error getting auth grant", e);
             handleException(e);
             return null;
         }

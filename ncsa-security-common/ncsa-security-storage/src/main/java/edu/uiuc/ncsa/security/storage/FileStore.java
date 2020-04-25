@@ -262,10 +262,10 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
             // are practically too many places it could fail. Best we can do is delete any we find.
             if (removeEmptyFiles) {
                 f.delete();
-                DebugUtil.dbg(this, "Deleting empty file:" + f);
+                DebugUtil.trace(this, "Deleting empty file:" + f);
                 return null;
             } else {
-                DebugUtil.dbg(this, "Skipping file of length zero:" + f);
+                DebugUtil.trace(this, "Skipping file of length zero:" + f);
                 return null;
             }
         }

@@ -27,7 +27,7 @@ public class RTI2 extends AbstractIssuer {
 
         RTIRequest request = (RTIRequest) req;
         Map<String, String> reqParamMap = OA2Utilities.getParameters(request.getServletRequest());
-        ServletDebugUtil.dbg(this,"Request parameters:" + reqParamMap);
+        ServletDebugUtil.trace(this,"Request parameters:" + reqParamMap);
         reqParamMap.put(OA2Constants.CLIENT_ID, req.getClient().getIdentifierString());
         OA2TokenForge tokenForge2 = (OA2TokenForge) tokenForge;
         RefreshToken refreshToken = tokenForge2.getRefreshToken();

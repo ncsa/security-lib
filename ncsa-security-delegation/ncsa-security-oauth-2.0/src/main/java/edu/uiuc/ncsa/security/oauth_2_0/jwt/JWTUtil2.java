@@ -66,7 +66,7 @@ public class JWTUtil2 {
               signature = ""; // as per spec
 
           } else {
-              DebugUtil.dbg(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
+              DebugUtil.trace(JWTUtil.class, "Signing ID token with algorithm=" + jsonWebKey.algorithm);
               signature = sign(header, payload, jsonWebKey);
           }
           String x = concat(header, payload);
@@ -157,7 +157,7 @@ public class JWTUtil2 {
               throw new IllegalStateException("Unknown algorithm");
           }
           String algorithm = (String) alg;
-          DebugUtil.dbg(JWTUtil.class, "Verifying ID token with algorithm =" + algorithm);
+          DebugUtil.trace(JWTUtil.class, "Verifying ID token with algorithm =" + algorithm);
           Signature signature = null;
           if (algorithm.equals(NONE_JWT)) {
               return true;
@@ -171,7 +171,7 @@ public class JWTUtil2 {
           signature.initVerify(pubKey);
           signature.update(concat(header, payload).getBytes());
           boolean rc = signature.verify(Base64.decodeBase64(sig));
-          DebugUtil.dbg(JWTUtil.class, "Verification ok?" + rc);
+          DebugUtil.trace(JWTUtil.class, "Verification ok?" + rc);
           return rc;
       }
 
@@ -223,20 +223,20 @@ public class JWTUtil2 {
           String[] x = decat(jwt);
           JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
           JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
-          DebugUtil.dbg(JWTUtil.class, "header=" + h);
-          DebugUtil.dbg(JWTUtil.class, "payload=" + p);
+          DebugUtil.trace(JWTUtil.class, "header=" + h);
+          DebugUtil.trace(JWTUtil.class, "payload=" + p);
           if (h.get(ALGORITHM) == null) {
               throw new IllegalArgumentException("Error: no algorithm.");
           } else {
               if (h.get(ALGORITHM).equals(NONE_JWT)) {
-                  DebugUtil.dbg(JWTUtil.class, "unsigned id token. Returning payload");
+                  DebugUtil.trace(JWTUtil.class, "unsigned id token. Returning payload");
 
                   return p;
               }
           }
           if (!h.get(TYPE).equals("JWT")) throw new GeneralException("Unsupported token type.");
           Object keyID = h.get(KEY_ID);
-          DebugUtil.dbg(JWTUtil.class, "key_id=" + keyID);
+          DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
 
           if (keyID == null || !(keyID instanceof String)) {
               throw new IllegalArgumentException("Error: Unknown algorithm");
