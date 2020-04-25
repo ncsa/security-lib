@@ -206,4 +206,12 @@ public class FunctorScript implements ScriptInterface {
     public void execute(StateInterface state) {
         execute();
     }
+
+    @Override
+    public String toString() {
+        return "FunctorScript{" +
+                "rawContent=" + rawContent +
+                ", functorMap=" + functorMap +
+                '}';
+    }
 }

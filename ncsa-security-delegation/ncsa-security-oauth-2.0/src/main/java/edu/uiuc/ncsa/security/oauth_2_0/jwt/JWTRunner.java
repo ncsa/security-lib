@@ -205,9 +205,9 @@ public class JWTRunner {
         throw new NotImplementedException("Error: other script runtime reponses not implemented yet.");
     }
 
-    protected void doScript(String srePostAuth) throws Throwable {
+    protected void doScript(String phase) throws Throwable {
         if (getScriptRuntimeEngine() != null) {
-            ScriptRunRequest req = newSRR(transaction, srePostAuth);
+            ScriptRunRequest req = newSRR(transaction, phase);
             for (PayloadHandler h : handlers) {
                 h.addRequestState(req);
             }
