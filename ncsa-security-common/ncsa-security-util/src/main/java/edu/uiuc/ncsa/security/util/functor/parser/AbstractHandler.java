@@ -4,13 +4,15 @@ import edu.uiuc.ncsa.security.util.functor.FunctorType;
 import edu.uiuc.ncsa.security.util.functor.JFunctorFactory;
 import edu.uiuc.ncsa.security.util.functor.parser.event.DelimiterEvent;
 
+import java.io.Serializable;
+
 /**
  * Top-level handler class. This has the routine bookkeeping in it for any handler, such as tracking the number
  * of delimiters, whether it has been used and some other handy utilities.
  * <p>Created by Jeff Gaynor<br>
  * on 7/15/18 at  5:21 PM
  */
-public abstract class AbstractHandler {
+public abstract class AbstractHandler implements Serializable {
     public static final int SWITCH_TYPE = 0;
     public static final int CONDITIONAL_TYPE = 1;
     public static final int FUNCTOR_TYPE = 2;
