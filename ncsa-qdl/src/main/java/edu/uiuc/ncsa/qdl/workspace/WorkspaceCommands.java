@@ -3,8 +3,12 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
@@ -13,6 +17,8 @@ import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -61,6 +67,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String HELP_COMMAND = ")help"; // show various types of help
     protected static final String OFF_COMMAND = ")off";
     protected static final String BUFFER_COMMAND = ")buffer";
+    protected static final String BUFFER2_COMMAND = ")b";
     protected static final String EXECUTE_COMMAND = ")";
     protected static final String MODULES_COMMAND = ")modules";
     protected static final String LOAD_COMMAND = ")load"; // grab a file and run it
@@ -71,6 +78,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String ENV_COMMAND = ")env";
     protected static final String WS_COMMAND = ")ws";
     protected static final String EDIT_COMMAND = ")edit";
+    protected static final String FILE_COMMAND = ")file";
 
     public static final int RC_NO_OP = -1;
     public static final int RC_CONTINUE = 1;
@@ -120,18 +128,18 @@ public class WorkspaceCommands implements Logable {
         say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
         say("Here is a quick summary of what they are and do.");
         int length = 8;
-        sayi(RJustify(BUFFER_COMMAND ,length) + "- commands relating to using buffers.");
-        sayi(RJustify(CLEAR_COMMAND  ,length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
-        sayi(RJustify(EDIT_COMMAND   ,length) + "- commands relating to running the line editor.");
-        sayi(RJustify(ENV_COMMAND    ,length) + "- commands relating to environment variables in this workspace.");
-        sayi(RJustify(EXECUTE_COMMAND,length) + "- short hand to execute whatever is in the current buffer.");
-        sayi(RJustify(FUNCS_COMMAND  ,length) + "- list all of the imported and user defined functions this workspace knows about.");
-        sayi(RJustify(HELP_COMMAND   ,length) + "- this message.");
-        sayi(RJustify(MODULES_COMMAND,length) + "- lists all the loaded modules this workspace knows about.");
-        sayi(RJustify(OFF_COMMAND    ,length) + "- exit the workspace.");
-        sayi(RJustify(LOAD_COMMAND   ,length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayi(RJustify(VARS_COMMAND   ,length) + "- lists all of the variables this workspace knows about.");
-        sayi(RJustify(WS_COMMAND     ,length) + "- commands relating to this workspace.");
+        sayi(RJustify(BUFFER_COMMAND, length) + "- commands relating to using buffers.");
+        sayi(RJustify(CLEAR_COMMAND, length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
+        sayi(RJustify(EDIT_COMMAND, length) + "- commands relating to running the line editor.");
+        sayi(RJustify(ENV_COMMAND, length) + "- commands relating to environment variables in this workspace.");
+        sayi(RJustify(EXECUTE_COMMAND, length) + "- short hand to execute whatever is in the current buffer.");
+        sayi(RJustify(FUNCS_COMMAND, length) + "- list all of the imported and user defined functions this workspace knows about.");
+        sayi(RJustify(HELP_COMMAND, length) + "- this message.");
+        sayi(RJustify(MODULES_COMMAND, length) + "- lists all the loaded modules this workspace knows about.");
+        sayi(RJustify(OFF_COMMAND, length) + "- exit the workspace.");
+        sayi(RJustify(LOAD_COMMAND, length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
+        sayi(RJustify(VARS_COMMAND, length) + "- lists all of the variables this workspace knows about.");
+        sayi(RJustify(WS_COMMAND, length) + "- commands relating to this workspace.");
         say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
     }
 
@@ -141,6 +149,10 @@ public class WorkspaceCommands implements Logable {
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
 
         switch (inputLine.getCommand()) {
+            case FILE_COMMAND:
+                return doFileCommands(inputLine);
+            case BUFFER2_COMMAND:
+                return _doNewBufferCommand(inputLine);
             case BUFFER_COMMAND:
                 return doBufferCommand(inputLine);
             case CLEAR_COMMAND:
@@ -186,6 +198,322 @@ public class WorkspaceCommands implements Logable {
         }
         say("Unknown command.");
         return RC_NO_OP;
+    }
+
+    protected int doFileCommands(InputLine inputLine) {
+        switch (inputLine.getArg(ACTION_INDEX)) {
+            case "copy":
+                return copyFile(inputLine);
+            case "delete":
+                return deleteFile(inputLine);
+            case "dir":
+                return showDir(inputLine);
+            case "mkdir":
+                return mkDir(inputLine);
+            case "vfs":
+                return doVFS(inputLine);
+            default:
+                say("unknown file command");
+                return RC_NO_OP;
+        }
+    }
+
+    BufferManager bufferManager = new BufferManager();
+
+    private int _doNewBufferCommand(InputLine inputLine) {
+        switch (inputLine.getArg(ACTION_INDEX)) {
+            case "create":
+                return _doBufferCreate(inputLine);
+            case "link":
+                return _doBufferLink(inputLine);
+            case "write":
+                return _doBufferWrite(inputLine);
+            case "list":
+                return _doBufferList(inputLine);
+            case "show":
+                return _doBufferShow(inputLine);
+            case "delete":
+                return _doBufferDelete(inputLine);
+            case "edit":
+                return _doEdit(inputLine);
+            case "run":
+                return _doRun(inputLine);
+            default:
+                say("unrecognized buffer command");
+                return RC_NO_OP;
+        }
+
+    }
+
+    protected int _doRun(InputLine inputLine) {
+        // )b create   load_script('/home/ncsa/temp/test.qdl')
+        int index = -1;
+        try {
+            index = inputLine.getIntArg(FIRST_ARG_INDEX);
+        } catch (Throwable t) {
+            say("sorry, I didn't understand that");
+            return RC_CONTINUE;
+        }
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
+        if (br == null) {
+            say("no such buffer");
+            return RC_NO_OP;
+        }
+        List<String> content = null;
+        if (br.hasContent()) {
+            content = br.getContent();
+        } else {
+            if (br.isLink()) {
+               content = bufferManager.readFile(br.link);
+            } else {
+                content = bufferManager.readFile(br.src);
+            }
+        }
+        boolean origEchoMode = getInterpreter().isEchoModeOn();
+        boolean ppOn = getInterpreter().isPrettyPrint();
+        getInterpreter().setEchoModeOn(false);
+        StringBuffer stringBuffer = new StringBuffer();
+        for (String x : content) {
+            stringBuffer.append(x + "\n");
+        }
+        try {
+            getInterpreter().execute(stringBuffer.toString());
+            getInterpreter().setEchoModeOn(origEchoMode);
+            getInterpreter().setPrettyPrint(ppOn);
+        } catch (Throwable t) {
+            getInterpreter().setEchoModeOn(origEchoMode);
+            getInterpreter().setPrettyPrint(ppOn);
+
+            getState().getLogger().error("Could not interpret buffer " + stringBuffer, t);
+            say("sorry, but there was an error:" + ((t instanceof NullPointerException) ? "(no message)" : t.getMessage()));
+        }
+        return RC_CONTINUE;
+    }
+
+    protected int _doBufferWrite(InputLine inputLine) {
+        int index = -1;
+        try {
+            index = inputLine.getIntArg(FIRST_ARG_INDEX);
+        } catch (Throwable t) {
+            say("sorry, I didn't understand that");
+            return RC_CONTINUE;
+        }
+        boolean ok = bufferManager.write(index);
+        if (ok) {
+            say("done");
+        } else {
+            say("nothing was found to write.");
+        }
+        return RC_CONTINUE;
+
+    }
+
+    LinkedList<String> editorClipboard = new LinkedList<>();
+
+    private int _doEdit(InputLine inputLine) {
+        int index = -1;
+        try {
+            index = inputLine.getIntArg(FIRST_ARG_INDEX);
+        } catch (Throwable t) {
+            say("sorry, I didn't understand that");
+            return RC_CONTINUE;
+        }
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
+        if (br == null) {
+            say("Sorry. No such buffer");
+            return RC_CONTINUE;
+        }
+        List<String> content;
+        if (br.hasContent()) {
+            content = br.getContent();
+        } else {
+            String fName = br.isLink() ? br.link : br.src;
+            try {
+                content = bufferManager.readFile(fName);
+            }catch(QDLException q){
+                getState().info("no file " + fName + " found, creating new one.");
+                content = new ArrayList<>();
+            }
+            br.setContent(content);
+        }
+        // so no buffer. There are a couple ways to get it.
+
+        LineEditor lineEditor = new LineEditor(br.getContent());
+        lineEditor.setClipboard(editorClipboard);
+        try {
+            lineEditor.execute();
+            br.setContent(lineEditor.getBuffer()); // Just to be sure it is the same.
+        } catch (Throwable t) {
+            say("Sorry, there was an issue editing this buffer.");
+            getState().warn("Error editing buffer:" + t.getMessage() + " for exception " + t.getClass().getSimpleName());
+        }
+
+        return RC_CONTINUE;
+    }
+
+    protected int _doBufferDelete(InputLine inputLine) {
+        int index = -1;
+        try {
+            index = inputLine.getIntArg(FIRST_ARG_INDEX);
+        } catch (Throwable t) {
+            say("sorry, I didn't understand that");
+            return RC_CONTINUE;
+        }
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
+        if (br.hasContent()) {
+            if ("y".equalsIgnoreCase(readline("buffer has not been saved. Do you still want to remove it?[y/n]"))) {
+                bufferManager.remove(inputLine.getIntArg(FIRST_ARG_INDEX));
+            } else {
+                say("aborted.");
+            }
+        }
+        return RC_CONTINUE;
+    }
+
+    private int showDir(InputLine inputLine) {
+        Polyad request = new Polyad(IOEvaluator.DIR);
+        try {
+            request.addArgument(new ConstantNode(inputLine.getArg(FIRST_ARG_INDEX), Constant.STRING_TYPE));
+        } catch (Throwable t) {
+            say("sorry. I didn't understand that.");
+            return RC_CONTINUE;
+        }
+        getState().getMetaEvaluator().evaluate(request, getState());
+        Object obj = request.getResult();
+        int i = 0;
+        if (obj instanceof StemVariable) {
+            StemVariable stemVariable = (StemVariable) obj;
+            for (String key : stemVariable.keySet()) {
+                i++;
+                say(stemVariable.get(key).toString());
+            }
+            say(i + " entries");
+        } else {
+        }
+        return RC_CONTINUE;
+    }
+
+    private int mkDir(InputLine inputLine) {
+        try {
+            String raw = IOEvaluator.MKDIR + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
+
+            getInterpreter().execute(raw);
+        } catch (Throwable throwable) {
+            say("Error" + (throwable instanceof NullPointerException ? "." : ":" + throwable.getMessage()));
+        }
+        return RC_CONTINUE;
+
+    }
+
+    private int deleteFile(InputLine inputLine) {
+        try {
+            String raw = IOEvaluator.RM_FILE + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
+            getInterpreter().execute(raw);
+        } catch (Throwable throwable) {
+            say("Error" + (throwable instanceof NullPointerException ? "." : ":" + throwable.getMessage()));
+        }
+        return RC_CONTINUE;
+    }
+
+    /**
+     * Copies <i>any</i> two files on the system including between VFS.
+     */
+
+    private int copyFile(InputLine inputLine) {
+
+        try {
+            String source = inputLine.getArg(FIRST_ARG_INDEX);
+            String target = inputLine.getArg(FIRST_ARG_INDEX + 1);
+            String readIt = IOEvaluator.READ_FILE + "('" + source + "')";
+            String raw = IOEvaluator.WRITE_FILE + "('" + target + "'," + readIt + ");";
+            getInterpreter().execute(raw);
+        } catch (Throwable throwable) {
+            say("Sorry, I couldn't do that: " + throwable.getMessage());
+        }
+        return RC_CONTINUE;
+    }
+
+    private int _doBufferList(InputLine inputLine) {
+        for (int i = 0; i < bufferManager.getBufferRecords().size(); i++) {
+            say(formatBufferRecord(i, bufferManager.getBufferRecords().get(i)));
+        }
+        return RC_CONTINUE;
+    }
+
+    private int _doBufferShow(InputLine inputLine) {
+        int index = -1;
+        try {
+            index = inputLine.getIntArg(FIRST_ARG_INDEX);
+        } catch (Throwable t) {
+            say("sorry, I didn't understand that");
+            return RC_CONTINUE;
+        }
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
+        if (br.hasContent()) {
+            for (String x : br.getContent()) {
+                say(x);
+            }
+            return RC_CONTINUE;
+        }
+        // So nothing in the buffer. So the file.
+        List<String> lines = null;
+        try {
+            if (br.isLink()) {
+                // If this is a link but the user really wants to see the source, they need to supply a flag
+                lines = bufferManager.read(inputLine.getIntArg(FIRST_ARG_INDEX), inputLine.hasArg("-src"));
+            } else {
+                lines = bufferManager.read(inputLine.getIntArg(FIRST_ARG_INDEX), true);
+            }
+
+        } catch (Throwable t) {
+            say("error reading buffer");
+            return RC_NO_OP;
+        }
+        if (lines.isEmpty()) {
+            say("");
+
+        } else {
+            for (String x : lines) {
+                say(x);
+            }
+        }
+        return RC_CONTINUE;
+    }
+
+    public String BUFFER_RECORD_SEPARATOR = "|";
+
+    protected String formatBufferRecord(int ndx, BufferManager.BufferRecord br) {
+        String a = BUFFER_RECORD_SEPARATOR + (br.hasContent() ? "*" : " ") + BUFFER_RECORD_SEPARATOR;
+        return ndx + a + br;
+    }
+
+    private int _doBufferLink(InputLine inputLine) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            say("sorry, you must supply a file name.");
+            return RC_CONTINUE;
+        }
+        String source = inputLine.getArg(FIRST_ARG_INDEX);
+        String target = null;
+        if (inputLine.hasArgAt(FIRST_ARG_INDEX + 1)) {
+            target = inputLine.getArg(FIRST_ARG_INDEX + 1);
+        }
+        int ndx = bufferManager.link(source, target);
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
+        say(formatBufferRecord(ndx, br));
+        return RC_CONTINUE;
+
+    }
+
+    private int _doBufferCreate(InputLine inputLine) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            say("sorry, you must supply a file name.");
+            return RC_CONTINUE;
+        }
+        String source = inputLine.getArg(FIRST_ARG_INDEX);
+        int ndx = bufferManager.create(source);
+        BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
+        say(formatBufferRecord(ndx, br));
+        return RC_CONTINUE;
     }
 
     /**
@@ -681,6 +1009,7 @@ public class WorkspaceCommands implements Logable {
     /**
      * Any list of string s(functions, variables, modules, etc.) is listed using this formatting function.
      * If understands command line switches for width, columns and does some regex's too.
+     *
      * @param inputLine
      * @param list
      * @return
@@ -755,7 +1084,7 @@ public class WorkspaceCommands implements Logable {
                 // single row, so don't pad, just a blank between entries
                 output[currentLine] = output[currentLine] + func + "  ";
             } else {
-                output[currentLine] = output[currentLine] + LJustify(func , maxWidth );
+                output[currentLine] = output[currentLine] + LJustify(func, maxWidth);
             }
         }
         for (String x : output) {
@@ -875,28 +1204,33 @@ public class WorkspaceCommands implements Logable {
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
             case "vfs":
-                if (state.getVfsFileProviders().isEmpty()) {
-                    say("No installed virtual file systems");
-                    return RC_CONTINUE;
-                }
-                say("Installed virtual file systems");
-                String indent = "                           "; // 25 blanks
-                String shortSpaces = "           "; // 12 blanks
-                for (String x : state.getVfsFileProviders().keySet()) {
-                    String output = "";
-                    VFSFileProvider y = state.getVfsFileProviders().get(x);
-                    output += makeColumn(indent, "type:" + y.getType());
-                    output += makeColumn(shortSpaces, "access:" + (y.canRead() ? "r" : "") + (y.canWrite() ? "w" : ""));
-                    output += makeColumn(indent, "scheme: " + y.getScheme());
-                    output += makeColumn(indent, "mount point:" + y.getMountPoint());
-                    output += makeColumn(indent, "current dir:" + (y.getCurrentDir() == null ? "(none)" : y.getCurrentDir()));
-                    sayi(output);
-                }
-                return RC_CONTINUE;
-
+                return doVFS(inputLine);
+            default:
+                say("unrecognized workspace command.");
+                return RC_NO_OP;
         }
-        return RC_NO_OP;
 
+    }
+
+    private int doVFS(InputLine inputLine) {
+        if (state.getVfsFileProviders().isEmpty()) {
+            say("No installed virtual file systems");
+            return RC_CONTINUE;
+        }
+        say("Installed virtual file systems");
+        String indent = "                           "; // 25 blanks
+        String shortSpaces = "           "; // 12 blanks
+        for (String x : state.getVfsFileProviders().keySet()) {
+            String output = "";
+            VFSFileProvider y = state.getVfsFileProviders().get(x);
+            output += makeColumn(indent, "type:" + y.getType());
+            output += makeColumn(shortSpaces, "access:" + (y.canRead() ? "r" : "") + (y.canWrite() ? "w" : ""));
+            output += makeColumn(indent, "scheme: " + y.getScheme());
+            output += makeColumn(indent, "mount point:" + y.getMountPoint());
+            output += makeColumn(indent, "current dir:" + (y.getCurrentDir() == null ? "(none)" : y.getCurrentDir()));
+            sayi(output);
+        }
+        return RC_CONTINUE;
     }
 
     String makeColumn(String spaces, String text) {
@@ -1211,6 +1545,8 @@ public class WorkspaceCommands implements Logable {
         state.createSystemConstants();
         state.createSystemInfo(qe);
         state.getOpEvaluator().setNumericDigits(qe.getNumericDigits());
+        bufferManager.state = getState();
+
         env = new XProperties();
         String loadEnv = null;
         if (inputLine.hasArg("-env")) {
@@ -1279,6 +1615,7 @@ public class WorkspaceCommands implements Logable {
         interpreter.setPrettyPrint(qe.isPrettyPrint());
         //   interpreter.setDebugOn(true);
         runScript(); // run any script if that mode is enabled.
+
     }
 
     /**
@@ -1342,6 +1679,8 @@ public class WorkspaceCommands implements Logable {
         }
         logger = loggerProvider.get();
         State state = getState();
+        bufferManager.state = getState();  // make any file operations later will succeed.
+
         if (inputLine.hasArg(CLA_HOME_DIR)) {
             rootDir = new File(inputLine.getNextArgFor(CLA_HOME_DIR));
         } else {
@@ -1420,6 +1759,7 @@ public class WorkspaceCommands implements Logable {
                 say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
             }
         }
+
         runScript(); // If there is a script, run it.
     }
 

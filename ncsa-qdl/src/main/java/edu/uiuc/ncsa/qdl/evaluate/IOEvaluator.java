@@ -12,11 +12,13 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.*;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -238,7 +240,8 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     /**
-     * Does print, say and to_string commands. 
+     * Does print, say and to_string commands.
+     *
      * @param polyad
      * @param state
      * @param printIt
@@ -595,32 +598,73 @@ public class IOEvaluator extends MathEvaluator {
             }
             isBase64 = (Boolean) obj3;
         }
-        try {
-            boolean didIt = false;
-            if (isStem(obj2)) {
-                FileUtil.writeStemToFile(fileName, (StemVariable) obj2);
-                didIt = true;
+        boolean didIt = false;
+        if (state.isVFSFile(fileName)) {
+            try {
+                VFSFileProvider vfs = state.getVFS(fileName);
+                XProperties xProperties = new XProperties();
+                ArrayList<String> lines = new ArrayList<>();
+                if (isStem(obj2)) {
+                    StemVariable contents = (StemVariable) obj2;
+
+                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
+                    if (!contents.containsKey("0")) {
+                        throw new IllegalArgumentException("Error: The given stem is not a list. It must be a list to use this function.");
+                    }
+                    for (int i = 0; i < contents.size(); i++) {
+                        lines.add(contents.getString(Integer.toString(i)));
+                    }
+                    didIt = true;
+
+                }
+                if (isString(obj2)) {
+                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
+                    lines.add(obj2.toString());
+                    didIt = true;
+
+                }
+
+                if (isBase64) {
+                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.BINARY_TYPE);
+                    lines.add(obj2.toString());  // in VFS stores we store a binary string
+                    didIt = true;
+
+                }
+
+                VFSEntry entry = new FileEntry(lines, xProperties);
+                vfs.put(fileName, entry);
+            } catch (Throwable t) {
+                throw new QDLException("Error: Could not write file to store." + t.getMessage());
             }
-            if (isString(obj2)) {
-                FileUtil.writeStringToFile(fileName, (String) obj2);
-                didIt = true;
+        }else{
+            try {
+                if (isStem(obj2)) {
+                    FileUtil.writeStemToFile(fileName, (StemVariable) obj2);
+                    didIt = true;
+                }
+                if (isString(obj2)) {
+                    FileUtil.writeStringToFile(fileName, (String) obj2);
+                    didIt = true;
+                }
+                if (isBase64) {
+                    FileUtil.writeFileAsBinary(fileName, (String) obj2);
+                    didIt = true;
+                }
+            } catch (Throwable t) {
+                if (t instanceof QDLException) {
+                    throw (RuntimeException) t;
+                }
+                throw new QDLException("Error: could not write file \"" + fileName + "\":" + t.getMessage());
             }
-            if (isBase64) {
-                FileUtil.writeFileAsBinary(fileName, (String) obj2);
-                didIt = true;
-            }
-            if (!didIt) {
-                throw new IllegalArgumentException("Error: The argument to " + WRITE_FILE + " is an unecognized type");
-            }
-            polyad.setResult(Boolean.TRUE);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
-            polyad.setEvaluated(true);
-        } catch (Throwable t) {
-            if (t instanceof QDLException) {
-                throw (RuntimeException) t;
-            }
-            throw new QDLException("Error: could not write file \"" + fileName + "\":" + t.getMessage());
         }
+
+
+        if (!didIt) {
+            throw new IllegalArgumentException("Error: The argument to " + WRITE_FILE + " is an unecognized type");
+        }
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
 
     }
 

@@ -169,6 +169,7 @@ public class VFSTest extends AbstractQDLTester {
         String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         String testFileName = "foo.txt";
         String p = testHeadPath + testFileName;
+        fileEntry.setPath(p);
         try {
             vfs.put(fileEntry);
             assert false : " Was able to write to a not writeable vfs";
