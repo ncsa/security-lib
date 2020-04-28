@@ -57,6 +57,14 @@ public class LineEditor {
         this.buffer = buffer;
     }
 
+    public LinkedList<String> getClipboard() {
+        return clipboard;
+    }
+
+    public void setClipboard(LinkedList<String> clipboard) {
+        this.clipboard = clipboard;
+    }
+
     /**
      * This will split the text at new lines and put it in the buffer.
      *

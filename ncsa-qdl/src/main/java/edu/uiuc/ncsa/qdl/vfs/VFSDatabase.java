@@ -65,6 +65,10 @@ public class VFSDatabase extends SQLDatabase {
                 stmt.close();
                 releaseConnection(c);
                 return paths;
+            }else{
+                // If there is exactly one row in the result, add it.
+                // Could also have post-checked loop
+                paths.add(rs.getString(FILE_NAME));
             }
             while (rs.next()) {
                 paths.add(rs.getString(FILE_NAME));

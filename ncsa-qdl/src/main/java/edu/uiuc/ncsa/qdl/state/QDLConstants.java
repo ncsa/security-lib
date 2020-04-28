@@ -80,4 +80,6 @@ public interface QDLConstants {
    String SYS_BOOT_LOG_NAME = "log_name";
    String SYS_BOOT_LOG_FILE = "log_file";
 
+   String SYS_BOOT_SERVER_MODE = "server_mode_on";
+
 }

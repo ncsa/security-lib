@@ -103,6 +103,7 @@ public class State extends FunctionState implements QDLConstants{
              qdl_props.put(SYS_BOOT_CONFIG_FILE, qe.getCfgFile());
              qdl_props.put(SYS_BOOT_LOG_FILE, qe.getMyLogger().getFileName());
              qdl_props.put(SYS_BOOT_LOG_NAME, qe.getMyLogger().getClassName());
+             qdl_props.put(SYS_BOOT_SERVER_MODE, isServerMode());
              systemInfo.put(SYS_BOOT, qdl_props);
          }
 

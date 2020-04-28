@@ -67,7 +67,8 @@ public class WorkspaceCommands implements Logable {
     protected static final String HELP_COMMAND = ")help"; // show various types of help
     protected static final String OFF_COMMAND = ")off";
     protected static final String BUFFER_COMMAND = ")buffer";
-    protected static final String BUFFER2_COMMAND = ")b";
+    protected static final String BUFFER2_COMMAND = ")buffer";
+    protected static final String SHORT_BUFFER2_COMMAND = ")b";
     protected static final String EXECUTE_COMMAND = ")";
     protected static final String MODULES_COMMAND = ")modules";
     protected static final String LOAD_COMMAND = ")load"; // grab a file and run it
@@ -128,7 +129,7 @@ public class WorkspaceCommands implements Logable {
         say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
         say("Here is a quick summary of what they are and do.");
         int length = 8;
-        sayi(RJustify(BUFFER_COMMAND, length) + "- commands relating to using buffers.");
+        sayi(RJustify(BUFFER2_COMMAND, length) + "- commands relating to using buffers. Alias is " + SHORT_BUFFER2_COMMAND);
         sayi(RJustify(CLEAR_COMMAND, length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
         sayi(RJustify(EDIT_COMMAND, length) + "- commands relating to running the line editor.");
         sayi(RJustify(ENV_COMMAND, length) + "- commands relating to environment variables in this workspace.");
@@ -151,19 +152,21 @@ public class WorkspaceCommands implements Logable {
         switch (inputLine.getCommand()) {
             case FILE_COMMAND:
                 return doFileCommands(inputLine);
+            case SHORT_BUFFER2_COMMAND:
             case BUFFER2_COMMAND:
                 return _doNewBufferCommand(inputLine);
-            case BUFFER_COMMAND:
-                return doBufferCommand(inputLine);
             case CLEAR_COMMAND:
                 return doWSClear(inputLine);
             case EDIT_COMMAND:
-                return doEditCommand(inputLine);
+                //  return doEditCommand(inputLine);
+                return _doBufferEdit(inputLine);
             case EXECUTE_COMMAND:
+                return _doBufferRun(inputLine);
+/*
+                old way had a single buffer that ran in the QDLWorkspace.
                 if (useLocalBuffer) return RC_EXECUTE_LOCAL_BUFFER;
                 if (externalBuffer != null) return RC_EXECUTE_EXTERNAL_BUFFER;
-                say("No buffers to execute");
-                return RC_CONTINUE;
+*/
             case ENV_COMMAND:
                 return doEnvCommand(inputLine);
             case FUNCS_COMMAND:
@@ -204,12 +207,16 @@ public class WorkspaceCommands implements Logable {
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "copy":
                 return copyFile(inputLine);
+            case "rm":
             case "delete":
                 return deleteFile(inputLine);
+            case "ls":
             case "dir":
                 return showDir(inputLine);
             case "mkdir":
                 return mkDir(inputLine);
+            case "rmdir":
+                return rmDir(inputLine);
             case "vfs":
                 return doVFS(inputLine);
             default:
@@ -224,20 +231,25 @@ public class WorkspaceCommands implements Logable {
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "create":
                 return _doBufferCreate(inputLine);
-            case "link":
-                return _doBufferLink(inputLine);
-            case "write":
-                return _doBufferWrite(inputLine);
-            case "list":
-                return _doBufferList(inputLine);
-            case "show":
-                return _doBufferShow(inputLine);
+            case "reset":
+                return _doBufferReset(inputLine);
             case "delete":
+            case "rm":  // for our unix friends
                 return _doBufferDelete(inputLine);
             case "edit":
-                return _doEdit(inputLine);
+                return _doBufferEdit(inputLine);
+            case "link":
+                return _doBufferLink(inputLine);
+            case "list":
+            case "ls":
+                return _doBufferList(inputLine);
             case "run":
-                return _doRun(inputLine);
+                return _doBufferRun(inputLine);
+            case "show":
+                return _doBufferShow(inputLine);
+            case "write":
+            case "save":
+                return _doBufferWrite(inputLine);
             default:
                 say("unrecognized buffer command");
                 return RC_NO_OP;
@@ -245,30 +257,44 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    protected int _doRun(InputLine inputLine) {
-        // )b create   load_script('/home/ncsa/temp/test.qdl')
-        int index = -1;
-        try {
-            index = inputLine.getIntArg(FIRST_ARG_INDEX);
-        } catch (Throwable t) {
-            say("sorry, I didn't understand that");
-            return RC_CONTINUE;
-        }
-        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
-        if (br == null) {
-            say("no such buffer");
+    protected int _doBufferReset(InputLine inputLine) {
+        if (!"y".equals(readline("Are you SURE you want to delete all buffers and reset them?"))) {
+            say("aborted.");
             return RC_NO_OP;
         }
+        bufferManager = new BufferManager();
+        say("buffers reset");
+        return RC_CONTINUE;
+    }
+
+    protected int _doBufferRun(InputLine inputLine) {
+        BufferManager.BufferRecord br = getBR(inputLine);
         List<String> content = null;
-        if (br.hasContent()) {
-            content = br.getContent();
-        } else {
-            if (br.isLink()) {
-               content = bufferManager.readFile(br.link);
-            } else {
-                content = bufferManager.readFile(br.src);
+
+        if (br == null || br.deleted) {
+            File f = new File(inputLine.getLastArg());
+            if (f.exists() && f.isFile()) {
+                try {
+                    content = FileUtil.readFileAsLines(f.getCanonicalPath());
+                } catch (Throwable throwable) {
+                }
             }
+            if (content == null || content.isEmpty()) {
+                say("no such file or buffer");
+                return RC_NO_OP;
+            }
+        }else{
+            if (br.hasContent()) {
+                  content = br.getContent();
+              } else {
+                  if (br.isLink()) {
+                      content = bufferManager.readFile(br.link);
+                  } else {
+                      content = bufferManager.readFile(br.src);
+                  }
+              }
         }
+
         boolean origEchoMode = getInterpreter().isEchoModeOn();
         boolean ppOn = getInterpreter().isPrettyPrint();
         getInterpreter().setEchoModeOn(false);
@@ -291,14 +317,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _doBufferWrite(InputLine inputLine) {
-        int index = -1;
-        try {
-            index = inputLine.getIntArg(FIRST_ARG_INDEX);
-        } catch (Throwable t) {
-            say("sorry, I didn't understand that");
-            return RC_CONTINUE;
+        BufferManager.BufferRecord br = getBR(inputLine);
+        if (br == null || br.deleted) {
+            say("buffer not found");
+            return RC_NO_OP;
         }
-        boolean ok = bufferManager.write(index);
+        boolean ok = bufferManager.write(br);
         if (ok) {
             say("done");
         } else {
@@ -310,16 +334,9 @@ public class WorkspaceCommands implements Logable {
 
     LinkedList<String> editorClipboard = new LinkedList<>();
 
-    private int _doEdit(InputLine inputLine) {
-        int index = -1;
-        try {
-            index = inputLine.getIntArg(FIRST_ARG_INDEX);
-        } catch (Throwable t) {
-            say("sorry, I didn't understand that");
-            return RC_CONTINUE;
-        }
-        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
-        if (br == null) {
+    private int _doBufferEdit(InputLine inputLine) {
+        BufferManager.BufferRecord br = getBR(inputLine);
+        if (br == null || br.deleted) {
             say("Sorry. No such buffer");
             return RC_CONTINUE;
         }
@@ -330,7 +347,7 @@ public class WorkspaceCommands implements Logable {
             String fName = br.isLink() ? br.link : br.src;
             try {
                 content = bufferManager.readFile(fName);
-            }catch(QDLException q){
+            } catch (QDLException q) {
                 getState().info("no file " + fName + " found, creating new one.");
                 content = new ArrayList<>();
             }
@@ -343,6 +360,7 @@ public class WorkspaceCommands implements Logable {
         try {
             lineEditor.execute();
             br.setContent(lineEditor.getBuffer()); // Just to be sure it is the same.
+            br.edited = true;
         } catch (Throwable t) {
             say("Sorry, there was an issue editing this buffer.");
             getState().warn("Error editing buffer:" + t.getMessage() + " for exception " + t.getClass().getSimpleName());
@@ -351,22 +369,42 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    protected int _doBufferDelete(InputLine inputLine) {
+    protected BufferManager.BufferRecord getBR(InputLine inputLine) {
+        String rawArg = null;
+        if (inputLine.getCommand().equals(EXECUTE_COMMAND)) {
+            // Since this is a shorthand, the input line looks like
+            // ) 2
+            rawArg = inputLine.getArg(ACTION_INDEX);
+        } else {
+            rawArg = inputLine.getArg(FIRST_ARG_INDEX);
+        }
+
         int index = -1;
         try {
-            index = inputLine.getIntArg(FIRST_ARG_INDEX);
-        } catch (Throwable t) {
-            say("sorry, I didn't understand that");
-            return RC_CONTINUE;
+            index = Integer.parseInt(rawArg);
+            return bufferManager.getBufferRecord(index);
+
+        } catch (NumberFormatException t) {
+            // no problem, maybe they used its name
         }
-        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
+        return bufferManager.getBufferRecord(rawArg);
+
+    }
+
+    protected int _doBufferDelete(InputLine inputLine) {
+        BufferManager.BufferRecord br = getBR(inputLine);
+        if (br == null) {
+            say("sorry, I didn't understand that");
+            return RC_NO_OP;
+        }
         if (br.hasContent()) {
-            if ("y".equalsIgnoreCase(readline("buffer has not been saved. Do you still want to remove it?[y/n]"))) {
-                bufferManager.remove(inputLine.getIntArg(FIRST_ARG_INDEX));
-            } else {
+            if (!"y".equalsIgnoreCase(readline("buffer has not been saved. Do you still want to remove it?[y/n]"))) {
                 say("aborted.");
+                return RC_NO_OP;
             }
         }
+        bufferManager.remove(br.src);
+
         return RC_CONTINUE;
     }
 
@@ -396,7 +434,17 @@ public class WorkspaceCommands implements Logable {
     private int mkDir(InputLine inputLine) {
         try {
             String raw = IOEvaluator.MKDIR + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
+            getInterpreter().execute(raw);
+        } catch (Throwable throwable) {
+            say("Error" + (throwable instanceof NullPointerException ? "." : ":" + throwable.getMessage()));
+        }
+        return RC_CONTINUE;
 
+    }
+
+    private int rmDir(InputLine inputLine) {
+        try {
+            String raw = IOEvaluator.RMDIR + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
             getInterpreter().execute(raw);
         } catch (Throwable throwable) {
             say("Error" + (throwable instanceof NullPointerException ? "." : ":" + throwable.getMessage()));
@@ -434,21 +482,24 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doBufferList(InputLine inputLine) {
+        int count = 0;
         for (int i = 0; i < bufferManager.getBufferRecords().size(); i++) {
-            say(formatBufferRecord(i, bufferManager.getBufferRecords().get(i)));
+            BufferManager.BufferRecord br = bufferManager.getBufferRecords().get(i);
+            if (!br.deleted) {
+                count++;
+                say(formatBufferRecord(i, bufferManager.getBufferRecords().get(i)));
+            }
         }
+        say("there are " + count + " active buffers.");
         return RC_CONTINUE;
     }
 
     private int _doBufferShow(InputLine inputLine) {
-        int index = -1;
-        try {
-            index = inputLine.getIntArg(FIRST_ARG_INDEX);
-        } catch (Throwable t) {
-            say("sorry, I didn't understand that");
-            return RC_CONTINUE;
+        BufferManager.BufferRecord br = getBR(inputLine);
+        if (br == null || br.deleted) {
+            say("buffer not found");
+            return RC_NO_OP;
         }
-        BufferManager.BufferRecord br = bufferManager.getBufferRecord(index);
         if (br.hasContent()) {
             for (String x : br.getContent()) {
                 say(x);
@@ -493,6 +544,10 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         String source = inputLine.getArg(FIRST_ARG_INDEX);
+        if (bufferManager.hasBR(source)) {
+            say("sorry but a buffer for " + source + " already exists.");
+            return RC_NO_OP;
+        }
         String target = null;
         if (inputLine.hasArgAt(FIRST_ARG_INDEX + 1)) {
             target = inputLine.getArg(FIRST_ARG_INDEX + 1);
@@ -500,6 +555,15 @@ public class WorkspaceCommands implements Logable {
         int ndx = bufferManager.link(source, target);
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
         say(formatBufferRecord(ndx, br));
+
+        if (inputLine.hasArg("-copy")) {
+            try {
+                copyFile(inputLine);
+                say(inputLine.getArg(FIRST_ARG_INDEX) + " copied to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
+            } catch (Throwable t) {
+                say("could not copy " + inputLine.getArg(FIRST_ARG_INDEX) + "to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
+            }
+        }
         return RC_CONTINUE;
 
     }
@@ -510,102 +574,20 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         String source = inputLine.getArg(FIRST_ARG_INDEX);
+        if (FIRST_ARG_INDEX + 2 <= inputLine.size()) { // +2 because there is the ) command and the action,
+            say("warning: Additional arguments detected. Did you want to create a link instead?");
+            return RC_NO_OP;
+        }
+        if (bufferManager.hasBR(source)) {
+            say("sorry but a buffer for " + source + " already exists.");
+            return RC_NO_OP;
+        }
         int ndx = bufferManager.create(source);
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
         say(formatBufferRecord(ndx, br));
         return RC_CONTINUE;
     }
 
-    /**
-     * This will invoke the line editor. Note that this has the following modes:
-     * <ul>
-     *     <li>)edit (no arg) -- invoke the editor on the local buffer (if that is enabled) or the file (if that is
-     *     enabled. Fail otherwise</li>
-     *     <li>)edit local -- force editing the local buffer</li>
-     *     <li>)edit file [path] -- edit an external file. If none is given, this will attempt to edit the one set by the
-     *     )buffer command.</li>
-     *
-     * </ul>
-     * Note that no )edit commands imply changing the current state of what buffer is being used.
-     *
-     * @param inputLine
-     * @return
-     */
-    private int doEditCommand(InputLine inputLine) {
-        if (!inputLine.hasArgAt(ACTION_INDEX)) {
-            if (useLocalBuffer) {
-                return doEditLocal();
-            } else {
-                return doEditExternal();
-            }
-        }// end case where there is no explicit argument.
-        switch (inputLine.getArg(ACTION_INDEX)) {
-            case "local":
-                // explicit call to edit the local buffer
-                return doEditLocal();
-            case "file":
-                if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-                    // explicit call to edit the external file.
-                    return doEditExternal();
-                }
-                return doEditFile(new File(inputLine.getArg(FIRST_ARG_INDEX)));
-        }
-        return RC_CONTINUE;
-    }
-
-    /**
-     * Edit an external file.
-     *
-     * @param file
-     * @return
-     */
-    private int doEditFile(File file) {
-        try {
-            LineEditor lineEditor = new LineEditor(FileUtil.readFileAsString(file.getAbsolutePath()));
-            lineEditor.execute();
-            // The user has to save their changes in the editor.
-            if (!lineEditor.isSaved()) {
-                String inLine = readline("Did you want to save the buffer? (y/n):");
-                if (inLine.equals("y")) {
-                    FileUtil.writeStringToFile(file.getAbsolutePath(), lineEditor.bufferToString());
-                }
-            }
-
-        } catch (Throwable t) {
-            say("There was a problem editing the external buffer:" + t.getMessage());
-            return RC_CONTINUE;
-        }
-        return RC_CONTINUE;
-    }
-
-    /**
-     * Edits the {@link #externalBuffer} that has been set and issues an error message if it is not set.
-     *
-     * @return
-     */
-    private int doEditExternal() {
-        if (externalBuffer == null) {
-            say("Sorry, there is no external buffer set. You must specify one or invoke the editor with the file name.");
-            return RC_CONTINUE;
-        }
-        return doEditFile(externalBuffer);
-
-    }
-
-    private int doEditLocal() {
-        if (localBuffer == null) {
-            say("New local buffer created.");
-        }
-        LineEditor lineEditor = new LineEditor(localBuffer.toString());
-        try {
-            lineEditor.execute();
-            localBuffer = new StringBuffer();
-            localBuffer.append(lineEditor.bufferToString());
-        } catch (Throwable t) {
-            say("There was an error during editing: " + t.getMessage());
-        }
-        return RC_CONTINUE;
-    }
 
     /**
      * This has several states:
@@ -750,150 +732,6 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    public File getExternalBuffer() {
-        return externalBuffer;
-    }
-
-    File externalBuffer;
-
-    public StringBuffer getLocalBuffer() {
-        return localBuffer;
-    }
-
-    StringBuffer localBuffer = new StringBuffer();
-
-    /**
-     * This has a few options.<br/><br/>
-     * )buffer local on|off|clear|save|load|append|show -- turn on or off local buffering<br/>
-     * )buffer file path -- sets an external file as the buffer<br/><br/>
-     *
-     * @param inputLine
-     * @return
-     */
-    private int doBufferCommand(InputLine inputLine) {
-        if (!inputLine.hasArgAt(ACTION_INDEX)) {
-            say("You must specify an action for this command. Options are local or file.");
-            return RC_CONTINUE;
-        }
-        switch (inputLine.getArg(ACTION_INDEX)) {
-            case "local":
-                return doLocalBuffer(inputLine);
-            case "file":
-                return doFileBuffer(inputLine);
-        }
-        say("Unrecognized buffer command.");
-        return RC_CONTINUE;
-    }
-
-    private int doFileBuffer(InputLine inputLine) {
-        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            say("You must supply a file name.");
-        } else {
-            externalBuffer = new File(inputLine.getArg(FIRST_ARG_INDEX));
-            say("Buffer set to \"" + externalBuffer.getAbsolutePath() + (externalBuffer.exists() ? "." : ". Warning -- it does not exist."));
-        }
-        useLocalBuffer = false;
-        return RC_CONTINUE;
-    }
-
-    boolean useLocalBuffer = true; // default at startup so )edit command just works
-
-    private int doLocalBuffer(InputLine inputLine) {
-
-        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            say("Unknown buffer command.");
-            return RC_CONTINUE;
-        }
-        switch (inputLine.getArg(FIRST_ARG_INDEX)) {
-            case "clear":
-                localBuffer = new StringBuffer();
-                say("Local buffer cleared");
-                return RC_CONTINUE;
-            case "off":
-                useLocalBuffer = false;
-                say("Local buffer disabled.");
-                return RC_CONTINUE;
-            case "on":
-                useLocalBuffer = true;
-                say("Local buffer enabled.");
-                return RC_CONTINUE;
-            case "prepend":
-                if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
-                    say("You must supply a file name for this operation.");
-                    return RC_CONTINUE;
-                }
-                StringBuffer tempSB = new StringBuffer();
-                try {
-                    tempSB.append(FileUtil.readFileAsString(inputLine.getArg(1 + FIRST_ARG_INDEX)));
-                    tempSB.append("\n" + localBuffer.toString());
-                    localBuffer = tempSB;
-                    say("Buffer updated.");
-                } catch (Throwable t) {
-                    say("Sorry, could not read the file \"" + inputLine.getArg(1 + FIRST_ARG_INDEX) + "\":" + t.getMessage());
-                    break;
-                }
-                useLocalBuffer = true;
-                return RC_CONTINUE;
-            case "show":
-                if (localBuffer == null || localBuffer.length() == 0) {
-                    say("(empty)");
-                } else {
-                    say(localBuffer.toString());
-                }
-                return RC_CONTINUE;
-            case "save":
-                return doBufferSave(inputLine);
-            case "load":
-                // case falls through!!
-                localBuffer = new StringBuffer();
-            case "append":
-                if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
-                    say("You must supply a file name for this operation.");
-                    return RC_CONTINUE;
-                }
-                try {
-                    localBuffer.append(FileUtil.readFileAsString(inputLine.getArg(1 + FIRST_ARG_INDEX)));
-                    say("Buffer updated.");
-                } catch (Throwable t) {
-                    say("Sorry, could not read the file \"" + inputLine.getArg(1 + FIRST_ARG_INDEX) + "\":" + t.getMessage());
-                    break;
-                }
-                useLocalBuffer = true;
-                return RC_CONTINUE;
-
-
-        }
-        say("say unknown buffer command.");
-        return RC_CONTINUE;
-    }
-
-    private int doBufferSave(InputLine inputLine) {
-        if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
-            say("Sorry, you need to supply a file path to save the local buffer.");
-            return RC_CONTINUE;
-        }
-        File targetFile = resolveAgainstRoot(inputLine.getArg(1 + FIRST_ARG_INDEX));
-        if (targetFile.exists()) {
-            if (!targetFile.isFile()) {
-                say("Sorry, but \"" + targetFile.getAbsolutePath() + "\" is not a file and cannot be overwritten. Aborting...");
-                return RC_CONTINUE;
-            }
-            if (!readline("\"" + targetFile.getAbsolutePath() + "\" exists. Do you want to overwrite it? (y/n):").equals("y")) {
-                say("aborting...");
-                return RC_CONTINUE;
-            }
-        }
-        try {
-            if (localBuffer == null) {
-                say("Sorry, the buffer is empty. There is nothing to save.");
-            } else {
-                FileUtil.writeStringToFile(targetFile.getAbsolutePath(), localBuffer.toString());
-            }
-        } catch (Throwable t) {
-            say("Sorry, there was a problem saving the buffer \"" + targetFile.getAbsolutePath() + "\": " + t.getMessage());
-        }
-        return RC_CONTINUE;
-    }
 
     /**
      * Optional list argument. Print out the current modules the system knows about

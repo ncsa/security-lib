@@ -147,4 +147,12 @@ public interface VFSFileProvider extends Serializable {
      * @throws Throwable
      */
     void rm(String path) throws Throwable;
+
+    /**
+     * If this store supports extended attributes.
+     * @return
+     */
+    boolean easSupported();
+
+
 }

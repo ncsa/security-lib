@@ -2,12 +2,10 @@ package edu.uiuc.ncsa.qdl.workspace;
 
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.io.IOException;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
@@ -102,33 +100,6 @@ public class QDLWorkspace {
             boolean prettyPrint = workspaceCommands.isPrettyPrint();
 
             try {
-                // Turn off echo mode if running a buffer or very strange things can result
-                if (executeLocalBuffer) {
-                    if (workspaceCommands.getLocalBuffer() != null) {
-                        workspaceCommands.setEchoModeOn(false);
-                        workspaceCommands.getInterpreter().execute(workspaceCommands.getLocalBuffer().toString());
-                        workspaceCommands.setEchoModeOn(echoMode);
-                        continue;
-                    }
-                }
-                if (executeExternalFile) {
-                    if (workspaceCommands.getExternalBuffer() != null) {
-                        try {
-                            String xb = FileUtil.readFileAsString(workspaceCommands.getExternalBuffer().getAbsolutePath());
-                            workspaceCommands.setEchoModeOn(false);
-                            workspaceCommands.getInterpreter().execute(xb);
-                            workspaceCommands.setEchoModeOn(echoMode);
-                            workspaceCommands.setPrettyPrint(prettyPrint);
-
-                        } catch (IOException t) {
-                            workspaceCommands.say("There was an error executing \"" + workspaceCommands.getExternalBuffer().getAbsolutePath() + "\"");
-                            workspaceCommands.setEchoModeOn(echoMode);
-                            workspaceCommands.setPrettyPrint(prettyPrint);
-
-                        }
-                    }
-                    continue;
-                }
                 if (input != null && !input.isEmpty()) {
                     // if you try to evaluate only a ";" then you will get a syntax exception from
                     // the parser for an empty statement.

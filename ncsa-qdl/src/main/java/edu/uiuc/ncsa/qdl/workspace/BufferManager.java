@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -20,13 +21,15 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 4/27/20 at  6:47 AM
  */
-public class BufferManager {
+public class BufferManager implements Serializable {
 
     LinkedList<String> clipboard = new LinkedList<>();
 
     public static class BufferRecord {
         String src;
         String link;
+        boolean edited = false;
+        boolean deleted = false;
 
         public List<String> getContent() {
             return content;
@@ -37,11 +40,11 @@ public class BufferManager {
         }
 
         List<String> content = null;
-        public boolean isContentNull(){
-            return content == null;
-        }
-        public boolean hasContent() {
 
+        public boolean hasContent() {
+            if (content == null) {
+                return false;
+            }
             return !content.isEmpty();
         }
 
@@ -91,7 +94,11 @@ public class BufferManager {
         if (bufferRecords.isEmpty()) return false;
         if (index < 0 || bufferRecords.size() < index) return false;
         return true;
+    }
 
+    public boolean hasBR(String name) {
+        if (bufferRecords.isEmpty()) return false;
+        return brMap.containsKey(name);
     }
 
     public int create(String source) {
@@ -111,13 +118,27 @@ public class BufferManager {
         return bufferRecords.size() - 1;
     }
 
-    public boolean remove(int index) {
-        if (!hasBR(index)) {
+    protected int getIndex(BufferRecord br) {
+        for (int i = 0; i < bufferRecords.size(); i++) {
+            if (bufferRecords.get(i) == br) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public boolean remove(String name) {
+        if (!hasBR(name)) {
             return false;
         }
-        BufferRecord br = bufferRecords.get(index);
-        bufferRecords.remove(index);
+        BufferRecord br = brMap.get(name);
+        // We don't actually remove the record since we do not want indices to change.
+        // If they recreate it later, they will get a different index. Best we can do...
+        
+        br.deleted = true;
         brMap.remove(br.src);
+        br.src = null;
+        br.link = null;
         return true;
     }
 
@@ -147,28 +168,15 @@ public class BufferManager {
         if (currentBR == null) {
             return null;
         }
-        String f = useSource ? currentBR.src:currentBR.link;
+        String f = useSource ? currentBR.src : currentBR.link;
         return readFile(f);
     }
 
 
-    public boolean write(int index) {
-        BufferRecord currentBR = getBufferRecord(index);
+    public boolean write(BufferRecord currentBR) {
+        //BufferRecord currentBR = getBufferRecord(index);
         if (currentBR == null) {
             return false;
-        }
-        if (!currentBR.isContentNull()) {
-            Polyad request = new Polyad(IOEvaluator.WRITE_FILE);
-            StemVariable stemVariable = new StemVariable();
-            List<Object> castList = new LinkedList<>();
-            castList.addAll(currentBR.getContent());
-            stemVariable.addList(castList);
-            request.addArgument(new ConstantNode(currentBR.src, Constant.STRING_TYPE));
-            request.addArgument(new ConstantNode(stemVariable, Constant.STEM_TYPE));
-            request.addArgument(new ConstantNode(Boolean.FALSE, Constant.BOOLEAN_TYPE)); // or its will be treated as binary
-            getState().getMetaEvaluator().evaluate(request, getState());
-            currentBR.setContent(null); // flush the buffer.
-            return true;
         }
         if (currentBR.isLink()) {
             // so this is a link but there is nothing in the buffer
@@ -180,9 +188,24 @@ public class BufferManager {
                 parser.setEchoModeOn(false);// no output
                 parser.execute(raw);
             } catch (Throwable throwable) {
-                getState().getLogger().warn("could not write file",throwable);
+                getState().getLogger().warn("could not write file", throwable);
                 return false;
             }
+            return true;
+        }
+
+        if (currentBR.edited) {
+            Polyad request = new Polyad(IOEvaluator.WRITE_FILE);
+            StemVariable stemVariable = new StemVariable();
+            List<Object> castList = new LinkedList<>();
+            castList.addAll(currentBR.getContent());
+            stemVariable.addList(castList);
+            request.addArgument(new ConstantNode(currentBR.src, Constant.STRING_TYPE));
+            request.addArgument(new ConstantNode(stemVariable, Constant.STEM_TYPE));
+            request.addArgument(new ConstantNode(Boolean.FALSE, Constant.BOOLEAN_TYPE)); // or its will be treated as binary
+            getState().getMetaEvaluator().evaluate(request, getState());
+            currentBR.setContent(null); // flush the buffer.
+            currentBR.edited = false;
             return true;
         }
         return false;

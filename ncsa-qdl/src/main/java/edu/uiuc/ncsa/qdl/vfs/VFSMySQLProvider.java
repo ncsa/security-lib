@@ -78,12 +78,22 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
         String relPath = VFSPaths.relativize(getStoreRoot(), normalize(path));
         relPath = relPath + (relPath.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
         relPath = VFSPaths.getUnqPath(relPath);
+        if(relPath.equalsIgnoreCase("../")){
+            relPath = PATH_SEPARATOR;
+        }
         boolean isRoot = relPath.equals(PATH_SEPARATOR);
-        List<String> output = db.selectByPath(PATH_SEPARATOR + relPath);
-        if (output.size() == 0) {
+        // next line -- relPath always ends with a /, so if the user is asking for the root
+        //  we don't want to search for // (which will return an empty set and nothing gets looked
+        // for later as subdirectories. 
+        List<String> output = db.selectByPath(PATH_SEPARATOR + (relPath.equals(PATH_SEPARATOR)?"":relPath));
+    //    if(!isRoot){
+            output.remove(""); // There is always exactly one of these in the result.
+      //  }
+        if (!isRoot && output.size() == 0) {
             // nothing in this directory
             return new String[0];
         }
+
         List<String> distinctPaths = db.getDistinctPaths();
         String[] components = VFSPaths.toPathComponents(relPath);
         for (String key : distinctPaths) {
@@ -98,14 +108,7 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
                 }
             }
         }
-        String[] fileList = new String[output.size()];
-        int i = 0;
-
-        for (String x : output) {
-            if (!x.isEmpty()) {
-                fileList[i++] = x;
-            }
-        }
+        String[] fileList = output.toArray(new String[0]);
 
         return fileList;
 
@@ -128,7 +131,7 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
         }
 
 
-        String[] components = VFSPaths.toPathComponents(path);
+        String[] components = VFSPaths.toPathComponents(realpath);
         String startPath = PATH_SEPARATOR;
         String[] newPath = new String[]{startPath, ""};
 
@@ -167,6 +170,7 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
             return false; // The key always turns the last component in to the file name, so this check if a file is already there.
         }
         List<String> output = db.selectByPath( realpath);
+        output.remove(""); // marker for being a directory.
         if(0 < output.size()){
             // then this is a directory and has entries in it, so no go
             //throw new QDLIOException("Error: The directory \"" + path + "\" is not empty.");
@@ -183,5 +187,10 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
     public void rm(String path) throws Throwable {
         super.rm(path);
         db.remove(getPrimaryKey(path));
+    }
+
+    @Override
+    public boolean easSupported() {
+        return true;
     }
 }

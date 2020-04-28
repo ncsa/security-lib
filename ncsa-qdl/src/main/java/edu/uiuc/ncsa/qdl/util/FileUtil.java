@@ -95,7 +95,7 @@ public class FileUtil {
     public static void writeStemToFile(String filename, StemVariable contents) throws Throwable {
         FileWriter fileWriter = new FileWriter(new File(filename));
         StringBuilder stringBuilder = new StringBuilder();
-        if (!contents.containsKey("0")) {
+        if (!contents.containsKey("0") && !contents.isEmpty()) {
             throw new IllegalArgumentException("Error: The given stem is not a list. It must be a list to use this function.");
         }
         for (int i = 0; i < contents.size(); i++) {

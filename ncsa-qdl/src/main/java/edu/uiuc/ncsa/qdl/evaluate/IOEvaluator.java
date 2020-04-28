@@ -608,12 +608,14 @@ public class IOEvaluator extends MathEvaluator {
                     StemVariable contents = (StemVariable) obj2;
 
                     xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
-                    if (!contents.containsKey("0")) {
+                    // allow for writing empty files. Edge case but happens.
+                    if (!contents.containsKey("0") && !contents.isEmpty()) {
                         throw new IllegalArgumentException("Error: The given stem is not a list. It must be a list to use this function.");
                     }
                     for (int i = 0; i < contents.size(); i++) {
                         lines.add(contents.getString(Integer.toString(i)));
                     }
+
                     didIt = true;
 
                 }
@@ -636,7 +638,7 @@ public class IOEvaluator extends MathEvaluator {
             } catch (Throwable t) {
                 throw new QDLException("Error: Could not write file to store." + t.getMessage());
             }
-        }else{
+        } else {
             try {
                 if (isStem(obj2)) {
                     FileUtil.writeStemToFile(fileName, (StemVariable) obj2);

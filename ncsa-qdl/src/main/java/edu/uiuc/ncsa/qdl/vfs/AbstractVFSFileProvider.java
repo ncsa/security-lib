@@ -283,6 +283,11 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
             throw new QDLIOException("Error: You do not have permissions to remove this file in the virtual file system");
         }
         checkPath(path);
+    }
 
+
+    @Override
+    public boolean easSupported() {
+        return false;
     }
 }
