@@ -130,11 +130,11 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     protected BigDecimal toBD(Object obj) {
-        if (!isNumber(obj)) throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
+        if (!isNumber(obj)) throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
         if (obj instanceof BigDecimal) return (BigDecimal) obj;
         if (obj instanceof Long) return new BigDecimal((Long) obj);
         if (obj instanceof Integer) return new BigDecimal((Integer) obj);
-        throw new IllegalArgumentException("Error: \"" + obj + "\" is not a number");
+        throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
     }
 
     protected StemVariable toStem(Object object) {
@@ -382,7 +382,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     protected VFSEntry resolveResourceToFile(String resourceName, State state) {
         if (state.isVFSFile(resourceName)) {
             if (!state.hasVFSProviders()) {
-                throw new QDLException("Error: unkonwn virtual file system for resource \"" + resourceName + "\"");
+                throw new QDLException("Error: unkonwn virtual file system for resource '" + resourceName + "'");
             }
             try {
                 return state.getFileFromVFS(resourceName);

@@ -13,18 +13,21 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLCodec;
-import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.*;
+import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.io.File;
 import java.io.FileReader;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
 /**
  * For control structure in loops, conditionals etc.
@@ -97,14 +100,26 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     // For external programs
 
-    public static final String RUN_COMMAND = "run_script";
+    public static final String RUN_COMMAND = "script_run";
     public static final String FQ_RUN_COMMAND = SYS_FQ + RUN_COMMAND;
     public static final int RUN_COMMAND_TYPE = 400 + CONTROL_BASE_VALUE;
 
-    public static final String LOAD_COMMAND = "load_script";
+    public static final String LOAD_COMMAND = "script_load";
     public static final String FQ_LOAD_COMMAND = SYS_FQ + LOAD_COMMAND;
     public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
+
+    public static final String SCRIPT_ARGS_COMMAND = "script_args";
+    public static final String FQ_SCRIPT_ARGS_COMMAND = SYS_FQ + SCRIPT_ARGS_COMMAND;
+    public static final int SCRIPT_ARGS_COMMAND_TYPE = 402 + CONTROL_BASE_VALUE;
+
+    public static final String SCRIPT_PATH_COMMAND = "script_path";
+    public static final String FQ_SCRIPT_PATH_COMMAND = SYS_FQ + SCRIPT_PATH_COMMAND;
+    public static final int SCRIPT_PATH_COMMAND_TYPE = 403 + CONTROL_BASE_VALUE;
+
+
     public static String FUNC_NAMES[] = new String[]{
+            SCRIPT_PATH_COMMAND,
+            SCRIPT_ARGS_COMMAND,
             SYS_INFO,
             OS_ENV,
             CONSTANTS,
@@ -121,6 +136,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             LOAD_COMMAND};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
+            FQ_SCRIPT_PATH_COMMAND,
+            FQ_SCRIPT_ARGS_COMMAND,
             FQ_SYS_INFO,
             FQ_OS_ENV,
             FQ_CONSTANTS,
@@ -153,6 +170,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case SCRIPT_PATH_COMMAND:
+            case FQ_SCRIPT_PATH_COMMAND:
+                return SCRIPT_PATH_COMMAND_TYPE;
+            case SCRIPT_ARGS_COMMAND:
+            case FQ_SCRIPT_ARGS_COMMAND:
+                return SCRIPT_ARGS_COMMAND_TYPE;
             case OS_ENV:
             case FQ_OS_ENV:
                 return OS_ENV_TYPE;
@@ -208,6 +231,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         // does is mark them as built in functions.
 
         switch (polyad.getName()) {
+            case SCRIPT_PATH_COMMAND:
+            case FQ_SCRIPT_PATH_COMMAND:
+                doScriptPaths(polyad, state);
+                return true;
+            case SCRIPT_ARGS_COMMAND:
+            case FQ_SCRIPT_ARGS_COMMAND:
+                doScriptArgs(polyad, state);
+                return true;
             case BREAK:
             case FQ_BREAK:
                 polyad.setEvaluated(true);
@@ -265,6 +296,102 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+    /**
+     * This accepts either a stem of paths or a single string that is parsed.
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doScriptPaths(Polyad polyad, State state) {
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.STEM_TYPE);
+            StemVariable stemVariable = new StemVariable();
+            if (state.getScriptPaths().isEmpty()) {
+                polyad.setResult(stemVariable);
+                return;
+            }
+            ArrayList<Object> sp = new ArrayList<>();
+            sp.addAll(state.getScriptPaths());
+            stemVariable.addList(sp);
+            polyad.setResult(stemVariable);
+            return;
+        }
+        if (polyad.getArgumments().size() == 1) {
+            Object obj = polyad.evalArg(0, state);
+            if (isString(obj)) {
+                state.setScriptPaths(obj.toString());
+                polyad.setEvaluated(true);
+                polyad.setResult(Boolean.TRUE);
+                polyad.setResultType(Constant.BOOLEAN_TYPE);
+                return;
+            }
+            if (!isStem(obj)) {
+                throw new IllegalArgumentException("Error: " + SCRIPT_PATH_COMMAND + " requires a stem as its argument.");
+            }
+            StemVariable stemVariable = (StemVariable) obj;
+            // now we have to turn it in to list, tending to the semantics.
+            StemList stemList = stemVariable.getStemList();
+            List<String> sp = new ArrayList<>();
+            for (int i = 0; i < stemList.size(); i++) {
+                Object entry = stemList.get(i);
+                if (entry != null && !(entry instanceof QDLNull)) {
+                    String newPath = entry.toString();
+                    newPath = newPath + (newPath.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
+                    sp.add(newPath);
+                }
+            }
+            state.setScriptPaths(sp);
+            polyad.setEvaluated(true);
+            polyad.setResult(Boolean.TRUE);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            return;
+        }
+        throw new IllegalArgumentException("Error: " + SCRIPT_PATH_COMMAND + " requires at most one argument, not " + polyad.getArgumments().size());
+
+    }
+
+    /**
+     * This will return a given script arg for a given index. No arg returns then number of arguments;
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doScriptArgs(Polyad polyad, State state) {
+
+        if (polyad.getArgumments().size() == 0) {
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setResult(state.hasScriptArgs() ? new Long(state.getScriptArgs().length) : 0L);
+            return;
+        }
+        if (polyad.getArgumments().size() == 1) {
+            Object obj = polyad.evalArg(0, state);
+            if (!state.hasScriptArgs()) {
+                throw new IllegalArgumentException("Error: index out of bounds for " + SCRIPT_ARGS_COMMAND + "-- no arguments found.");
+
+            }
+            if (!isLong(obj)) {
+                throw new IllegalArgumentException("Error: " + SCRIPT_ARGS_COMMAND + " requires an integer argument.");
+            }
+            int index = ((Long) obj).intValue();
+            if (index < 0) {
+                throw new IllegalArgumentException("Error: " + SCRIPT_ARGS_COMMAND + " requires a non-negative integer argument.");
+            }
+            if (state.getScriptArgs().length <= index) {
+                throw new IllegalArgumentException("Error: index out of bounds for " + SCRIPT_ARGS_COMMAND);
+            }
+
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setResult(state.getScriptArgs()[index]);
+            return;
+
+        }
+        throw new IllegalArgumentException("Error: " + SCRIPT_ARGS_COMMAND + " requires zero or one argument");
+
+    }
+
 
     // Contract is
     // no arg -- return all as stemm
@@ -318,41 +445,41 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doSysInfo(Polyad polyad, State state) {
-        getConst(polyad,state,state.getSystemInfo());
+        getConst(polyad, state, state.getSystemInfo());
     }
 
     protected void doConstants(Polyad polyad, State state) {
-        getConst(polyad,state,state.getSystemConstants());
+        getConst(polyad, state, state.getSystemConstants());
     }
 
-    protected void getConst(Polyad polyad, State state, StemVariable values){
+    protected void getConst(Polyad polyad, State state, StemVariable values) {
         if (polyad.getArgumments().size() == 0) {
             polyad.setEvaluated(true);
             polyad.setResult(values);
             polyad.setResultType(Constant.STEM_TYPE);
             return;
         }
-        Object obj = polyad.evalArg(0,state);
-        if(!isString(obj)){
+        Object obj = polyad.evalArg(0, state);
+        if (!isString(obj)) {
             throw new IllegalArgumentException("Error: This requires a string as its argument.");
         }
         // A little trickery here. The multi-index is assumed to be of the form
         // stem.index0.index1....  so it will parse the first component as the name of the
         // variable. Since the variable here is un-named, we put in a dummy value of sys. for it which is ignored.
-        StemMultiIndex multiIndex = new StemMultiIndex("sys."+obj.toString());
+        StemMultiIndex multiIndex = new StemMultiIndex("sys." + obj.toString());
         Object rc = null;
-        try{
+        try {
             rc = values.get(multiIndex);
 
-        }catch(IndexError ie){
+        } catch (IndexError ie) {
             // The user requested a non-existent property. Don't blow up, just return an empty string.
         }
         polyad.setEvaluated(true);
 
-        if(rc == null){
+        if (rc == null) {
             polyad.setResult("");
             polyad.setResultType(Constant.STRING_TYPE);
-        }else{
+        } else {
             polyad.setResult(rc);
             polyad.setResultType(Constant.getType(rc));
         }
@@ -373,9 +500,104 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    /**
+     * This will use the path information and try to resolve the script based on that.
+     * Contract is
+     * <ol>
+     *     <li>name start with a # ==> this is a file. If server mode, fail. if abs, do it, if rel resolve against file path</li>
+     *     <li>name is scheme qualified: if absolute, just get it, if relative, resolve against same scheme</li>
+     *     <li>no qualification: if absolute path and server mode, fail, if relative, try against each path  </li>
+     * </ol>
+     * <b>NOTE</b> First resolution wins.
+     *
+     * @param name
+     * @param state
+     * @return
+     */
+    protected QDLScript resolveScript(String name, State state) throws Throwable {
+        /*
+               path.1 := 'vfs#/mysql/init2'; path.0 := 'vfs#/mysql'; path.2 := 'vfs#/pt/';script_paths(path.);
+               run_script('temp/hw.qdl')
+         */
+        // case 1. This starts with a # so they want to force getting a regular file
+        if (name.startsWith(SCHEME_DELIMITER)) {
+            if (state.isServerMode()) {
+                throw new IllegalArgumentException("Error: File access forbidden in server mode.");
+            }
+            name = name.substring(1);
+            File file = new File(name);
+            if (file.isAbsolute()) {
+                return new QDLScript(FileUtil.readFileAsLines(name), null);
+            }
+            // so its relative.
+            for (String p : state.getScriptPaths()) {
+                if (!p.contains(SCHEME_DELIMITER)) {
+                    File test = new File(p, name);
+                    if (test.exists() && test.isFile() && test.canRead()) {
+                        return new QDLScript(FileUtil.readFileAsLines(test.getCanonicalPath()), null);
+                    }
+                }
+            }
+            return null;
+        }
+        // case 2: Scheme qualified.
+        if (name.contains(SCHEME_DELIMITER)) {
+            String tempName = name.substring(1 + name.indexOf(SCHEME_DELIMITER));
+            File testFile = new File(tempName);
+            if (testFile.isAbsolute()) {
+                if (state.hasVFSProviders()) {
+                    return state.getScriptFromVFS(name);
+                }
+            }
+            String caput = name.substring(0, name.indexOf(SCHEME_DELIMITER));
+            for (String p : state.getScriptPaths()) {
+                if (p.startsWith(caput)) {
+                    DebugUtil.trace(this, " trying path = " + p + tempName);
+
+                    QDLScript q = state.getScriptFromVFS(p + tempName);
+                    if (q != null) {
+                        DebugUtil.trace(this, " got path = " + p + tempName);
+
+                        return q;
+                    }
+                }
+            }
+
+        } else {
+            // case 3: No qualifications, just a string. Try everything.
+            File testFile = new File(name);
+            if (testFile.isAbsolute()) {
+                if (state.isServerMode()) {
+                    throw new IllegalArgumentException("Error: File access forbidden in server mode.");
+                } else {
+                    return new QDLScript(FileUtil.readFileAsLines(name), null);
+                }
+            }
+            for (String p : state.getScriptPaths()) {
+                String resourceName = p + name;
+                DebugUtil.trace(this, " path = " + resourceName);
+                if (state.isVFSFile(resourceName)) {
+                    if (state.isVFSFile(resourceName)) {
+                        if (state.hasVFSProviders()) {
+                            QDLScript script = state.getScriptFromVFS(resourceName);
+                            if (script != null) {
+                                return script;
+                            }
+                        }
+                    }
+                } else {
+                    if (testFile.exists() && testFile.isFile() && testFile.canRead()) {
+                        return new QDLScript(FileUtil.readFileAsLines(testFile.getCanonicalPath()), null);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     protected void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
         if (polyad.getArgumments().size() == 0) {
-            throw new IllegalArgumentException("Error: The" + commandName + " requires at least a single argument");
+            throw new IllegalArgumentException("Error: The " + commandName + " requires at least a single argument");
         }
         State localState = state;
         if (hasNewState) {
@@ -383,33 +605,52 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg1 = polyad.evalArg(0, state);
+        String[] argList = new String[0];
+        if (polyad.getArgumments().size() == 2) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (isStem(arg2)) {
+                StemList stemList = ((StemVariable) arg2).getStemList();
+                ArrayList<String> aa = new ArrayList<>();
+                for (int i = 0; i < stemList.size(); i++) {
+                    Object object = stemList.get(i);
+                    if (object != null && !(object instanceof QDLNull)) {
+                        aa.add(object.toString());
+                    }
+                }
+                argList = aa.toArray(new String[0]);
+            }
+        }
+        // try {
+        String resourceName = arg1.toString();
+        QDLScript script = null;
         try {
-            QDLParser interpreter = new QDLParser(localState);
-            String resourceName = arg1.toString();
-            QDLScript script = null;
-            if (state.isVFSFile(resourceName)) {
-                if (state.hasVFSProviders()) {
-                    script = state.getScriptFromVFS(resourceName);
-                }
-            }
-            if (script != null) {
-                script.execute(state);
-            } else {
-                if (state.isServerMode()) {
-                    throw new QDLServerModeException("File operations are not permitted in server mode");
-                }
-                interpreter.execute(FileUtil.readFileAsString(resourceName));
-            }
-            polyad.setEvaluated(true);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
-            polyad.setResult(Boolean.TRUE);
-
+            script = resolveScript(resourceName, state);
         } catch (Throwable t) {
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }
-            throw new QDLRuntimeException("Error running script \"" + arg1 + "\"", t);
+            throw new QDLRuntimeException("Error resolving script '" + resourceName + "'. Is your script path set?", t);
         }
+        if (script == null) {
+            throw new QDLRuntimeException("Error: Could not find the script '" + resourceName + "'. Is your script path set?");
+        } else {
+            try {
+                String[] oldArgs = localState.getScriptArgs();
+                localState.setScriptArgs(argList);
+                script.execute(localState);
+                localState.setScriptArgs(oldArgs);
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
+                }
+                throw new QDLRuntimeException("Error running script '" + arg1 + "'", t);
+            }
+        }
+        polyad.setEvaluated(true);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setResult(Boolean.TRUE);
+
+
     }
 
     protected void doRaiseError(Polyad polyad, State state) {
@@ -484,7 +725,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         Object arg = polyad.evalArg(0, state);
 
         if (!isString(arg)) {
-            throw new IllegalArgumentException("Error: The " + LOAD_MODULE + " command requires a string as its argument, not \"" + arg + "\"");
+            throw new IllegalArgumentException("Error: The " + LOAD_MODULE + " command requires a string as its argument, not '" + arg + "'");
         }
         String resourceName = arg.toString();
         if (loadTarget == LOAD_JAVA) {
@@ -519,14 +760,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (script == null) {
             file = new File(resourceName);
             if (!file.exists()) {
-                throw new IllegalArgumentException("Error: file, \"" + arg + "\" does not exist");
+                throw new IllegalArgumentException("Error: file, '" + arg + "' does not exist");
             }
             if (!file.isFile()) {
-                throw new IllegalArgumentException("Error: \"" + arg + "\" is not a file");
+                throw new IllegalArgumentException("Error: '" + arg + "' is not a file");
             }
 
             if (!file.canRead()) {
-                throw new IllegalArgumentException("Error: You do not have permission to read \"" + arg + "\".");
+                throw new IllegalArgumentException("Error: You do not have permission to read '" + arg + "'.");
             }
 
         }
@@ -585,7 +826,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         Module m = state.getModuleMap().get(moduleNS);
 
         if (m == null) {
-            throw new IllegalStateException("Error: no such module \"" + moduleNS + "\"");
+            throw new IllegalStateException("Error: no such module '" + moduleNS + "'");
         }
         String alias = null;
         Module newInstance = m.newInstance(state.newModuleState());

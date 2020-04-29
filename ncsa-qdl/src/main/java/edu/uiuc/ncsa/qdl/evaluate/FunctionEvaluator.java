@@ -119,7 +119,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
         FunctionRecord functionRecord = frs.functionRecord;
         if (functionRecord == null) {
-            throw new UndefinedFunctionException("Error: the function \"" + polyad.getName() + "\" with "
+            throw new UndefinedFunctionException("Error: the function '" + polyad.getName() + "' with "
                     + polyad.getArgumments().size() + " arguments was not found.");
         }
         State localState = (State) frs.state.newStateWithImports();

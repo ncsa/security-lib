@@ -5,13 +5,12 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This helps us organize the functionality of the state object. There are
@@ -202,4 +201,47 @@ public abstract class AbstractState implements StateInterface, Logable {
             logger.error(x);
         }
     }
+
+    protected String[] scriptArgs = null;
+
+    public boolean hasScriptArgs() {
+        return scriptArgs != null;
+    }
+
+    /**
+     * Command line arguments if this is being run in script mode.
+     *
+     * @return
+     */
+    public String[] getScriptArgs() {
+        return scriptArgs;
+    }
+
+    public void setScriptArgs(String[] scriptArgs) {
+        this.scriptArgs = scriptArgs;
+    }
+
+    public List<String> getScriptPaths() {
+        return scriptPaths;
+    }
+
+    /**
+     * Sets the script path from a string like path0:path1:path2. Each path in normalized form ends with a /.
+     * @param rawPath
+     */
+    public void setScriptPaths(String rawPath) {
+        scriptPaths = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(rawPath, ":");
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            token = token + (token.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
+            scriptPaths.add(token);
+        }
+    }
+
+    public void setScriptPaths(List<String> scriptPaths) {
+        this.scriptPaths = scriptPaths;
+    }
+
+    List<String> scriptPaths = new ArrayList<>();
 }

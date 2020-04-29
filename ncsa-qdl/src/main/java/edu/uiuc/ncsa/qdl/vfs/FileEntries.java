@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
@@ -126,6 +127,10 @@ public class FileEntries {
     }
 
     public static boolean isBinary(File f) throws IOException {
+        if(f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)){
+            // Make sure QDL knows its own files are not binary!
+            return false;
+        }
         String ftype = Files.probeContentType(f.toPath());
         if (ftype == null) return true; // just in case
         if (ftype.startsWith("text") ||

@@ -283,16 +283,16 @@ public class WorkspaceCommands implements Logable {
                 say("no such file or buffer");
                 return RC_NO_OP;
             }
-        }else{
+        } else {
             if (br.hasContent()) {
-                  content = br.getContent();
-              } else {
-                  if (br.isLink()) {
-                      content = bufferManager.readFile(br.link);
-                  } else {
-                      content = bufferManager.readFile(br.src);
-                  }
-              }
+                content = br.getContent();
+            } else {
+                if (br.isLink()) {
+                    content = bufferManager.readFile(br.link);
+                } else {
+                    content = bufferManager.readFile(br.src);
+                }
+            }
         }
 
         boolean origEchoMode = getInterpreter().isEchoModeOn();
@@ -1326,6 +1326,7 @@ public class WorkspaceCommands implements Logable {
     public static final String CLA_NO_BANNER = "-noBanner";
     public static final String CLA_DEBUG_ON = "-debug";
     public static final String CLA_RUN_SCRIPT_ON = "-run";
+    public static final String CLA_SCRIPT_PATH = "-script_path";
 
     protected File resolveAgainstRoot(String file) {
         File f = new File(file);
@@ -1361,8 +1362,10 @@ public class WorkspaceCommands implements Logable {
         setEchoModeOn(qe.isEchoModeOn());
         setPrettyPrint(qe.isPrettyPrint());
         isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
+
         if (isRunScript) {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
+
         }
         boolean isVerbose = qe.isWSVerboseOn();
         showBanner = qe.isShowBanner();
@@ -1451,8 +1454,9 @@ public class WorkspaceCommands implements Logable {
         interpreter = new QDLParser(env, getState());
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         interpreter.setPrettyPrint(qe.isPrettyPrint());
-        //   interpreter.setDebugOn(true);
-        runScript(); // run any script if that mode is enabled.
+        getState().setScriptPaths(qe.getScriptPath());
+
+        runScript(inputLine); // run any script if that mode is enabled.
 
     }
 
@@ -1597,12 +1601,33 @@ public class WorkspaceCommands implements Logable {
                 say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
             }
         }
-
-        runScript(); // If there is a script, run it.
+        if(inputLine.hasArg(CLA_SCRIPT_PATH)) {
+            getState().setScriptPaths(inputLine.getNextArgFor(CLA_SCRIPT_PATH));
+        }
+        runScript(inputLine); // If there is a script, run it.
     }
 
-    private void runScript() {
+    private void runScript(InputLine inputLine) {
         if (isRunScript) {
+
+            // get the args for the script
+            // contract is that there is the -run file x y z ...
+            // so x,y,z,... are passed tot the script.
+            ArrayList<String> argList = new ArrayList<>();
+
+            boolean addArg = false;
+            for (int i = 0; i < inputLine.size(); i++) {
+                if (addArg) {
+                    argList.add(inputLine.getArg(i));
+                }
+                if (inputLine.getArg(i).equals(CLA_RUN_SCRIPT_ON)) {
+                    i++;
+                    addArg = true;
+                }
+
+            }
+            String[] args = argList.toArray(new String[0]);
+            getState().setScriptArgs(args);
             try {
                 String runScript = FileUtil.readFileAsString(runScriptPath);
                 if (runScript != null && !runScript.isEmpty()) {
@@ -1610,6 +1635,8 @@ public class WorkspaceCommands implements Logable {
                     System.exit(0); // make sure to use this so external programs (like shell scripts) know all is ok
                 }
             } catch (Throwable t) {
+                getState().getLogger().error(t);
+                t.printStackTrace();
                 say("Error executing script \"" + runScriptPath + "\".");
                 System.exit(1); // So external prgrams can tell that something didn't work right.
             }

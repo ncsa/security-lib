@@ -319,7 +319,7 @@ public class IOEvaluator extends MathEvaluator {
                 }
 
             } catch (Throwable throwable) {
-                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                throw new QDLIOException("Error; Could not resolve virtual file system for '" + fileName + "'");
             }
         } else {
             // So its just a file.
@@ -328,10 +328,10 @@ public class IOEvaluator extends MathEvaluator {
             }
             File f = new File(fileName);
             if (!f.isDirectory()) {
-                throw new QDLIOException("Error: the requested object \"" + f + "\" is not a directory on this system.");
+                throw new QDLIOException("Error: the requested object '" + f + "' is not a directory on this system.");
             }
             if (f.list() != null && f.list().length != 0) {
-                throw new QDLIOException("Error: The directory \"" + f + "\" is not empty.");
+                throw new QDLIOException("Error: The directory '" + f + "' is not empty.");
             }
             rc = f.delete();
         }
@@ -365,7 +365,7 @@ public class IOEvaluator extends MathEvaluator {
                 if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
-                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                throw new QDLIOException("Error; Could not resolve virtual file system for '" + fileName + "'");
             }
         } else {
             // So its just a file.
@@ -374,7 +374,7 @@ public class IOEvaluator extends MathEvaluator {
             }
             File f = new File(fileName);
             if (!f.isFile()) {
-                throw new QDLIOException("Error: the requested object \"" + f + "\" is not a file on this system.");
+                throw new QDLIOException("Error: the requested object '" + f + "' is not a file on this system.");
             }
             rc = f.delete();
         }
@@ -407,7 +407,7 @@ public class IOEvaluator extends MathEvaluator {
                 if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
-                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                throw new QDLIOException("Error; Could not resolve virtual file system for '" + fileName + "'");
             }
         } else {
             // So its just a file.
@@ -459,7 +459,7 @@ public class IOEvaluator extends MathEvaluator {
                 if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
-                throw new QDLIOException("Error; Could not resolve virtual file system for \"" + fileName + "\"");
+                throw new QDLIOException("Error; Could not resolve virtual file system for '" + fileName + "'");
             }
         } else {
             // So its just a file.
@@ -563,7 +563,7 @@ public class IOEvaluator extends MathEvaluator {
                         access.contains("w"));
                 break;
             default:
-                throw new IllegalArgumentException("Error: unknown VFS type \"" + cfg.getString(VFS_ATTR_TYPE) + "\"");
+                throw new IllegalArgumentException("Error: unknown VFS type '" + cfg.getString(VFS_ATTR_TYPE) + "'");
 
         }
         state.addVFSProvider(vfs);
@@ -584,17 +584,17 @@ public class IOEvaluator extends MathEvaluator {
         Object obj = polyad.evalArg(0, state);
         Object obj2 = polyad.evalArg(1, state);
         if (obj == null || !isString(obj)) {
-            throw new IllegalArgumentException("Error: The first argument to \"" + WRITE_FILE + "\" must be a string that is the file name.");
+            throw new IllegalArgumentException("Error: The first argument to '" + WRITE_FILE + "' must be a string that is the file name.");
         }
         String fileName = obj.toString();
         if (obj2 == null) {
-            throw new IllegalArgumentException("Error: The second argument to \"" + WRITE_FILE + "\" must be a string or a stem list.");
+            throw new IllegalArgumentException("Error: The second argument to '" + WRITE_FILE + "' must be a string or a stem list.");
         }
         boolean isBase64 = false;
         if (polyad.getArgumments().size() == 3) {
             Object obj3 = polyad.evalArg(2, state);
             if (!isBoolean(obj3)) {
-                throw new IllegalArgumentException("Error: The third argument to \"" + WRITE_FILE + "\" must be a boolean.");
+                throw new IllegalArgumentException("Error: The third argument to '" + WRITE_FILE + "' must be a boolean.");
             }
             isBase64 = (Boolean) obj3;
         }
@@ -656,7 +656,7 @@ public class IOEvaluator extends MathEvaluator {
                 if (t instanceof QDLException) {
                     throw (RuntimeException) t;
                 }
-                throw new QDLException("Error: could not write file \"" + fileName + "\":" + t.getMessage());
+                throw new QDLException("Error: could not write file '" + fileName + "':" + t.getMessage());
             }
         }
 
@@ -696,7 +696,7 @@ public class IOEvaluator extends MathEvaluator {
         if (state.isVFSFile(fileName)) {
             vfsEntry = resolveResourceToFile(fileName, state);
             if (vfsEntry == null) {
-                throw new QDLException("Error: The resource \"" + fileName + "\" was not found in the virtual file system");
+                throw new QDLException("Error: The resource '" + fileName + "' was not found in the virtual file system");
             }
             hasVF = true;
         }
@@ -739,7 +739,7 @@ public class IOEvaluator extends MathEvaluator {
             if (t instanceof QDLException) {
                 throw (RuntimeException) t;
             }
-            throw new QDLException("Error reading file \"" + fileName + "\"" + t.getMessage());
+            throw new QDLException("Error reading file '" + fileName + "'" + t.getMessage());
         }
 
     }

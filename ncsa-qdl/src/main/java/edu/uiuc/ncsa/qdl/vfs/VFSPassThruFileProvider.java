@@ -28,7 +28,11 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
     public VFSEntry get(String path) throws Throwable {
         super.get(path);
         String realPath = getRealPath(path);
-        return FileEntries.fileToEntry(realPath);
+        try {
+            return FileEntries.fileToEntry(realPath);
+        }catch(Throwable t){
+            return null;
+        }
     }
 
 

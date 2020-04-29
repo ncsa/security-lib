@@ -73,6 +73,11 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getNodeValue(node, WS_HOME_DIR_TAG, "");
     }
 
+    protected String getScriptPath() {
+          String x =  getFirstAttribute(cn, SCRIPT_PATH_TAG);
+          return x==null?"":x;
+      }
+
     protected boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
         if (node == null) return defaultValue;
         try {
@@ -237,7 +242,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 isWSVerboseOn(),
                 showBanner(),
                 getVFSConfigs(),
-                getModuleConfigs());
+                getModuleConfigs(),
+                getScriptPath());
     }
 
     @Override

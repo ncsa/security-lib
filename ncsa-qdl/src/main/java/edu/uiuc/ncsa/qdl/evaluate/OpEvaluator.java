@@ -530,7 +530,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!isBoolean(objects[0])) {
-                    throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not \"" + objects[0] + "\"");
+                    throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not '" + objects[0] + "'");
                 }
                 r.result = !(Boolean) objects[0];
                 r.resultType = Constant.BOOLEAN_TYPE;

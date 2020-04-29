@@ -35,7 +35,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean verboseOn,
                           boolean showBanner,
                           List<VFSConfig> vfsConfigs,
-                          List<ModuleConfig> moduleConfigs) {
+                          List<ModuleConfig> moduleConfigs,
+                          String scriptPath) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -51,6 +52,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.prettyPrint = prettyPrint;
         this.numericDigits = numericDigits;
         this.showBanner = showBanner;
+        this.scriptPath = scriptPath;
     }
 
     public boolean isPrettyPrint() {
@@ -62,6 +64,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     boolean prettyPrint = false;
+
     public boolean isShowBanner() {
         return showBanner;
     }
@@ -130,6 +133,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
 
     /**
      * Should be set in the constructor. The setter here is allowed if the user is overriding it from the command line.
+     *
      * @param wsHomeDir
      */
     public void setWsHomeDir(String wsHomeDir) {
@@ -154,4 +158,9 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         return verboseOn;
     }
 
+    String scriptPath = null;
+
+    public String getScriptPath() {
+        return scriptPath;
+    }
 }

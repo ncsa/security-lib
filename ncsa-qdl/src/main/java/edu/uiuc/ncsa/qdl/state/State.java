@@ -229,13 +229,16 @@ public class State extends FunctionState implements QDLConstants{
 
     /**
      * Convenience to get a script from the VFS. This takes any file and tries to turn it in to a script,
-     * so tjhe "onus is on the app" to make sure this is a script.
+     * so the "onus is on the app" to make sure this is a script.
      *
      * @param fqName
      * @return
      */
     public QDLScript getScriptFromVFS(String fqName) throws Throwable {
         VFSEntry entry = getFileFromVFS(fqName);
+        if(entry == null){
+            return null;
+        }
         if (entry.getType().equals(Scripts.SCRIPT)) {
             return (QDLScript) entry;
         }
@@ -305,6 +308,8 @@ public class State extends FunctionState implements QDLConstants{
                 getModuleMap(),
                 getLogger(),
                 isServerMode());
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
         return newState;
 
     }
@@ -317,7 +322,6 @@ public class State extends FunctionState implements QDLConstants{
      * @return State
      */
     public State newStateWithImports() {
-        //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
         State newState = new State(importManager,
                 newStack,
@@ -328,9 +332,13 @@ public class State extends FunctionState implements QDLConstants{
                 getLogger(),
                 isServerMode());
         newState.setImportedModules(getImportedModules());
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
+        newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
 
+/*
     public State newLoopState() {
         //System.out.println("** State, creating new local state **");
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
@@ -345,6 +353,7 @@ public class State extends FunctionState implements QDLConstants{
         newState.setImportedModules(getImportedModules());
         return newState;
     }
+*/
 
     /**
      * For modules only. This copies the state except that no functions are inherited. The
@@ -365,6 +374,10 @@ public class State extends FunctionState implements QDLConstants{
                 getModuleMap(),
                 getLogger(),
                 isServerMode());
+        // May want to rethink setting these...
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
+        newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
 
