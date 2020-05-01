@@ -26,7 +26,7 @@ while[
        ]; // end catch block
        // This means that the try...catch has ended. It will be redone on the next loop
    ]; // end while
-
+ return();
 /*
   Expected output:
   

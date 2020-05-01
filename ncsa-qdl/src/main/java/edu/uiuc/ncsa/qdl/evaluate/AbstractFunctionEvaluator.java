@@ -167,7 +167,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             fPointer pointer,
                             String name,
                             State state) {
-        if (polyad.getArgumments().size() != 1) {
+        if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
@@ -202,7 +202,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             String name,
                             State state,
                             boolean optionalArgs) {
-        if (!optionalArgs && polyad.getArgumments().size() != 2) {
+        if (!optionalArgs && polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
@@ -210,12 +210,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if(arg1 == null || arg2 == null){
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
-        Object[] argList = new Object[polyad.getArgumments().size()];
+        Object[] argList = new Object[polyad.getArgCount()];
         argList[0] = arg1;
         argList[1] = arg2;
         if (optionalArgs) {
-            for (int i = 2; i < polyad.getArgumments().size(); i++) {
-                argList[i] = polyad.getArgumments().get(i).evaluate(state);
+            for (int i = 2; i < polyad.getArgCount(); i++) {
+                argList[i] = polyad.getArguments().get(i).evaluate(state);
             }
         }
         if (areNoneStems(argList)) {
@@ -232,11 +232,11 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         for (String key : keys) {
             fpResult r;
             if (optionalArgs) {
-                Object[] objects = new Object[polyad.getArgumments().size()];
+                Object[] objects = new Object[polyad.getArgCount()];
                 objects[0] = stem1.get(key);
                 objects[1] = stem2.get(key);
                 for (int i = 2; i < objects.length; i++) {
-                    objects[i] = polyad.getArgumments().get(i).getResult();
+                    objects[i] = polyad.getArguments().get(i).getResult();
                 }
                 r = pointer.process(objects);
 
@@ -254,7 +254,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             fPointer pointer,
                             String name,
                             State state) {
-        if (polyad.getArgumments().size() != 3) {
+        if (polyad.getArgCount() != 3) {
             throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);

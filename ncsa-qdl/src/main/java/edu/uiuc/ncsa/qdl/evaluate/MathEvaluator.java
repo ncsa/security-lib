@@ -226,7 +226,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -237,7 +237,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     SecureRandom secureRandom = new SecureRandom();
 
     protected void doRandom(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setResult(secureRandom.nextLong());
             polyad.setResultType(Constant.LONG_TYPE);
             polyad.setEvaluated(true);
@@ -273,7 +273,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(oldND);
         polyad.setResultType(Constant.LONG_TYPE);
 
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
         } else {
             Object arg1 = polyad.evalArg(0, state);
@@ -290,9 +290,9 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     protected void doRandomString(Polyad polyad, State state) {
         int length = 16;
 
-        if (0 < polyad.getArgumments().size()) {
+        if (0 < polyad.getArgCount()) {
             polyad.evalArg(0, state);
-            Object obj = polyad.getArgumments().get(0).getResult();
+            Object obj = polyad.getArguments().get(0).getResult();
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();
             } else {
@@ -302,9 +302,9 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         }
         // Second optional argument is number of strings.
         int returnCount = 1;
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             polyad.evalArg(1, state);
-            Object obj = polyad.getArgumments().get(1).getResult();
+            Object obj = polyad.getArguments().get(1).getResult();
             if (!isLong(obj)) {
                 throw new IllegalArgumentException("Error: The second argument must be an integer.");
             }
@@ -351,7 +351,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -375,7 +375,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -404,7 +404,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -427,7 +427,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -436,7 +436,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doDates(Polyad polyad, State state, boolean isInMillis) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             // A niladic case. return the right date type.
             if (isInMillis) {
                 Long now = new Date().getTime();
@@ -470,7 +470,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                             r.result = ts;
                         } catch (Throwable t) {
                             r.result = objects[0];
-                            r.resultType = polyad.getArgumments().get(0).getResultType();
+                            r.resultType = polyad.getArguments().get(0).getResultType();
                         }
                     }
                 } else {
@@ -482,7 +482,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                         return r;
                     } else {
                         r.result = objects[0];
-                        r.resultType = polyad.getArgumments().get(0).getResultType();
+                        r.resultType = polyad.getArguments().get(0).getResultType();
                     }
                 }
                 return r;

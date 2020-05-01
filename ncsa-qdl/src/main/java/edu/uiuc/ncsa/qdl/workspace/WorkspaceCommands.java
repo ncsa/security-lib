@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
@@ -371,7 +372,7 @@ public class WorkspaceCommands implements Logable {
 
     protected BufferManager.BufferRecord getBR(InputLine inputLine) {
         String rawArg = null;
-        if (inputLine.getCommand().equals(EXECUTE_COMMAND)) {
+        if (inputLine.getCommand().equals(EXECUTE_COMMAND) || inputLine.getCommand().equals(EDIT_COMMAND)) {
             // Since this is a shorthand, the input line looks like
             // ) 2
             rawArg = inputLine.getArg(ACTION_INDEX);
@@ -1432,13 +1433,13 @@ public class WorkspaceCommands implements Logable {
         String[] foundModules = setupModules(qe, getState());
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
-            if (isVerbose) {
+            if (!isRunScript && isVerbose) {
                 say("loaded java modules: " + foundModules[JAVA_MODULE_INDEX]);
             }
             env.put("java_modules", foundModules[JAVA_MODULE_INDEX]);
         }
         if (foundModules[QDL_MODULE_INDEX] != null && !foundModules[QDL_MODULE_INDEX].isEmpty()) {
-            if (isVerbose) {
+            if (!isRunScript && isVerbose) {
                 say("loaded QDL modules: " + foundModules[QDL_MODULE_INDEX]);
             }
 
@@ -1601,7 +1602,7 @@ public class WorkspaceCommands implements Logable {
                 say("warning: Could not load boot script\"" + bootFile + "\": " + t.getMessage());
             }
         }
-        if(inputLine.hasArg(CLA_SCRIPT_PATH)) {
+        if (inputLine.hasArg(CLA_SCRIPT_PATH)) {
             getState().setScriptPaths(inputLine.getNextArgFor(CLA_SCRIPT_PATH));
         }
         runScript(inputLine); // If there is a script, run it.
@@ -1635,10 +1636,18 @@ public class WorkspaceCommands implements Logable {
                     System.exit(0); // make sure to use this so external programs (like shell scripts) know all is ok
                 }
             } catch (Throwable t) {
+                if (t instanceof ReturnException) {
+                    ReturnException rx = (ReturnException) t;
+                    if (rx.resultType != Constant.NULL_TYPE) {
+                        System.out.println(rx.result);
+                        System.out.flush();
+                    }
+                    System.exit(0); // Best we can do. Java does not allow for returned values.
+                }
                 getState().getLogger().error(t);
                 t.printStackTrace();
                 say("Error executing script \"" + runScriptPath + "\".");
-                System.exit(1); // So external prgrams can tell that something didn't work right.
+                System.exit(1); // So external programs can tell that something didn't work right.
             }
         }
     }

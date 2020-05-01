@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ import static edu.uiuc.ncsa.qdl.evaluate.StemEvaluator.STEM_FUNCTION_BASE_VALUE;
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:18 AM
  */
-public class IOEvaluator extends MathEvaluator {
+public class IOEvaluator extends AbstractFunctionEvaluator {
 
     public static final String IO_NAMESPACE = "io";
     public static final String IO_FQ = IO_NAMESPACE + ImportManager.NS_DELIMITER;
@@ -74,6 +75,10 @@ public class IOEvaluator extends MathEvaluator {
     public static final String FQ_TO_STRING = SYS_FQ + TO_STRING;
     public static final int TO_STRING_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String TO_NUMBER = "to_number";
+    public static final String FQ_TO_NUMBER = SYS_FQ + TO_NUMBER;
+    public static final int TO_NUMBER_TYPE = 20 + STEM_FUNCTION_BASE_VALUE;
+
 
     public static final String VFS_MOUNT = "vfs_mount";
     public static final String IO_VFS_MOUNT = IO_FQ + "mount";
@@ -85,6 +90,7 @@ public class IOEvaluator extends MathEvaluator {
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
     public static String[] FUNC_NAMES = new String[]{
+            TO_NUMBER,
             TO_STRING,
             SAY_FUNCTION,
             PRINT_FUNCTION,
@@ -96,6 +102,7 @@ public class IOEvaluator extends MathEvaluator {
             VFS_UNMOUNT};
 
     public static String[] FQ_FUNC_NAMES = new String[]{
+            FQ_TO_NUMBER,
             FQ_TO_STRING,
             IO_SAY_FUNCTION,
             IO_PRINT_FUNCTION,
@@ -123,6 +130,9 @@ public class IOEvaluator extends MathEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case TO_NUMBER:
+            case FQ_TO_NUMBER:
+                return TO_NUMBER_TYPE;
             case TO_STRING:
             case FQ_TO_STRING:
                 return TO_STRING_TYPE;
@@ -167,7 +177,10 @@ public class IOEvaluator extends MathEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         boolean printIt = false;
         switch (polyad.getName()) {
-
+            case TO_NUMBER:
+            case FQ_TO_NUMBER:
+                doToNumber(polyad, state);
+                return true;
             case PRINT_FUNCTION:
             case IO_PRINT_FUNCTION:
             case IO_SAY_FUNCTION:
@@ -218,12 +231,63 @@ public class IOEvaluator extends MathEvaluator {
         return false;
     }
 
+    //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
+    private void doToNumber(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("Error: " + TO_NUMBER + " requires an argument");
+        }
+        Object arg = polyad.evalArg(0, state);
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                switch (Constant.getType(objects[0])) {
+                    case Constant.BOOLEAN_TYPE:
+                        r.result = ((Boolean) objects[0]) ? 1L : 0L;
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.STRING_TYPE:
+                        String x = (String) objects[0];
+                        try {
+                            r.result = Long.parseLong(x);
+                            r.resultType = Constant.LONG_TYPE;
+                        } catch (NumberFormatException nfx0) {
+                            try {
+                                r.result = new BigDecimal(x);
+                                r.resultType = Constant.DECIMAL_TYPE;
+                            } catch (NumberFormatException nfx2) {
+                                // ok, kill it here.
+                                throw new IllegalArgumentException(("Error: " + objects[0] + " is not a number."));
+                            }
+                        }
+                        break;
+                    case Constant.LONG_TYPE:
+                        r.result = objects[0];
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        r.result = objects[0];
+                        r.resultType = Constant.DECIMAL_TYPE;
+                        break;
+                    case Constant.NULL_TYPE:
+                        throw new IllegalArgumentException("Error: " + TO_NUMBER + " cannot convert null.");
+                    case Constant.STEM_TYPE:
+                        throw new IllegalArgumentException("Error: " + TO_NUMBER + " cannot convert a stem.");
+                    case Constant.UNKNOWN_TYPE:
+                        throw new IllegalArgumentException("Error: " + TO_NUMBER + " unknown argument type.");
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TO_NUMBER, state);
+    }
+
     protected void doScan(Polyad polyad, State state) {
         if (state.isServerMode()) {
             throw new QDLRuntimeException("Error: scan is not allowed in server mode.");
         }
 
-        if (polyad.getArgumments().size() != 0) {
+        if (polyad.getArgCount() != 0) {
             // This is the prompt.
             System.out.print(polyad.evalArg(0, state));
         }
@@ -255,9 +319,10 @@ public class IOEvaluator extends MathEvaluator {
         }
         String result = "";
         boolean prettyPrintForStems = false;
-        if (polyad.getArgumments().size() != 0) {
-            Object temp = polyad.evalArg(0, state);
-            if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() != 0) {
+            Object temp = null;
+            temp = polyad.evalArg(0, state);
+            if (polyad.getArgCount() == 2) {
                 // assume pretty print for stems.
                 Object flag = polyad.evalArg(1, state);
                 if (flag instanceof Boolean) {
@@ -282,13 +347,13 @@ public class IOEvaluator extends MathEvaluator {
         if (printIt) {
             System.out.println(result);
         }
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
         } else {
             if (printIt) {
-                polyad.setResult(polyad.getArgumments().get(0).getResult());
-                polyad.setResultType(polyad.getArgumments().get(0).getResultType());
+                polyad.setResult(polyad.getArguments().get(0).getResult());
+                polyad.setResultType(polyad.getArguments().get(0).getResultType());
 
             } else {
                 polyad.setResult(result);
@@ -299,7 +364,7 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doRMDir(Polyad polyad, State state) {
-        if (0 == polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("Error: " + RMDIR + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -341,7 +406,7 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doRMFile(Polyad polyad, State state) {
-        if (0 == polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("Error: " + RM_FILE + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -384,7 +449,7 @@ public class IOEvaluator extends MathEvaluator {
     }
 
     protected void doMkDir(Polyad polyad, State state) {
-        if (0 == polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("Error: " + MKDIR + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -435,7 +500,7 @@ public class IOEvaluator extends MathEvaluator {
      * @param state
      */
     protected void doDir(Polyad polyad, State state) {
-        if (0 == polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("Error: " + DIR + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -497,7 +562,7 @@ public class IOEvaluator extends MathEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
         }
-        if (polyad.getArgumments().size() != 1) {
+        if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("Error: " + VFS_MOUNT + " requires one argument");
         }
         Object arg1 = polyad.evalArg(0, state);
@@ -578,7 +643,7 @@ public class IOEvaluator extends MathEvaluator {
             throw new QDLServerModeException("File operations are not permitted in server mode");
         }
 
-        if (polyad.getArgumments().size() < 2) {
+        if (polyad.getArgCount() < 2) {
             throw new IllegalArgumentException("Error: " + WRITE_FILE + " requires a two arguments.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -591,7 +656,7 @@ public class IOEvaluator extends MathEvaluator {
             throw new IllegalArgumentException("Error: The second argument to '" + WRITE_FILE + "' must be a string or a stem list.");
         }
         boolean isBase64 = false;
-        if (polyad.getArgumments().size() == 3) {
+        if (polyad.getArgCount() == 3) {
             Object obj3 = polyad.evalArg(2, state);
             if (!isBoolean(obj3)) {
                 throw new IllegalArgumentException("Error: The third argument to '" + WRITE_FILE + "' must be a boolean.");
@@ -672,7 +737,7 @@ public class IOEvaluator extends MathEvaluator {
 
     protected void doReadFile(Polyad polyad, State state) {
 
-        if (0 == polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("Error: " + READ_FILE + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
@@ -681,7 +746,7 @@ public class IOEvaluator extends MathEvaluator {
         }
         String fileName = obj.toString();
         int op = -1; // default
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             Object obj2 = polyad.evalArg(1, state);
             if (!isLong(obj2)) {
                 throw new IllegalArgumentException("Error: The " + READ_FILE + " command's second argument must be an integer.");

@@ -56,7 +56,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getName()) {
             case IS_FUNCTION:
             case FQ_IS_FUNCTION:
-                if (polyad.getArgumments().size() != 1) {
+                if (polyad.getArgCount() != 1) {
                     throw new IllegalArgumentException("Error: You must supply at least one argument.");
                 }
                 Object object = polyad.evalArg(0, state);
@@ -68,7 +68,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 }
                 String name = object.toString();
                 int argCount = -1; // default -- get any
-                if (polyad.getArgumments().size() == 2) {
+                if (polyad.getArgCount() == 2) {
                     Object object2 = polyad.evalArg(1, state);
                     ;
                     if (!isLong(object2)) {
@@ -92,9 +92,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void doJavaFunction(Polyad polyad, State state, FR_WithState frs) {
         // Contains a java function that is wrapped in a QDLFunction. The polyad here contains the
         // arguments that are needed to unpack this.
-        Object[] argList = new Object[polyad.getArgumments().size()];
-        for (int i = 0; i < polyad.getArgumments().size(); i++) {
-            argList[i] = polyad.getArgumments().get(i).evaluate(state);
+        Object[] argList = new Object[polyad.getArgCount()];
+        for (int i = 0; i < polyad.getArgCount(); i++) {
+            argList[i] = polyad.getArguments().get(i).evaluate(state);
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
@@ -120,7 +120,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         FunctionRecord functionRecord = frs.functionRecord;
         if (functionRecord == null) {
             throw new UndefinedFunctionException("Error: the function '" + polyad.getName() + "' with "
-                    + polyad.getArgumments().size() + " arguments was not found.");
+                    + polyad.getArgCount() + " arguments was not found.");
         }
         State localState = (State) frs.state.newStateWithImports();
         // we are going to write local variables here and the MUST get priority over already exiting ones
@@ -130,7 +130,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
             // note that the call evaluates the state in the non-local environment as per contract,
             // but the named result goes in to the localState.
-            symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArgumments().get(i).evaluate(state));
+            symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(state));
         }
         for (Statement statement : functionRecord.statements) {
             try {

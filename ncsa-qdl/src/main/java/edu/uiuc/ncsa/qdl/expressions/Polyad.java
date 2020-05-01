@@ -49,7 +49,7 @@ public class Polyad extends ExpressionImpl {
          return getResult();
     }
     public void addArgument(ExpressionNode expr){
-        getArgumments().add(expr);
+        getArguments().add(expr);
     }
     @Override
     public String toString() {
@@ -64,7 +64,7 @@ public class Polyad extends ExpressionImpl {
     public ExpressionNode makeCopy() {
         Polyad polyad = new Polyad(operatorType);
         polyad.setName(getName());
-        for(ExpressionNode arg: getArgumments()){
+        for(ExpressionNode arg: getArguments()){
             polyad.addArgument(arg.makeCopy());
         }
         return polyad;

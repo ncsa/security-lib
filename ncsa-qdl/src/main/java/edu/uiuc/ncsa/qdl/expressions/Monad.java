@@ -29,7 +29,7 @@ public class Monad extends ExpressionImpl {
      */
     public Monad(int operatorType, ExpressionNode argument) {
         this(operatorType, true);
-        getArgumments().add(0, argument);
+        getArguments().add(0, argument);
     }
 
     /**
@@ -61,12 +61,12 @@ public class Monad extends ExpressionImpl {
     }
 
     public ExpressionNode getArgument() {
-        return getArgumments().get(0);
+        return getArguments().get(0);
     }
 
     public void setArgument(ExpressionNode node) {
-        if (getArgumments().size() == 0) {
-            getArgumments().add(node);
+        if (getArgCount() == 0) {
+            getArguments().add(node);
             return;
         }
         arguments = new ArrayList<>();

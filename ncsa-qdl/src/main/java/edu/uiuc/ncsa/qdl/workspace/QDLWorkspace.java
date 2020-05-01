@@ -109,6 +109,7 @@ public class QDLWorkspace {
                     workspaceCommands.getInterpreter().execute(input);
                 }
             } catch (Throwable t) {
+
                 // If there is an exception while local mode is running, we don't want to trash the user's
                 // echo mode, since that causes every subsequent command to fail at least until they
                 // figure it `out and turn it back on.

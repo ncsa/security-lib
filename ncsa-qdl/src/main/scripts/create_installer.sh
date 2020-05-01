@@ -46,6 +46,8 @@ mkdir "docs"
 cp /home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs/*.pdf docs
 mkdir "etc"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/min-cfg.xml etc/min-cfg.xml
+mkdir "examples"
+cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/*.qdl examples/
 mkdir "lib"
 cp "$QDL_ROOT/target/qdl.jar" lib
 mkdir "log"

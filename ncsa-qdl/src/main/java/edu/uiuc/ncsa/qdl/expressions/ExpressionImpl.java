@@ -19,6 +19,10 @@ public abstract class ExpressionImpl implements ExpressionNode {
         this.operatorType = operatorType;
     }
 
+    @Override
+    public int getArgCount() {
+        return getArguments().size();
+    }
 
     /**
      * The valence is the number of arguments this expression allows. <br/><br/>
@@ -32,12 +36,12 @@ public abstract class ExpressionImpl implements ExpressionNode {
     protected ArrayList<ExpressionNode> arguments = new ArrayList<>();
 
     @Override
-    public ArrayList<ExpressionNode> getArgumments() {
+    public ArrayList<ExpressionNode> getArguments() {
         return arguments;
     }
 
     public Object evalArg(int index, State state){
-        return getArgumments().get(index).evaluate(state);
+        return getArguments().get(index).evaluate(state);
     }
     @Override
     public void setArguments(ArrayList<ExpressionNode> arguments) {
@@ -57,7 +61,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
     @Override
     public Object getResult() {
         if (!evaluated) {
-            throw new UnevaluatedExpressionException("source=\"" + (getSourceCode()==null?"(none)":getSourceCode()) + "\"");
+            throw new UnevaluatedExpressionException("source='" + (getSourceCode()==null?"(none)":getSourceCode()) + "'");
         }
         return result;
     }

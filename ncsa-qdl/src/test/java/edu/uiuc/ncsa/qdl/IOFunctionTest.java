@@ -22,7 +22,7 @@ public class IOFunctionTest extends AbstractQDLTester {
         // right during testing.
         Polyad polyad = new Polyad(IOEvaluator.SCAN_FUNCTION);
         ConstantNode prompt = new ConstantNode("sayit>", Constant.STRING_TYPE);
-        polyad.getArgumments().add(prompt);
+        polyad.getArguments().add(prompt);
         polyad.evaluate(state);
         System.out.println("you entered:\"" + polyad.getResult() + "\"");
     }
@@ -33,7 +33,7 @@ public class IOFunctionTest extends AbstractQDLTester {
         Polyad polyad = new Polyad(IOEvaluator.SAY_FUNCTION);
         String testString = "These are the droids you are looking for";
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
-        polyad.getArgumments().add(prompt);
+        polyad.getArguments().add(prompt);
         polyad.evaluate(state);
         System.out.println("Check that the phrase :\"" + testString + "\" was printed");
     }

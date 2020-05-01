@@ -184,7 +184,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                           r.resultType = Constant.STRING_TYPE;
                       } else {
                           r.result = objects[0];
-                          r.resultType = polyad.getArgumments().get(0).getResultType();
+                          r.resultType = polyad.getArguments().get(0).getResultType();
                       }
                       return r;
                   }
@@ -204,7 +204,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                           r.resultType = Constant.STRING_TYPE;
                       } else {
                           r.result = objects[0];
-                          r.resultType = polyad.getArgumments().get(0).getResultType();
+                          r.resultType = polyad.getArguments().get(0).getResultType();
                       }
                       return r;
                   }
@@ -268,7 +268,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -354,7 +354,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -372,7 +372,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -393,7 +393,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }
@@ -419,7 +419,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.STEM_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArgumments().get(0).getResultType();
+                    r.resultType = polyad.getArguments().get(0).getResultType();
                 }
                 return r;
             }

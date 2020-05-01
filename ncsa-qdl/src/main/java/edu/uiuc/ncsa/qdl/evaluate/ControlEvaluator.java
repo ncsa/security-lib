@@ -303,7 +303,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doScriptPaths(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
             StemVariable stemVariable = new StemVariable();
@@ -317,7 +317,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             polyad.setResult(stemVariable);
             return;
         }
-        if (polyad.getArgumments().size() == 1) {
+        if (polyad.getArgCount() == 1) {
             Object obj = polyad.evalArg(0, state);
             if (isString(obj)) {
                 state.setScriptPaths(obj.toString());
@@ -347,7 +347,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             return;
         }
-        throw new IllegalArgumentException("Error: " + SCRIPT_PATH_COMMAND + " requires at most one argument, not " + polyad.getArgumments().size());
+        throw new IllegalArgumentException("Error: " + SCRIPT_PATH_COMMAND + " requires at most one argument, not " + polyad.getArgCount());
 
     }
 
@@ -359,13 +359,13 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doScriptArgs(Polyad polyad, State state) {
 
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.LONG_TYPE);
             polyad.setResult(state.hasScriptArgs() ? new Long(state.getScriptArgs().length) : 0L);
             return;
         }
-        if (polyad.getArgumments().size() == 1) {
+        if (polyad.getArgCount() == 1) {
             Object obj = polyad.evalArg(0, state);
             if (!state.hasScriptArgs()) {
                 throw new IllegalArgumentException("Error: index out of bounds for " + SCRIPT_ARGS_COMMAND + "-- no arguments found.");
@@ -407,7 +407,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         StemVariable env = new StemVariable();
         QDLCodec codec = new QDLCodec();
 
-        int argCount = polyad.getArgumments().size();
+        int argCount = polyad.getArgCount();
         if (argCount == 0) {
             // system variables.
             Map<String, String> map = System.getenv();
@@ -453,7 +453,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void getConst(Polyad polyad, State state, StemVariable values) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             polyad.setEvaluated(true);
             polyad.setResult(values);
             polyad.setResultType(Constant.STEM_TYPE);
@@ -596,7 +596,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("Error: The " + commandName + " requires at least a single argument");
         }
         State localState = state;
@@ -606,7 +606,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         Object arg1 = polyad.evalArg(0, state);
         String[] argList = new String[0];
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
             if (isStem(arg2)) {
                 StemList stemList = ((StemVariable) arg2).getStemList();
@@ -640,6 +640,13 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 script.execute(localState);
                 localState.setScriptArgs(oldArgs);
             } catch (Throwable t) {
+                if(t instanceof ReturnException){
+                    ReturnException rx = (ReturnException)t;
+                    polyad.setEvaluated(true);
+                    polyad.setResultType(rx.resultType);
+                    polyad.setResult(rx.result);
+                    return;
+                }
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
                 }
@@ -647,14 +654,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             }
         }
         polyad.setEvaluated(true);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
-        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.NULL_TYPE);
+        polyad.setResult(QDLNull.getInstance());
 
 
     }
 
     protected void doRaiseError(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("Error:" + RAISE_ERROR + " requires at least a single argument");
         }
         Object arg1 = polyad.evalArg(0, state);
@@ -663,7 +670,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         Object arg2 = null;
         state.setValue("error_message", arg1.toString());
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             arg2 = polyad.evalArg(1, state);
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
@@ -677,7 +684,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doReturn(Polyad polyad, State state) {
-        switch (polyad.getArgumments().size()) {
+        switch (polyad.getArgCount()) {
             case 0:
                 polyad.setEvaluated(true);
                 polyad.setResult(QDLNull.getInstance());
@@ -686,7 +693,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case 1:
                 Object r = polyad.evalArg(0, state);
                 polyad.setResult(r);
-                polyad.setResultType(polyad.getArgumments().get(0).getResultType());
+                polyad.setResultType(polyad.getArguments().get(0).getResultType());
                 polyad.setEvaluated(true);
                 break;
             default:
@@ -708,11 +715,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Error: reading files is not supported in server mode");
         }
-        if (0 == polyad.getArgumments().size() || 3 <= polyad.getArgumments().size()) {
+        if (0 == polyad.getArgCount() || 3 <= polyad.getArgCount()) {
             throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires one or two arguments.");
         }
         int loadTarget = LOAD_FILE;
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             // Then this is probably a Jva module
             Object arg2 = polyad.evalArg(1, state);
             if (isString(arg2)) {
@@ -806,7 +813,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param polyad
      */
     protected void doImport(Polyad polyad, State state) {
-        if (polyad.getArgumments().size() == 0) {
+        if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
@@ -830,7 +837,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         String alias = null;
         Module newInstance = m.newInstance(state.newModuleState());
-        if (polyad.getArgumments().size() == 2) {
+        if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
             if (arg2 == null || !isString(arg2)) {
                 throw new MissingArgumentException("Error: You must supply a valid alias import.");
@@ -852,7 +859,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     protected void doExecute(Polyad polyad, State state) {
         // execute a string.
-        if (polyad.getArgumments().size() != 1) {
+        if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("Error. Wrong number of arguments. " +
                     "This requires a single argument that is a string or a list of them.");
         }

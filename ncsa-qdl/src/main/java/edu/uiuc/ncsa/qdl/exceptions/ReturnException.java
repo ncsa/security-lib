@@ -8,4 +8,12 @@ public class ReturnException extends QDLException {
     
     public Object result;
     public int resultType;
+
+    @Override
+    public String toString() {
+        return "ReturnException{" +
+                "result=" + result +
+                ", resultType=" + resultType +
+                '}';
+    }
 }

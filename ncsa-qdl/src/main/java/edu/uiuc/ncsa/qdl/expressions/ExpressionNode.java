@@ -14,9 +14,11 @@ import java.util.ArrayList;
  */
 public interface ExpressionNode extends Statement, HasResultInterface {
 
-    ArrayList<ExpressionNode> getArgumments(); // need this to preserver order of lists
+    ArrayList<ExpressionNode> getArguments(); // need this to preserve order of lists
 
     void setArguments(ArrayList<ExpressionNode> arguments);
+
+    int getArgCount();
 
     int valence = 0;
 

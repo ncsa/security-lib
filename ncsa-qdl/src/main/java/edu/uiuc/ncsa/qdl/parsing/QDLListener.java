@@ -6,12 +6,14 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
-import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -74,7 +76,7 @@ public class QDLListener implements QDLParserListener {
             // We are here because it lumps them together with the variable values.
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals(QDLConstants.RESERVED_TRUE)), Constant.BOOLEAN_TYPE);
             p.statement = cnode;
-            cnode.setSourceCode(ctx.getText());
+            cnode.setSourceCode(getSource(ctx));
             return;
         }
         if(ctx.getText().equals(QDLConstants.RESERVED_NULL)){
@@ -134,7 +136,7 @@ public class QDLListener implements QDLParserListener {
     public void exitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
         Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
         Assignment topNode = currentA;
-        topNode.setSourceCode(assignmentContext.getText());
+        topNode.setSourceCode(getSource(assignmentContext));
         Assignment nextA = null;
         // The variable is the 0th child, the argument is the last child (it is an expression and ends up in the symbol table).
         int exprIndex = assignmentContext.children.size() - 1;
@@ -234,7 +236,7 @@ public class QDLListener implements QDLParserListener {
     public void exitFunction(QDLParserParser.FunctionContext ctx) {
         // Note that this resolves **all** functions, specifically the built in ones.
         Polyad polyad = (Polyad) parsingMap.getStatementFromContext(ctx);
-        polyad.setSourceCode(ctx.getText());
+        polyad.setSourceCode(getSource(ctx));
         // need to process its argument list.
         // There are 3 children  "f(" arglist ")", so we want the middle one.
 
@@ -254,7 +256,7 @@ public class QDLListener implements QDLParserListener {
 
                 // add it.
                 //        dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
-                polyad.getArgumments().add((ExpressionNode) resolveChild(kid));
+                polyad.getArguments().add((ExpressionNode) resolveChild(kid));
             }
         }
     }
@@ -651,7 +653,7 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.StatementContext stmt : ctx.statement()) {
             whileLoop.getStatements().add(resolveChild(stmt));
         }
-        whileLoop.setSourceCode(ctx.getText());
+        whileLoop.setSourceCode(getSource(ctx));
     }
 
     @Override
@@ -664,7 +666,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
         SwitchStatement switchStatement = (SwitchStatement) parsingMap.getStatementFromContext(ctx);
-        switchStatement.setSourceCode(ctx.getText());
+        switchStatement.setSourceCode(getSource(ctx));
         for (QDLParserParser.IfStatementContext ifc : ctx.ifStatement()) {
             ConditionalStatement cs = (ConditionalStatement) parsingMap.getStatementFromContext(ifc);
             switchStatement.getArguments().add(cs);
@@ -799,13 +801,35 @@ public class QDLListener implements QDLParserListener {
         // keep the top. level module but don't let the system try to turn anything else in to statements.
     }
 
+    /**
+     * There are various ways to try and get the source. Most of them strip off linefeeds so
+     * if there is line comment (// ... ) the rest of the source turns into a comment *if*
+     * the source ever gets reparsed. NOTE this is exactly what happens with module.
+     * This tries to get the original source with linefeeds
+     * and all. It ay be more fragile than the ANTLR documentation lets on, so be advised.
+     * The ctx.getText() method, however, is definitely broken...
+     * @param ctx
+     * @return
+     */
+   protected String getSource(ParserRuleContext ctx){
+       int a = ctx.start.getStartIndex();
+               int b = ctx.stop.getStopIndex();
+               Interval interval = new Interval(a,b);
+             String txt= ctx.start.getInputStream().getText(interval);
+             if(!StringUtils.isTrivial(txt)){
+                 // Sometimes the parser strips the final ;. If the source is used later
+                 // this causes re-parsing it to reliably bomb. Add it back as needed.
+                txt = txt + (txt.endsWith(";")?"":";");
+             }
+             return txt;
 
+   }
     @Override
     public void exitModuleStatement(QDLParserParser.ModuleStatementContext moduleContext) {
         // module['uri:/foo','bar']body[ say( 'hi');]; // single line test
         // )load module_example.qdl
         isModule = false;
-        ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
+         ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
         URI namespace = URI.create(stripSingleQuotes(moduleContext.STRING(0).toString()));
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
         currentModule.setNamespace(namespace);
@@ -827,7 +851,7 @@ public class QDLListener implements QDLParserListener {
             //}
         }
         // Parser strips off trailing ; which in turn causes a parser error later when we are runnign the import command.
-        moduleStatement.setSourceCode(moduleContext.getText() + (moduleContext.getText().endsWith(";")?"":";"));
+        moduleStatement.setSourceCode(getSource(moduleContext));
         currentModule.setModuleStatement(moduleStatement);
 
         parsingMap.endMark();
@@ -845,7 +869,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
-        tryCatch.setSourceCode(tcContext.getText());
+        tryCatch.setSourceCode(getSource(tcContext));
         boolean addToTry = true;
         try {
             for (int i = 1; i < tcContext.getChildCount(); i++) {

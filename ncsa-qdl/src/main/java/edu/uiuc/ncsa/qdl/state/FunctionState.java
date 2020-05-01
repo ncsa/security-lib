@@ -49,7 +49,7 @@ public abstract class FunctionState extends VariableState {
      * @return
      */
     public FR_WithState resolveFunction(Polyad polyad) {
-        return resolveFunction(polyad.getName(), polyad.getArgumments().size());
+        return resolveFunction(polyad.getName(), polyad.getArgCount());
     }
 
     public FR_WithState resolveFunction(String name, int argCount) {

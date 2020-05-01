@@ -93,23 +93,23 @@ public class WhileLoop implements Statement {
         String loopArg = null;
         Object arg = null;
 
-        switch (conditional.getArgumments().size()) {
+        switch (conditional.getArgCount()) {
             case 4:
-                arg = conditional.getArgumments().get(3).evaluate(localState);
+                arg = conditional.getArguments().get(3).evaluate(localState);
                 if (!(arg instanceof Long)) {
                     throw new IllegalArgumentException("Error: the loop increment must be a number");
                 }
                 Long zzz = (Long) arg;
                 increment = zzz.intValue();
             case 3:
-                arg = conditional.getArgumments().get(2).evaluate(localState);
+                arg = conditional.getArguments().get(2).evaluate(localState);
                 if (!(arg instanceof Long)) {
                     throw new IllegalArgumentException("Error: the loop starting value must be a number");
                 }
                 Long yyy = (Long) arg;
                 start = yyy.intValue();
             case 2:
-                arg = conditional.getArgumments().get(1).evaluate(localState);
+                arg = conditional.getArguments().get(1).evaluate(localState);
                 if (!(arg instanceof Long)) {
                     throw new IllegalArgumentException("Error: the loop ending value must be a number");
                 }
@@ -122,10 +122,10 @@ public class WhileLoop implements Statement {
                 }
                 // Now, the first argument is supposed to be a variable. We don't evaluate it since
                 // we are going to set the value in the local state table and increment it manually.
-                if (!(conditional.getArgumments().get(0) instanceof VariableNode)) {
+                if (!(conditional.getArguments().get(0) instanceof VariableNode)) {
                     throw new IllegalArgumentException("Error: You have not specified a variable for looping.");
                 }
-                VariableNode node = (VariableNode) conditional.getArgumments().get(0);
+                VariableNode node = (VariableNode) conditional.getArguments().get(0);
                 loopArg = node.getVariableReference();
                 break;
             default:
@@ -179,12 +179,12 @@ public class WhileLoop implements Statement {
      * @return
      */
     protected Object forKeysLoop(State localState) {
-        if (conditional.getArgumments().size() != 2) {
+        if (conditional.getArgCount() != 2) {
             throw new IllegalArgumentException("Error: You must supply two arguments for " + FOR_KEYS);
         }
         String loopVar = null;
         StemVariable stemVariable = null;
-        Object arg = conditional.getArgumments().get(1).evaluate(localState);
+        Object arg = conditional.getArguments().get(1).evaluate(localState);
         if (arg instanceof StemVariable) {
             stemVariable = (StemVariable) arg;
         } else {
@@ -192,7 +192,7 @@ public class WhileLoop implements Statement {
         }
 
         // Don't evaluate -- we just want the name of the variable.
-        arg = conditional.getArgumments().get(0);
+        arg = conditional.getArguments().get(0);
         if (arg instanceof VariableNode) {
             loopVar = ((VariableNode) arg).getVariableReference();
         } else {

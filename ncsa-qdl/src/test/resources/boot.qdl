@@ -1,10 +1,11 @@
 /*
   A file that has a bunch of other modules in it. Use this to pull in a lot of stuff for
-  testing.
+  testing. This grabs a lot of the examples out of the distro so you can play with them.
   Jeff Gaynor
   1/30/2020
 */
-load_module('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/armstrong_numbers.qdl');
-load_module('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/module_example.qdl');
-load_module('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/messy-function.qdl');
-load_module('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/recursion_test_factorial.qdl');
+root := sys#info('boot.qdl_home');
+load_module(root + '/examples/armstrong_numbers.qdl');
+load_module(root + '/examples/module_example.qdl');
+load_module(root + '/examples/messy-function.qdl');
+load_module(root + '/examples/recursion_test_factorial.qdl');

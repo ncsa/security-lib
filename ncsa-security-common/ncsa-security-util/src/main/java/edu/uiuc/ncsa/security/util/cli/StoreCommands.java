@@ -361,7 +361,17 @@ public abstract class StoreCommands extends CommonCommands {
             showSetIDHElp();
             return;
         }
-        id = BasicIdentifier.newID(inputLine.getLastArg());
+        String rawID = null;
+        Identifiable thingy = findItem(inputLine);
+        if (thingy != null) {
+            rawID = thingy.getIdentifierString();
+        } else {
+            rawID = inputLine.getLastArg();
+            if(rawID.startsWith("/")){
+                rawID = rawID.substring(1);
+            }
+        }
+        id = BasicIdentifier.newID(rawID);
         if (id == null) {
             say("warning: no identifier set");
             return;
@@ -372,8 +382,14 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     private void showSetIDHElp() {
-        say("set_id id = sets the current identifier. The argument is exactly the id. All subsequent operations will ");
+        say("set_id /id | id | index = sets the current identifier. The argument is exactly the id. All subsequent operations will ");
         say("use this identifier unless it is cleared or you explicitly override it.");
+        say("The arguments may be the id, the escaped version (commonly used elsewhere) of the index.");
+        say("The result will be the actual id of the object.");
+        say("E.g.");
+        say("set_id 3 --  sets the id to the 3rd object in the most recent ls command");
+        say("set_id /foo:bar -- sets the id to foo:bar");
+        say("set_id foo:bar -- sets the id to foo:bar");
         say("See also: clear_id, get_id");
     }
 

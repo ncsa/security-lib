@@ -21,8 +21,8 @@ public class TryCatch implements Statement {
             }
         } catch (RaiseErrorException t) {
             // custom error handling
-            localState.getSymbolStack().getLocalST().setStringValue("error_message", t.getPolyad().getArgumments().get(0).getResult().toString());
-            localState.getSymbolStack().getLocalST().setLongValue("error_code", (Long) t.getPolyad().getArgumments().get(1).getResult());
+            localState.getSymbolStack().getLocalST().setStringValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
+            localState.getSymbolStack().getLocalST().setLongValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }

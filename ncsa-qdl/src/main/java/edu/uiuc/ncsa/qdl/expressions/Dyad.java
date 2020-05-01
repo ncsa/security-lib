@@ -22,8 +22,8 @@ public class Dyad extends ExpressionImpl {
                 ExpressionNode leftNode,
                 ExpressionNode rightNode) {
         this(operatorType);
-        getArgumments().add(leftNode);
-        getArgumments().add(rightNode);
+        getArguments().add(leftNode);
+        getArguments().add(rightNode);
     }
 
   
@@ -35,19 +35,19 @@ public class Dyad extends ExpressionImpl {
     }
 
     public ExpressionNode getLeftArgument() {
-        return getArgumments().get(0);
+        return getArguments().get(0);
     }
 
     public ExpressionNode getRightArgument() {
-        return getArgumments().get(1);
+        return getArguments().get(1);
     }
 
     public void setLeftArgument(ExpressionNode node) {
-        getArgumments().add(0, node);
+        getArguments().add(0, node);
     }
 
     public void setRightArgument(ExpressionNode node) {
-        getArgumments().add(1, node);
+        getArguments().add(1, node);
     }
 
     @Override
