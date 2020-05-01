@@ -202,7 +202,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         }
     }
 
-    protected String[] scriptArgs = null;
+    protected Object[] scriptArgs = null;
 
     public boolean hasScriptArgs() {
         return scriptArgs != null;
@@ -213,11 +213,11 @@ public abstract class AbstractState implements StateInterface, Logable {
      *
      * @return
      */
-    public String[] getScriptArgs() {
+    public Object[] getScriptArgs() {
         return scriptArgs;
     }
 
-    public void setScriptArgs(String[] scriptArgs) {
+    public void setScriptArgs(Object[] scriptArgs) {
         this.scriptArgs = scriptArgs;
     }
 

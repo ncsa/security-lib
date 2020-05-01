@@ -1645,8 +1645,7 @@ public class WorkspaceCommands implements Logable {
                     System.exit(0); // Best we can do. Java does not allow for returned values.
                 }
                 getState().getLogger().error(t);
-                t.printStackTrace();
-                say("Error executing script \"" + runScriptPath + "\".");
+                say("Error executing script '" + runScriptPath + "'" + (t.getMessage()==null?".":":" + t.getMessage()));
                 System.exit(1); // So external programs can tell that something didn't work right.
             }
         }

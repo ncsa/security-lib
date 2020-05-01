@@ -605,19 +605,19 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg1 = polyad.evalArg(0, state);
-        String[] argList = new String[0];
+        Object[] argList = new Object[0];
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
             if (isStem(arg2)) {
                 StemList stemList = ((StemVariable) arg2).getStemList();
-                ArrayList<String> aa = new ArrayList<>();
+                ArrayList<Object> aa = new ArrayList<>();
                 for (int i = 0; i < stemList.size(); i++) {
                     Object object = stemList.get(i);
                     if (object != null && !(object instanceof QDLNull)) {
-                        aa.add(object.toString());
+                        aa.add(object);
                     }
                 }
-                argList = aa.toArray(new String[0]);
+                argList = aa.toArray(new Object[0]);
             }
         }
         // try {
@@ -635,7 +635,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new QDLRuntimeException("Error: Could not find the script '" + resourceName + "'. Is your script path set?");
         } else {
             try {
-                String[] oldArgs = localState.getScriptArgs();
+                Object[] oldArgs = localState.getScriptArgs();
                 localState.setScriptArgs(argList);
                 script.execute(localState);
                 localState.setScriptArgs(oldArgs);
