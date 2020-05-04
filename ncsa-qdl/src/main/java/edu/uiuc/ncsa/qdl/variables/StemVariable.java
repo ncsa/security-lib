@@ -358,7 +358,7 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * Convert this to JSON.
      *
-     * @param escapeNames -- whether or not to escape stem names when creating tje JSON object.
+     * @param escapeNames -- whether or not to escape stem names when creating the JSON object.
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
@@ -455,12 +455,16 @@ public class StemVariable extends HashMap<String, Object> {
         return obj.toString();
     }
 
+    public StemVariable fromJSON(JSONObject jsonObject) {
+        return fromJSON(jsonObject, false);
+    }
+
     /**
      * Populate this from a JSON object. Note that JSON arrays are turned in to stem lists.
      *
      * @param jsonObject return this object, populated
      */
-    public StemVariable fromJSON(JSONObject jsonObject) {
+    public StemVariable fromJSON(JSONObject jsonObject, boolean convertVars) {
         QDLCodec codec = new QDLCodec();
         for (Object k : jsonObject.keySet()) {
             String key = k.toString();
@@ -468,14 +472,25 @@ public class StemVariable extends HashMap<String, Object> {
             Object v = jsonObject.get(k);
             if (v instanceof JSONObject) {
                 StemVariable x = new StemVariable();
-                put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+                if (convertVars) {
+                    put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+                } else {
+                    put(key + STEM_INDEX_MARKER, x.fromJSON((JSONObject) v));
+                }
             } else {
                 if (v instanceof JSONArray) {
                     StemVariable x = new StemVariable();
-
-                    put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                    if (convertVars) {
+                        put(codec.encode(key) + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                    } else {
+                        put(key + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
+                    }
                 } else {
-                    put(codec.encode(key), v);
+                    if (convertVars) {
+                        put(codec.encode(key), v);
+                    } else {
+                        put(key, v);
+                    }
                 }
             }
         }
@@ -525,9 +540,9 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
-        if (!isVar(key)) {
+       /* if (!isVar(key)) {
             throw new IllegalArgumentException("Error: " + key + " is neither a legal variable name nor number.");
-        }
+        }*/
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);
         }

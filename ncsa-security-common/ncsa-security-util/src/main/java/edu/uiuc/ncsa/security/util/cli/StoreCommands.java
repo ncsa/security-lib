@@ -184,6 +184,8 @@ public abstract class StoreCommands extends CommonCommands {
      */
     protected abstract int longFormat(Identifiable identifiable);
 
+    protected abstract int longFormat(Identifiable identifiable, boolean isVerbose);
+
     protected List<Identifiable> allEntries = null;
 
     /**
@@ -367,7 +369,7 @@ public abstract class StoreCommands extends CommonCommands {
             rawID = thingy.getIdentifierString();
         } else {
             rawID = inputLine.getLastArg();
-            if(rawID.startsWith("/")){
+            if (rawID.startsWith("/")) {
                 rawID = rawID.substring(1);
             }
         }
@@ -483,25 +485,25 @@ public abstract class StoreCommands extends CommonCommands {
     protected void showLSHelp() {
         say("ls [flags] [number]");
         say("flags are");
-        say(StringUtils.RJustify(LONG_LIST_COMMAND, 4) + " = " + "long list of an object or all objects.");
-        say(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " short format list of an item or all items.");
-        say(StringUtils.RJustify(ALL_LONG_LIST_COMMAND1, 4) + " = " + "long list of every object.");
-        say(StringUtils.RJustify(ALL_LONG_LIST_COMMAND2, 4) + " = " + "ditto");
+        say(StringUtils.RJustify(LONG_LIST_COMMAND, 4) + " = " + "long list of an object or all objects. Longer entries will be truncated.");
+        say(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
+        say(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose listing. All entries will be shown in their entirety.");
+        //  say(StringUtils.RJustify(ALL_LONG_LIST_COMMAND2, 4) + " = " + "ditto");
         say("If you have listed all objects you may use the index number as the argument. Or you can supply");
         say("the identifier escaped with a /");
         say("E.g.");
-        say("ls -la = long list entire store. This may be huge.");
-        say("ls -l  = long list of the currently active object.");
-        say("ls -a  = short list of the store.");
-        say("ls -l 4 = long list of the 4th item from the ls -a command");
-        say("ls -l /foo:bar = long list of the object with identifier foo:bar");
-        say("ls -l foo:bar = long list of the object with identifier foo:bar");
+        say("ls " + LONG_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = long list entire store. This may be huge.");
+        say("ls " + LONG_LIST_COMMAND + " = long list of the currently active object.");
+        say("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
+        say("ls " + LONG_LIST_COMMAND + " 4 = long list of the 4th item from the ls -a command");
+        say("ls " + LONG_LIST_COMMAND + " /foo:bar = long list of the object with identifier foo:bar");
+        say("ls " + LONG_LIST_COMMAND + " foo:bar = long list of the object with identifier foo:bar");
+        say("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
     }
 
     protected final String LONG_LIST_COMMAND = "-l";
-    protected final String ALL_LIST_COMMAND = "-a";
-    protected final String ALL_LONG_LIST_COMMAND2 = "-la";
-    protected final String ALL_LONG_LIST_COMMAND1 = "-al";
+    protected final String ALL_LIST_COMMAND = "-E";
+    protected final String VERBOSE_COMMAND = "-v";
 
     protected boolean hasId() {
         return id != null;
@@ -522,11 +524,7 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
 
-        if (inputLine.hasArg(ALL_LONG_LIST_COMMAND1) || inputLine.hasArg(ALL_LONG_LIST_COMMAND2)) {
-            listAll(true, "");
-            return;
-        }
-
+        boolean isVerbose = inputLine.hasArg(VERBOSE_COMMAND);
         if (hasId()) {
             Identifiable identifiable = findItem(inputLine);
             if (identifiable == null) {
@@ -563,9 +561,14 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
             if (inputLine.hasArg(LONG_LIST_COMMAND)) {
-                longFormat(identifiable);
+                longFormat(identifiable, false);
             } else {
-                say(format(identifiable));
+                if (isVerbose) {
+                    longFormat(identifiable, true);
+
+                } else {
+                    say(format(identifiable));
+                }
             }
         }
 

@@ -431,18 +431,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doFromJSON(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
+        if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("Error: " + FROM_JSON + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
         if (!isString(arg)) {
             throw new IllegalArgumentException("Error: " + FROM_JSON + " requires a string as its argument");
         }
+        boolean convertKeys = false;
+
+        if(polyad.getArgCount() == 2){
+            Object arg2 = polyad.evalArg(1, state);
+            if(!isBoolean(arg2)){
+                throw new IllegalArgumentException("Error: " + FROM_JSON + " requires a boolean as its second argument if present.");
+            }
+          convertKeys = (Boolean)arg2;
+        }
         JSONObject jsonObject = null;
         StemVariable output = new StemVariable();
         try {
             jsonObject = JSONObject.fromObject((String) arg);
-            output.fromJSON(jsonObject);
+            output.fromJSON(jsonObject,convertKeys);
         } catch (Throwable t) {
             try {
                 JSONArray array = JSONArray.fromObject((String) arg);
@@ -470,7 +479,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + TO_JSON + " requires a stem as its first argument");
         }
         int indent = -1;
-        boolean convertNames = true;
+        boolean convertNames = false;
         /*
         Two args means the second is either a boolean for conversion or it an  int as the indent factor.
          */

@@ -161,18 +161,23 @@ public class Installer {
                 File f = new File(rootDir.getAbsolutePath() + current);
                 trace("processing " + f.getCanonicalPath());
                 if (f.getParentFile().equals(libDir)) {
-                    trace("processing lib dir" + f);
-                    InputStream is = Installer.class.getResourceAsStream(cString); // start with something we know is there                     
-                    cp(cString, f);
+                    if(f.getName().equals("qdl.jar")){
+                        f.delete();
+                        trace("processing lib dir" + f);
+                        cp(cString, f);
+                    }
 
                 }
                 if (f.getParentFile().equals(exxDir)) {
+                    // replace all files in examples dir.
+                    f.delete();
                     trace("processing examples dir" + f);
                     cp(cString, f);
 
                 }
 
                 if (f.getParentFile().equals(docDir)) {
+                    f.delete();
                     trace("processing doc dir" + f);
                     cp(cString, f);
 
@@ -181,8 +186,6 @@ public class Installer {
                     trace("processing version file" + f);
                     f.delete();
                     cp(cString, f);
-
-
                 }
             }
         }

@@ -104,33 +104,7 @@
                     </items>
                 </configuration>
             </plugin>
-            <!--    <plugin>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.7.2</version>
-                    <configuration>
-                        <sourceDirectory>
-                            /home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/antlr4/
-                        </sourceDirectory>
-                        <outputDirectory>
-                            /home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/qdl/generated
-                        </outputDirectory>
-                        <includes>
-                            <include>QDLParser.g4</include>
-                        </includes>
-                        <visitor>false</visitor>
-                        <listener>true</listener>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>antlr</id>
-                            <goals>
-                                <goal>antlr4</goal>
-                            </goals>
 
-                        </execution>
-                    </executions>
-                </plugin>-->
         </plugins>
     </build>
     <dependencies>

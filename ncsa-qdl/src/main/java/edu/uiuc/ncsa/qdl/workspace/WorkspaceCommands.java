@@ -1522,6 +1522,8 @@ public class WorkspaceCommands implements Logable {
         }
         logger = loggerProvider.get();
         State state = getState();
+        state.createSystemConstants();
+        state.createSystemInfo(null);
         bufferManager.state = getState();  // make any file operations later will succeed.
 
         if (inputLine.hasArg(CLA_HOME_DIR)) {
