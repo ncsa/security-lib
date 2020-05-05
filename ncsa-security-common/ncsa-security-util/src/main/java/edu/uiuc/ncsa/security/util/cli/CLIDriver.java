@@ -125,20 +125,23 @@ public class CLIDriver {
     protected void printHelp(){
         String indent = "  ";
         // This is help for the built in commands here
-        say("Command buffer commands. These are understood at all times and are interpreted before");
-        say(indent + "any commands are issued.");
+        say("--General commands:");
+        say(indent + EXIT_COMMAND + " or " + SHORT_EXIT_COMMAND + " = exit this component");
         say(indent + PRINT_HELP_COMMAND + " = print this help");
+        say("--Command buffer: These are understood at all times and are interpreted before");
+        say(indent + "any commands are issued.");
         say(indent + CLEAR_BUFFER_COMMAND + " =  clear the command history");
         say(indent + LOAD_BUFFER_COMMAND + " path = load the command history saved in the path");
+        say(indent + WRITE_BUFFER_COMMAND + " path = write the command history to the given file" );
+        say("--Command history:");
         say(indent + HISTORY_LIST_COMMAND + " [index] = either print the entire command history (no argument)");
         say(indent + indent + " or re-execute the command at the given index.");
-        say(indent + SHORT_EXIT_COMMAND + " = shorthand to exit this component");
         say(indent + REPEAT_LAST_COMMAND + " = re-evaluate the most recent (0th index) command in the history");
         say(indent + indent + "This is equivalent to issuing " + HISTORY_LIST_COMMAND + " 0");
-        say(indent + WRITE_BUFFER_COMMAND + " path = write the command history to the given file" );
 
         say("E.g.");
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
+        say("---");
     }
     protected String doRepeatCommand() {
         if (0 < commandHistory.size()) {
@@ -385,7 +388,9 @@ public class CLIDriver {
         for (int i = 0; i < tempCCIN.length; i++) {
             say(tempCCIN[i]);
         }
-        say("To get more information on a command type\n");
+        say("To get help on the CLI, type /?");
+        say("To get general information on the current component in use, type --help at the prompt.");
+        say("To get more information on a specific command\n");
         say("command --help");
     }
 
@@ -397,7 +402,8 @@ public class CLIDriver {
     protected void shutdown() {
         say("exiting ...");
 /*       Don't close the buffered reader since it will close System.in and
-         make it impossible to run another CLI in this JVM.
+         make it impossible to run another CLI in this JVM or anything else that
+         needs input for that matter.
 */
     }
 

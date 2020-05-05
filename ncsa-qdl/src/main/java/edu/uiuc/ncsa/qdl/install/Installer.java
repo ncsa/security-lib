@@ -161,9 +161,14 @@ public class Installer {
                 File f = new File(rootDir.getAbsolutePath() + current);
                 trace("processing " + f.getCanonicalPath());
                 if (f.getParentFile().equals(libDir)) {
-                    if(f.getName().equals("qdl.jar")){
+                    if (f.getName().equals("qdl.jar")) {
                         f.delete();
                         trace("processing lib dir" + f);
+                        cp(cString, f);
+                    }
+                    if (f.getName().equals("build-info.txt")) {
+                        f.delete();
+                        trace("processing build info" + f);
                         cp(cString, f);
                     }
 
@@ -192,8 +197,8 @@ public class Installer {
     }
 
     protected void cp(String x, File target) throws IOException {
-        if(target.isDirectory()){
-            trace("Skipping directory "+ target);
+        if (target.isDirectory()) {
+            trace("Skipping directory " + target);
             return;
         }
         InputStream is = getClass().getResourceAsStream(x); // start with something we know is there

@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
+import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
@@ -19,10 +20,8 @@ import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This is a facade for the various stateful components we have to track.
@@ -31,7 +30,7 @@ import java.util.HashMap;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
  */
-public class State extends FunctionState implements QDLConstants{
+public class State extends FunctionState implements QDLConstants {
     private static final long serialversionUID = 4129348937L;
 
 
@@ -69,46 +68,48 @@ public class State extends FunctionState implements QDLConstants{
         if (systemInfo != null) {
             return;
         }
-        systemInfo= new StemVariable();
+        systemInfo = new StemVariable();
         // Add some from Java, if not in server mode.
-         if (!isServerMode()) {
-             StemVariable os = new StemVariable();
-             os.put(SYS_INFO_OS_VERSION, System.getProperty("os.version"));
-             os.put(SYS_INFO_OS_NAME, System.getProperty("os.name"));
-             os.put(SYS_INFO_OS_ARCHITECTURE, System.getProperty("os.arch"));
+        if (!isServerMode()) {
+            StemVariable os = new StemVariable();
+            os.put(SYS_INFO_OS_VERSION, System.getProperty("os.version"));
+            os.put(SYS_INFO_OS_NAME, System.getProperty("os.name"));
+            os.put(SYS_INFO_OS_ARCHITECTURE, System.getProperty("os.arch"));
 
-             systemInfo.put(SYS_INFO_OS, os);
-             StemVariable system = new StemVariable();
-             system.put(SYS_INFO_JVM_VERSION, System.getProperty("java.version"));
-             system.put(SYS_INFO_INIT_MEMORY, (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + " MB");
-             system.put(SYS_INFO_SYSTEM_PROCESSORS, Runtime.getRuntime().availableProcessors());
-             systemInfo.put(SYS_INFO_SYSTEM, system);
-             StemVariable user = new StemVariable();
-             user.put(SYS_INFO_USER_INVOCATION_DIR, System.getProperty("user.dir"));
-             user.put(SYS_INFO_USER_HOME_DIR, System.getProperty("user.home"));
-             systemInfo.put(SYS_INFO_USER, user);
-         }
+            systemInfo.put(SYS_INFO_OS, os);
+            StemVariable system = new StemVariable();
+            system.put(SYS_INFO_JVM_VERSION, System.getProperty("java.version"));
+            system.put(SYS_INFO_INIT_MEMORY, (Runtime.getRuntime().totalMemory() / (1024 * 1024)) + " MB");
+            system.put(SYS_INFO_SYSTEM_PROCESSORS, Runtime.getRuntime().availableProcessors());
+            systemInfo.put(SYS_INFO_SYSTEM, system);
+            StemVariable user = new StemVariable();
+            user.put(SYS_INFO_USER_INVOCATION_DIR, System.getProperty("user.dir"));
+            user.put(SYS_INFO_USER_HOME_DIR, System.getProperty("user.home"));
+            systemInfo.put(SYS_INFO_USER, user);
+        }
 
-         StemVariable versionInfo = addManifestConstants();
-         if (versionInfo != null) {
-             systemInfo.put(SYS_QDL_VERSION, versionInfo);
-         }
-         if (qe != null && qe.isEnabled()) {
-             StemVariable qdl_props = new StemVariable();
-             qdl_props.put(SYS_BOOT_QDL_HOME, qe.getWSHomeDir());
-             if (!qe.getBootScript().isEmpty()) {
-                 qdl_props.put(SYS_BOOT_BOOT_SCRIPT, qe.getBootScript());
-             }
-             qdl_props.put(SYS_BOOT_CONFIG_NAME, qe.getName());
-             qdl_props.put(SYS_BOOT_CONFIG_FILE, qe.getCfgFile());
-             qdl_props.put(SYS_BOOT_LOG_FILE, qe.getMyLogger().getFileName());
-             qdl_props.put(SYS_BOOT_LOG_NAME, qe.getMyLogger().getClassName());
-             qdl_props.put(SYS_BOOT_SERVER_MODE, isServerMode());
-             qdl_props.put(SYS_SCRIPTS_PATH, qe.getScriptPath());
-             systemInfo.put(SYS_BOOT, qdl_props);
-         }
+
+        if (qe != null && qe.isEnabled()) {
+            StemVariable qdl_props = new StemVariable();
+            qdl_props.put(SYS_BOOT_QDL_HOME, qe.getWSHomeDir());
+            if (!qe.getBootScript().isEmpty()) {
+                qdl_props.put(SYS_BOOT_BOOT_SCRIPT, qe.getBootScript());
+            }
+            qdl_props.put(SYS_BOOT_CONFIG_NAME, qe.getName());
+            qdl_props.put(SYS_BOOT_CONFIG_FILE, qe.getCfgFile());
+            qdl_props.put(SYS_BOOT_LOG_FILE, qe.getMyLogger().getFileName());
+            qdl_props.put(SYS_BOOT_LOG_NAME, qe.getMyLogger().getClassName());
+            qdl_props.put(SYS_BOOT_SERVER_MODE, isServerMode());
+            qdl_props.put(SYS_SCRIPTS_PATH, qe.getScriptPath());
+            systemInfo.put(SYS_BOOT, qdl_props);
+            StemVariable versionInfo = addManifestConstants(qe.getWSHomeDir());
+            if (versionInfo != null) {
+                systemInfo.put(SYS_QDL_VERSION, versionInfo);
+            }
+        }
 
     }
+
     public void createSystemConstants() {
         if (systemConstants != null) {
             return;
@@ -139,14 +140,62 @@ public class State extends FunctionState implements QDLConstants{
     /**
      * If this is packaged in a jar, read off the information from the manifest file.
      * If no manifest, skip this.
+     *
      * @return
      */
-    protected StemVariable addManifestConstants() {
-        InputStream is = getClass().getResourceAsStream("/META-INF/MANIFEST.MF");
+    protected StemVariable addManifestConstants(String path) {
+        StemVariable versionInfo = new StemVariable();
+        List<String> manifest = null;
+        try {
+            manifest = FileUtil.readFileAsLines(path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
+        } catch (Throwable throwable) {
+            getLogger().info("Could not find the build info file. Looked in " + path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
+            throwable.printStackTrace();
+            return versionInfo;
+        }
+        //InputStream is = getClass().getResourceAsStream("MANIFEST.MF");
+/*
         if (is == null) {
+            System.out.println("STATE: manifest is null");
             return null;
         }
-        StemVariable versionInfo = new StemVariable();
+*/
+        for (String linein : manifest) {
+            if (linein.startsWith("application-version:")) {
+                // e.g.  application-version: 1.0.1
+                versionInfo.put(SYS_QDL_VERSION_VERSION, truncateLine("application-version:", linein));
+            }
+            if (linein.startsWith("Build-Jdk:")) {
+                // e.g. Build-Jdk: 1.8.0_231
+                versionInfo.put(SYS_QDL_VERSION_BUILD_JDK, truncateLine("Build-Jdk:", linein));
+            }
+            if (linein.startsWith("build-time:")) {
+                // e.g. build-time: 1586726889841
+                try {
+                    Long ts = Long.parseLong(truncateLine("build-time:", linein));
+                    versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, Iso8601.date2String(ts));
+                } catch (Throwable t) {
+                    versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, "?");
+                }
+            }
+            if (linein.startsWith("Created-By:")) {
+                // e.g. Created-By: Apache Maven 3.6.0
+                versionInfo.put(SYS_QDL_VERSION_CREATED_BY, truncateLine("Created-By:", linein));
+            }
+            if (linein.startsWith("implementation-build:")) {
+                // e.g.     implementation-build: Build: #21 (2020-04-12T16:28:09.841-05:00)
+                String build = truncateLine("implementation-build:", linein);
+                build = build.substring(0, build.indexOf("("));
+                build = truncateLine("Build:", build);
+                if (build.startsWith("#")) {
+                    build = build.substring(1);
+                }
+                versionInfo.put(SYS_QDL_VERSION_BUILD_NUMBER, build);
+            }
+
+        }
+        return versionInfo;
+/*
         try {
             if (is != null) {
                 InputStreamReader isr = new InputStreamReader(is);
@@ -191,6 +240,7 @@ public class State extends FunctionState implements QDLConstants{
             warn("Could not load version information:" + t.getMessage());
         }
         return versionInfo;
+*/
     }
 
     String truncateLine(String head, String line) {
@@ -237,7 +287,7 @@ public class State extends FunctionState implements QDLConstants{
      */
     public QDLScript getScriptFromVFS(String fqName) throws Throwable {
         VFSEntry entry = getFileFromVFS(fqName);
-        if(entry == null){
+        if (entry == null) {
             return null;
         }
         if (entry.getType().equals(Scripts.SCRIPT)) {

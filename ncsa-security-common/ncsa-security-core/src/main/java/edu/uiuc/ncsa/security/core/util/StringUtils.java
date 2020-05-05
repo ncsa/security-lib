@@ -56,9 +56,9 @@ public class StringUtils {
         // we know x.length() < width at this point.
         if (rightJustify) {
 
-            return getBlanks( width - x.length()) + x;
+            return getBlanks(width - x.length()) + x;
         } else {
-            return x + getBlanks(  width - x.length());
+            return x + getBlanks(width - x.length());
         }
     }
 
@@ -87,13 +87,43 @@ public class StringUtils {
         System.out.println(truncate("abcdefghijklmnopqrs", 10));
         System.out.println(truncate("abcdefghijklmnopqrs", 100));
         List<String> y = new ArrayList<>();
-        y.add("foo");
-        y.add("foo bar afg adfg sdfg sdfadgw546 rhg 54erthvbg sfgsdfg");
-        y.add("foo bar baz sd sdfg sd dfg dfg d dfgdfgdfgsdfg zsewyfg dzg9g8fd98 98sa9-8ur9-gb8");
-        System.out.println(fromList(wrap(10, y, 40)));
-        System.out.println(fromList(wrap(0, y, 30)));
+        y.add("       foo : azxz");
+        y.add("foo bar afg: adfg sdfg sdfadgw546 rhg 54erthvbg sfgsdfg");
+        y.add("   foo bar : baz sd sdfg sd dfg dfg d dfgdfgdfgsdfg zsewyfg dzg9g8fd98 98sa9-8ur9-gb8");
+        System.out.println(fromList(justify(10, y, 40)));
+        System.out.println(fromList(justify(0, y, 30)));
         String x = null;
         System.out.println(isTrivial(x));
+testWrap();
+    }
+
+    /*
+          callback_uri : ["https://client.example.org/callback","https://client.example.org/callback2"]
+               cfg : {"new":"config"}
+         client_id : oa4mp:/client_id/52d39e92ab5347c880fa19f3b9cb4204
+       creation_ts : 2020-05-04 13:47:41.0
+  last_modified_ts : 2020-05-04 13:48:21.0
+              name : New Test name
+     proxy_limited : false
+     public_client : true
+        public_key : ZOq88bMz4wIxYDbqfKpU2d4CTMx8vcXL2aYy1_XvkV1yZva1M0fHUFIqPRyZPrWapiTqeEzoXk2sJVzByDJgLp7psBaghosJfkq
+                     VTDQX_M17FBLYXZv7MviF6wB3_8MmCm2nHtKd5Ud6V6SvLj1tH5YmRcChCSS7evnXH94x3aqkIRfkQL0fJmbUDQQgOm-40vwBZt
+                     WSag3NImftUJch3twz
+     */
+    protected static void testWrap() {
+        ArrayList<String> x = new ArrayList<>();
+        x.add("    callback_uri : [\"https://client.example.org/callback\",\"https://client.example.org/callback2\"]");
+        x.add("             cfg : {\"new\":\"config\"}");
+        x.add("     creation_ts : 2020-05-04 13:47:41.0");
+        x.add("      public_key : ZOq88bMz4wIxYDbqfKpU2d4CTMx8vcXL2aYy1_XvkV1yZva1M0fHUFIqPRyZPrWapiTqeEzoXk2sJVzByDJgLp7psBaghosVTDQX_M17FBLYXZv7MviF6wB3_8MmCm2nHtKd5Ud6V6SvLj1tH5YmRcChCSS7evnXH94x3aqkIRf");
+        x.add("            name : New Test name");
+        x.add("last_modified_ts : 2020-05-04 13:48:21.0");
+        // NOTE that the length of eac line is printed at the end
+        List<String> y = wrap(19, x, 80);
+        for(String z: y){System.out.println(z + " |"+z.length());}
+        System.out.print("");
+        y = wrap(19, x, 125);
+        for(String z: y){System.out.println(z + " |"+z.length());}
 
     }
 
@@ -148,19 +178,20 @@ public class StringUtils {
 
     /**
      * Left and right margin are column numbers, so 10, string 80 means the resulting string
-     * will be padded with 10 characters on the left and 80 and the right. Each line will be wrapped separately.
+     * will be padded with 10 characters on the left and 80 and the right. Each line will be
+     * justifid within the margins separately
      *
      * @param leftMargin
      * @param source
      * @param rightMargin
      * @return
      */
-    public static String wrap(int leftMargin, String source, int rightMargin) {
-        return fromList(wrap(leftMargin, toList(source), rightMargin));
+    public static String justify(int leftMargin, String source, int rightMargin) {
+        return fromList(justify(leftMargin, toList(source), rightMargin));
 
     }
 
-    public static List<String> wrap(int leftMargin, List<String> source, int rightMargin) {
+    public static List<String> justify(int leftMargin, List<String> source, int rightMargin) {
         List<String> output = new ArrayList<>();
         int realWidth = rightMargin - leftMargin;
         String lPad = blanks.substring(0, leftMargin);
@@ -178,6 +209,42 @@ public class StringUtils {
         }
         return output;
     }
+
+    /**
+     * For output like
+     * <pre>
+     *     abc : foo
+     *  swwe e : bar fgd
+     *           ddd ryf
+     * </pre>
+     * This outdents the first line and indents to rest for the wrap.
+     *
+     * @param offset      length of whole left block
+     * @param source
+     * @param rightMargin
+     * @return
+     */
+    public static List<String> wrap(int offset, List<String> source, int rightMargin) {
+        List<String> output = new ArrayList<>();
+        for (int i = 0; i < source.size(); i++) {
+            String currentLine = source.get(i);
+            if (currentLine.length() < rightMargin) {
+                output.add(currentLine);
+            } else {
+                output.add(currentLine.substring(0, rightMargin));
+                List<String> flowedtext = StringUtils.wrap(0,
+                        StringUtils.toList(currentLine.substring(rightMargin)),
+                        rightMargin - offset);
+                for(String x : flowedtext){
+
+                    output.add(getBlanks(offset) + x);
+                }
+
+            }
+        }
+        return output;
+    }
+
 
     public static List<String> toList(String x) {
         StringTokenizer st = new StringTokenizer(x, "\n");

@@ -77,6 +77,11 @@ public abstract class CommonCommands implements Commands {
     }
 
     protected String defaultIndent = "";
+
+    public int indentWidth() {
+        return defaultIndent.length();
+    }
+
     public static final String INDENT = "  "; // use this in implementations for consistent indenting.
 
     public BufferedReader getBufferedReader() {
@@ -105,6 +110,27 @@ public abstract class CommonCommands implements Commands {
         }
     }
 
+
+    @Override
+    public void print_help(InputLine inputLine) throws Exception{
+        say("All commands have detailed help by typing:");
+        say("command --help");
+        say("--Environment commands: these control variables managed by this component");
+        say("You may access these by enclosing them in delimters, e.g. ${var}");
+        sayi("clear_env = clear the environment");
+        sayi("print_env = print all variables in the environment");
+        sayi("read_env = read either a properties or JSON file contain key value pairs ");
+        sayi("save_env = write the current environment to a file for later use.");
+        sayi("set_env = set a variable for use");
+
+        say("--Other commands:");
+        sayi("print_help = print this help out");
+        sayi("set_output_on = turn on/off all output (used mostly in batch files)");
+        sayi("set_verbose_on = turn verbose off or on");
+        sayi("echo = print the argument. Useful in batch scripts.");
+        sayi("version = the version of this component.");
+
+    }
 
     /**
      * Prints with the default indent and a linefeed.

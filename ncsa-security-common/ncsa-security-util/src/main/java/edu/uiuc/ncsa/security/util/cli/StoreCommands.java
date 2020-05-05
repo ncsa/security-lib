@@ -28,7 +28,7 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     /**
-     * Constructor that sets the indent level for this command processor. Every bit ouf
+     * Constructor that sets the indent level for this command processor. Every bit of
      * output will be indented by this amount.
      *
      * @param defaultIndent
@@ -178,11 +178,20 @@ public abstract class StoreCommands extends CommonCommands {
 
     /**
      * Give a long (multi-line) formatted object. This should allow users to see everything cleanly.
+     * This assumes the long format, not the verbose
      *
      * @param identifiable
      * @return the width of the left field when formatting (for consistent look and feel in overrides).
      */
     protected abstract int longFormat(Identifiable identifiable);
+
+    /**
+     * Long formatting with the switch for verbose or not. If false, that means use the long format
+     *
+     * @param identifiable
+     * @param isVerbose
+     * @return the width of the left field when formatting (for consistent look and feel in overrides).
+     */
 
     protected abstract int longFormat(Identifiable identifiable, boolean isVerbose);
 
@@ -532,9 +541,14 @@ public abstract class StoreCommands extends CommonCommands {
                 return;
             }
             if (inputLine.hasArg(LONG_LIST_COMMAND)) {
-                longFormat(identifiable);
+                longFormat(identifiable, false);
             } else {
-                say(format(identifiable));
+                if (isVerbose) {
+                    longFormat(identifiable, true);
+
+                } else {
+                    say(format(identifiable));
+                }
             }
             return;
         }
@@ -587,5 +601,24 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
 
+    @Override
+    public void print_help(InputLine inputLine) throws Exception{
+        super.print_help(inputLine);
+        say("--Serialization commands: Reading and writing objects.");
+        sayi("deserialize = read the object from a file");
+        sayi("serialize = write an object to a file");
+        say("--id commands:");
+        sayi("clear_id = clear the current id");
+        sayi("get_id = print the current id");
+        sayi("set_id = set the current id");
+        say("--Object commands:");
+        sayi("create = create a new object");
+        sayi("edit = edit and object");
+        sayi("list_keys = list the properties aka keys for objects of this typer");
+        sayi("ls = list properties in an object, an object or objects.");
+        sayi("rm = remove and object or properties in an object");
+        sayi("size = the number of objects.");
+        sayi("update = update (change) a property or all properties for an object.");
+    }
 }
 

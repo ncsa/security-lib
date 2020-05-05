@@ -23,5 +23,5 @@ public interface Commands extends Logable{
      * @return java.lang.String
      */
     public String getPrompt();
-
+    public void print_help(InputLine inputLine) throws Exception;
 }

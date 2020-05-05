@@ -204,6 +204,11 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         currentEnvFile = path;
     }
 
+    @Override
+    public void print_help(InputLine inputLine) throws Exception {
+    say("Need to write help.");
+    }
+
     /**
      * Called at initialization to read and process the command line arguments.
      */

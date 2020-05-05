@@ -47,12 +47,20 @@ cp /home/ncsa/dev/ncsa-git/cilogon.github.io.git/qdl/docs/*.pdf docs
 mkdir "etc"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/min-cfg.xml etc/min-cfg.xml
 mkdir "examples"
-cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/*.qdl examples/
+cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/examples/*.qdl examples/
 mkdir "lib"
 cp "$QDL_ROOT/target/qdl.jar" lib
+cd lib
+# Get the actual manifest so that build info is available.
+unzip qdl.jar "*.MF"
+# Puts it in the main qdl directory. Should be exactly one file in it.
+mv META-INF/MANIFEST.MF build-info.txt
+rmdir META-INF/
+
+cd ..
 mkdir "log"
 mkdir "lib/cp"
 mkdir "var"
 mkdir "var/ws"
 # jar cmf manifest-file jar-file input-files
-jar cmf installer.mf $JAR_NAME edu/uiuc/ncsa/qdl/install/Installer.class version.txt bin docs etc lib log var
+jar cmf installer.mf $JAR_NAME edu/uiuc/ncsa/qdl/install/Installer.class version.txt  build-info.txt bin docs etc lib log var examples
