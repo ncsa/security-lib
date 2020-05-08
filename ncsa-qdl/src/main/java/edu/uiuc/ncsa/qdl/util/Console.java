@@ -5,9 +5,11 @@ package edu.uiuc.ncsa.qdl.util;
 //
 // Disclaimer the use of this source is at your own risk.
 //
-// Permision to use and distribute into your own applications
+// Permission to use and distribute into your own applications
 //
 // RJHM van den Bergh , rvdb@comweb.nl
+
+import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,6 +45,11 @@ public class Console extends WindowAdapter implements WindowListener, ActionList
 		textArea=new JTextArea();
 		textArea.setEditable(false);
 		JButton button=new JButton("clear");
+		Font font = new Font("Liberation Mono", Font.BOLD, 14);
+		textArea.setFont(font);
+		textArea.setForeground(Color.YELLOW);
+		textArea.setBackground(Color.BLUE);
+		textArea.addKeyListener(setupKL());
 
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(new JScrollPane(textArea),BorderLayout.CENTER);
@@ -101,11 +108,15 @@ public class Console extends WindowAdapter implements WindowListener, ActionList
 		String[] fontNames=ge.getAvailableFontFamilyNames();
 		for(int n=0;n<fontNames.length;n++)  System.out.println(fontNames[n]);
 		// Testing part: simple an error thrown anywhere in this JVM will be printed on the Console
-		// We do it with a seperate Thread becasue we don't wan't to break a Thread used by the Console.
+		// We do it with a separate Thread becasue we don't wan't to break a Thread used by the Console.
 		System.out.println("\nLets throw an error on this console");
+		GeneralException generalException = new GeneralException();
+		                    generalException.printStackTrace();
+/*
 		errorThrower=new Thread(this);
 		errorThrower.setDaemon(true);
 		errorThrower.start();
+*/
 	}
 
 	public synchronized void windowClosed(WindowEvent evt)
@@ -182,8 +193,31 @@ public class Console extends WindowAdapter implements WindowListener, ActionList
 		return input;
 	}
 
+	void printEventInfo(PrintStream printStream, KeyEvent event, String msg ){
+		printStream.println(event.toString());
+	}
 	public static void main(String[] arg)
 	{
 		new Console(); // create console with not reference
+	}
+	public KeyListener setupKL(){
+
+		KeyListener listener = new KeyListener() {
+			@Override
+			public void keyPressed(KeyEvent event) {
+			    printEventInfo(System.out,  event, "Key Pressed");
+			}
+
+			@Override
+			public void keyTyped(KeyEvent event) {
+				printEventInfo(System.out,  event, "Key typed");
+			}
+
+			@Override
+			public void keyReleased(KeyEvent event) {
+				printEventInfo(System.out,  event, "Key Released");
+			}
+		};
+		 return listener;
 	}
 }

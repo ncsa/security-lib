@@ -47,11 +47,11 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static final String IO_SCAN_FUNCTION = IO_FQ + SCAN_FUNCTION;
     public static final int SCAN_TYPE = 2 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String READ_FILE = "read_file";
+    public static final String READ_FILE = "file_read";
     public static final String IO_READ_FILE = IO_FQ + "read";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String WRITE_FILE = "write_file";
+    public static final String WRITE_FILE = "file_write";
     public static final String IO_WRITE_FILE = IO_FQ + WRITE_FILE;
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 

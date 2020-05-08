@@ -42,6 +42,8 @@ public abstract class FunctionState extends VariableState {
                 myLoggingFacade);
     }
 
+    private static final long serialVersionUID = 0xcafed00d4L;
+
     /**
      * Convenience, just looks up name and arg count
      *

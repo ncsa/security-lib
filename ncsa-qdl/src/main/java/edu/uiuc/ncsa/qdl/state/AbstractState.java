@@ -32,7 +32,7 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     transient MyLoggingFacade logger; // makes no sense to serialize a logger.
 
-    private static final long serialversionUID = 129348937L;
+    private static final long serialVersionUID = 0xcafed00d3L;
 
     public AbstractState(ImportManager importManager,
                          SymbolStack symbolStack,

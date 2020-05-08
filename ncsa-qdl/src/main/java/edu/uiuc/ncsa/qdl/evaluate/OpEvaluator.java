@@ -72,16 +72,18 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         this.numericDigits = numericDigits;
     }
 
-   public static int numericDigits = 50; // default precision for decimals.
+    public static int numericDigits = 50; // default precision for decimals.
 
     /**
      * No listing for these yet since they are not the standard func() pattern, e.g. a < b.
+     *
      * @return
      */
     public TreeSet<String> listFunctions(boolean listFQ) {
-          TreeSet<String> names = new TreeSet<>();
-          return names;
-      }
+        TreeSet<String> names = new TreeSet<>();
+        return names;
+    }
+
     /**
      * Given an operator, this will return the integer value associated with it for lookups later.
      * {@link ExpressionNode}s store the value, not the operator.
@@ -279,21 +281,21 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     // just do object comparison
                     switch (dyad.getOperatorType()) {
                         case EQUALS_VALUE:
-                            if(objects[0] == null){
+                            if (objects[0] == null) {
                                 r.result = objects[1] == objects[0];
-                            }else {
-                                // dge case == null
-                                if(objects[1] instanceof QDLNull){
+                            } else {
+                                // edge case == null
+                                if (objects[1] instanceof QDLNull) {
                                     r.result = objects[0] instanceof QDLNull;
-                                }else {
+                                } else {
                                     r.result = objects[0].equals(objects[1]);
                                 }
                             }
                             break;
                         case NOT_EQUAL_VALUE:
-                            if(objects[0] == null){
+                            if (objects[0] == null) {
                                 r.result = objects[1] != objects[0];
-                            }else {
+                            } else {
                                 r.result = !objects[0].equals(objects[1]);
                             }
                             break;
@@ -408,8 +410,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             Long leftLong = (Long) objects[0];
                             Long rightLong = (Long) objects[1];
                             if (leftLong % rightLong == 0) {
-                                r.result = (Long) objects[0] / (Long) objects[1];
-
+                                r.result = leftLong / rightLong;
                             } else {
                                 BigDecimal left = new BigDecimal((Long) objects[0]);
                                 BigDecimal right = new BigDecimal((Long) objects[1]);
@@ -484,6 +485,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case MINUS_VALUE:
                 doMonadMinus(monad, state);
                 return;
+            case PLUS_VALUE:
+                doMonadPlus(monad, state);
+                return;
+
             default:
                 throw new NotImplementedException("Unknown monadic operator");
         }
@@ -540,31 +545,60 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         process1(monad, pointer, NOT, state);
     }
 
-    protected void doMonadMinus(Monad monad, State state) {
+    /**
+     * This will evaluate the expression and take its opposite. This is because the parser does not differentiate
+     * between -3^4 and (-3)^4, turing the first of each into a single monad. It works right if there
+     * are parentheses, but this is possible a thronier issue to fix than we want now. Best to
+     * ket it do this since algebraic operations work as expected.
+     * @param monad
+     * @param state
+     * @param sign
+     */
+    protected void doUnaryPlusMinus(Monad monad, State state, Long sign) {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-                if (!isNumber(objects[0]))
-                    throw new IllegalArgumentException("Error: You can only take the negative of a number");
-                if (isLong(objects[0])) {
-                    r.result = -(Long) objects[0];
-                    r.resultType = Constant.LONG_TYPE;
-                } else {
-                    BigDecimal x = toBD(objects[0]);
-                    r.result = BigDecimal.ZERO.subtract(x);
-                    r.resultType = Constant.DECIMAL_TYPE;
+                switch (Constant.getType(objects[0])) {
+                    case Constant.LONG_TYPE:
+                        r.result = sign* (Long) objects[0];
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        BigDecimal x = toBD(objects[0]);
+                        r.result = sign<0?x.negate():x;
+                        r.resultType = Constant.DECIMAL_TYPE;
+                        break;
+                    case Constant.STRING_TYPE:
+                        if(sign > 0) {
+                            r.result = objects[0];
+                        }else{
+                            r.result = "";
+                        }
+                        r.resultType = Constant.STRING_TYPE;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Error: You can only take the negative of a number or string");
+
                 }
                 return r;
             }
         };
-        process1(monad, pointer, MINUS, state);
+        process1(monad, pointer, sign == 1 ? PLUS : MINUS, state);
+    }
+
+    protected void doMonadPlus(Monad monad, State state) {
+        doUnaryPlusMinus(monad, state, 1L);
+    }
+
+    protected void doMonadMinus(Monad monad, State state) {
+        doUnaryPlusMinus(monad, state, -1L);
     }
 
     public void evaluate(Nilad nilad, State state) {
         switch (nilad.getOperatorType()) {
             default:
-                throw new NotImplementedException("Unknown monadic operator");
+                throw new NotImplementedException("Unknown niladic operator");
         }
     }
 

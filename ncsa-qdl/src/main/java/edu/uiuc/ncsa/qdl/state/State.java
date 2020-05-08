@@ -31,7 +31,7 @@ import java.util.List;
  * on 1/21/20 at  7:25 AM
  */
 public class State extends FunctionState implements QDLConstants {
-    private static final long serialversionUID = 4129348937L;
+    private static final long serialVersionUID = 0xcafed00d1L;
 
 
     public State(ImportManager resolver,
@@ -150,16 +150,9 @@ public class State extends FunctionState implements QDLConstants {
             manifest = FileUtil.readFileAsLines(path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
         } catch (Throwable throwable) {
             getLogger().info("Could not find the build info file. Looked in " + path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
-            throwable.printStackTrace();
             return versionInfo;
         }
-        //InputStream is = getClass().getResourceAsStream("MANIFEST.MF");
-/*
-        if (is == null) {
-            System.out.println("STATE: manifest is null");
-            return null;
-        }
-*/
+
         for (String linein : manifest) {
             if (linein.startsWith("application-version:")) {
                 // e.g.  application-version: 1.0.1
@@ -195,52 +188,6 @@ public class State extends FunctionState implements QDLConstants {
 
         }
         return versionInfo;
-/*
-        try {
-            if (is != null) {
-                InputStreamReader isr = new InputStreamReader(is);
-                BufferedReader bufferedInputStream = new BufferedReader(isr);
-                String linein = null;
-                while (null != (linein = bufferedInputStream.readLine())) {
-                    if (linein.startsWith("application-version:")) {
-                        // e.g.  application-version: 1.0.1
-                        versionInfo.put(SYS_QDL_VERSION_VERSION, truncateLine("application-version:", linein));
-                    }
-                    if (linein.startsWith("Build-Jdk:")) {
-                        // e.g. Build-Jdk: 1.8.0_231
-                        versionInfo.put(SYS_QDL_VERSION_BUILD_JDK, truncateLine("Build-Jdk:", linein));
-                    }
-                    if (linein.startsWith("build-time:")) {
-                        // e.g. build-time: 1586726889841
-                        try {
-                            Long ts = Long.parseLong(truncateLine("build-time:", linein));
-                            versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, Iso8601.date2String(ts));
-                        } catch (Throwable t) {
-                            versionInfo.put(SYS_QDL_VERSION_BUILD_TIME, "?");
-                        }
-                    }
-                    if (linein.startsWith("Created-By:")) {
-                        // e.g. Created-By: Apache Maven 3.6.0
-                        versionInfo.put(SYS_QDL_VERSION_CREATED_BY, truncateLine("Created-By:", linein));
-                    }
-                    if (linein.startsWith("implementation-build:")) {
-                        // e.g.     implementation-build: Build: #21 (2020-04-12T16:28:09.841-05:00)
-                        String build = truncateLine("implementation-build:", linein);
-                        build = build.substring(0, build.indexOf("("));
-                        build = truncateLine("Build:", build);
-                        if (build.startsWith("#")) {
-                            build = build.substring(1);
-                        }
-                        versionInfo.put(SYS_QDL_VERSION_BUILD_NUMBER, build);
-                    }
-                }
-                bufferedInputStream.close();
-            }
-        } catch (Throwable t) {
-            warn("Could not load version information:" + t.getMessage());
-        }
-        return versionInfo;
-*/
     }
 
     String truncateLine(String head, String line) {
@@ -389,22 +336,36 @@ public class State extends FunctionState implements QDLConstants {
         return newState;
     }
 
-/*
-    public State newLoopState() {
-        //System.out.println("** State, creating new local state **");
-        SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = new State(importManager,
-                newStack,
-                getOpEvaluator(),
-                getMetaEvaluator(),
-                getFunctionTable(),
-                getModuleMap(),
-                getLogger(),
-                isServerMode());
-        newState.setImportedModules(getImportedModules());
-        return newState;
+    /**
+     * For the case the this has been deserialized and needs to have its transient
+     * fields initialized. These are things like the {@link MetaEvaluator} that
+     * should not be serialized or current mount points (which can't be serialized
+     * because you'd have to serialize the entire backing file system to satisfy
+     * the contract of serialization!)
+     *
+     * @param oldState
+     */
+    public void injectTransientFields(State oldState) {
+        if (getMetaEvaluator() != null && getOpEvaluator() != null) {
+            // This is effectively a check if this has been done. If so, don't re-inject state.
+            return;
+        }
+        setLogger(oldState.getLogger()); // set the logger to whatever the current one is
+        setMetaEvaluator(oldState.getMetaEvaluator());
+        setOpEvaluator(oldState.getOpEvaluator());
+        if (oldState.hasVFSProviders()) {
+            setVfsFileProviders(new HashMap<>()); // Make sure something is in the current state before we muck with it.
+            for (String name : oldState.getVfsFileProviders().keySet()) {
+                addVFSProvider(oldState.getVfsFileProviders().get(name));
+            }
+        }
+        // Each imported module has its state serialized too. Hence each has to have current
+        // transient fields updated. This will act recursively (so imports in imports in imports etc.)
+        
+        for (String mod : getImportedModules().keySet()) {
+            getImportedModules().get(mod).getState().injectTransientFields(oldState);
+        }
     }
-*/
 
     /**
      * For modules only. This copies the state except that no functions are inherited. The

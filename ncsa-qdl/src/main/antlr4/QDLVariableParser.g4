@@ -53,17 +53,18 @@ grammar QDLVariableParser;
 
 // Control structures.
 
-      LogicalIf: 'if[';
-    LogicalThen: ']then[';
-    LogicalElse: ']else[';
-      WhileLoop: 'while[';
-        WhileDo: ']do[';
-SwitchStatement: 'switch[';
-DefineStatement: 'define[';
-  BodyStatement: ']body[';
-ModuleStatement: 'module[';
-  TryStatement : 'try[';
-CatchStatement : ']catch[';
+         LogicalIf : 'if[';
+       LogicalThen : ']then[';
+       LogicalElse : ']else[';
+         WhileLoop : 'while[';
+           WhileDo : ']do[';
+   SwitchStatement : 'switch[';
+   DefineStatement : 'define[';
+     BodyStatement : ']body[';
+   ModuleStatement : 'module[';
+     TryStatement  : 'try[';
+   CatchStatement  : ']catch[';
+StatementConnector : '][';
 
 fragment ESC : '\\\'';
 

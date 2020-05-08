@@ -1156,6 +1156,7 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
+
     private void doRealLoad(File f) {
         try {
             long lastModified = f.lastModified();
@@ -1164,13 +1165,8 @@ public class WorkspaceCommands implements Logable {
             /*
             Now set the stuff that cannot be serialized.
              */
-            newState.setLogger(getState().getLogger()); // set the logger to whatever the current one is
-            newState.setMetaEvaluator(getState().getMetaEvaluator());
-            newState.setOpEvaluator(getState().getOpEvaluator());
-            state.setVfsFileProviders(new HashMap<>()); // Make sure something is in the current state before we muck with it.
-            for (String name : getState().getVfsFileProviders().keySet()) {
-                newState.addVFSProvider(getState().getVfsFileProviders().get(name));
-            }
+            newState.injectTransientFields(getState());
+
             interpreter = new QDLParser(env, newState);
             interpreter.setEchoModeOn(isEchoModeOn());
             interpreter.setDebugOn(isDebugOn());
@@ -1639,6 +1635,7 @@ public class WorkspaceCommands implements Logable {
                 }
             } catch (Throwable t) {
                 if (t instanceof ReturnException) {
+                    // script cammed return(X), so return the agument.
                     ReturnException rx = (ReturnException) t;
                     if (rx.resultType != Constant.NULL_TYPE) {
                         System.out.println(rx.result);

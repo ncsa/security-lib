@@ -5,7 +5,7 @@
   1/30/2020
 */
 root := sys#info('boot.qdl_home');
-load_module(root + '/examples/armstrong_numbers.qdl');
-load_module(root + '/examples/module_example.qdl');
-load_module(root + '/examples/messy-function.qdl');
-load_module(root + '/examples/recursion_test_factorial.qdl');
+module_load(root + '/examples/armstrong_numbers.qdl');
+module_load(root + '/examples/module_example.qdl');
+module_load(root + '/examples/messy-function.qdl');
+module_load(root + '/examples/recursion_test_factorial.qdl');

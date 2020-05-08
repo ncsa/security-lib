@@ -2,14 +2,11 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
@@ -26,12 +23,14 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     public static final String SYS_FQ = SYS_NAMESPACE + ImportManager.NS_DELIMITER;
 
     public abstract String[] getFunctionNames();
-    public boolean isBuiltInFunction(String name){
-         for(String x : getFunctionNames()){
-             if(x.equals(name)) return  true;
-         }
-         return false;
+
+    public boolean isBuiltInFunction(String name) {
+        for (String x : getFunctionNames()) {
+            if (x.equals(name)) return true;
+        }
+        return false;
     }
+
     /**
      * This takes and expression (with an operator type) and returns true if is handled in this evaluator
      * and false otherwise.
@@ -149,8 +148,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      */
     public static abstract class fPointer {
         public abstract fpResult process(Object... objects);
+        public boolean isFirstArgumentMonadicMinus = false;
     }
-
     public static class fpResult {
         public Object result;
         public int resultType;
@@ -243,7 +242,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             } else {
                 r = pointer.process(stem1.get(key), stem2.get(key));
             }
+
+
             outStem.put(key, r.result);
+
         }
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
@@ -260,9 +262,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         Object arg1 = polyad.evalArg(0, state);
         Object arg2 = polyad.evalArg(1, state);
         Object arg3 = polyad.evalArg(2, state);
-        if(arg1 == null || arg2 == null || arg3 == null){
-             throw new UnknownSymbolException("Error: Unknown symbol");
-         }
+        if (arg1 == null || arg2 == null || arg3 == null) {
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
         if (areNoneStems(arg1, arg2, arg3)) {
             fpResult result = pointer.process(arg1, arg2, arg3);
             finishExpr(polyad, result);
@@ -386,9 +388,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             }
             try {
                 return state.getFileFromVFS(resourceName);
-            }catch (Throwable t){
-                if(t instanceof RuntimeException){
-                    throw (RuntimeException)t;
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
                 }
                 throw new QDLException("Error: could not file from VFS:" + t.getMessage(), t);
             }

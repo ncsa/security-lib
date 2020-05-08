@@ -463,8 +463,8 @@ public class ParserTest extends AbstractQDLTester {
         String g_module = "module['a:a','a']body[" + g_x + "];";
         String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
         String h_module = "module['b:b','b']body[" + h_y + "];";
-        String import_g = "import('a:a');";
-        String import_h = "import('b:b');";
+        String import_g = "module_import('a:a');";
+        String import_h = "module_import('b:b');";
         String f_xy = "define[f(x,y)]body[return(" + f_body + ");];";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -511,8 +511,8 @@ public class ParserTest extends AbstractQDLTester {
         String g_module = "module['a:a','a']body[" + g_x + "];";
         String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
         String h_module = "module['b:b','b']body[" + h_y + "];";
-        String import_g = "import('a:a');";
-        String import_h = "import('b:b');";
+        String import_g = "module_import('a:a');";
+        String import_h = "module_import('b:b');";
         String f_xy = "define[f(x,y)]body[" +
                 import_g + "\n" +
                 import_h + "\n" +
@@ -552,8 +552,8 @@ public class ParserTest extends AbstractQDLTester {
         String g_x = "define[g(x)]body[return(x+1);];";
         String h_y = "define[h(y)]body[return(y-1);];";
         String g_module = "module['a:a','a']body[q:=2;w:=3;" + g_x + h_y + "];";
-        String import_g = "import('a:a');";
-        String import_g1 = "import('a:a', 'b');";
+        String import_g =  "module_import('a:a');";
+        String import_g1 = "module_import('a:a', 'b');";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, g_module);
@@ -635,8 +635,8 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
         addLine(script, "list. := indices(10);");
-        addLine(script, "import('a:a');");
-        addLine(script, "import('a:b');");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "module_import('a:b');");
         addLine(script, "d := a#list.b#i;");
         addLine(script, "e := b#list.#i;");
 
@@ -663,8 +663,8 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:a','a']body[i:=2;list. := -10 + indices(5);];");
         addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + indices(5);];");
-        addLine(script, "import('a:a');");
-        addLine(script, "import('a:b');");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "module_import('a:b');");
         addLine(script, "p := i;");
         addLine(script, "q := list.0;");
         addLine(script, "r := j;");
@@ -707,9 +707,9 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
         addLine(script, "list. := indices(10);");
-        addLine(script, "import('a:a');");
-        addLine(script, "import('b:b');");
-        addLine(script, "import('a:b', 'd');");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "module_import('b:b');");
+        addLine(script, "module_import('a:b', 'd');");
         addLine(script, "d := d#list.b#i;");
         addLine(script, "e := b#list.d#i;");
 
@@ -1199,13 +1199,13 @@ public class ParserTest extends AbstractQDLTester {
     public void testNestedVariableImport() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:/a','a']body[q:=1;];");
-        addLine(script, "import('a:/a');");
-        addLine(script, "import('a:/a','b');");
-        addLine(script, "module['q:/q','w']body[import('a:/a');zz:=a#q+2;];");
+        addLine(script, "module_import('a:/a');");
+        addLine(script, "module_import('a:/a','b');");
+        addLine(script, "module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];");
         addLine(script, "a#q:=10;");
         addLine(script, "b#q:=11;");
         // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "import('q:/q');");
+        addLine(script, "module_import('q:/q');");
         addLine(script, "w#a#q:=3;");
         State state = testUtils.getNewState();
 
@@ -1223,8 +1223,8 @@ public class ParserTest extends AbstractQDLTester {
 
         define[f(x)]body[return(x+100);];
         module['a:/t','a']body[define[f(x)]body[return(x+1);];];
-        module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
-        import('q:/z');
+        module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
+        module_import('q:/z');
         w#a#f(3)
         w#g(2)
      */
@@ -1233,12 +1233,12 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "define[f(x)]body[return(x+100);];");
         addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
-        addLine(script, "module['q:/z','w']body[import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
+        addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
         addLine(script, "test_f:=f(1);");
-        addLine(script, "import('a:/t');");
+        addLine(script, "module_import('a:/t');");
         addLine(script, "test_a:=a#f(1);");
         // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "import('q:/z');");
+        addLine(script, "module_import('q:/z');");
         addLine(script, "test_waf := w#a#f(2);");
         addLine(script, "test_wg := w#g(2);");
         State state = testUtils.getNewState();

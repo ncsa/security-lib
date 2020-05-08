@@ -68,12 +68,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final int RETURN_TYPE = 100 + CONTROL_BASE_VALUE;
 
 
-    public static final String IMPORT = "import";
-    public static final String FQ_IMPORT = SYS_FQ + IMPORT;
+    public static final String MODULE_IMPORT = "module_import";
+    public static final String FQ_IMPORT = SYS_FQ + MODULE_IMPORT;
     public static final int IMPORT_TYPE = 203 + CONTROL_BASE_VALUE;
 
-    public static final String LOAD_MODULE = "load_module";
-    public static final String FQ_LOAD_MODULE = SYS_FQ + LOAD_MODULE;
+    public static final String MODULE_LOAD = "module_load";
+    public static final String FQ_LOAD_MODULE = SYS_FQ + MODULE_LOAD;
     public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
 
     // For system constants
@@ -129,8 +129,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             FOR_NEXT,
             CHECK_AFTER,
             RETURN,
-            IMPORT,
-            LOAD_MODULE,
+            MODULE_IMPORT,
+            MODULE_LOAD,
             RAISE_ERROR,
             RUN_COMMAND,
             LOAD_COMMAND};
@@ -204,10 +204,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case FQ_CHECK_AFTER:
                 return CHECK_AFTER_TYPE;
             // Module stuff
-            case IMPORT:
+            case MODULE_IMPORT:
             case FQ_IMPORT:
                 return IMPORT_TYPE;
-            case LOAD_MODULE:
+            case MODULE_LOAD:
             case FQ_LOAD_MODULE:
                 return LOAD_MODULE_TYPE;
             case RAISE_ERROR:
@@ -276,11 +276,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 loadScript(polyad, state);
                 return true;
 
-            case IMPORT:
+            case MODULE_IMPORT:
             case FQ_IMPORT:
                 doImport(polyad, state);
                 return true;
-            case LOAD_MODULE:
+            case MODULE_LOAD:
             case FQ_LOAD_MODULE:
                 doLoadModule(polyad, state);
                 return true;
@@ -716,7 +716,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new QDLServerModeException("Error: reading files is not supported in server mode");
         }
         if (0 == polyad.getArgCount() || 3 <= polyad.getArgCount()) {
-            throw new IllegalArgumentException("Error" + LOAD_MODULE + " requires one or two arguments.");
+            throw new IllegalArgumentException("Error" + MODULE_LOAD + " requires one or two arguments.");
         }
         int loadTarget = LOAD_FILE;
         if (polyad.getArgCount() == 2) {
@@ -725,14 +725,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             if (isString(arg2)) {
                 loadTarget = arg2.toString().equals("java") ? LOAD_JAVA : LOAD_FILE;
             } else {
-                throw new IllegalArgumentException("Error: " + LOAD_MODULE + " requires a string as a second argument");
+                throw new IllegalArgumentException("Error: " + MODULE_LOAD + " requires a string as a second argument");
             }
 
         }
         Object arg = polyad.evalArg(0, state);
 
         if (!isString(arg)) {
-            throw new IllegalArgumentException("Error: The " + LOAD_MODULE + " command requires a string as its argument, not '" + arg + "'");
+            throw new IllegalArgumentException("Error: The " + MODULE_LOAD + " command requires a string as its argument, not '" + arg + "'");
         }
         String resourceName = arg.toString();
         if (loadTarget == LOAD_JAVA) {
@@ -814,7 +814,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doImport(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
-            throw new IllegalArgumentException("Error" + IMPORT + " requires an argument");
+            throw new IllegalArgumentException("Error" + MODULE_IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
         if (arg == null) {

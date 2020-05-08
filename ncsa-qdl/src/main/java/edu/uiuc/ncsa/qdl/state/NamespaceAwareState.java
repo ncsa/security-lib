@@ -35,6 +35,7 @@ public abstract class NamespaceAwareState extends AbstractState {
                 moduleMap,
                 myLoggingFacade);
     }
+    private static final long serialVersionUID = 0xcafed00d6L;
 
     /**
      * Takes any function and looks for the NS delimiter, returning a module if there

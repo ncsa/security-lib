@@ -21,27 +21,27 @@ statement :
 
 
 ifStatement
-	:	LogicalIf expression LogicalThen (statement ';')* LeftBracket;
+	:	LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* LeftBracket;
 
 
 ifElseStatement
-	:	LogicalIf expression LogicalThen (statement ';')* LogicalElse (statement ';')* LeftBracket;
+	:	LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* LogicalElse (statement ';')* LeftBracket;
 
 conditionalStatement : ( ifElseStatement | ifStatement);
 
 loopStatement:
-     WhileLoop expression WhileDo (statement ';')* LeftBracket;
+     WhileLoop expression (WhileDo | StatementConnector) (statement ';')* LeftBracket;
 
 switchStatement:
     SwitchStatement (ifStatement ';')* LeftBracket;
 
 
 defineStatement:
-     DefineStatement function BodyStatement fdoc* (statement ';')+ LeftBracket;
+     DefineStatement function (BodyStatement | StatementConnector) fdoc* (statement ';')+ LeftBracket;
 
 
 moduleStatement:
-     ModuleStatement STRING (',' STRING)? BodyStatement (statement ';')* LeftBracket;
+     ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) (statement ';')* LeftBracket;
 
 tryCatchStatement:
      TryStatement (statement ';')* CatchStatement (statement ';')* LeftBracket;

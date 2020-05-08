@@ -17,7 +17,7 @@ expression
    function                                                              #functions
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
- | '-' expression                                                        #unaryMinusExpression
+ | ('+' | '-') expression                                                #unaryMinusExpression
  | '!' expression                                                        #notExpression
  | expression '^' expression                                             #powerExpression
  | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression

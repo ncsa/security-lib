@@ -127,7 +127,9 @@ public class FileEntries {
     }
 
     public static boolean isBinary(File f) throws IOException {
-        if(f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)){
+        if (f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)
+                || f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_MODULE_FILE_EXTENSION)
+        ) {
             // Make sure QDL knows its own files are not binary!
             return false;
         }
@@ -140,7 +142,7 @@ public class FileEntries {
                 ftype.endsWith("/java") ||
                 ftype.endsWith("/html")
         ) return false;
-        return true;
+        return true; // safe way -- anything it can't figure out is binary. User can override this.
     }
 
     public static JSONObject createConfig() {

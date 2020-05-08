@@ -36,7 +36,7 @@ public class ImportManager implements Serializable {
         }
     }
 
-    private static final long serialversionUID = 129348938L;
+    private static final long serialVersionUID = 0xcafed00d5L;
     /**
      * Delimiter for namespaces. Change this and you will probably break then entire system...
      */

@@ -20,7 +20,7 @@ import java.util.TreeSet;
  * on 1/22/20 at  10:53 AM
  */
 public class FunctionEvaluator extends AbstractFunctionEvaluator {
-    public static long serialVersionUID = 654768894456L;
+    public static long serialVersionUID = 0xcafed00d2L;
     public static final int BASE_FUNCTION_VALUE = 6000;
     public static final String IS_FUNCTION = "is_function";
     public static final String FQ_IS_FUNCTION = SYS_FQ + "is_function";

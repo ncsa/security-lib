@@ -1,7 +1,10 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.Constant;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -79,4 +82,26 @@ public class Monad extends ExpressionImpl {
         monad.setArgument(getArgument().makeCopy());
         return monad;
     }
+    public boolean isSigned(){
+        return operatorType == OpEvaluator.MINUS_VALUE;
+    }
+    public Long getSignedLongValue(){
+        if(!evaluated){
+            throw new UnevaluatedExpressionException("Error: unevaulated expression");
+        }
+        if(resultType != Constant.LONG_TYPE){
+            throw new IllegalArgumentException("error: not a long");
+        }
+        return (isSigned()?-1L:1L)* (Long)getResult();
+    }
+    public BigDecimal getSignedDecimalValue(){
+        if(!evaluated){
+            throw new UnevaluatedExpressionException("Error: unevaulated expression");
+        }
+        if(resultType != Constant.DECIMAL_TYPE){
+            throw new IllegalArgumentException("error: not a long");
+        }
+        return isSigned()?((BigDecimal)getResult()).negate():(BigDecimal)getResult();
+    }
+
 }
