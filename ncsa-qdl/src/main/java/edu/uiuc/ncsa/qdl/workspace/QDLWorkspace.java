@@ -19,7 +19,6 @@ import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
 public class QDLWorkspace {
 
     public QDLWorkspace(WorkspaceCommands workspaceCommands) {
-
         this.workspaceCommands = workspaceCommands;
     }
 
@@ -69,8 +68,8 @@ public class QDLWorkspace {
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
-            boolean executeLocalBuffer = false;
-            boolean executeExternalFile = false;
+   //         boolean executeLocalBuffer = false;
+     //       boolean executeExternalFile = false;
             System.out.print(INDENT);
             String input = workspaceCommands.readline().trim();
 
@@ -87,13 +86,13 @@ public class QDLWorkspace {
                     case RC_NO_OP:
                     case RC_CONTINUE:
                         continue;
-
+/*
                     case RC_EXECUTE_LOCAL_BUFFER:
                         executeLocalBuffer = true;
                         break;
                     case RC_EXECUTE_EXTERNAL_BUFFER:
                         executeExternalFile = true;
-                        break;
+                        break;*/
                 }
             }
             boolean echoMode = workspaceCommands.isEchoModeOn();

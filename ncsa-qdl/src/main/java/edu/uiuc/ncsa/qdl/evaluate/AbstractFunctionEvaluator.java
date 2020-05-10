@@ -2,7 +2,10 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.expressions.*;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -148,8 +151,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      */
     public static abstract class fPointer {
         public abstract fpResult process(Object... objects);
+
         public boolean isFirstArgumentMonadicMinus = false;
     }
+
     public static class fpResult {
         public Object result;
         public int resultType;
@@ -170,9 +175,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        if(arg1 == null){
-             throw new UnknownSymbolException("Error: Unknown symbol");
-         }
+        if (arg1 == null) {
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -180,12 +185,33 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         StemVariable stemVariable = (StemVariable) arg1;
         StemVariable outStem = new StemVariable();
-        for (String key : stemVariable.keySet()) {
-            outStem.put(key, pointer.process(stemVariable.get(key)).result);
-        }
+        processStem1(outStem, stemVariable, pointer);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+    }
+
+    /**
+     * Processing stems for monadic functions
+     *
+     * @param outStem
+     * @param stemVariable
+     * @param pointer
+     */
+    protected void processStem1(StemVariable outStem, StemVariable stemVariable, fPointer pointer) {
+        for (String key : stemVariable.keySet()) {
+            Object object = stemVariable.get(key);
+            if (object instanceof StemVariable) {
+                StemVariable newOut = new StemVariable();
+                processStem1(newOut, (StemVariable) object, pointer);
+                if(!newOut.isEmpty()) {
+                    outStem.put(key, newOut);
+                }
+            } else {
+                outStem.put(key, pointer.process(stemVariable.get(key)).result);
+            }
+        }
+
     }
 
     protected void process2(ExpressionImpl polyad,
@@ -196,6 +222,16 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         process2(polyad, pointer, name, state, false);
     }
 
+    /**
+     * NOTE optionalArguments means that the {@link fPointer} an take more than 2 arguments.
+     * So the basic functionality requires 2 args and there may be more.
+     *
+     * @param polyad
+     * @param pointer
+     * @param name
+     * @param state
+     * @param optionalArgs
+     */
     protected void process2(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
@@ -206,7 +242,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Object arg1 = polyad.evalArg(0, state);
         Object arg2 = polyad.evalArg(1, state);
-        if(arg1 == null || arg2 == null){
+        if (arg1 == null || arg2 == null) {
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
         Object[] argList = new Object[polyad.getArgCount()];
@@ -225,31 +261,55 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         StemVariable stem1 = toStem(arg1);
         StemVariable stem2 = toStem(arg2);
         StemVariable outStem = new StemVariable();
+        processStem2(outStem, stem1, stem2, pointer, polyad, optionalArgs);
+        polyad.setResult(outStem);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+    }
+
+    /*
+    For debugging
+      d.0.0 := 5; d.0.1 := 4; d.1.0:=  3; d.1.1 := -2;
+      c.0.0 := 2; c.0.1 := 1; c.1.0:= -7;  c.1.1 := 5;
+      c. + d.
+     */
+    protected void processStem2(StemVariable outStem,
+                                StemVariable stem1,
+                                StemVariable stem2,
+                                fPointer pointer,
+                                ExpressionImpl polyad, boolean optionalArgs) {
         Set<String> keys = getCommonKeys(stem1, stem2);
         // now we loop -- note that we must still preserve which is the first and second argument
         // so all this is basically to figure out how to loop over what.
         for (String key : keys) {
-            fpResult r;
+            fpResult r = null;
+            Object[] objects;
             if (optionalArgs) {
-                Object[] objects = new Object[polyad.getArgCount()];
-                objects[0] = stem1.get(key);
-                objects[1] = stem2.get(key);
+                objects = new Object[polyad.getArgCount()];
+
+            } else {
+                objects = new Object[2];
+            }
+            objects[0] = stem1.get(key);
+            objects[1] = stem2.get(key);
+            if (optionalArgs) {
                 for (int i = 2; i < objects.length; i++) {
                     objects[i] = polyad.getArguments().get(i).getResult();
                 }
-                r = pointer.process(objects);
-
-            } else {
-                r = pointer.process(stem1.get(key), stem2.get(key));
             }
 
-
-            outStem.put(key, r.result);
-
+            if (objects[0] instanceof StemVariable) {
+                StemVariable newOut = new StemVariable();
+                processStem2(newOut, (StemVariable) objects[0], (StemVariable) objects[1], pointer, polyad, optionalArgs);
+                if (!newOut.isEmpty()) {
+                    outStem.put(key, newOut);
+                }
+            } else {
+                r = pointer.process(objects);
+                outStem.put(key, r.result);
+            }
         }
-        polyad.setResult(outStem);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
+
     }
 
     protected void process3(ExpressionImpl polyad,
@@ -274,14 +334,57 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         StemVariable stem2 = toStem(arg2);
         StemVariable stem3 = toStem(arg3);
         StemVariable outStem = new StemVariable();
-        Set<String> keys = getCommonKeys(stem1, stem2, stem3);
-        for (String key : keys) {
-            fpResult r = pointer.process(stem1.get(key), stem2.get(key), stem3.get(key));
-            outStem.put(key, r.result);
-        }
+        processStem3(outStem, stem1, stem2, stem3, pointer, polyad, true);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+    }
+
+
+    protected void processStem3(StemVariable outStem,
+                                StemVariable stem1,
+                                StemVariable stem2,
+                                StemVariable stem3,
+                                fPointer pointer,
+                                ExpressionImpl polyad, boolean optionalArgs) {
+        Set<String> keys = getCommonKeys(stem1, stem2, stem3);
+        // now we loop -- note that we must still preserve which is the first and second argument
+        // so all this is basically to figure out how to loop over what.
+        for (String key : keys) {
+            fpResult r = null;
+            Object[] objects;
+            if (optionalArgs) {
+                objects = new Object[polyad.getArgCount()];
+
+            } else {
+                objects = new Object[3];
+            }
+            objects[0] = stem1.get(key);
+            objects[1] = stem2.get(key);
+            objects[2] = stem3.get(key);
+            if (optionalArgs) {
+                for (int i = 3; i < objects.length; i++) {
+                    objects[i] = polyad.getArguments().get(i).getResult();
+                }
+            }
+
+            if (objects[0] instanceof StemVariable) {
+                StemVariable newOut = new StemVariable();
+                processStem3(newOut,
+                        (StemVariable) objects[0],
+                        (StemVariable) objects[1],
+                        (StemVariable) objects[2],
+                        pointer, polyad, optionalArgs);
+                if(!newOut.isEmpty()) {
+                    outStem.put(key, newOut);
+                }
+                //r = pointer.process(objects);
+            } else {
+                r = pointer.process(objects);
+                outStem.put(key, r.result);
+            }
+        }
+
     }
 
     /**

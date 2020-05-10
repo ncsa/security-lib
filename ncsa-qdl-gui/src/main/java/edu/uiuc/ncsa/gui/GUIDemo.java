@@ -65,8 +65,8 @@ public class GUIDemo {
         TerminalEmulatorColorConfiguration colorConfig =        TerminalEmulatorColorConfiguration.newInstance(myPallette);
         factory.setTerminalEmulatorColorConfiguration(colorConfig);
         Terminal terminal = factory.createTerminal();
+        System.out.println("terminal is " + terminal.getClass().getSimpleName());
         Screen screen = new TerminalScreen(terminal);
-        TextGraphics textGraphics = screen.newTextGraphics();
 
            // sets up a resize listener in case the user changes the size.
   /*      terminal.addResizeListener((terminal1, newSize) -> {
@@ -84,19 +84,24 @@ public class GUIDemo {
             }
         });*/
 
-        textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
-
+        TextGraphics textGraphics = screen.newTextGraphics();
+        //textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
         screen.startScreen();
-        // Only one of these should be uncommented at any time since they are separate demos.
         screen.refresh(); // clear out any cruft in object properly.
+
+        // Only one of these should be uncommented at any time since they are separate demos.
         // showStuff(textGraphics);
-        //  testBox(screen);
         // helloWorld(screen);
         // userInput2(terminal, screen, textGraphics);
+        //  testBox(screen);
         terminalInput(terminal, screen, textGraphics);
         screen.stopScreen();
     }
 
+    /**
+     * Writes text an a couple fo graphics with the text graphics
+     * @param textGraphics
+     */
     protected static void showStuff(TextGraphics textGraphics) {
         textGraphics.putString(10, 10, "Hello World");
         textGraphics.drawRectangle(new TerminalPosition(5, 5), new TerminalSize(10, 10), '*');
@@ -107,7 +112,13 @@ public class GUIDemo {
      * Next is taken verbatim from
      * <a href="https://github.com/mabe02/lanterna/blob/master/src/test/java/com/googlecode/lanterna/tutorial/Tutorial04.java">this laterna tutorial.</a>
      * It will create a groovy floating text window with border. The contents have a few labels and a text box.
-     * Note
+     * <h3>Notes</h3>
+     * <ul>
+     *     <li>Tab between items.</li>
+     *     <li>A return activates item</li>
+     *     <li>Looks like accelerators are enabled (first character highlighted) but no code to do that, To close, tab to "Close"
+     *     button and hit enter.</li>
+     * </ul>
      *
      * @param screen
      * @throws IOException
@@ -125,6 +136,7 @@ public class GUIDemo {
                   Creating a new window is relatively uncomplicated, you can optionally supply a title for the window
                    */
         final Window window = new BasicWindow("My Root Window");
+        
 
                   /*
                   The window has no content initially, you need to call setComponent to populate it with something. In this
@@ -246,7 +258,7 @@ public class GUIDemo {
     }
 
     /**
-     * Use terminal like standard text mode.
+     * Use terminal like standard text mode. First try and stuff just gets tested here.
      *
      * @param terminal
      * @param screen
@@ -323,6 +335,8 @@ public class GUIDemo {
         // String is of form # RGB where each color is a hex number 0 - 256 aka x0 - xFF
         //terminal.setForegroundColor(TextColor.RGB.Factory.fromString("#0000FF"));
         terminal.enableSGR(SGR.BOLD);
+        List<String> commandBuffer = new ArrayList<>();
+        int currentBufferPosition = 0;
         while (keepRunning) {
             KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all.
             if (keyStroke != null) {
@@ -338,23 +352,30 @@ public class GUIDemo {
                         break;
                     case Enter:
                         System.out.println("printing buffer = " + stringBuffer);
+                        commandBuffer.add(0,stringBuffer.toString());
                         terminal.setCursorPosition(0, ++line); // ++ so it advances on first return.
                         terminal.flush();
+                        currentBufferPosition = 0;
                         stringBuffer = new StringBuffer();
                         break;
                     case ArrowUp:
                         terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+                        println(terminal, 0,line, commandBuffer.get(currentBufferPosition));
+                        currentBufferPosition = Math.min(currentBufferPosition + 1, commandBuffer.size()-1);
+                        System.out.println("Buff pos = " + currentBufferPosition);
                         terminal.flush();
                         break;
                     case ArrowDown:
+
                         terminal.setForegroundColor(TextColor.ANSI.YELLOW);
-                        String x = "this is a \ntest string";
-                        for (char c : x.toCharArray()) {
-                            terminal.putCharacter(c);
-                        }
+                        currentBufferPosition = Math.max(currentBufferPosition - 1, 0);
+                        println(terminal, 0,line, commandBuffer.get(currentBufferPosition));
+                        System.out.println("Buff pos = " + currentBufferPosition);
+
                         terminal.flush();
                         break;
                     case Character:
+                        currentBufferPosition = 0;
 
                         if (keyStroke.isAltDown()) {
                             System.out.println("got alt  " + keyStroke.getCharacter());
@@ -370,11 +391,14 @@ public class GUIDemo {
                         terminal.flush();
                         break;
                     case ArrowLeft:
+                        currentBufferPosition = 0;
+
                         terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
                         terminal.flush();
                         break;
                     case ArrowRight:
                         // Move cursor right, don't overrun end of line.
+                        currentBufferPosition = 0;
                         terminal.setCursorPosition(
                                 Math.min(stringBuffer.length() - 1, terminal.getCursorPosition().getColumn() + 1),
                                 terminal.getCursorPosition().getRow());
@@ -394,6 +418,12 @@ public class GUIDemo {
                 }
             }
 
+        }
+    }
+    public static void println(Terminal t, int col, int row, String x) throws IOException {
+        t.setCursorPosition(col, row);
+        for(char c : x.toCharArray()){
+            t.putCharacter(c);
         }
     }
 }

@@ -17,10 +17,10 @@ expression
    function                                                              #functions
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
- | ('+' | '-') expression                                                #unaryMinusExpression
  | '!' expression                                                        #notExpression
  | expression '^' expression                                             #powerExpression
  | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression
+ | ('+' | '-') expression                                                #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                 #addExpression
  | expression op=('<' | '>' | '<=' | '>=' | '=<' | '=>' ) expression     #compExpression
  | expression op=('==' | '!=') expression                                #eqExpression

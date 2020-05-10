@@ -1,15 +1,13 @@
 // Generated from QDLParser.g4 by ANTLR 4.7.2
 package edu.uiuc.ncsa.qdl.generated;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class QDLParserParser extends Parser {
@@ -856,13 +854,24 @@ public class QDLParserParser extends Parser {
 				expression(18);
 				}
 				break;
+			case T__2:
+				{
+				_localctx = new NotExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(80);
+				match(T__2);
+				setState(81);
+				expression(17);
+				}
+				break;
 			case Plus:
 			case Minus:
 				{
 				_localctx = new UnaryMinusExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(80);
+				setState(82);
 				_la = _input.LA(1);
 				if ( !(_la==Plus || _la==Minus) ) {
 				_errHandler.recoverInline(this);
@@ -872,19 +881,8 @@ public class QDLParserParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(81);
-				expression(17);
-				}
-				break;
-			case T__2:
-				{
-				_localctx = new NotExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(82);
-				match(T__2);
 				setState(83);
-				expression(16);
+				expression(14);
 				}
 				break;
 			case T__6:
@@ -983,11 +981,11 @@ public class QDLParserParser extends Parser {
 						_localctx = new PowerExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(97);
-						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
+						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
 						setState(98);
 						match(T__3);
 						setState(99);
-						expression(16);
+						expression(17);
 						}
 						break;
 					case 2:
@@ -995,7 +993,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new MultiplyExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(100);
-						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
 						setState(101);
 						((MultiplyExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1008,7 +1006,7 @@ public class QDLParserParser extends Parser {
 							consume();
 						}
 						setState(102);
-						expression(15);
+						expression(16);
 						}
 						break;
 					case 3:
@@ -2010,9 +2008,9 @@ public class QDLParserParser extends Parser {
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 15);
+			return precpred(_ctx, 16);
 		case 1:
-			return precpred(_ctx, 14);
+			return precpred(_ctx, 15);
 		case 2:
 			return precpred(_ctx, 13);
 		case 3:
@@ -2063,12 +2061,12 @@ public class QDLParserParser extends Parser {
 		"<\5\20\t\2<\13\3\2\2\2=B\5\20\t\2>?\7\3\2\2?A\5\20\t\2@>\3\2\2\2AD\3\2"+
 		"\2\2B@\3\2\2\2BC\3\2\2\2C\r\3\2\2\2DB\3\2\2\2EI\7\17\2\2FH\5\f\7\2GF\3"+
 		"\2\2\2HK\3\2\2\2IG\3\2\2\2IJ\3\2\2\2JL\3\2\2\2KI\3\2\2\2LM\7\4\2\2M\17"+
-		"\3\2\2\2NO\b\t\1\2Ob\5\16\b\2PQ\t\2\2\2Qb\5\20\t\24RS\t\3\2\2Sb\5\20\t"+
-		"\23TU\7\5\2\2Ub\5\20\t\22VW\7\t\2\2WX\5\20\t\2XY\7\4\2\2Yb\3\2\2\2Zb\7"+
+		"\3\2\2\2NO\b\t\1\2Ob\5\16\b\2PQ\t\2\2\2Qb\5\20\t\24RS\7\5\2\2Sb\5\20\t"+
+		"\23TU\t\3\2\2Ub\5\20\t\20VW\7\t\2\2WX\5\20\t\2XY\7\4\2\2Yb\3\2\2\2Zb\7"+
 		"$\2\2[b\5\6\4\2\\b\5\4\3\2]b\7\r\2\2^b\7\22\2\2_b\7\23\2\2`b\7\n\2\2a"+
 		"N\3\2\2\2aP\3\2\2\2aR\3\2\2\2aT\3\2\2\2aV\3\2\2\2aZ\3\2\2\2a[\3\2\2\2"+
-		"a\\\3\2\2\2a]\3\2\2\2a^\3\2\2\2a_\3\2\2\2a`\3\2\2\2b|\3\2\2\2cd\f\21\2"+
-		"\2de\7\6\2\2e{\5\20\t\22fg\f\20\2\2gh\t\4\2\2h{\5\20\t\21ij\f\17\2\2j"+
+		"a\\\3\2\2\2a]\3\2\2\2a^\3\2\2\2a_\3\2\2\2a`\3\2\2\2b|\3\2\2\2cd\f\22\2"+
+		"\2de\7\6\2\2e{\5\20\t\23fg\f\21\2\2gh\t\4\2\2h{\5\20\t\22ij\f\17\2\2j"+
 		"k\t\3\2\2k{\5\20\t\20lm\f\16\2\2mn\t\5\2\2n{\5\20\t\17op\f\r\2\2pq\t\6"+
 		"\2\2q{\5\20\t\16rs\f\f\2\2st\7 \2\2t{\5\20\t\ruv\f\13\2\2vw\7!\2\2w{\5"+
 		"\20\t\fxy\f\25\2\2y{\t\2\2\2zc\3\2\2\2zf\3\2\2\2zi\3\2\2\2zl\3\2\2\2z"+

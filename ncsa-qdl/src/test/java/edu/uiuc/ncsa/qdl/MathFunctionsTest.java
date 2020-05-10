@@ -4,11 +4,14 @@ import edu.uiuc.ncsa.qdl.evaluate.MathEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import org.junit.Test;
+
+import java.math.BigDecimal;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -188,4 +191,83 @@ public class MathFunctionsTest extends AbstractQDLTester {
         polyad.evaluate(state);
         assert polyad.getResult().equals(expectedResult);
     }
+
+    /**
+     * There was a bug in the parser that leading minus signs were not handled correctly.
+     * This is because tutorials on writing parsers gave some bad advice (having unary minus
+     * outrank other operators rather than being in their normal place in the hierarchy). This test
+     * shows that is fixed.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testSignedNumbers() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.0 := -1;");
+        addLine(script, "a.1 := -2^2;");
+        addLine(script, "a.2 := -2^3;");
+        addLine(script, "a.30 := -.1;");
+        addLine(script, "a.3 := -.1^2;");
+        addLine(script, "a.4 := -.1^3;");
+        addLine(script, "a.5 := -3*4;");
+        addLine(script, "a.6 := -3*(-4);");
+        addLine(script, "a.7 := 3*(-4);");
+        addLine(script, "a.8 := (3)*(4);");
+        addLine(script, "a.9 := -.3*(-4);");
+        addLine(script, "a.10 := 0-.3*(-4);");
+        addLine(script, "a.11 := .3*(4);");
+        addLine(script, "a.12 := -3*(-.4);");
+        addLine(script, "a.13 := 0-3*(-.4);");
+        addLine(script, "a.14 := 3*(-.4);");
+        addLine(script, "a.15 := -.3*(-.4);");
+        addLine(script, "a.16 := .3*(-.4);");
+        addLine(script, "a.17 := 0-.3*(-.4);");
+        addLine(script, "b. := -3 + indices(6);"); // {-3, -2, -1, 0, 1, 2}
+        addLine(script, "c. := -b.;"); // {3, 2, 1, 0, -1, -2}
+        addLine(script, "d. := -b.^2;"); // {-9, -4, -1, 0, -1, -4}
+        addLine(script, "e. := -b.^3;"); // {27, 8, 1, 0, -1, -8}
+        addLine(script, "f. := -3*b.;"); // {9, 6, 3, 0, -3, -6}
+        addLine(script, "g. := -.3*b.;"); // {.9, .6, .3, 0.0, -.3, -.6}
+        addLine(script, "h. := -.3 + b.;"); // {-3.3, -2.3, -1.3, -0.3, .7, 1.7}
+        addLine(script, "i. := -.3 - b.;"); // {2.7, 1.7, .7, -.3, -1.3, -2.3}
+
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a.0", state) == -1L;
+        assert getLongValue("a.1", state) == -4L;
+        assert getLongValue("a.2", state) == -8L;
+
+        assert areEqual(getBDValue("a.30", state), new BigDecimal("-.1"));
+        assert areEqual(getBDValue("a.3", state), new BigDecimal("-.01"));
+        assert areEqual(getBDValue("a.4", state), new BigDecimal("-.001"));
+
+        assert getLongValue("a.5", state) == -12L;
+        assert getLongValue("a.6", state) == 12L;
+        assert getLongValue("a.7", state) == -12L;
+        assert getLongValue("a.8", state) == 12L;
+
+        assert areEqual(getBDValue("a.9", state), new BigDecimal("1.2"));
+        assert areEqual(getBDValue("a.10", state), new BigDecimal("1.2"));
+        assert areEqual(getBDValue("a.11", state), new BigDecimal("1.2"));
+        assert areEqual(getBDValue("a.12", state), new BigDecimal("1.2"));
+
+        assert areEqual(getBDValue("a.13", state), new BigDecimal("1.2"));
+        assert areEqual(getBDValue("a.14", state), new BigDecimal("-1.2"));
+        assert areEqual(getBDValue("a.15", state), new BigDecimal(".12"));
+        assert areEqual(getBDValue("a.16", state), new BigDecimal("-.12"));
+        assert areEqual(getBDValue("a.17", state), new BigDecimal(".12"));
+
+        assert areEqual(getStemValue("b.",state), arrayToStem(new int[]{-3, -2, -1, 0, 1, 2}));
+        assert areEqual(getStemValue("c.",state), arrayToStem(new int[] {3, 2, 1, 0, -1, -2}));
+        assert areEqual(getStemValue("d.",state), arrayToStem(new int[] {-9, -4, -1, 0, -1, -4}));
+        assert areEqual(getStemValue("e.",state), arrayToStem(new int[] {27, 8, 1, 0, -1, -8}));
+        assert areEqual(getStemValue("f.",state), arrayToStem(new int[] {9, 6, 3, 0, -3, -6}));
+        assert areEqual(getStemValue("g.",state), arrayToStem(new double[] {.9, .6, .3, 0.0, -.3, -.6}));
+        assert areEqual(getStemValue("h.",state), arrayToStem(new double[] {-3.3, -2.3, -1.3, -0.3, .7, 1.7}));
+        assert areEqual(getStemValue("i.",state), arrayToStem(new double[] {2.7, 1.7, .7, -.3, -1.3, -2.3}));
+
+    }
+
 }

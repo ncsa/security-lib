@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import org.junit.Test;
 
 /**
@@ -108,39 +108,40 @@ public class StringFunctionTests extends AbstractQDLTester {
     }
 
     @Test
-       public void testContainsStemStringCaseInsensitive() throws Exception {
-           State state = testUtils.getNewState();
-           SymbolTable symbolTable = state.getSymbolStack();
+    public void testContainsStemStringCaseInsensitive() throws Exception {
+        State state = testUtils.getNewState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
-           StemVariable sourceStem = new StemVariable();
-           sourceStem.put("rule", "oNe Ring to rule them all");
-           sourceStem.put("find", "OnE Ring to find them");
-           sourceStem.put("bring", "one Ring to bring them all");
-           sourceStem.put("bind", "and in the darkness bind them");
-           String targetString = "One";
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "oNe Ring to rule them all");
+        sourceStem.put("find", "OnE Ring to find them");
+        sourceStem.put("bring", "one Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
+        String targetString = "One";
 
-           symbolTable.setStemVariable("sourceStem.", sourceStem);
-           symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStringValue("targetString", targetString);
 
-           Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
-           VariableNode left = new VariableNode("sourceStem.");
-           VariableNode right = new VariableNode("targetString");
-           ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
+        Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
+        VariableNode left = new VariableNode("sourceStem.");
+        VariableNode right = new VariableNode("targetString");
+        ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
 
-           polyad.addArgument(left);
-           polyad.addArgument(right);
-           polyad.addArgument(ignoreCase);
-           polyad.evaluate(state);
-           StemVariable result = (StemVariable) polyad.getResult();
-           assert result.containsKey("rule");
-           assert result.getBoolean("rule");
-           assert result.containsKey("find");
-           assert result.getBoolean("find");
-           assert result.containsKey("bring");
-           assert result.getBoolean("bring");
-           assert result.containsKey("bind");
-           assert !result.getBoolean("bind");
-       }
+        polyad.addArgument(left);
+        polyad.addArgument(right);
+        polyad.addArgument(ignoreCase);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.containsKey("rule");
+        assert result.getBoolean("rule");
+        assert result.containsKey("find");
+        assert result.getBoolean("find");
+        assert result.containsKey("bring");
+        assert result.getBoolean("bring");
+        assert result.containsKey("bind");
+        assert !result.getBoolean("bind");
+    }
+
     @Test
     public void testContainsStemStem() throws Exception {
         State state = testUtils.getNewState();
@@ -214,7 +215,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
 
-     StemVariable stem = new StemVariable();
+        StemVariable stem = new StemVariable();
         stem.put("1", "  foo");
         stem.put("woof", "      ");
         stem.put("warp", "foo           ");
@@ -308,42 +309,43 @@ public class StringFunctionTests extends AbstractQDLTester {
     }
 
     @Test
-     public void testIndexOfStemString_ignoreCase() throws Exception {
-         State state = testUtils.getTestState();
-         SymbolTable symbolTable = state.getSymbolStack();
+    public void testIndexOfStemString_ignoreCase() throws Exception {
+        State state = testUtils.getTestState();
+        SymbolTable symbolTable = state.getSymbolStack();
 
-         StemVariable sourceStem = new StemVariable();
-         sourceStem.put("rule", "one Ring to rule them all");
-         sourceStem.put("find", "onE Ring to find them");
-         sourceStem.put("bring", "oNE Ring to bring them all");
-         sourceStem.put("bind", "and in the darkness bind them");
-         String targetString = "ONE";
+        StemVariable sourceStem = new StemVariable();
+        sourceStem.put("rule", "one Ring to rule them all");
+        sourceStem.put("find", "onE Ring to find them");
+        sourceStem.put("bring", "oNE Ring to bring them all");
+        sourceStem.put("bind", "and in the darkness bind them");
+        String targetString = "ONE";
 
-         symbolTable.setStemVariable("sourceStem.", sourceStem);
-         symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        symbolTable.setStringValue("targetString", targetString);
 
-         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
-         VariableNode left = new VariableNode("sourceStem.");
-         VariableNode right = new VariableNode("targetString");
+        Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
+        VariableNode left = new VariableNode("sourceStem.");
+        VariableNode right = new VariableNode("targetString");
         ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
 
-         polyad.addArgument(left);
-         polyad.addArgument(right);
-         polyad.addArgument(ignoreCase);
-         polyad.evaluate(state);
-         StemVariable result = (StemVariable) polyad.getResult();
-         assert result.size() == 4;
-         assert result.getLong("rule") == 0L;
-         assert result.getLong("find") == 0L;
-         assert result.getLong("bind") == -1L;
-         assert result.getLong("bring") == 0L;
-     }
+        polyad.addArgument(left);
+        polyad.addArgument(right);
+        polyad.addArgument(ignoreCase);
+        polyad.evaluate(state);
+        StemVariable result = (StemVariable) polyad.getResult();
+        assert result.size() == 4;
+        assert result.getLong("rule") == 0L;
+        assert result.getLong("find") == 0L;
+        assert result.getLong("bind") == -1L;
+        assert result.getLong("bring") == 0L;
+    }
+
     @Test
     public void testIndexOfStemStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
 
-       StemVariable sourceStem = new StemVariable();
+        StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
@@ -585,7 +587,8 @@ public class StringFunctionTests extends AbstractQDLTester {
         snippets.put("7", "seven");
         StemVariable indices = new StemVariable();
         indices.setDefaultValue(new Long(4L));
-        String expectedResult = "and darkness";
+        // This sticks the work "darkness" in the string associated with the key bind
+        String expectedResult = "and darknessin the darkness bind them";
         symbolTable.setStemVariable("sourceStem.", sourceStem);
         symbolTable.setStemVariable("snippets.", snippets);
         symbolTable.setStemVariable("indices.", indices);
@@ -602,6 +605,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         StemVariable result = (StemVariable) polyad.getResult();
         // The contract is that the answer is conformable to the left argument, so only keys from the left
         // argument appear in the result.
+
         assert result.size() == 1;
         assert result.getString("bind").startsWith(expectedResult);
     }

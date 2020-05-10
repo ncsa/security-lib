@@ -59,7 +59,7 @@ public class WorkspaceCommands implements Logable {
     public static final String REGEX_SWITCH = SWITCH + "r";
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
     public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
-    MyLoggingFacade logger;
+    public MyLoggingFacade logger;
 
     XProperties env;
 
@@ -1253,8 +1253,8 @@ public class WorkspaceCommands implements Logable {
      *
      * @param x
      */
-    protected void say(String x) {
-        System.out.println(defaultIndent + x);
+    public void say(String x) {
+        getPrintStream().println(defaultIndent + x);
     }
 
     public static final String INDENT = "  "; // use this in implementations for consistent indenting.
@@ -1638,8 +1638,8 @@ public class WorkspaceCommands implements Logable {
                     // script cammed return(X), so return the agument.
                     ReturnException rx = (ReturnException) t;
                     if (rx.resultType != Constant.NULL_TYPE) {
-                        System.out.println(rx.result);
-                        System.out.flush();
+                        getPrintStream().println(rx.result);
+                        getPrintStream().flush();
                     }
                     System.exit(0); // Best we can do. Java does not allow for returned values.
                 }
@@ -1653,9 +1653,34 @@ public class WorkspaceCommands implements Logable {
     File rootDir = null;
     File saveDir = null;
 
+    public PrintStream getPrintStream() {
+        if(printStream == null){
+            printStream = System.out;
+        }
+        return printStream;
+    }
+
+    public void setPrintStream(PrintStream printStream) {
+        this.printStream = printStream;
+    }
+
+    PrintStream printStream;
+
+    public InputStream getInputStream() {
+        if(inputStream == null){
+            inputStream = System.in;
+        }
+        return inputStream;
+    }
+
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+    InputStream inputStream;
     protected BufferedReader getBufferedReader() {
         if (bufferedReader == null) {
-            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+            bufferedReader = new BufferedReader(new InputStreamReader(getInputStream()));
         }
         return bufferedReader;
     }
@@ -1667,7 +1692,7 @@ public class WorkspaceCommands implements Logable {
     BufferedReader bufferedReader;
 
     public String readline(String prompt) {
-        System.out.print(prompt);
+        getPrintStream().print(prompt);
         return readline();
     }
 

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
+import edu.uiuc.ncsa.qdl.state.VariableState;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -11,6 +12,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 
@@ -73,14 +75,23 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Object get(String key) {
         // TODO -- Horribly inefficient. This should be improved but that may take some serious work, so deferring
-        if (isLongIndex(key)) {
-            return get(Long.parseLong(key));
-        }
+            try{
+            if (isLongIndex(key)) {
+                return get(Long.parseLong(key));
+            }
 
-        if (!containsKey(key) && defaultValue != null) {
-            return defaultValue;
-        }
-        return super.get(key);
+            if (!containsKey(key) && defaultValue != null) {
+                return defaultValue;
+            }
+            return super.get(key);
+            } catch (StackOverflowError | PatternSyntaxException sto) {
+                //In this case someplace there is a reference to the stem itself, e.g.
+                // a. := indices(5);
+                // a.b. := a.
+                // This can work if the indices are accessed directly but attempting to access the whole
+                // things (such as printing it out with "say" is going to fail).
+                throw new VariableState.CyclicalError("Error: recursive overflow at index '" + key + "'");
+            }
     }
 
     public Object remove(Long key) {
@@ -521,10 +532,15 @@ public class StemVariable extends HashMap<String, Object> {
 
     String int_regex = "[1-9][0-9]*";
 
-    boolean isLongIndex(String key) {
+    public boolean isLongIndex(String key) {
         // special case of index being zero!! Otherwise, no such index can start with zero,
-        // so a key of "01" is a string, not the number 1. Sorry, best we can do. 
+        // so a key of "01" is a string, not the number 1. Sorry, best we can do.
+        //     try {
         return key.equals("0") || key.matches(int_regex);
+ /*       } catch (StackOverflowError sto) {
+
+            throw new IllegalStateException("Error: This stem references itself and access to it cannot be resolved.");
+        }*/
     }
 
     Pattern var_pattern = Pattern.compile(var_regex);
@@ -581,6 +597,7 @@ public class StemVariable extends HashMap<String, Object> {
             } else {
                 output = output + newIndent + key + "=" + convert(o);
             }
+
         }
         // now for any list
         for (StemEntry entry : getStemList()) {
@@ -772,6 +789,11 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public int size() {
         return super.size() + getStemList().size();
+    }
+
+    public boolean containsKey(Long key) {
+        StemEntry s = new StemEntry(key);
+        return getStemList().contains(s);
     }
 
     public boolean containsKey(String key) {
