@@ -27,10 +27,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
-import edu.uiuc.ncsa.security.util.cli.ExitException;
-import edu.uiuc.ncsa.security.util.cli.InputLine;
-import edu.uiuc.ncsa.security.util.cli.LineEditor;
+import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -52,6 +49,12 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 1/30/20 at  9:21 AM
  */
 public class WorkspaceCommands implements Logable {
+    public WorkspaceCommands() {
+    }
+
+    public WorkspaceCommands(IOInterface ioInterface) {
+        setIoInterface(ioInterface);
+    }
 
     public static final String SWITCH = "-";
     public static final String DISPLAY_WIDTH_SWITCH = SWITCH + "w";
@@ -1254,7 +1257,8 @@ public class WorkspaceCommands implements Logable {
      * @param x
      */
     public void say(String x) {
-        getPrintStream().println(defaultIndent + x);
+        getIoInterface().println(defaultIndent + x);
+       // getPrintStream().println(defaultIndent + x);
     }
 
     public static final String INDENT = "  "; // use this in implementations for consistent indenting.
@@ -1638,8 +1642,8 @@ public class WorkspaceCommands implements Logable {
                     // script cammed return(X), so return the agument.
                     ReturnException rx = (ReturnException) t;
                     if (rx.resultType != Constant.NULL_TYPE) {
-                        getPrintStream().println(rx.result);
-                        getPrintStream().flush();
+                        getIoInterface().println(rx.result);
+                        getIoInterface().flush();
                     }
                     System.exit(0); // Best we can do. Java does not allow for returned values.
                 }
@@ -1653,46 +1657,9 @@ public class WorkspaceCommands implements Logable {
     File rootDir = null;
     File saveDir = null;
 
-    public PrintStream getPrintStream() {
-        if(printStream == null){
-            printStream = System.out;
-        }
-        return printStream;
-    }
-
-    public void setPrintStream(PrintStream printStream) {
-        this.printStream = printStream;
-    }
-
-    PrintStream printStream;
-
-    public InputStream getInputStream() {
-        if(inputStream == null){
-            inputStream = System.in;
-        }
-        return inputStream;
-    }
-
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    InputStream inputStream;
-    protected BufferedReader getBufferedReader() {
-        if (bufferedReader == null) {
-            bufferedReader = new BufferedReader(new InputStreamReader(getInputStream()));
-        }
-        return bufferedReader;
-    }
-
-    protected void setBufferedReader(BufferedReader bufferedReader) {
-        this.bufferedReader = bufferedReader;
-    }
-
-    BufferedReader bufferedReader;
 
     public String readline(String prompt) {
-        getPrintStream().print(prompt);
+        getIoInterface().print(prompt);
         return readline();
     }
 
@@ -1708,7 +1675,7 @@ public class WorkspaceCommands implements Logable {
 
     public String readline() {
         try {
-            String x = getBufferedReader().readLine();
+            String x = getIoInterface().readline(null);
             if (x.equals(EXIT_COMMAND)) {
                 throw new ExitException(EXIT_COMMAND + " encountered");
             }
@@ -1718,4 +1685,13 @@ public class WorkspaceCommands implements Logable {
             throw new GeneralException("Error, could not read the input line due to IOException", iox);
         }
     }
+
+    public IOInterface getIoInterface() {
+        return getState().getIoInterface();
+    }
+
+    public void setIoInterface(IOInterface ioInterface) {
+        getState().setIoInterface(ioInterface);
+    }
+
 }

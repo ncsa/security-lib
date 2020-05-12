@@ -18,8 +18,7 @@ import net.sf.json.JSONObject;
 public class ClientJSONConfigUtil {
     public static final String SAVED_KEY = "isSaved";
     public static final String COMMENT_KEY = "comment";
-    public static final String CM_EXTRA_ATTRIBUTES_KEY = "cm_extra_attributes"; // for extra content management attributes, among others
-    public static final String EXTENDED_ATTRIBUTES = "extended_attributes"; // for attributes that
+  //  public static final String EXTENDED_ATTRIBUTES = "extended_attributes"; // for attributes that
 
     /**
      * Return the contents as a JSON array. This also means that if there is a single object, it will
@@ -142,26 +141,9 @@ public class ClientJSONConfigUtil {
         return claims.containsKey(key);
     }
 
-    /**
-     * One of the few bits of state. Checks if the object has a saved flag.
-     *
-     * @param config
-     * @return
-     */
-/*    public static boolean isSaved(JSONObject config) {
-        if (config.containsKey(SAVED_KEY)) {
-            return config.getBoolean(SAVED_KEY);
-        }
-
-        return true;
-    }
-
-    public static void setSaved(JSONObject config, boolean value) {
-        config.put(SAVED_KEY, value);
-    }*/
 
     /**
-     * Checks if the object has a comment flag.
+     * Checks if the argument has a comment flag.
      *
      * @param config
      * @return
@@ -192,6 +174,7 @@ public class ClientJSONConfigUtil {
         config.put(COMMENT_KEY, array);
     }
 
+/*
 
     public static void setExtendedAttributes(JSONObject config, JSONObject attributes) {
         config.put(EXTENDED_ATTRIBUTES, attributes);
@@ -205,6 +188,7 @@ public class ClientJSONConfigUtil {
         return config.getJSONObject(EXTENDED_ATTRIBUTES);
 
     }
+*/
 
 
 }

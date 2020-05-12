@@ -2,12 +2,12 @@ package edu.uiuc.ncsa.gui;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -19,9 +19,12 @@ import com.googlecode.lanterna.terminal.swing.TerminalEmulatorColorConfiguration
 import com.googlecode.lanterna.terminal.swing.TerminalEmulatorPalette;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import static com.googlecode.lanterna.input.KeyType.Escape;
 
@@ -40,7 +43,7 @@ public class GUIDemo {
         // All this to set the background color of the terminal...
         TerminalEmulatorPalette myPallette = new TerminalEmulatorPalette(
                 Color.WHITE, // sets default
-                Color.RED   , // sets default Bright
+                Color.RED, // sets default Bright
                 Color.BLUE, // sets background. This is the only reason for this constructor
                 Color.black,
                 Color.BLACK,
@@ -62,13 +65,13 @@ public class GUIDemo {
         );
 
         //TerminalEmulatorPalette palette = new TerminalEmulatorPalette()
-        TerminalEmulatorColorConfiguration colorConfig =        TerminalEmulatorColorConfiguration.newInstance(myPallette);
+        TerminalEmulatorColorConfiguration colorConfig = TerminalEmulatorColorConfiguration.newInstance(myPallette);
         factory.setTerminalEmulatorColorConfiguration(colorConfig);
         Terminal terminal = factory.createTerminal();
         System.out.println("terminal is " + terminal.getClass().getSimpleName());
         Screen screen = new TerminalScreen(terminal);
 
-           // sets up a resize listener in case the user changes the size.
+        // sets up a resize listener in case the user changes the size.
   /*      terminal.addResizeListener((terminal1, newSize) -> {
             // Be careful here though, this is likely running on a separate thread. Lanterna is threadsafe in
             // a best-effort way so while it shouldn't blow up if you call terminal methods on multiple threads,
@@ -90,7 +93,8 @@ public class GUIDemo {
         screen.refresh(); // clear out any cruft in object properly.
 
         // Only one of these should be uncommented at any time since they are separate demos.
-        // showStuff(textGraphics);
+       // showStuff(textGraphics);
+       // terminal.flush();
         // helloWorld(screen);
         // userInput2(terminal, screen, textGraphics);
         //  testBox(screen);
@@ -100,6 +104,7 @@ public class GUIDemo {
 
     /**
      * Writes text an a couple fo graphics with the text graphics
+     *
      * @param textGraphics
      */
     protected static void showStuff(TextGraphics textGraphics) {
@@ -257,6 +262,44 @@ public class GUIDemo {
                    */
     }
 
+    public static class MyWindow extends BasicWindow {
+        public MyWindow() {
+            super("My Window!");
+            setComponent(new Button("Exit", new Runnable() {
+                    @Override
+                    public void run() {
+                        MyWindow.this.close();
+                    }
+                }));
+        }
+    }
+
+    static File input;
+    public static void componentTest(Screen screen, TextGraphics textGraphics) {
+        final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
+        final Window window = new MyWindow();
+        Panel contentPanel = new Panel(new GridLayout(2));
+/*
+        contentPanel.addComponent(new Button("Test", new Runnable() {
+            @Override
+            public void run() {
+                 input = new FileDialogBuilder()
+                        .setTitle("Open File")
+                        .setDescription("Choose a file")
+                        .setActionLabel("Open")
+                        .build()
+                        .showDialog(textGUI);
+
+            }
+        }));
+*/
+
+        window.setComponent(contentPanel);
+        textGUI.addWindowAndWait(window);
+        window.close();
+
+    }
+
     /**
      * Use terminal like standard text mode. First try and stuff just gets tested here.
      *
@@ -344,15 +387,17 @@ public class GUIDemo {
                     case MouseEvent:
                         System.out.println("Yo!" + keyStroke);
                         break;
-
-
                     case Escape:
+                        componentTest(screen, textGraphics);
+                        println(terminal,0,line,input==null?"(empty)":input.getAbsolutePath());
+                        keepRunning = false;
+                        break;
                     case EOF: // If there is some issue shutting down the JVM, it starts spitting these out. Just exit.
                         keepRunning = false;
                         break;
                     case Enter:
                         System.out.println("printing buffer = " + stringBuffer);
-                        commandBuffer.add(0,stringBuffer.toString());
+                        commandBuffer.add(0, stringBuffer.toString());
                         terminal.setCursorPosition(0, ++line); // ++ so it advances on first return.
                         terminal.flush();
                         currentBufferPosition = 0;
@@ -360,8 +405,8 @@ public class GUIDemo {
                         break;
                     case ArrowUp:
                         terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
-                        println(terminal, 0,line, commandBuffer.get(currentBufferPosition));
-                        currentBufferPosition = Math.min(currentBufferPosition + 1, commandBuffer.size()-1);
+                        println(terminal, 0, line, commandBuffer.get(currentBufferPosition));
+                        currentBufferPosition = Math.min(currentBufferPosition + 1, commandBuffer.size() - 1);
                         System.out.println("Buff pos = " + currentBufferPosition);
                         terminal.flush();
                         break;
@@ -369,7 +414,7 @@ public class GUIDemo {
 
                         terminal.setForegroundColor(TextColor.ANSI.YELLOW);
                         currentBufferPosition = Math.max(currentBufferPosition - 1, 0);
-                        println(terminal, 0,line, commandBuffer.get(currentBufferPosition));
+                        println(terminal, 0, line, commandBuffer.get(currentBufferPosition));
                         System.out.println("Buff pos = " + currentBufferPosition);
 
                         terminal.flush();
@@ -420,9 +465,10 @@ public class GUIDemo {
 
         }
     }
+
     public static void println(Terminal t, int col, int row, String x) throws IOException {
         t.setCursorPosition(col, row);
-        for(char c : x.toCharArray()){
+        for (char c : x.toCharArray()) {
             t.putCharacter(c);
         }
     }

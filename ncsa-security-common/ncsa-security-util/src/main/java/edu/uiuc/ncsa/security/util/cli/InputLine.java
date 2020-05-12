@@ -54,38 +54,44 @@ public class InputLine {
 
     /**
      * returns the arguments as a vector. This omits the name of the function, returning only the arguments themselves
+     *
      * @return
      */
-    public Vector argsToVector(){
+    public Vector argsToVector() {
         Vector v = new Vector();
-        if(parsedInput == null){
+        if (parsedInput == null) {
             return v;
         }
-        for(int i = 1; i < parsedInput.size(); i++){
+        for (int i = 1; i < parsedInput.size(); i++) {
             v.add(getArg(i));
         }
         return v;
     }
+
     /**
      * Use for switches with value, e.g. if you have "-foo bar" then invoke this with "-foo" and bar will be removed too.
      * To remove a single value, use {@link #removeSwitch(String)}
+     *
      * @param value
      */
-    public void removeSwitchAndValue(String value){
+    public void removeSwitchAndValue(String value) {
         String x = getNextArgFor(value);
         removeSwitch(x);
         removeSwitch(value);
     }
+
     /**
      * Remove a value. NOTE that removing a switch does not remove its value!!! To do this all at once, use
      * {@link #removeSwitchAndValue(String)}
+     *
      * @param value
      */
-    public void removeSwitch(String value){
-     if(parsedInput != null){
-         parsedInput.remove(value);
-     }
+    public void removeSwitch(String value) {
+        if (parsedInput != null) {
+            parsedInput.remove(value);
+        }
     }
+
     @Override
 
     public String toString() {
@@ -136,6 +142,13 @@ public class InputLine {
         return getArg(size() - 1);
     }
 
+    public void setLastArg(String newValue) {
+        if (size() == 0) {
+            throw new ArgumentNotFoundException();
+        }
+        parsedInput.set(size() - 1, newValue);
+    }
+
     /**
      * Remember that the zero-th argument is the command, so that the arguments properly
      * begin at index = 1. <br/>
@@ -154,8 +167,35 @@ public class InputLine {
     }
 
     /**
+     * Sets the specific argument at the given index. If the index is invalid, then an
+     * exception is thrown, Note that the zero-tj argument is the calling function,
+     * so it cannot be set with the method.
+     *
+     * @param index
+     * @param value
+     */
+    public void setArg(int index, String value) {
+        if (0 <= parsedInput.size() && index + 1 <= parsedInput.size()) {
+            parsedInput.set(index, value);
+            return;
+        }
+        throw new ArgumentNotFoundException();
+
+    }
+
+    /**
+     * Append the argument to the end.
+     *
+     * @param value
+     */
+    public void appendArg(String value) {
+        parsedInput.add(value);
+    }
+
+    /**
      * Tries to get the index as an integer. If it is not an integer an
      * {@link ArgumentNotFoundException} is thrown.
+     *
      * @param index
      * @return
      */
@@ -166,6 +206,7 @@ public class InputLine {
             throw new ArgumentNotFoundException("Error: the argument /" + getArg(index) + "/ cannot be parsed. Did you forget the object index?");
         }
     }
+
 
     /**
      * Returns true if this command line was created with an empty string.
@@ -192,12 +233,13 @@ public class InputLine {
 
     /**
      * Is there a given arg at the given index? Useful if certain arguments are expected at certain positions.
+     *
      * @param index
      * @return
      */
     public boolean hasArgAt(int index) {
-          return index <= getArgCount();
-      }
+        return index <= getArgCount();
+    }
 
     /**
      * If this command line has arguments at all.
@@ -254,10 +296,11 @@ public class InputLine {
 
     /**
      * Returns the number of arguments for this input line.
+     *
      * @return
      */
-    public int getArgCount(){
-        if(parsedInput == null || parsedInput.isEmpty()){
+    public int getArgCount() {
+        if (parsedInput == null || parsedInput.isEmpty()) {
             return 0;
         }
         return parsedInput.size() - 1;

@@ -44,8 +44,8 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <!--<mainClass>edu.uiuc.ncsa.gui.GUIDemo</mainClass> -->
-                            <mainClass>edu.uiuc.ncsa.gui.p2.QDLGUIWorkspace</mainClass>
+                            <!--     <mainClass>edu.uiuc.ncsa.gui.GUIDemo</mainClass>  -->
+                           <mainClass>edu.uiuc.ncsa.gui.p2.QDLGUIWorkspace</mainClass>
                         </manifest>
                         <manifestEntries>
                             <application-version>${pom.version}</application-version>

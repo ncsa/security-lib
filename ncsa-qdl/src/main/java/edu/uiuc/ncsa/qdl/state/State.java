@@ -149,7 +149,9 @@ public class State extends FunctionState implements QDLConstants {
         try {
             manifest = FileUtil.readFileAsLines(path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
         } catch (Throwable throwable) {
-            getLogger().info("Could not find the build info file. Looked in " + path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
+            if (getLogger() != null) {
+                getLogger().info("Could not find the build info file. Looked in " + path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
+            }
             return versionInfo;
         }
 
@@ -361,7 +363,7 @@ public class State extends FunctionState implements QDLConstants {
         }
         // Each imported module has its state serialized too. Hence each has to have current
         // transient fields updated. This will act recursively (so imports in imports in imports etc.)
-        
+
         for (String mod : getImportedModules().keySet()) {
             getImportedModules().get(mod).getState().injectTransientFields(oldState);
         }

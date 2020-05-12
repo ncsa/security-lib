@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
@@ -38,10 +39,15 @@ public class QDLGUIWorkspace {
             return;
         }
         QDLGUIWorkspace workspace = new QDLGUIWorkspace(workspaceCommands);
+
         workspace.init(argLine);
+        // Now set it up so the IO works right for the terminal type:
+        workspace.ioInterface = new LanternaIO(workspace.terminal);
+        workspaceCommands.setIoInterface(workspace.ioInterface);
+        workspaceCommands.init(argLine);
         workspace.run();
     }
-
+    IOInterface ioInterface;
     WorkspaceCommands workspaceCommands;
     String INDENT = "    "; // prompt is 4 spaces.
 
@@ -59,20 +65,18 @@ public class QDLGUIWorkspace {
         terminal.setCursorVisible(true);
         terminal.setCursorPosition(0, 0);
 
-        terminal.setForegroundColor(TextColor.ANSI.YELLOW);
+
+        terminal.setForegroundColor(TextColor.ANSI.WHITE);
         // String is of form # RGB where each color is a hex number 0 - 256 aka x0 - xFF
         //terminal.setForegroundColor(TextColor.RGB.Factory.fromString("#0000FF"));
         terminal.enableSGR(SGR.BOLD);
-//        terminal.wait(2000);
-        System.out.println("Init complete");
-        workspaceCommands.init(argLine);
-
-
+        terminal.exitPrivateMode();
     }
 
     Terminal terminal;
     Screen screen;
     TextGraphics textGraphics;
+
     protected void run() throws Throwable {
         boolean isExit = false;
         String lastCommand = "";
@@ -80,10 +84,7 @@ public class QDLGUIWorkspace {
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded.
         while (!isExit) {
-            System.out.print(INDENT);
-            //String input = workspaceCommands.readline().trim();
-            String input = readInput();
-            System.out.println(""); // advances cursor to next line in GUI.
+            String input = ioInterface.readline(INDENT).trim();
 
             if (input.equals("%")) {
                 input = lastCommand;
@@ -94,6 +95,8 @@ public class QDLGUIWorkspace {
                 switch (workspaceCommands.execute(input)) {
                     case RC_EXIT_NOW:
                         isExit = true;
+                        terminal.flush();
+                        terminal.close();
                         return; // exit now, darnit.
                     case RC_NO_OP:
                     case RC_CONTINUE:
@@ -125,10 +128,10 @@ public class QDLGUIWorkspace {
     }
 
     protected void handleException(Throwable t) {
-        t.printStackTrace();
         if (getLogger() != null) {
             getLogger().error(t);
         }
+        
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
             if (t.getMessage().contains("extraneous input")) {
                 workspaceCommands.say("syntax error: Unexpected or illegal character.");
@@ -163,13 +166,13 @@ public class QDLGUIWorkspace {
     ArrayList<String> commandBuffer = new ArrayList<>();
 
     protected String readInput() throws IOException {
-        boolean keepRunning = true;
+        boolean keepReading = true;
         int line = 0;
         StringBuffer stringBuffer = new StringBuffer();
         int currentBufferPosition = 0;
 
 
-        while (keepRunning) {
+        while (keepReading) {
             KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all.
             if (keyStroke != null) {
                 switch (keyStroke.getKeyType()) {
@@ -181,19 +184,19 @@ public class QDLGUIWorkspace {
                     case Escape:
                         return stringBuffer.toString() + "\n";
                     case EOF: // If there is some issue shutting down the JVM, it starts spitting these out. Just exit.
-                        keepRunning = false;
+                        keepReading = false;
                         break;
                     case Enter:
-                        commandBuffer.add(0, stringBuffer.toString());
-                        return stringBuffer.toString();
+                        terminal.setForegroundColor(TextColor.ANSI.WHITE);
 
-/*
-                        terminal.setCursorPosition(0, ++line); // ++ so it advances on first return.
-                        terminal.flush();
-                        currentBufferPosition = 0;
-                        stringBuffer = new StringBuffer();
-                        break;
-*/
+                        String out;
+                        if (currentBufferPosition < 0 || commandBuffer.isEmpty()) {
+                            out = stringBuffer.toString();
+                            commandBuffer.add(0, stringBuffer.toString());
+                        } else {
+                            out = commandBuffer.get(currentBufferPosition);
+                        }
+                        return out;
                     case ArrowUp:
                         terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                         System.out.print(commandBuffer.get(currentBufferPosition));

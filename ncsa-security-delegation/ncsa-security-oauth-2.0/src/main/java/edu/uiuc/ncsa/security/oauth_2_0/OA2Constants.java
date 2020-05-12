@@ -8,6 +8,11 @@ public interface OA2Constants {
 
     public static String ACCESS_TOKEN = "access_token";
     public static String ACCESS_TYPE = "access_type";
+    /**
+     * This is used for the code=grant token when getting the access
+     * token. It looks like  {@link #RESPONSE_TYPE_CODE} (same value).
+     * Use the right one in case something chages in the spec!
+     */
     public static String AUTHORIZATION_CODE = "code";
     public static String REFRESH_LIFETIME = "rt_lifetime";
     public static String CERT_LIFETIME = "certlifetime";
@@ -19,7 +24,23 @@ public interface OA2Constants {
     public static String ERROR_DESCRIPTION = "error_description";
     public static String ERROR_URI = "error_uri";
     public static String EXPIRES_IN = "expires_in";
+    /**
+     * Used as the parameter for the grant type, e.g. grant_type="authorization_code"
+     */
     public static String GRANT_TYPE = "grant_type";
+    /**
+     * Use with <a href="https://tools.ietf.org/html/rfc6749#section-4.1">authorization code grant</a>
+     */
+    public static String GRANT_TYPE_AUTHORIZATION_CODE = "authorization_code";
+    /**
+     * Use with <a href="https://tools.ietf.org/html/rfc6749#section-4.1">authorization code grant</a>
+     */
+    public static String GRANT_TYPE_REFRESH_TOKEN = "refresh_token";
+    /**
+     * Use for <a href="https://tools.ietf.org/html/rfc6749#section-4.2">implicit flow.</a>
+     */
+    public static String GRANT_TYPE_IMPLICIT = "implicit";
+
     public static String NONCE = "nonce";
     public static String PROMPT = "prompt";
     public static String MAX_AGE = "max_age";
@@ -42,11 +63,38 @@ public interface OA2Constants {
 
     public static String REDIRECT_URI = "redirect_uri";
     public static String REFRESH_TOKEN = "refresh_token";
+    /**
+     * Used as the parameter to denote the response type, e.g. response_type="code"
+     */
     public static String RESPONSE_TYPE = "response_type";
+
+    /**
+     * Used with <a href="https://tools.ietf.org/html/rfc6749#section-4.1">authorization code grant</a>
+     */
+    public static String RESPONSE_TYPE_CODE = "code";
+    /**
+     * Used with <a href="https://tools.ietf.org/html/rfc6749#section-4.1">authorization code grant</a>
+     * <b>and</b> <a href="https://tools.ietf.org/html/rfc6749#section-4.2">implicit flow grant.</a>
+     */
+    public static String RESPONSE_TYPE_ID_TOKEN = "id_token";
+    /**
+     * Only used with <a href="https://tools.ietf.org/html/rfc6749#section-4.2">implicit flow grant.</a>
+     */
+    public static String RESPONSE_TYPE_TOKEN = "token";
+    /**
+     * Recently added
+     */
+    public static String RESPONSE_TYPE_NONE = "none";
+
     public static String STATE = "state";
     public static String SCOPE = "scope";
     public static String TOKEN_TYPE = "token_type";
     public static String BEARER_TOKEN_TYPE = "Bearer";
+    /**
+     * Use {@link #GRANT_TYPE_AUTHORIZATION_CODE}. Used to be only possible one but
+     * we have more now...
+     * @deprecated
+     */
     public static String AUTHORIZATION_CODE_VALUE = "authorization_code";
     /**
      * as per <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes">the open id spec</a>

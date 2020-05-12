@@ -98,7 +98,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         // Create the request
         HashMap m = new HashMap();
         m.put(AUTHORIZATION_CODE, atRequest.getAuthorizationGrant().getToken());
-        m.put(GRANT_TYPE, AUTHORIZATION_CODE_VALUE);
+        m.put(GRANT_TYPE, GRANT_TYPE_AUTHORIZATION_CODE);
         String clientID = atRequest.getClient().getIdentifierString();
         String clientSecret = atRequest.getClient().getSecret();
         if (!useBasicAuth) {

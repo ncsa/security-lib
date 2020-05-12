@@ -220,24 +220,24 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult result = new fpResult();
                 if (!isString(objects[0])) {
-                    throw new IllegalArgumentException("Error: The first argument to " + SUBSTRING + " must be a string.");
+                    throw new IllegalArgumentException("The first argument to " + SUBSTRING + " must be a string.");
                 }
                 String arg = objects[0].toString();
                 if (!isLong(objects[1])) {
-                    throw new IllegalArgumentException("Error: The second argument to " + SUBSTRING + " must be an integer.");
+                    throw new IllegalArgumentException("The second argument to " + SUBSTRING + " must be an integer.");
                 }
                 int n = ((Long) objects[1]).intValue();
                 int length = arg.length(); // default
                 String padding = null;
                 if (2 < objects.length) {
                     if (!isLong(objects[2])) {
-                        throw new IllegalArgumentException("Error: The third argument to " + SUBSTRING + " must be an integer.");
+                        throw new IllegalArgumentException("The third argument to " + SUBSTRING + " must be an integer.");
                     }
                     length = ((Long) objects[2]).intValue();
                 }
                 if (3 < objects.length) {
                     if (!isString(objects[3])) {
-                        throw new IllegalArgumentException("Error: The fourth argument to " + SUBSTRING + " must be a string.");
+                        throw new IllegalArgumentException("The fourth argument to " + SUBSTRING + " must be a string.");
                     }
                     padding = objects[3].toString();
                 }
@@ -285,7 +285,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 boolean caseSensitive = true;
                 if (objects.length == 3) {
                     if (!(objects[2] instanceof Boolean)) {
-                        throw new IllegalArgumentException("Error: if the 3rd argument is given, it must be a boolean.");
+                        throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
                     }
                     caseSensitive = (Boolean) objects[2];
                 }
@@ -317,7 +317,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     boolean caseSensitive = true;
                     if (objects.length == 3) {
                         if (!(objects[2] instanceof Boolean)) {
-                            throw new IllegalArgumentException("Error: if the 3rd argument is given, it must be a boolean.");
+                            throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
                         }
                         caseSensitive = (Boolean) objects[2];
                     }

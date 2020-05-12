@@ -160,7 +160,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!areAllNumbers(objects)) {
-                    throw new IllegalArgumentException("Error: operation is not defined for  non-numeric types");
+                    throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
                 if (areAllLongs(objects)) {
                     Long leftLong = (Long) objects[0];
@@ -185,7 +185,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!isLong(objects[1])) {
-                    throw new IllegalArgumentException("Error: Exponentiation requires the second argument be an integer");
+                    throw new IllegalArgumentException("Exponentiation requires the second argument be an integer");
                 }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
@@ -215,7 +215,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 if (!areAllNumbers(objects)) {
-                    throw new IllegalArgumentException("Error: only numbers may be compared");
+                    throw new IllegalArgumentException("only numbers may be compared");
                 }
                 BigDecimal left = toBD(objects[0]);
                 BigDecimal right = toBD(objects[1]);
@@ -316,7 +316,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!areAllBoolean(objects)) {
-                    throw new IllegalArgumentException("Error: arguments must be boolean for logical operations");
+                    throw new IllegalArgumentException("arguments must be boolean for logical operations");
                 }
                 Boolean left = (Boolean) objects[0];
                 Boolean right = (Boolean) objects[1];
@@ -376,7 +376,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     }
                 } else {
                     if (!areAllStrings(objects)) {
-                        throw new IllegalArgumentException("Error: cannot perform " + MINUS + " on mixed argument types.");
+                        throw new IllegalArgumentException("cannot perform " + MINUS + " on mixed argument types.");
                     }
                     String lString = objects[0].toString();
                     String rString = objects[1].toString();
@@ -436,7 +436,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.resultType = Constant.DECIMAL_TYPE;
                     }
                 } else {
-                    throw new IllegalArgumentException("Error: operation is not defined for  non-numeric types");
+                    throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
                 return r;
             }
@@ -504,28 +504,46 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * @param isPlusPlus
      */
     protected void doMonadIncOrDec(Monad monad, State state, boolean isPlusPlus) {
+        if (!(monad.getArgument() instanceof VariableNode)) {
+            throw new IllegalArgumentException("You can only " + (isPlusPlus ? "increment" : "decrement") + " a variable.");
+        }
         VariableNode var = (VariableNode) monad.getArgument();
         Object obj = var.evaluate(state);
-        if (!isLong(obj)) {
-            throw new IllegalArgumentException("Error: " + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires an integer value");
-        }
-        Long x = (Long) var.evaluate(state);
-        Long result = null;
-        if (isPlusPlus) {
-            result = x + 1L;
+        boolean gotOne = false;
+        Object resultValue = null;
+        if (isLong(obj)) {
+            gotOne = true;
+            Long x = (Long) var.evaluate(state);
+            if (isPlusPlus) {
+                resultValue = x + 1L;
+            } else {
+                resultValue = x - 1L;
+            }
+            monad.setResultType(Constant.LONG_TYPE); // should be redundant
 
-        } else {
-            result = x - 1L;
-
         }
-        monad.setResultType(Constant.LONG_TYPE); // should be redundant
+        if (isBigDecimal(obj)) {
+            gotOne = true;
+            monad.setResultType(Constant.DECIMAL_TYPE); // should be redundant
+            BigDecimal bd = (BigDecimal) obj;
+            BigDecimal one = new BigDecimal("1.0");
+            if (isPlusPlus) {
+                resultValue = bd.add(one);
+            } else {
+                resultValue = bd.subtract(one);
+            }
+            monad.setResultType(Constant.DECIMAL_TYPE); // should be redundant
+        }
+        if (!gotOne) {
+            throw new IllegalArgumentException("" + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires a number value");
+        }
         if (monad.isPostFix()) {
-            monad.setResult(x); // so the returned result is NOT incremented for postfixes.
+            monad.setResult(obj); // so the returned result is NOT incremented for postfixes.
         } else {
-            monad.setResult(result); // so the returned result is the increment for prefixes
+            monad.setResult(resultValue); // so the returned result is the increment for prefixes
         }
         monad.setEvaluated(true);
-        state.setValue(var.getVariableReference(), result);
+        state.setValue(var.getVariableReference(), resultValue);
     }
 
 
@@ -535,7 +553,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!isBoolean(objects[0])) {
-                    throw new IllegalArgumentException("Error: negation requires a strictly boolean argument not '" + objects[0] + "'");
+                    throw new IllegalArgumentException("negation requires a strictly boolean argument not '" + objects[0] + "'");
                 }
                 r.result = !(Boolean) objects[0];
                 r.resultType = Constant.BOOLEAN_TYPE;
@@ -550,6 +568,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * between -3^4 and (-3)^4, turing the first of each into a single monad. It works right if there
      * are parentheses, but this is possible a thronier issue to fix than we want now. Best to
      * ket it do this since algebraic operations work as expected.
+     *
      * @param monad
      * @param state
      * @param sign
@@ -561,24 +580,24 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 fpResult r = new fpResult();
                 switch (Constant.getType(objects[0])) {
                     case Constant.LONG_TYPE:
-                        r.result = sign* (Long) objects[0];
+                        r.result = sign * (Long) objects[0];
                         r.resultType = Constant.LONG_TYPE;
                         break;
                     case Constant.DECIMAL_TYPE:
                         BigDecimal x = toBD(objects[0]);
-                        r.result = sign<0?x.negate():x;
+                        r.result = sign < 0 ? x.negate() : x;
                         r.resultType = Constant.DECIMAL_TYPE;
                         break;
                     case Constant.STRING_TYPE:
-                        if(sign > 0) {
+                        if (sign > 0) {
                             r.result = objects[0];
-                        }else{
+                        } else {
                             r.result = "";
                         }
                         r.resultType = Constant.STRING_TYPE;
                         break;
                     default:
-                        throw new IllegalArgumentException("Error: You can only take the negative of a number or string");
+                        throw new IllegalArgumentException("You can only take the negative of a number or string");
 
                 }
                 return r;

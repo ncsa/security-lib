@@ -263,4 +263,16 @@ testWrap();
         return sb.toString();
     }
 
+    /**
+     * Pad a string with blanks as needed.
+     * @param s
+     * @param commandBufferMaxWidth
+     * @return
+     */
+    public static String pad(String s, int commandBufferMaxWidth) {
+          if(s.length() < commandBufferMaxWidth){
+              return s;
+          }
+          return s + getBlanks(commandBufferMaxWidth - s.length());
+    }
 }

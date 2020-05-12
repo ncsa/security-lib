@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.BasicIO;
+import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
 import java.util.*;
@@ -22,6 +24,20 @@ import java.util.*;
  * on 2/2/20 at  6:37 AM
  */
 public abstract class AbstractState implements StateInterface, Logable {
+
+    public IOInterface getIoInterface() {
+        if (ioInterface == null) {
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
+
+    public void setIoInterface(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
+
+    IOInterface ioInterface;
+
     public MyLoggingFacade getLogger() {
         return logger;
     }
@@ -227,6 +243,7 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     /**
      * Sets the script path from a string like path0:path1:path2. Each path in normalized form ends with a /.
+     *
      * @param rawPath
      */
     public void setScriptPaths(String rawPath) {

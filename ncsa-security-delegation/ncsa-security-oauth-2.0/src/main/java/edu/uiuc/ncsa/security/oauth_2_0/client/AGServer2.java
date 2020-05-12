@@ -48,7 +48,7 @@ public class AGServer2 extends ASImpl implements AGServer, OA2Constants {
     public AGResponse processAGRequest(AGRequest agRequest) {
         String nonce = NonceHerder.createNonce();
         HashMap m = new HashMap();
-        m.put(RESPONSE_TYPE, AUTHORIZATION_CODE);
+        m.put(RESPONSE_TYPE, RESPONSE_TYPE_CODE);
         m.put(CLIENT_ID, agRequest.getClient().getIdentifierString());
         m.put(SCOPE, OA2Scopes.SCOPE_OPENID + " " + OA2Scopes.SCOPE_MYPROXY + " " + OA2Scopes.SCOPE_PROFILE);
         m.put(REDIRECT_URI, agRequest.getParameters().get(REDIRECT_URI));

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Monad;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -112,5 +113,24 @@ public class TestMonadicOperations extends AbstractQDLTester {
          myMonad.evaluate(state);
          assert myMonad.getResult().equals(newValue);
      }
+    @Test
+    public void testMMAndPPParsing() throws Throwable {
+        StringBuffer script = new StringBuffer();
+          addLine(script, "j := 5;");
+          addLine(script, "a := ++j - j++;");
+          addLine(script, "b := --j - j--;");
+          addLine(script, "c := --j - --j;");
+          addLine(script, "d := ++j - --j;");
+        State state = testUtils.getNewState();
 
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a" , state)== 0L;
+        assert getLongValue("b" , state)== 0L;
+        assert getLongValue("c" , state)== 1L;
+        assert getLongValue("d" , state)== 1L;
+        assert getLongValue("j" , state)== 3L;
+
+
+    }
 }

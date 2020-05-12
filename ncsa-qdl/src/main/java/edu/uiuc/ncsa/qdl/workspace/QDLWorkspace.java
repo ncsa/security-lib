@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
@@ -24,18 +25,18 @@ public class QDLWorkspace {
 
     WorkspaceCommands workspaceCommands;
 
-     protected MyLoggingFacade getLogger(){
-         return workspaceCommands.logger;
-     }
+    protected MyLoggingFacade getLogger() {
+        return workspaceCommands.logger;
+    }
 
     protected void handleException(Throwable t) {
         if (getLogger() != null) {
             getLogger().error(t);
         }
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
-            if(t.getMessage().contains("extraneous input")){
+            if (t.getMessage().contains("extraneous input")) {
                 workspaceCommands.say("syntax error: Unexpected or illegal character.");
-            }else {
+            } else {
                 workspaceCommands.say("syntax error:" + (workspaceCommands.isDebugOn() ? t.getMessage() : "could not parse input"));
             }
             return;
@@ -68,10 +69,7 @@ public class QDLWorkspace {
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
-   //         boolean executeLocalBuffer = false;
-     //       boolean executeExternalFile = false;
-            System.out.print(INDENT);
-            String input = workspaceCommands.readline().trim();
+            String input = workspaceCommands.readline(INDENT).trim();
 
             if (input.equals("%")) {
                 input = lastCommand;
@@ -86,13 +84,6 @@ public class QDLWorkspace {
                     case RC_NO_OP:
                     case RC_CONTINUE:
                         continue;
-/*
-                    case RC_EXECUTE_LOCAL_BUFFER:
-                        executeLocalBuffer = true;
-                        break;
-                    case RC_EXECUTE_EXTERNAL_BUFFER:
-                        executeExternalFile = true;
-                        break;*/
                 }
             }
             boolean echoMode = workspaceCommands.isEchoModeOn();
@@ -127,7 +118,7 @@ public class QDLWorkspace {
             vector.add(arg);
         }
         InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
-        WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+        WorkspaceCommands workspaceCommands = new WorkspaceCommands(new BasicIO());
         workspaceCommands.init(argLine);
         if (workspaceCommands.isRunScript()) {
             return;

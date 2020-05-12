@@ -278,7 +278,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         } else {
             Object arg1 = polyad.evalArg(0, state);
             if (!isLong(arg1)) {
-                throw new IllegalArgumentException("Error: the supplied arguments was not an integer");
+                throw new IllegalArgumentException("the supplied arguments was not an integer");
             }
             Long newND = (Long) arg1;
             state.getOpEvaluator().setNumericDigits(newND.intValue());
@@ -296,7 +296,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();
             } else {
-                throw new IllegalArgumentException("Error: The first argument must be an integer.");
+                throw new IllegalArgumentException("The first argument must be an integer.");
 
             }
         }
@@ -306,7 +306,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             polyad.evalArg(1, state);
             Object obj = polyad.getArguments().get(1).getResult();
             if (!isLong(obj)) {
-                throw new IllegalArgumentException("Error: The second argument must be an integer.");
+                throw new IllegalArgumentException("The second argument must be an integer.");
             }
 
             if (obj instanceof Long) {

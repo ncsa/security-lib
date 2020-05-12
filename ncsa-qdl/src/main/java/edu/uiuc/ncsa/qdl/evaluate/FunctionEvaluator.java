@@ -57,14 +57,14 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             case IS_FUNCTION:
             case FQ_IS_FUNCTION:
                 if (polyad.getArgCount() != 1) {
-                    throw new IllegalArgumentException("Error: You must supply at least one argument.");
+                    throw new IllegalArgumentException( "You must supply at least one argument.");
                 }
                 Object object = polyad.evalArg(0, state);
                 if (object == null) {
-                    throw new MissingArgumentException("Error: You must supply an argument for the " + IS_FUNCTION + " command.");
+                    throw new MissingArgumentException(" You must supply an argument for the " + IS_FUNCTION + " command.");
                 }
                 if (!isString(object)) {
-                    throw new IllegalArgumentException("Error: the " + IS_FUNCTION + " command requires a string as its first argument.");
+                    throw new IllegalArgumentException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
                 }
                 String name = object.toString();
                 int argCount = -1; // default -- get any
@@ -72,7 +72,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     Object object2 = polyad.evalArg(1, state);
                     ;
                     if (!isLong(object2)) {
-                        throw new IllegalArgumentException("Error: The argument count must be a number.");
+                        throw new IllegalArgumentException(" The argument count must be a number.");
                     }
                     argCount = ((Long) object2).intValue();
                 }
@@ -119,7 +119,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
         FunctionRecord functionRecord = frs.functionRecord;
         if (functionRecord == null) {
-            throw new UndefinedFunctionException("Error: the function '" + polyad.getName() + "' with "
+            throw new UndefinedFunctionException(" the function '" + polyad.getName() + "' with "
                     + polyad.getArgCount() + " arguments was not found.");
         }
         State localState = (State) frs.state.newStateWithImports();
