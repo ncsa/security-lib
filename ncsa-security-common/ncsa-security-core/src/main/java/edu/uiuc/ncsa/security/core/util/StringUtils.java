@@ -94,7 +94,7 @@ public class StringUtils {
         System.out.println(fromList(justify(0, y, 30)));
         String x = null;
         System.out.println(isTrivial(x));
-testWrap();
+        testWrap();
     }
 
     /*
@@ -120,10 +120,14 @@ testWrap();
         x.add("last_modified_ts : 2020-05-04 13:48:21.0");
         // NOTE that the length of eac line is printed at the end
         List<String> y = wrap(19, x, 80);
-        for(String z: y){System.out.println(z + " |"+z.length());}
+        for (String z : y) {
+            System.out.println(z + " |" + z.length());
+        }
         System.out.print("");
         y = wrap(19, x, 125);
-        for(String z: y){System.out.println(z + " |"+z.length());}
+        for (String z : y) {
+            System.out.println(z + " |" + z.length());
+        }
 
     }
 
@@ -235,7 +239,7 @@ testWrap();
                 List<String> flowedtext = StringUtils.wrap(0,
                         StringUtils.toList(currentLine.substring(rightMargin)),
                         rightMargin - offset);
-                for(String x : flowedtext){
+                for (String x : flowedtext) {
 
                     output.add(getBlanks(offset) + x);
                 }
@@ -264,15 +268,68 @@ testWrap();
     }
 
     /**
+     * Checks if towo strings have equal content.
+     * @param x
+     * @param y
+     * @param ignoreCase ignore case. Everything is converted to lower case before checking
+     * @param trimEnds remove any lead or trailing whitespace before checking
+     * @return
+     */
+    public static boolean equals(String x,
+                                 String y,
+                                 boolean ignoreCase,
+                                 boolean trimEnds) {
+        // all the stimple cases
+        if (x == null && y == null) return true;
+        if (x == null && y != null) return false;
+        if (x != null && y == null) return false;
+        if (trimEnds) {
+            x = x.trim();
+            y = y.trim();
+        }
+        if(ignoreCase){
+            x = x.toLowerCase();
+            y = y.toLowerCase();
+        }
+
+        if (x.length() != y.length()) return false;
+        char[] yChar = y.toCharArray();
+        char[] xChar = x.toCharArray();
+        for(int i = 0; i < xChar.length; i++){
+            if(xChar[i] != yChar[i]) return false;
+        }
+        return true;
+    }
+
+    public static boolean equals(String x,
+                                 String y){
+        return equals(x,y,false,false);
+    }
+
+    /**
      * Pad a string with blanks as needed.
+     *
      * @param s
      * @param commandBufferMaxWidth
      * @return
      */
     public static String pad(String s, int commandBufferMaxWidth) {
-          if(s.length() < commandBufferMaxWidth){
-              return s;
-          }
-          return s + getBlanks(commandBufferMaxWidth - s.length());
+        if (s.length() < commandBufferMaxWidth) {
+            return s;
+        }
+        return s + getBlanks(commandBufferMaxWidth - s.length());
     }
+
+    /**
+     * Pad the string to the given lengthh with blanks. This makes sure every line
+     * is the same length.
+     *
+     * @param s
+     * @param commandBufferMaxWidth
+     * @return
+     */
+    public static String pad2(String s, int commandBufferMaxWidth) {
+        return s + getBlanks(commandBufferMaxWidth - s.length());
+    }
+
 }

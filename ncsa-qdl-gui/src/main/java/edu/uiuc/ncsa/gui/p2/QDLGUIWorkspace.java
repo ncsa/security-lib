@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.gui.p2;
 import com.googlecode.lanterna.SGR;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -16,7 +15,6 @@ import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -42,11 +40,12 @@ public class QDLGUIWorkspace {
 
         workspace.init(argLine);
         // Now set it up so the IO works right for the terminal type:
-        workspace.ioInterface = new LanternaIO(workspace.terminal);
+        workspace.ioInterface = new LanternaIO(workspace.terminal, workspace.screen);
         workspaceCommands.setIoInterface(workspace.ioInterface);
         workspaceCommands.init(argLine);
         workspace.run();
     }
+
     IOInterface ioInterface;
     WorkspaceCommands workspaceCommands;
     String INDENT = "    "; // prompt is 4 spaces.
@@ -70,7 +69,10 @@ public class QDLGUIWorkspace {
         // String is of form # RGB where each color is a hex number 0 - 256 aka x0 - xFF
         //terminal.setForegroundColor(TextColor.RGB.Factory.fromString("#0000FF"));
         terminal.enableSGR(SGR.BOLD);
-        terminal.exitPrivateMode();
+        terminal.exitPrivateMode(); // Just let built in command line handle scrolling and mouse support.
+     /*   int x = terminal.getTerminalSize().getRows();
+        screen.scrollLines(0,x,x); // scroll in units of 25 lines.
+*/
     }
 
     Terminal terminal;
@@ -131,7 +133,7 @@ public class QDLGUIWorkspace {
         if (getLogger() != null) {
             getLogger().error(t);
         }
-        
+
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
             if (t.getMessage().contains("extraneous input")) {
                 workspaceCommands.say("syntax error: Unexpected or illegal character.");
@@ -163,12 +165,12 @@ public class QDLGUIWorkspace {
         return workspaceCommands.logger;
     }
 
-    ArrayList<String> commandBuffer = new ArrayList<>();
+    ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
 
-    protected String readInput() throws IOException {
+ /*   protected String readInput() throws IOException {
         boolean keepReading = true;
         int line = 0;
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
         int currentBufferPosition = 0;
 
 
@@ -182,21 +184,21 @@ public class QDLGUIWorkspace {
 
 
                     case Escape:
-                        return stringBuffer.toString() + "\n";
+                        return stringBuilder.toString() + "\n";
                     case EOF: // If there is some issue shutting down the JVM, it starts spitting these out. Just exit.
                         keepReading = false;
                         break;
                     case Enter:
                         terminal.setForegroundColor(TextColor.ANSI.WHITE);
 
-                        String out;
+                        StringBuilder out;
                         if (currentBufferPosition < 0 || commandBuffer.isEmpty()) {
-                            out = stringBuffer.toString();
-                            commandBuffer.add(0, stringBuffer.toString());
+                            out = stringBuilder;
+                            commandBuffer.add(0, stringBuilder);
                         } else {
                             out = commandBuffer.get(currentBufferPosition);
                         }
-                        return out;
+                        return out.toString();
                     case ArrowUp:
                         terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                         System.out.print(commandBuffer.get(currentBufferPosition));
@@ -205,7 +207,6 @@ public class QDLGUIWorkspace {
                         terminal.flush();
                         break;
                     case ArrowDown:
-
                         terminal.setForegroundColor(TextColor.ANSI.YELLOW);
                         currentBufferPosition = Math.max(currentBufferPosition - 1, 0);
                         System.out.print(commandBuffer.get(currentBufferPosition));
@@ -214,7 +215,7 @@ public class QDLGUIWorkspace {
                     case Character:
                         currentBufferPosition = 0;
 
-                        stringBuffer.append(keyStroke.getCharacter());
+                        stringBuilder.append(keyStroke.getCharacter());
                         terminal.putCharacter(keyStroke.getCharacter());
                         terminal.flush();
                         break;
@@ -228,13 +229,13 @@ public class QDLGUIWorkspace {
                         // Move cursor right, don't overrun end of line.
                         currentBufferPosition = 0;
                         terminal.setCursorPosition(
-                                Math.min(stringBuffer.length() - 1, terminal.getCursorPosition().getColumn() + 1),
+                                Math.min(stringBuilder.length() - 1, terminal.getCursorPosition().getColumn() + 1),
                                 terminal.getCursorPosition().getRow());
                         terminal.flush();
                         break;
                     case Backspace:
-                        if (stringBuffer != null && 0 < stringBuffer.length()) {
-                            stringBuffer = stringBuffer.deleteCharAt(stringBuffer.length() - 1);
+                        if (stringBuilder != null && 0 < stringBuilder.length()) {
+                            stringBuilder = stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                             terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
                             terminal.putCharacter(' '); // blank what was there
                             terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
@@ -247,6 +248,6 @@ public class QDLGUIWorkspace {
             }
         }
         return "";
-    }
+    }          */
 }
 

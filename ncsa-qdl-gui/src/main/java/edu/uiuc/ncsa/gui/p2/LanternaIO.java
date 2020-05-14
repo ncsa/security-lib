@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.gui.p2;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.UnixTerminal;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -18,24 +19,26 @@ public class LanternaIO extends BasicIO {
     Terminal terminal;
     int line = 0;
     boolean isUnix = false;
+    Screen screen;
 
-    public LanternaIO(Terminal terminal) {
+    public LanternaIO(Terminal terminal, Screen screen) {
         this.terminal = terminal;
         isUnix = terminal instanceof UnixTerminal;
         defaultTextColor = TextColor.ANSI.GREEN;
+        this.screen = screen;
     }
 
     @Override
     public String readline(String prompt) throws IOException {
         print(prompt);
-        String out =  readInput();
+        String out = readInput();
         cursorNewLine();
         return out;
     }
 
     @Override
     public String readline() throws IOException {
-        String out =  readInput();
+        String out = readInput();
         cursorNewLine();
         return out;
     }
@@ -107,8 +110,6 @@ public class LanternaIO extends BasicIO {
     }
 
     protected void cursorNewLine() throws IOException {
-        System.out.println("in cursor newLine ");
-
         if (isUnix) {
             println("");
             return;
@@ -117,21 +118,26 @@ public class LanternaIO extends BasicIO {
     }
 
     TextColor defaultTextColor;
-    ArrayList<String> commandBuffer = new ArrayList<>();
+    ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
     int commandBufferMaxWidth = 0;
 
     protected String readInput() throws IOException {
         terminal.setForegroundColor(defaultTextColor); // just in case
-
+        int startCol = terminal.getCursorPosition().getColumn(); // column where we start
+        int startRow = terminal.getCursorPosition().getRow(); // row where we start
         boolean keepReading = true;
         int line = 0;
-        StringBuffer stringBuffer = new StringBuffer();
-        int currentBufferPosition = -1;
-         boolean commandHistoryActive = false;
+        StringBuilder currentLine = new StringBuilder();
+        commandBuffer.add(0, currentLine); // push it on the stack
+        int currentBufferPosition = 0;  // start at current line
 
         while (keepReading) {
-            KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all.
+            KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all(!).
             if (keyStroke != null) {
+                if (currentBufferPosition == 0) {
+                    terminal.setForegroundColor(defaultTextColor);
+                }
+
                 switch (keyStroke.getKeyType()) {
                     case MouseEvent:
                         System.out.println("Yo!" + keyStroke);
@@ -139,73 +145,136 @@ public class LanternaIO extends BasicIO {
 
 
                     case Escape:
-                       // return stringBuffer.toString() + "\n";
+                        // return stringBuffer.toString() + "\n";
                     case EOF: // If there is some issue shutting down the JVM, it starts spitting these out. Just exit.
                         keepReading = false;
                         break;
                     case Enter:
-
-                        String out;
-                        if (currentBufferPosition < 0 || commandBuffer.isEmpty()) {
-                            out = stringBuffer.toString();
-                            System.out.println("Buffer = " + out);
-                            System.out.println("History = " + commandBuffer);
-                            commandBuffer.add(0, stringBuffer.toString());
-                            commandBufferMaxWidth = Math.max(commandBufferMaxWidth, stringBuffer.length());
+                        commandBufferMaxWidth = Math.max(commandBufferMaxWidth, currentLine.length());
+                        if (currentBufferPosition == 0) {
+                            if (1 < commandBuffer.size() && !StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
+                                commandBuffer.set(0, currentLine);
+                            }
                         } else {
-                            out = commandBuffer.get(currentBufferPosition);
+                            if (1 < commandBuffer.size()) {
+                                if (StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
+                                    // don't add just take away unused buffer.
+                                    commandBuffer.remove(0);
+                                } else {
+                                    commandBuffer.set(0, currentLine);
+                                }
+                            }
                         }
-                        //cursorNewLine();
-                        return out;
+                        return currentLine.toString();
                     case ArrowUp:
                         if (!commandBuffer.isEmpty()) {
-                            terminal.setCursorPosition(0, terminal.getCursorPosition().getRow());
+                            terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
                             terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                             currentBufferPosition = Math.min(++currentBufferPosition, commandBuffer.size() - 1);
-                            print(StringUtils.pad(commandBuffer.get(currentBufferPosition), commandBufferMaxWidth));
-                            commandHistoryActive = true;
+                            currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));
+                            print(StringUtils.pad2(currentLine.toString(), commandBufferMaxWidth));
+                            terminal.setCursorPosition(startCol, startRow);
+                            flush();
                         }
-                        terminal.flush();
                         break;
                     case ArrowDown:
                         if (!commandBuffer.isEmpty()) {
                             terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
-                            terminal.setCursorPosition(0, terminal.getCursorPosition().getRow());
+                            terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
                             currentBufferPosition = Math.max(--currentBufferPosition, 0);
-                            print(commandBuffer.get(currentBufferPosition));
-                            terminal.flush();
+                            currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));
+                            print(StringUtils.pad2(currentLine.toString(), commandBufferMaxWidth));
+                            terminal.setCursorPosition(startCol, startRow);
+                            flush();
                         }
                         break;
                     case Character:
-                        // currentBufferPosition = 0;
-                        stringBuffer.append(keyStroke.getCharacter());
-                       // terminal.putCharacter(keyStroke.getCharacter());
-                        print(keyStroke.getCharacter());
-                        flush();
+                        int currentCol0 = terminal.getCursorPosition().getColumn();
+                        int position = currentCol0 - startCol;
+                        char character = keyStroke.getCharacter();
+
+                        if (position < 0) {
+                            position = 0;
+                        }
+                        if (currentLine.length() < position) {
+                            position = currentLine.length() - 1;
+                        }
+
+                        currentLine.insert(position, character);
+                        terminal.setCursorPosition(startCol + position, terminal.getCursorPosition().getRow());
+                        print(currentLine.substring(position));
+                        terminal.setCursorPosition(startCol + position + 1, terminal.getCursorPosition().getRow());
+                        terminal.flush();
                         break;
                     case ArrowLeft:
-                        currentBufferPosition = 0;
-
-                        terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
+                        terminal.setCursorPosition(
+                                Math.max(0, terminal.getCursorPosition().getColumn() - 1),
+                                terminal.getCursorPosition().getRow());
                         terminal.flush();
                         break;
                     case ArrowRight:
                         // Move cursor right, don't overrun end of line.
-                        currentBufferPosition = 0;
                         terminal.setCursorPosition(
-                                Math.min(stringBuffer.length() - 1, terminal.getCursorPosition().getColumn() + 1),
+                                Math.min(startCol + currentLine.length(),
+                                        terminal.getCursorPosition().getColumn() + 1),
                                 terminal.getCursorPosition().getRow());
                         terminal.flush();
                         break;
                     case Backspace:
-                        if (stringBuffer != null && 0 < stringBuffer.length()) {
-                            stringBuffer = stringBuffer.deleteCharAt(stringBuffer.length() - 1);
-                            terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
-                            terminal.putCharacter(' '); // blank what was there
-                            terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
+                        // delete character to LEFT of cursor and redraw
+                        int currentCol = terminal.getCursorPosition().getColumn() - startCol;
+                        int currentRow = terminal.getCursorPosition().getRow();
+                        if (0 < currentCol && 0 < currentLine.length()) {
+                            currentCol = Math.max(0, currentCol - 1);
+                            currentLine = currentLine.deleteCharAt(currentCol);
+                            terminal.setCursorPosition(startCol + currentCol, currentRow);
+                            //     terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
+                            // terminal.flush();
+                            print(currentLine.substring(currentCol) + " "); // blanks out last char
+                            terminal.setCursorPosition(startCol + currentCol, currentRow);
                             terminal.flush();
                         }
                         break;
+                    case Delete:
+                        // delete character to RIGHT of cursor and redraw
+                        int currentCol1 = terminal.getCursorPosition().getColumn() - startCol;
+                        int currentRow1 = terminal.getCursorPosition().getRow();
+
+                        if (0 < currentCol1 && currentCol1 < currentLine.length()) {
+                            currentCol1 = Math.min(startCol + currentLine.length() - 1, currentCol1);
+
+                            currentLine = currentLine.deleteCharAt(currentCol1);
+                            terminal.setCursorPosition(startCol + currentCol1, currentRow1);
+                            print(currentLine.substring(currentCol1) + " "); // blanks out last char
+                            terminal.setCursorPosition(startCol + currentCol1, currentRow1);
+                            flush();
+                        }
+                        break;
+                    case End:
+                        terminal.setCursorPosition(startCol + currentLine.length(), startRow);
+                        flush();
+                        break;
+                    case Home:
+                        terminal.setCursorPosition(startCol, startRow);
+                        flush();
+                        break;
+/*         To do proper scolling will require a lot more work. This starts page up and down.
+
+                    case PageUp:
+                        int x = terminal.getTerminalSize().getRows();
+                        screen.clear();
+                        screen.scrollLines(0, x, -1);
+                        screen.refresh();
+
+                        break;
+                    case PageDown:
+                         x = terminal.getTerminalSize().getRows();
+                        screen.scrollLines(0, x, 1); // scroll in units of 25 lines.
+                        screen.clear();
+                        screen.refresh();
+                        break;
+*/
+
                     default:
 
                 }

@@ -71,6 +71,7 @@ public class GUIDemo {
         System.out.println("terminal is " + terminal.getClass().getSimpleName());
         Screen screen = new TerminalScreen(terminal);
 
+
         // sets up a resize listener in case the user changes the size.
   /*      terminal.addResizeListener((terminal1, newSize) -> {
             // Be careful here though, this is likely running on a separate thread. Lanterna is threadsafe in
@@ -150,6 +151,7 @@ public class GUIDemo {
                   should be.
                    */
         Panel contentPanel = new Panel(new GridLayout(2));
+        
 
         /*
          * Lanterna contains a number of built-in layout managers, the simplest one being LinearLayout that simply
