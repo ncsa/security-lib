@@ -1151,9 +1151,12 @@ public class WorkspaceCommands implements Logable {
                 }
             }
             FileOutputStream fos = new FileOutputStream(target);
+            logger.info("saving workspace '" + target.getAbsolutePath() + "'");
+
             StateUtils.save(state, fos);
             say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
         } catch (Throwable t) {
+            logger.error("could not save workspace.", t);
             say("could not save the workspace:" + t.getMessage());
         }
         return RC_NO_OP;

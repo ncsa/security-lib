@@ -24,7 +24,7 @@ public class LanternaIO extends BasicIO {
     public LanternaIO(Terminal terminal, Screen screen) {
         this.terminal = terminal;
         isUnix = terminal instanceof UnixTerminal;
-        defaultTextColor = TextColor.ANSI.GREEN;
+        defaultTextColor = TextColor.ANSI.WHITE;
         this.screen = screen;
     }
 
@@ -169,7 +169,7 @@ public class LanternaIO extends BasicIO {
                     case ArrowUp:
                         if (!commandBuffer.isEmpty()) {
                             terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
-                            terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+                        //    terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                             currentBufferPosition = Math.min(++currentBufferPosition, commandBuffer.size() - 1);
                             currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));
                             print(StringUtils.pad2(currentLine.toString(), commandBufferMaxWidth));
@@ -179,7 +179,7 @@ public class LanternaIO extends BasicIO {
                         break;
                     case ArrowDown:
                         if (!commandBuffer.isEmpty()) {
-                            terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+                      //      terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                             terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
                             currentBufferPosition = Math.max(--currentBufferPosition, 0);
                             currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));

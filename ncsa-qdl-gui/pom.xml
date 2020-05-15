@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ncsa-qdl-gui</artifactId>
+    <name>Text mode GUI for the QD Language</name>
+
     <dependencies>
         <dependency>
             <groupId>com.googlecode.lanterna</groupId>

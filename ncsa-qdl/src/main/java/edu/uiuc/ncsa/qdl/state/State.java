@@ -367,6 +367,7 @@ public class State extends FunctionState implements QDLConstants {
         for (String mod : getImportedModules().keySet()) {
             getImportedModules().get(mod).getState().injectTransientFields(oldState);
         }
+        setIoInterface(oldState.getIoInterface());
     }
 
     /**

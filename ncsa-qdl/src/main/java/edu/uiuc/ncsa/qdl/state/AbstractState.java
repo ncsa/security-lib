@@ -36,7 +36,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.ioInterface = ioInterface;
     }
 
-    IOInterface ioInterface;
+    transient IOInterface ioInterface;
 
     public MyLoggingFacade getLogger() {
         return logger;

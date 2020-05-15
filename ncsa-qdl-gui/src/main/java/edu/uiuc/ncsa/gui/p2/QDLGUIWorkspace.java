@@ -15,7 +15,6 @@ import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.util.ArrayList;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
@@ -66,10 +65,11 @@ public class QDLGUIWorkspace {
 
 
         terminal.setForegroundColor(TextColor.ANSI.WHITE);
-        // String is of form # RGB where each color is a hex number 0 - 256 aka x0 - xFF
+        // String is of form # RGB where each color is a hex number 0 - 255 aka x0 - xFF
         //terminal.setForegroundColor(TextColor.RGB.Factory.fromString("#0000FF"));
         terminal.enableSGR(SGR.BOLD);
         terminal.exitPrivateMode(); // Just let built in command line handle scrolling and mouse support.
+        // next stuff is for debugging in the IDE. Comment previous line, uncomment these.
      /*   int x = terminal.getTerminalSize().getRows();
         screen.scrollLines(0,x,x); // scroll in units of 25 lines.
 */
@@ -165,89 +165,5 @@ public class QDLGUIWorkspace {
         return workspaceCommands.logger;
     }
 
-    ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
-
- /*   protected String readInput() throws IOException {
-        boolean keepReading = true;
-        int line = 0;
-        StringBuilder stringBuilder = new StringBuilder();
-        int currentBufferPosition = 0;
-
-
-        while (keepReading) {
-            KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all.
-            if (keyStroke != null) {
-                switch (keyStroke.getKeyType()) {
-                    case MouseEvent:
-                        System.out.println("Yo!" + keyStroke);
-                        break;
-
-
-                    case Escape:
-                        return stringBuilder.toString() + "\n";
-                    case EOF: // If there is some issue shutting down the JVM, it starts spitting these out. Just exit.
-                        keepReading = false;
-                        break;
-                    case Enter:
-                        terminal.setForegroundColor(TextColor.ANSI.WHITE);
-
-                        StringBuilder out;
-                        if (currentBufferPosition < 0 || commandBuffer.isEmpty()) {
-                            out = stringBuilder;
-                            commandBuffer.add(0, stringBuilder);
-                        } else {
-                            out = commandBuffer.get(currentBufferPosition);
-                        }
-                        return out.toString();
-                    case ArrowUp:
-                        terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
-                        System.out.print(commandBuffer.get(currentBufferPosition));
-                        currentBufferPosition = Math.min(currentBufferPosition + 1, commandBuffer.size() - 1);
-                        System.out.println("Buff pos = " + currentBufferPosition);
-                        terminal.flush();
-                        break;
-                    case ArrowDown:
-                        terminal.setForegroundColor(TextColor.ANSI.YELLOW);
-                        currentBufferPosition = Math.max(currentBufferPosition - 1, 0);
-                        System.out.print(commandBuffer.get(currentBufferPosition));
-                        terminal.flush();
-                        break;
-                    case Character:
-                        currentBufferPosition = 0;
-
-                        stringBuilder.append(keyStroke.getCharacter());
-                        terminal.putCharacter(keyStroke.getCharacter());
-                        terminal.flush();
-                        break;
-                    case ArrowLeft:
-                        currentBufferPosition = 0;
-
-                        terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
-                        terminal.flush();
-                        break;
-                    case ArrowRight:
-                        // Move cursor right, don't overrun end of line.
-                        currentBufferPosition = 0;
-                        terminal.setCursorPosition(
-                                Math.min(stringBuilder.length() - 1, terminal.getCursorPosition().getColumn() + 1),
-                                terminal.getCursorPosition().getRow());
-                        terminal.flush();
-                        break;
-                    case Backspace:
-                        if (stringBuilder != null && 0 < stringBuilder.length()) {
-                            stringBuilder = stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-                            terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
-                            terminal.putCharacter(' '); // blank what was there
-                            terminal.setCursorPosition(terminal.getCursorPosition().getColumn() - 1, terminal.getCursorPosition().getRow());
-                            terminal.flush();
-                        }
-                        break;
-                    default:
-
-                }
-            }
-        }
-        return "";
-    }          */
 }
 
