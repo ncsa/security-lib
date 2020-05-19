@@ -892,10 +892,14 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         // First line of the Vietnamese epic, the Tale of Kieu
         addLine(script, "a :='Trăm năm trong cõi người ta, Chữ tài chữ mệnh khéo là ghét nhau.';");
+        // Some Ahmaric text...
+        addLine(script, "p :='በሰማይ ፡ የምትኖር ፡ ኣባታችን ፡ ሆይ ፡';");
         addLine(script, "b := (a == vdecode(vencode(a)));");
+        addLine(script, "q := (p == vdecode(vencode(p)));");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("b", state);
+        assert getBooleanValue("q", state);
     }
 
     /**

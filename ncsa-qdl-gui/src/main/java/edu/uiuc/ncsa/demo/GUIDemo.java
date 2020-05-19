@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.gui;
+package edu.uiuc.ncsa.demo;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.graphics.TextGraphics;
@@ -8,6 +8,7 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -92,7 +93,7 @@ public class GUIDemo {
         //textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
         screen.startScreen();
         screen.refresh(); // clear out any cruft in object properly.
-
+              //textGraphics.
         // Only one of these should be uncommented at any time since they are separate demos.
        // showStuff(textGraphics);
        // terminal.flush();
@@ -281,8 +282,8 @@ public class GUIDemo {
         final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(screen);
         final Window window = new MyWindow();
         Panel contentPanel = new Panel(new GridLayout(2));
-/*
-        contentPanel.addComponent(new Button("Test", new Runnable() {
+
+        contentPanel.addComponent(new Button("open file", new Runnable() {
             @Override
             public void run() {
                  input = new FileDialogBuilder()
@@ -294,7 +295,7 @@ public class GUIDemo {
 
             }
         }));
-*/
+
 
         window.setComponent(contentPanel);
         textGUI.addWindowAndWait(window);

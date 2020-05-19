@@ -10,6 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ncsa-qdl-gui</artifactId>
+    <version>1.1-QDL-SNAPSHOT</version>
+
     <name>Text mode GUI for the QD Language</name>
 
     <dependencies>
@@ -46,8 +48,8 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <!--     <mainClass>edu.uiuc.ncsa.gui.GUIDemo</mainClass>  -->
-                           <mainClass>edu.uiuc.ncsa.gui.p2.QDLGUIWorkspace</mainClass>
+                            <!--     <mainClass>edu.uiuc.ncsa.demo.GUIDemo</mainClass>  -->
+                           <mainClass>edu.uiuc.ncsa.qdl.gui.QDLGUIWorkspace</mainClass>
                         </manifest>
                         <manifestEntries>
                             <application-version>${pom.version}</application-version>

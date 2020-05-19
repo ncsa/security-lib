@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.gui.p2;
+package edu.uiuc.ncsa.qdl.gui;
 
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyStroke;
@@ -134,9 +134,7 @@ public class LanternaIO extends BasicIO {
         while (keepReading) {
             KeyStroke keyStroke = terminal.readInput(); //Block input or this does not draw right at all(!).
             if (keyStroke != null) {
-                if (currentBufferPosition == 0) {
-                    terminal.setForegroundColor(defaultTextColor);
-                }
+           
 
                 switch (keyStroke.getKeyType()) {
                     case MouseEvent:
@@ -169,7 +167,7 @@ public class LanternaIO extends BasicIO {
                     case ArrowUp:
                         if (!commandBuffer.isEmpty()) {
                             terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
-                        //    terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+                            //    terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                             currentBufferPosition = Math.min(++currentBufferPosition, commandBuffer.size() - 1);
                             currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));
                             print(StringUtils.pad2(currentLine.toString(), commandBufferMaxWidth));
@@ -179,7 +177,7 @@ public class LanternaIO extends BasicIO {
                         break;
                     case ArrowDown:
                         if (!commandBuffer.isEmpty()) {
-                      //      terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
+                            //      terminal.setForegroundColor(TextColor.ANSI.MAGENTA);
                             terminal.setCursorPosition(startCol, terminal.getCursorPosition().getRow());
                             currentBufferPosition = Math.max(--currentBufferPosition, 0);
                             currentLine = new StringBuilder(commandBuffer.get(currentBufferPosition));
@@ -258,21 +256,25 @@ public class LanternaIO extends BasicIO {
                         terminal.setCursorPosition(startCol, startRow);
                         flush();
                         break;
-/*         To do proper scolling will require a lot more work. This starts page up and down.
+//         To do proper scrolling will require a lot more work. This starts page up and down.
+                    // Warning that Lanterna clears away anything that is scrolled, apparently
+                    // for good since there is no way to get it out of the screen's back buffer.
+                    // They explicitly warn against redrawing the screen repeatedly by the
+                    // use since that is really slow and clogs up the system. If they
+                    // have a fully functioning scrolling system, I have yet to find it.
+/*
 
                     case PageUp:
                         int x = terminal.getTerminalSize().getRows();
-                        screen.clear();
-                        screen.scrollLines(0, x, -1);
-                        screen.refresh();
-
+                        screen.scrollLines(0, x, 5);
+                        screen.refresh(Screen.RefreshType.DELTA);
                         break;
                     case PageDown:
-                         x = terminal.getTerminalSize().getRows();
-                        screen.scrollLines(0, x, 1); // scroll in units of 25 lines.
-                        screen.clear();
-                        screen.refresh();
+                        x = terminal.getTerminalSize().getRows();
+                        screen.scrollLines(0, x, -5);
+                        screen.refresh(Screen.RefreshType.DELTA);
                         break;
+
 */
 
                     default:

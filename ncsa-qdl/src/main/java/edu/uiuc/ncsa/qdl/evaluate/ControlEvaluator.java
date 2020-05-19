@@ -88,7 +88,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     // for os environment
     public static final String OS_ENV = "os_env";
-    public static final String FQ_OS_ENV = SYS_INFO + OS_ENV;
+    public static final String FQ_OS_ENV = SYS_FQ + OS_ENV;
     public static final int OS_ENV_TYPE = 208 + CONTROL_BASE_VALUE;
 
 
