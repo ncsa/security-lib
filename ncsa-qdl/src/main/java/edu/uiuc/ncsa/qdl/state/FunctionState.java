@@ -150,9 +150,9 @@ public abstract class FunctionState extends VariableState {
     }
 
     public List<String> listAllDocumentation() {
-        List<String> out = getFunctionTable().listDoxx();
+        List<String> out = getFunctionTable().listAllDocs();
         for (URI key : getImportManager().keySet()) {
-            List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listDoxx();
+            List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listAllDocs();
             for (String x : uqVars) {
                 List<String> aliases = getImportManager().getAlias(key);
                 if (aliases.size() == 1) {

@@ -1,5 +1,6 @@
-target
+**/target/*
 .idea
+**/*.iml
 
 /ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/util/AWTConsole.java
 /ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/util/Console.java

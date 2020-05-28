@@ -173,22 +173,5 @@ public class ClientJSONConfigUtil {
         array.add(comment);
         config.put(COMMENT_KEY, array);
     }
-
-/*
-
-    public static void setExtendedAttributes(JSONObject config, JSONObject attributes) {
-        config.put(EXTENDED_ATTRIBUTES, attributes);
-    }
-
-
-    public static JSONObject getExtendedAttributes(JSONObject config) {
-        if (!config.containsKey(EXTENDED_ATTRIBUTES)) {
-            return new JSONObject();
-        }
-        return config.getJSONObject(EXTENDED_ATTRIBUTES);
-
-    }
-*/
-
-
+    
 }

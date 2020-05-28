@@ -1,0 +1,14 @@
+This is a list of fixes from Mischa Salle. If it's on this list, it is pending.
+These are all improvements. Actual bug fixes were either already done in the last release or done here.
+
+https://github.com/rcauth-eu/security-lib/commit/bada9fbb10bdd50177dda432edf3c9fdf4826bd9
+https://github.com/rcauth-eu/security-lib/commit/6bcb0ccc9a36faff21db8783a3e2b58d774def72
+https://github.com/rcauth-eu/security-lib/commit/6d6c3e8d91056ba8171c64006fa9d11b4e94f4f1 <- Not sure if this will change behavior
+https://github.com/rcauth-eu/security-lib/commit/f001081a07140fa765422ceaeedf9f8647d4f4a2 <- debug util reorder of log levels.
+https://github.com/rcauth-eu/security-lib/commit/84531d9acd44f30be43613102fb3576db487abfb <- Good but big revision of data descriptor entry to allow options
+https://github.com/rcauth-eu/security-lib/commit/ee1e1ec7b5fb576d6873152a3baef4ac48169346 <- refresh token lifetime not set right, but this whole machinery is set to change.
+https://github.com/rcauth-eu/security-lib/commit/b1fc71d6222ae0e622293fd64e5fce4bb4af96db <- pom.xml changes to handle versions numbers better. Requires new plugin...
+https://github.com/rcauth-eu/security-lib/commit/e86a6f2f804bac4f30f2659423646db7d1832dd3 <- pom change for newer javax servlet api. Might break everything though...FOA2Scope
+
+// worked backwards from end of list. Stopped at this one:
+https://github.com/rcauth-eu/security-lib/commit/46441147ab790b0c415198edb65462b0410cb4a8

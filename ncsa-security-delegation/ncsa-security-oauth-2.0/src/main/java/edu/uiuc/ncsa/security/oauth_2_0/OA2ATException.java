@@ -18,10 +18,8 @@ public class OA2ATException extends GeneralException {
     }
 
     public OA2ATException(String error, String description) {
-           this.description = description;
-           this.error = error;
-           this.statusCode = HttpStatus.SC_BAD_REQUEST; //default
-       }
+        this(error, description, HttpStatus.SC_BAD_REQUEST);
+    }
 
     String error;
     String description;

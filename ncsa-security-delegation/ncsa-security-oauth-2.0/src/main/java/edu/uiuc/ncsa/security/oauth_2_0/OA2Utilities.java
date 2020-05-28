@@ -28,7 +28,7 @@ public class OA2Utilities {
 
     public static String getParam(HttpServletRequest req, String key){
           String[] values  = req.getParameterValues(key);
-          if(values == null && values.length == 0) return null;
+          if(values == null || values.length == 0) return null;
 
           if(1 < values.length){
               throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,

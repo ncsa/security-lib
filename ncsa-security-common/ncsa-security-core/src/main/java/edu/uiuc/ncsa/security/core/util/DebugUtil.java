@@ -17,7 +17,7 @@ import java.util.Date;
 public class DebugUtil {
 
     /**
-     * Turn of debugging
+     * Turn off debugging
      */
     public static int DEBUG_LEVEL_OFF = 0;
     /**
@@ -147,7 +147,7 @@ public class DebugUtil {
     }
 
     /** This only prints if the requested level is at least error AND the current utility supports it.
-     * Note that if ther eis no exception, then that is noted in the log as well.
+     * Note that if there is no exception, then that is noted in the log as well.
      *
      * @param level
      * @param callingClass

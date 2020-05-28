@@ -50,6 +50,7 @@ public class OA2RedirectableError extends GeneralException {
     }
 
     public OA2RedirectableError(String error, String description, String state) {
+        super("error: "+error+" (description: "+description+")");
         this.error = error;
         this.description = description;
         this.state = state;

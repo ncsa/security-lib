@@ -21,18 +21,16 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         return logFile;
     }
 
-    String logFile;
-    boolean debugOn;
-
-    public String getLoggerName() {
-        return loggerName;
-    }
-
-    String loggerName;
+    String logFile = null;
+    boolean debugOn = false;
+    String loggerName = null;
     int fileCount = -1;
     int maxFileSize = -1;
     boolean appendOn = true;
     boolean disableLog4j = true;
+    public String getLoggerName() {
+        return loggerName;
+    }
 
 
     public LoggerProvider(String logFile,
@@ -121,7 +119,7 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     } else {
                         logFileName = logFile;
                     }
-                    fileHandler = new FileHandler(logFile, maxFileSize, fileCount, true);
+                    fileHandler = new FileHandler(logFile, maxFileSize, fileCount, appendOn);
                     fileHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
                     logger.getLogger().addHandler(fileHandler);
                     logger.getLogger().setUseParentHandlers(false); // suppresses console output.

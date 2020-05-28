@@ -50,7 +50,7 @@ public class DataDescriptorEntry implements Comparable {
     }
 
     /**
-     * it is strongly suggested that you use {@link java.sql.Types since
+     * it is strongly suggested that you use {@link java.sql.Types} since
      * these are stable and pretty easily map to most interesting data types.
      * These (within rather narrow limits)
      * are converted by the database abstraction layer to the correct underlying

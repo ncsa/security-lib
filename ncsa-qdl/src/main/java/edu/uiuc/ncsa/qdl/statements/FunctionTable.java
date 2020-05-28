@@ -9,7 +9,7 @@ import java.util.TreeSet;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:52 AM
  */
-public class FunctionTable extends HashMap<String, FunctionRecord> {
+public class FunctionTable extends HashMap<String, FunctionRecord> implements Documentable {
     String munger = "$$$";
 
     public String createKey(String name, int argCount) {
@@ -33,6 +33,7 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
         return super.containsKey(createKey(var, argCount));
     }
 
+    @Override
     public TreeSet<String> listFunctions(String regex) {
         TreeSet<String> names = new TreeSet<>();
 
@@ -57,7 +58,8 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
      *
      * @return
      */
-    public List<String> listDoxx() {
+    @Override
+    public List<String> listAllDocs() {
         ArrayList<String> docs = new ArrayList<>();
         for (String key : keySet()) {
             String name = key.substring(0, key.indexOf(munger)); // de-munge
@@ -85,6 +87,7 @@ public class FunctionTable extends HashMap<String, FunctionRecord> {
      * @param fName
      * @return
      */
+    @Override
     public List<String> getDocumentation(String fName, int argCount) {
         if (get(fName, argCount) == null) {
             return null;

@@ -2,12 +2,12 @@ package edu.uiuc.ncsa.demo;
 
 import com.googlecode.lanterna.*;
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.Window;
-import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.FileDialogBuilder;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
@@ -35,73 +35,78 @@ import static com.googlecode.lanterna.input.KeyType.Escape;
  */
 public class GUIDemo {
     public static void main(String[] args) throws IOException {
+        mytest();
+
+
+    }
+    protected static void mytest()throws IOException{
         // Note UnixTerminal is supported BUT will freee the IDE because of
-        // how it uses standard out. Write everything letting Lanterna decide
-        // what works then switch when running in xterm.
+              // how it uses standard out. Write everything letting Lanterna decide
+              // what works then switch when running in xterm.
 
-        // Next three are required to start pretty much anything
-        DefaultTerminalFactory factory = new DefaultTerminalFactory();
-        // All this to set the background color of the terminal...
-        TerminalEmulatorPalette myPallette = new TerminalEmulatorPalette(
-                Color.WHITE, // sets default
-                Color.RED, // sets default Bright
-                Color.BLUE, // sets background. This is the only reason for this constructor
-                Color.black,
-                Color.BLACK,
-                Color.red,
-                Color.RED,
-                Color.green,
-                Color.GREEN,
-                Color.yellow,
-                Color.YELLOW,
-                Color.blue,
-                Color.BLUE,
-                Color.magenta,
-                Color.MAGENTA,
-                Color.cyan,
-                Color.CYAN,
-                Color.white,
-                Color.WHITE
+              // Next three are required to start pretty much anything
+              DefaultTerminalFactory factory = new DefaultTerminalFactory();
+              // All this to set the background color of the terminal...
+              TerminalEmulatorPalette myPallette = new TerminalEmulatorPalette(
+                      Color.WHITE, // sets default
+                      Color.RED, // sets default Bright
+                      Color.BLUE, // sets background. This is the only reason for this constructor
+                      Color.black,
+                      Color.BLACK,
+                      Color.red,
+                      Color.RED,
+                      Color.green,
+                      Color.GREEN,
+                      Color.yellow,
+                      Color.YELLOW,
+                      Color.blue,
+                      Color.BLUE,
+                      Color.magenta,
+                      Color.MAGENTA,
+                      Color.cyan,
+                      Color.CYAN,
+                      Color.white,
+                      Color.WHITE
 
-        );
+              );
 
-        //TerminalEmulatorPalette palette = new TerminalEmulatorPalette()
-        TerminalEmulatorColorConfiguration colorConfig = TerminalEmulatorColorConfiguration.newInstance(myPallette);
-        factory.setTerminalEmulatorColorConfiguration(colorConfig);
-        Terminal terminal = factory.createTerminal();
-        System.out.println("terminal is " + terminal.getClass().getSimpleName());
-        Screen screen = new TerminalScreen(terminal);
+              //TerminalEmulatorPalette palette = new TerminalEmulatorPalette()
+              TerminalEmulatorColorConfiguration colorConfig = TerminalEmulatorColorConfiguration.newInstance(myPallette);
+              factory.setTerminalEmulatorColorConfiguration(colorConfig);
+              Terminal terminal = factory.createTerminal();
+              System.out.println("terminal is " + terminal.getClass().getSimpleName());
+              Screen screen = new TerminalScreen(terminal);
 
 
-        // sets up a resize listener in case the user changes the size.
-  /*      terminal.addResizeListener((terminal1, newSize) -> {
-            // Be careful here though, this is likely running on a separate thread. Lanterna is threadsafe in
-            // a best-effort way so while it shouldn't blow up if you call terminal methods on multiple threads,
-            // it might have unexpected behavior if you don't do any external synchronization
-            textGraphics.drawLine(5, 3, newSize.getColumns() - 1, 3, ' ');
-            textGraphics.putString(5, 3, "Terminal Size: ", SGR.BOLD);
-            textGraphics.putString(5 + "Terminal Size: ".length(), 3, newSize.toString());
-            try {
-                terminal1.flush();
-            } catch (IOException e) {
-                // Not much we can do here
-                throw new RuntimeException(e);
-            }
-        });*/
+              // sets up a resize listener in case the user changes the size.
+        /*      terminal.addResizeListener((terminal1, newSize) -> {
+                  // Be careful here though, this is likely running on a separate thread. Lanterna is threadsafe in
+                  // a best-effort way so while it shouldn't blow up if you call terminal methods on multiple threads,
+                  // it might have unexpected behavior if you don't do any external synchronization
+                  textGraphics.drawLine(5, 3, newSize.getColumns() - 1, 3, ' ');
+                  textGraphics.putString(5, 3, "Terminal Size: ", SGR.BOLD);
+                  textGraphics.putString(5 + "Terminal Size: ".length(), 3, newSize.toString());
+                  try {
+                      terminal1.flush();
+                  } catch (IOException e) {
+                      // Not much we can do here
+                      throw new RuntimeException(e);
+                  }
+              });*/
 
-        TextGraphics textGraphics = screen.newTextGraphics();
-        //textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
-        screen.startScreen();
-        screen.refresh(); // clear out any cruft in object properly.
-              //textGraphics.
-        // Only one of these should be uncommented at any time since they are separate demos.
-       // showStuff(textGraphics);
-       // terminal.flush();
-        // helloWorld(screen);
-        // userInput2(terminal, screen, textGraphics);
-        //  testBox(screen);
-        terminalInput(terminal, screen, textGraphics);
-        screen.stopScreen();
+              TextGraphics textGraphics = screen.newTextGraphics();
+              //textGraphics.setForegroundColor(TextColor.ANSI.YELLOW);
+              screen.startScreen();
+              screen.refresh(); // clear out any cruft in object properly.
+                    //textGraphics.
+              // Only one of these should be uncommented at any time since they are separate demos.
+             // showStuff(textGraphics);
+             // terminal.flush();
+              // helloWorld(screen);
+              // userInput2(terminal, screen, textGraphics);
+              //  testBox(screen);
+              terminalInput(terminal, screen, textGraphics);
+              screen.stopScreen();
     }
 
     /**
