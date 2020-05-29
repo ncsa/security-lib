@@ -144,7 +144,11 @@
             <version>1.4.7</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Inexplicably the next two entries must be in this order or maven will not resolve the dependencies. -->
+        <!--
+             Inexplicably the next redundant entries must be in this order or maven will not resolve the dependencies.
+             If these are here, it complains bitterly about how pom is almost unusable, and yet it will not build
+             without them. Oy veh!
+        -->
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>

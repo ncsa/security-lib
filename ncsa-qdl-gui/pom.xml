@@ -25,7 +25,13 @@
             <artifactId>ncsa-qdl</artifactId>
             <version>1.1-QDL-SNAPSHOT</version>
         </dependency>
+        <dependency>
+              <groupId>com.gitlab.klamonte</groupId>
+              <artifactId>jexer</artifactId>
+              <version>0.3.2</version>
+            </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
