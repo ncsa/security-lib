@@ -21,9 +21,14 @@ import java.util.StringTokenizer;
 public class Scripts extends FileEntryConstants {
 
     /**
-     * Identifies the JSON array of line sof code
+     * Identifies the JSON array of lines of code
      */
     public static final String CODE = "code";
+    /**
+     * Identifies a call to construct a script_run() command call.
+     */
+    public static final String RUN = "run";
+
     /**
      * Identifies this object
      */

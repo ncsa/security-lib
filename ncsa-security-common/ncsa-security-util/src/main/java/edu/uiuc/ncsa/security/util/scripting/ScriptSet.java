@@ -55,4 +55,11 @@ public class ScriptSet<V extends ScriptInterface> implements Iterable<V>{
     public Iterator<V> iterator() {
         return scripts.iterator();
     }
+
+    @Override
+    public String toString() {
+        return "ScriptSet{" +
+                "scripts=" + scripts +
+                '}';
+    }
 }

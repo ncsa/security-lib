@@ -225,7 +225,9 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
     /**
-     * Command line arguments if this is being run in script mode.
+     * Command line arguments if this is being run in script mode.  This is an array of objects.
+     * If invoked from inside QDL then it may be any QDL variable. When coming from outside, these
+     * will be strings (since, e.g., bash is unaware of QDL variable types).
      *
      * @return
      */

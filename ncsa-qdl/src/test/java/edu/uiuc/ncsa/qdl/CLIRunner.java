@@ -4,6 +4,8 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -13,19 +15,44 @@ public class CLIRunner {
     // This just exists to run a few tests/debug stuff from the command line
     public static void main(String[] args) {
         try {
-            String configPath = "$.config[*]";
+          //  testReadChar();
+            // JSON Path work ok except some dependency named slfj seems to blow up. Not sure why.
+            // Might not be stable enough to use...
+            String configPath = "$.config[*]"; // read all lines from the config array
+            // Next path specifically looks at one element in the sourceConfig.
             String claimsPath = "$.claims.sourceConfig[0].ldap.preProcessing.script[*]";
             DocumentContext jsonContext = JsonPath.parse(jsonCfg);
             List<String> x = jsonContext.read(configPath);
             List<String> script = jsonContext.read(claimsPath);
             System.out.println(x);
-            for(String y: script){
+            for (String y : script) {
                 System.out.println(y);
             }
 
-        } catch (Exception e
+        } catch (Throwable e
         ) {
             e.printStackTrace();
+        }
+    }
+
+    static Scanner scanner = new Scanner(System.in,"UTF-8").useDelimiter("\\A");
+    static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\p{javaWhitespace}+");
+    static final Pattern EMPTY_PATTERN = Pattern.compile("\\^");
+
+    protected static int readChar() {
+        // me trying to read a single char. This still requires the user hit return after each character
+        // but it will send back a character at a time.
+        //scanner.useDelimiter(EMPTY_PATTERN);
+        scanner.useDelimiter(EMPTY_PATTERN);
+        String ch = scanner.next();
+        scanner.useDelimiter(WHITESPACE_PATTERN);
+        return ch.charAt(0);
+    }
+    protected static void testReadChar() throws Throwable{
+        int x=0;
+        while(true){
+            x = readChar();
+            System.out.print("x=" + x );
         }
     }
 

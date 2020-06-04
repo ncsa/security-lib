@@ -377,6 +377,16 @@ public class StemVariable extends HashMap<String, Object> {
             return getStemList().toJSON(); // handles case of simple list of simple elements
         }
         JSONObject json = new JSONObject();
+        //edge case. empty stem list should return a JSON object
+        if(size() == 0){
+            return json;
+        }
+        if(super.size() == 0){
+            // super.size counts the number of non-stem entries. This means there are
+            // list elements and nothing else.
+            // if it is just a list, return it asap.
+            return getStemList().toJSON();
+        }
         StemList<StemEntry> localSL = new StemList<>();
         localSL.addAll(getStemList());
         QDLCodec codec = new QDLCodec();
@@ -407,14 +417,16 @@ public class StemVariable extends HashMap<String, Object> {
                 json.put(escapeNames ? codec.decode(key) : key, get(key));
             }
         }
+        // This is here because what it does is it checks that stem lists have all been added.
+        // remove this and stem lists don't get processed right.
         if (localSL.size() == size()) {
-            return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
-        }
+             return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
+         }
+
 
         // now for the messy bit -- lists
         // At this point there were no collisions in the indices.
         JSONArray array = getStemList().toJSON();
-        array.addAll(localSL.toJSON());
         if (!array.isEmpty()) {
             for (int i = 0; i < array.size(); i++) {
                 json.put(i, array.get(i));

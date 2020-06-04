@@ -121,6 +121,15 @@ public class LanternaIO extends BasicIO {
     ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
     int commandBufferMaxWidth = 0;
 
+    /**
+     * Turns out that Lanterna uses a polling method to get the input (and get around the inability of Java
+     * to actually read individual characters). As such it polls every 1/4 second, limiting pastin, e.g.,
+     * to
+     * 4 char per second (!!!!) Making it impossible to paste longer text. 1600 chars takes 400 sec or about
+     * 12 minutes.
+     * @return
+     * @throws IOException
+     */
     protected String readInput() throws IOException {
         terminal.setForegroundColor(defaultTextColor); // just in case
         int startCol = terminal.getCursorPosition().getColumn(); // column where we start

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.scripting;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.FileEntry;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
@@ -18,13 +19,46 @@ import java.util.List;
  * on 2/4/20 at  5:09 PM
  */
 public class QDLScript extends FileEntry implements ScriptInterface {
+    /*
+    Collision of names. The things that are run one the server are called "scripts" because that is what they
+    are called in the delegation framework. Inside QDL a script is something run with a script_run command
+    and has arguments. The scriptArgList here are the args for that and the isRunScript refers to whether
+    this is to be run in QDL as a QDL script. Too darn many few words for the concepts...
+     */
     public QDLScript(List<String> lines, XProperties xp) {
         super(lines, xp);
+    }
+    StemVariable scriptArglist = null;
+    boolean isRunScript = false;
+
+    public StemVariable getScriptArglist() {
+        return scriptArglist;
+    }
+
+    public void setScriptArglist(StemVariable scriptArglist) {
+        this.scriptArglist = scriptArglist;
+    }
+
+    public String getScriptArgName() {
+        return scriptArgName;
+    }
+
+    public void setScriptArgName(String scriptArgName) {
+        this.scriptArgName = scriptArgName;
+    }
+    public static String DEFAULT_ARG_NAME = "__args" + StemVariable.STEM_INDEX_MARKER;
+    String scriptArgName = DEFAULT_ARG_NAME; // default
+    public boolean isRunScript() {
+        return isRunScript;
+    }
+
+    public void setRunScript(boolean runScript) {
+        isRunScript = runScript;
     }
 
     public QDLScript(Reader script, XProperties properties) {
         super(properties);
-        renderContent(script); // too many variables for finding the reader is closed later.
+        renderContent(script); // render asap since reader may be closed later by another process.
     }
 
 
@@ -58,6 +92,11 @@ public class QDLScript extends FileEntry implements ScriptInterface {
 
     public void execute(StateInterface state) {
         QDLParser parser = new QDLParser((State) state);
+        if(isRunScript()){
+            if(getScriptArglist() != null && !getScriptArglist().isEmpty()){
+                ((State) state).getSymbolStack().setValue(getScriptArgName(), getScriptArglist()); 
+            }
+        }
         try {
             parser.execute(getText());
         } catch (Throwable t) {
@@ -71,10 +110,27 @@ public class QDLScript extends FileEntry implements ScriptInterface {
 
     @Override
     public String toString() {
-        return "QDLScript{" +
-                Scripts.CODE + "=\n'" + getText() + '\'' +
-                ", \nproperties=" + getProperties() +
-                "\n}";
+        String x =  "QDLScript{" +
+                Scripts.CODE + "=\n" + getText() +
+                "properties=" + getProperties() + "\n";
+        if(isRunScript()){
+            if(getScriptArglist()== null || getScriptArglist().size() == 0){
+                x = x + "args=(none)";
+
+            }else{
+                x = x + "args=[";
+                for(int i = 0; i < getScriptArglist().size(); i++){
+                    if(i != 0){
+                        x = x + ",";
+                    }
+                    x = x + getScriptArglist().get(new Long(i));
+                }
+                x = x + "]";
+            }
+
+        }
+
+                return x + "\n}";
     }
 
 }

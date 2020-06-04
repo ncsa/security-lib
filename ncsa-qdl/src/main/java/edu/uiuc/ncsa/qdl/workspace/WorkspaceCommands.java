@@ -209,20 +209,30 @@ public class WorkspaceCommands implements Logable {
 
     protected int doFileCommands(InputLine inputLine) {
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("File commands:");
+                sayi("copy");
+                sayi("delete or rm");
+                sayi("ls or dir");
+                sayi("mkdir");
+                sayi("rmdir");
+                sayi("vfs");
+                return RC_NO_OP;
             case "copy":
-                return copyFile(inputLine);
+                return _fileCopy(inputLine);
             case "rm":
             case "delete":
-                return deleteFile(inputLine);
+                return _fileDelete(inputLine);
             case "ls":
             case "dir":
-                return showDir(inputLine);
+                return _fileDir(inputLine);
             case "mkdir":
-                return mkDir(inputLine);
+                return _fileMkDir(inputLine);
             case "rmdir":
-                return rmDir(inputLine);
+                return _fileRmDir(inputLine);
             case "vfs":
-                return doVFS(inputLine);
+                return _fileVFS(inputLine);
             default:
                 say("unknown file command");
                 return RC_NO_OP;
@@ -233,6 +243,19 @@ public class WorkspaceCommands implements Logable {
 
     private int _doNewBufferCommand(InputLine inputLine) {
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("buffer commands:");
+                sayi("create");
+                sayi("delete or rm");
+                sayi("edit");
+                sayi("link");
+                sayi("ls or list");
+                sayi("reset");
+                sayi("run");
+                sayi("show");
+                sayi("write or save");
+                return RC_NO_OP;
             case "create":
                 return _doBufferCreate(inputLine);
             case "reset":
@@ -262,6 +285,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _doBufferReset(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("reset");
+            sayi("Drops ALL buffers and the index resets to zero. Do this only if you have to.");
+            return RC_NO_OP;
+        }
         if (!"y".equals(readline("Are you SURE you want to delete all buffers and reset them?"))) {
             say("aborted.");
             return RC_NO_OP;
@@ -272,6 +300,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _doBufferRun(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("run (index | name)");
+            sayi("Run the given buffer. This will execute as if you had types it in to the current session. ");
+            sayi(" Synonym is ) index|name.");
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         List<String> content = null;
 
@@ -321,6 +355,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _doBufferWrite(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("(write | save) (index | name)");
+            sayi("Write (aka save) the buffer. If there is a link, the target is written to the source.");
+            return RC_NO_OP;
+        }
+
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("buffer not found");
@@ -339,6 +379,11 @@ public class WorkspaceCommands implements Logable {
     LinkedList<String> editorClipboard = new LinkedList<>();
 
     private int _doBufferEdit(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("edit (index | name)");
+            sayi("invoke the line editor on the given buffer");
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("Sorry. No such buffer");
@@ -396,6 +441,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _doBufferDelete(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("(delete | rm) )index | name)");
+            sayi("removes the buffer.");
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null) {
             say("sorry, I didn't understand that");
@@ -412,7 +462,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int showDir(InputLine inputLine) {
+    private int _fileDir(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("(dir | ls) path");
+            sayi("List contents of the directory. Note if this is a single file, nothing will be listed.");
+            return RC_NO_OP;
+        }
+
         Polyad request = new Polyad(IOEvaluator.DIR);
         try {
             request.addArgument(new ConstantNode(inputLine.getArg(FIRST_ARG_INDEX), Constant.STRING_TYPE));
@@ -435,7 +491,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int mkDir(InputLine inputLine) {
+    private int _fileMkDir(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("mkdir path");
+            sayi("Make a directory in the file system. This creates all intermediate paths too if needed.");
+            return RC_NO_OP;
+        }
+
         try {
             String raw = IOEvaluator.MKDIR + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
             getInterpreter().execute(raw);
@@ -446,7 +508,13 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    private int rmDir(InputLine inputLine) {
+    private int _fileRmDir(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("rmdir path");
+            sayi("Removes the given path (but not the intermediate paths.)");
+            return RC_NO_OP;
+        }
+
         try {
             String raw = IOEvaluator.RMDIR + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
             getInterpreter().execute(raw);
@@ -457,7 +525,13 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    private int deleteFile(InputLine inputLine) {
+    private int _fileDelete(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("(delete | rm) filename");
+            sayi("Delete the file.");
+            return RC_NO_OP;
+        }
+
         try {
             String raw = IOEvaluator.RM_FILE + "('" + inputLine.getArg(FIRST_ARG_INDEX) + "');";
             getInterpreter().execute(raw);
@@ -471,7 +545,12 @@ public class WorkspaceCommands implements Logable {
      * Copies <i>any</i> two files on the system including between VFS.
      */
 
-    private int copyFile(InputLine inputLine) {
+    private int _fileCopy(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("copy source target");
+            sayi("Copy a file from the source to the target. Note that the workspace is VFS aware.");
+            return RC_NO_OP;
+        }
 
         try {
             String source = inputLine.getArg(FIRST_ARG_INDEX);
@@ -486,6 +565,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doBufferList(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("ls | list");
+            sayi("list all buffers with information about them.");
+            return RC_NO_OP;
+
+        }
         int count = 0;
         for (int i = 0; i < bufferManager.getBufferRecords().size(); i++) {
             BufferManager.BufferRecord br = bufferManager.getBufferRecords().get(i);
@@ -499,6 +584,13 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doBufferShow(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("show (index | name) [-src]");
+            sayi("Show the buffer. If the buffer is linked, it will show the target.");
+            sayi("-src will only have an effect with links and will show the source rather than the target.");
+            return RC_NO_OP;
+        }
+
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("buffer not found");
@@ -543,6 +635,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doBufferLink(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("link source target [-copy]");
+            sayi("Creates a link (for external editing) between source and target.");
+            sayi("If the -copy flag is used, target will be overwritten. In subsequent commands, e.g. run, save this will resolve the link.");
+            return RC_NO_OP;
+        }
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("sorry, you must supply a file name.");
             return RC_CONTINUE;
@@ -562,7 +660,7 @@ public class WorkspaceCommands implements Logable {
 
         if (inputLine.hasArg("-copy")) {
             try {
-                copyFile(inputLine);
+                _fileCopy(inputLine);
                 say(inputLine.getArg(FIRST_ARG_INDEX) + " copied to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
             } catch (Throwable t) {
                 say("could not copy " + inputLine.getArg(FIRST_ARG_INDEX) + "to " + inputLine.getArg(FIRST_ARG_INDEX + 1));
@@ -572,7 +670,17 @@ public class WorkspaceCommands implements Logable {
 
     }
 
+    protected boolean _doHelp(InputLine inputLine) {
+        if (inputLine.hasArg("help") || inputLine.hasArg("-help") || inputLine.hasArg("--help")) return true;
+        return false;
+    }
+
     private int _doBufferCreate(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("create path");
+            sayi("create a new buffer for the path.");
+            return RC_CONTINUE;
+        }
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("sorry, you must supply a file name.");
             return RC_CONTINUE;
@@ -611,25 +719,49 @@ public class WorkspaceCommands implements Logable {
      */
     private int doEnvCommand(InputLine inputLine) {
         if (!inputLine.hasArgAt(ACTION_INDEX)) {
-            return doEnvList(inputLine);
+            return _envList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("Environment commands");
+                sayi("clear");
+                sayi("drop");
+                sayi("get");
+                sayi("list");
+                sayi("load");
+                sayi("save");
+                sayi("set");
+                sayi("name");
+                return RC_NO_OP;
             case "clear":
+                if (_doHelp(inputLine)) {
+                    say("clear");
+                    sayi("Clear all entries in the environment");
+                    return RC_NO_OP;
+                }
+
                 env = new XProperties();
                 say("Environment cleared.");
             case "drop":
-                return doEnvDrop(inputLine);
+                return _envDrop(inputLine);
             case "get":
-                return doEnvGet(inputLine);
+                return _envGet(inputLine);
             case "list":
-                return doEnvList(inputLine);
+                return _envList(inputLine);
             case "load":
-                return doEnvLoad(inputLine);
+                return _envLoad(inputLine);
             case "save":
-                return doEnvSave(inputLine);
+                return _envSave(inputLine);
             case "set":
-                return doEnvSet(inputLine);
+                return _envSet(inputLine);
             case "name":
+                if (_doHelp(inputLine)) {
+                    say("name");
+                    sayi("list the file path and name (if any) of the current environment.");
+                    return RC_NO_OP;
+                }
+
                 if (envFile == null) {
                     say("No environment file has been set.");
                 } else {
@@ -641,7 +773,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvSave(InputLine inputLine) {
+    private int _envSave(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("save [filename]");
+            sayi("Saves the environment. If there is a default file it will save to that. Specifying the name forces the save to that file.");
+            return RC_NO_OP;
+        }
+
         File currentFile = envFile;
         if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             currentFile = new File(inputLine.getArg(FIRST_ARG_INDEX));
@@ -659,7 +797,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvLoad(InputLine inputLine) {
+    private int _envLoad(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("load file");
+            sayi("Load the given file as the current environment. This adds to the current environment");
+            return RC_NO_OP;
+        }
+
         // load a file
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("Sorry but you must specify a file to load it");
@@ -683,7 +827,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvDrop(InputLine inputLine) {
+    private int _envDrop(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("drop variable");
+            say("Drop i.e. remove the named variable from the environment.");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("Sorry, you must supply an environment variable name to remove it.");
             return RC_CONTINUE;
@@ -694,7 +844,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvGet(InputLine inputLine) {
+    private int _envGet(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("get variable");
+            sayi("get the value for the given variable,");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("Sorry, you must supply an environment variable name to get its value.");
             return RC_CONTINUE;
@@ -704,7 +860,16 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvSet(InputLine inputLine) {
+    private int _envSet(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("set variable value");
+            sayi("sets the variable to the given value. Caution, only string values are " +
+                    "allowed and if there are embedded blanks, surround it with double quotes");
+            sayi("e.g.");
+            sayi("set my_var \"mairzy doats\"");
+            return RC_NO_OP;
+        }
+
         String pName = inputLine.getArg(FIRST_ARG_INDEX);
         if (!inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
             say("Sorry, no value supplied.");
@@ -725,7 +890,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doEnvList(InputLine inputLine) {
+    private int _envList(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("list");
+            sayi("List all the variables and their values in the current environment.");
+            return RC_NO_OP;
+        }
+
         if (env == null || env.isEmpty()) {
             say("(empty)");
         } else {
@@ -748,6 +919,12 @@ public class WorkspaceCommands implements Logable {
             return doModulesList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("Modules commands:");
+                sayi("list");
+                sayi("imports");
+                return RC_NO_OP;
             case "list":
                 return doModulesList(inputLine);
             case "imports":
@@ -790,24 +967,31 @@ public class WorkspaceCommands implements Logable {
      */
     private int doFuncs(InputLine inputLine) {
         if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
-            return doFuncsList(inputLine);
+            return _funcsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "--help":
+                say("Function commands:");
+                sayi("drop");
+                sayi("help");
+                sayi("list");
+                sayi("system");
+                return RC_NO_OP;
             case "drop":
-                return doFuncsDrop(inputLine);
+                return _funcsDrop(inputLine);
             case "help":
-                return doFuncsHelp(inputLine);
+                return _funcsHelp(inputLine);
             case "list":
-                return doFuncsList(inputLine);
+                return _funcsList(inputLine);
             case "system":
-                return doSystemFuncsList(inputLine);
+                return _funcsListSystem(inputLine);
             default:
                 say("sorry, unrecognized command.");
         }
         return RC_CONTINUE;
     }
 
-    private int doFuncsDrop(InputLine inputLine) {
+    private int _funcsDrop(InputLine inputLine) {
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
         getState().getFunctionTable().remove(fName);
         if (getState().getFunctionTable().containsKey(fName)) {
@@ -818,7 +1002,7 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doFuncsHelp(InputLine inputLine) {
+    private int _funcsHelp(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
             // so they entered )funcs help Print off first lines of help
             TreeSet<String> treeSet = new TreeSet<>();
@@ -936,13 +1120,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    protected int doSystemFuncsList(InputLine inputLine) {
+    protected int _funcsListSystem(InputLine inputLine) {
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
         TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
         return printList(inputLine, funcs);
     }
 
-    protected int doFuncsList(InputLine inputLine) {
+    protected int _funcsList(InputLine inputLine) {
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         TreeSet<String> funs = getState().listFunctions(useCompactNotation, null);
         return printList(inputLine, funs);
@@ -957,15 +1141,23 @@ public class WorkspaceCommands implements Logable {
      */
     private int doVars(InputLine inputLine) {
         if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
-            return doVarsList(inputLine);
+            return _varsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("Variable commands");
+                sayi("system");
+                say("list");
+                say("drop");
+                say("size");
+                return RC_NO_OP;
             case "system":
-                return doVarsSystem(inputLine);
+                return _varsSystem(inputLine);
             case "list":
-                return doVarsList(inputLine);
+                return _varsList(inputLine);
             case "drop":
-                return doVarsDrop(inputLine);
+                return _varsDrop(inputLine);
             case "size":
                 say(state.getStackSize() + " symbols defined.");
                 return RC_CONTINUE;
@@ -974,13 +1166,13 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    protected int doVarsSystem(InputLine inputLine) {
+    protected int _varsSystem(InputLine inputLine) {
         TreeSet<String> sysVars = new TreeSet<>();
         //  sysVars.addAll(getState().getSystemVars().listVariables());
         return printList(inputLine, sysVars);
     }
 
-    private int doVarsDrop(InputLine inputLine) {
+    private int _varsDrop(InputLine inputLine) {
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("Sorry. You did not supply a variable name to drop");
             return RC_NO_OP;
@@ -990,7 +1182,7 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doVarsList(InputLine inputLine) {
+    private int _varsList(InputLine inputLine) {
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         return printList(inputLine, getState().listVariables(useCompactNotation));
     }
@@ -1024,6 +1216,16 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
+            case "help":
+            case "--help":
+                say("Workspace commands");
+                sayi("load");
+                sayi("save");
+                sayi("clear");
+                sayi("echo");
+                sayi("id");
+                sayi("memory");
+                return RC_NO_OP;
             case "load":
                 return doWsLoad(inputLine);
             case "save":
@@ -1046,7 +1248,7 @@ public class WorkspaceCommands implements Logable {
                         " MB, processors = " + Runtime.getRuntime().availableProcessors());
                 return RC_CONTINUE;
             case "vfs":
-                return doVFS(inputLine);
+                return _fileVFS(inputLine);
             default:
                 say("unrecognized workspace command.");
                 return RC_NO_OP;
@@ -1054,7 +1256,13 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    private int doVFS(InputLine inputLine) {
+    private int _fileVFS(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("vfs");
+            sayi("Print any information about mounted virtual file systems.");
+            return RC_NO_OP;
+        }
+
         if (state.getVfsFileProviders().isEmpty()) {
             say("No installed virtual file systems");
             return RC_CONTINUE;
@@ -1261,7 +1469,7 @@ public class WorkspaceCommands implements Logable {
      */
     public void say(String x) {
         getIoInterface().println(defaultIndent + x);
-       // getPrintStream().println(defaultIndent + x);
+        // getPrintStream().println(defaultIndent + x);
     }
 
     public static final String INDENT = "  "; // use this in implementations for consistent indenting.
@@ -1651,7 +1859,7 @@ public class WorkspaceCommands implements Logable {
                     System.exit(0); // Best we can do. Java does not allow for returned values.
                 }
                 getState().getLogger().error(t);
-                say("Error executing script '" + runScriptPath + "'" + (t.getMessage()==null?".":":" + t.getMessage()));
+                say("Error executing script '" + runScriptPath + "'" + (t.getMessage() == null ? "." : ":" + t.getMessage()));
                 System.exit(1); // So external programs can tell that something didn't work right.
             }
         }

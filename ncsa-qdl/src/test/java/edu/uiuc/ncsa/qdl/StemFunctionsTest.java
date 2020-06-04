@@ -13,6 +13,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**
@@ -621,6 +622,39 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
     /**
+     * Critical test. This shows that a stem with integer indices (so it looks like a list)
+     * gets converted completely faithfully.
+     * This is a different structure than a JSON object in that the list elements 0,1,2,3 are
+     * just entries, so it is necessary to show the entries end up as part of the JSON object and
+     * are not stashed in a list someplace.
+     * @throws Exception
+     */
+    @Test
+    public void testMixedJSON() throws Exception{
+        StemVariable s = new StemVariable();
+        String name = "bob";
+        String issuer = "https://localhost:9443/oauth2";
+        String tokenID = "https://localhost:9443/oauth2/idToken/7e3318d9e03b19a2a38ba88542abab0a/1591271860588";
+        s.put("sub",name);
+        s.put("iss",issuer);
+        s.put("token_id",tokenID);
+        s.put(0L,3L);
+        s.put(1L,"foo");
+        s.put(2L,new BigDecimal("23.4"));
+        s.put(3L, Boolean.TRUE);
+        JSON json =  s.toJSON();
+        assert json instanceof JSONObject;
+        JSONObject jo = (JSONObject)json;
+        assert jo.size() == s.size();
+        assert jo.getString("sub").equals(name);
+        assert jo.getString("iss").equals(issuer);
+        assert jo.getString("token_id").equals(tokenID);
+        assert jo.getLong("0") == 3L;
+        assert jo.getString("1").equals("foo");
+        assert jo.getDouble("2") == 23.4;
+        assert jo.getBoolean("3");
+    }
+    /**
      * Test that arrays are faithfully translated to and from stems
      *
      * @throws Exception
@@ -657,7 +691,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * This tests a mixture of arrays of arrays and single items to show that order in
-     * the origina list is preserved.
+     * the original list is preserved.
      *
      * @throws Exception
      */
