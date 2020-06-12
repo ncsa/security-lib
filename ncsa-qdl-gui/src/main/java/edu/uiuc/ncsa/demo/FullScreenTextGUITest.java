@@ -49,7 +49,7 @@ public class FullScreenTextGUITest {
             }
         }
         catch (EOFException ignore) {
-            // Terminal closed
+            // Terminal closed                               Left
         }
         finally {
             screen.stopScreen();

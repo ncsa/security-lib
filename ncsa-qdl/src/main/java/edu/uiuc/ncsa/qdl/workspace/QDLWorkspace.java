@@ -5,8 +5,10 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
+import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
@@ -70,7 +72,6 @@ public class QDLWorkspace {
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
             String input = workspaceCommands.readline(INDENT).trim();
-
             if (input.equals("%")) {
                 input = lastCommand;
             } else {
@@ -118,12 +119,35 @@ public class QDLWorkspace {
             vector.add(arg);
         }
         InputLine argLine = new InputLine(vector); // now we have a bunch of utilities for this
-        WorkspaceCommands workspaceCommands = new WorkspaceCommands(new BasicIO());
+        WorkspaceCommands workspaceCommands;
+        boolean isoTerminal = false;
+        //System.setProperty("org.jline.terminal.dumb", "true"); // kludge for jline
+        ISO6429IO iso6429IO = null; // only make one of these if you need it because jLine takes over all IO!
+         if(argLine.hasArg("-ansi")){
+             iso6429IO = new ISO6429IO();
+             System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
+             workspaceCommands = new WorkspaceCommands(iso6429IO);
+             isoTerminal = true;
+
+         } else{
+             System.out.println("using generic terminal");
+             workspaceCommands = new WorkspaceCommands(new BasicIO());
+
+         }
         workspaceCommands.init(argLine);
         if (workspaceCommands.isRunScript()) {
             return;
         }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
+        ArrayList<String> functions = new ArrayList<>();
+        functions.addAll(qc.workspaceCommands.getState().getMetaEvaluator().listFunctions(false));
+        functions.addAll(qc.workspaceCommands.getState().listFunctions(true, null));
+        if (isoTerminal) {
+            // set up command completion
+            iso6429IO.setCommandCompletion(functions);
+            iso6429IO.getScreenSize(); // Figure this out.
+            iso6429IO.setLoggingFacade(workspaceCommands.logger);
+        }
 
         qc.run(new InputLine(new Vector()));
 

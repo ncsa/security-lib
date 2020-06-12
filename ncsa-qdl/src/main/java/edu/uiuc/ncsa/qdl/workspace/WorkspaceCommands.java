@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
+import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
@@ -39,6 +40,8 @@ import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_BINARY;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_TEXT_STRING;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.LJustify;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
@@ -160,7 +163,7 @@ public class WorkspaceCommands implements Logable {
             case BUFFER2_COMMAND:
                 return _doNewBufferCommand(inputLine);
             case CLEAR_COMMAND:
-                return doWSClear(inputLine);
+                return _wsClear(inputLine);
             case EDIT_COMMAND:
                 //  return doEditCommand(inputLine);
                 return _doBufferEdit(inputLine);
@@ -176,7 +179,7 @@ public class WorkspaceCommands implements Logable {
             case FUNCS_COMMAND:
                 return doFuncs(inputLine);
             case IMPORTS_COMMAND:
-                return doModuleImports(inputLine);
+                return _moduleImports(inputLine);
             case HELP_COMMAND:
                 return doHelp(inputLine);
             case MODULES_COMMAND:
@@ -185,7 +188,7 @@ public class WorkspaceCommands implements Logable {
                 if (inputLine.hasArg("y")) {
                     return RC_EXIT_NOW;
                 }
-                if (readline("Do you want to exit? (y/n)").equals("y")) {
+                if (readline("Do you want to exit?" + (bufferManager.anyEdited() ? " There are unsaved buffers. " : " ") + "(y/n)").equals("y")) {
                     return RC_EXIT_NOW;
                 }
                 say("System exit cancelled.");
@@ -197,11 +200,11 @@ public class WorkspaceCommands implements Logable {
             case SAVE_COMMAND:
                 inline = inline.replace(SAVE_COMMAND, WS_COMMAND + " save ");
                 inputLine = new InputLine(CLT.tokenize(inline));
-                return doWSSave(inputLine);
+                return _wsSave(inputLine);
             case LOAD_COMMAND:
                 inline = inline.replace(LOAD_COMMAND, WS_COMMAND + " load ");
                 inputLine = new InputLine(CLT.tokenize(inline));
-                return doWsLoad(inputLine);
+                return _wsLoad(inputLine);
         }
         say("Unknown command.");
         return RC_NO_OP;
@@ -406,11 +409,13 @@ public class WorkspaceCommands implements Logable {
 
         LineEditor lineEditor = new LineEditor(br.getContent());
         lineEditor.setClipboard(editorClipboard);
+        lineEditor.setIoInterface(getIoInterface());
         try {
             lineEditor.execute();
             br.setContent(lineEditor.getBuffer()); // Just to be sure it is the same.
             br.edited = true;
         } catch (Throwable t) {
+            t.printStackTrace();
             say("Sorry, there was an issue editing this buffer.");
             getState().warn("Error editing buffer:" + t.getMessage() + " for exception " + t.getClass().getSimpleName());
         }
@@ -551,11 +556,11 @@ public class WorkspaceCommands implements Logable {
             sayi("Copy a file from the source to the target. Note that the workspace is VFS aware.");
             return RC_NO_OP;
         }
-
+           boolean isBinary = inputLine.hasArg("-binary");
         try {
             String source = inputLine.getArg(FIRST_ARG_INDEX);
             String target = inputLine.getArg(FIRST_ARG_INDEX + 1);
-            String readIt = IOEvaluator.READ_FILE + "('" + source + "')";
+            String readIt = IOEvaluator.READ_FILE + "('" + source + "'," +(isBinary?FILE_OP_BINARY:FILE_OP_TEXT_STRING)+ ")";
             String raw = IOEvaluator.WRITE_FILE + "('" + target + "'," + readIt + ");";
             getInterpreter().execute(raw);
         } catch (Throwable throwable) {
@@ -916,7 +921,7 @@ public class WorkspaceCommands implements Logable {
      */
     private int doModulesCommand(InputLine inputLine) {
         if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
-            return doModulesList(inputLine);
+            return _modulesList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "help":
@@ -926,15 +931,22 @@ public class WorkspaceCommands implements Logable {
                 sayi("imports");
                 return RC_NO_OP;
             case "list":
-                return doModulesList(inputLine);
+                return _modulesList(inputLine);
             case "imports":
-                return doModuleImports(inputLine);
+                return _moduleImports(inputLine);
         }
         say("Unknown modules command");
         return RC_CONTINUE;
     }
 
-    private int doModuleImports(InputLine inputLine) {
+    private int _moduleImports(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("imports");
+             sayi("A table of imported modules and their aliases. ");
+             sayi("You must load a module with " + ControlEvaluator.MODULE_LOAD + " to make QDL aware of it before importing it");
+            return RC_NO_OP;
+        }
+
         if (!state.getImportManager().hasImports()) {
             say("(no imports)");
             return RC_CONTINUE;
@@ -946,7 +958,14 @@ public class WorkspaceCommands implements Logable {
         return printList(inputLine, aliases);
     }
 
-    private int doModulesList(InputLine inputLine) {
+    private int _modulesList(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("list");
+             sayi("Lists the modules available (via " + ControlEvaluator.MODULE_LOAD + ") in to this workspace. " +
+                     "Note that to use one, you must import it with the " + ControlEvaluator.MODULE_IMPORT + " command.");
+            return RC_NO_OP;
+        }
+
         TreeSet<String> m = new TreeSet<>();
         for (URI key : getState().getModuleMap().keySet()) {
             m.add(key.toString());
@@ -992,6 +1011,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _funcsDrop(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("drop fname");
+             sayi("Removes the function from the current workspace. Note this applies to user-defined functions, not imported functions.");
+            return RC_NO_OP;
+        }
+
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
         getState().getFunctionTable().remove(fName);
         if (getState().getFunctionTable().containsKey(fName)) {
@@ -1003,6 +1028,16 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _funcsHelp(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("help [fname arg_count] [-r regex]");
+             sayi("List help for functions.");
+             sayi("help (no argument) - print off the first line of the embedded help.");
+             sayi("help fname - print help for the given name ");
+             sayi("help fname arg_count - print the complete embedded help for the function with the given argument count.");
+             sayi("If the regex is included, apply that to the results per line.");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
             // so they entered )funcs help Print off first lines of help
             TreeSet<String> treeSet = new TreeSet<>();
@@ -1121,12 +1156,24 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int _funcsListSystem(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("system");
+             sayi("List all system (built-in) functions.");
+            return RC_NO_OP;
+        }
+
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
         TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
         return printList(inputLine, funcs);
     }
 
     protected int _funcsList(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("list");
+             sayi("List all user defined functions.");
+            return RC_NO_OP;
+        }
+
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         TreeSet<String> funs = getState().listFunctions(useCompactNotation, null);
         return printList(inputLine, funs);
@@ -1173,6 +1220,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _varsDrop(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("drop name");
+             sayi("Drops i.e. removes the given variable from the current workspace.");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("Sorry. You did not supply a variable name to drop");
             return RC_NO_OP;
@@ -1183,6 +1236,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _varsList(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("list");
+             sayi("Lists the variables in the current workspace.");
+            return RC_NO_OP;
+        }
+
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         return printList(inputLine, getState().listVariables(useCompactNotation));
     }
@@ -1227,13 +1286,13 @@ public class WorkspaceCommands implements Logable {
                 sayi("memory");
                 return RC_NO_OP;
             case "load":
-                return doWsLoad(inputLine);
+                return _wsLoad(inputLine);
             case "save":
-                return doWSSave(inputLine);
+                return _wsSave(inputLine);
             case "clear":
-                return doWSClear(inputLine);
+                return _wsClear(inputLine);
             case "echo":
-                return doWSEchoMode(inputLine);
+                return _wsEchoMode(inputLine);
             case "id":
                 if (currentWorkspace == null) {
                     say("No workspace loaded");
@@ -1300,7 +1359,13 @@ public class WorkspaceCommands implements Logable {
 
     boolean prettyPrint = false;
 
-    private int doWSEchoMode(InputLine inputLine) {
+    private int _wsEchoMode(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("echo (on | off) [-pp (on | off)]");
+            sayi("Toggle the echo mode so every command is printed if it has output.");
+            sayi("-pp = pretty print on or off. Stems should be printed horizontal by default.");
+            return RC_NO_OP;
+        }
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
             if (inputLine.hasArg("-pp")) {
                 String pp = inputLine.getNextArgFor("-pp").toLowerCase();
@@ -1330,15 +1395,34 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    private int doWSClear(InputLine inputLine) {
+    private int _wsClear(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("clear");
+            sayi("Clear the state *completely*. This includes all virtual file systems and buffers.");
+            return RC_NO_OP;
+        }
+        boolean clearIt = readline("Are you sure you want to clear the worskapce state? (Y/n)[n]").equals("Y");
+        if (!clearIt) {
+            say("WS clear aborted.");
+            return RC_NO_OP;
+        }
         state = null;
         // Get rid of everything.
+
         interpreter = new QDLParser(getState());
         say("workspace cleared");
         return RC_CONTINUE;
     }
 
-    private int doWSSave(InputLine inputLine) {
+    private int _wsSave(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("save filename");
+             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
+             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
+             sayi("See the corresponding load command to recover it.");
+            return RC_NO_OP;
+        }
+
         try {
             if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
                 say("sorry, no file given");
@@ -1370,8 +1454,10 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
-
-    private void doRealLoad(File f) {
+   /*
+   Does the actual work of loading a file once the logic for what to do has been done.
+    */
+    private void _realLoad(File f) {
         try {
             long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
@@ -1395,12 +1481,19 @@ public class WorkspaceCommands implements Logable {
 
     File currentWorkspace;
 
-    private int doWsLoad(InputLine inputLine) {
+    private int _wsLoad(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+             say("load filename");
+             sayi("Loads a saved workspace. If the name is relative, it will be resolved against " +
+                     "the default location or it may be an absolute path.");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             if (currentWorkspace == null) {
                 say("Sorry, no file given and no workspace has been loaded.");
             } else {
-                doRealLoad(currentWorkspace);
+                _realLoad(currentWorkspace);
             }
             return RC_CONTINUE;
         }
@@ -1416,7 +1509,7 @@ public class WorkspaceCommands implements Logable {
                 f = new File(saveDir, fName);
             }
         }
-        doRealLoad(f);
+        _realLoad(f);
         return RC_CONTINUE;
     }
 
@@ -1645,13 +1738,21 @@ public class WorkspaceCommands implements Logable {
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
             if (!isRunScript && isVerbose) {
-                say("loaded java modules: " + foundModules[JAVA_MODULE_INDEX]);
+                say("loaded java modules:");
+                StringTokenizer t = new StringTokenizer(foundModules[JAVA_MODULE_INDEX], ",");
+                while(t.hasMoreTokens()){
+                 sayi(t.nextToken().trim());
+                }
             }
             env.put("java_modules", foundModules[JAVA_MODULE_INDEX]);
         }
         if (foundModules[QDL_MODULE_INDEX] != null && !foundModules[QDL_MODULE_INDEX].isEmpty()) {
             if (!isRunScript && isVerbose) {
-                say("loaded QDL modules: " + foundModules[QDL_MODULE_INDEX]);
+                say("loaded QDL modules:");
+                StringTokenizer t = new StringTokenizer(foundModules[QDL_MODULE_INDEX], ",");
+                while(t.hasMoreTokens()){
+                 sayi(t.nextToken().trim());
+                }
             }
 
             env.put("qdl_modules", foundModules[QDL_MODULE_INDEX]);
@@ -1870,8 +1971,11 @@ public class WorkspaceCommands implements Logable {
 
 
     public String readline(String prompt) {
-        getIoInterface().print(prompt);
-        return readline();
+        try {
+            return getIoInterface().readline(prompt);
+        }catch(IOException iox){
+            throw new QDLException("Error reading input.");
+        }
     }
 
     public boolean isEchoModeOn() {

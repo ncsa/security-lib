@@ -50,7 +50,8 @@ public class AnotherJSONUtil {
                         rc.add(jsonArray.getLong(i));
                     }
                     if (ooo instanceof Double) {
-                        rc.add(new BigDecimal(jsonArray.getDouble(i)));
+                        // Convert to a string then to a big decimal. Creating a BD from a double always introduces rounding errors.
+                        rc.add(new BigDecimal(jsonArray.getString(i)));
                     }
                     if (ooo instanceof Boolean || ooo instanceof String) {
                         rc.add(ooo);

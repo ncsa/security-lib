@@ -753,9 +753,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalArgumentException("The " + READ_FILE + " command's second argument must be an integer.");
             }
             op = ((Long) obj2).intValue();
-            if (op != 0 && op != 1) {
+      /*      if (op != 0 && op != 1) {
                 throw new IllegalArgumentException("The " + READ_FILE + " command's second argument must have value of 1 or 0.");
-            }
+            }*/
         }
         VFSEntry vfsEntry = null;
         boolean hasVF = false;

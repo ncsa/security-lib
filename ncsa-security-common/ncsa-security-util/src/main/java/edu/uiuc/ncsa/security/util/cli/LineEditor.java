@@ -163,8 +163,7 @@ public class LineEditor {
             say("Empty buffer. Type ? to see help.");
         }
         while (!isDone) {
-            say2(PROMPT);
-            String command = readline().trim();
+            String command = readline(PROMPT);
             EditorInputLine eil = null;
             boolean isUnkownCommand = true;
             try {
@@ -204,8 +203,8 @@ public class LineEditor {
             }
             if (eil.isCommand(CLEAR_COMMAND, CLEAR_COMMAND_LONG)) {
                 isUnkownCommand = false;
-                say("are you sure you want to clear the buffer (y|n)?");
-                if (readline().equals("y")) {
+                //say();
+                if (readline("are you sure you want to clear the buffer (y|n)?").equals("y")) {
                     buffer = new LinkedList<>();
                     say("buffer cleared.");
                 }
@@ -525,11 +524,11 @@ public class LineEditor {
             return;
         }
 
-        String lineIn = readline();
+        String lineIn = readline("");
         LinkedList<String> tempBuffer = new LinkedList<>();
         while (!lineIn.trim().equals(END_COMMAND)) {
             tempBuffer.add(lineIn);
-            lineIn = readline();
+            lineIn = readline("");
         }
         if (eil.hasIndices()) {
             getBuffer().addAll(eil.getIndices()[0], tempBuffer);
@@ -556,9 +555,8 @@ public class LineEditor {
         int[] range = getRange(eil);
         for (int i = range[0]; i <= range[1]; i++) {
             say(i + ": " + getBuffer().get(i));
-            say2(PROMPT);
             try {
-                String lineIn = readline();
+                String lineIn = readline(PROMPT);
                 getBuffer().set(i, lineIn);
             } catch (IOException e) {
                 say("Sorry, an error occurred. aborting...");
@@ -715,17 +713,22 @@ public class LineEditor {
 
     }
 
-    public BufferedReader getBufferedReader() {
-        if (bufferedReader == null) {
-            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+    public IOInterface getIoInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
         }
-        return bufferedReader;
+        return ioInterface;
     }
 
-    BufferedReader bufferedReader;
+    public void setIoInterface(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
 
-    protected String readline() throws IOException {
-        return getBufferedReader().readLine();
+    IOInterface ioInterface;
+
+
+    protected String readline(String x) throws IOException {
+        return getIoInterface().readline(x);
     }
 
     protected EditorInputLine toInputLine(String x) {
@@ -738,7 +741,8 @@ public class LineEditor {
      * @param x
      */
     protected void say(String x) {
-        System.out.println(x);
+     //   System.out.println(x);
+        getIoInterface().println(x);
     }
 
     /**
@@ -752,9 +756,6 @@ public class LineEditor {
         }
     }
 
-    protected void say2(String x) {
-        System.out.print(x);
-    }
 
     boolean isDone = false;
 

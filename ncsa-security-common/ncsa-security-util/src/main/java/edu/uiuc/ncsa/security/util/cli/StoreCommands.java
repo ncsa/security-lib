@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -106,15 +107,12 @@ public abstract class StoreCommands extends CommonCommands {
 
     public abstract void edit(InputLine inputLine);
 
-    public void update(InputLine inputLine) {
+    public void update(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showUpdateHelp();
             return;
         }
-/*        if (inputLine.size() == 1) {
-            say("You must supply the index or id of the item to update");
-            return;
-        }*/
+
         Identifiable identifiable = findItem(inputLine);
         if (identifiable == null) {
             say("You must supply the index or id of the item to update");
@@ -155,7 +153,7 @@ public abstract class StoreCommands extends CommonCommands {
      * @param identifiable
      * @return returns true if the passed object needs to be saved, false otherwise.
      */
-    public abstract boolean update(Identifiable identifiable);
+    public abstract boolean update(Identifiable identifiable) throws IOException;
 
     /**
      * This is a hook for extensions so they don't have to completely
@@ -166,7 +164,7 @@ public abstract class StoreCommands extends CommonCommands {
      *
      * @param identifiable
      */
-    public abstract void extraUpdates(Identifiable identifiable);
+    public abstract void extraUpdates(Identifiable identifiable) throws IOException;
 
     /**
      * In listing operations, take the {@link Identifiable} argument and make a string version that a
@@ -259,7 +257,7 @@ public abstract class StoreCommands extends CommonCommands {
      *
      * @param inputLine
      */
-    public void create(InputLine inputLine) {
+    public void create(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showCreateHelp();
             return;
@@ -288,8 +286,8 @@ public abstract class StoreCommands extends CommonCommands {
             getStore().save(x);
             info("Created and saved " + x.getClass().getSimpleName() + " with id " + x.getIdentifierString());
             say("Created object with id \"" + x.getIdentifier() + "\"");
-            sayi2("edit [y/n]?");
-            if (isOk(readline())) {
+            //sayi2("edit [y/n]?");
+            if (isOk(readline("edit [y/n]?"))) {
                 update(x);
                 info("updated object with id " + x.getIdentifierString());
             }
@@ -298,20 +296,20 @@ public abstract class StoreCommands extends CommonCommands {
         }
     }
 
-    protected void create() {
+    protected void create() throws IOException {
         boolean tryAgain = true;
         Identifier id = null;
         Identifiable c = null;
         while (tryAgain) {
-            sayi2("enter the id of the object you want to create or return for a random one >");
-            String inLine = readline();
+          //  sayi2("enter the id of the object you want to create or return for a random one >");
+            String inLine = readline("enter the id of the object you want to create or return for a random one >");
             if (!isEmpty(inLine)) {
                 try {
                     id = BasicIdentifier.newID(inLine);
                     tryAgain = false;
                 } catch (Throwable t) {
-                    sayi2("That is not a valid uri. Try again (y/n)? ");
-                    tryAgain = isOk(readline());
+                  //  sayi2("That is not a valid uri. Try again (y/n)? ");
+                    tryAgain = isOk(readline("That is not a valid uri. Try again (y/n)? "));
                 }
             } else {
                 tryAgain = false;
@@ -328,8 +326,8 @@ public abstract class StoreCommands extends CommonCommands {
         getStore().save(c);
         info("Created object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
         sayi("Object created with identifier " + c.getIdentifierString());
-        sayi2("edit [y/n]?");
-        if (isOk(readline())) {
+        //sayi2("edit [y/n]?");
+        if (isOk(readline("edit [y/n]?"))) {
             update(c);
             info("Updated object " + c.getClass().getSimpleName() + " with identifier " + c.getIdentifierString());
 
@@ -476,7 +474,7 @@ public abstract class StoreCommands extends CommonCommands {
         return null;
     }
 
-    public void rm(InputLine inputLine) {
+    public void rm(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showRMHelp();
             return;

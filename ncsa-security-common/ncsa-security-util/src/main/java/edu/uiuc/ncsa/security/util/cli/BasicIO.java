@@ -68,13 +68,14 @@ public class BasicIO implements IOInterface {
     @Override
     public void print(Object x) {
         getPrintStream().print(x);
+        flush();
     }
 
     @Override
     public void println(Object x) {
         getPrintStream().println(x);
+        flush();
     }
-
     @Override
     public void flush() {
             getPrintStream().flush();

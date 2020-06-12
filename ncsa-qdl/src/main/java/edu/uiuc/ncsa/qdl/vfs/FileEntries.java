@@ -140,7 +140,10 @@ public class FileEntries {
                 ftype.endsWith("/json") ||
                 ftype.endsWith("/javascript") ||
                 ftype.endsWith("/java") ||
-                ftype.endsWith("/html")
+                ftype.endsWith("/html") ||
+                ftype.endsWith("/xhtml+xml") || 
+                ftype.endsWith("/x-shellscript") ||
+                ftype.endsWith("/x-sh")
         ) return false;
         return true; // safe way -- anything it can't figure out is binary. User can override this.
     }

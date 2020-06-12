@@ -132,6 +132,12 @@ public abstract class FunctionState extends VariableState {
         }
     } // )load module_example.qdl
 
+    /**
+     *
+     * @param useCompactNotation
+     * @param regex
+     * @return
+     */
     public TreeSet<String> listFunctions(boolean useCompactNotation, String regex) {
         TreeSet<String> out = getFunctionTable().listFunctions(regex);
         for (URI key : getImportManager().keySet()) {

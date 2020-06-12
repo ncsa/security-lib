@@ -79,7 +79,7 @@ public class CLIDriver {
     protected void setCLICommands(Commands[] commands) {
         this.commands = commands;
     }
-
+/*
     public void setBufferedReader(BufferedReader bufferedReader) {
         this.bufferedReader = bufferedReader;
     }
@@ -91,11 +91,15 @@ public class CLIDriver {
         return bufferedReader;
     }
 
-    BufferedReader bufferedReader;
+    BufferedReader bufferedReader;*/
 
-    protected String readline() throws IOException {
-        return getBufferedReader().readLine();
+    protected String readline(String prompt) throws IOException {
+            return getIoInterface().readline(prompt);
     }
+ /*   protected String readline() throws IOException {
+        return getIoInterface().readline();
+        //return getBufferedReader().readLine();
+    }*/
 
     protected static final int NEW_COMMAND_VALUE = 0;
     protected static final int REPEAT_COMMAND_VALUE = 10;
@@ -249,8 +253,8 @@ public class CLIDriver {
         String prompt = commands[0].getPrompt();
         while (!isDone) {
             try {
-                say2(prompt);
-                cmdLine = readline();
+                //say2(prompt);
+                cmdLine = readline(prompt);
                 if (hasEnv()) {
                     cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
                 }
@@ -413,7 +417,8 @@ public class CLIDriver {
      * @param x
      */
     protected void say(String x) {
-        System.out.println(x);
+        getIoInterface().println(x);
+        //System.out.println(x);
     }
 
     /**
@@ -422,6 +427,20 @@ public class CLIDriver {
      * @param x
      */
     protected void say2(String x) {
-        System.out.print(x);
+        getIoInterface().print(x);
+        //System.out.print(x);
     }
+
+    public IOInterface getIoInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
+
+    public void setIoInterface(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
+
+    IOInterface ioInterface;
 }

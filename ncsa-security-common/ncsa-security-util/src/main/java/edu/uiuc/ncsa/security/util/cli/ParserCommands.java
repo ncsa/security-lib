@@ -64,7 +64,7 @@ public class ParserCommands extends CommonCommands {
         return functorFactory;
     }
 
-    public void run(InputLine inputLine) {
+    public void run(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showRunHelp();
             return;
@@ -114,7 +114,7 @@ public class ParserCommands extends CommonCommands {
         say("   Note that if the file you entered does not exist, it will be created when you save it.");
     }
 
-    public void edit(InputLine inputLine) {
+    public void edit(InputLine inputLine) throws IOException {
         if (showHelp(inputLine)) {
             showEditHelp();
             return;

@@ -97,6 +97,21 @@ public abstract class CommonCommands implements Commands {
 
     BufferedReader bufferedReader;
 
+    public IOInterface getIoInterface() {
+        if(ioInterface == null){
+            ioInterface = new BasicIO();
+        }
+        return ioInterface;
+    }
+
+    public void setIoInterface(IOInterface ioInterface) {
+        this.ioInterface = ioInterface;
+    }
+
+    IOInterface ioInterface;
+    protected String readline(String prompt) throws IOException {
+                                          return getIoInterface().readline(prompt);
+    }
     protected String readline() {
         try {
             String x = getBufferedReader().readLine();
@@ -139,7 +154,7 @@ public abstract class CommonCommands implements Commands {
      */
     protected void say(String x) {
         if (isPrintOuput()) {
-            System.out.println(defaultIndent + x);
+            getIoInterface().println(defaultIndent + x);
         }
     }
 
@@ -167,19 +182,13 @@ public abstract class CommonCommands implements Commands {
      * @param x
      */
     protected void say2(String x) {
-        System.out.print(defaultIndent + x);
+        getIoInterface().print(defaultIndent + x);
     }
 
-    /**
-     * Output a line without a linefeed and using the indent currently in force.
-     * Generally this is used a part of a prompt and is followed by a call
-     * to {@link #readline}.
-     *
-     * @param x
-     */
-    protected void sayi2(String x) {
+
+  /*  protected void sayi2(String x) {
         say2(INDENT + x);
-    }
+    }*/
 
     /**
      * returns "true if the command has the flag --help in it. This is a cue from the user to show
@@ -207,9 +216,10 @@ public abstract class CommonCommands implements Commands {
      * @param defaultValue
      * @return
      */
-    protected String getInput(String prompt, String defaultValue) {
-        sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
-        String inLine = readline();
+    protected String getInput(String prompt, String defaultValue) throws IOException {
+        //sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
+      //  sayi2(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
+        String inLine = readline(prompt + "[" + (defaultValue == null ? "(null)" : defaultValue) + "]:");
         if (isEmpty(inLine)) {
             // assumption is that the default value is required
             return defaultValue; // no input. User hit a return

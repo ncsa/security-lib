@@ -83,6 +83,12 @@ public class BufferManager implements Serializable {
         return bufferRecords.get(index);
     }
 
+    public boolean anyEdited(){
+        for(String key : brMap.keySet()){
+            if(getBufferRecord(key).edited) return true;
+        }
+        return false;
+    }
     public BufferRecord getBufferRecord(String name) {
         if (!brMap.containsKey(name)) {
             return null;
@@ -188,7 +194,7 @@ public class BufferManager implements Serializable {
                 parser.setEchoModeOn(false);// no output
                 parser.execute(raw);
             } catch (Throwable throwable) {
-                getState().getLogger().warn("could not write file", throwable);
+                getState().error("could not write file", throwable);
                 return false;
             }
             return true;
