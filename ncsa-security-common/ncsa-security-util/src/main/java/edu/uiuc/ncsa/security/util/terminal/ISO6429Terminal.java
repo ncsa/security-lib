@@ -171,21 +171,24 @@ public class ISO6429Terminal{
         debug("  > got int=" + x);
         CSI csi;
         switch (x) {
-            case 9:
+            case 9: // Tab
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 9);
                 return new KeyStroke(KeyType.Tab, csi);
 
-            case 13:
+            case 13: // ^M = return
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 13);
                 return new KeyStroke(KeyType.Enter, csi);
-            case 16:
+            case 16:// ^P
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 13);
                 return new KeyStroke(KeyType.PasteMode, csi);
-
-            case 127:
+            case 22: // ^V
+                csi = new CSI();
+                csi.rawCommand = String.valueOf((char) 22);
+                return new KeyStroke(KeyType.ClipboardPaste, csi);
+            case 127: // Backspace
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 127);
                 return new KeyStroke(KeyType.Backspace, csi);

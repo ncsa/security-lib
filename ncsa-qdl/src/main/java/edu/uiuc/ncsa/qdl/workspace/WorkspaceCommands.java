@@ -440,6 +440,8 @@ public class WorkspaceCommands implements Logable {
 
         } catch (NumberFormatException t) {
             // no problem, maybe they used its name
+        }catch(ArrayIndexOutOfBoundsException ai){
+            return null;
         }
         return bufferManager.getBufferRecord(rawArg);
 
@@ -1779,6 +1781,9 @@ public class WorkspaceCommands implements Logable {
      * @param inputLine
      */
     public void init(InputLine inputLine) throws Throwable {
+        if(getIoInterface() != null){
+            getIoInterface().setBufferingOn(true);
+        }
         if (inputLine.hasArg(CONFIG_FILE_FLAG)) {
             fromConfigFile(inputLine);
             return;

@@ -8,6 +8,7 @@ public interface OA2Constants {
 
     public static String ACCESS_TOKEN = "access_token";
     public static String ACCESS_TYPE = "access_type";
+
     /**
      * This is used for the code=grant token when getting the access
      * token. It looks like  {@link #RESPONSE_TYPE_CODE} (same value).
@@ -112,5 +113,9 @@ public interface OA2Constants {
 
     public static String FORM_ENCODING = "application/x-www-form-urlencoded";
 
-
+    /**
+        Token endpoint authorization methods are post and basic, as per OIDC spec.
+     */
+    String TOKEN_ENDPOINT_AUTH_POST = "client_secret_post";
+    String TOKEN_ENDPOINT_AUTH_BASIC = "client_secret_basic";
 }

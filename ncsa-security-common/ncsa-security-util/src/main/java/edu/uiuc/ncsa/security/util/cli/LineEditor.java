@@ -172,13 +172,14 @@ public class LineEditor {
                 say("Sorry, there was an error processing that command");
                 continue;
             }
+
             if (eil.isCommand(QUIT_COMMAND, QUIT_COMMAND_LONG)) {
                 isDone = true;
                 isUnkownCommand = false;
-                if(eil.hasArg("!")){
+                if (eil.hasArg("!")) {
                     buffer = new LinkedList<>();
                     sayv("Buffer cleared. bye-bye...");
-                }else{
+                } else {
                     sayv("bye-bye...");
                 }
                 break;
@@ -523,18 +524,34 @@ public class LineEditor {
             doInsertHelp();
             return;
         }
-
+        getIoInterface().setBufferingOn(false);
         String lineIn = readline("");
+        boolean keepLooping = true;
         LinkedList<String> tempBuffer = new LinkedList<>();
-        while (!lineIn.trim().equals(END_COMMAND)) {
+        while(keepLooping) {
+         //   System.out.println("LineEditor:" + " in loop, first line =\"" + lineIn + "\"");
+            if(lineIn.trim().equals(END_COMMAND)){
+                break;
+            }
             tempBuffer.add(lineIn);
+       //     System.out.println("LineEditor: line added");
+            while(!getIoInterface().isQueueEmpty()){
+      //          System.out.println("LineEditor: Q not empty");
+                lineIn = readline("");
+        //        System.out.println("LineEditor: Q not empty, adding \"" + lineIn + "\"");
+                tempBuffer.add(lineIn);
+            }
+
             lineIn = readline("");
+        //    System.out.println("LineEditor: Done with Q: \"" + lineIn + "\"");
+
         }
         if (eil.hasIndices()) {
             getBuffer().addAll(eil.getIndices()[0], tempBuffer);
         } else {
             getBuffer().addAll(tempBuffer);
         }
+        getIoInterface().setBufferingOn(true);
         sayv("inserted " + tempBuffer.size() + " lines.");
     }
 
@@ -553,6 +570,7 @@ public class LineEditor {
             return;
         }
         int[] range = getRange(eil);
+        getIoInterface().setBufferingOn(false);
         for (int i = range[0]; i <= range[1]; i++) {
             say(i + ": " + getBuffer().get(i));
             try {
@@ -563,6 +581,8 @@ public class LineEditor {
                 sayv("Message was \"" + e.getMessage() + "\"");
             }
         }
+        getIoInterface().setBufferingOn(true);
+
         say("done");
     }
 
@@ -579,6 +599,7 @@ public class LineEditor {
     }
 
     String PRINT_NO_LINE_NUMBERS_FLAG = "-noNumber";
+
     protected void doPrint(EditorInputLine eil) {
         if (showHelp(eil)) {
             doPrintHelp();
@@ -587,8 +608,8 @@ public class LineEditor {
         boolean showLineNumbers = !eil.hasArg(PRINT_NO_LINE_NUMBERS_FLAG);
         int[] range = getRange(eil);
         for (int i = range[0]; i <= range[1]; i++) {
-            String head = showLineNumbers?(i + ": "):("");
-            say(head  + getBuffer().get(i));
+            String head = showLineNumbers ? (i + ": ") : ("");
+            say(head + getBuffer().get(i));
         }
     }
 
@@ -714,7 +735,7 @@ public class LineEditor {
     }
 
     public IOInterface getIoInterface() {
-        if(ioInterface == null){
+        if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;
@@ -741,7 +762,7 @@ public class LineEditor {
      * @param x
      */
     protected void say(String x) {
-     //   System.out.println(x);
+        //   System.out.println(x);
         getIoInterface().println(x);
     }
 

@@ -4,8 +4,13 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * ISO 6429 (cursor addressing spec) compliant implementation of the {@link IOInterface}.
@@ -15,7 +20,9 @@ import java.util.ArrayList;
  * on 6/9/20 at  7:52 AM
  */
 public class ISO6429IO implements IOInterface {
-    // This turns it on for everything and is ONLY a low-level debug hack
+
+    // This turns it on for everything and is ONLY a low-level debug hack.
+    // This will put out a lot of output since it does spit out each keystroke!
     boolean debugON = true;
 
     public MyLoggingFacade getLoggingFacade() {
@@ -58,20 +65,57 @@ public class ISO6429IO implements IOInterface {
         return readline(null);
     }
 
+    boolean bufferingOn = false;
+
     @Override
     public String readline(String prompt) throws IOException {
+        StringBuilder currentLine = new StringBuilder();
         if (prompt == null) {
             prompt = "";
         }
+        int currentCol0 = -1;
+        int startCol = 0;
         print(prompt);
+        debug("Command buffering is " + (isBufferingOn() ? "ON" : "OFF"));
+        if (isQueueEmpty()) {
+            debug("queue empty");
+            startCol = terminal.getCursorCol();
+            currentCol0 = startCol;
+            commandBuffer.add(0, currentLine); // push it on the stack
+        } else {
+            debug("queue not empty:" + queue.size() + " entries");
+
+            String x = queue.get(0);
+
+            queue.remove(0);
+            if (isQueueEmpty()) {
+                // no null termination=? partial line
+                debug("partial line:\"" + x + "\"");
+                currentLine.append(x);
+
+                print(x);
+                currentCol0 = x.length();
+                startCol = currentCol0;
+                terminal.setCursorCol(currentCol0);
+
+            } else {
+                if (queue.get(0) == null) {
+                    queue.remove(0); // empty Q so no false positives
+                    // This denotes that the current line ended with a CR/LF so return it.
+                }
+                debug("full line:\"" + x + "\"");
+
+                println(x);
+                return x;
+            }
+        }
+
+
         boolean keepLooping = true;
         // column where we start. It is best to ping the terminal itself for this, since some start
         // at 0 as the first column and some start at 1. Best to punt and just ask.
-        int startCol = terminal.getCursorCol();
-        int currentCol0 = startCol;
         int width = terminal.getScreenSize()[1];
-        StringBuilder currentLine = new StringBuilder();
-        commandBuffer.add(0, currentLine); // push it on the stack
+
         int currentBufferPosition = 0;  // start at current line
         boolean pasteModeOn = false;
         while (keepLooping) {
@@ -81,20 +125,22 @@ public class ISO6429IO implements IOInterface {
                 case Character:
 
                     int position = currentCol0 - startCol;
+                    debug("in char, pos = " + position);
                     char character = keyStroke.getCharacter();
-
                     if (position < 0) {
                         position = 0;
                     }
                     if (currentLine.length() < position) {
                         position = currentLine.length() - 1;
                     }
-
+                    debug("inserting char " + character);
                     currentLine.insert(position, character);
+                    debug("printing line length = " + currentLine.length() + " from position " + position);
                     print(currentLine.substring(position));
 
                     currentCol0++; // increment the cursor position.
                     if (currentCol0 % width == 0) {
+                        debug("adding CR/LF");
                         // insert new line so it wraps. This  moves cursor to start of line  + a line feed .
                         print("\r\n");
                     }
@@ -130,6 +176,10 @@ public class ISO6429IO implements IOInterface {
                     }
                     break;
                 case ArrowUp:
+                    if (!isBufferingOn()) {
+                        break;
+                    }
+
                     if (!commandBuffer.isEmpty()) {
                         terminal.clearLine(startCol);
                         currentBufferPosition = Math.min(++currentBufferPosition, commandBuffer.size() - 1);
@@ -139,6 +189,9 @@ public class ISO6429IO implements IOInterface {
                     }
                     break;
                 case ArrowDown:
+                    if (!isBufferingOn()) {
+                        break;
+                    }
                     if (!commandBuffer.isEmpty()) {
                         terminal.clearLine(startCol);
                         currentBufferPosition = Math.max(--currentBufferPosition, 0);
@@ -166,18 +219,20 @@ public class ISO6429IO implements IOInterface {
                         currentCol0++; // increment the cursor position.
                         break;
                     }
-                    commandBufferMaxWidth = Math.max(commandBufferMaxWidth, currentLine.length());
-                    if (currentBufferPosition == 0) {
-                        if (1 < commandBuffer.size() && !StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
-                            commandBuffer.set(0, currentLine);
-                        }
-                    } else {
-                        if (1 < commandBuffer.size()) {
-                            if (StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
-                                // don't add just take away unused buffer.
-                                commandBuffer.remove(0);
-                            } else {
+                    if (isBufferingOn()) {
+                        commandBufferMaxWidth = Math.max(commandBufferMaxWidth, currentLine.length());
+                        if (currentBufferPosition == 0) {
+                            if (1 < commandBuffer.size() && !StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
                                 commandBuffer.set(0, currentLine);
+                            }
+                        } else {
+                            if (1 < commandBuffer.size()) {
+                                if (StringUtils.equals(currentLine.toString(), commandBuffer.get(1).toString())) {
+                                    // don't add just take away unused buffer.
+                                    commandBuffer.remove(0);
+                                } else {
+                                    commandBuffer.set(0, currentLine);
+                                }
                             }
                         }
                     }
@@ -250,6 +305,51 @@ public class ISO6429IO implements IOInterface {
                             currentCol0 = startCol + currentLine.length();
                             terminal.setCursorCol(currentCol0); // put the cursor at the end of the line
                         }
+                    }
+                    break;
+                case ClipboardPaste:
+                    debug("Got paste, pasting");
+                    Toolkit toolKit = Toolkit.getDefaultToolkit();
+                    Clipboard clipboard = toolKit.getSystemClipboard();
+
+                    try {
+                        String result = (String) clipboard.getData(DataFlavor.stringFlavor);
+
+                        String[] lines = result.split("\n");
+                        boolean hasCR = result.endsWith("\n");
+                        debug("got " + lines.length + " lines:" + Arrays.toString(lines));
+                        if (lines.length <= 1) {
+                            // check for paste, no new line ==> insert text.
+                            position = currentCol0 - startCol;
+
+                            if (position < 0) {
+                                position = 0;
+                            }
+                            if (currentLine.length() < position) {
+                                position = currentLine.length() - 1;
+                            }
+                            currentLine.insert(position, result);
+                            terminal.setCursorCol(startCol + position);
+                            print(currentLine.substring(position));
+                            currentCol0 = startCol + position + result.length();
+                            terminal.setCursorCol(currentCol0);
+                        } else {
+                            for (String line : lines) {
+                                queue.add(line);
+                            }
+                            if (hasCR) {
+                                debug("Adding null termination");
+                                queue.add(null); // marker! Paste may be null terminated => last line ended with a CR/LF
+                            }
+                            info("got from clipboard:" + result);
+                            currentLine.append(queue.get(0));
+                            queue.remove(0);
+                            println(currentLine.toString());
+                            return currentLine.toString();
+
+                        }
+                    } catch (UnsupportedFlavorException e) {
+                        warn("unable to get clipboard", e);
                     }
                     break;
                 case Unknown:
@@ -350,8 +450,30 @@ public class ISO6429IO implements IOInterface {
             loggingFacade.debug(x);
         }
     }
+
+    ArrayList<String> queue = new ArrayList<>();
+
+    @Override
+    public void clearQueue() {
+        queue.clear();
+    }
+
+    @Override
+    public boolean isQueueEmpty() {
+        return queue.isEmpty();
+    }
+
+    @Override
+    public void setBufferingOn(boolean bufferingOn) {
+        this.bufferingOn = bufferingOn;
+    }
+
+    @Override
+    public boolean isBufferingOn() {
+        return bufferingOn;
+    }
 }
-/*
+/* for testing cut and paste
 a
 b
 c

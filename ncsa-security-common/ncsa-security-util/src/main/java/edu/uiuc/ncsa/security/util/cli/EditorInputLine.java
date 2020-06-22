@@ -23,18 +23,25 @@ public class EditorInputLine extends InputLine {
      * <pre>
      *     isCommand("r","read");
      * </pre>
+     *
      * @param x
      * @return
      */
     public boolean isCommand(String... x) {
-        if(x == null || x.length == 0){
+        if (x == null || x.length == 0) {
             return false;
         }
         boolean rc = false;
-        for(String z : x){
-            rc = rc || getCommand().equals(z);
+        try {
+            for (String z : x) {
+                rc = rc || getCommand().equals(z);
+            }
+            return rc;
+        } catch (CommandNotFoundException cf) {
+            // If the command is really munged then just catch this and return false.
+            return false;
         }
-        return rc;
+
     }
 
     protected void parseIt(Vector v) {
@@ -99,11 +106,11 @@ public class EditorInputLine extends InputLine {
     }
 
     public boolean hasIndices() {
-        return indices != null && 0<indices.length;
+        return indices != null && 0 < indices.length;
     }
 
-    public int getIndexSize(){
-        if(!hasIndices()) return 0;
+    public int getIndexSize() {
+        if (!hasIndices()) return 0;
         return indices.length;
     }
 }

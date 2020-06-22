@@ -80,4 +80,24 @@ public class BasicIO implements IOInterface {
     public void flush() {
             getPrintStream().flush();
     }
+
+    @Override
+    public void clearQueue() {
+
+    }
+
+    @Override
+    public boolean isQueueEmpty() {
+        return true; // trivially this has no queue so it's always empty.
+    }
+
+    @Override
+    public void setBufferingOn(boolean bufferOn) {
+         // no op
+    }
+
+    @Override
+    public boolean isBufferingOn() {
+        return false;
+    }
 }
