@@ -25,9 +25,12 @@ public class Scripts extends FileEntryConstants {
      */
     public static final String CODE = "code";
     /**
-     * Identifies a call to construct a script_run() command call.
+     * Identifies a call to construct a script_load() command call.
+     * Note that scripts are <i>loaded</i> in to the current environment and run because
+     * on the server, the environment has been initialized. If we were to use script_run,
+     * then none of the state after the call would be available to the scripting engine.
      */
-    public static final String RUN = "run";
+    public static final String RUN = "load";
 
     /**
      * Identifies this object

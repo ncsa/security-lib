@@ -1,9 +1,12 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -131,22 +134,36 @@ public class AnotherJSONUtil {
             if (!scriptName.endsWith("'")) {
                 scriptName = scriptName + "'";
             }
-            StemVariable argList = new StemVariable();
+      //      StemVariable argList = new StemVariable();
+            String rawArgs="";
             if (jsonObject.containsKey(ARGS_TAG)) {
-                argList.addList(toScriptArgs((JSON) jsonObject.get(ARGS_TAG)));
-
+                rawArgs = buildArgList((JSON)jsonObject.get(ARGS_TAG));
+      //          argList.addList(toScriptArgs((JSON) jsonObject.get(ARGS_TAG)));
             }
             String argName = QDLScript.DEFAULT_ARG_NAME;
-            if (jsonObject.containsKey(ARG_NAME_TAG)) {
+            /*
+            TODO -- Maybe allow passing in of arg lists if the entries are scalars
+            The problem is if stem arguments (especially multiple ones) are passed in
+            because there is no canonical way to make a stem on the fly, except
+            to invoke the from_json method on a string.
+            So if the args for my_script.qdl
+               ["a",true,4,{"x":"y"}]
+             pass along
+               script_load('my_script.qdl",'a',true,4,from_json('{"x":"y"}'));
+             This has a bunch of edge cases though. At this point, it is all rolled into a single
+             argument which is a lot simpler than slogging through all the various values.
+
+             */
+/*            if (jsonObject.containsKey(ARG_NAME_TAG)) {
                 argName = jsonObject.getString(ARG_NAME_TAG);
                 qdlScript.setScriptArgName(argName);
-            }
+            }*/
             String cmd;
-            if (argList.isEmpty()) {
+            if (StringUtils.isTrivial(rawArgs)) {
                 cmd = ControlEvaluator.LOAD_COMMAND + "(" + scriptName + ");";
             } else {
-                cmd = ControlEvaluator.LOAD_COMMAND + "(" + scriptName + ", " + argName + ");";
-                qdlScript.setScriptArglist(argList);
+                cmd = ControlEvaluator.LOAD_COMMAND + "(" + scriptName + ", " + rawArgs + ");";
+                //qdlScript.setScriptArglist(argList);
             }
             lines.add(cmd);
             qdlScript.setLines(lines);
@@ -169,37 +186,87 @@ public class AnotherJSONUtil {
         throw new IllegalArgumentException("Error: Unknown script type.");
     }
 
+    protected static String buildArgList(JSON json){
+        String out = "";
+        if(json.isArray()){
+            JSONArray array = (JSONArray)json;
+            for(int i = 0; i < array.size(); i++) {
+                Object obj = array.get(i);
+                if(obj instanceof String){
+                       out = out + "'" + obj.toString() + "'";
+                }
+                if(obj instanceof Boolean || obj instanceof Integer || obj instanceof Double){
+                   out = out + obj.toString();
+                }
+                if(obj instanceof JSON){
+                    StemVariable stemVariable = new StemVariable();
+                    if(obj instanceof JSONArray) {
+                        stemVariable.fromJSON((JSONArray) obj);
+                    }else{
+                        stemVariable.fromJSON((JSONObject) obj);
+                    }
+                    out = out + StemEvaluator.FROM_JSON + "('" + stemVariable.toJSON() + "')";
+                }
+
+                if(i != array.size() - 1){
+                    out = out + ",";
+                }
+            }
+        }else{
+            out = StemEvaluator.FROM_JSON  + "('" + json.toString() + "')";
+        }
+        out = "to_list(" + out + ")";
+        DebugUtil.trace(AnotherJSONUtil.class, "returned arg list =" + out);
+        return out;
+        // must be a stem list
+    }
     public static void main(String[] args) {
         try {
             JSONObject j = JSONObject.fromObject(test2);
             System.out.println(j.toString(2));
             ScriptSet<QDLScript> scripts = createScripts((JSON) j.get("qdl"));
             System.out.println(scripts);
+
+
+
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
 
-    static String test0 = "{\"qdl\":{\"run\":\"x.qdl\"}}";
+    static String test0 = "{\"qdl\":{\"load\":\"x.qdl\"}}";
     static String test1 = "{\"qdl\":{\"code\":\"init();\"}}";
     static String test2 = "{\"qdl\":\n" +
             "   {\n" +
-            "     \"run\":\"y.qdl\",\n" +
+            "     \"load\":\"y.qdl\",\n" +
             "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"wlcg\"},\n" +
-            "     \"args\":[4,true,{\"server\":\"localhost\",\"port\":443}],\n" +
+            "     \"args\":[4,true,-47.5, {\"server\":\"localhost\",\"port\":443},[3,4]]\n" +
+            "   }\n" +
+            "}\n";
+    static String test2a = "{\"qdl\":\n" +
+            "   {\n" +
+            "     \"load\":\"y.qdl\",\n" +
+            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"wlcg\"},\n" +
+            "     \"args\":{\"port\":9443,\"verbose\":true,\"x0\":-47.5, \"ssl\":[3.5,true]},\n" +
             "     \"arg_name\":\"oa2\"\n" +
             "   }\n" +
             "}\n";
-
     static String test3 = "{\"qdl\":\n" +
             "     [\n" +
-            "      {\"run\":\"init.qdl\", \"xmd\":{\"exec_phase\":\"pre_auth\"}},\n" +
-            "      {\"run\":\"lsst.qdl\", \"xmd\":{\"exec_phase\":\"post_token\"}} \n" +
+            "      {\"load\":\"init.qdl\", \"xmd\":{\"exec_phase\":\"pre_auth\"}},\n" +
+            "      {\"load\":\"lsst.qdl\", \"xmd\":{\"exec_phase\":\"post_token\"}} \n" +
             "     ]\n" +
             "}";
     static String test4 = "{\"qdl\":\n" +
             "   {\n" +
-            "     \"code\":\"y.qdl\",\n" +
+            "     \"code\":\"init(true, 9443);\",\n" +
+            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"scitoken\"}\n" +
+            "   }\n" +
+            "}\n";
+
+    static String test5 = "{\"qdl\":\n" +
+            "   {\n" +
+            "     \"code\":[\"init(9443);\",\"verbose(true);\"],\n" +
             "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"scitoken\"}\n" +
             "   }\n" +
             "}\n";

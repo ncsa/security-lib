@@ -178,7 +178,7 @@ public class ServiceClient {
         creds = Base64.encodeBase64String(creds.getBytes());
         while(creds.endsWith("=")){
             // shave off any trailing = from the encoding. 
-            creds = creds.substring(creds.length() - 1);
+            creds = creds.substring(0,creds.length() - 1);
         }
         DebugUtil.trace(this, "Doing request with basic authz " + creds);
         httpRequestBase.setHeader("Authorization", "Basic " + creds);
