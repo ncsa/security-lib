@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
@@ -21,11 +22,27 @@ import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
 
 /**
+ * This will create a JWT. The contract is generally that it has (multiple) {@link PayloadHandler}s
+ * which process a given token. These are run at various times during execution based on the phase
+ * and flow states. For various historical reasons, the JWT is referred to as "claims" and it would
+ * take far too much tracking down in the code to change it.
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/20 at  7:38 AM
  */
 public class JWTRunner {
     OIDCServiceTransactionInterface transaction;
+
+    public AccessTokenHandlerInterface getAccessTokenHandler() {
+        return accessTokenHandler;
+    }
+
+    public void setAccessTokenHandler(AccessTokenHandlerInterface  accessTokenHandler) {
+        this.accessTokenHandler = accessTokenHandler;
+        addHandler(accessTokenHandler);
+    }
+
+    AccessTokenHandlerInterface accessTokenHandler = null;
+    public boolean hasATHandler(){return accessTokenHandler != null;}
 
     public JWTRunner(OIDCServiceTransactionInterface transaction, ScriptRuntimeEngine scriptRuntimeEngine) {
         this.transaction = transaction;
@@ -39,10 +56,10 @@ public class JWTRunner {
     }
 
     public void doAuthClaims() throws Throwable {
-
-
+        DebugUtil.trace(this, "Starting Auth claims");
         transaction.setFlowStates(new FlowStates());
         for (PayloadHandler h : handlers) {
+            DebugUtil.trace(this, "Running init for handler " + h);
             h.init();
             h.setAccountingInformation();
         }
@@ -206,10 +223,43 @@ public class JWTRunner {
     }
 
     protected void doScript(String phase) throws Throwable {
+        //oldDoScript(phase);
+        newDoScript(phase);
+    }
+
+    protected void newDoScript(String phase) throws Throwable{
+          if(getScriptRuntimeEngine() == null){
+              return;
+          }
+        ScriptRunRequest req = newSRR(transaction, phase);
+        if(handlers.isEmpty()){
+            // Functors do not have handlers, it all comes through the script engine.
+            // Therefore, if this does not have handlers, try to run it as legacy code
+
+            ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
+            handleSREResponse(transaction, resp);
+
+        }else {
+            // This has handlers so it new and should be run as such.
+            for (PayloadHandler h : handlers) {
+                h.addRequestState(req);
+                getScriptRuntimeEngine().clearScriptSet();
+                getScriptRuntimeEngine().setScriptSet(h.getPhCfg().getScriptSet());
+                ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
+                handleSREResponse(transaction, resp);
+                h.handleResponse(resp);
+            }
+        }
+
+    }
+    // This next method did not clear the script set and reset it. It is kept for reference in case some
+    // legacy (e.g. functor) handlers do not react well to this
+    private void oldDoScript(String phase) throws Throwable {
         if (getScriptRuntimeEngine() != null) {
             ScriptRunRequest req = newSRR(transaction, phase);
             for (PayloadHandler h : handlers) {
                 h.addRequestState(req);
+
             }
 
             ScriptRunResponse resp = getScriptRuntimeEngine().run(req);

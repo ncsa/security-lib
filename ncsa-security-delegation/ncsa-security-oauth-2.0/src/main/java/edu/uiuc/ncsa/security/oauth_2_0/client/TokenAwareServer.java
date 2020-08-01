@@ -94,8 +94,15 @@ public abstract class TokenAwareServer extends ASImpl {
             return new JSONObject();
         }
         // Now we have to check claims.
+        if(!claims.containsKey(AUDIENCE)){
+            throw new GeneralException("Error: Missing " + AUDIENCE + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
+        }
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
             throw new GeneralException("Error: Audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
+        }
+
+        if(!claims.containsKey(ISSUER)){
+            throw new GeneralException("Error: Missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         try {

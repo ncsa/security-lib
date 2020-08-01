@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
+import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
@@ -91,4 +92,15 @@ public interface PayloadHandler {
      * Create an instance of the handler with the constructor for any state, then invoke this method.
      */
     void refreshAccountingInformation();
+
+    public PayloadHandlerConfig getPhCfg() ;
+
+    public void setPhCfg(PayloadHandlerConfig phCfg);
+
+    /**
+     * Returns the payload from this handler encoded with a key, if applicable.
+     * @param key
+     * @return
+     */
+    public String getToken(JSONWebKey key);
 }

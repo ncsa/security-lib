@@ -34,7 +34,7 @@ public class TemplateUtil {
             // Have to properly escape the regex here.
             // Note that this does not permit nesting of templates, so while
             // ab${xx}c would get replaced correctly, ab${x${y}}c would not and you'd
-            // get a complaint about goruping from the replaceAll method. This is because
+            // get a complaint about grouping from the replaceAll method. This is because
             // the key of the hashmap is turned in to an actual regex with the right escaping
             //
             count++;

@@ -226,9 +226,6 @@ public class AnotherJSONUtil {
             System.out.println(j.toString(2));
             ScriptSet<QDLScript> scripts = createScripts((JSON) j.get("qdl"));
             System.out.println(scripts);
-
-
-
         } catch (Throwable t) {
             t.printStackTrace();
         }

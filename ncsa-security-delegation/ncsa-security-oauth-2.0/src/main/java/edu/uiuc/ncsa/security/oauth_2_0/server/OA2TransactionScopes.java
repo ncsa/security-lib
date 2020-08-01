@@ -13,7 +13,7 @@ import java.util.Collection;
  * on 7/15/19 at  7:51 PM
  */
 public interface OA2TransactionScopes {
-    JSONObject getClaims();
+    JSONObject getUserMetaData();
 
     Collection<String> getScopes();
 }

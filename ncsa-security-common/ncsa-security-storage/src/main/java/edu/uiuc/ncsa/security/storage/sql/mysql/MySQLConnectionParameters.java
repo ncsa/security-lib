@@ -27,7 +27,9 @@ public class MySQLConnectionParameters extends SQLConnectionImpl {
     public String getJdbcUrl() {
         String jdbcURL = addParameters("jdbc:mysql://%s:%d/%s?characterEncoding=utf8&user=%s&password=%s"
                        + "&serverTimezone=" + TimeZone.getDefault().getID()
-                       + (useSSL?"&useSSL=true":""));
+                       + (useSSL?"&useSSL=true":"") +
+                        ("&regexp_time_limit=1024") // Fixes CIL-751, very low time limit on regex matching in MyQSL 8+
+                );
 
         return String.format(jdbcURL,
                 host, port, schema, username, password);

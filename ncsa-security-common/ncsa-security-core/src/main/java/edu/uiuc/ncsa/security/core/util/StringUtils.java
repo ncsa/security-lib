@@ -128,7 +128,8 @@ public class StringUtils {
         for (String z : y) {
             System.out.println(z + " |" + z.length());
         }
-
+        System.out.println("Wrap a line");
+        System.out.println(wrap("ZOq88bMz4wIxYDbqfKpU2d4CTMx8vcXL2aYy1_XvkV1yZva1M0fHUFIqPRyZPrWapiTqeEzoXk2sJVzByDJgLp7psBaghosVTDQX_M17FBLYXZv7MviF6wB3_8MmCm2nHtKd5Ud6V6SvLj1tH5YmRcChCSS7evnXH94x3aqkIRf", 80));
     }
 
     /**
@@ -249,6 +250,24 @@ public class StringUtils {
         return output;
     }
 
+    /**
+     * Convience to wrap a single string.
+     * @param source
+     * @param width
+     * @return
+     */
+    public static String wrap(String source, int width){
+        String formattedString = "";
+
+        for (int i = 0; i < source.length() / width; i++) {
+             formattedString = formattedString + source.substring(i * width, (i + 1) * width) + "\n";
+         }
+         if (0 != source.length() % width) {
+             // if there is anything left over, append it, otherwise, skip this.
+             formattedString = formattedString + source.substring(source.length() - source.length() % width);
+         }
+         return formattedString;
+    }
 
     public static List<String> toList(String x) {
         StringTokenizer st = new StringTokenizer(x, "\n");

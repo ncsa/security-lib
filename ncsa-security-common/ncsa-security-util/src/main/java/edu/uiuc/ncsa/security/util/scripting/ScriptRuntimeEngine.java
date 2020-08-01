@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.security.util.scripting;
 
-import net.sf.json.JSONObject;
-
 /**
  * This contains a {@link ScriptSet} and resolves requests based on information in the request. It then runs the
  * selected script(s), returning the response when done.
@@ -17,13 +15,9 @@ public abstract class ScriptRuntimeEngine {
         this.state = state;
     }
 
-    protected JSONObject config;
     StateInterface state;
     public abstract  String serializeState();
     public abstract   void deserializeState(String state);
-    public ScriptRuntimeEngine(JSONObject config) {
-        this.config = config;
-    }
 
     public ScriptSet getScriptSet() {
         return scriptSet;
@@ -33,7 +27,25 @@ public abstract class ScriptRuntimeEngine {
         this.scriptSet = scriptSet;
     }
 
+    public void clearScriptSet(){
+        this.scriptSet = null;
+    }
     ScriptSet scriptSet;
 
     public abstract ScriptRunResponse run(ScriptRunRequest request);
+
+    /**
+     * If the engine has had the scripts already injected, then this will return <code>true</code>.
+     *
+     * @return
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
+    }
+
+    boolean initialized = false;
 }
