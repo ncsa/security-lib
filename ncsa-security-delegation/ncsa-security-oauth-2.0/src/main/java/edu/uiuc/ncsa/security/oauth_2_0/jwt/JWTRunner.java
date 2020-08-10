@@ -36,13 +36,33 @@ public class JWTRunner {
         return accessTokenHandler;
     }
 
-    public void setAccessTokenHandler(AccessTokenHandlerInterface  accessTokenHandler) {
+    public void setAccessTokenHandler(AccessTokenHandlerInterface accessTokenHandler) {
         this.accessTokenHandler = accessTokenHandler;
         addHandler(accessTokenHandler);
     }
 
     AccessTokenHandlerInterface accessTokenHandler = null;
-    public boolean hasATHandler(){return accessTokenHandler != null;}
+
+
+    public boolean hasATHandler() {
+        return accessTokenHandler != null;
+    }
+
+    RefreshTokenHandlerInterface refreshTokenHandler = null;
+
+    public void setRefreshTokenHandler(RefreshTokenHandlerInterface refreshTokenHandler) {
+        this.refreshTokenHandler = refreshTokenHandler;
+        addHandler(refreshTokenHandler);
+    }
+
+    public RefreshTokenHandlerInterface getRefreshTokenHandler() {
+        return refreshTokenHandler;
+    }
+
+    public boolean hasRTHandler() {
+        return refreshTokenHandler != null;
+    }
+
 
     public JWTRunner(OIDCServiceTransactionInterface transaction, ScriptRuntimeEngine scriptRuntimeEngine) {
         this.transaction = transaction;
@@ -169,6 +189,8 @@ public class JWTRunner {
             @Override
             public Map<String, Object> getArgs() {
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
+                map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
+                map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
                 map.put(SRE_REQ_FLOW_STATES, transaction.getFlowStates()); // so its a map
                 return map;
             }
@@ -227,19 +249,19 @@ public class JWTRunner {
         newDoScript(phase);
     }
 
-    protected void newDoScript(String phase) throws Throwable{
-          if(getScriptRuntimeEngine() == null){
-              return;
-          }
+    protected void newDoScript(String phase) throws Throwable {
+        if (getScriptRuntimeEngine() == null) {
+            return;
+        }
         ScriptRunRequest req = newSRR(transaction, phase);
-        if(handlers.isEmpty()){
+        if (handlers.isEmpty()) {
             // Functors do not have handlers, it all comes through the script engine.
             // Therefore, if this does not have handlers, try to run it as legacy code
 
             ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
             handleSREResponse(transaction, resp);
 
-        }else {
+        } else {
             // This has handlers so it new and should be run as such.
             for (PayloadHandler h : handlers) {
                 h.addRequestState(req);
@@ -252,6 +274,7 @@ public class JWTRunner {
         }
 
     }
+
     // This next method did not clear the script set and reset it. It is kept for reference in case some
     // legacy (e.g. functor) handlers do not react well to this
     private void oldDoScript(String phase) throws Throwable {

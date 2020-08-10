@@ -1,9 +1,10 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
-import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.security.oauth_2_0.jwt.FlowStates;
+import net.sf.json.JSONObject;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -11,8 +12,19 @@ import java.util.Collection;
  */
 public interface OIDCServiceTransactionInterface {
     FlowStates getFlowStates();
+
     void setFlowStates(FlowStates flowStates);
+
     Collection<String> getScopes();
+
     void setScopes(Collection<String> scopes);
+
+    List<String> getAudience();
+
+    void setAudience(List<String> audience);
+
+    JSONObject getExtendedAttributes();
+
+    void setExtendedAttributes(JSONObject xas);
 }
 

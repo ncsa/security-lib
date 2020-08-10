@@ -373,6 +373,10 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
+        if(super.size() == 0 && getStemList().size() == 0){
+            // Empty stem corresponds to an empty JSON Object
+            return new JSONObject();
+        }
         if (getStemList().size() == size()) {
             return getStemList().toJSON(); // handles case of simple list of simple elements
         }

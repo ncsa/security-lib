@@ -18,7 +18,9 @@ public interface ScriptingConstants {
     String SRE_POST_REFRESH = "post_refresh";
     String SRE_REQ_CLAIMS = "claims";
     String SRE_REQ_ACCESS_TOKEN = "access_token";
+    String SRE_REQ_REFRESH_TOKEN = "refresh_token";
     String SRE_REQ_SCOPES = "scopes";
+    String SRE_REQ_AUDIENCE = "audience";
     String SRE_REQ_FLOW_STATES = "flow_states";
     String SRE_REQ_CLAIM_SOURCES = "claim_sources";
     String SRE_REQ_EXTENDED_ATTRIBUTES = "eas";

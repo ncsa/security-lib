@@ -14,7 +14,7 @@ public class JSONWebKeys extends HashMap<String, JSONWebKey> {
              throw new IllegalStateException("Error: No default key ID specified.");
          }
         if(!containsKey(defaultKeyID)){  // This checks that the key is set AND the key is actually in this collection.
-            throw new IllegalStateException("Error: The default key id does not match any keys. Check your keys and their ids.");
+            throw new IllegalStateException("Error: The default key id \"" + defaultKeyID + "\" does not match any keys. Check your keys and their ids.");
         }
 
         return get(defaultKeyID);
