@@ -8,7 +8,7 @@
             edu.uiuc.ncsa.security
         </groupId>
         <artifactId>ncsa-security-all</artifactId>
-        <version>4.4.4</version>
+        <version>4.4.5</version>
     </parent>
 
     <artifactId>ncsa-qdl</artifactId>
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -152,24 +152,24 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -185,34 +185,34 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-storage</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.5</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
