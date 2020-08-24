@@ -295,7 +295,8 @@ public class InputLine {
     }
 
     /**
-     * Returns the number of arguments for this input line.
+     * Returns the number of arguments for this input line. This does <b>not</b> include the original
+     * command, so e.g. a value fo zero means no arguments were passed.
      *
      * @return
      */

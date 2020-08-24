@@ -5,7 +5,8 @@ import net.sf.json.JSONObject;
 
 /**
  * Budding collection of useful tools for creating complex JSON objects.
- * <p>   The structure of a JSON serialization is {name:{key0:val0,...}} where name is the name of the component
+ * <p>
+ *     The structure of a JSON serialization is {name:{key0:val0,...}} where name is the name of the component
  * e.g. client, admin, ldap,... etc. So this lets you create a JSON object that has a single JSON object
  * as its value and directly do set/get against the value object. </p>
  * <p>Created by Jeff Gaynor<br>
@@ -31,12 +32,13 @@ This method sets or gets one of the components from the JSON object
         return json.getJSONObject(getComponentName()).get(key);
     }
 
-    public JSONArray getJSONArray(JSONObject json, String key){
+    public JSONArray getJSONArray(JSONObject json, String key) {
         if (!hasKey(json, key)) return null;
         Object object = getJSONValue(json, key);
-       JSONArray array =  JSONArray.fromObject(object); // should get converted from a String
+        JSONArray array = JSONArray.fromObject(object); // should get converted from a String
         return array;
     }
+
     public String getJSONValueString(JSONObject json, String key) {
         if (!hasKey(json, key)) return null;
         Object object = getJSONValue(json, key);

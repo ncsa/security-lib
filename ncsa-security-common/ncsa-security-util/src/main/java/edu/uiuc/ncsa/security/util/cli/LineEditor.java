@@ -20,7 +20,7 @@ import java.util.StringTokenizer;
  * on 8/30/18 at  11:23 AM
  */
 
-public class LineEditor {
+public class LineEditor extends AbstractEditor {
     public boolean isSaved() {
         return saved;
     }
@@ -80,7 +80,6 @@ public class LineEditor {
 
     CommandLineTokenizer CLT = new CommandLineTokenizer();
 
-    public static String PROMPT = "edit>";
     public static final String END_COMMAND = "."; // end input to buffer
     public static final String APPEND_COMMAND = "a"; // append to end of file
     public static final String APPEND_COMMAND_LONG = "append"; // append to end of file
@@ -102,8 +101,6 @@ public class LineEditor {
     public static final String MOVE_COMMAND_LONG = "move"; // [x,y,z] move lines x - y to before z, then delete from the original location
     public static final String PRINT_COMMAND = "p"; // print a range of lines
     public static final String PRINT_COMMAND_LONG = "print"; // print a range of lines
-    public static final String QUIT_COMMAND = "q"; // quit the editor
-    public static final String QUIT_COMMAND_LONG = "quit"; // quit the editor
     public static final String READ_COMMAND = "r";
     public static final String READ_COMMAND_LONG = "read";
     public static final String SUBSITUTE_COMMAND = "s"; // substitute
@@ -112,13 +109,10 @@ public class LineEditor {
     public static final String PASTE_COMMAND_LONG = "paste"; // paste the contents of the clipboard before the line numberr.
     public static final String CUT_COMMAND = "u"; // cut a range of lines to the clipboard
     public static final String CUT_COMMAND_LONG = "cut"; // cut a range of lines to the clipboard
-    public static final String VERBOSE_COMMAND = "v"; // toggles verbose mode on or off.
-    public static final String VERBOSE_COMMAND_LONG = "verbose"; // toggles verbose mode on or off.
     public static final String WRITE_COMMAND = "w"; // write the file
     public static final String WRITE_COMMAND_LONG = "write"; // write the file
     public static final String SIZE_COMMAND = "z"; // how many lines are in this buffer?
     public static final String SIZE_COMMAND_LONG = "size"; // how many lines are in this buffer?
-    public static final String HELP_COMMAND = "?"; // Help command
 
     protected void allHelp() {
         say("This is the line editor. It operates per line. Each command is of the form");
@@ -155,7 +149,6 @@ public class LineEditor {
     }
 
 
-    boolean verboseOn = false;
 
     public void execute() throws Throwable {
         say("CLI editor.");
@@ -164,10 +157,10 @@ public class LineEditor {
         }
         while (!isDone) {
             String command = readline(PROMPT);
-            EditorInputLine eil = null;
+            LineEditorInputLine eil = null;
             boolean isUnkownCommand = true;
             try {
-                eil = new EditorInputLine(command);
+                eil = new LineEditorInputLine(command);
             } catch (Throwable t) {
                 say("Sorry, there was an error processing that command");
                 continue;
@@ -296,7 +289,7 @@ public class LineEditor {
         say("        listing all the lines that match the regex. Omitting the range implies search the whole buffer");
     }
 
-    protected void doFind(EditorInputLine eil) {
+    protected void doFind(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doFindHelp();
             return;
@@ -321,11 +314,13 @@ public class LineEditor {
         say(SUBSITUTE_COMMAND + " \\\\s \"\"");
     }
 
-    protected boolean showHelp(EditorInputLine eil) {
+/*
+    protected boolean showHelp(LineEditorInputLine eil) {
         return eil.hasArg(HELP_COMMAND);
     }
+*/
 
-    protected int[] getRange(EditorInputLine eil) {
+    protected int[] getRange(LineEditorInputLine eil) {
         int[] range = new int[2];
         range[0] = 0;
         range[1] = getBuffer().size() - 1;
@@ -342,7 +337,7 @@ public class LineEditor {
         return range;
     }
 
-    protected void doSubstitute(EditorInputLine eil) {
+    protected void doSubstitute(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doSubstituteHelp();
             return;
@@ -360,7 +355,7 @@ public class LineEditor {
         say("cut [x,y] = copy the given range to the clipboard, then remove them from the buffer.");
     }
 
-    protected void doCut(EditorInputLine eil) {
+    protected void doCut(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doCutHelp();
             return;
@@ -374,7 +369,7 @@ public class LineEditor {
     }
 
 
-    protected void doDelete(EditorInputLine eil) {
+    protected void doDelete(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doDeleteHelp();
             return;
@@ -396,7 +391,7 @@ public class LineEditor {
         say("    Omitting z means append to the end of the buffer.");
     }
 
-    protected void doMove(EditorInputLine eil) {
+    protected void doMove(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doMoveHelp();
             return;
@@ -442,7 +437,7 @@ public class LineEditor {
         say(VIEW_CLIPBOARD_COMMAND + "|" + VIEW_CLIPBOARD_COMMAND_LONG + " = view the contents of the clipboard");
     }
 
-    protected void doViewClipboard(EditorInputLine eil) {
+    protected void doViewClipboard(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doViewClipboardHelp();
             return;
@@ -463,7 +458,7 @@ public class LineEditor {
         say("      Note that if the range is omitted, the entire buffer is saved.");
     }
 
-    protected void doWrite(EditorInputLine eil) {
+    protected void doWrite(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doWriteHelp();
             return;
@@ -498,12 +493,12 @@ public class LineEditor {
         say("        No arguments are accepted, it is just a convenience.");
     }
 
-    protected void doAppend(EditorInputLine eil) throws IOException {
+    protected void doAppend(LineEditorInputLine eil) throws IOException {
         if (showHelp(eil)) {
             doAppendtHelp();
             return;
         }
-        eil = new EditorInputLine(INSERT_COMMAND); // This just causes it to insert at the end.
+        eil = new LineEditorInputLine(INSERT_COMMAND); // This just causes it to insert at the end.
         doInsert(eil);
     }
 
@@ -519,7 +514,7 @@ public class LineEditor {
      *
      * @param eil
      */
-    protected void doInsert(EditorInputLine eil) throws IOException {
+    protected void doInsert(LineEditorInputLine eil) throws IOException {
         if (showHelp(eil)) {
             doInsertHelp();
             return;
@@ -564,7 +559,7 @@ public class LineEditor {
         say("       Sorry, this is the best general solution so far...");
     }
 
-    protected void doEditLines(EditorInputLine eil) {
+    protected void doEditLines(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doEditLinesHelp();
             return;
@@ -600,7 +595,7 @@ public class LineEditor {
 
     String PRINT_NO_LINE_NUMBERS_FLAG = "-noNumber";
 
-    protected void doPrint(EditorInputLine eil) {
+    protected void doPrint(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doPrintHelp();
             return;
@@ -624,7 +619,7 @@ public class LineEditor {
      *
      * @param eil
      */
-    protected void doRead(EditorInputLine eil) {
+    protected void doRead(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doReadHelp();
             return;
@@ -677,7 +672,7 @@ public class LineEditor {
 
     }
 
-    protected void doCopy(EditorInputLine eil) {
+    protected void doCopy(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doCopyHelp();
             return;
@@ -696,7 +691,7 @@ public class LineEditor {
         say("     append to the end of the buffer.");
     }
 
-    protected void doPaste(EditorInputLine eil) {
+    protected void doPaste(LineEditorInputLine eil) {
         if (showHelp(eil)) {
             doPasteHelp();
             return;
@@ -734,57 +729,19 @@ public class LineEditor {
 
     }
 
-    public IOInterface getIoInterface() {
-        if (ioInterface == null) {
-            ioInterface = new BasicIO();
-        }
-        return ioInterface;
-    }
 
-    public void setIoInterface(IOInterface ioInterface) {
-        this.ioInterface = ioInterface;
-    }
-
-    IOInterface ioInterface;
-
-
-    protected String readline(String x) throws IOException {
-        return getIoInterface().readline(x);
-    }
-
-    protected EditorInputLine toInputLine(String x) {
-        return new EditorInputLine(CLT.tokenize(x));
-    }
-
-    /**
-     * For use with informational messages.
-     *
-     * @param x
-     */
-    protected void say(String x) {
-        //   System.out.println(x);
-        getIoInterface().println(x);
-    }
-
-    /**
-     * Used for spitting out extra messages in verbose mode.
-     *
-     * @param x
-     */
-    protected void sayv(String x) {
-        if (verboseOn) {
-            say(x);
-        }
+    protected LineEditorInputLine toInputLine(String x) {
+        return new LineEditorInputLine(CLT.tokenize(x));
     }
 
 
-    boolean isDone = false;
+
 
     public static void main(String[] args) {
         LineEditor lineEditor = new LineEditor(new LinkedList<String>());
         lineEditor.say("attempting to read arguments as files to insert...");
         for (String arg : args) {
-            EditorInputLine eil = new EditorInputLine(READ_COMMAND + " \"" + arg + "\"");
+            LineEditorInputLine eil = new LineEditorInputLine(READ_COMMAND + " \"" + arg + "\"");
             try {
                 lineEditor.doRead(eil);
             } catch (Throwable t) {

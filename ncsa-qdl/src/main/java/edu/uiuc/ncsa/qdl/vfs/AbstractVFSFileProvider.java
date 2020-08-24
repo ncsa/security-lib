@@ -4,8 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
-import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
-import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -127,6 +126,18 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
         return VFSPaths.getFileName(name).endsWith(QDLVersion.DEFAULT_FILE_EXTENSION);
     }
 
+    /**
+     * Returns if this path is absolute, i.e. if it starts with the path separator.
+     * So A#/a/b/c is absolute, A#b/c is not. <br/><br/>
+     * An absolute path contains enough information to find the file. A relative path
+     * does not. This will compare them ignoring schemes.
+     *
+     * @param path
+     * @return
+     */
+    static boolean isAbsolute(String path) {
+        return getUnqPath(path).startsWith(VFSPaths.PATH_SEPARATOR);
+    }
     /**
      * Resolves this against any current directory and returns the unqualified *relative* path against the
      * store's root path.

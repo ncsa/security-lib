@@ -284,7 +284,7 @@ public class VFSPaths {
 
     /**
      * Attempts to relativize the other path against the path. So if path=/a/b other=/a/b/c/d
-     * then this returns c/d. 
+     * then this returns c/d.
      * In point of  fact <br/><br/>
      *      relativize(p,resolve(p,q)).equals(q) <br/><br/>
      *  as long as they have the same scheme (or the relative path gets the scheme of the path).

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
-import edu.uiuc.ncsa.security.util.cli.EditorInputLine;
+import edu.uiuc.ncsa.security.util.cli.LineEditorInputLine;
 import org.junit.Test;
 
 /**
@@ -11,7 +11,7 @@ public class EditorTest extends TestBase {
     @Test
     public void testInputLine() throws Exception {
         String lineIn = "a [2,5]";
-        EditorInputLine eil = new EditorInputLine(lineIn);
+        LineEditorInputLine eil = new LineEditorInputLine(lineIn);
         // plain vanilla test
         assert eil.getCommand().equals("a");
         assert eil.hasIndices();
@@ -19,7 +19,7 @@ public class EditorTest extends TestBase {
         assert eil.getIndices()[1] == 5;
 
         lineIn = "a [ 2,   6]";
-        eil = new EditorInputLine(lineIn);
+        eil = new LineEditorInputLine(lineIn);
         assert eil.getCommand().equals("a");
         assert eil.hasIndices();
         assert eil.getIndices()[0] == 2;
@@ -27,7 +27,7 @@ public class EditorTest extends TestBase {
 
 
         lineIn = "a [ 2,   6, 11]";
-        eil = new EditorInputLine(lineIn);
+        eil = new LineEditorInputLine(lineIn);
         assert eil.getCommand().equals("a");
         assert eil.hasIndices();
         assert eil.getIndices()[0] == 2;
