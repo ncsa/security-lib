@@ -76,28 +76,12 @@ public abstract class StoreCommands extends CommonCommands {
 
     }
 
-    protected void showSerializeHelp() {
-        say("serializes an object and either shows it on the command line or put it in a file. Cf. deserialize.");
-        say("serialize  [-file path] index");
-        say("Serializes the object with the given index. (Note that the index must be the last argument!) " +
-                "It will print it to the command line or save it to the given file,");
-        say("overwriting the contents of the file.");
-    }
-
-    protected void showDeserializeHelp() {
-        say("Deserializes an object into the currnet store overwriting the contents. Cf. serialize.");
-        say("deserialize  [-new] -file path");
-        say("Deserializes the object in the given file. This replaces the object with the given index in the store.");
-        say("The response will give the identifier of the object created.");
-        say("If the -new flag is used, it is assumed that the object should be new. This means that if there is an existing object");
-        say("with that identifier the operation will fail. If there is no identifier, one will be created.");
-        say("Omitting the -new flag means that any object will be overwritten and if needed, a new identifier will be created");
-    }
 
 
     // Note to self -- cannot just have these here because all of the machinery to do this to and from XML resides in another
     // module and that would create a circular set of dependencies. This is the reason there is the subclass StoreCommands2
-    // in OA4MP. Best we can do with how Java works...
+    // in OA4MP. Best we can do with how Java works until we have a large-scale restructuring of the packages, which we
+    // don't want to do.
 
     public abstract void serialize(InputLine inputLine);
 

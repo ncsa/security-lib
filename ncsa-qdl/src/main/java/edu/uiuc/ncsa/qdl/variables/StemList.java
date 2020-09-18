@@ -35,7 +35,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
 
     @Override
     public String toString() {
-        String output = "StemList{";
+        String output = "{";
         boolean isFirst = true;
         for (long i = 0; i < size(); i++) {
             if (isFirst) {

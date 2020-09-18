@@ -42,7 +42,11 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public String getString(String key) {
-        return get(key).toString();
+        Object obj = get(key);
+        if(obj == null){
+            return null;
+        }
+        return obj.toString();
     }
 
     public Boolean getBoolean(String key) {

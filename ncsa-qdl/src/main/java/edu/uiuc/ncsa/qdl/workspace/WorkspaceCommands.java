@@ -211,6 +211,10 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected int doFileCommands(InputLine inputLine) {
+        if(inputLine.size()<=ACTION_INDEX){
+           say("Sorry, please supply an argument (e.g. --help)");
+           return RC_NO_OP;
+        }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "help":
             case "--help":
@@ -245,6 +249,10 @@ public class WorkspaceCommands implements Logable {
     BufferManager bufferManager = new BufferManager();
 
     private int _doNewBufferCommand(InputLine inputLine) {
+        if(inputLine.size() <= ACTION_INDEX){
+            say("Sorry, you need an argument, (e.g. --help)");
+            return RC_NO_OP;
+        }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "help":
             case "--help":

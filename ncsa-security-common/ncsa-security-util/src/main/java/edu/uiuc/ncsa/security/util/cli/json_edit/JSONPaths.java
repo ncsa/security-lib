@@ -25,7 +25,7 @@ public class JSONPaths {
      * @param path
      * @return
      */
-    static boolean isAbsolute(String path) {
+    public static boolean isAbsolute(String path) {
         return getUnqPath(path).startsWith(PATH_SEPARATOR);
     }
 
@@ -35,16 +35,16 @@ public class JSONPaths {
      * @param fqPath
      * @return
      */
-    static String getUnqPath(String fqPath) {
+    public  static String getUnqPath(String fqPath) {
         return fqPath.substring(fqPath.indexOf(SCHEME_DELIMITER) + 1);
     }
 
-    static String getFileName(String path) {
+    static public  String getFileName(String path) {
         String[] firstTry = path.split(PATH_SEPARATOR);
         return firstTry[firstTry.length - 1];
     }
 
-    static String getParentPath(String path) {
+    public  static String getParentPath(String path) {
         if (path == null || path.isEmpty()) return path;
         int index = path.lastIndexOf(PATH_SEPARATOR);
         return path.substring(0, index);
@@ -57,7 +57,7 @@ public class JSONPaths {
      * @param path
      * @return
      */
-    static String[] toPathComponents(String path) {
+    public  static String[] toPathComponents(String path) {
         String uPath = getUnqPath(path);
         if (uPath.startsWith(PATH_SEPARATOR)) {
             // if this is an absolute path, like /a/b/c, then the split method below will give a spurious
@@ -75,7 +75,7 @@ public class JSONPaths {
      * @param index
      * @return
      */
-    static String getComponentAt(String path, int index) {
+    public  static String getComponentAt(String path, int index) {
         String[] components = toPathComponents(path);
         return components[index];
     }
@@ -87,7 +87,7 @@ public class JSONPaths {
      * @param endIndex
      * @return
      */
-    static String subpath(String path, int beginIndex, int endIndex) {
+    public  static String subpath(String path, int beginIndex, int endIndex) {
         String p = "";
         String[] components = toPathComponents(path);
         for (int i = beginIndex; i < endIndex; i++) {
@@ -109,7 +109,7 @@ public class JSONPaths {
      * @param other
      * @return
      */
-    static boolean startsWith(String path, String other) {
+    public  static boolean startsWith(String path, String other) {
         return getUnqPath(path).startsWith(getUnqPath(other));
     }
 
@@ -121,7 +121,7 @@ public class JSONPaths {
      * @param other
      * @return
      */
-    static boolean endsWith(String path, String other) {
+    public  static boolean endsWith(String path, String other) {
         return getUnqPath(path).endsWith(getUnqPath(other));
     }
 
@@ -131,7 +131,7 @@ public class JSONPaths {
      * @param path
      * @return
      */
-    static String normalize(String path) {
+    public  static String normalize(String path) {
         String scheme = getScheme(path);
         String unq = getUnqPath(path);
         File file = new File(unq);
@@ -154,7 +154,7 @@ public class JSONPaths {
      * @param relativePath
      * @return
      */
-    static String resolve(String path, String relativePath) {
+    public static String resolve(String path, String relativePath) {
         File pFile = new File(getUnqPath(path));
         File oFile = new File(getUnqPath(relativePath));
         Path p = pFile.toPath().resolve(oFile.toPath());
@@ -174,7 +174,7 @@ public class JSONPaths {
      * @return
      */
 
-    static String resolveSibling(String path, String other) {
+    public static String resolveSibling(String path, String other) {
         File pFile = new File(getUnqPath(path));
         File oFile = new File(getUnqPath(other));
         Path p = pFile.toPath().resolveSibling(oFile.toPath());
@@ -196,7 +196,7 @@ public class JSONPaths {
      * @return
      */
 
-    static String relativize(String path, String other) {
+    public static String relativize(String path, String other) {
         File pFile = new File(getUnqPath(path));
         File oFile = new File(getUnqPath(other));
         Path p = pFile.toPath().relativize(oFile.toPath());
@@ -215,7 +215,7 @@ public class JSONPaths {
      * @param other
      * @return
      */
-    static int compareTo(String path, String other) {
+    public static int compareTo(String path, String other) {
         File pFile = new File(getUnqPath(path));
         File oFile = new File(getUnqPath(other));
         return pFile.toPath().compareTo(oFile.toPath());
@@ -228,7 +228,7 @@ public class JSONPaths {
      * @param path2
      * @return
      */
-    static boolean equals(String path1, String path2) {
+    public static boolean equals(String path1, String path2) {
         return getScheme(path1).equals(getScheme(path2)) && compareTo(normalize(path1), normalize(path2)) == 0;
     }
 

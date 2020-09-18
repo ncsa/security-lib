@@ -188,6 +188,7 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
         ldap2.setRawPostProcessor(getRawPostProcessor());
         ldap2.setRawPreProcessor(getRawPreProcessor());
         ldap2.setSearchFilterAttribute(getSearchFilterAttribute());
+        ldap2.setAdditionalFilter(getAdditionalFilter());
         return ldap2;
     }
 
@@ -207,9 +208,31 @@ public class LDAPConfiguration extends JSONClaimSourceConfig {
                 ", contextName='" + contextName + '\'' +
                 ", failOnError=" + failOnError +
                 ", notifyOnFail=" + notifyOnFail +
+                ", additionalFilter=" + additionalFilter + 
                 '}';
     }
 
+    /**
+     * This is used as part of the search filter. A normal one would be
+     * <pre>
+     *     ((& + {@link #getSearchFilterAttribute} + claim + )({@link #getAdditionalFilter}))
+     * </pre>
+     * So one might look like
+     * <pre>
+     *     (&(uid=bob)(isMemberOf=Communities:LVC:SegDB:SegDBWriter))
+     * </pre>
+     * Generally this will be dropped verbatim in the slot, so include parentheses.
+     * @return
+     */
+    public String getAdditionalFilter() {
+        return additionalFilter;
+    }
+
+    public void setAdditionalFilter(String additionalFilter) {
+        this.additionalFilter = additionalFilter;
+    }
+
+    String additionalFilter;
     @Override
     public void fromJSON(JSONObject json) {
         LDAPConfigurationUtil x = new LDAPConfigurationUtil();

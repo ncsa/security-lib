@@ -236,14 +236,14 @@ public class AnotherJSONUtil {
     static String test2 = "{\"qdl\":\n" +
             "   {\n" +
             "     \"load\":\"y.qdl\",\n" +
-            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"wlcg\"},\n" +
+            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"access\"},\n" +
             "     \"args\":[4,true,-47.5, {\"server\":\"localhost\",\"port\":443},[3,4]]\n" +
             "   }\n" +
             "}\n";
     static String test2a = "{\"qdl\":\n" +
             "   {\n" +
             "     \"load\":\"y.qdl\",\n" +
-            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"wlcg\"},\n" +
+            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"id\"},\n" +
             "     \"args\":{\"port\":9443,\"verbose\":true,\"x0\":-47.5, \"ssl\":[3.5,true]},\n" +
             "     \"arg_name\":\"oa2\"\n" +
             "   }\n" +
@@ -257,7 +257,7 @@ public class AnotherJSONUtil {
     static String test4 = "{\"qdl\":\n" +
             "   {\n" +
             "     \"code\":\"init(true, 9443);\",\n" +
-            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"scitoken\"}\n" +
+            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"refresh\"}\n" +
             "   }\n" +
             "}\n";
 
