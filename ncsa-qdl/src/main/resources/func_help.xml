@@ -1,0 +1,753 @@
+<help>
+    <entry id="abs">
+        <body>
+            <![CDATA[
+abs(arg) - find the absolute value of a number or stem.
+E.g. abs(-2) yields 2.
+            ]]>
+        </body>
+    </entry>
+    <!-- NOTE no blank elements -->
+    <entry id="date_ms">
+        <body>
+            <![CDATA[
+date_ms() - current date in milliseconds
+date_ms(arg) - if arg is an integer, return it, if it is a string in ISO 8601 format.
+See also: date_iso
+            ]]>
+        </body>
+    </entry>
+    <entry id="date_iso">
+        <body>
+            <![CDATA[
+   date_iso() - return the current date as an ISO 8601 formatted string
+date_iso(arg) - if arg is an integer, convert it to an ISO string.
+                If it is an ISO string, return it.
+See also: date_ms
+            ]]>
+        </body>
+    </entry>
+
+    <entry id="decode_b64">
+        <body>
+            <![CDATA[
+decode_b64(arg) - decode a base 64 encoded string or stem of strings to string(s).
+                  Note that if the arg is encoded binary, you will get gibberish back.
+See also: encode_b64
+            ]]>
+        </body>
+    </entry>
+
+    <entry id="encode_b64">
+            <body>
+                <![CDATA[
+encode_b64(arg) - encode a string or stem of string into base 64.
+See also: decode_b64
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="from_hex">
+            <body>
+                <![CDATA[
+from_hex(arg) - convert a hexadecimal string or stem of strings to a string.
+See also: to_hex
+                ]]>
+            </body>
+        </entry>
+    <entry id="hash">
+            <body>
+                <![CDATA[
+hash(arg) - calculates the SHA-1 digest of a string or stem of strings.
+            The output is a hexadecimal string. Note that this has nothing to
+            do with converting to or from hex strings.
+                ]]>
+            </body>
+        </entry>
+    <entry id="mod">
+            <body>
+                <![CDATA[
+mod(a,b) - compute the modulus, i.e., the remainder after long division, of two integer.
+           the arguments are either scalar or stems.
+                ]]>
+            </body>
+        </entry>
+    <entry id="numeric_digits">
+            <body>
+                <![CDATA[
+   numeric_digits() - display the current precision
+numeric_digits(arg) - set the precision to the value of arg, which is a positive integer.
+                      The result displayed is the old precision.
+                ]]>
+            </body>
+        </entry>
+    <entry id="random">
+            <body>
+                <![CDATA[
+ random() - return a random number
+random(n) - return n (an integer) random numbers as a stem list.
+                ]]>
+            </body>
+        </entry>
+    <entry id="random_string">
+            <body>
+                <![CDATA[
+    random_string() - return a random string of 16 bytes, base 64 encoded.
+   random_string(n) - return a random string of n bytes, base 64 encoded
+random_string(n, m) - return a list containing m entries with n bytes each, base 64 encoded
+See also: encode_b64, decode_b64
+                ]]>
+            </body>
+        </entry>
+    <entry id="to_hex">
+            <body>
+                <![CDATA[
+to_hex(arg) - convert a string or stem of strings to hexadecimal numbers.
+Note: Since the representation relies on the underlying character set, this is of less use
+generally than encoding a string in base 64. However, from_hex is guaranteed to be its inverse.
+See also: encode_b64, decode_b64, from_hex
+                ]]>
+            </body>
+        </entry>
+    <entry id="box">
+            <body>
+                <![CDATA[
+box(arg0, arg1, ...) - take any collection of variables and turn them into a single stem, their
+                       names becoming keys. They are removed from the symbol table.
+                       There must be at least one argument and the result is a boolean true if it
+                       succeeded and false otherwise (so you can test programatically if it worked).
+See also: unbox
+                ]]>
+            </body>
+        </entry>
+    <entry id="exclude_keys">
+            <body>
+                <![CDATA[
+exclude_keys(target., list.) - remove the list. of keys (and their values) from target.
+Note: The result will be a subset of target. that contains none of the keys listed in the list. argument.
+                ]]>
+            </body>
+        </entry>
+    <entry id="encode_b64">
+            <body>
+                <![CDATA[
+                ]]>
+            </body>
+        </entry>
+    <entry id="from_json">
+            <body>
+                <![CDATA[
+         from_json(arg) - takes the argument with is a string representation of JSON and turns it into a stem.
+from_json(arg, convert) - as per single argument case, but allows a flag (true or false) if vencode is to be
+                          applied to each key. The default is false.
+See also: vencode, to_json
+                ]]>
+            </body>
+        </entry>
+    <entry id="list_keys">
+            <body>
+                <![CDATA[
+list_keys(arg.) - returns a list of the keys in the argument.
+list_keys(arg., scalars_only) - returns a list of the keys in the argument.
+                                scalars_only is a boolean that when true will return only those keys whose
+                                values are scalars. if false, all keys are returned.
+Note: Strings are scalars.
+See also: keys
+                ]]>
+            </body>
+        </entry>
+    <entry id="has_keys">
+            <body>
+                <![CDATA[
+has_keys(target., key_list.) - returns a boolean list that is the same size as key_list. and
+                               has a true or false if that entry is a key in target.
+See also: list_keys
+                ]]>
+            </body>
+        </entry>
+    <entry id="include_keys">
+             <body>
+                 <![CDATA[
+include_keys(target., key_list.) - returns a stem that is the subset of target. including only
+                                   keys found in key_list.
+See also: exclude_keys
+                 ]]>
+             </body>
+         </entry>
+    <entry id="indices">
+             <body>
+                 <![CDATA[
+indices(n) - make a stem list whose values are 0,..., n-1
+Note: This is extremely useful in certain looping constructs.
+                 ]]>
+             </body>
+         </entry>
+    <entry id="is_list">
+             <body>
+                 <![CDATA[
+is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are integers.
+                 ]]>
+             </body>
+         </entry>
+    <entry id="keys">
+             <body>
+                 <![CDATA[
+keys(stem.) - returns a list of the keys in stem.
+Note: There is no canonical ordering of keys, so these are effectively random.
+                 ]]>
+             </body>
+         </entry>
+    <entry id="list_append">
+             <body>
+                 <![CDATA[
+list_append(list0., arg) - append arg to list0., adjusting the indices as needed.
+Note: If arg is a scalar, the single value is appended. If arg is a list, then the
+      entire list is appended.
+                 ]]>
+             </body>
+         </entry>
+    <entry id="list_copy">
+             <body>
+                 <![CDATA[
+list_copy(source., start_index, length, target., target_index) - copy one list into another, overwriting old elements.
+
+     source. = the stem that is the source of the copy.
+ start_index = the index in the source where the copy starts
+      length = how many elements to copy
+     target. = the target stem of the copy
+target_index = the index in the target that will receive the copy. Note that any elements already
+               in these locations will be replaced. If you need to insert elements,
+               consider using the list_insert_at command.
+See also: list_insert_at
+                 ]]>
+             </body>
+         </entry>
+    <entry id="list_insert_at">
+             <body>
+                 <![CDATA[
+list_insert_at(source., start_index, length, target., target_index) -  insert one list in another, moving the old elements.
+
+     source. = the stem that is the source of the copy.
+ start_index = the index in the source where the copy starts
+      length = how many elements to copy
+     target. = the target stem of the copy
+target_index = the index in the target that will receive the copy. Note that any elements already
+               in these locations will be moved. If you intend to replace a section of this list,
+               consider using the list_copy command.                 ]]>
+See also: list_copy
+             </body>
+         </entry>
+    <entry id="list_subset">
+             <body>
+                 <![CDATA[
+list_subset(source_list., start_index) - return a subset of the source_list starting at the given index.
+list_subset(source_list., start_index, n) - return a subset of the source_list starting at the given index,
+                                            but only return n elements.
+Note: If n is omiited, then the rest of the list is returned from the start index on. The source is not altered
+      and the resulting list has 0 as its first index.
+                 ]]>
+             </body>
+         </entry>
+    <entry id="mask">
+             <body>
+                 <![CDATA[
+mask(target., bit_mask.) - returns a subset of target. corresponding to each true value in the mask.
+Note: This operates generally on stems. Many operations return boolean stems which can be used with this function.
+               ]]>
+             </body>
+         </entry>
+    <entry id="rename_keys">
+             <body>
+                 <![CDATA[
+rename_keys(target., new_names.) - rename the keys in target. using the new_names.
+Note: The keys in new_names. are a subset of target. and their values become the keys in target.
+      If a key is in new_names. but not in target. it is ignored.
+                ]]>
+             </body>
+         </entry>
+
+    <entry id="set_default">
+            <body>
+                <![CDATA[
+set_default(stem., scalar) - sets the default value for this stem to the value of scalar.
+Note: the default value is not returned in any key operations, so setting the default for a new
+      stem and using the keys() function on it returns an empty list, for instance.
+                ]]>
+            </body>
+        </entry>
+    <entry id="size">
+            <body>
+                <![CDATA[
+size(arg) -  return the size of the argument.
+
+arg is a stem - return the number of elements in the stem
+arg is a string - return the number of characters in the string, i.e., its length
+args is a scalar - zero, since scalars (such as integers) have no size.
+            ]]>
+            </body>
+        </entry>
+    <entry id="to_json">
+            <body>
+                <![CDATA[
+                 to_json(stem.) - convert the stem to a JSON string.
+        to_json(stem., convert) - if convert is true, vencode all keys in the JSON for the stem
+to_json(stem., convert, indent) - (requires convert), indent is an integer giving the number of spaces to indent the JSON string
+See also: from_json
+                ]]>
+            </body>
+        </entry>
+    <entry id="to_list">
+            <body>
+                <![CDATA[
+to_list(arg0, arg1, ...) - takes any set of arguments (including stems) and converts to a list,
+                           whose elements are the arguments.
+Note: This does not remove the arguments from the symbol table.
+                ]]>
+            </body>
+        </entry>
+    <entry id="unbox">
+            <body>
+                <![CDATA[
+unbox(arg.) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
+Note: One reason to use vencode when turning JSON into a stem is that if the keys in the stem are
+      not legal QDL variable names, then this operation will fail. Using vencode ensures all names are legal.
+                ]]>
+            </body>
+        </entry>
+    <entry id="union">
+            <body>
+                <![CDATA[
+union(arg0., arg1., ...) - takes the union of all stems, returning a single stem all of whose keys-values are taken
+                           form the arguments. Note that the stems are processed in order and values may be over-written.
+                ]]>
+            </body>
+        </entry>
+    <entry id="dir">
+            <body>
+                <![CDATA[
+dir(arg) - list the names of the files in a given location. Note that this is VFS aware.
+Note: Directory names will have a / appended to them.
+           ]]>
+            </body>
+        </entry>
+    <entry id="mkdir">
+            <body>
+                <![CDATA[
+mkdir(arg) - make a directory. Note that if there are path components that do not exist, they will be
+             created. This returns true if it worked.
+Note: One major reason for this to fail is that, e.g., a virtual file system is mounted in read only mode.
+]]>
+            </body>
+        </entry>
+    <entry id="rmdir">
+            <body>
+                <![CDATA[
+rmdir(path) - remove the last component of this path (which must be a directory).
+Note that the directory must be empty first.
+See also: rm - remove a single file
+]]>
+            </body>
+        </entry>
+    <entry id="rm">
+            <body>
+                <![CDATA[
+rm(file_name) - removes the given file.
+             ]]>
+            </body>
+        </entry>
+
+    <entry id="say">
+            <body>
+                <![CDATA[
+say(arg) - print anything.
+say(arg, pretty_print) - print anything, but make the format more vertical if its a stem.
+Note: say returns the value of its argument so this can be used in statements for debugging too.
+See also: print
+]]>
+            </body>
+        </entry>
+    <entry id="print">
+            <body>
+                <![CDATA[
+print - this is a synonym for the say function, so read the help for that.
+                ]]>
+            </body>
+        </entry>
+    <entry id="file_read">
+            <body>
+                <![CDATA[
+read_file(file_name) - read a file in. The result is a single string of the file contents
+read_file(file_name, type) - type is an integer that determines the result:
+-1 = as string (default)
+ 0 = binary. This reads the file and hands back a single base 64 encoded string of the contents.
+ 1 = stem. A stem list whose entries are each line in the file.
+See also: decode_64
+]]>
+            </body>
+        </entry>
+    <entry id="scan">
+            <body>
+                <![CDATA[
+scan([prompt]) - get user input. The prompt is optional, but will be printed. Input from the console blocks until
+                 the user hits enter.
+                ]]>
+            </body>
+        </entry>
+    <entry id="vsf_mount">
+            <body>
+                <![CDATA[
+vfs_mount(cfg.) - mount a virtual file system.
+Note: The cfg. contains the configuration and is not trivial to describe. Read the reference manual for the details.
+             ]]>
+            </body>
+        </entry>
+    <entry id="file_write">
+            <body>
+                <![CDATA[
+file_write(file_name, contents) = write the contents to the given file. contents can be a string or a list of strings.
+file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,, then the contents are decoded to binary
+                                 before writing. The default is that this flag is false.
+See also: file_read, decode_b64, encode_b64
+]]>
+            </body>
+        </entry>
+    <entry id="execute">
+            <body>
+                <![CDATA[
+execute(arg) - take the argument which is a string and execute it as if it were typed in.
+               ]]>
+            </body>
+        </entry>
+    <entry id="script_args">
+            <body>
+                <![CDATA[
+script_args() - print out the list of arguments to this script
+script_args(n) - print the n-1 argument (first argument is 0).
+Note: This is specific to scripts. If the script is called in QDL, the arguments may be any QDL data type.
+      If this is called from the command line by another process, the arguments will all be strings (even if they
+      are passed in as, e.g. numbers).
+                ]]>
+            </body>
+        </entry>
+    <entry id="script_load">
+            <body>
+                <![CDATA[
+script_load(file_name) - load the script and run it.
+script_load(file_name, arg0, arg1, ...) load the script, passing in the given arguments
+Note: Loading a script means to run it in the current session.
+See Also: script_run, script_args
+]]>
+            </body>
+        </entry>
+    <entry id="script_run">
+            <body>
+                <![CDATA[
+script_run(file_name) - run the script
+script_run(file_name, arg0, arg1,...) - run the script, passing in the given arguments
+Note: Running a script means that a new clean environment is created and the script is run there.
+      Output and input, however, are done in the current console.
+See Alsp: script_load, script_run, scan, say, print
+]]>
+            </body>
+        </entry>
+
+    <entry id="info">
+            <body>
+                <![CDATA[
+info() -- a stem of all current information about the session (such as load paths, memory and such).
+info(key) - the single value for the given.
+E.g. info('user.home_dir') prints out the current user's home directory.
+See also: constants()
+]]>
+            </body>
+        </entry>
+    <entry id="constants">
+            <body>
+                <![CDATA[
+constants() - all constants associated with the system
+constants(key) - the value of a specific constant.
+E.g. constants('file_type.binary') returns the integer that can be used in the file_read function.
+See also: info()
+                ]]>
+            </body>
+        </entry>
+    <entry id="is_defined">
+            <body>
+                <![CDATA[
+is_defined(var) - a boolean-valued function that tells you if a given variable has been named.
+Note: the argument is not a string, it is the actual variable.
+                ]]>
+            </body>
+        </entry>
+    <entry id="is_function">
+            <body>
+                <![CDATA[
+is_function(name) - checks if the value of name (it is a string) is defined.
+is_function(name, arg_count) checks if a function given in name with the number of arguments is defined.
+                ]]>
+            </body>
+        </entry>
+    <entry id="os_env">
+            <body>
+                <![CDATA[
+os_env() - return a stem of all operating system environment values currently known by the system
+os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with each name as a key. If a property
+                       is not found, that entry is omitted.
+E.g. os_env('PATH') will give you the values of the PATH variable on most systems
+Note: If you set environment variables in a shell script that invokes QDL, you may recover them using this call.
+                ]]>
+            </body>
+        </entry>
+    <entry id="remove">
+            <body>
+                <![CDATA[
+remove(var) - remove a variable and its value from the symbol table.
+Note: This expunges it from the session and any future attempts to access it will result in errors until it is set again.
+See also: is_defined
+                ]]>
+            </body>
+        </entry>
+    <entry id="script_path">
+            <body>
+                <![CDATA[
+script_path() - returns the list of paths used to resolve scripts
+script_path(arg) - sets the script path. Either this is a string each of whose paths are separated with
+                   a colon, e.g. 'path0:path1' or it is a stem of paths.
+Note: When invoking a script with an absolute path, that is run. If the path is relative, then the script pats
+      are used to resolve it. Note that if relative path has a scheme for a VFS, then this restricts resolution to those
+      paths. If the path is unqualified, every path is checked.
+See also: script_load, script_run
+]]>
+            </body>
+        </entry>
+    <entry id="to_number">
+            <body>
+                <![CDATA[
+to_number(arg) - convert a string or stem of strings to numbers. Each number must be a valid string representation.
+                ]]>
+            </body>
+        </entry>
+    <entry id="to_string">
+            <body>
+                <![CDATA[
+to_string(arg) - arg is anything and the result is a string representation of it.
+to_string(arg, is_pretty_print) - attempt to put the result in to a nicer format.
+Note: The print or say function effectively calls this and spits out the result to the console.
+]]>
+            </body>
+        </entry>
+    <entry id="var_type">
+            <body>
+                <![CDATA[
+var_type(arg0, arg1,...) -  returns a list of integers that show the type of each argument. 
+               ]]>
+            </body>
+        </entry>
+    <entry id="break">
+            <body>
+                <![CDATA[
+break() - immediately terminates a loop.
+See also: continue, return
+               ]]>
+            </body>
+        </entry>
+    <entry id="check_after">
+            <body>
+                <![CDATA[
+check_after(conditional) - in loops, this means that the conditional is checked at the end of an interation
+               rather than before the iteration. This effectively gives a post-positional loop.
+                ]]>
+            </body>
+        </entry>
+    <entry id="common_keys">
+            <body>
+                <![CDATA[
+common_keys(stem1., stem2.) - returns a list of keys common to both stems.
+               ]]>
+            </body>
+        </entry>
+    <entry id="contains">
+            <body>
+                <![CDATA[
+contains(source, snippets) - returns a conformable result for any combination of stems and strings. If both areguments
+                         are string, teh result is a boolean. If source is a stem and snippets is a string, then the result is
+                         a boolean stem witha  true for each entry that contains the snippet etc.
+contains(source, snippets, case_sensitive) -- if case_sensitive is true (default) all testing is done preserving case.
+                         if false, all arguments are converted to lower case first.
+Note: Original arguments are never altered.
+]]>
+            </body>
+        </entry>
+    <entry id="continue">
+            <body>
+                <![CDATA[
+continue() - jumps to the next iteration in a loop
+See also: break, return
+                ]]>
+            </body>
+        </entry>
+    <entry id="for_keys">
+            <body>
+                <![CDATA[
+for_keys(var, stem.)
+
+  var - is a simple variable and will contain the current key during the loop.
+        If it has already been defined, its values will be over-written.
+stem. - is a stem variable. The keys of this stem will be assigned to the var and may be accessed  in the loop.
+Note: This only operates inside of looping constructs.
+                ]]>
+            </body>
+        </entry>
+    <entry id="for_next">
+            <body>
+                <![CDATA[
+for_next(var, stop_value [,start_value, increment])
+
+        var - the variable to be used. As the loop is executed, this value will change.
+ stop_value - the final value for the loop. When the variable acquires this value, the loop is
+              terminated (so the loop body does not execute with this value!)
+start_value - (optional, default is 0). The first value assigned to var.
+  increment - (optional, default is 1). How much the loop variable should be incremented on each iteration.
+Note: This only functions in looping constructs.
+                ]]>
+            </body>
+        </entry>
+    <entry id="index_of">
+            <body>
+                <![CDATA[
+index_of(source, snippets) - returns a conformable stem of integers giving the location of the snippet or a -1 if
+                  the snippet is not found.
+index_of(source, snippets, case_sensitive) - if true (default) all comparisons are case sensitive. If false,
+                  all are converted to lower case first.
+                ]]>
+            </body>
+        </entry>
+    <entry id="module_import">
+            <body>
+                <![CDATA[
+module_import(urn)- import the given module using its default alias.
+module_import(urn, alias) - import the module, assigning it a different alias.
+Note: A module must be loaded before it can be imported or the system does not know about it.
+]]>
+            </body>
+        </entry>
+    <entry id="module_load">
+            <body>
+                <![CDATA[
+module_load(path) - load the module into the current session from the given file. It cannot be used until it is imported.
+module_load(path, type) - load the module. If type is 'file' (default) then this is assumed to be QDL and loaded.
+                          If the type is 'java' then the path is actually the fully qualified class name and this is loaded from
+                          the Java virtual machine.
+             ]]>
+            </body>
+        </entry>
+    <entry id="raise_error">
+            <body>
+                <![CDATA[
+raise_error(message) - raises an error and propagates the message in to the catch block
+raise_error(message, code) - add and option numeric code
+Note: This ONLY works inside a try[ ... ]catch[] block!
+                ]]>
+            </body>
+        </entry>
+    <entry id="return">
+            <body>
+                <![CDATA[
+return() - return from a function with no value.
+return(value)  - return value from this function as the result
+Note: This only works for functions.
+See also: continue, break
+               ]]>
+            </body>
+        </entry>
+    <entry id="replace">
+            <body>
+                <![CDATA[
+replace(source, old, new) - replaces all occurences of old wit new in the source. These may be various combinations of stems
+              and strings.
+E.g.   replace('abcde', 'cd', '23') yields 'ab23e'
+                ]]>
+            </body>
+        </entry>
+    <entry id="substring">
+            <body>
+                <![CDATA[
+substring(arg, n) - take a substring of the arg starting at the given index, n, and going to the rest of the string. This
+                  will also be done on each element if arg is a stem.
+substring(arg, n,length) - start the substring at index n and continue for length characters.
+substring(arg, n ,length ,padding) - start at the index, retrieve length characters and if there are not enough,
+                 cyclically pad the result with the string padding.
+                ]]>
+            </body>
+        </entry>
+    <entry id="to_lower">
+            <body>
+                <![CDATA[
+to_lower(arg) - convert a string or stem of strings to lower case. No effect on non-strings.
+See also: to_upper
+                ]]>
+
+            </body>
+        </entry>
+    <entry id="to_upper">
+            <body>
+                <![CDATA[
+to_upper(arg) - convert a string or stem of strings to upper case. No effect on non-strings.
+See also: to_upper
+               ]]>
+            </body>
+        </entry>
+    <entry id="tokenize">
+            <body>
+                <![CDATA[
+tokenize(arg, delimiter) - tokenize a string or stem of strings using the given delimeter.
+E.g. tokenize('abd:def:123', ':') yeilds the stem
+{
+ 0=abd,
+ 1=def,
+ 2=123
+}
+                ]]>
+            </body>
+        </entry>
+    <entry id="trim">
+            <body>
+                <![CDATA[
+ trim(arg) - remove all leading and trailing blanks from the arg. The argument may also be a stem of strings.
+]]>
+            </body>
+        </entry>
+    <entry id="vencode">
+            <body>
+                <![CDATA[
+vencode(arg) -  encode a string or stem of them.
+Note: This is supremely useful for non-western character sets that must be preserved.
+E.g. vencode('你浣') yields $E4$BD$A0$E6$B5$A3
+See also: vdecode
+]]>
+
+            </body>
+        </entry>
+    <entry id="vdecode">
+            <body>
+                <![CDATA[
+vdecode(arg) -  decode an encoded string or stem.
+See also: vencode
+]]>
+            </body>
+        </entry>
+<!--    <entry id="vfs_unmount">
+            <body>
+                <![CDATA[
+                ]]>
+            </body>
+        </entry>-->
+    <!--
+    <entry id="">
+            <body>
+                <![CDATA[
+                ]]>
+            </body>
+        </entry>
+          -->
+</help>
