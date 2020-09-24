@@ -17,10 +17,17 @@ public interface Documentable extends Serializable {
     TreeSet<String> listFunctions(String regex);
 
     /**
-     * return all the function documentation this module knows.
+     * Return the first lines of all the function documentation this module knows.
      * @return
      */
     List<String> listAllDocs();
+
+    /**
+     * Return the first line of all documentation for the given function name.
+     * @param functionName
+     * @return
+     */
+    List<String> listAllDocs(String functionName);
 
     /**
      * Get the complete documentation for a specific function.

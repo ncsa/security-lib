@@ -9,7 +9,7 @@ import jexer.event.TResizeEvent;
 import jexer.menu.TMenu;
 
 /**
- * WARNING!!! THIS ONLY RUNS IN XTERM AND WILL CRASH, SINCE IT HAS AN NPE
+ * WARNING!!! Only run in a terminal or it will crash.
  *  --> IT WILL ALSO KILL IDEA IN THE PROCESS <--
  *  
  * Implements a simple tiling window manager.  A root non-moveable

@@ -10,9 +10,9 @@ import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
     
 public interface  RFC8693Constants extends OA2Constants {
     String IETF_CAPUT = "urn:ietf:params:"; // Should never change.
-    String GRANT_TYPE_TOKEN_EXCHANGE = IETF_CAPUT + "grant_type:token_exchange";
-    String ACCESS_TOKEN_TYPE = IETF_CAPUT + "token_type:access_token";
-    String REFRESH_TOKEN_TYPE = IETF_CAPUT + "token_type:refresh_token";
+    String GRANT_TYPE_TOKEN_EXCHANGE = IETF_CAPUT + "oauth:grant_type:token_exchange";
+    String ACCESS_TOKEN_TYPE = IETF_CAPUT + "oauth:token_type:access_token";
+    String REFRESH_TOKEN_TYPE = IETF_CAPUT + "oauth:token_type:refresh_token";
     String ID_TOKEN_TYPE = IETF_CAPUT + "oauth:token-type:id_token";
     //Indicates that the token is a base64url-encoded SAML 1.1
     String SAML1_TOKEN_TYPE = IETF_CAPUT + "oauth:token-type:saml1";

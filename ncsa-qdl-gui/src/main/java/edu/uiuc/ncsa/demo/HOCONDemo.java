@@ -15,7 +15,7 @@ public class HOCONDemo {
 
     public static void main(String[] args) {
         ConfigRenderOptions renderOpts = ConfigRenderOptions.defaults().setOriginComments(false).setComments(false).setJson(false);
-        Config conf = ConfigFactory.parseString(test3a);
+        Config conf = ConfigFactory.parseString(test4);
         System.out.println(conf.root().render(renderOpts));
 
         doToken();
@@ -134,4 +134,31 @@ public class HOCONDemo {
             "      }// end qdl  \n" +
             "  } //end id token\n" +
             "} //end token";
+
+    public static String test4 ="  tokens{\n" +
+            "    identity{\n" +
+            "    type=identity\n" +
+            "    qdl{\n" +
+            "        load=\"vfs#/scripts/ligo.qdl\"\n" +
+            "        xmd={exec_phase=pre_auth}\n" +
+            "      }// end qdl\n" +
+            "    } //end identity token\n" +
+            "    access{\n" +
+            "       type=sci_token\n" +
+            "       qdl{\n" +
+            "          load=\"vfs#/scripts/ligo-access.qdl\"\n" +
+            "          xmd={exec_phase=post_token}\n" +
+            "       } //end QDL\n" +
+            "       templates=[\n" +
+            "         {aud= \"https://fnal.gov\"\n" +
+            "          paths=[\n" +
+            "            {op=read, path=\"/home/${sub}\"},\n" +
+            "            {op=write, path=\"/home/${sub}\"},\n" +
+            "            {op=compute, path=\"/process27\"}\n" +
+            "\n" +
+            "           ] //end paths\n" +
+            "           }\n" +
+            "        ] // end template array\n" +
+            "    } // end access token\n" +
+            "  } //end tokens";
 }

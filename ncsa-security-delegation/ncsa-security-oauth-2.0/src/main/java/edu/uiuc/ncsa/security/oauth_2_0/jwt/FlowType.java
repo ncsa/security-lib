@@ -19,7 +19,7 @@ public enum FlowType implements FunctorType {
     USER_INFO("user_info"),
     GET_CERT("get_cert"),
     GET_CLAIMS("get_claims"),
-
+    AT_DO_TEMPLATES("at_do_templates"),
     /**
      * Allows for accepting requests. If this is set to false, then any attempt to access the
      * system generates an exception. It effectively is the same as setting all other state

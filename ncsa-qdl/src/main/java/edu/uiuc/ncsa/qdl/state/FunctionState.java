@@ -133,7 +133,6 @@ public abstract class FunctionState extends VariableState {
     } // )load module_example.qdl
 
     /**
-     *
      * @param useCompactNotation
      * @param regex
      * @return
@@ -178,7 +177,12 @@ public abstract class FunctionState extends VariableState {
             String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
             String realName = fname.substring(1 + fname.indexOf(NS_DELIMITER));
             if (alias == null || alias.isEmpty()) {
-                List<String> out = getFunctionTable().getDocumentation(realName, argCount);
+                List<String> out;
+                if (argCount == -1) {
+                    out = getFunctionTable().listAllDocs(realName);
+                } else {
+                    out = getFunctionTable().getDocumentation(realName, argCount);
+                }
                 if (out == null) {
                     return new ArrayList<>();
                 }
@@ -189,7 +193,12 @@ public abstract class FunctionState extends VariableState {
                 return new ArrayList<>();
             }
             URI ns = importManager.getByAlias(alias);
-            List<String> docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
+            List<String> docs;
+            if (argCount == -1) {
+                docs = getModuleMap().get(ns).getState().getFunctionTable().listAllDocs(realName);
+            } else {
+                docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
+            }
             if (docs == null) {
                 return new ArrayList<>();
             }
@@ -199,26 +208,44 @@ public abstract class FunctionState extends VariableState {
         }
         // No imports, not qualified, hand back whatever we have
         if (!importManager.hasImports()) {
-            List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+            List<String> out;
+            if (argCount == -1) {
+                out = getFunctionTable().listAllDocs(fname);
+            } else {
+                out = getFunctionTable().getDocumentation(fname, argCount);
+            }
             if (out == null) {
                 return new ArrayList<>();
             }
             return out;
         }
         // Final case, unqualified name and there are imports. Return all that match.
-        List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+//        List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+        List<String> out;
+        if (argCount == -1) {
+            out = getFunctionTable().listAllDocs(fname);
+        } else {
+            out = getFunctionTable().getDocumentation(fname, argCount);
+        }
+
         if (out == null) {
             out = new ArrayList<>();
         }
         for (URI key : getImportManager().keySet()) {
-            if (getModuleMap().get(key).getState().getFunctionTable().get(fname, argCount) != null) {
-                String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname + "(" + argCount + "):";
-                List<String> doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname,
-                        argCount);
+            if (getModuleMap().get(key).getState().getFunctionTable().containsKey(fname, argCount)) {
+                List<String> doxx;
+                if (argCount == -1) {
+                    doxx = getModuleMap().get(key).getState().getFunctionTable().listAllDocs(fname);
+                } else {
+                    doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname, argCount);
+                }
                 if (doxx == null) {
+                    String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname;
+                    if (0 <= argCount) {
+                        caput = caput + "(" + argCount + "):";
+                    }
                     out.add(caput + " none");
                 } else {
-                    //out.add(caput);
                     out.addAll(doxx);
                 }
             }

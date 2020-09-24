@@ -26,10 +26,19 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
     }
 
     public FunctionRecord get(String key, int argCount) {
+
         return super.get(createKey(key, argCount));
     }
 
     public boolean containsKey(String var, int argCount) {
+        if (argCount == -1) {
+            for (String k : keySet()) {
+                if (k.startsWith(var + munger)) {
+                    return true;
+                }
+            }
+            return false;
+        }
         return super.containsKey(createKey(var, argCount));
     }
 
@@ -62,7 +71,7 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
     public List<String> listAllDocs() {
         ArrayList<String> docs = new ArrayList<>();
         for (String key : keySet()) {
-            String name = key.substring(0, key.indexOf(munger)); // de-munge
+            String name = key.substring(0, key.lastIndexOf(munger)); // de-munge
             FunctionRecord fr = get(key);
             name = name + "(" + fr.getArgCount() + ")";
             if (0 < fr.documentation.size()) {
@@ -78,6 +87,29 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
             docs.add(name);
         }
 
+        return docs;
+    }
+
+    // Filter by fname.
+    public List<String> listAllDocs(String fname) {
+        ArrayList<String> docs = new ArrayList<>();
+        for (String key : keySet()) {
+            if (key.startsWith(fname + munger)) {
+                FunctionRecord fr = get(key);
+                String name = fname + "(" + fr.getArgCount() + ")";
+                if (0 < fr.documentation.size()) {
+                    if (!fr.documentation.get(0).contains(name)) {
+                        name = fr.documentation.get(0);
+                    } else {
+                        name = name + ": " + fr.documentation.get(0);
+                    }
+                } else {
+                    name = name + ": (none)";
+
+                }
+                docs.add(name);
+            }
+        }
         return docs;
     }
 

@@ -26,6 +26,7 @@ public class FlowStates {
     public boolean idToken = true;
     public boolean refreshToken = true;
     public boolean userInfo = true;
+    public boolean at_do_templates = true;
 
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
@@ -36,6 +37,7 @@ public class FlowStates {
         jsonObject.put(ID_TOKEN.getValue(), idToken);
         jsonObject.put(REFRESH_TOKEN.getValue(), refreshToken);
         jsonObject.put(USER_INFO.getValue(), userInfo);
+        jsonObject.put(AT_DO_TEMPLATES.getValue(), at_do_templates);
         return jsonObject;
     }
 
@@ -47,6 +49,7 @@ public class FlowStates {
         idToken = jsonObject.getBoolean(ID_TOKEN.getValue());
         refreshToken = jsonObject.getBoolean(REFRESH_TOKEN.getValue());
         userInfo = jsonObject.getBoolean(USER_INFO.getValue());
+        at_do_templates = jsonObject.getBoolean(AT_DO_TEMPLATES.getValue());
     }
 
     @Override
@@ -58,6 +61,7 @@ public class FlowStates {
                 ", getClaims=" + getClaims +
                 ", idToken=" + idToken +
                 ", refreshToken=" + refreshToken +
+                ", do access token templates="  + at_do_templates +
                 ", userInfo=" + userInfo +
                 '}';
     }
