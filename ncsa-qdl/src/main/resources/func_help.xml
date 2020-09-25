@@ -506,7 +506,8 @@ os_env() - return a stem of all operating system environment values currently kn
 os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with each name as a key. If a property
                        is not found, that entry is omitted.
 E.g. os_env('PATH') will give you the values of the PATH variable on most systems
-Note: If you set environment variables in a shell script that invokes QDL, you may recover them using this call.
+Note 1: If you set environment variables in a shell script that invokes QDL, you may recover them using this call.
+Note 2: This is always empty in server mode! Scripts have no access to the underlying system.
                 ]]>
             </body>
         </entry>
