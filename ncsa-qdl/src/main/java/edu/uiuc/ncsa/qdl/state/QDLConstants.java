@@ -34,6 +34,13 @@ public interface QDLConstants {
     }
     // For the system constants:
     
+    String SYS_DETOKENIZE_TYPE = "detokenize.";
+    String SYS_DETOKENIZE_PREPEND = "prepend";
+    String SYS_DETOKENIZE_APPEND = "append";
+    String SYS_DETOKENIZE_OMIT_DANGLING_DELIMITER = "omit_dangling_delimiter";
+
+
+
     String SYS_VAR_TYPES = "var_type.";
     String SYS_VAR_TYPE_DECIMAL = "decimal";
     String SYS_VAR_TYPE_INTEGER = "integer";

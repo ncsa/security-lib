@@ -44,7 +44,7 @@ public class QDLWorkspace {
             return;
         }
         if (t instanceof IllegalStateException) {
-            workspaceCommands.say("syntax error:" + t.getMessage());
+            workspaceCommands.say("illegal state:" + t.getMessage());
             return;
         }
         if (t instanceof IllegalArgumentException) {
@@ -55,6 +55,14 @@ public class QDLWorkspace {
             workspaceCommands.say(t.getMessage());
             return;
         }
+        // In case a jar is corrupted (e.g. maven builds it wrong, partial upgrade failed, so missing dependency)
+        // since the first symptom is this. Without this case, it falls through and the user just gets a random error
+        // that whatever component failed, not that the component was actually missing.
+        if (t instanceof NoClassDefFoundError) {
+            workspaceCommands.say("internal error: Missing classes. Did you try an upgrade that failed? (" + t.getMessage() + ")");
+            return;
+        }
+        // Final fall through case.
         if (t.getMessage() == null) {
             workspaceCommands.say("error!");
         } else {
@@ -123,17 +131,17 @@ public class QDLWorkspace {
         boolean isoTerminal = false;
         //System.setProperty("org.jline.terminal.dumb", "true"); // kludge for jline
         ISO6429IO iso6429IO = null; // only make one of these if you need it because jLine takes over all IO!
-         if(argLine.hasArg("-ansi")){
-             iso6429IO = new ISO6429IO();
-             System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
-             workspaceCommands = new WorkspaceCommands(iso6429IO);
-             isoTerminal = true;
+        if (argLine.hasArg("-ansi")) {
+            iso6429IO = new ISO6429IO();
+            System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
+            workspaceCommands = new WorkspaceCommands(iso6429IO);
+            isoTerminal = true;
 
-         } else{
-             System.out.println("using generic terminal");
-             workspaceCommands = new WorkspaceCommands(new BasicIO());
+        } else {
+            System.out.println("using generic terminal");
+            workspaceCommands = new WorkspaceCommands(new BasicIO());
 
-         }
+        }
         workspaceCommands.init(argLine);
         if (workspaceCommands.isRunScript()) {
             return;

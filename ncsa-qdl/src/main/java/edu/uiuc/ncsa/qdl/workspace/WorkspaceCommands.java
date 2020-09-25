@@ -130,11 +130,11 @@ public class WorkspaceCommands implements Logable {
                     "(____\\/_)(______/ (_______/\n" +
                     "- - . -  / - . .  / . - . . ";
 
-    protected void showHelpHelp() {
+    protected void showHelp4Help() {
         say(HELP_COMMAND + " syntax:");
         say(HELP_COMMAND + " - (no arg) print generic help for the workspace.");
-        say(HELP_COMMAND + "* - print a short summary of help for every user defined function.");
-        say(HELP_COMMAND + "name - print help. System functions will have a summary printed (read the manual for more).");
+        say(HELP_COMMAND + " * - print a short summary of help for every user defined function.");
+        say(HELP_COMMAND + " name - print help. System functions will have a summary printed (read the manual for more).");
         say("        For user defined function, a summary of all calls with various argument counts will be shown.");
         say(HELP_COMMAND + " name arg_count - print out detailed information for the user-defined function and the given number of arguments.");
 
@@ -159,7 +159,7 @@ public class WorkspaceCommands implements Logable {
         sayi(RJustify(LOAD_COMMAND, length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
         sayi(RJustify(VARS_COMMAND, length) + "- lists all of the variables this workspace knows about.");
         sayi(RJustify(WS_COMMAND, length) + "- commands relating to this workspace.");
-        say("Generally, supplyinh --help as a parameter to a command will print out something useful.");
+        say("Generally, supplying --help as a parameter to a command will print out something useful.");
         say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
 
     }
@@ -1289,7 +1289,7 @@ public class WorkspaceCommands implements Logable {
             return RC_CONTINUE;
         }
            if(inputLine.getArg(ACTION_INDEX).equals("--help")){
-               showHelpHelp();
+               showHelp4Help();
                return RC_CONTINUE;
            }
         String name = inputLine.getArg(ACTION_INDEX);
@@ -1297,6 +1297,10 @@ public class WorkspaceCommands implements Logable {
             // so they entered )funcs help Print off first lines of help
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(getState().listAllDocumentation());
+            if(treeSet.isEmpty()){
+                say("(no user-defined functions)");
+                return RC_CONTINUE;
+            }
             return printList(inputLine, treeSet);
         }
 

@@ -2,15 +2,15 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 /**
- * This evaluates all string functions. 
+ * This evaluates all string functions.
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:17 AM
  */
@@ -32,7 +32,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final int TO_LOWER_TYPE = 2 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_UPPER = "to_upper";
-    public static final String SYS_TO_UPPER = SYS_FQ +TO_UPPER;
+    public static final String SYS_TO_UPPER = SYS_FQ + TO_UPPER;
     public static final int TO_UPPER_TYPE = 3 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TRIM = "trim";
@@ -61,11 +61,15 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     public static final String ENCODE = "vencode";
     public static final String SYS_ENCODE = SYS_FQ + ENCODE;
-        public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
+    public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DECODE = "vdecode";
     public static final String SYS_DECODE = SYS_FQ + DECODE;
-        public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
+    public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
+
+    public static final String DETOKENIZE = "detokenize";
+    public static final String SYS_DETOKENIZE = SYS_FQ + DETOKENIZE;
+    public static final int DETOKENIZE_TYPE = 12 + STRING_FUNCTION_BASE_VALUE;
 
     public static String FUNC_NAMES[] = new String[]{
             CONTAINS,
@@ -77,6 +81,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             REPLACE,
             INDEX_OF,
             TOKENIZE,
+            DETOKENIZE,
             ENCODE,
             DECODE};
     public static String FQ_FUNC_NAMES[] = new String[]{
@@ -89,17 +94,18 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             SYS_REPLACE,
             SYS_INDEX_OF,
             SYS_TOKENIZE,
+            SYS_DETOKENIZE,
             SYS_ENCODE,
             SYS_DECODE};
 
-   public TreeSet<String> listFunctions(boolean listFQ) {
-          TreeSet<String> names = new TreeSet<>();
-          String[] funcNames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
-          for (String key : funcNames) {
-              names.add(key + "()");
-          }
-          return names;
-      }
+    public TreeSet<String> listFunctions(boolean listFQ) {
+        TreeSet<String> names = new TreeSet<>();
+        String[] funcNames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
+        for (String key : funcNames) {
+            names.add(key + "()");
+        }
+        return names;
+    }
 
     @Override
     public String[] getFunctionNames() {
@@ -108,110 +114,260 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public int getType(String name) {
-        if (name.equals(CONTAINS)) return CONTAINS_TYPE;
-        if (name.equals(TO_LOWER)) return TO_LOWER_TYPE;
-        if (name.equals(TO_UPPER)) return TO_UPPER_TYPE;
-        if (name.equals(SUBSTRING)) return SUBSTRING_TYPE;
-        if (name.equals(REPLACE)) return REPLACE_TYPE;
-        if (name.equals(INSERT)) return INSERT_TYPE;
-        if (name.equals(TRIM)) return TRIM_TYPE;
-        if (name.equals(INDEX_OF)) return INDEX_OF_TYPE;
-        if (name.equals(TOKENIZE)) return TOKENIZE_TYPE;
-        if (name.equals(ENCODE)) return ENCODE_TYPE;
-        if (name.equals(DECODE)) return DECODE_TYPE;
+        switch (name) {
+            case CONTAINS:
+            case SYS_CONTAINS:
+                return CONTAINS_TYPE;
+            case TO_LOWER:
+            case SYS_TO_LOWER:
+                return TO_LOWER_TYPE;
+            case TO_UPPER:
+            case SYS_TO_UPPER:
+                return TO_UPPER_TYPE;
+            case SUBSTRING:
+            case SYS_SUBSTRING:
+                return SUBSTRING_TYPE;
+            case REPLACE:
+            case SYS_REPLACE:
+                return REPLACE_TYPE;
+            case TRIM:
+            case SYS_TRIM:
+                return TRIM_TYPE;
+            case INSERT:
+            case SYS_INSERT:
+                return INSERT_TYPE;
+            case INDEX_OF:
+            case SYS_INDEX_OF:
+                return INDEX_OF_TYPE;
+            case TOKENIZE:
+            case SYS_TOKENIZE:
+                return TOKENIZE_TYPE;
+            case DETOKENIZE:
+            case SYS_DETOKENIZE:
+                return DETOKENIZE_TYPE;
+            case ENCODE:
+            case SYS_ENCODE:
+                return ENCODE_TYPE;
+            case DECODE:
+            case SYS_DECODE:
+                return DECODE_TYPE;
+        }
         return UNKNOWN_VALUE;
     }
 
     @Override
-       public boolean evaluate(Polyad polyad, State state) {
-           switch (polyad.getName()) {
-               case CONTAINS:
-               case SYS_CONTAINS:
-                   doContains(polyad, state);
-                   return true;
-               case TRIM:
-               case SYS_TRIM:
-                   doTrim(polyad, state);
-                   return true;
-               case INDEX_OF:
-               case SYS_INDEX_OF:
-                   doIndexOf(polyad, state);
-                   return true;
-               case TO_LOWER:
-               case SYS_TO_LOWER:
-                   doSwapCase(polyad, state, true);
-                   return true;
-               case TO_UPPER:
-               case SYS_TO_UPPER:
-                   doSwapCase(polyad, state, false);
-                   return true;
-               case REPLACE:
-               case SYS_REPLACE:
-                   doReplace(polyad, state);
-                   return true;
-               case INSERT:
-               case SYS_INSERT:
-                   doInsert(polyad, state);
-                   return true;
-               case TOKENIZE:
-               case SYS_TOKENIZE:
-                   doTokenize(polyad, state);
-                   return true;
-               case SUBSTRING:
-               case SYS_SUBSTRING:
-                   doSubstring(polyad, state);
-                   return true;
-               case ENCODE:
-               case SYS_ENCODE:
-                   doEncode(polyad, state);
-                   return true;
-               case DECODE:
-               case SYS_DECODE:
-                   doDecode(polyad, state);
-                   return true;
-           }
-           return false;
-       }
+    public boolean evaluate(Polyad polyad, State state) {
+        switch (polyad.getName()) {
+            case CONTAINS:
+            case SYS_CONTAINS:
+                doContains(polyad, state);
+                return true;
+            case TRIM:
+            case SYS_TRIM:
+                doTrim(polyad, state);
+                return true;
+            case INDEX_OF:
+            case SYS_INDEX_OF:
+                doIndexOf(polyad, state);
+                return true;
+            case TO_LOWER:
+            case SYS_TO_LOWER:
+                doSwapCase(polyad, state, true);
+                return true;
+            case TO_UPPER:
+            case SYS_TO_UPPER:
+                doSwapCase(polyad, state, false);
+                return true;
+            case REPLACE:
+            case SYS_REPLACE:
+                doReplace(polyad, state);
+                return true;
+            case INSERT:
+            case SYS_INSERT:
+                doInsert(polyad, state);
+                return true;
+            case TOKENIZE:
+            case SYS_TOKENIZE:
+                doTokenize(polyad, state);
+                return true;
+            case DETOKENIZE:
+            case SYS_DETOKENIZE:
+                doDetokeninze(polyad, state);
+                return true;
+            case SUBSTRING:
+            case SYS_SUBSTRING:
+                doSubstring(polyad, state);
+                return true;
+            case ENCODE:
+            case SYS_ENCODE:
+                doEncode(polyad, state);
+                return true;
+            case DECODE:
+            case SYS_DECODE:
+                doDecode(polyad, state);
+                return true;
+        }
+        return false;
+    }
+
+    public static  final Long DETOKENIZE_PREPEND_VALUE = 1L;
+    public static  final Long DETOKENIZE_OMIT_DANGLING_DELIMITER_VALUE = 2L;
+    /*
+    Change a stem into a string with each value separated by a delimiter. Note that
+    in lists, the order is preserved but in general stems there is no canonical order.
+     */
+    protected void doDetokeninze(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 2 && polyad.getArgCount() != 3) {
+            throw new IllegalArgumentException("Error: " + DETOKENIZE + " requires two or three arguments");
+        }
+        Object leftArg = polyad.evalArg(0, state);
+        Object rightArg = polyad.evalArg(1, state);
+        boolean isPrepend = false;
+        boolean omitDanglingDelimiter = false;
+        if (polyad.getArgCount() == 3) {
+            Object prepend = polyad.evalArg(2, state);
+            if (!isLong(prepend)) {
+                throw new IllegalArgumentException("Error: the third argument for " + DETOKENIZE + " must be a n integer. You supplied '" + prepend + "'");
+            }
+            int options = ((Long) prepend).intValue();
+            switch (options) {
+                case 0:
+                    isPrepend = false;
+                    omitDanglingDelimiter = false;
+                    break;
+                case 1:  //DETOKENIZE_PREPEND_VALUE
+                    isPrepend = true;
+                    omitDanglingDelimiter = false;
+                    break;
+
+                case 2:
+                    isPrepend = false;
+                    omitDanglingDelimiter = true;
+                    break;
+
+                case 3: // DETOKENIZE_PREPEND_VALUE + DETOKENIZE_OMIT_DANGLING_DELIMITER_VALUE
+                    isPrepend = true;
+                    omitDanglingDelimiter = true;
+                    break;
+
+
+            }
+        }
+        String result = "";
+
+        if (isStem(leftArg)) {
+            StemVariable leftStem = (StemVariable) leftArg;
+            int lsize = leftStem.size();
+            int currentCount = 0;
+
+            if (isStem(rightArg)) {
+                StemVariable rightStem = (StemVariable) rightArg;
+                for (String key : leftStem.keySet()) {
+                    if (rightStem.containsKey(key)) {
+                        String delim = "";
+
+                        if (isPrepend) {
+                            if (omitDanglingDelimiter && currentCount == 0) {
+                                result = leftStem.getString(key);
+                            } else {
+                                result = result + rightStem.getString(key) + leftStem.getString(key);
+                            }
+                        } else {
+                            if (omitDanglingDelimiter && currentCount == lsize - 1) {
+
+                                result = result + leftStem.getString(key);
+                            } else {
+
+                                result = result + leftStem.getString(key) + rightStem.getString(key);
+                            }
+
+                        }
+                    }
+                    currentCount++;
+                }
+            } else {
+                // propagate the right arg as delimiter everywhere.
+
+                for (String key : leftStem.keySet()) {
+                    if (isPrepend) {
+                        if (omitDanglingDelimiter && currentCount == 0) {
+
+                            result =  leftStem.getString(key);
+                        }else{
+                            result = result + rightArg + leftStem.getString(key);
+
+                        }
+
+                    } else {
+                        if (omitDanglingDelimiter && currentCount == lsize - 1) {
+                            result = result + leftStem.getString(key);
+                        }else{
+                            result = result + leftStem.getString(key) + rightArg;
+                        }
+                    }
+                    currentCount++;
+                }
+            }
+
+        } else {
+            if (isStem(rightArg)) {
+                throw new IllegalArgumentException("Error: a stem of delimiters cannot be applied to a scalar.");
+            }
+            if (omitDanglingDelimiter) {
+                result = leftArg.toString();
+            } else {
+                if (isPrepend) {
+                    result = rightArg.toString() + leftArg.toString();
+                } else {
+                    result = leftArg.toString() + rightArg.toString();
+                }
+            }
+
+        }
+        polyad.setResult(result);
+        polyad.setResultType(Constant.STRING_TYPE);
+        polyad.setEvaluated(true);
+
+    }
 
     protected void doDecode(Polyad polyad, State state) {
         QDLCodec codec = new QDLCodec();
         fPointer pointer = new fPointer() {
-                  @Override
-                  public fpResult process(Object... objects) {
-                      fpResult r = new fpResult();
-                      if (objects[0] instanceof String) {
-                          r.result = codec.decode(objects[0].toString());
-                          r.resultType = Constant.STRING_TYPE;
-                      } else {
-                          r.result = objects[0];
-                          r.resultType = polyad.getArguments().get(0).getResultType();
-                      }
-                      return r;
-                  }
-              };
-              process1(polyad, pointer, TRIM, state);
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (objects[0] instanceof String) {
+                    r.result = codec.decode(objects[0].toString());
+                    r.resultType = Constant.STRING_TYPE;
+                } else {
+                    r.result = objects[0];
+                    r.resultType = polyad.getArguments().get(0).getResultType();
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TRIM, state);
 
     }
 
     protected void doEncode(Polyad polyad, State state) {
         QDLCodec codec = new QDLCodec();
         fPointer pointer = new fPointer() {
-                  @Override
-                  public fpResult process(Object... objects) {
-                      fpResult r = new fpResult();
-                      if (objects[0] instanceof String) {
-                          r.result = codec.encode(objects[0].toString());
-                          r.resultType = Constant.STRING_TYPE;
-                      } else {
-                          r.result = objects[0];
-                          r.resultType = polyad.getArguments().get(0).getResultType();
-                      }
-                      return r;
-                  }
-              };
-              process1(polyad, pointer, TRIM, state);
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (objects[0] instanceof String) {
+                    r.result = codec.encode(objects[0].toString());
+                    r.resultType = Constant.STRING_TYPE;
+                } else {
+                    r.result = objects[0];
+                    r.resultType = polyad.getArguments().get(0).getResultType();
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TRIM, state);
     }
-
 
 
     protected void doSubstring(Polyad polyad, State state) {

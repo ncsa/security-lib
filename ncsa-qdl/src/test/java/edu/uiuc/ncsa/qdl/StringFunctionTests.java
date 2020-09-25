@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.StringEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.parsing.QDLParser;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -609,4 +610,22 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.size() == 1;
         assert result.getString("bind").startsWith(expectedResult);
     }
+    @Test
+    public void testDetokenize() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := indices(5);");
+        addLine(script, "t0 := detokenize(a., ':');");
+        addLine(script, "t1 := detokenize(a., 'k=', 1);"); // prepend
+        addLine(script, "t2 := detokenize(a., ':', 2);"); // omit dangling
+        addLine(script, "t3 := detokenize(a., 'k=', 3);"); // omit dangling and prepend
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("t0", state).equals("0:1:2:3:4:");
+        assert getStringValue("t1", state).equals("k=0k=1k=2k=3k=4");
+        assert getStringValue("t2", state).equals("0:1:2:3:4");
+        assert getStringValue("t3", state).equals("0:1:2:3:4");
+    }
+
 }

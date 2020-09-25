@@ -182,6 +182,18 @@ Note: This is extremely useful in certain looping constructs.
                  ]]>
              </body>
          </entry>
+    <entry id="has_value">
+        <body>
+            <![CDATA[
+has_value(left_arg, right_arg) - returns a boolean result conformable to the
+         left_arg (so a scalar left arg returns a scalar, but a stem returns a stem).
+         This checks the the value of the left_arg is in the right_arg. Note that
+         unlike many other stem functions, the keys are ignored. The resulting key set
+         will always be identical to the left_arg.
+See also: mask
+            ]]>
+        </body>
+    </entry>
     <entry id="is_list">
              <body>
                  <![CDATA[
@@ -455,7 +467,7 @@ See Alsp: script_load, script_run, scan, say, print
             <body>
                 <![CDATA[
 info() -- a stem of all current information about the session (such as load paths, memory and such).
-info(key) - the single value for the given.
+info(key) - key is a string. This returns the single value for the given key.
 E.g. info('user.home_dir') prints out the current user's home directory.
 See also: constants()
 ]]>
@@ -465,7 +477,7 @@ See also: constants()
             <body>
                 <![CDATA[
 constants() - all constants associated with the system
-constants(key) - the value of a specific constant.
+constants(key) - key is a string. This returns the value of a specific key.
 E.g. constants('file_type.binary') returns the integer that can be used in the file_read function.
 See also: info()
                 ]]>
@@ -710,6 +722,26 @@ E.g. tokenize('abd:def:123', ':') yeilds the stem
                 ]]>
             </body>
         </entry>
+
+    <entry id="detokenize">
+            <body>
+                <![CDATA[
+detokenize(arg, delimiter) - converts  a string or stem of strings (tokens) into a string using the delimiter between entries.
+detokenize(arg, delimiter, options) - options is an integer which is the sum of
+          1 for prepend
+          2 for omit dangling delimiter
+So options = 0 means append, have a trailing delimiter
+   options = 1 means prepend, "   "     leading "
+   options = 2 means append, omit trailing delimiter
+   options = 3 means prepend, omit first delimiter
+E.g. detokenize(indices(4), ' ') yields the string
+'0 1 2 3 '
+(Note the trailing blank added at the end.)
+See also: truncate, constants (which contains the option values for reference)
+
+                ]]>
+            </body>
+        </entry>
     <entry id="trim">
             <body>
                 <![CDATA[
@@ -717,6 +749,8 @@ E.g. tokenize('abd:def:123', ':') yeilds the stem
 ]]>
             </body>
         </entry>
+
+
     <entry id="vencode">
             <body>
                 <![CDATA[

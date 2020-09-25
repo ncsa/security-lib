@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.StringEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
@@ -126,6 +127,12 @@ public class State extends FunctionState implements QDLConstants {
         varTypes.put(SYS_VAR_TYPE_DECIMAL, new Long(Constant.DECIMAL_TYPE));
         varTypes.put(SYS_VAR_TYPE_UNDEFINED, new Long(Constant.UNKNOWN_TYPE));
         systemConstants.put(SYS_VAR_TYPES, varTypes);
+
+        StemVariable detokenizeTypes = new StemVariable();
+        detokenizeTypes.put(SYS_DETOKENIZE_PREPEND, StringEvaluator.DETOKENIZE_PREPEND_VALUE);
+        detokenizeTypes.put(SYS_DETOKENIZE_OMIT_DANGLING_DELIMITER, StringEvaluator.DETOKENIZE_OMIT_DANGLING_DELIMITER_VALUE);
+        systemConstants.put(SYS_DETOKENIZE_TYPE, detokenizeTypes);
+
         StemVariable errorCodes = new StemVariable();
         errorCodes.put(SYS_ERROR_CODE_SYSTEM_ERROR, TryCatch.RESERVED_ERROR_CODE);
         systemConstants.put(SYS_ERROR_CODES, errorCodes);

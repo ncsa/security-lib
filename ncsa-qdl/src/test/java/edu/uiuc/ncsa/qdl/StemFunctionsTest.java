@@ -910,4 +910,61 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getLongValue("test", state).equals(3L);
         assert getStemValue("test.",state).size() == 2;
     }
+
+    /**
+     * Test the has_value function. This test checks for conformability as well as results.
+     * It is a bit long but it is critical that this work and in particular, if there is regression
+     * it is found immediately.
+     * @throws Throwable
+     */
+    @Test
+     public void testHasValue() throws Throwable {
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a. := indices(3); b.:=2+indices(5);c.foo:=1;c.bar:='arf';");
+         addLine(script, "test_a_b. := has_value(a.,b.);");
+         addLine(script, "test_b_a. := has_value(b.,a.);");
+         addLine(script, "test_a_c. := has_value(a.,c.);");
+         addLine(script, "test_c_a. := has_value(c.,a.);");
+         addLine(script, "test_c := has_value('arf',c.);"); // scalar result
+         addLine(script, "test_1 := has_value(1,a.);"); // scalar result
+         addLine(script, "test_bad := has_value(42,b.);"); // scalar result
+         addLine(script, "test_bad2 := has_value(42,'woof');"); // scalar result
+
+         State state = testUtils.getNewState();
+
+         // really detailed tests since this is probably one of the most used functions.
+         QDLParser interpreter = new QDLParser(null, state);
+         interpreter.execute(script.toString());
+         // tests for scalar left arg:
+         assert getBooleanValue("test_c", state);
+         assert getBooleanValue("test_1", state);
+         assert !getBooleanValue("test_bad", state);
+         assert !getBooleanValue("test_bad2", state);
+
+         StemVariable test_a_b = getStemValue("test_a_b.",state);
+         assert test_a_b.size()== 3;
+         assert test_a_b.get(0).equals(Boolean.FALSE);
+         assert test_a_b.get(1).equals(Boolean.FALSE);
+         assert test_a_b.get(2).equals(Boolean.TRUE);
+
+        StemVariable test_b_a = getStemValue("test_a_b.",state);
+        assert test_b_a.size() == 5;
+        assert test_b_a.get(0).equals(Boolean.TRUE);
+        assert test_b_a.get(1).equals(Boolean.FALSE);
+        assert test_b_a.get(2).equals(Boolean.FALSE);
+        assert test_b_a.get(3).equals(Boolean.FALSE);
+        assert test_b_a.get(4).equals(Boolean.FALSE);
+
+        StemVariable test_a_c = getStemValue("test_a_c.",state);
+        assert test_a_c.size() == 3;
+        assert test_a_c.get(0).equals(Boolean.FALSE);
+        assert test_a_c.get(1).equals(Boolean.FALSE);
+        assert test_a_c.get(2).equals(Boolean.TRUE);
+
+        StemVariable test_c_a = getStemValue("test_c_a.",state);
+        assert test_c_a.size() == 2;
+        assert test_c_a.get("foo").equals(Boolean.TRUE);
+        assert test_c_a.get("bar").equals(Boolean.FALSE);
+
+     }
 }

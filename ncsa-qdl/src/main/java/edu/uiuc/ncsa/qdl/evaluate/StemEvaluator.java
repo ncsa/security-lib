@@ -34,6 +34,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_MAKE_INDICES = STEM_FQ + MAKE_INDICES;
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 
+
     public static final String REMOVE = "remove";
     public static final String FQ_REMOVE = STEM_FQ + REMOVE;
     public static final int REMOVE_TYPE = 5 + STEM_FUNCTION_BASE_VALUE;
@@ -62,6 +63,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String VAR_TYPE = "var_type";
     public static final String FQ_VAR_TYPE = SYS_FQ + VAR_TYPE;
     public static final int VAR_TYPE_TYPE = 11 + STEM_FUNCTION_BASE_VALUE;
+
+    public static final String HAS_VALUE = "has_value";
+    public static final String FQ_HAS_VALUE = STEM_FQ + HAS_VALUE;
+    public static final int HAS_VALUE_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
 
 
     // Key functions
@@ -142,6 +147,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String FUNC_NAMES[] = new String[]{
             SIZE,
             MAKE_INDICES,
+            HAS_VALUE,
             REMOVE,
             IS_DEFINED,
             VAR_TYPE,
@@ -168,6 +174,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_SIZE,
             FQ_MAKE_INDICES,
+            FQ_HAS_VALUE,
             FQ_REMOVE,
             FQ_IS_DEFINED,
             FQ_VAR_TYPE,
@@ -216,6 +223,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case SET_DEFAULT:
             case FQ_SET_DEFAULT:
                 return SET_DEFAULT_TYPE;
+            case HAS_VALUE:
+            case FQ_HAS_VALUE:
+                return HAS_VALUE_TYPE;
             case MASK:
             case FQ_MASK:
                 return MASK_TYPE;
@@ -330,6 +340,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_INCLUDE_KEYS:
                 doIncludeKeys(polyad, state);
                 return true;
+            case HAS_VALUE:
+            case FQ_HAS_VALUE:
+                doIsMemberOf(polyad, state);
+                return true;
             case EXCLUDE_KEYS:
             case FQ_EXCLUDE_KEYS:
                 doExcludeKeys(polyad, state);
@@ -396,6 +410,64 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Compute if the left argument is a member of the right argument. result is always conformable to the left argument.
+     * @param polyad
+     * @param state
+     */
+    protected void doIsMemberOf(Polyad polyad, State state) {
+        if(polyad.getArgCount() != 2){
+            throw new IllegalArgumentException("Error: " + HAS_VALUE + " requires 2 arguments.");
+        }
+        Object leftArg = polyad.evalArg(0, state);
+        Object rightArg = polyad.evalArg(1, state);
+        // breask down tidily in to 4 cases.
+        if(isStem(leftArg)){
+            StemVariable lStem = (StemVariable)leftArg;
+            StemVariable result = new StemVariable(); // result is always conformable to left arg
+
+            if(isStem(rightArg)){
+               StemVariable rStem = (StemVariable) rightArg;
+               for(String lkey : lStem.keySet()){
+                   Boolean rc = Boolean.FALSE;
+                   for(String rKey : rStem.keySet()){
+                       if(lStem.get(lkey).equals(rStem.get(rKey))){
+                           rc = Boolean.TRUE;
+                           break;
+                       }
+                   }
+                   result.put(lkey, rc);
+
+               }
+            }else{
+               // check if each element in the left stem matches the value of the right arg.
+               for(String lKey: lStem.keySet()){
+                  result.put(lKey, lStem.get(lKey).equals(rightArg)?Boolean.TRUE:Boolean.FALSE); // got to finagle these are right Java objects
+               }
+            }
+            polyad.setResult(result);
+            polyad.setResultType(Constant.STEM_TYPE);
+
+        }else{
+            Boolean result = Boolean.FALSE;
+            if(isStem(rightArg)){
+                StemVariable rStem = (StemVariable)rightArg;
+               for(String rKey: rStem.keySet()){
+                   if(leftArg.equals(rStem.get(rKey))){
+                       result = Boolean.TRUE;
+                       break;
+                   }
+               }
+            }else{
+                result = leftArg.equals(rightArg);
+            }
+            polyad.setResult(result);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+
+        }
+        polyad.setEvaluated(true);
     }
 
 
