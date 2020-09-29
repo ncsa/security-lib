@@ -8,7 +8,10 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemListNode;
+import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
 
 import java.util.List;
 
@@ -98,6 +101,14 @@ public class QDLRunner {
                                 p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                                 stmt = p;
                             }
+                        }
+                        if(stmt instanceof StemVariableNode ||  stmt instanceof StemListNode){
+                            stmt.evaluate(state);
+                            ConstantNode cNode = new ConstantNode(((StatementWithResultInterface)stmt).getResult(), Constant.STEM_TYPE);
+                            Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
+                            p.addArgument(cNode);
+                            p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
+                            stmt = p;
                         }
                     }
                     stmt.evaluate(currentState);

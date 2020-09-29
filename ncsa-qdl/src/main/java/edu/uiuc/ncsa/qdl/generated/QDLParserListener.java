@@ -58,6 +58,36 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitAssignment(QDLParserParser.AssignmentContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#stemVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemVariable(QDLParserParser.StemVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#stemVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemVariable(QDLParserParser.StemVariableContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#stemEntry}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemEntry(QDLParserParser.StemEntryContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#stemEntry}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemEntry(QDLParserParser.StemEntryContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#stemList}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemList(QDLParserParser.StemListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#stemList}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemList(QDLParserParser.StemListContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#argList}.
 	 * @param ctx the parse tree
 	 */
@@ -67,6 +97,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArgList(QDLParserParser.ArgListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#stemValue}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemValue(QDLParserParser.StemValueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#stemValue}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemValue(QDLParserParser.StemValueContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#function}.
 	 * @param ctx the parse tree

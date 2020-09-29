@@ -15,6 +15,8 @@ statement :
           | switchStatement
           | assignment
           | tryCatchStatement
+          | stemVariable
+          | stemList
           | expression
           ;
 

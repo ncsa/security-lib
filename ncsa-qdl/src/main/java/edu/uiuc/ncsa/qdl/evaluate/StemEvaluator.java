@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemList;
@@ -617,11 +617,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         for (int i = 0; i < polyad.getArgCount(); i++) {
             StemVariable stem = null;
             polyad.evalArg(i, state);
-            if (polyad.getArguments().get(i) instanceof VariableNode) {
-                VariableNode vn = (VariableNode) polyad.getArguments().get(i);
+            if (polyad.getArguments().get(i) instanceof StatementWithResultInterface) {
+                StatementWithResultInterface vn =  polyad.getArguments().get(i);
+/*
                 if (!(vn.getResult() instanceof StemVariable)) {
                     throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
                 }
+*/
                 stem = (StemVariable) vn.getResult();
             }
             if ((polyad.getArguments().get(i) instanceof StemVariable)) {
@@ -886,7 +888,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         Long index = 0L;
 
-        for (ExpressionNode arg : polyad.getArguments()) {
+        for (StatementWithResultInterface arg : polyad.getArguments()) {
             Object r = arg.evaluate(state);
             stemList.add(new StemEntry(index++, r));
         }

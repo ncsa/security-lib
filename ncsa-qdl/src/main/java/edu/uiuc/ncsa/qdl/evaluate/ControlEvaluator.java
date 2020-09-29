@@ -394,7 +394,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
 
     // Contract is
-    // no arg -- return all as stemm
+    // no arg -- return all as stem
     // 1 or more, return environment variable for each. Single one returns the value, otherwise a stem
     // Empty result at all times in server mode.
     protected void doOSEnv(Polyad polyad, State state) {

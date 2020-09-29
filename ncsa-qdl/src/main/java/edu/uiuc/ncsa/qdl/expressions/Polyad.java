@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 
 /**
  * For multiple arguments. This is used, e.g., for all functions.
@@ -48,7 +49,7 @@ public class Polyad extends ExpressionImpl {
          state.getMetaEvaluator().evaluate(this, state);
          return getResult();
     }
-    public void addArgument(ExpressionNode expr){
+    public void addArgument(StatementWithResultInterface expr){
         getArguments().add(expr);
     }
     @Override
@@ -64,7 +65,7 @@ public class Polyad extends ExpressionImpl {
     public ExpressionNode makeCopy() {
         Polyad polyad = new Polyad(operatorType);
         polyad.setName(getName());
-        for(ExpressionNode arg: getArguments()){
+        for(StatementWithResultInterface arg: getArguments()){
             polyad.addArgument(arg.makeCopy());
         }
         return polyad;

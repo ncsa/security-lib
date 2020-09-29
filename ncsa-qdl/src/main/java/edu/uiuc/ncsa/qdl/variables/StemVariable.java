@@ -594,7 +594,11 @@ public class StemVariable extends HashMap<String, Object> {
 
     public StemVariable union(StemVariable... stemVariables) {
         for (StemVariable stemVariable : stemVariables) {
-            this.putAll(stemVariable);
+            this.putAll(stemVariable); // non-list
+            for(StemEntry stemEntry : stemVariable.getStemList()){
+                this.getStemList().append(stemEntry);
+            }
+         //   this.getStemList().addAll(stemVariable.getStemList());
         }
         return this;
     }

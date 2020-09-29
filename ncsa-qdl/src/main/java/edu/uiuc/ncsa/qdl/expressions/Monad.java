@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.math.BigDecimal;
@@ -63,11 +64,11 @@ public class Monad extends ExpressionImpl {
         return getResult();
     }
 
-    public ExpressionNode getArgument() {
+    public StatementWithResultInterface getArgument() {
         return getArguments().get(0);
     }
 
-    public void setArgument(ExpressionNode node) {
+    public void setArgument(StatementWithResultInterface node) {
         if (getArgCount() == 0) {
             getArguments().add(node);
             return;

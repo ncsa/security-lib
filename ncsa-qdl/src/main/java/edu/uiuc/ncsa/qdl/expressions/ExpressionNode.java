@@ -1,22 +1,21 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
-import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 
 import java.util.ArrayList;
 
 /**
  * This class mostly manages the structure of expressions (so arguments are the children) and
- * evluating them is delegating the result to the {@link OpEvaluator} class.
+ * evaluating them is delegating the result to the {@link OpEvaluator} class.
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:02 PM
  */
-public interface ExpressionNode extends Statement, HasResultInterface {
+public interface ExpressionNode extends StatementWithResultInterface {
 
-    ArrayList<ExpressionNode> getArguments(); // need this to preserve order of lists
+    ArrayList<StatementWithResultInterface> getArguments(); // need this to preserve order of lists
 
-    void setArguments(ArrayList<ExpressionNode> arguments);
+    void setArguments(ArrayList<StatementWithResultInterface> arguments);
 
     int getArgCount();
 
@@ -28,5 +27,4 @@ public interface ExpressionNode extends Statement, HasResultInterface {
 
     //Object evaluate(State state);
 
-    public ExpressionNode makeCopy(); // would prefer clone, but there is a conflict in packages because it has protected access
 }

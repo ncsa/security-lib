@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;
@@ -33,10 +34,10 @@ public abstract class ExpressionImpl implements ExpressionNode {
      */
     protected int valence = 0;
 
-    protected ArrayList<ExpressionNode> arguments = new ArrayList<>();
+    protected ArrayList<StatementWithResultInterface> arguments = new ArrayList<>();
 
     @Override
-    public ArrayList<ExpressionNode> getArguments() {
+    public ArrayList<StatementWithResultInterface> getArguments() {
         return arguments;
     }
 
@@ -44,7 +45,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return getArguments().get(index).evaluate(state);
     }
     @Override
-    public void setArguments(ArrayList<ExpressionNode> arguments) {
+    public void setArguments(ArrayList<StatementWithResultInterface> arguments) {
         this.arguments = arguments;
     }
 

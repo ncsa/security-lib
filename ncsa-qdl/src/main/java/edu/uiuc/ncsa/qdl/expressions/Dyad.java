@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 
 import java.util.ArrayList;
 
@@ -34,19 +35,19 @@ public class Dyad extends ExpressionImpl {
         return getResult();
     }
 
-    public ExpressionNode getLeftArgument() {
+    public StatementWithResultInterface getLeftArgument() {
         return getArguments().get(0);
     }
 
-    public ExpressionNode getRightArgument() {
+    public StatementWithResultInterface getRightArgument() {
         return getArguments().get(1);
     }
 
-    public void setLeftArgument(ExpressionNode node) {
+    public void setLeftArgument(StatementWithResultInterface node) {
         getArguments().add(0, node);
     }
 
-    public void setRightArgument(ExpressionNode node) {
+    public void setRightArgument(StatementWithResultInterface node) {
         getArguments().add(1, node);
     }
 

@@ -1772,6 +1772,9 @@ public class WorkspaceCommands implements Logable {
             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
         }
 
+        if(inputLine.hasArg("-debug")){
+            setDebugOn(true);
+        }
         if (rootDir != null) {
             // This is where we let the command line override the configuration.
             qe.setWsHomeDir(rootDir.getAbsolutePath());

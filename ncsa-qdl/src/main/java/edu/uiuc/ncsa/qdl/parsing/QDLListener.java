@@ -9,8 +9,7 @@ import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
@@ -79,11 +78,11 @@ public class QDLListener implements QDLParserListener {
             cnode.setSourceCode(getSource(ctx));
             return;
         }
-        if(ctx.getText().equals(QDLConstants.RESERVED_NULL)){
+        if (ctx.getText().equals(QDLConstants.RESERVED_NULL)) {
             p.statement = QDLNull.getInstance();
             return;
         }
-            ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
+        ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
 
     }
 
@@ -158,7 +157,7 @@ public class QDLListener implements QDLParserListener {
             }
 
             nextA = new Assignment();
-            if(assignmentContext.children.size() == i+1){
+            if (assignmentContext.children.size() == i + 1) {
                 // no next element, implies the user sent something like a :=; so no rhs, OR the
                 // rhs was so munged the parser can't figure out what it is.
                 // Throw an  exception they can understand rather than an index out of bounds.
@@ -192,7 +191,7 @@ public class QDLListener implements QDLParserListener {
                 return;
                 //  A := 'a'; B := 'b';
                 // q := A += B += 'c';
-            } else{
+            } else {
                 // Chain them together if there are more to come
             }
             currentA = nextA;
@@ -256,7 +255,7 @@ public class QDLListener implements QDLParserListener {
 
                 // add it.
                 //        dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
-                polyad.getArguments().add((ExpressionNode) resolveChild(kid));
+                polyad.getArguments().add((StatementWithResultInterface) resolveChild(kid));
             }
         }
     }
@@ -404,7 +403,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-        Monad monad = new Monad(ctx.children.get(0).getText().equals(OpEvaluator.MINUS)?OpEvaluator.MINUS_VALUE:OpEvaluator.PLUS_VALUE, false);
+        Monad monad = new Monad(ctx.children.get(0).getText().equals(OpEvaluator.MINUS) ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE, false);
         stash(ctx, monad);
         finish(monad, ctx);
     }
@@ -808,28 +807,32 @@ public class QDLListener implements QDLParserListener {
      * This tries to get the original source with linefeeds
      * and all. It ay be more fragile than the ANTLR documentation lets on, so be advised.
      * The ctx.getText() method, however, is definitely broken...
+     *
      * @param ctx
      * @return
      */
-   protected String getSource(ParserRuleContext ctx){
-       int a = ctx.start.getStartIndex();
-               int b = ctx.stop.getStopIndex();
-               Interval interval = new Interval(a,b);
-             String txt= ctx.start.getInputStream().getText(interval);
-             if(!StringUtils.isTrivial(txt)){
-                 // Sometimes the parser strips the final ;. If the source is used later
-                 // this causes re-parsing it to reliably bomb. Add it back as needed.
-                txt = txt + (txt.endsWith(";")?"":";");
-             }
-             return txt;
+    protected String getSource(ParserRuleContext ctx) {
+        int a = ctx.start.getStartIndex();
+        int b = ctx.stop.getStopIndex();
+        if(b < a){
+            return "no source";
+        }
+        Interval interval = new Interval(a, b);
+        String txt = ctx.start.getInputStream().getText(interval);
+        if (!StringUtils.isTrivial(txt)) {
+            // Sometimes the parser strips the final ;. If the source is used later
+            // this causes re-parsing it to reliably bomb. Add it back as needed.
+            txt = txt + (txt.endsWith(";") ? "" : ";");
+        }
+        return txt;
+    }
 
-   }
     @Override
     public void exitModuleStatement(QDLParserParser.ModuleStatementContext moduleContext) {
         // module['uri:/foo','bar']body[ say( 'hi');]; // single line test
         // )load module_example.qdl
         isModule = false;
-         ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
+        ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
         URI namespace = URI.create(stripSingleQuotes(moduleContext.STRING(0).toString()));
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
         currentModule.setNamespace(namespace);
@@ -894,4 +897,67 @@ public class QDLListener implements QDLParserListener {
 
     }
 
+    @Override
+    public void enterStemVariable(QDLParserParser.StemVariableContext ctx) {
+        StemVariableNode stemVariableNode = new StemVariableNode();
+        stash(ctx, stemVariableNode);
+    }
+
+    @Override
+    public void exitStemVariable(QDLParserParser.StemVariableContext ctx) {
+        StemVariableNode svn = (StemVariableNode) parsingMap.getStatementFromContext(ctx);
+        svn.setSourceCode(getSource(ctx));
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree p = ctx.getChild(i);
+            if (p instanceof QDLParserParser.StemEntryContext) {
+                StemEntryNode stmt = (StemEntryNode) resolveChild(p);
+                svn.getStatements().add(stmt);
+            }
+        }
+    }
+
+    @Override
+    public void enterStemEntry(QDLParserParser.StemEntryContext ctx) {
+        StemEntryNode sen = new StemEntryNode();
+        stash(ctx, sen);
+    }
+
+    @Override
+    public void exitStemEntry(QDLParserParser.StemEntryContext ctx) {
+        StemEntryNode svn = (StemEntryNode) parsingMap.getStatementFromContext(ctx);
+        StatementWithResultInterface key = (StatementWithResultInterface) resolveChild(ctx.getChild(0));
+        StatementWithResultInterface value = (StatementWithResultInterface) resolveChild(ctx.getChild(2));
+        svn.setKey(key);
+        svn.setValue(value);
+
+
+    }
+
+    @Override
+    public void enterStemList(QDLParserParser.StemListContext ctx) {
+        StemListNode sln = new StemListNode();
+        stash(ctx, sln);
+    }
+
+    @Override
+    public void exitStemList(QDLParserParser.StemListContext ctx) {
+        StemListNode sln = (StemListNode) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            ParseTree pt = ctx.getChild(i);
+            if (pt instanceof QDLParserParser.StemValueContext) {
+                StatementWithResultInterface stmt = (StatementWithResultInterface) resolveChild(pt);
+                sln.getStatements().add(stmt);
+            }
+        }
+    }
+
+    @Override
+    public void enterStemValue(QDLParserParser.StemValueContext ctx) {
+
+    }
+
+    @Override
+    public void exitStemValue(QDLParserParser.StemValueContext ctx) {
+
+    }
 }

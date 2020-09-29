@@ -24,11 +24,19 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
      */
     public void append(Object obj) {
         V newEntry;
-        if (isEmpty()) {
-            newEntry = (V) new StemEntry(0L, obj);
-        } else {
-            V stemEntry = last();
-            newEntry = (V) new StemEntry(stemEntry.index + 1, obj);
+        if(obj instanceof StemEntry){
+            // in this case, stem entries are being added directly, so don't wrap them in a stem entry.
+
+            newEntry = (V)new StemEntry(size(), ((StemEntry) obj).entry); // argh Java requires a cast. If StemEntry is ever extended, this will break.
+
+        }else{
+            if (isEmpty()) {
+                newEntry = (V) new StemEntry(0L, obj);
+            } else {
+                V stemEntry = last();
+                newEntry = (V) new StemEntry(stemEntry.index + 1, obj);
+            }
+
         }
         add(newEntry);
     }

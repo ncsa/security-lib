@@ -5,12 +5,25 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-assignment : (variable op=ASSIGN)+  expression;
-   argList : expression (',' expression)*;
-  function : FuncStart argList* ')';
+assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
+
+ stemVariable : '{' stemEntry (',' stemEntry)* '}'
+              | '{' '}';
+    stemEntry : expression ':' stemValue;
+     stemList : '[' stemValue (',' stemValue)* ']'
+              | '[' ']';
+      argList : stemValue (',' stemValue)*;
+
+    stemValue : expression
+              | stemVariable
+              | stemList;
+
+   //   argList : expression (',' expression)*;
+     function : FuncStart argList* ')';
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
-// and checking for regression.
+// and checking for regression. Also Antlr 4 interprets the comments in the right hand column and
+// will use these for generating method names in Java. Be careful of actually putting comments there!
 
 expression
  :

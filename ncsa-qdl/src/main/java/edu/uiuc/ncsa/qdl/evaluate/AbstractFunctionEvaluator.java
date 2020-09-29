@@ -3,11 +3,11 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
@@ -448,7 +448,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param informativeMessage
      * @return
      */
-    protected StemVariable getOrCreateStem(ExpressionNode node, State state, String informativeMessage) {
+    protected StemVariable getOrCreateStem(StatementWithResultInterface node, State state, String informativeMessage) {
         StemVariable stem1 = null;
         if (node instanceof VariableNode) {
             VariableNode vn = (VariableNode) node;
