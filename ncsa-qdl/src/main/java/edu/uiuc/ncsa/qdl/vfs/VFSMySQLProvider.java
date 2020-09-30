@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
     @Override
     public String[] dir(String path) throws Throwable {
         super.dir(path);
-
+        DebugUtil.trace(this, "in get dir for path = \"" + path + "\"");
         String relPath = VFSPaths.relativize(getStoreRoot(), normalize(path));
         relPath = relPath + (relPath.endsWith(PATH_SEPARATOR) ? "" : PATH_SEPARATOR);
         relPath = VFSPaths.getUnqPath(relPath);
@@ -84,8 +85,12 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
         boolean isRoot = relPath.equals(PATH_SEPARATOR);
         // next line -- relPath always ends with a /, so if the user is asking for the root
         //  we don't want to search for // (which will return an empty set and nothing gets looked
-        // for later as subdirectories. 
-        List<String> output = db.selectByPath(PATH_SEPARATOR + (relPath.equals(PATH_SEPARATOR)?"":relPath));
+        // for later as subdirectories.
+        String ppp = PATH_SEPARATOR + (relPath.equals(PATH_SEPARATOR)?"":relPath);
+        DebugUtil.trace(this, "Getting ready to select by path for \"" + ppp + "\"");
+
+        List<String> output = db.selectByPath(ppp);
+        DebugUtil.trace(this, "got output from DB: " + output);
     //    if(!isRoot){
             output.remove(""); // There is always exactly one of these in the result.
       //  }
@@ -93,8 +98,9 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
             // nothing in this directory
             return new String[0];
         }
-
+        DebugUtil.trace(this, "getting distinct paths");
         List<String> distinctPaths = db.getDistinctPaths();
+        DebugUtil.trace(this, "distinct paths=" + distinctPaths);
         String[] components = VFSPaths.toPathComponents(relPath);
         for (String key : distinctPaths) {
             if (isChildOf(components, key, isRoot)) {
@@ -108,8 +114,9 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
                 }
             }
         }
+        DebugUtil.trace(this, "Converting output to string array");
         String[] fileList = output.toArray(new String[0]);
-
+        DebugUtil.trace(this, "Returning " + fileList.length + " elements");
         return fileList;
 
     }

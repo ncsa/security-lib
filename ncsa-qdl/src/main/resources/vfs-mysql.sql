@@ -17,12 +17,30 @@
   Be SURE you set the grant to the right user or there will be no access to this database!
   You may need to create the user for this database too, but that is not part of this script.
  */
+ /*
+  For older MariaDB abd MySQL: The total key length is 767 bytes/3 = 255 unicode chars.
+ */
+  */
 create table qdl_vfs(
-   path VARCHAR(768),
-   name VARCHAR(256),
+   path VARCHAR(191),
+   name VARCHAR(64),
    ea TEXT,
    content TEXT,
    PRIMARY KEY(path, name)
    );
+
+
+/*
+  For mariaDB, the total key length is as per above
+
+ */
+
+ create table qdl_vfs(
+    path VARCHAR(511),
+    name VARCHAR(256),
+    ea TEXT,
+    content TEXT,
+    PRIMARY KEY(path, name)
+    );
 
 GRANT All  ON qdl_vfs TO 'user'@'server';

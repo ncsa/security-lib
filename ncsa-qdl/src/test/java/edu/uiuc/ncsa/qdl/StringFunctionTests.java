@@ -625,7 +625,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getStringValue("t0", state).equals("0:1:2:3:4:");
         assert getStringValue("t1", state).equals("k=0k=1k=2k=3k=4");
         assert getStringValue("t2", state).equals("0:1:2:3:4");
-        assert getStringValue("t3", state).equals("0:1:2:3:4");
+        assert getStringValue("t3", state).equals("0k=1k=2k=3k=4");
     }
 
 }

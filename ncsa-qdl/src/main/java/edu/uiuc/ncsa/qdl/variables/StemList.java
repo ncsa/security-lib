@@ -43,7 +43,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
 
     @Override
     public String toString() {
-        String output = "{";
+        String output = "[";
         boolean isFirst = true;
         for (long i = 0; i < size(); i++) {
             if (isFirst) {
@@ -51,10 +51,10 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
             } else {
                 output = output + ",";
             }
-            output = output + i + "=" + get(i);
+            output = output +  get(i);
         }
 
-        return output + "}";
+        return output + "]";
     }
 
     /**

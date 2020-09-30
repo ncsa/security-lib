@@ -10,6 +10,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.TreeSet;
@@ -104,7 +105,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
 
         for (String key : fnames) {
             names.add(key + "()");
@@ -221,13 +222,22 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             @Override
             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                if (objects[0] instanceof Long) {
-                    r.result = Math.abs((Long) objects[0]);
-                    r.resultType = Constant.LONG_TYPE;
-                } else {
-                    r.result = objects[0];
-                    r.resultType = polyad.getArguments().get(0).getResultType();
+                // If a long or decimal, take the absolute value. If anything else (e.g. a string) return argument.
+                switch (Constant.getType(objects[0])) {
+                    case Constant.LONG_TYPE:
+                        r.result = Math.abs((Long) objects[0]);
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        BigDecimal bd = (BigDecimal) objects[0];
+                        r.result = bd.abs();
+                        r.resultType = Constant.DECIMAL_TYPE;
+                        break;
+                    default:
+                        r.result = objects[0];
+                        r.resultType = polyad.getArguments().get(0).getResultType();
                 }
+
                 return r;
             }
         };

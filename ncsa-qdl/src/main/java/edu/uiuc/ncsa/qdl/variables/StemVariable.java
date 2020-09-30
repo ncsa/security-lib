@@ -53,6 +53,9 @@ public class StemVariable extends HashMap<String, Object> {
         return (Boolean) get(key);
     }
 
+    public Boolean getBoolean(Long key) {
+         return (Boolean) get(key);
+     }
     /**
      * If this is set, then any get with no key will return this value. Since
      * the basic unit of QDL is the stem, this gives us a way of basically turning

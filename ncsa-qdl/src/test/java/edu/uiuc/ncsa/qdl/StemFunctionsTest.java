@@ -943,28 +943,28 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
          StemVariable test_a_b = getStemValue("test_a_b.",state);
          assert test_a_b.size()== 3;
-         assert test_a_b.get(0).equals(Boolean.FALSE);
-         assert test_a_b.get(1).equals(Boolean.FALSE);
-         assert test_a_b.get(2).equals(Boolean.TRUE);
+         assert !test_a_b.getBoolean(0L);
+         assert !test_a_b.getBoolean(1L);
+         assert test_a_b.getBoolean(2L);
 
-        StemVariable test_b_a = getStemValue("test_a_b.",state);
+        StemVariable test_b_a = getStemValue("test_b_a.",state);
         assert test_b_a.size() == 5;
-        assert test_b_a.get(0).equals(Boolean.TRUE);
-        assert test_b_a.get(1).equals(Boolean.FALSE);
-        assert test_b_a.get(2).equals(Boolean.FALSE);
-        assert test_b_a.get(3).equals(Boolean.FALSE);
-        assert test_b_a.get(4).equals(Boolean.FALSE);
+        assert  test_b_a.getBoolean(0L);
+        assert !test_b_a.getBoolean(1L);
+        assert !test_b_a.getBoolean(2L);
+        assert !test_b_a.getBoolean(3L);
+        assert !test_b_a.getBoolean(4L);
 
         StemVariable test_a_c = getStemValue("test_a_c.",state);
         assert test_a_c.size() == 3;
-        assert test_a_c.get(0).equals(Boolean.FALSE);
-        assert test_a_c.get(1).equals(Boolean.FALSE);
-        assert test_a_c.get(2).equals(Boolean.TRUE);
+        assert !test_a_c.getBoolean(0L);
+        assert test_a_c.getBoolean(1L);
+        assert !test_a_c.getBoolean(2L);
 
         StemVariable test_c_a = getStemValue("test_c_a.",state);
         assert test_c_a.size() == 2;
-        assert test_c_a.get("foo").equals(Boolean.TRUE);
-        assert test_c_a.get("bar").equals(Boolean.FALSE);
+        assert  test_c_a.getBoolean("foo");
+        assert !test_c_a.getBoolean("bar");
 
      }
 }

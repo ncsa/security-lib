@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -454,6 +455,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("" + MKDIR + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
+        DebugUtil.trace(this, "in " + MKDIR + ": starting, arg = " + obj);
         if (obj == null || !isString(obj)) {
             throw new IllegalArgumentException("The " + MKDIR + " command requires a string for its first argument.");
         }
@@ -467,9 +469,15 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 vfs = state.getVFS(fileName);
                 if (vfs != null) {
                     rc = vfs.mkdir(fileName);
+                }else{
+                    DebugUtil.trace(this, "in " + MKDIR + ": NO VFS");
+
                 }
 
             } catch (Throwable throwable) {
+                DebugUtil.trace(this, "in " + MKDIR + ": got exception \"" + throwable.getMessage() + "\"");
+                state.getLogger().error("in " + MKDIR + ", got exception", throwable);
+
                 if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
@@ -478,6 +486,8 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         } else {
             // So its just a file.
             if (state.isServerMode()) {
+                state.getLogger().error("in " + MKDIR + ", in server mode, file ops not allowed.");
+
                 throw new QDLServerModeException("File system operations not permitted in server mode.");
             }
             File f = new File(fileName);
@@ -504,11 +514,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException("" + DIR + " requires a file name to read.");
         }
+        DebugUtil.trace(this, "starting " + DIR + " command");
         Object obj = polyad.evalArg(0, state);
         if (obj == null || !isString(obj)) {
             throw new IllegalArgumentException("The " + DIR + " command requires a string for its first argument.");
         }
         String fileName = obj.toString();
+        DebugUtil.trace(this, "in " + DIR + " command: file name =" + fileName);
+
         int op = -1; // default
 
         VFSFileProvider vfs = null;
@@ -518,10 +531,17 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             try {
                 vfs = state.getVFS(fileName);
                 if (vfs != null) {
+                    DebugUtil.trace(this, "in " + DIR + " command: got a VFS=" + vfs);
+
                     entries = vfs.dir(fileName);
+                }else{
+                    DebugUtil.trace(this, "in " + DIR + " command: NO VFS");
+
                 }
 
             } catch (Throwable throwable) {
+                DebugUtil.trace(this, "Got an exception:" + throwable.getMessage());
+                state.getLogger().error("Error accessing VFS!", throwable);
                 if (throwable instanceof RuntimeException) {
                     throw (RuntimeException) throwable;
                 }
@@ -535,6 +555,8 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             File f = new File(fileName);
             entries = f.list();
         }
+        DebugUtil.trace(this, "in " + DIR + " command: entries =" + entries);
+
         if (entries == null) {
             // Then this is not a directory the request was made for a file.
             // The result should be null

@@ -25,6 +25,7 @@ import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.LoggerProvider;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -1756,7 +1757,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     File envFile; // this is the name of the file holding the environment variables
-
+     String TRACE_ARG = "-trace";
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
         ConfigurationNode node = ConfigUtil.findConfiguration(
@@ -1772,7 +1773,16 @@ public class WorkspaceCommands implements Logable {
             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
         }
 
-        if(inputLine.hasArg("-debug")){
+        // Setting this flag at the command line will turn on lower level debugging.
+        // The actual option in the configuration file turns on logging debug (so info and trace are enabled).
+        if(inputLine.hasArg(TRACE_ARG)){
+            say("trace enabled");
+            setDebugOn(true);
+            DebugUtil.setIsEnabled(true);
+            DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
+
+        }
+        if(qe.isDebugOn() ){
             setDebugOn(true);
         }
         if (rootDir != null) {

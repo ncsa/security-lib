@@ -367,10 +367,11 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Checks that creating a list then looping through the elements preserves order. These elements are
      * 0,1., 2, 3. (so alternating stems)
+     *
      * @throws Throwable
      */
     @Test
-    public void testLoopOrder() throws Throwable{
+    public void testLoopOrder() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := true;");
         addLine(script, "a. := null;");
@@ -383,7 +384,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "while[");
         addLine(script, "   for_keys(j,a.)");
         addLine(script, "]do[");
-        addLine(script, "// say(j);" );
+        addLine(script, "// say(j);");
         addLine(script, "say('j==' + j + ', type=' + var_type(a.j));");
         addLine(script, "]; // end while");
 
@@ -394,6 +395,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "Looping through a list was not done in order.";
 
     }
+
     /**
      * This checks that managing scope outside of a block works. Here a variable is set to
      * null then set inside a loop and the values are updated correctly
@@ -552,7 +554,7 @@ public class ParserTest extends AbstractQDLTester {
         String g_x = "define[g(x)]body[return(x+1);];";
         String h_y = "define[h(y)]body[return(y-1);];";
         String g_module = "module['a:a','a']body[q:=2;w:=3;" + g_x + h_y + "];";
-        String import_g =  "module_import('a:a');";
+        String import_g = "module_import('a:a');";
         String import_g1 = "module_import('a:a', 'b');";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -651,6 +653,44 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * very, very basic compact stem notation test.
+     * @throws Throwable
+     */
+    
+    public void testCompactStemNotation() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [5,3,1];");
+        addLine(script, "b. := {'p':'q', abs(-3.4):size('abcd')};");
+        addLine(script, "c. := {'z':{'t':abs(-42)}};");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+
+        StemVariable a = getStemValue("a.", state);
+        assert a.size() == 3;
+        assert a.get(0L).equals(5L);
+        assert a.get(1L).equals(3L);
+        assert a.get(2L).equals(1L);
+
+        StemVariable b = getStemValue("b.", state);
+        assert b.size() == 2;
+        assert b.containsKey("p");
+        assert b.get("p").equals("q");
+        assert b.containsKey("3.4");
+        assert b.get("3.4").equals(4L);
+
+        StemVariable c = getStemValue("c.", state);
+        assert c.size() == 1;
+        assert c.containsKey("z");
+        StemVariable innnerStem = (StemVariable) c.get("z");
+        assert innnerStem.size() == 1;
+        assert innnerStem.containsKey("t");
+        assert innnerStem.getLong("t").equals(42L);
+    }
+
+    /**
      * If a variable is in a module and that module is imported, you should be able
      * to access the variable without a namespace if it has been imported and there
      * are no clashes
@@ -733,9 +773,9 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "c:=a+b;");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("a",state) == 5L;
-        assert getLongValue("b",state) == -10L;
-        assert getLongValue("c",state) == -5L;
+        assert getLongValue("a", state) == 5L;
+        assert getLongValue("b", state) == -10L;
+        assert getLongValue("c", state) == -5L;
     }
 
     /**
@@ -758,12 +798,12 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.5^=b;"); //   5^3 =  125
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("a.0", state) ==3L;
-        assert getLongValue("a.1", state) ==-2L;
-        assert getLongValue("a.2", state) ==6L;
-        assert getLongValue("a.3", state) ==1L;
-        assert getLongValue("a.4", state) ==1L;
-        assert getLongValue("a.5", state) ==125L;
+        assert getLongValue("a.0", state) == 3L;
+        assert getLongValue("a.1", state) == -2L;
+        assert getLongValue("a.2", state) == 6L;
+        assert getLongValue("a.3", state) == 1L;
+        assert getLongValue("a.4", state) == 1L;
+        assert getLongValue("a.5", state) == 125L;
     }
 
     /**
@@ -812,16 +852,16 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.9 := a!=a;"); //F
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("a.1",state);
-        assert getBooleanValue("a.3",state);
-        assert getBooleanValue("a.4",state);
-        assert getBooleanValue("a.5",state);
-        assert getBooleanValue("a.6",state);
-        assert getBooleanValue("a.7",state);
-        assert getBooleanValue("a.8",state);
-        assert !getBooleanValue("a.0",state);
-        assert !getBooleanValue("a.2",state);
-        assert !getBooleanValue("a.9",state);
+        assert getBooleanValue("a.1", state);
+        assert getBooleanValue("a.3", state);
+        assert getBooleanValue("a.4", state);
+        assert getBooleanValue("a.5", state);
+        assert getBooleanValue("a.6", state);
+        assert getBooleanValue("a.7", state);
+        assert getBooleanValue("a.8", state);
+        assert !getBooleanValue("a.0", state);
+        assert !getBooleanValue("a.2", state);
+        assert !getBooleanValue("a.9", state);
     }
 
 
@@ -856,11 +896,11 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "e:=!((a<--b)&&(c<a));");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("a",state) ==1L;// got incremented
-        assert getLongValue("b",state) ==-1L; // got decremented twice
-        assert getLongValue("c",state) ==2L;
-        assert !getBooleanValue("d",state);
-        assert getBooleanValue("e",state);
+        assert getLongValue("a", state) == 1L;// got incremented
+        assert getLongValue("b", state) == -1L; // got decremented twice
+        assert getLongValue("c", state) == 2L;
+        assert !getBooleanValue("d", state);
+        assert getBooleanValue("e", state);
     }
 
     /**
@@ -918,10 +958,10 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "d.:=-indices(3);");
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("a"  , state)   == -4L;
-        assert getLongValue("b"  , state)   == 11L;
-        assert getLongValue("c"  , state)   == -3L;
-        assert getLongValue("d.0", state)  == 0L;
+        assert getLongValue("a", state) == -4L;
+        assert getLongValue("b", state) == 11L;
+        assert getLongValue("c", state) == -3L;
+        assert getLongValue("d.0", state) == 0L;
         assert getLongValue("d.1", state) == -1L;
         assert getLongValue("d.2", state) == -2L;
     }
@@ -938,8 +978,8 @@ public class ParserTest extends AbstractQDLTester {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert getLongValue("a", state) ==1L;
-        assert getLongValue("b", state) ==-6L;
+        assert getLongValue("a", state) == 1L;
+        assert getLongValue("b", state) == -6L;
     }
 
     @Test
@@ -954,8 +994,8 @@ public class ParserTest extends AbstractQDLTester {
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
 
-        assert getLongValue("a",state) == 1L;
-        assert getLongValue("b",state) == -24L;
+        assert getLongValue("a", state) == 1L;
+        assert getLongValue("b", state) == -24L;
     }
 
     /**
@@ -989,10 +1029,11 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Shows making an assignment with '=' and not ':=' gets caught early as a parser error
      * (rather than having it blow up elsewhere).
+     *
      * @throws Throwable
      */
     @Test
-    public void testBadAssignment() throws Throwable{
+    public void testBadAssignment() throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1012,6 +1053,7 @@ public class ParserTest extends AbstractQDLTester {
      * unwanted entries in the symbol table. Mostly this is to make sure
      * that if some future change to the parser happens, this bug
      * does not resurface since it was very hard to isolate.
+     *
      * @throws Throwable
      */
     @Test
@@ -1078,6 +1120,7 @@ public class ParserTest extends AbstractQDLTester {
      * settable inside the scope and visible outside. This pattern is used
      * for conditionals, loops, and switch statements. If this breaks it means that
      * scope handling is broken generally.
+     *
      * @throws Throwable
      */
     @Test
@@ -1215,9 +1258,9 @@ public class ParserTest extends AbstractQDLTester {
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("a#q" , state)== 10L;
-        assert getLongValue("b#q" , state)== 11L;
-        assert getLongValue("w#a#q",state)== 3L;
+        assert getLongValue("a#q", state) == 10L;
+        assert getLongValue("b#q", state) == 11L;
+        assert getLongValue("w#a#q", state) == 3L;
 
     }
 
@@ -1249,9 +1292,9 @@ public class ParserTest extends AbstractQDLTester {
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("test_f",  state) == 101L;
-        assert getLongValue("test_a",  state) == 2L;
-        assert getLongValue("test_waf",state) == 3L;
+        assert getLongValue("test_f", state) == 101L;
+        assert getLongValue("test_a", state) == 2L;
+        assert getLongValue("test_waf", state) == 3L;
         assert getLongValue("test_wg", state) == 6L;
 
     }
@@ -1286,10 +1329,11 @@ public class ParserTest extends AbstractQDLTester {
      * Common construction is to set a variable null (allocate where it is in which scope)
      * then set it elsewhere inside another scope. This checks each type gets set and that a non-existent
      * variable is also not just set.
+     *
      * @throws Throwable
      */
     @Test
-    public void testNestedVariableScope() throws Throwable{
+    public void testNestedVariableScope() throws Throwable {
         StringBuffer script = new StringBuffer();
         State state = testUtils.getNewState();
         addLine(script, "a := null;");
