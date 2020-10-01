@@ -28,8 +28,21 @@ public class ScriptSet<V extends ScriptInterface> implements Iterable<V>{
      */
     public ScriptInterface get(String key, String value){
         for(ScriptInterface s : scripts ){
-            if(s.getProperties().containsKey(key) && s.getProperties().getString(key).equals(value)){
-                return s;
+            // if stored property a list, check and return first hit.
+            if(s.getProperties().containsKey(key)){
+                if(s.getProperties().isList(key)){
+                    String[] list = s.getProperties().getList(key);
+                    for(String x : list){
+                        if(x.equals(value)){
+                            return s;
+                        }
+                    }
+                }else{
+                    //stored property is not a list, check the value directly.
+                    if(s.getProperties().getString(key).equals(value)){
+                        return s;
+                    }
+                }
             }
         }
         return null;

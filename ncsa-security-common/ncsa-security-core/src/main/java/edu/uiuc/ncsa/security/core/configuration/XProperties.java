@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.core.configuration;
 
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.*;
@@ -25,7 +26,7 @@ import java.util.*;
  * <li>methods for adding (vs. simply replacing) values from another property file</li>
  * <li>methods for loading from other sources without replacing all the properties</li>
  * <li>a few more convenient constructors</li>
-
+ *
  * </ul>
  * <p> There is a main method to test this. It takes a single argument which is a file name which will be created
  * (thereby allowing a test of writing a file and reading it.)
@@ -275,7 +276,6 @@ public class XProperties extends Properties {
     }
 
 
-
     /**
      * Set the property from the integer value.
      *
@@ -297,7 +297,6 @@ public class XProperties extends Properties {
     public long getLong(String key) {
         return Long.parseLong(getProperty(key));
     }
-
 
 
     /**
@@ -357,8 +356,8 @@ public class XProperties extends Properties {
      * @return
      */
     public String getString(String key) {
-        Object obj =  get(key);
-        if(obj == null) return "null";
+        Object obj = get(key);
+        if (obj == null) return "null";
         return obj.toString();
     }
 
@@ -372,7 +371,6 @@ public class XProperties extends Properties {
     public void setString(String key, String value) {
         setProperty(key, value);
     }
-
 
 
     /**
@@ -507,17 +505,17 @@ public class XProperties extends Properties {
 
 
     /*
-    * One of the irritating limitations of the Properties object is that you cannot take one set of properties
-    * and put them into a new properties object directly. Using the original <code>load</code> method overwrites
-    * all of the current properties.
-    * @param source
-    * @param overwrite if this is <code>true</code> then the current properties will be replaced by those in the argument
-    */
+     * One of the irritating limitations of the Properties object is that you cannot take one set of properties
+     * and put them into a new properties object directly. Using the original <code>load</code> method overwrites
+     * all of the current properties.
+     * @param source
+     * @param overwrite if this is <code>true</code> then the current properties will be replaced by those in the argument
+     */
     public void add(Map source, boolean overwrite) {
         // we can't just use the built-in streams to do this (which would really easy) because they completely overwrite everything
         // and we allow the user not to do that.
         Set e = source.keySet();
-        for (Object key : e ) {
+        for (Object key : e) {
             if (!containsKey(key) || overwrite) {
                 Object value = source.get(key);
                 setProperty(key.toString(), value.toString());
@@ -687,8 +685,6 @@ public class XProperties extends Properties {
     }//end getList
 
 
-
-
     /**
      * Gets the value associated with the key and splits it into an array of strings
      * using the value from <code>getListSeparator</code>
@@ -778,7 +774,6 @@ public class XProperties extends Properties {
     }
 
 
-
     /**
      * Set the value of a list using the default separator.
      *
@@ -789,6 +784,26 @@ public class XProperties extends Properties {
         setList(key, list, getListSeparator());
     }
 
+    public boolean isList(String key) {
+        return isList(key, getListSeparator());
+    }
+
+    /**
+     * check if a string is in list format. This is not a clever test! It is unaware of any structure for the
+     * list.
+     * @param key
+     * @param separator
+     * @return
+     */
+    public boolean isList(String key, String separator) {
+        if (StringUtils.isTrivial(separator)) {
+            separator = getListSeparator();
+        }
+        if (!containsKey(key)) {
+            return false;
+        }
+        return getString(key).contains(separator);
+    }
 
     /**
      * Writes the properties to the store file. The header is written at the start
@@ -798,7 +813,7 @@ public class XProperties extends Properties {
      * @throws java.io.IOException if no store file has been set.
      */
 
-    public void store(String header)  {
+    public void store(String header) {
         if (getStoreFileName() == null) {
             throw new IllegalStateException("Error, no file set for default save");
 
@@ -815,7 +830,6 @@ public class XProperties extends Properties {
 
     /**
      * This just invokes <code>store</code> with an empty header.
-     *
      */
 
     public void store() {
@@ -867,7 +881,7 @@ public class XProperties extends Properties {
      * Gets a clone of this object. Note that each call causes a new clone to be produced.
      *
      * @return the XProperties object as an XProperties object, so unlike the <code>clone</code>
-     *         method no casting is required.
+     * method no casting is required.
      */
     public XProperties getClone() {
         return (XProperties) clone();
@@ -999,15 +1013,15 @@ public class XProperties extends Properties {
 
     public synchronized String toString(int indent) {
         String blanks = "";
-        for(int i =0; i< indent; i++){
+        for (int i = 0; i < indent; i++) {
             blanks = blanks + " ";
         }
-        String out = "{" + (isEmpty()?"":"\n");
-        for(Object rawKey: keySet()){
+        String out = "{" + (isEmpty() ? "" : "\n");
+        for (Object rawKey : keySet()) {
             String key = rawKey.toString();
-            out = out + blanks + key + "=" +  getString(key) + "\n";
+            out = out + blanks + key + "=" + getString(key) + "\n";
         }
-        out = out +  "}";
+        out = out + "}";
         return out;
     }
 }

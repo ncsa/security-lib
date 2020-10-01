@@ -103,8 +103,23 @@ public class AnotherJSONUtil {
         xp.put(Scripts.LANG_VERSION, QDLVersion.VERSION);
 
         if (jsonObject.containsKey(XMD_TAG)) {
-            xp.add(jsonObject.getJSONObject(XMD_TAG), true);
-            return xp;
+            // options are to add single values or arrays.
+            JSONObject xmd = jsonObject.getJSONObject(XMD_TAG);
+            for(Object key : xmd.keySet()){
+                Object object = xmd.get(key);
+                if(object instanceof JSONArray){
+                    JSONArray array = (JSONArray) object;
+                    String[] list = new String[array.size()];
+                    for(int i = 0; i < array.size(); i++){
+                        list[i] = array.getString(i);
+                    }
+                    xp.setList(key.toString(), list);
+                }else{
+                    xp.put(key.toString(), object.toString());
+                }
+            }
+            //xp.add(jsonObject.getJSONObject(XMD_TAG), true);
+
         }
         return xp;
     }
@@ -236,7 +251,7 @@ public class AnotherJSONUtil {
     static String test2 = "{\"qdl\":\n" +
             "   {\n" +
             "     \"load\":\"y.qdl\",\n" +
-            "     \"xmd\":{\"phase\":\"pre_auth\",\"token_type\":\"access\"},\n" +
+            "     \"xmd\":{\"phase\":[\"pre_auth\",\"post_refresh\"],\"token_type\":\"access\"},\n" +
             "     \"args\":[4,true,-47.5, {\"server\":\"localhost\",\"port\":443},[3,4]]\n" +
             "   }\n" +
             "}\n";
