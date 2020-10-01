@@ -6,7 +6,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.security</groupId>
         <artifactId>ncsa-security-common</artifactId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
     </parent>
 
     <artifactId>ncsa-security-storage</artifactId>
@@ -18,12 +18,12 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-util</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
-            <version>5.0-SNAPSHOT</version>
+            <version>5.0</version>
         </dependency>
     </dependencies>
 </project>

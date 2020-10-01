@@ -5,12 +5,12 @@
     <parent>
         <artifactId>ncsa-security-all</artifactId>
         <groupId>edu.uiuc.ncsa.security</groupId>
-        <version>5.0-SNAPSHOT</version>
+        <version>5.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ncsa-qdl-gui</artifactId>
-    <version>1.2-QDL-SNAPSHOT</version>
+    <version>1.2</version>
 
     <name>Text mode GUI for the QD Language</name>
 
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-qdl</artifactId>
-            <version>1.2-QDL-SNAPSHOT</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
               <groupId>com.gitlab.klamonte</groupId>
