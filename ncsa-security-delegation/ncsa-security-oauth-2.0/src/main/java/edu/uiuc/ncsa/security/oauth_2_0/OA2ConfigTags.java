@@ -42,4 +42,9 @@ public interface OA2ConfigTags {
      */
     public String SCOPE_HANDLER = "handler";
 
+    public String ADDITIONAL_PARAMETERS = "parameters";
+    public String ADDITIONAL_PARAMETER = "parameter";
+    public String PARAMETER_KEY = "key";
+
+
 }

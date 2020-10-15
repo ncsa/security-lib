@@ -862,10 +862,10 @@ public class StemVariable extends HashMap<String, Object> {
         if (!getStemList().isEmpty()) {
             StemEntry last = getStemList().last();
             startIndex = last.index + 1;
-            ;
         }
         for (StemEntry entry : list) {
             getStemList().add(new StemEntry(startIndex++, entry.entry));
+           // put(startIndex++, entry.entry); // Or they get simple indices, not stem indices.
         }
     }
 

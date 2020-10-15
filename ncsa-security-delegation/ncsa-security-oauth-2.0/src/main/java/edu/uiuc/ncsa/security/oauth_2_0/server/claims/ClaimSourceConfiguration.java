@@ -220,6 +220,13 @@ public class ClaimSourceConfiguration implements Serializable {
         this.map = map;
     }
 
+    /**
+     * Get all the properties this knows about.
+     * @return
+     */
+    public Map<String, Object> getProperties(){
+        return map;
+    }
     public Object getProperty(String key) {
         if (map == null || !map.containsKey(key)) {
             return null;

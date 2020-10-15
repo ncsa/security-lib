@@ -236,6 +236,7 @@ public abstract class StoreCommands extends CommonCommands {
         say("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
     }
 
+  
     /**
      * Creates a new item. The argument is
      *
@@ -355,6 +356,11 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         String rawID = inputLine.getLastArg();
+        if(rawID.equals("set_id")){
+            // they forgot an argument
+            say("sorry, but you have to supply an id to set.");
+            return;
+        }
         int index = -1;
         try{
              index = Integer.parseInt(rawID);

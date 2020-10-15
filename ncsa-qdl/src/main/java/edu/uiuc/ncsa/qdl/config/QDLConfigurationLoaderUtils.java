@@ -33,20 +33,20 @@ public class QDLConfigurationLoaderUtils {
                                 vpt.getRootDir(), vpt.getScheme(), vpt.getMountPoint(),
                                 vpt.canRead(), vpt.canWrite());
                         state.addVFSProvider(provider);
-                        config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
+                        config.getMyLogger().info("VFS pass-through mount: " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
                         break;
                     case VFS_TYPE_MEMORY:
                         provider = new VFSMemoryFileProvider(
                                 vfsConfig.getScheme(), vfsConfig.getMountPoint(), vfsConfig.canRead(), vfsConfig.canWrite());
                         state.addVFSProvider(provider);
-                        config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
+                        config.getMyLogger().info("VFS in-memory mount: " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
                         break;
                     case VFS_TYPE_MYSQL:
                         provider = setupMySQLVFS(config, (VFSSQLConfig) vfsConfig);
                         state.addVFSProvider(provider);
-                        config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
+                        config.getMyLogger().info("VFS MySQL mount: " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
                         break;
                     case VFS_TYPE_ZIP:
@@ -54,7 +54,7 @@ public class QDLConfigurationLoaderUtils {
                         provider = new VFSZipFileProvider(zc.getZipFilePath(), zc.getScheme(),zc.getMountPoint(),
                                 zc.canRead(), zc.canWrite());
                         state.addVFSProvider(provider);
-                        config.getMyLogger().info("VFS mount: " + vfsConfig.getScheme() +
+                        config.getMyLogger().info("VFS zip file mount: " + vfsConfig.getScheme() +
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
 
                         break;

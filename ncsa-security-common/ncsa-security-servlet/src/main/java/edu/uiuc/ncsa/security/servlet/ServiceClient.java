@@ -21,6 +21,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,16 +109,39 @@ public class ServiceClient {
     }
 
     public static String convertToStringRequest(String host, Map m) {
-        int size = m.size();
         int i = 0;
-        String[][] strings = new String[size][2];
+        ArrayList<String> keyList = new ArrayList<>();
+        ArrayList<String> valueList = new ArrayList<>();
+        // Dynamically create the entries, then turn them in to an array (which is required for a library later).
         for (Object o : m.keySet()) {
             Object v = m.get(o);
             if (v != null) {
-                strings[i][0] = o.toString();
-                strings[i++][1] = v.toString();
+                if(v instanceof List){
+                    // If its a list, repeatedly add it with the same key
+                    List<String> list = (List<String>) v;
+                    for(String xx : list){
+                        keyList.add(o.toString());
+                        valueList.add(xx);
+                        //strings[i][0] = o.toString();
+                        //strings[i++][1] = xx;
+                    }
+                }else {
+                    keyList.add(o.toString());
+                    valueList.add(v.toString());
+
+//                    strings[i][0] = o.toString();
+  //                  strings[i++][1] = v.toString();
+                }
             }
         }
+        int size = keyList.size();
+
+        String[][] strings = new String[size][2];
+        for(int j = 0; j < size; j++){
+               strings[j][0] = keyList.get(j);
+               strings[j][1] = valueList.get(j);
+        }
+
         return convertToStringRequest(host, strings);
     }
 

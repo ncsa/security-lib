@@ -1,0 +1,57 @@
+This is scrapbook of things That I would like to consider for QDL that are not fully formed
+but should be captured someplace.
+
+10/5/2020
+- Workspace Library mangement
+    Workspaces need a better way to manage them.This should involve being able to identify them, have a description
+       (that does not require, say, loading the whole thing and accessing a QDL variable).
+    Be able to designate a library of workspaces as a default.
+    Note id is not the same as the name of file on disk (though default might make them same).
+    Be able to list entries in this library e.g. as
+      last saved    id        description
+      2020-10-05    clients   Client management workspace with various preconfigured test clients
+    Be able to designate a command to run on load/reload
+    Loading a workspace displays a banner of the above along with what command is being run (?)
+       --silent = no banner
+       --no_run = do not run command
+    Have multiple libraries (?) or just any old directory?
+    Have default workplace extensions, .e.g., *.ws, *.ws1 or some such.
+    Set autosave interval. Allow for silent saves (so no output) vs. verbose (message printed on save).
+       This only works if an id has been set or maybe if it has already been saved once
+    ??Ability to search libraries? Not sure what that means. Look inside each one? Look for ids using a regex?
+
+-Debugging tools
+ Have new commands
+    interrupt(message) or maybe trace(message) - inside a function. Throws an exception that halts processing with state
+        The output (to console) is to print the message (if any) and return handle for the process
+    All variables are available in the workspace in some inspection mode
+    resume(handle) - resume processing.
+    )SI type command - shows state indicator of what is currently suspended.
+    )SI clear * | handle - get rid of give stack or all of them.
+    ?? Does this persist in saves with the system?
+
+10/7/2020
+Stem Issue: --> a.0 and a.0. can both refer to a stem, the latter is not in the list, the former is.<--
+
+- Stem variables do not have an easy way to append something to their list.
+   list_append() appends one list to another, but list_append(stem0., stem1.) does nothing unless stem1. has a list.
+   This is consistent, but very counter-intuitive to people trying to use lists.
+- Question about lists (needs forensics, so trawl through the code). So far it seems that
+  * scalar indices are treated differently than stem ones, so
+    a.0 may be stem valued and kept in the list, but a.0. won't be in the list.
+  * This implies that enforcement of the stem rule is not consistent in the code
+  * Write up HOW it should work and be sure the unit tests show this.
+
+- Error handling in scripts: Be able to have scripts set a flag that is picked up as an error. Something like
+  err.message := 'missing LDAP credentials'
+  err.ok := false;
+  So err. (reserved) would have the flag checked. If true, then Java would throw an exception.
+E.g.
+  try[
+      if[script_args() != 2]then[raise_error('err');];
+    ]catch[
+         err.message := 'blah';
+         err.ok := false;
+         return();
+    ]
+    Then throw a specific ScriptRuntimeException or some such that has the message (and maybe other stuff?) in it too.

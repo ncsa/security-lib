@@ -388,8 +388,8 @@ print - this is a synonym for the say function, so read the help for that.
     <entry id="file_read">
             <body>
                 <![CDATA[
-read_file(file_name) - read a file in. The result is a single string of the file contents
-read_file(file_name, type) - type is an integer that determines the result:
+file_read(file_name) - read a file in. The result is a single string of the file contents
+file_read(file_name, type) - type is an integer that determines the result:
 -1 = as string (default)
  0 = binary. This reads the file and hands back a single base 64 encoded string of the contents.
  1 = stem. A stem list whose entries are each line in the file.
@@ -423,6 +423,26 @@ See also: file_read, decode_b64, encode_b64
 ]]>
             </body>
         </entry>
+    <entry id="list_starts_with">
+            <body>
+                <![CDATA[
+list_starts_with(x., y.) - returns a left conformable list that has the indices of the right argument.  If there
+                           is no such element, an index of -1 is returned.
+E.g.
+  list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
+{0=0, 1=-1, 2=1}
+How to read this: left element 0 starts with right element 0
+                   "     "     1  does not start with any
+                   "     "     2 starts with right element 1
+
+To get a list of these, use mask, e.g.
+     mask(['a','qrs','pqr'], -1 <list_starts_with(['a','qrs','pqr'],['a','p','s','t']))
+{0=a, 2=pqr}
+See also: mask
+               ]]>
+            </body>
+        </entry>
+
     <entry id="execute">
             <body>
                 <![CDATA[

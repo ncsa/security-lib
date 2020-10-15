@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.extensions.example;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.state.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Concat implements QDLFunction {
     }
 
     @Override
-    public Object evaluate(Object[] objects) {
+    public Object evaluate(Object[] objects, State state) {
         return objects[0].toString() + objects[1].toString();
     }
 

@@ -106,7 +106,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     // list functions
 
-
     public static final String LIST_APPEND = "list_append";
     public static final String FQ_LIST_APPEND = STEM_FQ + LIST_APPEND;
     public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;
@@ -130,6 +129,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String TO_LIST = "to_list";
     public static final String FQ_TO_LIST = STEM_FQ + TO_LIST;
     public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;
+
+    public static final String LIST_STARTS_WITH = "list_starts_with";
+    public static final String FQ_LIST_STARTS_WITH = STEM_FQ + LIST_STARTS_WITH;
+    public static final int LIST_STARTS_WITH_TYPE = 206 + STEM_FUNCTION_BASE_VALUE;
 
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
@@ -167,6 +170,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             LIST_INSERT_AT,
             LIST_SUBSET,
             LIST_COPY,
+            LIST_STARTS_WITH,
             IS_LIST,
             TO_LIST,
             TO_JSON,
@@ -194,6 +198,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_LIST_INSERT_AT,
             FQ_LIST_SUBSET,
             FQ_LIST_COPY,
+            FQ_LIST_STARTS_WITH,
             FQ_IS_LIST,
             FQ_TO_LIST,
             FQ_TO_JSON,
@@ -265,6 +270,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_COPY:
             case FQ_LIST_COPY:
                 return LIST_COPY_TYPE;
+            case LIST_STARTS_WITH:
+            case FQ_LIST_STARTS_WITH:
+                return LIST_STARTS_WITH_TYPE;
             case LIST_INSERT_AT:
             case FQ_LIST_INSERT_AT:
                 return LIST_INSERT_AT_TYPE;
@@ -376,6 +384,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_SUBSET:
                 doListSubset(polyad, state);
                 return true;
+            case LIST_STARTS_WITH:
+            case FQ_LIST_STARTS_WITH:
+                doListStartsWith(polyad, state);
+                return true;
             case MAKE_INDICES:
             case FQ_MAKE_INDICES:
                 doMakeIndex(polyad, state);
@@ -413,54 +425,97 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     /**
+     * Returns a list of indices. The results is conformable to the left argument and the values in it
+     * are the indices of the right argument.
+     *
+     * @param polyad
+     * @param state
+     */
+    // list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
+    protected void doListStartsWith(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 2) {
+            throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires 2 arguments.");
+        }
+        Object leftArg = polyad.evalArg(0, state);
+        if (!isStem(leftArg)) {
+            throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the left argument.");
+        }
+        Object rightArg = polyad.evalArg(1, state);
+        if (!isStem(rightArg)) {
+            throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the right argument.");
+        }
+
+        StemVariable output = new StemVariable();
+        StemVariable leftStem = (StemVariable) leftArg;
+        StemVariable rightStem = (StemVariable) rightArg;
+        for (long i = 0; i < leftStem.size(); i++) {
+            boolean gotOne = false;
+            for (long j = 0; j < rightStem.size(); j++) {
+                if (leftStem.get(i).toString().startsWith(rightStem.get(j).toString())) {
+                    output.put(i, j);
+                    gotOne = true;
+                    break;
+                }
+            }
+            if (!gotOne) {
+                output.put(i, -1L);
+            }
+        }
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+    }
+
+    /**
      * Compute if the left argument is a member of the right argument. result is always conformable to the left argument.
+     *
      * @param polyad
      * @param state
      */
     protected void doIsMemberOf(Polyad polyad, State state) {
-        if(polyad.getArgCount() != 2){
+        if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("Error: " + HAS_VALUE + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
         Object rightArg = polyad.evalArg(1, state);
         // breask down tidily in to 4 cases.
-        if(isStem(leftArg)){
-            StemVariable lStem = (StemVariable)leftArg;
+        if (isStem(leftArg)) {
+            StemVariable lStem = (StemVariable) leftArg;
             StemVariable result = new StemVariable(); // result is always conformable to left arg
 
-            if(isStem(rightArg)){
-               StemVariable rStem = (StemVariable) rightArg;
-               for(String lkey : lStem.keySet()){
-                   Boolean rc = Boolean.FALSE;
-                   for(String rKey : rStem.keySet()){
-                       if(lStem.get(lkey).equals(rStem.get(rKey))){
-                           rc = Boolean.TRUE;
-                           break;
-                       }
-                   }
-                   result.put(lkey, rc);
+            if (isStem(rightArg)) {
+                StemVariable rStem = (StemVariable) rightArg;
+                for (String lkey : lStem.keySet()) {
+                    Boolean rc = Boolean.FALSE;
+                    for (String rKey : rStem.keySet()) {
+                        if (lStem.get(lkey).equals(rStem.get(rKey))) {
+                            rc = Boolean.TRUE;
+                            break;
+                        }
+                    }
+                    result.put(lkey, rc);
 
-               }
-            }else{
-               // check if each element in the left stem matches the value of the right arg.
-               for(String lKey: lStem.keySet()){
-                  result.put(lKey, lStem.get(lKey).equals(rightArg)?Boolean.TRUE:Boolean.FALSE); // got to finagle these are right Java objects
-               }
+                }
+            } else {
+                // check if each element in the left stem matches the value of the right arg.
+                for (String lKey : lStem.keySet()) {
+                    result.put(lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
+                }
             }
             polyad.setResult(result);
             polyad.setResultType(Constant.STEM_TYPE);
 
-        }else{
+        } else {
             Boolean result = Boolean.FALSE;
-            if(isStem(rightArg)){
-                StemVariable rStem = (StemVariable)rightArg;
-               for(String rKey: rStem.keySet()){
-                   if(leftArg.equals(rStem.get(rKey))){
-                       result = Boolean.TRUE;
-                       break;
-                   }
-               }
-            }else{
+            if (isStem(rightArg)) {
+                StemVariable rStem = (StemVariable) rightArg;
+                for (String rKey : rStem.keySet()) {
+                    if (leftArg.equals(rStem.get(rKey))) {
+                        result = Boolean.TRUE;
+                        break;
+                    }
+                }
+            } else {
                 result = leftArg.equals(rightArg);
             }
             polyad.setResult(result);
@@ -618,7 +673,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             StemVariable stem = null;
             polyad.evalArg(i, state);
             if (polyad.getArguments().get(i) instanceof StatementWithResultInterface) {
-                StatementWithResultInterface vn =  polyad.getArguments().get(i);
+                StatementWithResultInterface vn = polyad.getArguments().get(i);
 /*
                 if (!(vn.getResult() instanceof StemVariable)) {
                     throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
@@ -878,7 +933,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     /**
      * Takes a list of arguments (possible stem variables) and creates a new stem from it.
      * The scalars are added with cardinal indexes and stems will have their values added as well in this fashion.
-     * (Their keys are not added because you ocould have just added to the existing stem variable).
+     * (Their keys are not added because you could have just added to the existing stem variable).
      *
      * @param polyad
      */
@@ -890,7 +945,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         for (StatementWithResultInterface arg : polyad.getArguments()) {
             Object r = arg.evaluate(state);
+/*            if(r instanceof StemVariable){
+                out.put((index++) + ".", r);
+            }else{
+                stemList.add(new StemEntry(index++, r));
+            }*/
             stemList.add(new StemEntry(index++, r));
+
         }
         out.setStemList(stemList);
         polyad.setResult(out);

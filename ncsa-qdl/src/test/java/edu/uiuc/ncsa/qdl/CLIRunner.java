@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import net.sf.json.JSONObject;
 
 import java.util.List;
 import java.util.Scanner;
@@ -15,6 +16,8 @@ public class CLIRunner {
     // This just exists to run a few tests/debug stuff from the command line
     public static void main(String[] args) {
         try {
+            JSONObject jsonObject = JSONObject.fromObject(memberOf);
+            System.out.println(jsonObject.toString());
           //  testReadChar();
             // JSON Path work ok except some dependency named slfj seems to blow up. Not sure why.
             // Might not be stable enough to use...
@@ -34,7 +37,97 @@ public class CLIRunner {
             e.printStackTrace();
         }
     }
-
+        static String memberOf = "{\"isMemberOf\":  [\n" +
+                "    {\n" +
+                "   \"name\": \"org_ici\",\n" +
+                "   \"id\": 1282\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"list_apcs\",\n" +
+                "   \"id\": 1898\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"all_ncsa_employe\",\n" +
+                "   \"id\": 1097\n" +
+                "  },\n" +
+                "  {\"name\": \"jira-users\"},\n" +
+                "    {\n" +
+                "   \"name\": \"lsst_users\",\n" +
+                "   \"id\": 1363\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"iam_sec_testing\",\n" +
+                "   \"id\": 1342\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"list_staffsanscenaffl\",\n" +
+                "   \"id\": 1931\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"lsst_int_lspdev\",\n" +
+                "   \"id\": 1618\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"org_csd\",\n" +
+                "   \"id\": 1288\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"all_lsst\",\n" +
+                "   \"id\": 1616\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"grp_bldg_ncsa\",\n" +
+                "   \"id\": 1166\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"list_staff\",\n" +
+                "   \"id\": 1895\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"prj_cerb_users\",\n" +
+                "   \"id\": 1301\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"opnsrc_users\",\n" +
+                "   \"id\": 1603\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"all_building\",\n" +
+                "   \"id\": 1469\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"org_cisr\",\n" +
+                "   \"id\": 1213\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"grp_bldg_both\",\n" +
+                "   \"id\": 1168\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"cilogon_help\",\n" +
+                "   \"id\": 1683\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"org_all_groups\",\n" +
+                "   \"id\": 1032\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"grp_jira_users\",\n" +
+                "   \"id\": 1103\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"all_users\",\n" +
+                "   \"id\": 1002\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"lsst_reporting\",\n" +
+                "   \"id\": 1605\n" +
+                "  },\n" +
+                "    {\n" +
+                "   \"name\": \"list_allncsa\",\n" +
+                "   \"id\": 1892\n" +
+                "  }\n" +
+                " ]}";
     static Scanner scanner = new Scanner(System.in,"UTF-8").useDelimiter("\\A");
     static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\p{javaWhitespace}+");
     static final Pattern EMPTY_PATTERN = Pattern.compile("\\^");

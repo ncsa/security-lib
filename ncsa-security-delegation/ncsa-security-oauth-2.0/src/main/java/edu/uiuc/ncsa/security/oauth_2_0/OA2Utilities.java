@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
+import net.sf.json.JSONArray;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,9 +33,11 @@ public class OA2Utilities {
           if(values == null || values.length == 0) return null;
 
           if(1 < values.length){
-              throw new OA2RedirectableError(OA2Errors.INVALID_REQUEST,
-                      "Invalid request: Multiple parameters are not supported for \"" + key + "\"",
-                      req.getParameter(OA2Constants.STATE));
+              JSONArray array = new JSONArray();
+              for(String x : values){
+                  array.add(x);
+              }
+            return array.toString();
           }
           return values[0];
       }

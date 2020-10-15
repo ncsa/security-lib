@@ -626,6 +626,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         try {
             script = resolveScript(resourceName, state);
         } catch (Throwable t) {
+            state.warn("Could not find script:" + t.getMessage());
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }

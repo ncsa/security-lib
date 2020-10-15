@@ -1,11 +1,13 @@
 package edu.uiuc.ncsa.qdl.extensions;
 
+import edu.uiuc.ncsa.qdl.state.State;
+
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * A wrapper for a single Java method that can be invoked from QDL. It may indeed be a single utility, or it may
- * front an entire class and expose the methods in it (so you {@link #getInstance()}  call just hands this class
+ * front an entire class and expose the methods in it   call just hands this class
  * back. You could, for instance, have a single Java object with several methods, each of which holds a reference to the object
  * and invokes a method on it. There are may possibilities.
  * <p>Created by Jeff Gaynor<br>
@@ -32,11 +34,12 @@ public interface QDLFunction extends Serializable {
 
     /**
      * The method that is invoked by QDL. It will have the arguments evaluated and put in to the
-     * array of objects. It is up to you to do any checking you see fit.
+     * array of objects. It is up to you to do any checking you see fit. State is supplied if needed.
      * @param objects
+     * @param state 
      * @return
      */
-    public Object evaluate(Object[] objects);
+    public Object evaluate(Object[] objects, State state);
 
 
     /**

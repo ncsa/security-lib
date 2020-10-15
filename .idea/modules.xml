@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ncsa-qdl/ncsa-qdl.iml" filepath="$PROJECT_DIR$/ncsa-qdl/ncsa-qdl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-qdl-gui/ncsa-qdl-gui.iml" filepath="$PROJECT_DIR$/ncsa-qdl-gui/ncsa-qdl-gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ncsa-qdl-website/ncsa-qdl-website.iml" filepath="$PROJECT_DIR$/ncsa-qdl-website/ncsa-qdl-website.iml" />
       <module fileurl="file://$PROJECT_DIR$/ncsa-security-all.iml" filepath="$PROJECT_DIR$/ncsa-security-all.iml" />
       <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-common.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-common.iml" />
       <module fileurl="file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/ncsa-security-core.iml" filepath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/ncsa-security-core.iml" />

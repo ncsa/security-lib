@@ -44,7 +44,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ?FQ_FUNC_NAMES:FUNC_NAMES;
+        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
         for (String key : fnames) {
             names.add(key + "()");
         }
@@ -57,7 +57,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             case IS_FUNCTION:
             case FQ_IS_FUNCTION:
                 if (polyad.getArgCount() != 1) {
-                    throw new IllegalArgumentException( "You must supply at least one argument.");
+                    throw new IllegalArgumentException("You must supply at least one argument.");
                 }
                 Object object = polyad.evalArg(0, state);
                 if (object == null) {
@@ -98,7 +98,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
-        Object result = qfr.qdlFunction.evaluate(argList);
+        // Direct analog of func(polyad, state):
+        Object result = qfr.qdlFunction.evaluate(argList, state);
         polyad.setResult(result);
         polyad.setEvaluated(true);
         polyad.setResultType(Constant.getType(result));
