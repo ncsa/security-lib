@@ -2,22 +2,54 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/wish-list.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/ScriptRuntimeException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_extensions.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_extensions.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/FunctionEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/FunctionEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/extensions/QDLFunction.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/extensions/QDLFunction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/extensions/example/Concat.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/extensions/example/Concat.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLExprParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLExprParser.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ArgListContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ArgListContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LeftBracketContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LeftBracketContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$MultiplyExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$MultiplyExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NotExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NotExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NullContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NullContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumbersContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumbersContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$OrExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$OrExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PostfixContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PostfixContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PowerExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PowerExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PrefixContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PrefixContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$Semi_for_empty_expressionsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$Semi_for_empty_expressionsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StringsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StringsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$SwitchStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$SwitchStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$TryCatchStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$TryCatchStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$UnaryMinusExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$UnaryMinusExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/CLIRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/CLIRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/constant-values.html" beforeDir="false" />
@@ -238,13 +270,11 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/src/main/java/edu/uiuc/ncsa/security/servlet/ServiceClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/StoreCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/StoreCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" afterDir="false" />
@@ -280,6 +310,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-noframe.html" beforeDir="false" />
@@ -722,10 +753,6 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/server/claims/ClaimSourceConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/server/claims/ClaimSourceConfiguration.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" afterDir="false" />
@@ -782,7 +809,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.22813345" />
   </component>
-  <component name="RunManager" selected="Application.HOCONDemo">
+  <component name="RunManager" selected="JUnit.TestSuite">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -1072,7 +1099,10 @@
       </extension>
       <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.qdl" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.TestSuite" />
+      <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea  -Dusername=&quot;oa4mp-server&quot; -Dpassword=&quot;c9SW5SuspuMU&quot;" />
+      <option name="PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -1114,14 +1144,14 @@
     </configuration>
     <list>
       <item itemvalue="Application.QDLWorkspace" />
-      <item itemvalue="JUnit.TestSuite" />
       <item itemvalue="Application.CLIRunner" />
       <item itemvalue="Application.HOCONDemo" />
+      <item itemvalue="JUnit.TestSuite" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.HOCONDemo" />
         <item itemvalue="JUnit.TestSuite" />
+        <item itemvalue="Application.HOCONDemo" />
         <item itemvalue="Application.CLIRunner" />
       </list>
     </recent_temporary>
@@ -1151,22 +1181,34 @@
       <workItem from="1478886188860" duration="126000" />
       <workItem from="1478886342868" duration="65000" />
       <workItem from="1601674370966" duration="600000" />
-      <workItem from="1601895412829" duration="97564000" />
+      <workItem from="1601895412829" duration="119321000" />
     </task>
+    <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
+      <created>1602796126004</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1602796126004</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fix for CIL-849. Some reshuffling of classes." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix for CIL-849. Some reshuffling of classes." />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="334" y="196" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1602161152983">
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1602860377434">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="334" y="196" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1602161152983" />
-    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser" timestamp="1602250996003">
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1602860377434" />
+    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser" timestamp="1602886127745">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1602250996003" />
+    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1602886127745" />
     <state x="608" y="325" width="525" height="433" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1602070012710">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1175,46 +1217,54 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="723" y="430" width="306" height="223" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1601986139234" />
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1602796124225">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1602796124225" />
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog" timestamp="1602015370527">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1602015370527" />
-    <state width="1566" height="342" key="GridCell.Tab.0.bottom" timestamp="1602791343797">
+    <state width="1566" height="277" key="GridCell.Tab.0.bottom" timestamp="1602886656924">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1602791343797" />
-    <state width="1566" height="342" key="GridCell.Tab.0.center" timestamp="1602791343796">
+    <state width="1566" height="277" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1602886656924" />
+    <state width="1566" height="277" key="GridCell.Tab.0.center" timestamp="1602886656924">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1602791343796" />
-    <state width="1566" height="342" key="GridCell.Tab.0.left" timestamp="1602791343796">
+    <state width="1566" height="277" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1602886656924" />
+    <state width="1566" height="277" key="GridCell.Tab.0.left" timestamp="1602886656923">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1602791343796" />
-    <state width="1566" height="342" key="GridCell.Tab.0.right" timestamp="1602791343797">
+    <state width="1566" height="277" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1602886656923" />
+    <state width="1566" height="277" key="GridCell.Tab.0.right" timestamp="1602886656924">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1602791343797" />
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1602791340323">
+    <state width="1566" height="277" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1602886656924" />
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1602886645970">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1602791340323" />
-    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1602791340322">
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1602886645970" />
+    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1602886645970">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1602791340322" />
-    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1602791340322">
+    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1602886645970" />
+    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1602886645970">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1602791340322" />
-    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1602791340322">
+    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1602886645970" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1602886645970">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1602791340322" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1602886645970" />
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor" timestamp="1602070095217">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1602070095217" />
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1602796129442">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1602796129442" />
     <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1601895574941">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1223,10 +1273,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1602103180450" />
-    <state x="545" y="286" width="913" height="504" key="find.popup" timestamp="1602795630832">
+    <state x="545" y="286" width="913" height="504" key="find.popup" timestamp="1602859686230">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="545" y="286" width="913" height="504" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1602795630832" />
+    <state x="545" y="286" width="913" height="504" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1602859686230" />
     <state x="540" y="244" key="run.anything.popup" timestamp="1602790210264">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1240,14 +1290,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
-          <line>1053</line>
-          <option name="timeStamp" value="1" />
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
+          <line>215</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
-          <line>940</line>
-          <option name="timeStamp" value="4" />
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
+          <line>480</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java</url>
+          <line>90</line>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java</url>
+          <line>910</line>
+          <option name="timeStamp" value="25" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

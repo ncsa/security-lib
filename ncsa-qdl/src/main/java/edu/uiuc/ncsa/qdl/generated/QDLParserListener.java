@@ -166,6 +166,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitNumbers(QDLParserParser.NumbersContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code stemLi}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemLi(QDLParserParser.StemLiContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code stemLi}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemLi(QDLParserParser.StemLiContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code association}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
@@ -357,6 +369,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code stemVar}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterStemVar(QDLParserParser.StemVarContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code stemVar}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitStemVar(QDLParserParser.StemVarContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#element}.
 	 * @param ctx the parse tree

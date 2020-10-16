@@ -43,7 +43,7 @@ public class StemVariable extends HashMap<String, Object> {
 
     public String getString(String key) {
         Object obj = get(key);
-        if(obj == null){
+        if (obj == null) {
             return null;
         }
         return obj.toString();
@@ -54,8 +54,9 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Boolean getBoolean(Long key) {
-         return (Boolean) get(key);
-     }
+        return (Boolean) get(key);
+    }
+
     /**
      * If this is set, then any get with no key will return this value. Since
      * the basic unit of QDL is the stem, this gives us a way of basically turning
@@ -82,23 +83,34 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Object get(String key) {
         // TODO -- Horribly inefficient. This should be improved but that may take some serious work, so deferring
-            try{
+        if(key.endsWith(STEM_INDEX_MARKER)){
+             key = key.substring(0, key.length() - 1);
+        }
+        try {
             if (isLongIndex(key)) {
                 return get(Long.parseLong(key));
             }
+            if (key.endsWith(STEM_INDEX_MARKER)) {
+                try {
+                    Long kk = Long.parseLong(key.substring(0, key.length() - 1));
+                    return get(kk);
 
+                } catch (Throwable t) {
+                    // not a number
+                }
+            }
             if (!containsKey(key) && defaultValue != null) {
                 return defaultValue;
             }
             return super.get(key);
-            } catch (StackOverflowError | PatternSyntaxException sto) {
-                //In this case someplace there is a reference to the stem itself, e.g.
-                // a. := indices(5);
-                // a.b. := a.
-                // This can work if the indices are accessed directly but attempting to access the whole
-                // things (such as printing it out with "say" is going to fail).
-                throw new VariableState.CyclicalError("Error: recursive overflow at index '" + key + "'");
-            }
+        } catch (StackOverflowError | PatternSyntaxException sto) {
+            //In this case someplace there is a reference to the stem itself, e.g.
+            // a. := indices(5);
+            // a.b. := a.
+            // This can work if the indices are accessed directly but attempting to access the whole
+            // things (such as printing it out with "say" is going to fail).
+            throw new VariableState.CyclicalError("Error: recursive overflow at index '" + key + "'");
+        }
     }
 
     public Object remove(Long key) {
@@ -133,7 +145,6 @@ public class StemVariable extends HashMap<String, Object> {
      * @param list
      */
     public void addList(List<Object> list) {
-        StemList list1 = new StemList();
         long startIndex = -1L;
         if (!getStemList().isEmpty()) {
             startIndex = getStemList().last().index;
@@ -143,7 +154,6 @@ public class StemVariable extends HashMap<String, Object> {
             getStemList().add(stemEntry);
         }
     }
-
 
     public Object get(StemMultiIndex w) {
         StemVariable currentStem = this;
@@ -173,8 +183,13 @@ public class StemVariable extends HashMap<String, Object> {
          * the ones in between.
          */
         for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
-            StemVariable nextStem = (StemVariable) currentStem.get(name);
+         //   String name = w.getComponents()[i] + STEM_INDEX_MARKER;
+            String name = w.getComponents()[i] ;
+            Object object = currentStem.get(name);
+            StemVariable nextStem = null;
+            if(object instanceof StemVariable){
+                nextStem = (StemVariable) object;
+            }
             if (nextStem == null) {
                 nextStem = new StemVariable();
                 currentStem.put(name, nextStem);
@@ -380,7 +395,12 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
-        if(super.size() == 0 && getStemList().size() == 0){
+           return newToJSON(escapeNames);
+    }
+
+    protected JSON newToJSON(boolean escapeNames) {
+
+        if (super.size() == 0 && getStemList().size() == 0) {
             // Empty stem corresponds to an empty JSON Object
             return new JSONObject();
         }
@@ -389,10 +409,88 @@ public class StemVariable extends HashMap<String, Object> {
         }
         JSONObject json = new JSONObject();
         //edge case. empty stem list should return a JSON object
-        if(size() == 0){
+        if (size() == 0) {
             return json;
         }
-        if(super.size() == 0){
+        if (super.size() == 0) {
+            // super.size counts the number of non-stem entries. This means there are
+            // list elements and nothing else.
+            // if it is just a list, return it asap.
+            return getStemList().toJSON();
+        }
+        StemList<StemEntry> localSL = new StemList<>();
+        localSL.addAll(getStemList());
+        QDLCodec codec = new QDLCodec();
+
+        // Special case of a JSON array of objects that has been turned in to a stem list.
+        // We want to recover this since it is a very common construct.
+        for (String key : super.keySet()) {
+               Object object = get(key);
+
+            if (object instanceof StemVariable) {
+                StemVariable x = (StemVariable) object;
+
+                // compound object
+
+                String newKey = key;
+                if(newKey.endsWith(STEM_INDEX_MARKER)) {
+                 newKey =   key.substring(0, key.length() - 1);
+                }
+                if (isLongIndex(newKey)) {
+                    StemEntry stemEntry = new StemEntry(Long.parseLong(newKey));
+                    if (!localSL.contains(stemEntry)) {
+                        stemEntry.entry = x;
+                        localSL.add(stemEntry);
+                    } else {
+                        throw new IndexError("Error: The stem contains a list element \"" + newKey + "\" " +
+                                "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
+                    }
+                } else {
+                    json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
+                }
+
+            } else {
+                if(!(object instanceof QDLNull)) {
+                    // don't add it if it is null.
+                    json.put(escapeNames ? codec.decode(key) : key, object);
+                }
+            }
+        }
+        // This is here because what it does is it checks that stem lists have all been added.
+        // remove this and stem lists don't get processed right.
+        if (localSL.size() == size()) {
+            return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
+        }
+
+
+        // now for the messy bit -- lists
+        // At this point there were no collisions in the indices.
+        JSONArray array = getStemList().toJSON();
+        if (!array.isEmpty()) {
+            for (int i = 0; i < array.size(); i++) {
+                json.put(i, array.get(i));
+            }
+        }
+
+        return json;
+    }
+
+
+    protected JSON oldToJSON(boolean escapeNames) {
+
+        if (super.size() == 0 && getStemList().size() == 0) {
+            // Empty stem corresponds to an empty JSON Object
+            return new JSONObject();
+        }
+        if (getStemList().size() == size()) {
+            return getStemList().toJSON(); // handles case of simple list of simple elements
+        }
+        JSONObject json = new JSONObject();
+        //edge case. empty stem list should return a JSON object
+        if (size() == 0) {
+            return json;
+        }
+        if (super.size() == 0) {
             // super.size counts the number of non-stem entries. This means there are
             // list elements and nothing else.
             // if it is just a list, return it asap.
@@ -431,8 +529,8 @@ public class StemVariable extends HashMap<String, Object> {
         // This is here because what it does is it checks that stem lists have all been added.
         // remove this and stem lists don't get processed right.
         if (localSL.size() == size()) {
-             return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
-         }
+            return localSL.toJSON(); // Covers 99.9% of all cases for lists of compound objects.
+        }
 
 
         // now for the messy bit -- lists
@@ -533,6 +631,31 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable fromJSON(JSONArray array) {
+           return newfromJSON(array);
+    }
+
+    protected StemVariable newfromJSON(JSONArray array) {
+   //     StemList<StemEntry> sl = new StemList<>();
+         for (int i = 0; i < array.size(); i++) {
+             Object v = array.get(i);
+             if (v instanceof JSONObject) {
+                 StemVariable x = new StemVariable();
+                 put((long) i, x.fromJSON((JSONObject) v));
+             } else {
+                 if (v instanceof JSONArray) {
+                     StemVariable x = new StemVariable();
+                     put((long) i, x.fromJSON((JSONArray) v));
+                 } else {
+                  //   sl.add(new StemEntry(i, v));
+                     put((long)i, v);
+                 }
+             }
+         }
+     //    setStemList(sl);
+
+         return this;
+    }
+    protected StemVariable oldfromJSON(JSONArray array) {
         StemList<StemEntry> sl = new StemList<>();
         for (int i = 0; i < array.size(); i++) {
             Object v = array.get(i);
@@ -582,9 +705,18 @@ public class StemVariable extends HashMap<String, Object> {
        /* if (!isVar(key)) {
             throw new IllegalArgumentException("Error: " + key + " is neither a legal variable name nor number.");
         }*/
+       if(key.endsWith(STEM_INDEX_MARKER)){
+           key = key.substring(0,key.length() - 1);
+       }
+/*
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);
         }
+*/
+        if (isIntVar(key)) {
+            return put(Long.parseLong(key), value);
+        }
+
         return super.put(key, value);
     }
 
@@ -598,10 +730,10 @@ public class StemVariable extends HashMap<String, Object> {
     public StemVariable union(StemVariable... stemVariables) {
         for (StemVariable stemVariable : stemVariables) {
             this.putAll(stemVariable); // non-list
-            for(StemEntry stemEntry : stemVariable.getStemList()){
+            for (StemEntry stemEntry : stemVariable.getStemList()) {
                 this.getStemList().append(stemEntry);
             }
-         //   this.getStemList().addAll(stemVariable.getStemList());
+            //   this.getStemList().addAll(stemVariable.getStemList());
         }
         return this;
     }
@@ -826,7 +958,8 @@ public class StemVariable extends HashMap<String, Object> {
     public boolean containsKey(String key) {
         if (isLongIndex(key)) {
             StemEntry s = new StemEntry(Long.parseLong(key));
-            return getStemList().contains(s);
+            boolean rc =  getStemList().contains(s);
+            return rc;
         }
         return super.containsKey(key);
     }
@@ -865,7 +998,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         for (StemEntry entry : list) {
             getStemList().add(new StemEntry(startIndex++, entry.entry));
-           // put(startIndex++, entry.entry); // Or they get simple indices, not stem indices.
+            // put(startIndex++, entry.entry); // Or they get simple indices, not stem indices.
         }
     }
 

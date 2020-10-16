@@ -615,9 +615,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         JSON j = stemVariable.toJSON();
         StemVariable x = (StemVariable) stemVariable.get("isMemberOf.");
         assert x.size() == 3;
-        assert !x.containsKey("0") : "Spurious element added to stem on serialization to JSON.";
-        assert !x.containsKey("1") : "Spurious element added to stem on serialization to JSON.";
-        assert !x.containsKey("2") : "Spurious element added to stem on serialization to JSON.";
+        assert x.containsKey("0") : "Spurious element added to stem on serialization to JSON.";
+        assert x.containsKey("1") : "Spurious element added to stem on serialization to JSON.";
+        assert x.containsKey("2") : "Spurious element added to stem on serialization to JSON.";
 
     }
 
@@ -662,7 +662,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     @Test
     public void testJSONArray2() throws Exception {
         JSONArray array = new JSONArray();
-        for (int i = 0; i < 2 * count; i++) {
+        for (int i = 0; i < 2 * 2; i++) {
             array.add(makeRandomArray(i));
         }
         verifyJSONArrayRoundtrip(array);
@@ -887,7 +887,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     //      x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.2.0 :='a'; w.2.1 :='b';
 
     /**
-     * Make sure that w.z.y.x and w.z.y.x. (so long non-stem and long stem) resolutions work.
+     * Thse two tests make sure that w.z.y.x and w.z.y.x. (so long non-stem and long stem) resolutions work.
      *  This creates two variables
      *  <pre>
      *      w.2
@@ -900,15 +900,28 @@ public class StemFunctionsTest extends AbstractQDLTester {
     @Test
     public void testMultiIndex() throws Throwable {
         StringBuffer script = new StringBuffer();
-        addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.2.0 :='a'; w.2.1 :='b';");
-        addLine(script, "test := w.z.y.x;");
-        addLine(script, "test. := w.z.y.x.;");
+        addLine(script, "x := 0; y.0 := 1; z.1 := 2;  w.2.0 :='a'; w.2.1 :='b';");
+        // Point with this is that the stem resolution knows that y.0 is a stem and looks up the value of 1
+        // in the resolution, so z.1 can resolve to the right index.
+        addLine(script, "test. := w.z.y.x.;"); // resolves to w.2 which is a stem
+        State state = testUtils.getNewState();
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getStemValue("test.",state).size() == 2;
+    }
+
+    @Test
+    public void testMultiIndex2() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3;");
+        addLine(script, "test := w.z.y.x;"); // resolves to w.2 which is an integer here.
         State state = testUtils.getNewState();
 
         QDLParser interpreter = new QDLParser(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("test", state).equals(3L);
-        assert getStemValue("test.",state).size() == 2;
+
     }
 
     /**

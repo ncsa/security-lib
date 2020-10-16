@@ -374,15 +374,15 @@ public class QDLListener implements QDLParserListener {
     }
 
     protected void finish(Dyad dyad, ParseTree parseTree) {
-        dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
-        dyad.setRightArgument((ExpressionNode) resolveChild(parseTree.getChild(2)));
+            dyad.setLeftArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(0)));
+        dyad.setRightArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(2)));
         dyad.setSourceCode(parseTree.getText());
 
     }
 
     protected void finish(Monad monad, ParseTree parseTree) {
         int index = monad.isPostFix() ? 0 : 1; // post fix means 0th is the arg, prefix means 1 is the arg.
-        monad.setArgument((ExpressionNode) resolveChild(parseTree.getChild(index)));
+        monad.setArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(index)));
         monad.setSourceCode(parseTree.getText());
 
     }
@@ -958,6 +958,26 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitStemValue(QDLParserParser.StemValueContext ctx) {
+
+    }
+
+    @Override
+    public void enterStemLi(QDLParserParser.StemLiContext ctx) {
+
+    }
+
+    @Override
+    public void exitStemLi(QDLParserParser.StemLiContext ctx) {
+
+    }
+
+    @Override
+    public void enterStemVar(QDLParserParser.StemVarContext ctx) {
+
+    }
+
+    @Override
+    public void exitStemVar(QDLParserParser.StemVarContext ctx) {
 
     }
 }

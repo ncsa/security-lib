@@ -28,6 +28,8 @@ assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
 expression
  :
    function                                                              #functions
+ | stemVariable                                                          #stemVar
+ | stemList                                                              #stemLi
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
  | '!' expression                                                        #notExpression

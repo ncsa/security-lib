@@ -279,6 +279,8 @@ public class ParserTest extends AbstractQDLTester {
         // Takes x.i.j, y.i.j and returns the matrix product z.i.j
 
         String set_a = "a.0.0:=1; a.0.1 := 2; a.1.0 := 3; a.1.1 := 4;";
+        //String set_a = "a. := [[1,2],[3,4]];";
+        //String set_b = "b. := [[5,4],[3,2]];";
         String set_b = "b.0.0:=5; b.0.1 := 4; b.1.0 := 3; b.1.1 := 2;";
         String set_c00 = "c.0.0 := x.0.0*y.0.0 + x.0.1*y.1.0;\n";
         String set_c10 = "c.1.0 := x.1.0*y.0.0 + x.1.1*y.1.0;\n";
@@ -424,7 +426,7 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         StemVariable stemVariable = getStemValue("a.", state);
         assert stemVariable.size() == 10; // Fingers and toes test.
-        assert stemVariable.containsKey("1."); // odds are stems
+        assert stemVariable.containsKey("1"); // odds are stems
         assert stemVariable.containsKey("0"); // evens are scalars
     }
 
