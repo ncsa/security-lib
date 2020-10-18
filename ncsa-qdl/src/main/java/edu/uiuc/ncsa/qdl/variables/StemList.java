@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.variables;
 
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -40,7 +41,9 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         }
         add(newEntry);
     }
-
+     public static class seGapException extends QDLException{
+      // If there is a gap in the entries, fall back on stem notation.
+     }
     @Override
     public String toString() {
         String output = "[";
@@ -51,7 +54,11 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
             } else {
                 output = output + ",";
             }
-            output = output +  get(i);
+            Object obj = get(i);
+            if(obj == null){
+                throw new seGapException();
+            }
+            output = output +  obj;
         }
 
         return output + "]";

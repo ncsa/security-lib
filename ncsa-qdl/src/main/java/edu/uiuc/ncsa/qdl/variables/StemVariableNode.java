@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.variables;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSONObject;
 
@@ -44,8 +45,10 @@ public class StemVariableNode implements StatementWithResultInterface {
 
     @Override
     public void setResultType(int type) {
-        throw new NotImplementedException("Error: Not implements");
-
+        if(type != Constant.STEM_TYPE){
+            throw new NFWException("error: Attempt to reset stem to type " + type);
+        }
+                       // result type is fixed since these are created to only manage
     }
 
     @Override

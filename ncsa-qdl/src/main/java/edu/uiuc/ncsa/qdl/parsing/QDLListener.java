@@ -980,4 +980,15 @@ public class QDLListener implements QDLParserListener {
     public void exitStemVar(QDLParserParser.StemVarContext ctx) {
 
     }
+
+    @Override
+    public void enterTildeExpression(QDLParserParser.TildeExpressionContext ctx) {
+    }
+
+    @Override
+    public void exitTildeExpression(QDLParserParser.TildeExpressionContext ctx) {
+        Dyad dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+        stash(ctx, dyad);
+        finish(dyad, ctx);
+    }
 }

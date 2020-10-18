@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
@@ -11,7 +12,6 @@ import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
-import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -300,7 +300,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
             if (objects[0] instanceof StemVariable) {
                 StemVariable newOut = new StemVariable();
-                processStem2(newOut, (StemVariable) objects[0], (StemVariable) objects[1], pointer, polyad, optionalArgs);
+                processStem2(newOut, toStem(objects[0]), toStem(objects[1]), pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {
                     outStem.put(key, newOut);
                 }
@@ -371,9 +371,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             if (objects[0] instanceof StemVariable) {
                 StemVariable newOut = new StemVariable();
                 processStem3(newOut,
-                        (StemVariable) objects[0],
-                        (StemVariable) objects[1],
-                        (StemVariable) objects[2],
+                        toStem(objects[0]),
+                        toStem(objects[1]),
+                        toStem(objects[2]),
                         pointer, polyad, optionalArgs);
                 if(!newOut.isEmpty()) {
                     outStem.put(key, newOut);
@@ -468,7 +468,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             }
         }
         if (stem1 == null) {
-            throw new NFWException("Internal error: the supplied node is not a variable node. You probably supplied the wrong argument");
+            throw new MissingArgumentException("error: the first argument is not a variable in this workspace.");
+            //throw new NFWException("Internal error: the supplied node is not a variable node. You probably supplied the wrong argument");
         }
         return stem1;
     }

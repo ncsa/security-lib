@@ -335,7 +335,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
             } else {
                 if (temp instanceof StemVariable) {
+                    StemVariable s = ((StemVariable) temp);
                     if (prettyPrintForStems) {
+
                         result = ((StemVariable) temp).toString(1);
                     } else {
                         result = temp.toString();

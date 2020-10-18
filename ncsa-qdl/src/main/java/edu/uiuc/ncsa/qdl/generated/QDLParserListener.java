@@ -154,6 +154,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitPrefix(QDLParserParser.PrefixContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code tildeExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterTildeExpression(QDLParserParser.TildeExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code tildeExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitTildeExpression(QDLParserParser.TildeExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code numbers}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

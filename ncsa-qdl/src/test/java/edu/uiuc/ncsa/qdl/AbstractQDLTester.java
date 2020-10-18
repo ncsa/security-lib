@@ -14,6 +14,9 @@ import java.util.Random;
  * on 1/16/20 at  1:15 PM
  */
 public class AbstractQDLTester extends TestBase {
+
+   protected TestUtils testUtils = TestUtils.newInstance();
+
     /*
     Convenience getters for testing
      */

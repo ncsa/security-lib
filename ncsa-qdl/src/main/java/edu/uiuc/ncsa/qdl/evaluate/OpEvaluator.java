@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
@@ -18,26 +19,27 @@ import java.util.TreeSet;
  */
 public class OpEvaluator extends AbstractFunctionEvaluator {
 
-    public static String ASSIGNMENT = ":=";
-    public static String POWER = "^";
-    public static String TIMES = "*";
-    public static String DIVIDE = "/";
-    public static String INTEGER_DIVIDE = "%";
-    public static String PLUS = "+";
-    public static String MINUS = "-";
-    public static String PLUS_PLUS = "++";
-    public static String MINUS_MINUS = "--";
-    public static String AND = "&&";
-    public static String OR = "||";
-    public static String EQUALS = "==";
-    public static String NOT_EQUAL = "!=";
-    public static String LESS_THAN = "<";
-    public static String LESS_THAN_EQUAL = "<=";
-    public static String LESS_THAN_EQUAL2 = "=<";
-    public static String MORE_THAN = ">";
-    public static String MORE_THAN_EQUAL = ">=";
-    public static String MORE_THAN_EQUAL2 = "=>";
-    public static String NOT = "!";
+    public static final String ASSIGNMENT = ":=";
+    public static final String POWER = "^";
+    public static final String TILDE = "~";
+    public static final String TIMES = "*";
+    public static final String DIVIDE = "/";
+    public static final String INTEGER_DIVIDE = "%";
+    public static final String PLUS = "+";
+    public static final String MINUS = "-";
+    public static final String PLUS_PLUS = "++";
+    public static final String MINUS_MINUS = "--";
+    public static final String AND = "&&";
+    public static final String OR = "||";
+    public static final String EQUALS = "==";
+    public static final String NOT_EQUAL = "!=";
+    public static final String LESS_THAN = "<";
+    public static final String LESS_THAN_EQUAL = "<=";
+    public static final String LESS_THAN_EQUAL2 = "=<";
+    public static final String MORE_THAN = ">";
+    public static final String MORE_THAN_EQUAL = ">=";
+    public static final String MORE_THAN_EQUAL2 = "=>";
+    public static final String NOT = "!";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -58,6 +60,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int DIVIDE_VALUE = 210;
     public static final int POWER_VALUE = 211;
     public static final int INTEGER_DIVIDE_VALUE = 212;
+    public static final int TILDE_VALUE = 213;
 
     @Override
     public String[] getFunctionNames() {
@@ -92,26 +95,68 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * @return
      */
     public int getType(String oo) {
-        if (oo.equals(ASSIGNMENT)) return ASSIGNMENT_VALUE;
+        switch (oo) {
+            case ASSIGNMENT:
+                return ASSIGNMENT_VALUE;
+            case AND:
+                return AND_VALUE;
+            case EQUALS:
+                return EQUALS_VALUE;
+            case LESS_THAN:
+                return LESS_THAN_VALUE;
+            case LESS_THAN_EQUAL:
+            case LESS_THAN_EQUAL2:
+                return LESS_THAN_EQUAL_VALUE;
+            case MINUS:
+                return MINUS_VALUE;
+            case MORE_THAN:
+                return MORE_THAN_VALUE;
+            case MORE_THAN_EQUAL:
+            case MORE_THAN_EQUAL2:
+                return MORE_THAN_EQUAL_VALUE;
+            case NOT_EQUAL:
+                return NOT_EQUAL_VALUE;
+            case OR:
+                return OR_VALUE;
+            case PLUS:
+                return PLUS_VALUE;
+            case POWER:
+                return POWER_VALUE;
+            case TIMES:
+                return TIMES_VALUE;
+            case DIVIDE:
+                return DIVIDE_VALUE;
+            case INTEGER_DIVIDE:
+                return INTEGER_DIVIDE_VALUE;
+            case MINUS_MINUS:
+                return MINUS_MINUS_VALUE;
+            case NOT:
+                return NOT_VALUE;
+            case PLUS_PLUS:
+                return PLUS_PLUS_VALUE;
+            case TILDE:
+                return TILDE_VALUE;
+        }
+//        if (oo.equals(ASSIGNMENT)) return ASSIGNMENT_VALUE;
         // Dyadic operators
-        if (oo.equals(AND)) return AND_VALUE;
-        if (oo.equals(EQUALS)) return EQUALS_VALUE;
-        if (oo.equals(LESS_THAN)) return LESS_THAN_VALUE;
-        if (oo.equals(LESS_THAN_EQUAL) || oo.equals(LESS_THAN_EQUAL2)) return LESS_THAN_EQUAL_VALUE;
-        if (oo.equals(MINUS)) return MINUS_VALUE;
-        if (oo.equals(MORE_THAN)) return MORE_THAN_VALUE;
-        if (oo.equals(MORE_THAN_EQUAL) || oo.equals(MORE_THAN_EQUAL2)) return MORE_THAN_EQUAL_VALUE;
-        if (oo.equals(NOT_EQUAL)) return NOT_EQUAL_VALUE;
-        if (oo.equals(OR)) return OR_VALUE;
-        if (oo.equals(PLUS)) return PLUS_VALUE;
-        if (oo.equals(POWER)) return POWER_VALUE;
-        if (oo.equals(TIMES)) return TIMES_VALUE;
-        if (oo.equals(DIVIDE)) return DIVIDE_VALUE;
-        if (oo.equals(INTEGER_DIVIDE)) return INTEGER_DIVIDE_VALUE;
+        //      if (oo.equals(AND)) return AND_VALUE;
+        //    if (oo.equals(EQUALS)) return EQUALS_VALUE;
+        //  if (oo.equals(LESS_THAN)) return LESS_THAN_VALUE;
+        //   if (oo.equals(LESS_THAN_EQUAL) || oo.equals(LESS_THAN_EQUAL2)) return LESS_THAN_EQUAL_VALUE;
+//        if (oo.equals(MINUS)) return MINUS_VALUE;
+//        if (oo.equals(MORE_THAN)) return MORE_THAN_VALUE;
+//        if (oo.equals(MORE_THAN_EQUAL) || oo.equals(MORE_THAN_EQUAL2)) return MORE_THAN_EQUAL_VALUE;
+//        if (oo.equals(NOT_EQUAL)) return NOT_EQUAL_VALUE;
+//        if (oo.equals(OR)) return OR_VALUE;
+//        if (oo.equals(PLUS)) return PLUS_VALUE;
+//        if (oo.equals(POWER)) return POWER_VALUE;
+        //       if (oo.equals(TIMES)) return TIMES_VALUE;
+//        if (oo.equals(DIVIDE)) return DIVIDE_VALUE;
+//        if (oo.equals(INTEGER_DIVIDE)) return INTEGER_DIVIDE_VALUE;
         // monadic operators.
-        if (oo.equals(MINUS_MINUS)) return MINUS_MINUS_VALUE;
-        if (oo.equals(NOT)) return NOT_VALUE;
-        if (oo.equals(PLUS_PLUS)) return PLUS_PLUS_VALUE;
+//        if (oo.equals(MINUS_MINUS)) return MINUS_MINUS_VALUE;
+//        if (oo.equals(NOT)) return NOT_VALUE;
+//        if (oo.equals(PLUS_PLUS)) return PLUS_PLUS_VALUE;
         return UNKNOWN_VALUE;
     }
 
@@ -131,6 +176,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return;
             case PLUS_VALUE:
                 doDyadPlus(dyad, state);
+                return;
+            case TILDE_VALUE:
+                doTilde(dyad, state);
                 return;
             case MINUS_VALUE:
                 doDyadMinus(dyad, state);
@@ -152,6 +200,36 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             default:
                 throw new NotImplementedException("Unknown dyadic operator");
         }
+    }
+
+    protected void doTilde(Dyad dyad, State state) {
+        Object obj0 = dyad.evalArg(0, state);
+        Object obj1 = dyad.evalArg(1, state);
+        if((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)){
+            throw new IllegalArgumentException("Error: cannot do a union a null");
+        }
+        StemVariable stem0 = null;
+        StemVariable stem1 = null;
+
+        if(obj0 instanceof StemVariable){
+            stem0 =  (StemVariable)obj0;
+        }else{
+            stem0 = new StemVariable();
+            stem0.put(0L, obj0);
+        }
+
+        if(obj1 instanceof StemVariable){
+            stem1 =  (StemVariable)obj1;
+        }else{
+            stem1 = new StemVariable();
+            stem1.put(0L, obj1);
+        }
+
+        StemVariable output = new StemVariable();
+        output.union(stem0, stem1);
+        dyad.setResult(output);
+        dyad.setResultType(Constant.STEM_TYPE);
+        dyad.setEvaluated(true);
     }
 
     protected void doDyadIntegerDivide(Dyad dyad, State state) {

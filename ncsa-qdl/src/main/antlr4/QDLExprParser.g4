@@ -33,6 +33,7 @@ expression
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
  | '!' expression                                                        #notExpression
+ | expression '~' expression                                             #tildeExpression
  | expression '^' expression                                             #powerExpression
  | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression
  | ('+' | '-') expression                                                #unaryMinusExpression

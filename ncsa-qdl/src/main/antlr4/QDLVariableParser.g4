@@ -47,6 +47,7 @@ grammar QDLVariableParser;
          Or : '||';
    Backtick : '`';
     Percent : '%';
+      Tilde : '~';
 
 // The left bracket, as the end of a control statement, has to be found in the lexer.
    LeftBracket: ']';

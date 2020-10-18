@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.state.VariableState;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -708,6 +709,9 @@ public class StemVariable extends HashMap<String, Object> {
        if(key.endsWith(STEM_INDEX_MARKER)){
            key = key.substring(0,key.length() - 1);
        }
+       if(StringUtils.isTrivial(key)){
+           throw new IllegalArgumentException("error: Cannot have a trivial stem key");
+       }
 /*
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);
@@ -739,6 +743,9 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public String toString(int indentFactor, String currentIndent) {
+        if(isList()){
+            return getStemList().toString();
+        }
         String blanks = "                                                           ";
         blanks = blanks + blanks + blanks + blanks; // lots of blanks
         String output = currentIndent + "{\n";
@@ -824,6 +831,13 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public String toString() {
+        try {
+            if (isList()) {
+                return getStemList().toString();
+            }
+        }catch(StemList.seGapException x){
+            //rock on. Just means the list is sparse so use full notation.
+        }
         String output = "{";
         boolean isFirst = true;
         for (String key : keySet()) {
@@ -1116,6 +1130,6 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public boolean isList() {
-        return stemList.size() == size();
+        return getStemList().size() == size();
     }
 }

@@ -15,6 +15,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -104,6 +105,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_KEYS = STEM_FQ + KEYS;
     public static final int KEYS_TYPE = 107 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String SHUFFLE = "shuffle";
+    public static final String FQ_SHUFFLE = STEM_FQ + SHUFFLE;
+    public static final int SHUFFLE_TYPE = 108 + STEM_FUNCTION_BASE_VALUE;
+
     // list functions
 
     public static final String LIST_APPEND = "list_append";
@@ -164,6 +169,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             HAS_KEYS,
             INCLUDE_KEYS,
             RENAME_KEYS,
+            SHUFFLE,
             MASK,
             KEYS,
             LIST_APPEND,
@@ -192,6 +198,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_HAS_KEYS,
             FQ_INCLUDE_KEYS,
             FQ_RENAME_KEYS,
+            FQ_SHUFFLE,
             FQ_MASK,
             FQ_KEYS,
             FQ_LIST_APPEND,
@@ -258,6 +265,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case RENAME_KEYS:
             case FQ_RENAME_KEYS:
                 return RENAME_KEYS_TYPE;
+            case SHUFFLE:
+            case FQ_SHUFFLE:
+                return SHUFFLE_TYPE;
             case IS_LIST:
             case FQ_IS_LIST:
                 return IS_LIST_TYPE;
@@ -359,6 +369,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case RENAME_KEYS:
             case FQ_RENAME_KEYS:
                 doRenameKeys(polyad, state);
+                return true;
+            case SHUFFLE:
+            case FQ_SHUFFLE:
+                shuffleKeys(polyad, state);
                 return true;
             case IS_LIST:
             case FQ_IS_LIST:
@@ -1055,11 +1069,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(LIST_APPEND + " requires 2 arguments");
         }
         // surgery. If the first argument is null and a stem, turn it in to one.
-        StemVariable stem1 = getOrCreateStem(
-                polyad.getArguments().get(0),
-                state,
-                LIST_APPEND + " requires stem as its first argument");
-
+            StemVariable stem1 = getOrCreateStem(
+                    polyad.getArguments().get(0),
+                    state,
+                    LIST_APPEND + " requires stem as its first argument");
         Object arg2 = polyad.evalArg(1, state);
         if (arg2 instanceof StemVariable) {
             stem1.listAppend((StemVariable) arg2);
@@ -1213,6 +1226,28 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doRenameKeys(Polyad polyad, State state) {
+       oldRenameKeys(polyad, state);
+    }
+
+    /**
+     * Permute the elements in a stem. The right argument must contain every key in the left argument or
+     * an exception is raised. This is really just using cycle notation from abstract algebra...
+    E.g.,
+      <pre>
+   10+3*indices(5)
+[10,13,16,19,22]
+   rename_keys(10+3*indices(5), [4,2,3,1,0])
+[22,19,13,16,10]
+     </pre>
+     read that in [4,2,3,1,0]: old --> new, so 0 --> 4, 1 --> 2, 2-->3, 3-->1, 4-->0
+     */
+    /*
+    Test commands
+    a.p:='foo';a.q:='bar';a.r:='baz';a.0:=10;a.1:=15;
+    b.q :='r';b.0:='q';b.1:=0;b.p:=1;b.r:='p';
+     shuffle(a., b.);
+     */
+    protected void shuffleKeys(Polyad polyad, State state){
         if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
         }
@@ -1228,15 +1263,58 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
         }
+        StemVariable newKeyStem = (StemVariable)arg2;
+        Set<String> newKeys = newKeyStem.keySet();
+        StemVariable output = new StemVariable();
 
         StemVariable target = (StemVariable) arg;
-        target.renameKeys((StemVariable) arg2);
+        Set<String> keys = target.keySet();
+        // easy check is to count. If this fails, then we throw and exception.
+        if(keys.size() != newKeys.size()){
+            throw new IllegalArgumentException("Error: the supplied set of keys must match every key in the source stem.");
+        }
 
-        polyad.setResult(target);
+        for(String key : keys){
+           if(newKeys.contains(key)){
+               String kk = newKeyStem.getString(key);
+               Object vv = target.get(kk);
+               output.put(key, vv);
+           }else{
+               throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the second argument/");
+           }
+        }
+
+        polyad.setResult(output);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
+    /*
+    This only renames keys in situ, i.e. it changes the stem given.
+     */
+    protected void oldRenameKeys(Polyad polyad, State state){
+        if (polyad.getArgCount() != 2) {
+                throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
+            }
+            polyad.evalArg(0, state);
+            Object arg = polyad.getArguments().get(0).getResult();
+            if (!isStem(arg)) {
+                throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its first argument.");
+            }
+            polyad.evalArg(1, state);
 
+            Object arg2 = polyad.getArguments().get(1).getResult();
+            polyad.evalArg(1, state);
+            if (!isStem(arg2)) {
+                throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
+            }
+
+            StemVariable target = (StemVariable) arg;
+            target.renameKeys((StemVariable) arg2);
+
+            polyad.setResult(target);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+    }
     /**
      * <code>common_keys(stem1., stem2.)</code><br/><br/> Return a list of keys common to both stems.
      *

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
  * on 1/21/20 at  11:27 AM
  */
 public class ParserTest extends AbstractQDLTester {
-    TestUtils testUtils = TestUtils.newInstance();
+    //TestUtils testUtils = TestUtils.newInstance();
 
     /**
      * Tests the rational function<br/><br/>
