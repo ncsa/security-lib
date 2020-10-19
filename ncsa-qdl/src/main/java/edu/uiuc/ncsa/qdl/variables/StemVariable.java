@@ -755,11 +755,11 @@ public class StemVariable extends HashMap<String, Object> {
         return null;
     }
 
-    /*
-            a.p :='q'; a.r:='abc';
-  a.0 := 42; a.1 := 3;a.17:=100;
-  a.;
-  a.~[[mod(random(3),100)],mod(random(4),100)];
+    /*     Quick test that union to a stem with sparse array entries appends after the last entry.
+    a.p :='q'; a.r:='abc';
+    a.0 := 42; a.1 := 3;a.17:=100;
+    a.; // show it
+    a.~[[mod(random(3),100)],mod(random(4),100)];
      */
     public StemVariable union(StemVariable... stemVariables) {
         for (StemVariable stemVariable : stemVariables) {

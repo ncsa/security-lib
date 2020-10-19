@@ -688,11 +688,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.evalArg(i, state);
             if (polyad.getArguments().get(i) instanceof StatementWithResultInterface) {
                 StatementWithResultInterface vn = polyad.getArguments().get(i);
-/*
-                if (!(vn.getResult() instanceof StemVariable)) {
-                    throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
-                }
-*/
                 stem = (StemVariable) vn.getResult();
             }
             if ((polyad.getArguments().get(i) instanceof StemVariable)) {
@@ -701,7 +696,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (stem == null) {
                 throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
             }
-            outStem.union(stem);
+            // Or we get a result that references other bits of stems and can modify them with no warning.
+            outStem.union((StemVariable) stem.clone());
         }
         polyad.setResult(outStem);
         polyad.setEvaluated(true);
