@@ -42,6 +42,24 @@ public class StemVariable extends HashMap<String, Object> {
         return (Long) get(key);
     }
 
+    public BigDecimal getDecimal(Long key) {
+        Object obj = get(key);
+        if (obj instanceof BigDecimal) {
+            return (BigDecimal) obj;
+        }
+        // try to convert it.
+        return new BigDecimal(obj.toString());
+
+    }
+    public BigDecimal getDecimal(String key) {
+        Object obj = get(key);
+        if (obj instanceof BigDecimal) {
+            return (BigDecimal) obj;
+        }
+        // try to convert it.
+        return new BigDecimal(obj.toString());
+    }
+
     public String getString(String key) {
         Object obj = get(key);
         if (obj == null) {
@@ -84,8 +102,8 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Object get(String key) {
         // TODO -- Horribly inefficient. This should be improved but that may take some serious work, so deferring
-        if(key.endsWith(STEM_INDEX_MARKER)){
-             key = key.substring(0, key.length() - 1);
+        if (key.endsWith(STEM_INDEX_MARKER)) {
+            key = key.substring(0, key.length() - 1);
         }
         try {
             if (isLongIndex(key)) {
@@ -184,11 +202,11 @@ public class StemVariable extends HashMap<String, Object> {
          * the ones in between.
          */
         for (int i = 0; i < w.getComponents().length - 1; i++) {
-         //   String name = w.getComponents()[i] + STEM_INDEX_MARKER;
-            String name = w.getComponents()[i] ;
+            //   String name = w.getComponents()[i] + STEM_INDEX_MARKER;
+            String name = w.getComponents()[i];
             Object object = currentStem.get(name);
             StemVariable nextStem = null;
-            if(object instanceof StemVariable){
+            if (object instanceof StemVariable) {
                 nextStem = (StemVariable) object;
             }
             if (nextStem == null) {
@@ -269,7 +287,12 @@ public class StemVariable extends HashMap<String, Object> {
     public Object clone() {
         StemVariable output = new StemVariable();
         for (String key : keySet()) {
-            output.put(key, get(key));
+            Object obj = get(key);
+            if (obj instanceof StemVariable) {
+                output.put(key, ((StemVariable) obj).clone());
+            } else {
+                output.put(key, obj);
+            }
         }
         return output;
     }
@@ -396,7 +419,7 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON(boolean escapeNames) {
-           return newToJSON(escapeNames);
+        return newToJSON(escapeNames);
     }
 
     protected JSON newToJSON(boolean escapeNames) {
@@ -426,7 +449,7 @@ public class StemVariable extends HashMap<String, Object> {
         // Special case of a JSON array of objects that has been turned in to a stem list.
         // We want to recover this since it is a very common construct.
         for (String key : super.keySet()) {
-               Object object = get(key);
+            Object object = get(key);
 
             if (object instanceof StemVariable) {
                 StemVariable x = (StemVariable) object;
@@ -434,8 +457,8 @@ public class StemVariable extends HashMap<String, Object> {
                 // compound object
 
                 String newKey = key;
-                if(newKey.endsWith(STEM_INDEX_MARKER)) {
-                 newKey =   key.substring(0, key.length() - 1);
+                if (newKey.endsWith(STEM_INDEX_MARKER)) {
+                    newKey = key.substring(0, key.length() - 1);
                 }
                 if (isLongIndex(newKey)) {
                     StemEntry stemEntry = new StemEntry(Long.parseLong(newKey));
@@ -451,7 +474,7 @@ public class StemVariable extends HashMap<String, Object> {
                 }
 
             } else {
-                if(!(object instanceof QDLNull)) {
+                if (!(object instanceof QDLNull)) {
                     // don't add it if it is null.
                     json.put(escapeNames ? codec.decode(key) : key, object);
                 }
@@ -632,30 +655,31 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable fromJSON(JSONArray array) {
-           return newfromJSON(array);
+        return newfromJSON(array);
     }
 
     protected StemVariable newfromJSON(JSONArray array) {
-   //     StemList<StemEntry> sl = new StemList<>();
-         for (int i = 0; i < array.size(); i++) {
-             Object v = array.get(i);
-             if (v instanceof JSONObject) {
-                 StemVariable x = new StemVariable();
-                 put((long) i, x.fromJSON((JSONObject) v));
-             } else {
-                 if (v instanceof JSONArray) {
-                     StemVariable x = new StemVariable();
-                     put((long) i, x.fromJSON((JSONArray) v));
-                 } else {
-                  //   sl.add(new StemEntry(i, v));
-                     put((long)i, v);
-                 }
-             }
-         }
-     //    setStemList(sl);
+        //     StemList<StemEntry> sl = new StemList<>();
+        for (int i = 0; i < array.size(); i++) {
+            Object v = array.get(i);
+            if (v instanceof JSONObject) {
+                StemVariable x = new StemVariable();
+                put((long) i, x.fromJSON((JSONObject) v));
+            } else {
+                if (v instanceof JSONArray) {
+                    StemVariable x = new StemVariable();
+                    put((long) i, x.fromJSON((JSONArray) v));
+                } else {
+                    //   sl.add(new StemEntry(i, v));
+                    put((long) i, v);
+                }
+            }
+        }
+        //    setStemList(sl);
 
-         return this;
+        return this;
     }
+
     protected StemVariable oldfromJSON(JSONArray array) {
         StemList<StemEntry> sl = new StemList<>();
         for (int i = 0; i < array.size(); i++) {
@@ -706,12 +730,12 @@ public class StemVariable extends HashMap<String, Object> {
        /* if (!isVar(key)) {
             throw new IllegalArgumentException("Error: " + key + " is neither a legal variable name nor number.");
         }*/
-       if(key.endsWith(STEM_INDEX_MARKER)){
-           key = key.substring(0,key.length() - 1);
-       }
-       if(StringUtils.isTrivial(key)){
-           throw new IllegalArgumentException("error: Cannot have a trivial stem key");
-       }
+        if (key.endsWith(STEM_INDEX_MARKER)) {
+            key = key.substring(0, key.length() - 1);
+        }
+        if (StringUtils.isTrivial(key)) {
+            throw new IllegalArgumentException("error: Cannot have a trivial stem key");
+        }
 /*
         if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
             return put(Long.parseLong(key), value);
@@ -731,20 +755,33 @@ public class StemVariable extends HashMap<String, Object> {
         return null;
     }
 
+    /*
+            a.p :='q'; a.r:='abc';
+  a.0 := 42; a.1 := 3;a.17:=100;
+  a.;
+  a.~[[mod(random(3),100)],mod(random(4),100)];
+     */
     public StemVariable union(StemVariable... stemVariables) {
         for (StemVariable stemVariable : stemVariables) {
-            this.putAll(stemVariable); // non-list
-            for (StemEntry stemEntry : stemVariable.getStemList()) {
-                this.getStemList().append(stemEntry);
-            }
-            //   this.getStemList().addAll(stemVariable.getStemList());
+            super.putAll(stemVariable); // non-list
+            listAppend(stemVariable); // list elements
         }
         return this;
     }
 
+    public static String STEM_ENTRY_CONNECTOR = ":";
+
     public String toString(int indentFactor, String currentIndent) {
-        if(isList()){
-            return getStemList().toString();
+        String list = null;
+        try {
+            if (!getStemList().isEmpty()) {
+                list = getStemList().toString();
+                if (isList()) {
+                    return list;
+                }
+            }
+        } catch (StemList.seGapException x) {
+            //rock on
         }
         String blanks = "                                                           ";
         blanks = blanks + blanks + blanks + blanks; // lots of blanks
@@ -759,20 +796,25 @@ public class StemVariable extends HashMap<String, Object> {
             }
             Object o = get(key);
             if (o instanceof StemVariable) {
-                output = output + newIndent + key + "=" + ((StemVariable) o).toString(indentFactor, newIndent);
+                output = output + newIndent + key + STEM_ENTRY_CONNECTOR + ((StemVariable) o).toString(indentFactor, newIndent);
             } else {
-                output = output + newIndent + key + "=" + convert(o);
+                output = output + newIndent + key + STEM_ENTRY_CONNECTOR + convert(o);
             }
 
         }
-        // now for any list
-        for (StemEntry entry : getStemList()) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                output = output + ",\n";
+        if (list == null) {
+            // now for any list
+            for (StemEntry entry : getStemList()) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    output = output + ",\n";
+                }
+                output = output + newIndent + entry.index + STEM_ENTRY_CONNECTOR + convert(entry.entry);
             }
-            output = output + newIndent + entry.index + "=" + convert(entry.entry);
+        } else {
+            output = list + "~" + output;
+
         }
         return output + "\n" + currentIndent + "}";
 
@@ -831,22 +873,34 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public String toString() {
+        String list = null;
         try {
-            if (isList()) {
-                return getStemList().toString();
+            if (!getStemList().isEmpty()) {
+                list = getStemList().toString();
+                if (isList()) {
+                    return list;
+                }
             }
-        }catch(StemList.seGapException x){
+        } catch (StemList.seGapException x) {
             //rock on. Just means the list is sparse so use full notation.
         }
+
         String output = "{";
         boolean isFirst = true;
-        for (String key : keySet()) {
+        Set<String> keys;
+        if (list == null) {
+            keys = keySet(); // process everything here.
+        } else {
+            keys = super.keySet(); // only process proper stem entries.
+            output = list + "~" + output;
+        }
+        for (String key : keys) {
             if (isFirst) {
                 isFirst = false;
             } else {
                 output = output + ", ";
             }
-            output = output + key + "=" + get(key);
+            output = output + key + STEM_ENTRY_CONNECTOR + get(key);
         }
 
         return output + "}";
@@ -972,7 +1026,7 @@ public class StemVariable extends HashMap<String, Object> {
     public boolean containsKey(String key) {
         if (isLongIndex(key)) {
             StemEntry s = new StemEntry(Long.parseLong(key));
-            boolean rc =  getStemList().contains(s);
+            boolean rc = getStemList().contains(s);
             return rc;
         }
         return super.containsKey(key);

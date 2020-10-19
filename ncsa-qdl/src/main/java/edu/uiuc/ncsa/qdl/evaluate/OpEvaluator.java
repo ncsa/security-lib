@@ -225,9 +225,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             stem1.put(0L, obj1);
         }
 
-        StemVariable output = new StemVariable();
-        output.union(stem0, stem1);
-        dyad.setResult(output);
+        // NOTE this is done so we don't end up shlepping around references to things and modifying them
+        // wihout warning.
+  //       stem0 = (StemVariable) stem0.clone();
+  //       stem1 = (StemVariable)stem1.clone();
+        stem0.union(stem1);
+        dyad.setResult(stem0);
         dyad.setResultType(Constant.STEM_TYPE);
         dyad.setEvaluated(true);
     }

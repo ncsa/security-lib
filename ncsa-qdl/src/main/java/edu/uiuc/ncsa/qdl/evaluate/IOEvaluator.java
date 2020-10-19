@@ -347,6 +347,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 }
             }
         }
+
         if (printIt) {
             state.getIoInterface().println(result);
             //System.out.println(result);

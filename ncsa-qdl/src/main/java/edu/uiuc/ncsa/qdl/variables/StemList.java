@@ -41,9 +41,12 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         }
         add(newEntry);
     }
+
      public static class seGapException extends QDLException{
       // If there is a gap in the entries, fall back on stem notation.
+         // All this exception needs is to exist.
      }
+
     @Override
     public String toString() {
         String output = "[";
