@@ -119,6 +119,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
 
     public static class TestFileStore extends FSTransactionStore<BasicTransaction> {
+
         @Override
         public XMLConverter getXMLConverter() {
             throw new NotImplementedException("Error: Method not implemented");

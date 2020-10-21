@@ -107,6 +107,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     }
 
     @Override
+    public int size(boolean includeVersions) {
+        throw new NotImplementedException("Internal error: A cache should never call this.");
+    }
+
+    @Override
     public List<V> getAll() {
         throw new NotImplementedException("Error: this is not supported in a cache.");
     }

@@ -49,13 +49,22 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         System.out.println(x);
     }
 
+    public String getConfigName() {
+        return configName;
+    }
+
+    public void setConfigName(String configName) {
+        this.configName = configName;
+    }
+
+    String configName;
     public void load(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showLoadHelp();
             return;
         }
         String fileName = null;
-        String configName = inputLine.getArg(1);
+        configName = inputLine.getArg(1);
 
         if (2 < inputLine.size()) {
             fileName = inputLine.getArg(2);
@@ -71,13 +80,14 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
 
     protected void showLoadHelp() {
-        say("loads a configuration from the file. The options are");
-        say("   load configName - Loads the named configuration from the currently active configuration file.");
+        say("load [config_name config_file] a configuration from the file. The options are");
+        say("   load - displays current configuration file and name of the current configuration.");
+        say("   load configName - loads the named configuration from the currently active configuration file.");
         say("   load configName fileName - loads the configuration named \"configName\" from the fully qualified name of the file and sets it active");
         say("\nExample\n");
         say("   load default /var/www/config/config.xml \n");
         say("loads the configuration named \"default\" from the file named \"config.xml\" in the directory \"/var/www/config\"\n");
-        say("Note that after a load, any new configuration file becomes the default for future store operations.");
+        say("Note that after a load, any new configuration file becomes the default for future load operations.");
     }
 
 
@@ -259,6 +269,9 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         setConfigurationNode(ConfigUtil.findConfiguration(filename, configName, getComponentName()));
         setEnvironment(null); //so it gets loaded next time it's needed.
         getEnvironment(); // reload it
+        this.configName = configName;
+        this.configFile = filename;
+
     }
 
 

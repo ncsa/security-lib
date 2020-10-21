@@ -22,8 +22,8 @@ import org.junit.runners.Suite;
         StemFunctionsTest.class,
         ParserTest.class,
         GlomTest.class,
-        // Without the VFS tests, all other tests (134 of them) take 784 ms. (av. 5.85 ms per test)
-        // Running this next test adds a full 2 seconds for the initial database connection
+        // Without the VFS tests, all other tests (156 of them) take 1.532 s. (av. 9.82 ms per test)
+        // Running this next test adds a full 3 seconds for the initial database connection
         // and unzipping.
         // Point is that this is quite fast since pretty much every test creates a parser and executes it.
         VFSTest.class

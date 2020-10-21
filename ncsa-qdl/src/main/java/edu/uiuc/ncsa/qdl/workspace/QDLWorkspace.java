@@ -114,7 +114,7 @@ public class QDLWorkspace {
                 // figure it `out and turn it back on.
                 workspaceCommands.setEchoModeOn(echoMode);
                 workspaceCommands.setPrettyPrint(prettyPrint);
-                handleException(t);
+               handleException(t);
             }
         }
     }

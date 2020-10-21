@@ -453,6 +453,9 @@ public class WorkspaceCommands implements Logable {
             // ) 2
             rawArg = inputLine.getArg(ACTION_INDEX);
         } else {
+            if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+                return null;
+            }
             rawArg = inputLine.getArg(FIRST_ARG_INDEX);
         }
 
@@ -620,11 +623,17 @@ public class WorkspaceCommands implements Logable {
             sayi("-src will only have an effect with links and will show the source rather than the target.");
             return RC_NO_OP;
         }
-
-        BufferManager.BufferRecord br = getBR(inputLine);
-        if (br == null || br.deleted) {
-            say("buffer not found");
+        BufferManager.BufferRecord br = null;
+        try {
+            br = getBR(inputLine);
+            if (br == null || br.deleted) {
+                say("buffer not found");
+                return RC_NO_OP;
+            }
+        } catch (Throwable t) {
+            say("I can't find that buffer. Sorry.");
             return RC_NO_OP;
+
         }
         if (br.hasContent()) {
             for (String x : br.getContent()) {
@@ -1289,16 +1298,16 @@ public class WorkspaceCommands implements Logable {
             showGeneralHelp();
             return RC_CONTINUE;
         }
-           if(inputLine.getArg(ACTION_INDEX).equals("--help")){
-               showHelp4Help();
-               return RC_CONTINUE;
-           }
+        if (inputLine.getArg(ACTION_INDEX).equals("--help")) {
+            showHelp4Help();
+            return RC_CONTINUE;
+        }
         String name = inputLine.getArg(ACTION_INDEX);
         if (name.equals("*")) {
             // so they entered )funcs help Print off first lines of help
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(getState().listAllDocumentation());
-            if(treeSet.isEmpty()){
+            if (treeSet.isEmpty()) {
                 say("(no user-defined functions)");
                 return RC_CONTINUE;
             }
@@ -1757,7 +1766,8 @@ public class WorkspaceCommands implements Logable {
     }
 
     File envFile; // this is the name of the file holding the environment variables
-     String TRACE_ARG = "-trace";
+    String TRACE_ARG = "-trace";
+
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
         ConfigurationNode node = ConfigUtil.findConfiguration(
@@ -1775,14 +1785,14 @@ public class WorkspaceCommands implements Logable {
 
         // Setting this flag at the command line will turn on lower level debugging.
         // The actual option in the configuration file turns on logging debug (so info and trace are enabled).
-        if(inputLine.hasArg(TRACE_ARG)){
+        if (inputLine.hasArg(TRACE_ARG)) {
             say("trace enabled");
             setDebugOn(true);
             DebugUtil.setIsEnabled(true);
             DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
 
         }
-        if(qe.isDebugOn() ){
+        if (qe.isDebugOn()) {
             setDebugOn(true);
         }
         if (rootDir != null) {

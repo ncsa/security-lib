@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
@@ -59,6 +60,7 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
         }
         return vIndex;
     }
+
 
 
     @Override

@@ -19,8 +19,8 @@ import edu.uiuc.ncsa.security.storage.sql.internals.Table;
 import javax.inject.Provider;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 /**
  * Top-level SQL store object. A store is simply a logical analog of a hash table, where the key
@@ -250,34 +250,32 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
 
     public List<V> search(String key, String condition, boolean isRegEx) {
-        String searchString = "select * from " + getTable().getFQTablename() + " where " + key + " " +  (isRegEx?"regexp":"=") + " ?";
-          List<V>  values = new ArrayList<>();
-          Connection c = getConnection();
-          V t = null;
-          try {
-              PreparedStatement stmt = c.prepareStatement(searchString);
-              stmt.setString(1, condition);
-              stmt.executeQuery();
-              ResultSet rs = stmt.getResultSet();
-              // Now we have to pull in all the values.
-              while(rs.next()){
-                  ColumnMap map = rsToMap(rs);
-                  t = create();
-                  populate(map, t);
-                  values.add(t);
-              }
+        String searchString = "select * from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
+        List<V> values = new ArrayList<>();
+        Connection c = getConnection();
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(searchString);
+            stmt.setString(1, condition);
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                values.add(t);
+            }
 
-              rs.close();
-              stmt.close();
-              releaseConnection(c);
-          } catch (SQLException e) {
-              destroyConnection(c);
-              throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
-          }
-          return values;
-      }
-
-
+            rs.close();
+            stmt.close();
+            releaseConnection(c);
+        } catch (SQLException e) {
+            destroyConnection(c);
+            throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
+        }
+        return values;
+    }
 
 
     public Table getTable() {
@@ -289,7 +287,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
 
     public int size() {
-        return size(getTable().getFQTablename());
+        return size(getTable().getFQTablename(), true);
+    }
+
+    @Override
+    public int size(boolean includeVersions) {
+        return size(getTable().getFQTablename(), includeVersions);
     }
 
     /**
@@ -298,8 +301,19 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      * @param tablename
      * @return
      */
-    protected int size(String tablename) {
-        String query = "SELECT COUNT(*)  from " + tablename;
+    protected int size(String tablename, boolean includeVersions) {
+        String query = null;
+        if (includeVersions) {
+            query = "SELECT COUNT(*)  from " + tablename;
+        } else {
+            XMLConverter xmlConverter = getXMLConverter();
+            if (xmlConverter instanceof MapConverter) {
+                MapConverter mapConverter = (MapConverter) xmlConverter;
+                query = "SELECT COUNT(*)  from " + tablename + " WHERE " + mapConverter.getKeys().identifier() + " NOT LIKE '%" + VERSION_TAG + "%'";
+            } else {
+                query = "SELECT COUNT(*)  from " + tablename;
+            }
+        }
         Connection c = getConnection();
         int rowCount = 0; // default size
 
@@ -545,14 +559,14 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         for (ColumnDescriptorEntry cde : cds) {
             if (!foundCols.containsKey(cde.getName().toLowerCase())) {
                 // create the column
-                String rawStmt  = null;
-                if(cde.getType() == Types.TIMESTAMP){
+                String rawStmt = null;
+                if (cde.getType() == Types.TIMESTAMP) {
                     DebugUtil.trace(this, "Adding column " + cde.getName() + " of type TIMESTAMP = " + cde.getType());
                     // Timestamps must be explicitly allowed to be negative or have a default time or there will be an exception.
                     // Note that the next statement should work for versions of MySQL and for PostgreSQL. It may need
                     // modification for other database types.
-                     rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType()) + " DEFAULT CURRENT_TIMESTAMP";
-                }else{
+                    rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType()) + " DEFAULT CURRENT_TIMESTAMP";
+                } else {
                     System.err.println("Adding column " + cde.getName() + " of type " + cde.getType());
                     rawStmt = "Alter Table " + getTable().getFQTablename() + " add Column " + cde.getName() + " " + jdbcMappings.get(cde.getType());
                 }
@@ -593,7 +607,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
         }
     }
-    public XMLConverter<V> getXMLConverter(){
+
+    public XMLConverter<V> getXMLConverter() {
         return converter;
     }
 }

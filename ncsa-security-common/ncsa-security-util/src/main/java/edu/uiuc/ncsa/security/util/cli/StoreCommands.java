@@ -77,7 +77,6 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
 
-
     // Note to self -- cannot just have these here because all of the machinery to do this to and from XML resides in another
     // module and that would create a circular set of dependencies. This is the reason there is the subclass StoreCommands2
     // in OA4MP. Best we can do with how Java works until we have a large-scale restructuring of the packages, which we
@@ -236,7 +235,7 @@ public abstract class StoreCommands extends CommonCommands {
         say("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
     }
 
-  
+
     /**
      * Creates a new item. The argument is
      *
@@ -286,14 +285,14 @@ public abstract class StoreCommands extends CommonCommands {
         Identifier id = null;
         Identifiable c = null;
         while (tryAgain) {
-          //  sayi2("enter the id of the object you want to create or return for a random one >");
+            //  sayi2("enter the id of the object you want to create or return for a random one >");
             String inLine = readline("enter the id of the object you want to create or return for a random one >");
             if (!isEmpty(inLine)) {
                 try {
                     id = BasicIdentifier.newID(inLine);
                     tryAgain = false;
                 } catch (Throwable t) {
-                  //  sayi2("That is not a valid uri. Try again (y/n)? ");
+                    //  sayi2("That is not a valid uri. Try again (y/n)? ");
                     tryAgain = isOk(readline("That is not a valid uri. Try again (y/n)? "));
                 }
             } else {
@@ -356,18 +355,18 @@ public abstract class StoreCommands extends CommonCommands {
             return;
         }
         String rawID = inputLine.getLastArg();
-        if(rawID.equals("set_id")){
+        if (rawID.equals("set_id")) {
             // they forgot an argument
             say("sorry, but you have to supply an id to set.");
             return;
         }
         int index = -1;
-        try{
-             index = Integer.parseInt(rawID);
-        }catch(NumberFormatException nfx){
+        try {
+            index = Integer.parseInt(rawID);
+        } catch (NumberFormatException nfx) {
             // alles ok...
         }
-        if(index == -1 && !rawID.startsWith("/")){
+        if (index == -1 && !rawID.startsWith("/")) {
             inputLine.setLastArg("/" + rawID);
         }
         Identifiable thingy = findItem(inputLine);
@@ -384,7 +383,7 @@ public abstract class StoreCommands extends CommonCommands {
             say("warning: no identifier set");
             return;
         }
-            say("Identifier set to " + id);
+        say("Identifier set to " + id);
     }
 
     private void showSetIDHElp() {
@@ -581,9 +580,13 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
     }
-
+    protected static String SIZE_ALL_FLAG = "-all";
+    protected static String SIZE_VERSIONS_FLAG = "-versions";
     protected void showSizeHelp() {
-        sayi("Prints out the number of elements in the current store.");
+        say("size [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "] - prints out the number of  entries in the store ");
+        sayi("This by default does not count versions.");
+        sayi(SIZE_ALL_FLAG + " = include a count of everything, including versions");
+        sayi(SIZE_VERSIONS_FLAG + " = include a count of only versions.");
     }
 
     public void size(InputLine inputLine) {
@@ -591,12 +594,21 @@ public abstract class StoreCommands extends CommonCommands {
             showSizeHelp();
             return;
         }
-        sayi("Current store has " + getStore().size() + " entries");
+        if (inputLine.hasArg(SIZE_ALL_FLAG)) {
+            sayi("Current store has " + getStore().size(true) + " entries");
+            return;
+        }
+        if (inputLine.hasArg(SIZE_VERSIONS_FLAG)) {
+            sayi("Current store has " + (getStore().size(true) - getStore().size(false)) + " versions.");
+            return;
+        }
+
+        sayi("Current store has " + getStore().size(false) + " entries (excluding versions).");
     }
 
 
     @Override
-    public void print_help(InputLine inputLine) throws Exception{
+    public void print_help(InputLine inputLine) throws Exception {
         super.print_help(inputLine);
         say("--Serialization commands: Reading and writing objects.");
         sayi("deserialize = read the object from a file");

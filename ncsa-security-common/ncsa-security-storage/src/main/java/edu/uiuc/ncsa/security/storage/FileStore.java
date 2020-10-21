@@ -113,7 +113,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         this.storageDirectory = storeDirectory;
         this.identifiableProvider = identifiableProvider;
         this.converter = converter;
-        this.removeEmptyFiles =removeEmptyFiles;
+        this.removeEmptyFiles = removeEmptyFiles;
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         }
         File storeDir = new File(directory, "store");
         File index = new File(directory, "index");
-        doSetup(storeDir, index,idp, cp, removeEmptyFiles);
+        doSetup(storeDir, index, idp, cp, removeEmptyFiles);
     }
 
     protected File indexDirectory;
@@ -362,9 +362,25 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     public int size() {
-        return storageDirectory.list().length;
+        return size(false);
     }
 
+    @Override
+    public int size(boolean includeVersions) {
+        if (includeVersions) {
+            return storageDirectory.list().length;
+
+        }
+        int count = 0;
+        Set<Identifier> keys = keySet();
+        for(Identifier key : keys){
+            if(!key.toString().contains(VERSION_TAG)){
+                count++;
+            }
+        }
+
+        return count;
+    }
 
     class IdentifierFileFilter implements FilenameFilter {
         public boolean accept(File dir, String name) {

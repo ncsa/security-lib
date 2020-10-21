@@ -6,17 +6,17 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemEntry;
-import edu.uiuc.ncsa.qdl.variables.StemList;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -706,14 +706,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doUnBox(Polyad polyad, State state) {
-        if (1 != polyad.getArgCount()) {
-            throw new IllegalArgumentException("the " + UNBOX + " function requires  1 argument");
+        if (0 == polyad.getArgCount()) {
+            throw new IllegalArgumentException("the " + UNBOX + " function requires  at least 1 argument");
         }
         polyad.evalArg(0, state);
         // should take either a stem or a variable reference to it.
         StemVariable stem = null;
+        Boolean safeMode = Boolean.TRUE;
+        if(polyad.getArgCount() == 2){
+            Object o = polyad.evalArg(1,state);
+            if(!isBoolean(o)){
+                throw new IllegalArgumentException("The second argument of " + UNBOX + " must be a boolean.");
+            }
+            safeMode = (Boolean)o;
+        }
         String varName = null;
-        if (polyad.getArguments().get(0) instanceof VariableNode) {
+                if (polyad.getArguments().get(0) instanceof VariableNode) {
             VariableNode vn = (VariableNode) polyad.getArguments().get(0);
             varName = vn.getVariableReference();
             if (!(vn.getResult() instanceof StemVariable)) {
@@ -721,18 +729,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             stem = (StemVariable) vn.getResult();
         }
+        if (polyad.getArguments().get(0) instanceof StemVariableNode) {
+            stem = (StemVariable) polyad.evalArg(0, state);
+        }
+
         if ((polyad.getArguments().get(0) instanceof StemVariable)) {
             stem = (StemVariable) polyad.getArguments().get(0);
         }
         if (stem == null) {
             throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
         }
+        if(stem.getStemList().size() != 0){
+            throw new IllegalArgumentException("You can only unbox a stem without a list. List elements cannot be reasonably unboxed.");
+        }
+        // Make a safe copy of the state to unpack this in case something bombs
+        List<String> keys = new ArrayList<>();
         State localState = state.newModuleState();
         for (String key : stem.keySet()) {
-            localState.setValue(key, stem.get(key));
+            Object ob = stem.get(key);
+            key = key + (isStem(ob)?STEM_INDEX_MARKER:"");
+            if(safeMode){
+                if(state.isDefined(key)){
+                    throw new IllegalArgumentException("Error: name clash in safe mode for \"" + key + "\"");
+                }
+            }
+            keys.add(key);
+            localState.setValue(key, ob);
         }
-        // once all is said and done and none of this bombed copy it.. That way we don't leave the actual state in disaary
-        for (String key : stem.keySet()) {
+        // once all is said and done and none of this bombed copy it. That way we don't leave the actual state in disaary
+        for (String key : keys) {
             state.setValue(key, localState.getValue(key));
         }
         if (varName != null) {
@@ -1259,11 +1284,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
         }
+        StemVariable target = (StemVariable) arg;
         StemVariable newKeyStem = (StemVariable)arg2;
         Set<String> newKeys = newKeyStem.keySet();
+        Set<String> usedKeys = target.keySet();
+
         StemVariable output = new StemVariable();
 
-        StemVariable target = (StemVariable) arg;
         Set<String> keys = target.keySet();
         // easy check is to count. If this fails, then we throw and exception.
         if(keys.size() != newKeys.size()){
@@ -1273,11 +1300,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         for(String key : keys){
            if(newKeys.contains(key)){
                String kk = newKeyStem.getString(key);
+               usedKeys.remove(kk);
                Object vv = target.get(kk);
                output.put(key, vv);
            }else{
-               throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the second argument/");
+               throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the second argument.");
            }
+        }
+        if(!usedKeys.isEmpty()){
+            throw new IllegalArgumentException("Error: each key in the left argument must be used as a value in the second argument. This assures that all elements are shuffled.");
         }
 
         polyad.setResult(output);

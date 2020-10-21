@@ -15,7 +15,7 @@ import java.util.Map;
  * on Mar 12, 2010 at  10:21:39 AM
  */
 public interface Store<V extends Identifiable> extends Map<Identifier, V> {
-
+      public static final String VERSION_TAG = "#version";
 
     /**
      * Create a new object of the given type. This is not in the store until it is registered. Attempts
@@ -67,5 +67,7 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @return
      */
     public List<V> search(String key, String condition, boolean isRegEx);
+
+    public int size(boolean includeVersions);
 
 }

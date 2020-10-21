@@ -43,6 +43,20 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     }
 
     @Override
+    public int size(boolean includeVersions) {
+        if(includeVersions){
+            return super.size();
+        }
+        int count = 0;
+        for(Identifier id : keySet() ){
+            if(!id.toString().contains(VERSION_TAG)){
+                    count++;
+            }
+        }
+        return count;
+    }
+
+    @Override
     public XMLConverter<V> getXMLConverter() {
         return null;
     }

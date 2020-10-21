@@ -320,7 +320,9 @@ Note: This does not remove the arguments from the symbol table.
     <entry id="unbox">
             <body>
                 <![CDATA[
-unbox(arg.) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
+unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
+                            safeModeOn (default is true) will NOT overwrite any variables in the current workspace
+                            Turning safeModeOn to false will.
 Note: One reason to use vencode when turning JSON into a stem is that if the keys in the stem are
       not legal QDL variable names, then this operation will fail. Using vencode ensures all names are legal.
                 ]]>
@@ -443,6 +445,22 @@ See also: mask
             </body>
         </entry>
 
+    <entry id="shuffle">
+            <body>
+                <![CDATA[
+shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target. according to keys.
+                          Argument keys. must have the same keys as the target. AND the values
+                          of keys. are (as a set) the same as the keys. in the target.
+E.g.
+    shuffle(2+3*indices(4), [2,1,3,0])
+[8,5,11,2]
+
+     In this case, the left argument is [2,5,8,11] and the right argument has 0->2, 1->1, 2->3, 3->0.
+     This works generally with stems too.
+See also: rename_keys, which lets you rename some of the keys in a stem.
+               ]]>
+            </body>
+        </entry>
     <entry id="execute">
             <body>
                 <![CDATA[

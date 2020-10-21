@@ -49,6 +49,14 @@ public class AggregateStore<V extends Store> implements Store {
         stores.add(store);
     }
 
+    @Override
+    public int size(boolean includeVersions) {
+        int x = 0;
+        for (Store s : stores) {
+            x = x + s.size(includeVersions);
+        }
+        return x;
+    }
 
     protected void checkValid() {
         if (0 == stores.size()) {

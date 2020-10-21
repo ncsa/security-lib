@@ -144,4 +144,18 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         }
         return results;
     }
+
+    @Override
+    public int size(boolean includeVersions) {
+        if(includeVersions){
+            return super.size();
+        }
+        int count = 0;
+        for(Identifier id : keySet() ){
+            if(!id.toString().contains(VERSION_TAG)){
+                    count++;
+            }
+        }
+        return count;
+    }
 }

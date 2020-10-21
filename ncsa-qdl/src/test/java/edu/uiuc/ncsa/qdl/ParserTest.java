@@ -656,9 +656,10 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * very, very basic compact stem notation test.
+     *
      * @throws Throwable
      */
-    
+
     public void testCompactStemNotation() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1090,6 +1091,36 @@ public class ParserTest extends AbstractQDLTester {
         assert stem.getLong("3") == 13L;
         assert stem.getLong("4") == 14L;
         assert stem.getString("help").equals(phrase);
+    }
+
+    @Test
+    public void testSafeUnbox() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 'foo';"); // Create existing entry in symbol table
+        addLine(script, "unbox({'a':'b'});"); // try to overwrite it in safe mode -- should fail
+
+        QDLParser interpreter = new QDLParser(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Was able to unbox a variable with a name clash in safe mode.";
+        } catch (IllegalArgumentException ix) {
+            assert true;
+        }
+
+    }
+
+    @Test
+    public void testUnboxWithFlag() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 'foo';"); // Create existing entry in symbol table
+        addLine(script, "unbox({'a':'b'}, false);"); // force overwrite
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("a", state).equals("b") :
+                "Failed to overwrite in unbox. Expected \"b\", got \"" + getStringValue("a", state) + "\"";
     }
 
     /**
