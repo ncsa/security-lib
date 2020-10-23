@@ -1,10 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
-import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.StringEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
@@ -19,6 +16,7 @@ import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.HashMap;
@@ -141,9 +139,43 @@ public class State extends FunctionState implements QDLConstants {
         fileTypes.put(SYS_FILE_TYPE_STEM, new Long(IOEvaluator.FILE_OP_TEXT_STEM));
         fileTypes.put(SYS_FILE_TYPE_STRING, new Long(IOEvaluator.FILE_OP_TEXT_STRING));
         systemConstants.put(SYS_FILE_TYPES, fileTypes);
+
+        StemVariable uriFields = new StemVariable();
+        uriFields.put(URI_AUTHORITY, URI_AUTHORITY);
+        uriFields.put(URI_HOST, URI_HOST);
+        uriFields.put(URI_FRAGMENT, URI_FRAGMENT);
+        uriFields.put(URI_QUERY, URI_QUERY);
+        uriFields.put(URI_PORT, URI_PORT);
+        uriFields.put(URI_PATH, URI_PATH);
+        uriFields.put(URI_SCHEME, URI_SCHEME);
+        uriFields.put(URI_SCHEME_SPECIFIC_PART, URI_SCHEME_SPECIFIC_PART);
+        uriFields.put(URI_USER_INFO, URI_USER_INFO);
+        systemConstants.put(URI_FIELDS, uriFields);
+
+        StemVariable logLevels = new StemVariable();
+        logLevels.put(SYS_LOG_NONE, ControlEvaluator.LOG_LEVEL_NONE);
+        logLevels.put(SYS_LOG_TRACE, ControlEvaluator.LOG_LEVEL_TRACE);
+        logLevels.put(SYS_LOG_INFO, ControlEvaluator.LOG_LEVEL_INFO);
+        logLevels.put(SYS_LOG_WARN, ControlEvaluator.LOG_LEVEL_WARN);
+        logLevels.put(SYS_LOG_ERROR, ControlEvaluator.LOG_LEVEL_ERROR);
+        logLevels.put(SYS_LOG_SEVERE, ControlEvaluator.LOG_LEVEL_SEVERE);
+        systemConstants.put(SYS_LOG_LEVELS, logLevels);
+
     }
 
+    public MetaDebugUtil getDebugUtil() {
+        if(debugUtil == null){
+            debugUtil = new MetaDebugUtil();
+            debugUtil.setDebugLevel(MetaDebugUtil.DEBUG_LEVEL_OFF_LABEL);
+        }
+        return debugUtil;
+    }
 
+    public void setDebugUtil(MetaDebugUtil debugUtil) {
+        this.debugUtil = debugUtil;
+    }
+
+    MetaDebugUtil debugUtil = null;
     /**
      * If this is packaged in a jar, read off the information from the manifest file.
      * If no manifest, skip this.

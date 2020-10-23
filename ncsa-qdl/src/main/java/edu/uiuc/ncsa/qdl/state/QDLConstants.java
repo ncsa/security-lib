@@ -28,17 +28,16 @@ public interface QDLConstants {
     String RESERVED_TRUE = "true";
     String RESERVED_FALSE = "false";
     String RESERVED_NULL = "null";
-    
-   static boolean isReservedWord(String x){
-         return RESERVED_TRUE.equals(x) || RESERVED_FALSE.equals(x) ||RESERVED_NULL.equals(x);
+
+    static boolean isReservedWord(String x) {
+        return RESERVED_TRUE.equals(x) || RESERVED_FALSE.equals(x) || RESERVED_NULL.equals(x);
     }
     // For the system constants:
-    
+
     String SYS_DETOKENIZE_TYPE = "detokenize.";
     String SYS_DETOKENIZE_PREPEND = "prepend";
     String SYS_DETOKENIZE_APPEND = "append";
     String SYS_DETOKENIZE_OMIT_DANGLING_DELIMITER = "omit_dangling_delimiter";
-
 
 
     String SYS_VAR_TYPES = "var_type.";
@@ -53,7 +52,7 @@ public interface QDLConstants {
     String SYS_ERROR_CODES = "error_codes.";
     String SYS_ERROR_CODE_SYSTEM_ERROR = "system_error";
 
-    String SYS_FILE_TYPES="file_types.";
+    String SYS_FILE_TYPES = "file_types.";
     String SYS_FILE_TYPE_BINARY = "binary";
     String SYS_FILE_TYPE_STEM = "stem";
     String SYS_FILE_TYPE_STRING = "string";
@@ -72,22 +71,40 @@ public interface QDLConstants {
     String SYS_INFO_OS_NAME = "name";
     String SYS_INFO_OS_VERSION = "version";
 
-   String SYS_QDL_VERSION = "qdl_version.";
-   String SYS_QDL_VERSION_VERSION = "version";
-   String SYS_QDL_VERSION_BUILD_JDK = "build_jdk";
-   String SYS_QDL_VERSION_BUILD_TIME = "build_time";
-   String SYS_QDL_VERSION_CREATED_BY = "created_by";
-   String SYS_QDL_VERSION_BUILD_NUMBER = "build_nr";
+    String SYS_QDL_VERSION = "qdl_version.";
+    String SYS_QDL_VERSION_VERSION = "version";
+    String SYS_QDL_VERSION_BUILD_JDK = "build_jdk";
+    String SYS_QDL_VERSION_BUILD_TIME = "build_time";
+    String SYS_QDL_VERSION_CREATED_BY = "created_by";
+    String SYS_QDL_VERSION_BUILD_NUMBER = "build_nr";
 
-   String SYS_BOOT = "boot.";
-   String SYS_BOOT_QDL_HOME = "qdl_home";
-   String SYS_BOOT_BOOT_SCRIPT = "boot_script";
-   String SYS_BOOT_CONFIG_NAME = "cfg_name";
-   String SYS_BOOT_CONFIG_FILE = "cfg_file";
-   String SYS_BOOT_LOG_NAME = "log_name";
-   String SYS_BOOT_LOG_FILE = "log_file";
+    String SYS_BOOT = "boot.";
+    String SYS_BOOT_QDL_HOME = "qdl_home";
+    String SYS_BOOT_BOOT_SCRIPT = "boot_script";
+    String SYS_BOOT_CONFIG_NAME = "cfg_name";
+    String SYS_BOOT_CONFIG_FILE = "cfg_file";
+    String SYS_BOOT_LOG_NAME = "log_name";
+    String SYS_BOOT_LOG_FILE = "log_file";
 
-   String SYS_BOOT_SERVER_MODE = "server_mode_on";
-   String SYS_SCRIPTS_PATH = "scripts_path";
+    String SYS_BOOT_SERVER_MODE = "server_mode_on";
+    String SYS_SCRIPTS_PATH = "scripts_path";
 
+    String URI_FIELDS = "uri_fields.";
+    String URI_AUTHORITY = "authority";
+    String URI_FRAGMENT = "fragment";
+    String URI_HOST = "host";
+    String URI_PATH = "path";
+    String URI_QUERY = "query";
+    String URI_SCHEME_SPECIFIC_PART = "scheme_specific_part";
+    String URI_SCHEME = "scheme";
+    String URI_USER_INFO = "user_info";
+    String URI_PORT = "port";
+
+    String SYS_LOG_LEVELS = "sys_log.";
+    String SYS_LOG_NONE = "off";
+    String SYS_LOG_TRACE = "trace";
+    String SYS_LOG_INFO = "info";
+    String SYS_LOG_WARN = "warn";
+    String SYS_LOG_ERROR = "error";
+    String SYS_LOG_SEVERE = "severe";
 }

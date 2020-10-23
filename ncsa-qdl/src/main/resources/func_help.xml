@@ -323,8 +323,40 @@ Note: This does not remove the arguments from the symbol table.
 unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
                             safeModeOn (default is true) will NOT overwrite any variables in the current workspace
                             Turning safeModeOn to false will.
-Note: One reason to use vencode when turning JSON into a stem is that if the keys in the stem are
-      not legal QDL variable names, then this operation will fail. Using vencode ensures all names are legal.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="to_uri">
+            <body>
+                <![CDATA[
+to_uri(string) - Takes a string that is a valid URI and returns a stem variable with all the parts (scheme, query, etc.)
+                 put into entries. This is RFC 3986 compliant.
+See also: constants() for the field names, from_uri.
+]]>
+            </body>
+        </entry>
+
+    <entry id="from_uri">
+            <body>
+                <![CDATA[
+from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the variable x, then
+   x == from_uri(to_uri(x))
+should be true.
+See also: constants() for the field names, to_uri.
+
+                ]]>
+            </body>
+        </entry>
+    <entry id="unique">
+            <body>
+                <![CDATA[
+unique(list.) - Take a list (of scalars) and return a list of the unique elements.
+E.g.
+  unique(['a',2,4,true]~['a','b',0,3,true])
+[0,a,2,b,3,4,true]
+
+ If this is used on a stem, it will only alter any list.
                 ]]>
             </body>
         </entry>

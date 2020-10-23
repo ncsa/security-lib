@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.qdl.workspace.QDLWorkspace;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -91,7 +92,16 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_OS_ENV = SYS_FQ + OS_ENV;
     public static final int OS_ENV_TYPE = 208 + CONTROL_BASE_VALUE;
 
+    // logging
+    public static final String SYSTEM_LOG = "log";
+    public static final String FQ_SYSTEM_LOG = SYS_FQ + SYSTEM_LOG;
+    public static final int SYSTEM_LOG_TYPE = 209 + CONTROL_BASE_VALUE;
 
+
+    // logging
+    public static final String DEBUG = "debug";
+    public static final String FQ_DEBUG = SYS_FQ + DEBUG;
+    public static final int DEBUG_TYPE = 210 + CONTROL_BASE_VALUE;
     // try ... catch
 
     public static final String RAISE_ERROR = "raise_error";
@@ -122,6 +132,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             SCRIPT_ARGS_COMMAND,
             SYS_INFO,
             OS_ENV,
+            SYSTEM_LOG,
+            DEBUG,
             CONSTANTS,
             CONTINUE,
             BREAK,
@@ -140,6 +152,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             FQ_SCRIPT_ARGS_COMMAND,
             FQ_SYS_INFO,
             FQ_OS_ENV,
+            FQ_SYSTEM_LOG,
+            FQ_DEBUG,
             FQ_CONSTANTS,
             FQ_CONTINUE,
             FQ_BREAK,
@@ -179,6 +193,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case OS_ENV:
             case FQ_OS_ENV:
                 return OS_ENV_TYPE;
+            case DEBUG:
+            case FQ_DEBUG:
+                return DEBUG_TYPE;
+            case SYSTEM_LOG:
+            case FQ_SYSTEM_LOG:
+                return SYSTEM_LOG_TYPE;
             case SYS_INFO:
             case FQ_SYS_INFO:
                 return SYS_INFO_TYPE;
@@ -257,6 +277,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case FQ_OS_ENV:
                 doOSEnv(polyad, state);
                 return true;
+            case SYSTEM_LOG:
+            case FQ_SYSTEM_LOG:
+                doSysLog(polyad, state, false);
+                return true;
+            case DEBUG:
+            case FQ_DEBUG:
+                doSysLog(polyad, state, true);
+                return true;
             case CONTINUE:
             case FQ_CONTINUE:
                 polyad.setEvaluated(true);
@@ -294,6 +322,96 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+
+    public static final int LOG_LEVEL_NONE = -1;
+    public static final int LOG_LEVEL_TRACE = 0;
+    public static final int LOG_LEVEL_INFO = 1;
+    public static final int LOG_LEVEL_WARN = 2;
+    public static final int LOG_LEVEL_ERROR = 3;
+    public static final int LOG_LEVEL_SEVERE = 4;
+
+    /**
+     * Write to the system log.
+     * log(message) - info
+     * log(message, int) 0 - 5
+     *
+     * @param polyad
+     * @param state
+     */
+    private void doSysLog(Polyad polyad, State state, boolean isDebug) {
+        if (polyad.getArgCount() == 0 || state.getLogger() == null) {
+            polyad.setResult(Boolean.FALSE);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        int logLevel = LOG_LEVEL_INFO;
+        Object obj = polyad.evalArg(0, state);
+        if (polyad.getArgCount() == 2) {
+            Object arg1 = polyad.evalArg(1, state);
+            if (isLong(arg1)) {
+                logLevel = ((Long) arg1).intValue();
+            } else {
+                String msg = "requested logging level \"" + arg1 + "\"is unknown.";
+                if (isDebug) {
+                    DebugUtil.info(QDLWorkspace.class, msg);
+                } else {
+                    state.getLogger().info(msg);
+                }
+            }
+        }
+        String message = obj.toString();
+        Boolean ok = Boolean.TRUE;
+        switch (logLevel) {
+            case LOG_LEVEL_NONE:
+                // do nothing.
+                break;
+            case LOG_LEVEL_TRACE:
+                if (isDebug) {
+                    state.getDebugUtil().trace(QDLWorkspace.class, message);
+                } else {
+                    state.getLogger().debug(message);
+                }
+                break;
+            case LOG_LEVEL_INFO:
+                if (isDebug) {
+                    state.getDebugUtil().info(QDLWorkspace.class, message);
+                } else {
+                    state.getLogger().info(message);
+                }
+                break;
+            case LOG_LEVEL_WARN:
+                if (isDebug) {
+                    state.getDebugUtil().warn(QDLWorkspace.class, message);
+                } else {
+                    state.getLogger().warn(message);
+                }
+                break;
+            case LOG_LEVEL_ERROR:
+                if (isDebug) {
+                    state.getDebugUtil().error(QDLWorkspace.class, message);
+                } else {
+                    state.getLogger().error(message);
+                }
+                break;
+            case LOG_LEVEL_SEVERE:
+                if (isDebug) {
+                    state.getDebugUtil().severe(QDLWorkspace.class, message);
+                } else {
+                    state.getLogger().warn(message); // no other options
+                }
+                break;
+
+            default:
+                ok = Boolean.FALSE;
+        }
+        polyad.setResult(ok);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
+
+        //    state.getLogger().
     }
 
     /**
@@ -641,8 +759,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 script.execute(localState);
                 localState.setScriptArgs(oldArgs);
             } catch (Throwable t) {
-                if(t instanceof ReturnException){
-                    ReturnException rx = (ReturnException)t;
+                if (t instanceof ReturnException) {
+                    ReturnException rx = (ReturnException) t;
                     polyad.setEvaluated(true);
                     polyad.setResultType(rx.resultType);
                     polyad.setResult(rx.result);
@@ -733,7 +851,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         Object arg = polyad.evalArg(0, state);
 
         if (!isString(arg)) {
-            throw new IllegalArgumentException( MODULE_LOAD + " requires a string as its argument, not '" + arg + "'");
+            throw new IllegalArgumentException(MODULE_LOAD + " requires a string as its argument, not '" + arg + "'");
         }
         String resourceName = arg.toString();
         if (loadTarget == LOAD_JAVA) {

@@ -109,6 +109,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_SHUFFLE = STEM_FQ + SHUFFLE;
     public static final int SHUFFLE_TYPE = 108 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String UNIQUE_VALUES = "unique";
+    public static final String FQ_UNIQUE_VALUES = STEM_FQ + UNIQUE_VALUES;
+    public static final int UNIQUE_VALUES_TYPE = 109 + STEM_FUNCTION_BASE_VALUE;
+
+
     // list functions
 
     public static final String LIST_APPEND = "list_append";
@@ -179,6 +184,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             LIST_STARTS_WITH,
             IS_LIST,
             TO_LIST,
+            UNIQUE_VALUES,
             TO_JSON,
             FROM_JSON};
     public static String FQ_FUNC_NAMES[] = new String[]{
@@ -208,6 +214,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_LIST_STARTS_WITH,
             FQ_IS_LIST,
             FQ_TO_LIST,
+            FQ_UNIQUE_VALUES,
             FQ_TO_JSON,
             FQ_FROM_JSON};
 
@@ -268,6 +275,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case SHUFFLE:
             case FQ_SHUFFLE:
                 return SHUFFLE_TYPE;
+            case UNIQUE_VALUES:
+            case FQ_UNIQUE_VALUES:
+                return UNIQUE_VALUES_TYPE;
             case IS_LIST:
             case FQ_IS_LIST:
                 return IS_LIST_TYPE;
@@ -374,6 +384,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_SHUFFLE:
                 shuffleKeys(polyad, state);
                 return true;
+            case UNIQUE_VALUES:
+            case FQ_UNIQUE_VALUES:
+                doUniqueValues(polyad, state);
+                return true;
             case IS_LIST:
             case FQ_IS_LIST:
                 doIsList(polyad, state);
@@ -436,6 +450,26 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doUniqueValues(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+                   throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
+               }
+               polyad.evalArg(0, state);
+               Object arg = polyad.getArguments().get(0).getResult();
+               if (!isStem(arg)) {
+                   polyad.setResult(new StemVariable()); // just an empty stem
+                   polyad.setResultType(Constant.STEM_TYPE);
+                   polyad.setEvaluated(true);
+                   return;
+               }
+               StemVariable stemVariable = (StemVariable) arg;
+               StemVariable out = stemVariable.unique();
+
+               polyad.setResult(out);
+               polyad.setResultType(Constant.STEM_TYPE);
+               polyad.setEvaluated(true);
     }
 
     /**
@@ -845,7 +879,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         StemVariable stemVariable = (StemVariable) arg;
+
         StemVariable out = new StemVariable();
+
         for (String key : stemVariable.keySet()) {
             out.put(key, key);
         }

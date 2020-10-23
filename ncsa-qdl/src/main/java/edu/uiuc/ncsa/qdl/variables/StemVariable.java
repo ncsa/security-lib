@@ -1186,4 +1186,9 @@ public class StemVariable extends HashMap<String, Object> {
     public boolean isList() {
         return getStemList().size() == size();
     }
+    public StemVariable unique(){
+        StemVariable output = new StemVariable();
+        output.setStemList(getStemList().unique());
+        return output;
+    }
 }

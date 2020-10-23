@@ -25,10 +25,7 @@ import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.Iso8601;
-import edu.uiuc.ncsa.security.core.util.LoggerProvider;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
@@ -1766,6 +1763,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     File envFile; // this is the name of the file holding the environment variables
+    // turns on some low-level tracing of this class with DebugUtil when it initializes. Not for public use.
     String TRACE_ARG = "-trace";
 
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
@@ -1777,6 +1775,12 @@ public class WorkspaceCommands implements Logable {
         QDLConfigurationLoader loader = new QDLConfigurationLoader(inputLine.getNextArgFor(CONFIG_FILE_FLAG), node);
 
         QDLEnvironment qe = loader.load();
+        // The state probably exists at this point if the user had to set the terminal type.
+        // Make sure the logger ends up in the actual state.
+        // The logger is created in the loader, so it happens automatically if there is a logging block in the config.
+        if(state != null){
+            state.setLogger(qe.getMyLogger());
+        }
         if (inputLine.hasArg("-home_dir")) {
             // The user might set the home directory here.
             // This is overrides configuration file.
@@ -1789,9 +1793,14 @@ public class WorkspaceCommands implements Logable {
             say("trace enabled");
             setDebugOn(true);
             DebugUtil.setIsEnabled(true);
-            DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
+            DebugUtil.setDebugLevel(DebugConstants.DEBUG_LEVEL_TRACE);
 
         }
+        MetaDebugUtil du = new MetaDebugUtil();
+        du.setDebugLevel(qe.getDebugLevel());
+        state.setDebugUtil(du);
+
+        // Next is for logging, which is not the same as debug.
         if (qe.isDebugOn()) {
             setDebugOn(true);
         }

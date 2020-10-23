@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
@@ -12,6 +14,18 @@ import java.util.TreeSet;
  * on 2/20/20 at  8:39 AM
  */
 public class StemList<V extends StemEntry> extends TreeSet<V> {
+    public StemList unique(){
+        Iterator<V> iterator = iterator();
+        HashSet set = new HashSet();
+        while(iterator.hasNext()){
+            set.add(iterator.next().entry);
+        }
+        StemList stemList1 = new StemList();
+        for(Object object : set){
+            stemList1.append(object);
+        }
+        return stemList1;
+    }
     public Object get(long index) {
         V stemEntry = (V) new StemEntry(index);
         if (!contains(stemEntry)) return null;

@@ -157,7 +157,7 @@ public class JWTUtil2 {
               throw new IllegalStateException("Unknown algorithm");
           }
           String algorithm = (String) alg;
-          DebugUtil.trace(JWTUtil.class, "Verifying ID token with algorithm =" + algorithm);
+          DebugUtil.trace(JWTUtil.class, "Verifying JWT with algorithm =" + algorithm);
           Signature signature = null;
           if (algorithm.equals(NONE_JWT)) {
               return true;

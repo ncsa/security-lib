@@ -62,6 +62,15 @@ public class MyLoggingFacade implements Logable {
 
     public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
+        if(logger == null){
+            return; // in bootstrapping, this might not be quite settable.
+        }
+        if( debugOn){
+            logger.setLevel(Level.FINEST);
+        }else{
+            logger.setLevel(Level.INFO);
+
+        }
     }
 
     java.util.logging.Logger logger;
@@ -69,6 +78,9 @@ public class MyLoggingFacade implements Logable {
     public java.util.logging.Logger getLogger() {
         if (logger == null) {
             logger = java.util.logging.Logger.getLogger(getClassName());
+            if(isDebugOn()){
+                logger.setLevel(Level.FINEST);
+            }
         }
         return logger;
     }
@@ -83,7 +95,7 @@ public class MyLoggingFacade implements Logable {
     public void debug(String x) {
         if (isDebugOn()) {
             String out = getClassName() + "(" + (new Date()) + "): " + x;
-            getLogger().info(out);
+            getLogger().finest(out);
         }
     }
 

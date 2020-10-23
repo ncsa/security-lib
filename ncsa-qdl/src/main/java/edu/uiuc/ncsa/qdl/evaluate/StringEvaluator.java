@@ -5,9 +5,14 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.state.QDLConstants.*;
 
 /**
  * This evaluates all string functions.
@@ -71,6 +76,14 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final String SYS_DETOKENIZE = SYS_FQ + DETOKENIZE;
     public static final int DETOKENIZE_TYPE = 12 + STRING_FUNCTION_BASE_VALUE;
 
+    public static final String TO_URI = "to_uri";
+    public static final String SYS_TO_URI = SYS_FQ + TO_URI;
+    public static final int TO_URI_TYPE = 13 + STRING_FUNCTION_BASE_VALUE;
+
+    public static final String FROM_URI = "from_uri";
+    public static final String SYS_FROM_URI = SYS_FQ + FROM_URI;
+    public static final int FROM_URI_TYPE = 14 + STRING_FUNCTION_BASE_VALUE;
+
     public static String FUNC_NAMES[] = new String[]{
             CONTAINS,
             TO_LOWER,
@@ -83,7 +96,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             TOKENIZE,
             DETOKENIZE,
             ENCODE,
-            DECODE};
+            DECODE,
+            TO_URI,
+            FROM_URI};
     public static String FQ_FUNC_NAMES[] = new String[]{
             SYS_CONTAINS,
             SYS_TO_LOWER,
@@ -96,7 +111,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             SYS_TOKENIZE,
             SYS_DETOKENIZE,
             SYS_ENCODE,
-            SYS_DECODE};
+            SYS_DECODE,
+            SYS_TO_URI,
+            SYS_FROM_URI};
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
@@ -151,6 +168,12 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case DECODE:
             case SYS_DECODE:
                 return DECODE_TYPE;
+            case TO_URI:
+            case SYS_TO_URI:
+                return TO_URI_TYPE;
+            case FROM_URI:
+            case SYS_FROM_URI:
+                return FROM_URI_TYPE;
         }
         return UNKNOWN_VALUE;
     }
@@ -206,12 +229,93 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case SYS_DECODE:
                 doDecode(polyad, state);
                 return true;
+            case TO_URI:
+            case SYS_TO_URI:
+                doToURI(polyad, state);
+                return true;
+            case FROM_URI:
+            case SYS_FROM_URI:
+                doFromURI(polyad, state);
+                return true;
         }
         return false;
     }
 
-    public static  final Long DETOKENIZE_PREPEND_VALUE = 1L;
-    public static  final Long DETOKENIZE_OMIT_DANGLING_DELIMITER_VALUE = 2L;
+    private void doFromURI(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("Error: " + FROM_URI + " requires an argument");
+        }
+        Object object = polyad.evalArg(0, state);
+        if (!isStem(object)) {
+            throw new IllegalArgumentException("Error: " + FROM_URI + " requires a stem as its argument");
+        }
+
+        StemVariable s = (StemVariable) object;
+        try {
+            Long port = s.getLong("port");
+
+            URI uri = new URI(s.getString(URI_SCHEME),
+                    s.getString(URI_USER_INFO),
+                    s.getString(URI_HOST),
+                    port.intValue(),
+                    s.getString(URI_PATH),
+                    s.getString(URI_QUERY),
+                    s.getString(URI_FRAGMENT));
+            polyad.setResult(uri.toString());
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(Boolean.TRUE);
+        } catch (URISyntaxException usx) {
+            throw new IllegalArgumentException("error: this is not a valid uri");
+        }
+    }
+
+    /**
+     * Turn a string into a parsed uri.
+     *
+     * @param polyad
+     * @param state
+     */
+    private void doToURI(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("Error: " + TO_URI + " requires an argument");
+        }
+        Object object = polyad.evalArg(0, state);
+        if (!isString(object)) {
+            throw new IllegalArgumentException("Error: " + TO_URI + " requires a string as its argument");
+        }
+        try {
+            URI uri = URI.create(object.toString());
+            StemVariable output = new StemVariable();
+            putURIAttrib(output, URI_AUTHORITY, uri.getAuthority());
+            putURIAttrib(output, URI_FRAGMENT, uri.getFragment());
+            putURIAttrib(output, URI_HOST, uri.getHost());
+            putURIAttrib(output, URI_PATH, uri.getPath());
+            putURIAttrib(output, URI_QUERY, uri.getQuery());
+            putURIAttrib(output, URI_SCHEME_SPECIFIC_PART, uri.getSchemeSpecificPart());
+            putURIAttrib(output, URI_SCHEME, uri.getScheme());
+            putURIAttrib(output, URI_USER_INFO, uri.getUserInfo());
+            output.put(URI_PORT, new Long(uri.getPort()));
+            polyad.setResult(output);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(Boolean.TRUE);
+            return;
+        } catch (Throwable t) {
+            throw new IllegalArgumentException("Error: \"" + object + "\" is not a valid uri: " + t.getMessage());
+        }
+
+    }
+
+
+    void putURIAttrib(StemVariable s, String key, String value) {
+        if (StringUtils.isTrivial(value)) {
+            return;
+        }
+        s.put(key, value);
+    }
+
+    public static final Long DETOKENIZE_PREPEND_VALUE = 1L;
+    public static final Long DETOKENIZE_OMIT_DANGLING_DELIMITER_VALUE = 2L;
+
     /*
     Change a stem into a string with each value separated by a delimiter. Note that
     in lists, the order is preserved but in general stems there is no canonical order.
@@ -292,8 +396,8 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     if (isPrepend) {
                         if (omitDanglingDelimiter && currentCount == 0) {
 
-                            result =  leftStem.getString(key);
-                        }else{
+                            result = leftStem.getString(key);
+                        } else {
                             result = result + rightArg + leftStem.getString(key);
 
                         }
@@ -301,7 +405,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     } else {
                         if (omitDanglingDelimiter && currentCount == lsize - 1) {
                             result = result + leftStem.getString(key);
-                        }else{
+                        } else {
                             result = result + leftStem.getString(key) + rightArg;
                         }
                     }

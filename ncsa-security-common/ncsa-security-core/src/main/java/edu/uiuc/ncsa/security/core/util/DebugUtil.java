@@ -2,8 +2,6 @@ package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
-import java.util.Date;
-
 /**
  * Utilities for centralizing some common debugging commands. The debug level is set globally for all calls to this.
  * Note that this is not logging. Use the {@link MyLoggingFacade} for that. This is for levels of debugging that may be
@@ -14,40 +12,17 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on 7/27/16 at  2:55 PM
  */
-public class DebugUtil {
+public class DebugUtil implements DebugConstants{
 
-    /**
-     * Turn off debugging
-     */
-    public static int DEBUG_LEVEL_OFF = 0;
-    /**
-     * ONly basic information should be displayed, such as milestones in the control flow
-     */
-    public static int DEBUG_LEVEL_INFO = 1;
-    /**
-     * Display warnings about the control flow and possibly harmful things
-     */
-    public static int DEBUG_LEVEL_WARN = 2;
-    /**
-     * Show errors or possible branch points of errors, but ones that still allow the control flow to continue
-     */
-    public static int DEBUG_LEVEL_ERROR = 3;
-    /**
-     * Show error that stop the control flow that probably lead the application to abort of be unrecoverable.
-     */
-    public static int DEBUG_LEVEL_SEVERE = 4;
-    /**
-     * Show detailed information about the execution so that detailed information about the control flow
-     * can be seen. Note that this may be extremely verbose.
-     */
-    public static int DEBUG_LEVEL_TRACE = 5;
+    static MetaDebugUtil debugUtil = null;
 
-    public static String DEBUG_LEVEL_OFF_LABEL = "OFF";
-    public static String DEBUG_LEVEL_INFO_LABEL = "INFO";
-    public static String DEBUG_LEVEL_WARN_LABEL = "WARN";
-    public static String DEBUG_LEVEL_ERROR_LABEL = "ERROR";
-    public static String DEBUG_LEVEL_SEVERE_LABEL = "SEVERE";
-    public static String DEBUG_LEVEL_TRACE_LABEL = "TRACE";
+    protected static MetaDebugUtil getInstance() {
+        if (debugUtil == null) {
+            debugUtil = new MetaDebugUtil();
+        }
+        return debugUtil;
+    }
+
 
     protected static String toLabel(int level) {
         if (level == DEBUG_LEVEL_OFF) return "";
@@ -67,9 +42,6 @@ public class DebugUtil {
      * @param givenLabel
      * @return
      */
-    protected static boolean checkLevelAndLabel(String targetLabel, String givenLabel) {
-        return targetLabel.toLowerCase().equals(givenLabel.toLowerCase());
-    }
 
     /**
      * This is used to set the debugging level from a label.
@@ -81,72 +53,45 @@ public class DebugUtil {
     }
 
     protected static int toLevel(String label) {
-        if (checkLevelAndLabel(DEBUG_LEVEL_OFF_LABEL, label)) return DEBUG_LEVEL_OFF;
-        if (checkLevelAndLabel(DEBUG_LEVEL_INFO_LABEL, label)) return DEBUG_LEVEL_INFO;
-        if (checkLevelAndLabel(DEBUG_LEVEL_WARN_LABEL, label)) return DEBUG_LEVEL_WARN;
-        if (checkLevelAndLabel(DEBUG_LEVEL_ERROR_LABEL, label)) return DEBUG_LEVEL_ERROR;
-        if (checkLevelAndLabel(DEBUG_LEVEL_SEVERE_LABEL, label)) return DEBUG_LEVEL_SEVERE;
-        if (checkLevelAndLabel(DEBUG_LEVEL_TRACE_LABEL, label)) return DEBUG_LEVEL_TRACE;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_OFF_LABEL, label)) return DEBUG_LEVEL_OFF;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_INFO_LABEL, label)) return DEBUG_LEVEL_INFO;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_WARN_LABEL, label)) return DEBUG_LEVEL_WARN;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_ERROR_LABEL, label)) return DEBUG_LEVEL_ERROR;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_SEVERE_LABEL, label)) return DEBUG_LEVEL_SEVERE;
+        if (getInstance().checkLevelAndLabel(DEBUG_LEVEL_TRACE_LABEL, label)) return DEBUG_LEVEL_TRACE;
 
         throw new NFWException("INTERNAL ERROR: Unknown debugging level encountered:" + label);
 
     }
 
     public static int getDebugLevel() {
-        return debugLevel;
+        return getInstance().getDebugLevel();
     }
 
     public static void setDebugLevel(int newDebugLevel) {
-        debugLevel = newDebugLevel;
+        getInstance().setDebugLevel(newDebugLevel);
     }
 
-    protected static int debugLevel;
 
     public static boolean isEnabled() {
-        return getDebugLevel() != DEBUG_LEVEL_OFF;
+        return getInstance().isEnabled();
     }
 
     public static void setIsEnabled(boolean isEnabled) {
-        if (isEnabled) {
-            setDebugLevel(DEBUG_LEVEL_WARN); //default
-        } else {
-            setDebugLevel(DEBUG_LEVEL_OFF);
-        }
+        getInstance().setIsEnabled(isEnabled);
+    }
+
+
+    public static void printIt(int level, Class callingClass, String message) {
+        getInstance().printIt(level, callingClass, message);
+    }
+
+    protected static void printIt(String message) {
+        getInstance().printIt(message);
     }
 
     /**
-     * The actual call for this entire class. You can call it directly with the debug level and such, but generally should
-     * use the named levels.
-     *
-     * @param level
-     * @param callingClass
-     * @param message
-     */
-/*
-    public static void printIt(int level, Class callingClass, String message) {
-        if (level <= getDebugLevel()) {
-            printIt(callingClass.getSimpleName() + " (" + (new Date()) + ") " + toLabel(level) + ": " + message);
-        }
-    }
-*/
-
-
-    public static void printIt(int level, Class callingClass, String message) {
-        // Standard logging format is date host service: message
-        if (level <= getDebugLevel()) {
-            if(host == null || host.isEmpty()) {
-                printIt(Iso8601.date2String(new Date()) + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
-            }else{
-                printIt(Iso8601.date2String(new Date()) + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
-                //printIt(callingClass.getSimpleName() + " (" + (new Date()) + ") " + host + " " +  toLabel(level) + ": " + message);
-            }
-        }
-    }
-    protected static void printIt(String message) {
-        System.err.println(message);
-    }
-
-    /** This only prints if the requested level is at least error AND the current utility supports it.
+     * This only prints if the requested level is at least error AND the current utility supports it.
      * Note that if there is no exception, then that is noted in the log as well.
      *
      * @param level
@@ -155,80 +100,74 @@ public class DebugUtil {
      * @param throwable
      */
     public static void printIt(int level, Class callingClass, String message, Throwable throwable) {
-
-        if (DEBUG_LEVEL_ERROR <= level && level <= getDebugLevel()) {
-            if (throwable == null) {
-                printIt("     =====>> (NO STACKTRACE AVAILABLE)");
-            } else {
-                throwable.printStackTrace();
-            }
-        }
-        printIt(level, callingClass, message);
+        getInstance().printIt(level, callingClass, message, throwable);
     }
 
 
     public static void info(Class callingClass, String message) {
-        printIt(DEBUG_LEVEL_INFO, callingClass, message);
+        getInstance().info(callingClass, message);
     }
 
     public static void info(Object obj, String message) {
-        info(obj.getClass(), message);
+        getInstance().info(obj.getClass(), message);
     }
 
     public static void warn(Class callingClass, String message) {
-        printIt(DEBUG_LEVEL_WARN, callingClass, message);
+        getInstance().warn(callingClass, message);
     }
 
     public static void warn(Object obj, String message) {
-        warn(obj.getClass(), message);
+        getInstance().warn(obj, message);
     }
 
     public static void error(Object obj, String message, Throwable t) {
-        error(obj.getClass(), message, t);
+        getInstance().error(obj,message,t);
     }
 
     public static void error(Class callingClass, String message, Throwable t) {
-        printIt(DEBUG_LEVEL_ERROR, callingClass, message, t);
+        getInstance().error(callingClass,message,t);
     }
 
     public static void error(Class callingClass, String message) {
-        printIt(DEBUG_LEVEL_ERROR, callingClass, message);
+        getInstance().error(callingClass,message);
     }
 
     public static void error(Object obj, String message) {
-        error(obj.getClass(), message);
+        getInstance().error(obj, message);
     }
 
     public static void severe(Object obj, String message, Throwable t) {
-        severe(obj.getClass(), message, t);
+        getInstance().severe(obj, message, t);
     }
 
     public static void severe(Class callingClass, String message, Throwable t) {
-        printIt(DEBUG_LEVEL_SEVERE, callingClass, message, t);
+        getInstance().severe(callingClass, message, t);
     }
 
     public static void severe(Class callingClass, String message) {
-        printIt(DEBUG_LEVEL_SEVERE, callingClass, message);
+        getInstance().severe(callingClass, message);
     }
 
     public static void severe(Object obj, String message) {
-        severe(obj.getClass(), message);
+              getInstance().severe(obj, message);
     }
 
     public static void trace(Object obj, String message, Throwable t) {
-        trace(obj.getClass(), message, t);
+        getInstance().trace(obj, message, t);
     }
 
     public static void trace(Class callingClass, String message, Throwable t) {
-        printIt(DEBUG_LEVEL_TRACE, callingClass, message, t);
+        getInstance().trace(callingClass, message, t);
     }
 
-    public static void trace(Class callingClass, String message) {
-        printIt(DEBUG_LEVEL_TRACE, callingClass, message);
+    public static void trace(Class callingClass, String message)
+    {
+        getInstance().trace(callingClass, message);
     }
 
     public static void trace(Object obj, String message) {
-        trace(obj.getClass(), message);
+
+        getInstance().trace(obj, message);
     }
 
     /**
@@ -239,8 +178,7 @@ public class DebugUtil {
      * @deprecated use warn instead
      */
     public static void dbg(Object callingObject, String message) {
-        //dbg(callingObject.getClass(), message);
-        warn(callingObject, message);
+        getInstance().warn(callingObject, message);
     }
 
 
@@ -251,7 +189,7 @@ public class DebugUtil {
      * @deprecated use error instead
      */
     public static void dbg(Object callingObject, String message, Throwable throwable) {
-        error(callingObject, message, throwable);
+        getInstance().error(callingObject, message, throwable);
     }
 
 
@@ -262,11 +200,7 @@ public class DebugUtil {
      * @deprecated use error instead
      */
     public static void dbg(Class callingClass, String message, Throwable throwable) {
-        /*if (isEnabled()) {
-            throwable.printStackTrace();
-        }
-        dbg(callingClass, message);*/
-        error(callingClass, message, throwable);
+        getInstance().error(callingClass, message, throwable);
     }
 
     /**
@@ -275,14 +209,10 @@ public class DebugUtil {
      * @deprecated use warn instead
      */
     public static void dbg(Class callingClass, String message) {
-/*
-        if (isEnabled()) {
-            System.err.println(callingClass.getSimpleName() + " (" + (new Date()) + "): " + message);
-        }
-*/
-        warn(callingClass, message);
+        getInstance().warn(callingClass, message);
     }
-
-    public static String host;
+    public static void setHost(String host){
+        getInstance().host = host;
+    }
 
 }

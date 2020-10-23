@@ -1124,6 +1124,23 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * This should be improved! It does check the bare bones minimum for this feature through.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testURI() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " z := 'https://www.google.com/search?channel=fs&client=ubuntu&q=URI+specification#fragment=42';");
+        addLine(script, "a := z == from_uri(to_uri(z));");
+
+        QDLParser interpreter = new QDLParser(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("a", state) :
+                "Failed to parse a uri";
+    }
+    /**
      * Shows that variables can be set to null and that they exist in the symbol table.
      *
      * @throws Throwable

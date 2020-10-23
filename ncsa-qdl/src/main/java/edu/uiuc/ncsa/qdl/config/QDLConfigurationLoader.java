@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
@@ -114,10 +115,16 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
 
     protected boolean isServerModeOn() {
-
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
     }
 
+    protected String getDebugLevel() {
+        String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
+        if(level == null){
+            level = DebugUtil.DEBUG_LEVEL_OFF_LABEL;
+        }
+        return level;
+    }
     protected boolean isEchoModeOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
@@ -243,7 +250,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 showBanner(),
                 getVFSConfigs(),
                 getModuleConfigs(),
-                getScriptPath());
+                getScriptPath(),
+                getDebugLevel());
     }
 
     @Override

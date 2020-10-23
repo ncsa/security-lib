@@ -36,7 +36,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean showBanner,
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs,
-                          String scriptPath) {
+                          String scriptPath,
+                          String debugLevel) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -53,8 +54,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.numericDigits = numericDigits;
         this.showBanner = showBanner;
         this.scriptPath = scriptPath;
+        this.debugLevel = debugLevel;
     }
 
+    public String getDebugLevel() {
+        return debugLevel;
+    }
+
+    public void setDebugLevel(String debugLevel) {
+        this.debugLevel = debugLevel;
+    }
+
+    String debugLevel;
     public boolean isPrettyPrint() {
         return prettyPrint;
     }
