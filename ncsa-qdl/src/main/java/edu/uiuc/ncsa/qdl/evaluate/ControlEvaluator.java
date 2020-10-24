@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
@@ -325,12 +326,60 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
 
+    public static final int LOG_LEVEL_UNKNOWN = -100;
     public static final int LOG_LEVEL_NONE = -1;
     public static final int LOG_LEVEL_TRACE = 0;
     public static final int LOG_LEVEL_INFO = 1;
     public static final int LOG_LEVEL_WARN = 2;
     public static final int LOG_LEVEL_ERROR = 3;
     public static final int LOG_LEVEL_SEVERE = 4;
+
+    private Level getLogLevel(Long myLevel) {
+        return getLogLevel(myLevel.intValue());
+    }
+
+    private boolean isValidLoggingLevel(Long longLevel){
+        int value = longLevel.intValue();
+        switch(value){
+            case LOG_LEVEL_NONE  :
+            case LOG_LEVEL_TRACE :
+            case LOG_LEVEL_INFO  :
+            case LOG_LEVEL_WARN  :
+            case LOG_LEVEL_ERROR :
+            case LOG_LEVEL_SEVERE:
+                return true;
+            default: return false;
+        }
+    }
+    private Level getLogLevel(int myLevel) {
+        switch (myLevel) {
+            default:
+            case LOG_LEVEL_NONE:
+                return Level.OFF;
+            case LOG_LEVEL_TRACE:
+                return Level.FINEST;
+            case LOG_LEVEL_INFO:
+                return Level.INFO;
+            case LOG_LEVEL_WARN:
+                return Level.WARNING;
+            case LOG_LEVEL_ERROR:
+                return Level.ALL;
+            case LOG_LEVEL_SEVERE:
+                return Level.SEVERE;
+        }
+    }
+
+    protected int getMyLogLevel(Level level) {
+        int value = level.intValue();
+        if (value == Level.OFF.intValue()) return LOG_LEVEL_NONE;
+        if (value == Level.FINEST.intValue()) return LOG_LEVEL_TRACE;
+        if (value == Level.INFO.intValue()) return LOG_LEVEL_INFO;
+        if (value == Level.WARNING.intValue()) return LOG_LEVEL_WARN;
+        if (value == Level.ALL.intValue()) return LOG_LEVEL_ERROR;
+        if (value == Level.SEVERE.intValue()) return LOG_LEVEL_SEVERE;
+
+        return LOG_LEVEL_UNKNOWN;
+    }
 
     /**
      * Write to the system log.
@@ -341,30 +390,80 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     private void doSysLog(Polyad polyad, State state, boolean isDebug) {
+        int currentIntLevel = LOG_LEVEL_NONE;
+        if (isDebug) {
+            currentIntLevel = state.getDebugUtil().getDebugLevel();
+        } else {
+            if(state.getLogger() != null) {
+                currentIntLevel = getMyLogLevel(state.getLogger().getLogger().getLevel());
+            }
+        }
+        Long currentLongLevel = new Long((long) currentIntLevel);
+
         if (polyad.getArgCount() == 0 || state.getLogger() == null) {
-            polyad.setResult(Boolean.FALSE);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setResult(currentLongLevel);
+            polyad.setResultType(Constant.LONG_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        int logLevel = LOG_LEVEL_INFO;
-        Object obj = polyad.evalArg(0, state);
+        int newLogLevel = currentIntLevel;
+
+        Object arg0 = polyad.evalArg(0, state);
+        String message = null;
+
+        if (polyad.getArgCount() == 1) {
+            if (isLong(arg0)) {
+                // Then they are setting the logging level
+                if(!isValidLoggingLevel((Long)arg0)){
+                    throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
+                }
+                newLogLevel = ((Long) arg0).intValue();
+
+                if (isDebug) {
+                    state.getDebugUtil().setDebugLevel(newLogLevel);
+                } else {
+                    state.getLogger().getLogger().setLevel(getLogLevel(newLogLevel)); // look up Java log level
+                }
+                polyad.setResult(currentLongLevel);
+                polyad.setResultType(Constant.LONG_TYPE);
+                polyad.setEvaluated(true);
+                return;
+            }
+            // Use whatever the current level is at as the default for the message
+            if (isString(arg0)) {
+                message = (String) arg0;
+                 newLogLevel = LOG_LEVEL_INFO; // default if nothing supplied
+            }
+        }
+
+
+
+
         if (polyad.getArgCount() == 2) {
+            // then the arguments are 0 is the level, 1 is the message
             Object arg1 = polyad.evalArg(1, state);
-            if (isLong(arg1)) {
-                logLevel = ((Long) arg1).intValue();
+
+            if (isLong(arg0)) {
+                newLogLevel = ((Long) arg0).intValue();
+                if(!isValidLoggingLevel((Long)arg0)){
+                    throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
+                }
+
             } else {
-                String msg = "requested logging level \"" + arg1 + "\"is unknown.";
+                // Now it will just fall through and print the message to the default level.
+                // Used to do something else here. Changed contract. Still do something else??
+                /*String msg = "requested logging level \"" + arg0 + "\"is unknown.";
                 if (isDebug) {
                     DebugUtil.info(QDLWorkspace.class, msg);
                 } else {
                     state.getLogger().info(msg);
-                }
+                }*/
             }
+            message = arg1.toString();
         }
-        String message = obj.toString();
+
         Boolean ok = Boolean.TRUE;
-        switch (logLevel) {
+        switch (newLogLevel) {
             case LOG_LEVEL_NONE:
                 // do nothing.
                 break;
