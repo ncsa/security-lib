@@ -2,22 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Converted static logging class to dynamic to make it more flexible.">
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/exceptions/InterruptException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/SIEntry.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/examples/halt_test.qdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/ParsingMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/ParsingMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLParserDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLParserDriver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/StateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/StateUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/MetaDebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/MetaDebugUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/constant-values.html" beforeDir="false" />
@@ -239,9 +230,11 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore$IdentifierFileFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore$IdentifierFileFilter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" afterDir="false" />
@@ -249,6 +242,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" afterDir="false" />
@@ -286,6 +280,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/constant-values.html" beforeDir="false" />
@@ -373,6 +368,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/constant-values.html" beforeDir="false" />
@@ -526,6 +522,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/constant-values.html" beforeDir="false" />
@@ -734,11 +731,13 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/PayloadHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/PayloadHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -760,6 +759,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1iL68yczXC5b1nt09nUevEhal73" />
@@ -1192,7 +1196,7 @@
       <workItem from="1603021511698" duration="71560000" />
       <workItem from="1603364992558" duration="26949000" />
       <workItem from="1603540687464" duration="5340000" />
-      <workItem from="1603654489357" duration="27558000" />
+      <workItem from="1603654489357" duration="27820000" />
     </task>
     <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
       <created>1602796126004</created>
@@ -1250,7 +1254,14 @@
       <option name="project" value="LOCAL" />
       <updated>1603546548558</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Quashed a few last minute issues. Much better documentation with examples.">
+      <created>1603750074059</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1603750074059</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1265,7 +1276,8 @@
     <MESSAGE value="Reworked documentation. Added unit tests." />
     <MESSAGE value="Converted static logging class to dynamic to make it more flexible." />
     <MESSAGE value="Logging/debugging improvement to QDL." />
-    <option name="LAST_COMMIT_MESSAGE" value="Logging/debugging improvement to QDL." />
+    <MESSAGE value="Quashed a few last minute issues. Much better documentation with examples." />
+    <option name="LAST_COMMIT_MESSAGE" value="Quashed a few last minute issues. Much better documentation with examples." />
   </component>
   <component name="WindowStateProjectService">
     <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1603487027443">
@@ -1284,54 +1296,54 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="723" y="430" width="306" height="223" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1601986139234" />
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1603546548395">
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1603750073831">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1603546548395" />
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1603750073831" />
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog" timestamp="1602015370527">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1602015370527" />
-    <state width="1566" height="342" key="GridCell.Tab.0.bottom" timestamp="1603746928179">
+    <state width="1566" height="342" key="GridCell.Tab.0.bottom" timestamp="1603750238507">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1603746928179" />
-    <state width="1566" height="342" key="GridCell.Tab.0.center" timestamp="1603746928178">
+    <state width="1566" height="342" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238507" />
+    <state width="1566" height="342" key="GridCell.Tab.0.center" timestamp="1603750238507">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1603746928178" />
-    <state width="1566" height="342" key="GridCell.Tab.0.left" timestamp="1603746928178">
+    <state width="1566" height="342" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238507" />
+    <state width="1566" height="342" key="GridCell.Tab.0.left" timestamp="1603750238506">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1603746928178" />
-    <state width="1566" height="342" key="GridCell.Tab.0.right" timestamp="1603746928178">
+    <state width="1566" height="342" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238506" />
+    <state width="1566" height="342" key="GridCell.Tab.0.right" timestamp="1603750238507">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1603746928178" />
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1603746925439">
+    <state width="1566" height="342" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238507" />
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1603750238508">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1603746925439" />
-    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1603746925439">
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238508" />
+    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1603750238507">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1603746925439" />
-    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1603746925438">
+    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238507" />
+    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1603750238507">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1603746925438" />
-    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1603746925439">
+    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238507" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1603750238508">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1603746925439" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1603750238508" />
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor" timestamp="1602070095217">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1602070095217" />
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1603546552299">
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1603750077179">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1603546552299" />
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1603750077179" />
     <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1603654490446">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1340,10 +1352,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1603484523632" />
-    <state x="444" y="313" width="944" height="504" key="find.popup" timestamp="1603684936301">
+    <state x="444" y="313" width="944" height="562" key="find.popup" timestamp="1603750261028">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="444" y="313" width="944" height="504" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1603684936301" />
+    <state x="444" y="313" width="944" height="562" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1603750261028" />
     <state x="540" y="244" width="672" height="677" key="run.anything.popup" timestamp="1603655629621">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
