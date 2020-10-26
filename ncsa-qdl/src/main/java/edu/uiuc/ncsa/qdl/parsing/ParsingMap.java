@@ -55,7 +55,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
      *
      * @return
      */
-    public List<Element> getElements() {
+    public ArrayList<Element> getElements() {
         return elements;
     }
 

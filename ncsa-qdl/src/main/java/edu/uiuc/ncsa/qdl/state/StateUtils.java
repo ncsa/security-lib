@@ -17,23 +17,60 @@ import java.util.zip.GZIPOutputStream;
  */
 public class StateUtils {
     /**
+     * Take the current state and make a complete copy of it.
+     *
+     * @param state
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static State clone(State state) throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        save(state, baos);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        State newState =  load(bais);
+        // Now set all the transient fields that were not serialized.
+        newState.setOpEvaluator(state.getOpEvaluator());
+        newState.setMetaEvaluator(state.getMetaEvaluator());
+        newState.setLogger(state.getLogger());
+        newState.setScriptPaths(state.getScriptPaths());
+        newState.setVfsFileProviders(state.getVfsFileProviders());
+        newState.setServerMode(state.isServerMode());
+        return newState;
+
+    }
+
+    public static int size(State state) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            save(state, baos);
+            return baos.toByteArray().length;
+        } catch (IOException iox) {
+             iox.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
      * Serialize the Sate object to the given output stream.
+     *
      * @param state
      * @param outputStream
      * @throws IOException
      */
     public static void save(State state, OutputStream outputStream) throws IOException {
         GZIPOutputStream gos = new GZIPOutputStream(outputStream);
-           ObjectOutputStream out = new ObjectOutputStream(gos);
+        ObjectOutputStream out = new ObjectOutputStream(gos);
 
-           // Method for serialization of object
-           out.writeObject(state);
-           out.flush();
-           out.close();
+        // Method for serialization of object
+        out.writeObject(state);
+        out.flush();
+        out.close();
     }
 
     /**
      * Serialize the state to a base 64 encoded string.
+     *
      * @param state
      * @return
      * @throws IOException
@@ -46,6 +83,7 @@ public class StateUtils {
 
     /**
      * Deserialize the state from a base 64 encoded string.
+     *
      * @param encodedState
      * @return
      * @throws IOException
@@ -67,7 +105,7 @@ public class StateUtils {
         return state;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         try {
             // Just a quick test for this
             State state = new State(new ImportManager(),
@@ -84,7 +122,7 @@ public class StateUtils {
             System.out.println("size = " + b.length());
             state = loadb64(b);
             System.out.println("state ok? " + state.getValue("foo").equals(42L));
-        }catch(Throwable t){
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

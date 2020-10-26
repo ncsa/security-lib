@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
@@ -13,6 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemListNode;
 import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +38,8 @@ public class QDLRunner {
     public State getState() {
         return state;
     }
-     Boolean prettyPrint = Boolean.FALSE;
+
+    Boolean prettyPrint = Boolean.FALSE;
 
     public Boolean getPrettyPrint() {
         return prettyPrint;
@@ -56,7 +60,7 @@ public class QDLRunner {
 
     State state;
 
-    public QDLRunner(List<Element> elements) {
+    public QDLRunner(ArrayList<Element> elements) {
         this.elements = elements;
     }
 
@@ -64,16 +68,28 @@ public class QDLRunner {
         return elements;
     }
 
-    public void setElements(List<Element> elements) {
+    public void setElements(ArrayList<Element> elements) {
         this.elements = elements;
     }
 
-    List<Element> elements;
+    ArrayList<Element> elements;
 
     public void run() throws Throwable {
         State currentState = getState();
-        for (Element element : elements) {
+        run(0, currentState);
+
+    }
+
+    public void restart(SIEntry siEntry) {
+        run(siEntry.lineNumber + 1, siEntry.state);
+    }
+
+    protected void run(int startIndex, State currentState) {
+        for (int i = startIndex; i < elements.size(); i++) {
+            //for (Element element : elements) {
+            Element element = elements.get(i);
             if (element.getStatement() != null) {
+
                 // it can happen that the parser returns an empty statement. Skip it.
                 Statement stmt = element.getStatement();
                 if (stmt instanceof ModuleStatement) {
@@ -102,16 +118,22 @@ public class QDLRunner {
                                 stmt = p;
                             }
                         }
-                        if(stmt instanceof StemVariableNode ||  stmt instanceof StemListNode){
+                        if (stmt instanceof StemVariableNode || stmt instanceof StemListNode) {
                             stmt.evaluate(state);
-                            ConstantNode cNode = new ConstantNode(((StatementWithResultInterface)stmt).getResult(), Constant.STEM_TYPE);
+                            ConstantNode cNode = new ConstantNode(((StatementWithResultInterface) stmt).getResult(), Constant.STEM_TYPE);
                             Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
                             p.addArgument(cNode);
                             p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                             stmt = p;
                         }
                     }
-                    stmt.evaluate(currentState);
+                    try {
+                        stmt.evaluate(currentState);
+                    } catch (InterruptException ix) {
+                        ix.getSiEntry().qdlRunner = this;
+                        ix.getSiEntry().lineNumber = i; // number where this happened.
+                        throw ix;
+                    }
                 }
             }
         }

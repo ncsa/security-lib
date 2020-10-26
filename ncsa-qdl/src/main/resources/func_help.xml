@@ -360,6 +360,14 @@ E.g.
                 ]]>
             </body>
         </entry>
+    <entry id="halt">
+              <body>
+                  <![CDATA[
+  halt([message]]) - This will halt the system on this line and update the workspace state indicator, passing along
+                     the message. Note that this is properly a debugging tool. This is disabled in server mode.
+]]>
+              </body>
+          </entry>
     <entry id="union">
             <body>
                 <![CDATA[

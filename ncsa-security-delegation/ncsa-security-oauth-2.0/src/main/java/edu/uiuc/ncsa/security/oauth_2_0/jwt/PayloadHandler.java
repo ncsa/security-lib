@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import net.sf.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 2/15/20 at  7:13 AM
  */
-public interface PayloadHandler {
+public interface PayloadHandler extends Serializable {
     /**
      * Creates and initializes the claims object this class manages.
      */

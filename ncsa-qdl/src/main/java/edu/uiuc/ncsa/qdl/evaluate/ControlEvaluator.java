@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
@@ -63,6 +64,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_CHECK_AFTER = SYS_FQ + CHECK_AFTER;
     public static final int CHECK_AFTER_TYPE = 5 + CONTROL_BASE_VALUE;
 
+    public static final String INTERRUPT = "halt";
+    public static final String FQ_INTERRUPT = SYS_FQ + INTERRUPT;
+    public static final int INTERRUPT_TYPE = 6 + CONTROL_BASE_VALUE;
 
     // function stuff
     public static final String RETURN = "return";
@@ -137,6 +141,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             DEBUG,
             CONSTANTS,
             CONTINUE,
+            INTERRUPT,
             BREAK,
             FOR_KEYS,
             FOR_NEXT,
@@ -157,6 +162,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             FQ_DEBUG,
             FQ_CONSTANTS,
             FQ_CONTINUE,
+            FQ_INTERRUPT,
             FQ_BREAK,
             FQ_FOR_KEYS,
             FQ_FOR_NEXT,
@@ -209,6 +215,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case CONTINUE:
             case FQ_CONTINUE:
                 return CONTINUE_TYPE;
+            case INTERRUPT:
+            case FQ_INTERRUPT:
+                return INTERRUPT_TYPE;
             case BREAK:
             case FQ_BREAK:
                 return BREAK_TYPE;
@@ -292,6 +301,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new ContinueException();
+            case INTERRUPT:
+            case FQ_INTERRUPT:
+                doInterrupt(polyad, state);
+                return true;
             case RETURN:
             case FQ_RETURN:
                 doReturn(polyad, state);
@@ -323,6 +336,37 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doInterrupt(Polyad polyad, State state) {
+        if(state.isServerMode()){
+            // no interrupts in server mode.
+            polyad.setResult(-1L);
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+         String message = "";
+        switch (polyad.getArgCount()){
+            case 0:
+                // do nothing.
+                break;
+            case 1:
+                Object obj = polyad.evalArg(0, state);
+                if(obj == null || (obj instanceof QDLNull)){
+                    message = "(null)";
+                }else{
+                    message = obj.toString();
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Error: " + INTERRUPT + " accepts at most one argument.");
+        }
+        SIEntry sie = new SIEntry();
+        sie.state = state;
+        sie.message = message;
+
+        throw new InterruptException(sie);
     }
 
 
@@ -413,16 +457,19 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         if (polyad.getArgCount() == 1) {
             if (isLong(arg0)) {
-                // Then they are setting the logging level
-                if(!isValidLoggingLevel((Long)arg0)){
-                    throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
-                }
-                newLogLevel = ((Long) arg0).intValue();
+                // Cannot reset logging levels in server mode or server loses control of logging
+                if(!state.isServerMode()) {
+                    // Then they are setting the logging level
+                    if (!isValidLoggingLevel((Long) arg0)) {
+                        throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
+                    }
+                    newLogLevel = ((Long) arg0).intValue();
 
-                if (isDebug) {
-                    state.getDebugUtil().setDebugLevel(newLogLevel);
-                } else {
-                    state.getLogger().getLogger().setLevel(getLogLevel(newLogLevel)); // look up Java log level
+                    if (isDebug) {
+                        state.getDebugUtil().setDebugLevel(newLogLevel);
+                    } else {
+                        state.getLogger().getLogger().setLevel(getLogLevel(newLogLevel)); // look up Java log level
+                    }
                 }
                 polyad.setResult(currentLongLevel);
                 polyad.setResultType(Constant.LONG_TYPE);

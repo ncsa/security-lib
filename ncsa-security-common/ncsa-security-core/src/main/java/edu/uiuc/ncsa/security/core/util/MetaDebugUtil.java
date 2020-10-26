@@ -2,13 +2,14 @@ package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 10/23/20 at  2:54 PM
  */
-public class MetaDebugUtil implements DebugConstants {
+public class MetaDebugUtil implements DebugConstants, Serializable {
 
 
 

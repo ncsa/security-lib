@@ -32,6 +32,15 @@ import java.util.List;
 public class State extends FunctionState implements QDLConstants {
     private static final long serialVersionUID = 0xcafed00d1L;
 
+    public int getPID() {
+        return pid;
+    }
+
+    public void setPID(int pid) {
+        this.pid = pid;
+    }
+
+    int pid = 0;
 
     public State(ImportManager resolver,
                  SymbolStack symbolStack,

@@ -340,7 +340,7 @@ public class StringUtils {
     }
 
     /**
-     * Pad the string to the given lengthh with blanks. This makes sure every line
+     * Pad the string to the given length with blanks. This makes sure every line
      * is the same length.
      *
      * @param s

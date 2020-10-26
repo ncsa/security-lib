@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
@@ -78,6 +79,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String BUFFER2_COMMAND = ")buffer";
     protected static final String SHORT_BUFFER2_COMMAND = ")b";
     protected static final String EXECUTE_COMMAND = ")";
+    protected static final String RESUME_COMMAND = "))";
     protected static final String MODULES_COMMAND = ")modules";
     protected static final String LOAD_COMMAND = ")load"; // grab a file and run it
     protected static final String SAVE_COMMAND = ")save";
@@ -88,6 +90,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String WS_COMMAND = ")ws";
     protected static final String EDIT_COMMAND = ")edit";
     protected static final String FILE_COMMAND = ")file";
+    protected static final String STATE_INDICATOR_COMMAND = ")si";
 
     public static final int RC_NO_OP = -1;
     public static final int RC_CONTINUE = 1;
@@ -150,6 +153,7 @@ public class WorkspaceCommands implements Logable {
         sayi(RJustify(EDIT_COMMAND, length) + "- commands relating to running the line editor.");
         sayi(RJustify(ENV_COMMAND, length) + "- commands relating to environment variables in this workspace.");
         sayi(RJustify(EXECUTE_COMMAND, length) + "- short hand to execute whatever is in the current buffer.");
+        sayi(RJustify(RESUME_COMMAND, length) + "- short hand to resume execution for a halted process. Note the argument is the process id (pid), not the buffer number. ");
         sayi(RJustify(FUNCS_COMMAND, length) + "- list all of the imported and user defined functions this workspace knows about.");
         sayi(RJustify(HELP_COMMAND, length) + "- this message.");
         sayi(RJustify(MODULES_COMMAND, length) + "- lists all the loaded modules this workspace knows about.");
@@ -180,11 +184,8 @@ public class WorkspaceCommands implements Logable {
                 return _doBufferEdit(inputLine);
             case EXECUTE_COMMAND:
                 return _doBufferRun(inputLine);
-/*
-                old way had a single buffer that ran in the QDLWorkspace.
-                if (useLocalBuffer) return RC_EXECUTE_LOCAL_BUFFER;
-                if (externalBuffer != null) return RC_EXECUTE_EXTERNAL_BUFFER;
-*/
+            case RESUME_COMMAND:
+                return _doSIResume(inputLine);
             case ENV_COMMAND:
                 return doEnvCommand(inputLine);
             case FUNCS_COMMAND:
@@ -195,6 +196,8 @@ public class WorkspaceCommands implements Logable {
                 return doHelp(inputLine);
             case MODULES_COMMAND:
                 return doModulesCommand(inputLine);
+            case STATE_INDICATOR_COMMAND:
+                return doSICommand(inputLine);
             case OFF_COMMAND:
                 if (inputLine.hasArg("y")) {
                     return RC_EXIT_NOW;
@@ -219,6 +222,230 @@ public class WorkspaceCommands implements Logable {
         }
         say("Unknown command.");
         return RC_NO_OP;
+    }
+
+    public static class SIEntries extends TreeMap<Integer, SIEntry> {
+        int maxKey = -1;
+
+        @Override
+        public SIEntry put(Integer key, SIEntry value) {
+            int key0 = key; // since we have to do math with it and don't want the class
+            if (key0 < 0) {
+                // set the key to the next PID
+                key0 = 1 + maxKey;
+                maxKey++;
+            } else {
+                if (containsKey(key)) {
+                    throw new IllegalArgumentException("Error: PID is in use");
+                }
+            }
+            maxKey = Math.max(maxKey, key0);
+
+            return super.put(key0, value);
+        }
+
+        public int nextKey() {
+            return maxKey + 1;
+        }
+    }
+
+    SIEntries siEntries = new SIEntries();
+
+    private int doSICommand(InputLine inputLine) {
+        if (inputLine.size() <= ACTION_INDEX) {
+            say("Sorry, please supply an argument (e.g. --help)");
+            return RC_NO_OP;
+        }
+        if (!inputLine.hasArgAt(ACTION_INDEX)) {
+            return _doSIList(inputLine);
+        }
+        switch (inputLine.getArg(ACTION_INDEX)) {
+            case "--help":
+                say("State indicator commands:");
+                sayi("--help - this messages");
+                sayi("[list] - list all current states in the indicator by process id (pid)");
+                sayi("reset - clear the entire state indicator, restoring the system process as the default");
+                sayi("resume [pid] - resume running the given process. No arguments means restart the current one.");
+                sayi("rm pid - remove the given state from the system, losing all of it. If it is the current state, the system default will replace it.");
+                sayi("set [pid] - set the current process id. No argument means to display the current pid.");
+                return RC_NO_OP;
+            case "list":
+                // list all current pids.
+                return _doSIList(inputLine);
+            case "reset":
+                SIEntry sie = siEntries.get(new Integer(0));
+                siEntries = new SIEntries();
+                siEntries.put(0, sie);
+                currentPID = 0;
+                say("state indicator reset.");
+                return RC_CONTINUE;
+            case "resume":
+                // resume the execution of a process by pid
+                return _doSIResume(inputLine);
+            case "rm":
+                return _doSIRemove(inputLine);
+            case "set":
+                return _doSISet(inputLine);
+        }
+
+        return RC_NO_OP;
+    }
+
+    private int _doSIRemove(InputLine inputLine) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            say("sorry, no pid given.");
+            return RC_CONTINUE;
+        }
+        try {
+            int pid = inputLine.getIntArg(FIRST_ARG_INDEX);
+            if (pid == currentPID) {
+                interpreter = defaultInterpreter;
+                state = defaultState;
+                currentPID = 0;
+            }
+            if (!siEntries.containsKey(pid)) {
+                say("invalid pid " + pid);
+                return RC_NO_OP;
+            }
+
+            siEntries.remove(pid);
+            say("process id " + pid + " has been removed from the state indicator.");
+            return RC_NO_OP;
+
+        } catch (ArgumentNotFoundException ax) {
+            say("Sorry, but that was not a valid pid");
+        }
+
+        return RC_NO_OP;
+    }
+
+    private int _doSISet(InputLine inputLine) {
+        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            say("currently active process id is " + currentPID);
+            return RC_CONTINUE;
+        }
+        try {
+            int pid = inputLine.getIntArg(FIRST_ARG_INDEX);
+            if (pid == currentPID) {
+                return RC_NO_OP;
+            }
+            if (!siEntries.containsKey(pid)) {
+                say("invalid pid " + pid);
+                return RC_NO_OP;
+            }
+            if (pid == 0) {
+                interpreter = defaultInterpreter;
+                state = defaultState;
+
+            } else {
+                SIEntry sie = siEntries.get(pid);
+                interpreter = sie.interpreter;
+                interpreter.setEchoModeOn(isEchoModeOn());
+                interpreter.setPrettyPrint(isPrettyPrint());
+                state = sie.state;
+            }
+            currentPID = pid;
+            say("pid set to " + pid);
+        } catch (ArgumentNotFoundException ax) {
+            say("Sorry, but that was not a valid pid");
+        }
+
+        return RC_NO_OP;
+    }
+
+    private int _doSIResume(InputLine inputLine) {
+        try {
+            int pid = 0;
+            if (inputLine.getCommand().equals(RESUME_COMMAND)) {
+                if (inputLine.getArgCount() == 0) {
+                    // They just passed in a ))
+                    pid = currentPID;
+                } else {
+                    try {
+                        pid = inputLine.getIntArg(1);
+                    } catch (Throwable n) {
+                        say("sorry but the pid could not be determined");
+                        return RC_CONTINUE;
+                    }
+                }
+            } else {
+                if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+                    pid = inputLine.getIntArg(FIRST_ARG_INDEX);
+                } else {
+                    // no arg. Use current pid
+                    pid = currentPID;
+                }
+            }
+/*
+            if (pid == 0) {
+                // no resume on current thread
+                return RC_NO_OP;
+            }
+*/
+            if (!siEntries.containsKey(pid)) {
+                say("invalid pid " + pid);
+                return RC_NO_OP;
+            }
+            SIEntry sie = siEntries.get(pid);
+            try {
+                sie.qdlRunner.restart(sie);
+                // if it finishes, then reset to default.
+                state = defaultState;
+                currentPID = 0;
+                interpreter = defaultInterpreter;
+                siEntries.remove(sie.pid);
+            } catch (InterruptException ix) {
+                sie.lineNumber = ix.getSiEntry().lineNumber;
+                sie.message = ix.getSiEntry().message;
+                sie.timestamp = ix.getSiEntry().timestamp;
+            }
+        } catch (ArgumentNotFoundException ax) {
+            say("Sorry, but that was not a valid pid");
+        }
+        return RC_NO_OP;
+    }
+
+    protected QDLParser cloneInterpreter(InputLine inputLine) {
+        try {
+            State newState = StateUtils.clone(getState());
+            QDLParser qdlParser = new QDLParser(newState);
+            qdlParser.setEchoModeOn(interpreter.isEchoModeOn());
+            qdlParser.setPrettyPrint(interpreter.isPrettyPrint());
+            return qdlParser;
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private int _doSIList(InputLine inputLine) {
+        // entry is
+        // pid status  timestamp size message
+        // pid is an integer
+        // status is * for active -- for not
+        // timestamp is when created
+        // size is the size of the state object.
+        // message is the message
+        say(StringUtils.pad2("pid", 5) +
+                " | active | " +
+                StringUtils.pad2("line", 10) + " | " +
+                StringUtils.pad2("time", 30) + " | " +
+                StringUtils.pad2("size", 20) + " | " +
+                " message");
+
+        for (Integer key : siEntries.keySet()) {
+            SIEntry siEntry = siEntries.get(key);
+            int lineNr = siEntry.lineNumber;
+            String line = (siEntry.pid == 0 ? "  " : Integer.toString(lineNr));
+            String lineOut = StringUtils.pad2(key.toString(), 5) +
+                    " | " + StringUtils.pad2((siEntry.pid == currentPID ? "  * " : " ---"), 6) +
+                    " | " + StringUtils.pad2(line, 10) +
+                    " | " + StringUtils.pad2(siEntry.timestamp.toString(), 30) +
+                    " | " + StringUtils.pad2(Integer.toString(StateUtils.size(siEntry.state)), 20) +
+                    " | " + siEntry.message;
+            say(lineOut);
+        }
+        return RC_CONTINUE;
     }
 
 
@@ -322,10 +549,14 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
+    boolean isSI = true;
+
     protected int _doBufferRun(InputLine inputLine) {
-        if (_doHelp(inputLine)) {
-            say("run (index | name)");
+                if (_doHelp(inputLine)) {
+            say("run (index | name) [&]");
             sayi("Run the given buffer. This will execute as if you had types it in to the current session. ");
+            sayi("If you supply an &, then the current workspace is cloned and the code is run in that. ");
+            sayi("See the state indicator documentation for more");
             sayi(" Synonym is ) index|name.");
             return RC_NO_OP;
         }
@@ -355,27 +586,63 @@ public class WorkspaceCommands implements Logable {
                 }
             }
         }
+        boolean isSI = inputLine.hasArg("&");
 
         boolean origEchoMode = getInterpreter().isEchoModeOn();
-        boolean ppOn = getInterpreter().isPrettyPrint();
-        getInterpreter().setEchoModeOn(false);
+        QDLParser interpreter;
+        if (isSI) {
+
+            interpreter = cloneInterpreter(inputLine);
+            interpreter.setPrettyPrint(isPrettyPrint());
+            interpreter.setEchoModeOn(isEchoModeOn());
+        } else {
+
+            interpreter = getInterpreter();
+        }
+        if (interpreter == null) {
+            say("could not create debug instance.");
+            return RC_NO_OP;
+        }
+
+        boolean ppOn = interpreter.isPrettyPrint();
+        interpreter.setEchoModeOn(false);
         StringBuffer stringBuffer = new StringBuffer();
         for (String x : content) {
             stringBuffer.append(x + "\n");
         }
         try {
-            getInterpreter().execute(stringBuffer.toString());
-            getInterpreter().setEchoModeOn(origEchoMode);
-            getInterpreter().setPrettyPrint(ppOn);
+            interpreter.execute(stringBuffer.toString());
+            interpreter.setEchoModeOn(origEchoMode);
+            interpreter.setPrettyPrint(ppOn);
         } catch (Throwable t) {
-            getInterpreter().setEchoModeOn(origEchoMode);
-            getInterpreter().setPrettyPrint(ppOn);
-
-            getState().getLogger().error("Could not interpret buffer " + stringBuffer, t);
-            say("sorry, but there was an error:" + ((t instanceof NullPointerException) ? "(no message)" : t.getMessage()));
+            if (!isSI) {
+                interpreter.setEchoModeOn(origEchoMode);
+                interpreter.setPrettyPrint(ppOn);
+                boolean isHalt = t instanceof InterruptException;
+                if (isHalt) {
+                    getState().getLogger().error("interrupt in main workspace " + stringBuffer, t);
+                    say("sorry, you cannot halt the main workspace. Consider starting a separate process.");
+                } else {
+                    getState().getLogger().error("Could not interpret buffer " + stringBuffer, t);
+                    say("sorry, but there was an error:" + ((t instanceof NullPointerException) ? "(no message)" : t.getMessage()));
+                }
+            } else {
+                if (t instanceof InterruptException) {
+                    InterruptException ie = (InterruptException) t;
+                    int nextPID = siEntries.nextKey();
+                    ie.getSiEntry().pid = nextPID;
+                    ie.getSiEntry().interpreter = interpreter;
+                    siEntries.put(nextPID, ie.getSiEntry());
+                    say(Integer.toString(nextPID));
+                }
+            }
         }
         return RC_CONTINUE;
     }
+
+    QDLParser defaultInterpreter;
+    State defaultState;
+    int currentPID = 0;
 
     protected int _doBufferWrite(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -1099,11 +1366,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     /**
-     * Any list of string s(functions, variables, modules, etc.) is listed using this formatting function.
+     * Any list of strings (functions, variables, modules, etc.) is listed using this formatting function.
      * If understands command line switches for width, columns and does some regex's too.
      *
      * @param inputLine
-     * @param list
+     * @param list      A simple list items, e.g., names of functions or variables.
      * @return
      */
     protected int printList(InputLine inputLine, TreeSet<String> list) {
@@ -1723,6 +1990,12 @@ public class WorkspaceCommands implements Logable {
                     logger,
                     false);// workspace is never in server mode
             // Experiment for a Java module
+            state.setPID(0);
+            SIEntry sys = new SIEntry();
+            sys.state = state;
+            sys.pid = 0;
+            sys.message = "system";
+            siEntries.put(0, sys);
         }
         return state;
 
@@ -1778,7 +2051,7 @@ public class WorkspaceCommands implements Logable {
         // The state probably exists at this point if the user had to set the terminal type.
         // Make sure the logger ends up in the actual state.
         // The logger is created in the loader, so it happens automatically if there is a logging block in the config.
-        if(state != null){
+        if (state != null) {
             state.setLogger(qe.getMyLogger());
         }
         if (inputLine.hasArg("-home_dir")) {
@@ -1913,7 +2186,8 @@ public class WorkspaceCommands implements Logable {
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         interpreter.setPrettyPrint(qe.isPrettyPrint());
         getState().setScriptPaths(qe.getScriptPath());
-
+        defaultInterpreter = interpreter;
+        defaultState = state;
         runScript(inputLine); // run any script if that mode is enabled.
 
     }

@@ -45,7 +45,7 @@ public class QDLParserDriver {
 
     ParsingMap parsingMap = new ParsingMap();
 
-    public List<Element> getElements() {
+    public ArrayList<Element> getElements() {
         if (parsingMap == null) {
             return new ArrayList<>();
         }
@@ -145,7 +145,7 @@ public class QDLParserDriver {
         return parser;
     }
 
-    public List<Element> parse(Reader reader) throws Throwable {
+    public ArrayList<Element> parse(Reader reader) throws Throwable {
         QDLParserParser parser = getParser(preProcessStream(reader, environment), state);
         parser.elements();
         return getElements();

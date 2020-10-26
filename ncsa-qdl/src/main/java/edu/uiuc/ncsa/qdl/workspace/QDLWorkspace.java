@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
+import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -34,6 +35,12 @@ public class QDLWorkspace {
     protected void handleException(Throwable t) {
         if (getLogger() != null) {
             getLogger().error(t);
+        }
+        if(t instanceof InterruptException){
+            InterruptException ie = (InterruptException)t;
+            // add a bunch of stuff to state table.
+            workspaceCommands.say("Got interrupt at line " + ie.getSiEntry().lineNumber + " at " + ie.getSiEntry().timestamp);
+            return;
         }
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {
             if (t.getMessage().contains("extraneous input")) {
