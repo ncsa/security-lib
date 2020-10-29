@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.StringEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -620,7 +620,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         addLine(script, "t3 := detokenize(a., 'k=', 3);"); // omit dangling and prepend
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("t0", state).equals("0:1:2:3:4:");
         assert getStringValue("t1", state).equals("k=0k=1k=2k=3k=4");

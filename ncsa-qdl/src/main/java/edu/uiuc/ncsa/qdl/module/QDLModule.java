@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.exceptions.ModuleInstantiationException;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -24,7 +24,7 @@ public class QDLModule extends Module {
 
     @Override
     public Module newInstance(State state) {
-        QDLParser p = new QDLParser(new XProperties(), state);
+        QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
         try {
             p.execute(getModuleStatement().getSourceCode());
             return state.getModuleMap().get(getNamespace());

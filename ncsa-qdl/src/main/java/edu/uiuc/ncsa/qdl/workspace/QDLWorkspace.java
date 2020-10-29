@@ -39,7 +39,7 @@ public class QDLWorkspace {
         if(t instanceof InterruptException){
             InterruptException ie = (InterruptException)t;
             // add a bunch of stuff to state table.
-            workspaceCommands.say("Got interrupt at line " + ie.getSiEntry().lineNumber + " at " + ie.getSiEntry().timestamp);
+            workspaceCommands.say("sorry, cannot interrupt main workspace process.");
             return;
         }
         if ((t instanceof ParseCancellationException) | (t instanceof ParsingException)) {

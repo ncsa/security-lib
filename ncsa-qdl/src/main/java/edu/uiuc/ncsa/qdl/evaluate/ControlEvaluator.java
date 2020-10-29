@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
@@ -1143,7 +1143,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
 
-        QDLParser p = new QDLParser(new XProperties(), state);
+        QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
         for (int i = 0; i < stem.size(); i++) {
             String currentIndex = Integer.toString(i);
             if (!stem.containsKey(currentIndex)) {

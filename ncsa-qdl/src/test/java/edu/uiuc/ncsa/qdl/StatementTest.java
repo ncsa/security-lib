@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.Assignment;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
@@ -60,7 +60,7 @@ public class StatementTest extends AbstractQDLTester {
         // With the multiplication assignment to j, this results in fast exponential growth.
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("j", state).equals(65585696L) : "Loop did not execute properly.";
     }
@@ -84,7 +84,7 @@ public class StatementTest extends AbstractQDLTester {
         // With the multiplication assignment to j, this results in fast exponential growth.
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to execute a loop without a valid conditional";
@@ -104,7 +104,7 @@ public class StatementTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_TRUE + " := 2;");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_TRUE + " a value";
@@ -115,7 +115,7 @@ public class StatementTest extends AbstractQDLTester {
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_FALSE + " := 1;");
 
-        //QDLParser interpreter = new QDLParser(null, state);
+        //QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
@@ -126,7 +126,7 @@ public class StatementTest extends AbstractQDLTester {
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_NULL + " := 'foo';");
 
-        // QDLParser interpreter = new QDLParser(null, state);
+        // QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_NULL + " a value";

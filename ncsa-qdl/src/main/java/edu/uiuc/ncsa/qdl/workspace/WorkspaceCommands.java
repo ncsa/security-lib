@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
@@ -225,7 +225,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     public static class SIEntries extends TreeMap<Integer, SIEntry> {
-        int maxKey = -1;
+        int maxKey = 100; // system pid is 0, but that is not stored here.
 
         @Override
         public SIEntry put(Integer key, SIEntry value) {
@@ -250,6 +250,15 @@ public class WorkspaceCommands implements Logable {
     }
 
     SIEntries siEntries = new SIEntries();
+
+    public static class WSInternals implements Serializable {
+        State defaultState;
+        Integer currentPID;
+        SIEntries siEntries;
+        State activeState;
+        Date startTimestamp;
+
+    }
 
     private int doSICommand(InputLine inputLine) {
         if (inputLine.size() <= ACTION_INDEX) {
@@ -388,12 +397,17 @@ public class WorkspaceCommands implements Logable {
             }
             SIEntry sie = siEntries.get(pid);
             try {
+                if (sie.qdlRunner == null) {
+                    say("si damage"); // something is out of whack. Don't kill the workspace, just tell them.
+                    return RC_NO_OP;
+                }
                 sie.qdlRunner.restart(sie);
                 // if it finishes, then reset to default.
                 state = defaultState;
                 currentPID = 0;
                 interpreter = defaultInterpreter;
                 siEntries.remove(sie.pid);
+                say("exit pid " + sie.pid);
             } catch (InterruptException ix) {
                 sie.lineNumber = ix.getSiEntry().lineNumber;
                 sie.message = ix.getSiEntry().message;
@@ -405,10 +419,10 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
-    protected QDLParser cloneInterpreter(InputLine inputLine) {
+    protected QDLInterpreter cloneInterpreter(InputLine inputLine) {
         try {
             State newState = StateUtils.clone(getState());
-            QDLParser qdlParser = new QDLParser(newState);
+            QDLInterpreter qdlParser = new QDLInterpreter(newState);
             qdlParser.setEchoModeOn(interpreter.isEchoModeOn());
             qdlParser.setPrettyPrint(interpreter.isPrettyPrint());
             return qdlParser;
@@ -418,7 +432,15 @@ public class WorkspaceCommands implements Logable {
         return null;
     }
 
-    private int _doSIList(InputLine inputLine) {
+    // formatting constants for si. These are the width of the fields in the si list command.
+    // One of these days, if workspaces get too big or somesuch,
+    protected int ___SI_PID = 5;
+    protected int ___SI_ACTIVE = 6;
+    protected int ___SI_TIMESTAMP = 25;
+    protected int ___SI_LINE_NR = 5;
+    protected int ___SI_SIZE = 6;
+
+    protected int _doSIList(InputLine inputLine) {
         // entry is
         // pid status  timestamp size message
         // pid is an integer
@@ -426,22 +448,29 @@ public class WorkspaceCommands implements Logable {
         // timestamp is when created
         // size is the size of the state object.
         // message is the message
-        say(StringUtils.pad2("pid", 5) +
+        say(StringUtils.pad2("pid", ___SI_PID) +
                 " | active | " +
-                StringUtils.pad2("line", 10) + " | " +
-                StringUtils.pad2("time", 30) + " | " +
-                StringUtils.pad2("size", 20) + " | " +
-                " message");
+                StringUtils.pad2("stmt", ___SI_LINE_NR) + " | " +
+                StringUtils.pad2("time", ___SI_TIMESTAMP) + " | " +
+                StringUtils.pad2("size", ___SI_SIZE) + " | " +
+                "message");
+        // do system separate since it is never stored in the si entries
+        String lineOut = StringUtils.pad2(0, ___SI_PID) +
+                " | " + StringUtils.pad2((0 == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
+                " | " + StringUtils.pad2(" ", ___SI_LINE_NR) + // line number
+                " | " + StringUtils.pad2(startTimeStamp, ___SI_TIMESTAMP) + // timestamp
+                " | " + StringUtils.pad2(StateUtils.size(defaultState), ___SI_SIZE) +
+                " | " + "system";
+        say(lineOut);
 
         for (Integer key : siEntries.keySet()) {
             SIEntry siEntry = siEntries.get(key);
             int lineNr = siEntry.lineNumber;
-            String line = (siEntry.pid == 0 ? "  " : Integer.toString(lineNr));
-            String lineOut = StringUtils.pad2(key.toString(), 5) +
-                    " | " + StringUtils.pad2((siEntry.pid == currentPID ? "  * " : " ---"), 6) +
-                    " | " + StringUtils.pad2(line, 10) +
-                    " | " + StringUtils.pad2(siEntry.timestamp.toString(), 30) +
-                    " | " + StringUtils.pad2(Integer.toString(StateUtils.size(siEntry.state)), 20) +
+            lineOut = StringUtils.pad2(key, ___SI_PID) +
+                    " | " + StringUtils.pad2((siEntry.pid == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
+                    " | " + StringUtils.pad2(lineNr, ___SI_LINE_NR) +
+                    " | " + StringUtils.pad2(siEntry.timestamp, ___SI_TIMESTAMP) +
+                    " | " + StringUtils.pad2(StateUtils.size(siEntry.state), ___SI_SIZE) +
                     " | " + siEntry.message;
             say(lineOut);
         }
@@ -552,12 +581,16 @@ public class WorkspaceCommands implements Logable {
     boolean isSI = true;
 
     protected int _doBufferRun(InputLine inputLine) {
-                if (_doHelp(inputLine)) {
-            say("run (index | name) [&]");
+        if (_doHelp(inputLine)) {
+            say("run (index | name) [& | !]");
             sayi("Run the given buffer. This will execute as if you had types it in to the current session. ");
             sayi("If you supply an &, then the current workspace is cloned and the code is run in that. ");
+            sayi("If you supply an !, then completely clean state is created (VFS and script path is set,");
+            sayi("but no imports etc.) and the code is run in that. ");
             sayi("See the state indicator documentation for more");
-            sayi(" Synonym is ) index|name.");
+            sayi(" Synonyms: ");
+            sayi("   ) index|name  - start running a buffer. You must start a process before it can be suspended.");
+            sayi("   )) pid -- resume a suspended process by process if (pid)");
             return RC_NO_OP;
         }
         BufferManager.BufferRecord br = getBR(inputLine);
@@ -586,19 +619,32 @@ public class WorkspaceCommands implements Logable {
                 }
             }
         }
-        boolean isSI = inputLine.hasArg("&");
+        int flag = (inputLine.hasArg("&") ? 1 : 0) + (inputLine.hasArg("!") ? 2 : 0);
+        if (flag == 3) {
+            say("sorry, you have specified both to clone the workspace and ignore it. You can only do one of these.");
+            return RC_NO_OP;
+        }
 
         boolean origEchoMode = getInterpreter().isEchoModeOn();
-        QDLParser interpreter;
-        if (isSI) {
+        QDLInterpreter interpreter = null;
+        switch (flag) {
 
-            interpreter = cloneInterpreter(inputLine);
-            interpreter.setPrettyPrint(isPrettyPrint());
-            interpreter.setEchoModeOn(isEchoModeOn());
-        } else {
+            case 0:
+                interpreter = getInterpreter();
+                break;
+            case 1:
+                interpreter = cloneInterpreter(inputLine);
+                break;
 
-            interpreter = getInterpreter();
+            case 2:
+                State newState = state.newDebugState();
+                  newState.setPID(state.getPID()+1); // anything other than zero
+                interpreter = new QDLInterpreter(newState);
+                interpreter.setPrettyPrint(isPrettyPrint());
+                interpreter.setEchoModeOn(isEchoModeOn());
+                break;
         }
+
         if (interpreter == null) {
             say("could not create debug instance.");
             return RC_NO_OP;
@@ -631,7 +677,7 @@ public class WorkspaceCommands implements Logable {
                     InterruptException ie = (InterruptException) t;
                     int nextPID = siEntries.nextKey();
                     ie.getSiEntry().pid = nextPID;
-                    ie.getSiEntry().interpreter = interpreter;
+                    // ie.getSiEntry().interpreter = interpreter;
                     siEntries.put(nextPID, ie.getSiEntry());
                     say(Integer.toString(nextPID));
                 }
@@ -640,7 +686,7 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    QDLParser defaultInterpreter;
+    QDLInterpreter defaultInterpreter;
     State defaultState;
     int currentPID = 0;
 
@@ -933,7 +979,10 @@ public class WorkspaceCommands implements Logable {
     public String BUFFER_RECORD_SEPARATOR = "|";
 
     protected String formatBufferRecord(int ndx, BufferManager.BufferRecord br) {
-        String a = BUFFER_RECORD_SEPARATOR + (br.hasContent() ? "*" : " ") + BUFFER_RECORD_SEPARATOR;
+        // so a ? is shown if its a link, a * if its a buffer that hasn't been saved.
+        String saved = (br.isLink() ? "?" : "") + (br.hasContent() ? "*" : " ");
+
+        String a = BUFFER_RECORD_SEPARATOR + saved + BUFFER_RECORD_SEPARATOR;
         return ndx + a + br;
     }
 
@@ -1796,7 +1845,7 @@ public class WorkspaceCommands implements Logable {
         state = null;
         // Get rid of everything.
 
-        interpreter = new QDLParser(getState());
+        interpreter = new QDLInterpreter(getState());
         say("workspace cleared");
         return RC_CONTINUE;
     }
@@ -1831,8 +1880,14 @@ public class WorkspaceCommands implements Logable {
             }
             FileOutputStream fos = new FileOutputStream(target);
             logger.info("saving workspace '" + target.getAbsolutePath() + "'");
-
-            StateUtils.save(state, fos);
+            WSInternals wsInternals = new WSInternals();
+            wsInternals.defaultState = defaultState;
+            wsInternals.currentPID = currentPID;
+            wsInternals.activeState = state;
+            wsInternals.siEntries = siEntries;
+            wsInternals.startTimestamp = startTimeStamp;
+            StateUtils.saveObject(wsInternals, fos);
+            //StateUtils.save(state, fos);
             say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
         } catch (Throwable t) {
             logger.error("could not save workspace.", t);
@@ -1848,21 +1903,31 @@ public class WorkspaceCommands implements Logable {
         try {
             long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
-            State newState = StateUtils.load(fis);
+            WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
+
+            //State newState = StateUtils.load(fis);
+            State newState = wsInternals.activeState;
+            currentPID = wsInternals.currentPID;
+            defaultState = wsInternals.defaultState;
+            siEntries = wsInternals.siEntries;
+            startTimeStamp = wsInternals.startTimestamp;
             /*
             Now set the stuff that cannot be serialized.
              */
             newState.injectTransientFields(getState());
-
-            interpreter = new QDLParser(env, newState);
+            defaultState.injectTransientFields(getState());
+            for (Integer key : siEntries.keySet()) {
+                SIEntry sie = siEntries.get(key);
+                sie.state.injectTransientFields(getState());
+            }
+            interpreter = new QDLInterpreter(env, newState);
             interpreter.setEchoModeOn(isEchoModeOn());
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
             say(f.getCanonicalPath() + " loaded " + f.length() + " bytes. Last saved " + new Date(lastModified));
         } catch (Throwable t) {
-            say("workspace not loaded.");
-            t.printStackTrace();
+            say("workspace not loaded:" + t.getMessage());
         }
     }
 
@@ -1900,9 +1965,9 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    QDLParser interpreter = null;
+    QDLInterpreter interpreter = null;
 
-    public QDLParser getInterpreter() {
+    public QDLInterpreter getInterpreter() {
         return interpreter;
     }
 
@@ -1989,13 +2054,12 @@ public class WorkspaceCommands implements Logable {
                     new ModuleMap(),
                     logger,
                     false);// workspace is never in server mode
-            // Experiment for a Java module
             state.setPID(0);
-            SIEntry sys = new SIEntry();
+            /*SIEntry sys = new SIEntry();
             sys.state = state;
             sys.pid = 0;
             sys.message = "system";
-            siEntries.put(0, sys);
+            siEntries.put(0, sys);*/
         }
         return state;
 
@@ -2182,7 +2246,7 @@ public class WorkspaceCommands implements Logable {
             }
             env.put("boot_script", bf);
         }
-        interpreter = new QDLParser(env, getState());
+        interpreter = new QDLInterpreter(env, getState());
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         interpreter.setPrettyPrint(qe.isPrettyPrint());
         getState().setScriptPaths(qe.getScriptPath());
@@ -2191,6 +2255,8 @@ public class WorkspaceCommands implements Logable {
         runScript(inputLine); // run any script if that mode is enabled.
 
     }
+
+    Date startTimeStamp = new Date(); // default is now
 
     /**
      * Bootstraps the whole thing.
@@ -2346,7 +2412,7 @@ public class WorkspaceCommands implements Logable {
                 env.put("externalModules", foundClasses);
             }
         }
-        interpreter = new QDLParser(env, getState());
+        interpreter = new QDLInterpreter(env, getState());
         interpreter.setEchoModeOn(true);
         if (inputLine.hasArg(CLA_BOOT_SCRIPT)) {
             String bootFile = inputLine.getNextArgFor(CLA_BOOT_SCRIPT);

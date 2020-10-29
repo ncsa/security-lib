@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.util;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -339,16 +340,55 @@ public class StringUtils {
         return s + getBlanks(commandBufferMaxWidth - s.length());
     }
 
+    protected static String STARS = "**************************************************************************************";
+    public static String pad2(int value, int commandBufferMaxWidth) {
+        String x = Integer.toString(value);
+        return pad2(x, false, commandBufferMaxWidth);
+    }
+
+    public static String pad2(Date value, boolean isISO, int commandBufferMaxWidth) {
+        String x;
+        if(isISO){
+            x = Iso8601.date2String(value);
+        }else{
+            x = value.toString();
+        }
+        return pad2(x, false, commandBufferMaxWidth);
+    }
+
+    /**
+     * Default is ISO 8601 dates
+     * @param value
+     * @param commandBufferMaxWidth
+     * @return
+     */
+    public static String pad2(Date value, int commandBufferMaxWidth) {
+
+        return pad2(value, true, commandBufferMaxWidth);
+    }
+
     /**
      * Pad the string to the given length with blanks. This makes sure every line
-     * is the same length.
+     * is the same length. If the line is too long, it is
      *
      * @param s
      * @param commandBufferMaxWidth
      * @return
      */
+
     public static String pad2(String s, int commandBufferMaxWidth) {
+        return pad2(s, true, commandBufferMaxWidth); // default is to truncate lines too long
+    }
+    public static String pad2(String s, boolean isTruncate, int commandBufferMaxWidth) {
+        if(commandBufferMaxWidth <= s.length()){
+            if(isTruncate){
+                s = s.substring(0,commandBufferMaxWidth);
+            }else {
+                s = STARS.substring(0, Math.min(5, commandBufferMaxWidth));
+            }
+        }
         return s + getBlanks(commandBufferMaxWidth - s.length());
+
     }
 
 }

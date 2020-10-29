@@ -47,6 +47,19 @@ See also: decode_b64
             </body>
         </entry>
 
+    <entry id="head">
+            <body>
+                <![CDATA[
+head(target, stopChar[,is_case_sensitive]) - Return up to stopChar in the target. Both of the first arguments
+                 may be conformable stems. The result is always conformable to target.
+                 is_case_sensitive - if true (default) does case sensitive checking.
+E.g.
+    head(['bob@foo', 'todd@foo'], '@')
+[bob,todd]
+                ]]>
+            </body>
+        </entry>
+
     <entry id="from_hex">
             <body>
                 <![CDATA[

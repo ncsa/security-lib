@@ -445,6 +445,32 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     /**
+     * This will return a pristine copy of the current state for debugging purposes.
+     * Generally only use this in the state indicator when explicitly asked, since there
+     * are no imports and such. It will send along the VFS's, if in server mode and the script path
+     * @return
+     */
+    public State newDebugState() {
+           // NOTE this has no parents. Modules have completely clear state when starting!
+           ImportManager r = new ImportManager();
+           SymbolStack newStack = new SymbolStack();
+           newStack.addParent(new SymbolTableImpl());
+           State newState = new State(r,
+                   newStack,
+                   getOpEvaluator(),
+                   getMetaEvaluator(),
+                   new FunctionTable(),
+                   new ModuleMap(), // so no modules
+                   getLogger(),
+                   isServerMode());
+           // May want to rethink setting these...
+           newState.setScriptArgs(getScriptArgs());
+           newState.setScriptPaths(getScriptPaths());
+           newState.setVfsFileProviders(getVfsFileProviders());
+           return newState;
+       }
+
+    /**
      * Add the module under the default alias
      *
      * @param module

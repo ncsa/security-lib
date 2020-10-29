@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemListNode;
 import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  6:15 AM
  */
-public class QDLRunner {
+public class QDLRunner implements Serializable {
     public boolean isEchoModeOn() {
         return echoModeOn;
     }
@@ -63,6 +64,16 @@ public class QDLRunner {
     public QDLRunner(ArrayList<Element> elements) {
         this.elements = elements;
     }
+
+    public QDLInterpreter getInterpreter() {
+        return interpreter;
+    }
+
+    public void setInterpreter(QDLInterpreter interpreter) {
+        this.interpreter = interpreter;
+    }
+
+    QDLInterpreter interpreter;
 
     public List<Element> getElements() {
         return elements;
@@ -130,8 +141,13 @@ public class QDLRunner {
                     try {
                         stmt.evaluate(currentState);
                     } catch (InterruptException ix) {
-                        ix.getSiEntry().qdlRunner = this;
-                        ix.getSiEntry().lineNumber = i; // number where this happened.
+                        if(!ix.getSiEntry().initialized) {
+                            // if it was set up, pass it up the stack
+                            ix.getSiEntry().qdlRunner = this;
+                            ix.getSiEntry().lineNumber = i; // number where this happened.
+                            ix.getSiEntry().interpreter = getInterpreter();
+                            ix.getSiEntry().initialized = true;
+                        }
                         throw ix;
                     }
                 }

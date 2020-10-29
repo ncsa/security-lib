@@ -1,4 +1,4 @@
-// Generated from QDLParser.g4 by ANTLR 4.7.2
+// Generated from QDLInterpreter.g4 by ANTLR 4.7.2
 package edu.uiuc.ncsa.qdl.generated;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -114,7 +114,7 @@ public class QDLParserLexer extends Lexer {
 	}
 
 	@Override
-	public String getGrammarFileName() { return "QDLParser.g4"; }
+	public String getGrammarFileName() { return "QDLInterpreter.g4"; }
 
 	@Override
 	public String[] getRuleNames() { return ruleNames; }

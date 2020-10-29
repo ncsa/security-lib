@@ -12,7 +12,7 @@ cd $SOURCE_DIR
 # There is no option to set the source directory
 echo "switching to " $SOURCE_DIR
 echo "putting files in "$OUT_DIR
-antlr4 QDLParser.g4 -o $OUT_DIR -package $OUT_PACKAGE
+antlr4 QDLInterpreter.g4 -o $OUT_DIR -package $OUT_PACKAGE
 cd $OUT_DIR
 #rm *.java
 #rm *.class

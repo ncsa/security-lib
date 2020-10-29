@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.Logable;
 
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,7 +84,9 @@ public class MyLoggingFacade implements Logable {
         return logger;
     }
 
-
+      protected String msg(String x){
+        return getClassName()+ ":" + x;
+      }
     /**
      * If debug is set on, print the string with the classname and date. Otherwise, do not print debug
      * messages. This allows you to switch debug prints on and off throughout your code via configuration.
@@ -94,13 +95,12 @@ public class MyLoggingFacade implements Logable {
      */
     public void debug(String x) {
         if (isDebugOn()) {
-            String out = getClassName() + "(" + (new Date()) + "): " + x;
-            getLogger().finest(out);
+            getLogger().finest(msg(x));
         }
     }
 
     public void info(String x) {
-        getLogger().info(getClassName() + "(" + (new Date()) + "): " + x);
+        getLogger().info(msg(x));
     }
 
     public void warn(String x, Throwable t) {
@@ -113,7 +113,7 @@ public class MyLoggingFacade implements Logable {
     }
 
     public void warn(String x) {
-        getLogger().warning(getClassName() + "(" + (new Date()) + "): " + x);
+        getLogger().warning(msg(x));
     }
 
     public void error(String x, Throwable t) {
@@ -130,7 +130,7 @@ public class MyLoggingFacade implements Logable {
     }
 
     public void error(String x) {
-        getLogger().severe(getClassName() + "(" + (new Date()) + "): " + x);
+        getLogger().severe(msg(x));
     }
 
     String fileName;

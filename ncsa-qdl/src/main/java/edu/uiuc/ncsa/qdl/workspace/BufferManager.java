@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
@@ -190,7 +190,7 @@ public class BufferManager implements Serializable {
             String readIt = IOEvaluator.READ_FILE + "('" + currentBR.link + "')";
             String raw = IOEvaluator.WRITE_FILE + "('" + currentBR.src + "'," + readIt + ");";
             try {
-                QDLParser parser = new QDLParser(getState());
+                QDLInterpreter parser = new QDLInterpreter(getState());
                 parser.setEchoModeOn(false);// no output
                 parser.execute(raw);
             } catch (Throwable throwable) {

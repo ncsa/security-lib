@@ -84,6 +84,10 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final String SYS_FROM_URI = SYS_FQ + FROM_URI;
     public static final int FROM_URI_TYPE = 14 + STRING_FUNCTION_BASE_VALUE;
 
+    public static final String CAPUT = "head";
+    public static final String SYS_CAPUT = SYS_FQ + CAPUT;
+    public static final int CAPUT_TYPE = 15 + STRING_FUNCTION_BASE_VALUE;
+
     public static String FUNC_NAMES[] = new String[]{
             CONTAINS,
             TO_LOWER,
@@ -93,6 +97,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             SUBSTRING,
             REPLACE,
             INDEX_OF,
+            CAPUT,
             TOKENIZE,
             DETOKENIZE,
             ENCODE,
@@ -108,6 +113,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             SYS_SUBSTRING,
             SYS_REPLACE,
             SYS_INDEX_OF,
+            SYS_CAPUT,
             SYS_TOKENIZE,
             SYS_DETOKENIZE,
             SYS_ENCODE,
@@ -156,6 +162,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case INDEX_OF:
             case SYS_INDEX_OF:
                 return INDEX_OF_TYPE;
+            case CAPUT:
+            case SYS_CAPUT:
+                return CAPUT_TYPE;
             case TOKENIZE:
             case SYS_TOKENIZE:
                 return TOKENIZE_TYPE;
@@ -188,6 +197,10 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case TRIM:
             case SYS_TRIM:
                 doTrim(polyad, state);
+                return true;
+            case CAPUT:
+            case SYS_CAPUT:
+                doCaput(polyad, state);
                 return true;
             case INDEX_OF:
             case SYS_INDEX_OF:
@@ -239,6 +252,44 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doCaput(Polyad polyad, State state) {
+        fPointer pointer = new fPointer() {
+              @Override
+              public fpResult process(Object... objects) {
+                  fpResult r = new fpResult();
+                  int pos = -1;
+                  boolean caseSensitive = true;
+                  if (objects.length == 3) {
+                      if (!(objects[2] instanceof Boolean)) {
+                          throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
+                      }
+                      caseSensitive = (Boolean) objects[2];
+                  }
+
+                  if (areAllStrings(objects[0], objects[1])) {
+                      String s0 = (String)objects[0];
+                      String s1 = (String) objects[1];
+                      if (caseSensitive) {
+                          pos = s0.indexOf(s1);
+                      } else {
+                          pos = s0.toLowerCase().indexOf(s1.toLowerCase());
+                      }
+                      if(pos < 0 ){
+                          // not found
+                          r.result = s0;
+                      }else{
+                          r.result = s0.substring(0, pos);
+                      }
+
+                  }
+                  r.resultType = Constant.STRING_TYPE;
+                  return r;
+              }
+          };
+          process2(polyad, pointer, CAPUT, state, true);
+
     }
 
     private void doFromURI(Polyad polyad, State state) {

@@ -59,11 +59,15 @@ public class StateUtils {
      * @throws IOException
      */
     public static void save(State state, OutputStream outputStream) throws IOException {
+                saveObject(state, outputStream);
+    }
+
+    public static void saveObject(Object object, OutputStream outputStream) throws IOException {
         GZIPOutputStream gos = new GZIPOutputStream(outputStream);
         ObjectOutputStream out = new ObjectOutputStream(gos);
 
         // Method for serialization of object
-        out.writeObject(state);
+        out.writeObject(object);
         out.flush();
         out.close();
     }
@@ -95,14 +99,18 @@ public class StateUtils {
         return load(baos);
     }
 
-    public static State load(InputStream inputStream) throws IOException, ClassNotFoundException {
+    public static Object loadObject(InputStream inputStream) throws IOException, ClassNotFoundException {
         GZIPInputStream gis = new GZIPInputStream(inputStream);
         ObjectInputStream in = new ObjectInputStream(gis);
 
         // Method for deserialization of object
-        State state = (State) in.readObject();
+        Object object = in.readObject();
         in.close();
-        return state;
+        return object;
+
+    }
+    public static State load(InputStream inputStream) throws IOException, ClassNotFoundException {
+        return (State)loadObject(inputStream);
     }
 
     public static void main(String[] args) {

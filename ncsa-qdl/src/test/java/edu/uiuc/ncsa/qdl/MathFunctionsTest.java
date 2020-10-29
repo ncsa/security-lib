@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MathEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -233,7 +233,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "i. := -.3 - b.;"); // {2.7, 1.7, .7, -.3, -1.3, -2.3}
 
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a.0", state) == -1L;
         assert getLongValue("a.1", state) == -4L;

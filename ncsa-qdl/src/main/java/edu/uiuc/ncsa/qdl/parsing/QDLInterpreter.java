@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 
 /**
@@ -13,7 +14,7 @@ import java.io.StringReader;
  * <p>Created by Jeff Gaynor<br>
  * on 1/11/20 at  4:46 PM
  */
-public class QDLParser {
+public class QDLInterpreter implements Serializable {
     boolean debugOn = false;
 
     public boolean isDebugOn() {
@@ -26,12 +27,12 @@ public class QDLParser {
 
     XProperties environment;
 
-    public QDLParser(State state) {
+    public QDLInterpreter(State state) {
         this.environment = new XProperties();
         this.state = state;
     }
 
-    public QDLParser(XProperties environment, State state) {
+    public QDLInterpreter(XProperties environment, State state) {
         this.environment = environment;
         this.state = state;
     }
@@ -65,6 +66,7 @@ public class QDLParser {
         runner.setState(state);
         runner.setEchoModeOn(isEchoModeOn());
         runner.setPrettyPrint(isPrettyPrint());
+        runner.setInterpreter(this); // needed for state indicator operations.
         runner.run();
 
     }

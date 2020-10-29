@@ -6,8 +6,8 @@ OUT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security
 SCRIPT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/resources/antlr4/"
 echo "reading command file from "  $SCRIPT_DIR
 # And another thing... in a split grammar, the test rig will resolve the name of the grammar from the
-# stem. Antlr is actually picky about this, so in a combined grammar you would invoke QDLParser here
-# you just invoke QDL and it looks for QDLParser.class. Not well documented in the AAntkr reference man, FYI...
+# stem. Antlr is actually picky about this, so in a combined grammar you would invoke QDLInterpreter here
+# you just invoke QDL and it looks for QDLInterpreter.class. Not well documented in the AAntkr reference man, FYI...
 echo "switching to directory " $OUT_DIR
 cd $OUT_DIR
 echo "running file " $SCRIPT_DIR$1

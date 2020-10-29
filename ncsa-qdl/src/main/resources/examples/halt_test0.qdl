@@ -1,0 +1,14 @@
+/*
+    Test for state indicator
+*/
+
+r := random();
+say('starting halt test #' + r);
+if[
+  mod(r, 4) == 0
+][
+  halt('randomly halting #' + r);
+]else[
+  script_run('ex#/halt_test0.qdl');
+];
+halt('exiting #' + r);

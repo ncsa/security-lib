@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -49,7 +49,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "v := (x^3 + x*y^2 - 3*x*y + 1)/(x^4 + y^2 +2);");
         addLine(script, "return(v);");
         addLine(script, "];");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         addLine(script, "a:=3;");
@@ -99,7 +99,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "v := (x*y^2*z^3 - x/y^2 + z^4)/(1-(x*y*(1-z))^2);");
         addLine(script, "return(v);");
         addLine(script, "];");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         for (int i = 1; i < 1 + results.length; i++) {
@@ -159,7 +159,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "]body[");
         addLine(script, "return(" + cf + "-" + cf2 + ");");
         addLine(script, "];");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         // That was to make sure the function ended up in the state, so let's be sure it
@@ -246,7 +246,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, g_x);
         addLine(script, h_y);
         addLine(script, f_xy);
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // now verify the results
         for (int i = 1; i < 1 + results.length; i++) {
@@ -298,7 +298,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, set_b);
         // interpret this much so if we have to debug it we don't have a ton of initializiation to go through
         State state = testUtils.getNewState();
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         script = new StringBuffer();
         addLine(script, "z. := mm(a.,b.);");
@@ -344,7 +344,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "w. := indices(4);"); // We want w. to exist outside of the loop so we can test it.
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         String outer_loop_start = "while[for_next(i,2)]do[";
         String inner_loop_start = "while[for_next(j,2)]do[";
@@ -392,7 +392,7 @@ public class ParserTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Looping through a list was not done in order.";
 
@@ -422,7 +422,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "");
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stemVariable = getStemValue("a.", state);
         assert stemVariable.size() == 10; // Fingers and toes test.
@@ -479,7 +479,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, import_h);
         addLine(script, f_xy);
         // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         // all that is set up. Now put in some values and try to evaluate it
@@ -529,7 +529,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, import_h);
         addLine(script, f_xy);
         // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
 
@@ -566,7 +566,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a#q:=10;");
         addLine(script, "b#q:=11;");
         // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a#q").equals(10L);
         assert state.getValue("b#q").equals(11L);
@@ -606,7 +606,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "]body[");
         addLine(script, "return(" + cf + ");");
         addLine(script, "];");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         // That was to make sure the function ended up in the state, so let's be sure it
@@ -645,7 +645,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "e := b#list.#i;");
 
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         Long d = getLongValue("d", state);
@@ -668,7 +668,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "b. := {'p':'q', abs(-3.4):size('abcd')};");
         addLine(script, "c. := {'z':{'t':abs(-42)}};");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         StemVariable a = getStemValue("a.", state);
@@ -718,7 +718,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a#i := 5;");
 
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         Long p = getLongValue("p", state);
@@ -757,7 +757,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "e := b#list.d#i;");
 
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         Long d = getLongValue("d", state);
@@ -774,7 +774,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a:=5;");
         addLine(script, "b := -10;");
         addLine(script, "c:=a+b;");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
         assert getLongValue("b", state) == -10L;
@@ -799,7 +799,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.3/=b;"); //   3/3 =  1
         addLine(script, "a.4%=b;"); //   4%3 =  1
         addLine(script, "a.5^=b;"); //   5^3 =  125
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a.0", state) == 3L;
         assert getLongValue("a.1", state) == -2L;
@@ -822,7 +822,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "A := 'a'; B := 'b'; C := 'pqrc';");
         addLine(script, "q := A += B += D := C -= 'pqr';");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert getStringValue("q", state).equals("abc");
@@ -853,7 +853,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.7 := b=>b;"); //T
         addLine(script, "a.8 := a==a;"); //T
         addLine(script, "a.9 := a!=a;"); //F
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("a.1", state);
         assert getBooleanValue("a.3", state);
@@ -877,7 +877,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "c:=-5;");
         addLine(script, "d:=a<b&&c<a;");
         addLine(script, "e:=!(a<b&&c<a);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
@@ -897,7 +897,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "c:=2;");
         addLine(script, "d:=a++ < 0;");
         addLine(script, "e:=!((a<--b)&&(c<a));");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 1L;// got incremented
         assert getLongValue("b", state) == -1L; // got decremented twice
@@ -920,7 +920,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a:='" + test + "';");
         addLine(script, "say('test print chars:');");
         addLine(script, "say(a);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
     }
 
@@ -939,7 +939,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "p :='በሰማይ ፡ የምትኖር ፡ ኣባታችን ፡ ሆይ ፡';");
         addLine(script, "b := (a == vdecode(vencode(a)));");
         addLine(script, "q := (p == vdecode(vencode(p)));");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("b", state);
         assert getBooleanValue("q", state);
@@ -959,7 +959,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "b:=11;");
         addLine(script, "c:=-(11+2*a);");
         addLine(script, "d.:=-indices(3);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == -4L;
         assert getLongValue("b", state) == 11L;
@@ -978,7 +978,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a:=4;");
         addLine(script, "b:=-(--a * 1 *  --a * 1 * --a);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert getLongValue("a", state) == 1L;
@@ -994,7 +994,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a:=4;");
         addLine(script, "b:=-(a-- * 1 *  a-- * 1 * a--);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert getLongValue("a", state) == 1L;
@@ -1016,7 +1016,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "var. := random(5);");
         addLine(script, "w. := indices(10);");
         addLine(script, "z. := has_keys(var., w.);");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // so the first 5 entries are true, the next 5 are false.
         for (int i = 0; i < 5; i++) {
@@ -1041,7 +1041,7 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a = 3");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to make an assignment with = not :=";
@@ -1066,7 +1066,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a := 'aaa';");
         addLine(script, "a += 'qqq';");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert state.getValue("a").equals("aaaqqq");
         // Either of these indicate the logic for parsing op + assignment is broken. Regression tests.
@@ -1082,7 +1082,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "my_stem.help := '" + phrase + "';");
         addLine(script, "list_append(my_stem., 10 + indices(5));");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("my_stem.", state);
         assert stem.getLong("0") == 10L;
@@ -1100,7 +1100,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a := 'foo';"); // Create existing entry in symbol table
         addLine(script, "unbox({'a':'b'});"); // try to overwrite it in safe mode -- should fail
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to unbox a variable with a name clash in safe mode.";
@@ -1117,7 +1117,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a := 'foo';"); // Create existing entry in symbol table
         addLine(script, "unbox({'a':'b'}, false);"); // force overwrite
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("b") :
                 "Failed to overwrite in unbox. Expected \"b\", got \"" + getStringValue("a", state) + "\"";
@@ -1135,7 +1135,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, " z := 'https://www.google.com/search?channel=fs&client=ubuntu&q=URI+specification#fragment=42';");
         addLine(script, "a := z == from_uri(to_uri(z));");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("a", state) :
                 "Failed to parse a uri";
@@ -1155,7 +1155,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a0 := a == null;");
         addLine(script, "a1 := a. == null;");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert state.getValue("a") instanceof QDLNull;
@@ -1184,7 +1184,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "if[r < 100]then[a := 5;];");
         addLine(script, "if[r < 57]then[a. := indices(2);];");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert getLongValue("a", state) == 5L;
@@ -1198,7 +1198,7 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "execute('var := \\'abc\\' + \\'def\\';');");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("var", state).equals("abcdef");
 
@@ -1217,7 +1217,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a := null;");
         addLine(script, "if[2 < 3]then[a :=2;];");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert state.getValue("a") != null;
@@ -1272,7 +1272,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "j := '" + rawJSON + "';");
         addLine(script, "claims. := from_json(j);");
         addLine(script, "j2 := to_json(from_json(to_json(from_json(to_json(from_json(j))))));");
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
         assert state.getValue("j2") != null;
@@ -1306,7 +1306,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "w#a#q:=3;");
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a#q", state) == 10L;
         assert getLongValue("b#q", state) == 11L;
@@ -1340,7 +1340,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "test_wg := w#g(2);");
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("test_f", state) == 101L;
         assert getLongValue("test_a", state) == 2L;
@@ -1405,7 +1405,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "    ]; //end switch                            ");
         addLine(script, "]; // end do                                   ");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("stem.", state);
         assert stem.getLong("0") == 5L;

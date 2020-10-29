@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -906,7 +906,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "test. := w.z.y.x.;"); // resolves to w.2 which is a stem
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStemValue("test.",state).size() == 2;
     }
@@ -918,7 +918,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "test := w.z.y.x;"); // resolves to w.2 which is an integer here.
         State state = testUtils.getNewState();
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("test", state).equals(3L);
 
@@ -946,7 +946,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
          State state = testUtils.getNewState();
 
          // really detailed tests since this is probably one of the most used functions.
-         QDLParser interpreter = new QDLParser(null, state);
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
          interpreter.execute(script.toString());
          // tests for scalar left arg:
          assert getBooleanValue("test_c", state);

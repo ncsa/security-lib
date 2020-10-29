@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.config;
 
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.vfs.*;
@@ -132,7 +132,7 @@ public class QDLConfigurationLoaderUtils {
             String foundModules = "";
             boolean isFirstJavaModules = true;
             boolean isFirstQDLModules = true;
-            QDLParser interpreter = new QDLParser(state);
+            QDLInterpreter interpreter = new QDLInterpreter(state);
 
             for (ModuleConfig moduleConfig : config.getModuleConfigs()) {
                 if (moduleConfig.getType().equals(MODULE_TYPE_JAVA)) {
@@ -197,7 +197,7 @@ public class QDLConfigurationLoaderUtils {
 
     public static String runBootScript(QDLEnvironment config, State state) {
         if (config.hasBootScript()) {
-            QDLParser interpreter = new QDLParser(state);
+            QDLInterpreter interpreter = new QDLInterpreter(state);
             String bootFile = config.getBootScript();
             try {
                 String bootScript = FileUtil.readFileAsString(bootFile);

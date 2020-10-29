@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class GlomTest extends AbstractQDLTester {
         // Evaluate this is two ways and check they match
         addLine(script, "out1. := " + cf + "-" + cf2 + ";"); // single, massive expression
         addLine(script, "out2. := x. - y.;"); // do separately, subtract results
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable out1 = getStemValue("out1.", state);
         StemVariable out2 = getStemValue("out2.", state);
@@ -66,7 +66,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := 1~2~3;");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 3;
@@ -81,7 +81,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,2]~[3,4];");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 4;
@@ -97,7 +97,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := (1~'ab')+(3~'cd');");
         // should result in [4,abcd]
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 2;
@@ -111,7 +111,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := ~1;");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to execute a monadic glom ~1. It should have failed.";
@@ -126,7 +126,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := {'a':'p'}~{'b':'r'};");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 2;
@@ -145,7 +145,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := {'a':'p'}~{'a':'r'};");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 1;
@@ -157,7 +157,7 @@ public class GlomTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := 1~'abc'~{'a':'b'};");
 
-        QDLParser interpreter = new QDLParser(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         StemVariable stem = getStemValue("a.", state);
         assert stem.size() == 3;

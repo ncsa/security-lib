@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.parsing.QDLParser;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.FileEntry;
@@ -91,7 +91,7 @@ public class QDLScript extends FileEntry implements ScriptInterface {
 
 
     public void execute(StateInterface state) {
-        QDLParser parser = new QDLParser((State) state);
+        QDLInterpreter parser = new QDLInterpreter((State) state);
         if(isRunScript()){
             if(getScriptArglist() != null && !getScriptArglist().isEmpty()){
                 ((State) state).getSymbolStack().setValue(getScriptArgName(), getScriptArglist()); 
