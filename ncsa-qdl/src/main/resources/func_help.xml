@@ -54,8 +54,9 @@ head(target, stopChar[,is_case_sensitive]) - Return up to stopChar in the target
                  may be conformable stems. The result is always conformable to target.
                  is_case_sensitive - if true (default) does case sensitive checking.
 E.g.
-    head(['bob@foo', 'todd@foo'], '@')
-[bob,todd]
+    head(['bob@foo', 'todd@foo', 'rolf!baz'], '@')
+[bob,todd,]
+    Note that there is no match for the last element, so an empty string is returned.
                 ]]>
             </body>
         </entry>
@@ -66,6 +67,26 @@ E.g.
 from_hex(arg) - convert a hexadecimal string or stem of strings to a string.
 See also: to_hex
                 ]]>
+            </body>
+        </entry>
+    <entry id="check_syntax">
+            <body>
+                <![CDATA[
+check_syntax(string) - This will take the (possibly very long) string and run it through the
+                        parser checking for syntax errors. Note that this does not run anything!
+                        Its use is to help you track down errors like missing semi-colons, illegal
+                        characters and other statements.
+                        It returns either an empty string (no issues found) or an error message
+                        containing something like 'syntax error: line 1:4'. This means that the
+                        first line of input (lines are counted starting at 1) had an error at
+                        position 4 (characters on the line are counted from zero).
+E.g.
+   check_syntax(file_read('/path/to/file/x.qdl'))
+syntax error:line 11:27 mismatched input '=' expecting {'^', '=<', '=>', ...
+
+Meaning that on line 11, position 27 there was an error in the file.
+See also: execute
+]]>
             </body>
         </entry>
     <entry id="hash">

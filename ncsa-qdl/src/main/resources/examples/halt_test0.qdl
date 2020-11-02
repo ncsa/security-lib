@@ -11,4 +11,4 @@ if[
 ]else[
   script_run('ex#/halt_test0.qdl');
 ];
-halt('exiting #' + r);
+halt('exiting halt test #' + r);

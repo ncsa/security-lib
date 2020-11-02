@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -60,6 +61,31 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
       // If there is a gap in the entries, fall back on stem notation.
          // All this exception needs is to exist.
      }
+    public String toString(int indentFactor, String currentIndent){
+        String output = currentIndent + "[\n";
+        String newIndent = currentIndent + StringUtils.getBlanks(indentFactor);
+
+        boolean isFirst = true;
+        for (long i = 0; i < size(); i++) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ",\n";
+            }
+            Object obj = get(i);
+            if(obj == null){
+                throw new seGapException();
+            }
+            output = output + newIndent + StemConverter.convert(obj);
+        }
+
+        return output + "\n]";
+
+
+    }
+    public String toString(int indentFactor){
+          return toString(indentFactor, "");
+    }
 
     @Override
     public String toString() {

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
@@ -161,7 +162,7 @@ public class QDLListener implements QDLParserListener {
                 // no next element, implies the user sent something like a :=; so no rhs, OR the
                 // rhs was so munged the parser can't figure out what it is.
                 // Throw an  exception they can understand rather than an index out of bounds.
-                throw new IllegalArgumentException("Error: missing/unparseable expression for assignment");
+                throw new AssignmentException("missing/unparseable right-hand expression for assignment");
             }
             nextVar = assignmentContext.children.get(i + 1).getText();
             nextA.setVariableReference(nextVar);

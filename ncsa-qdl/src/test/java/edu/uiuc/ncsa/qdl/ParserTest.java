@@ -430,6 +430,30 @@ public class ParserTest extends AbstractQDLTester {
         assert stemVariable.containsKey("0"); // evens are scalars
     }
 
+    /**
+     * The parser should throw an exception on single equals, e.g.
+     * <pre>
+     *     a=1;
+     * </pre>
+     * should blow up. This is the most common beginner error (using wrong assignment operator)
+     * and should not just fail silently.
+     * @throws Throwable
+     */
+    @Test
+    public void testSingleEquals() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a=1;");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false:"Was able to interpret single equals without parser error";
+        }catch(ParseCancellationException pcx){
+            assert true;
+        }
+    }
+
     /*
      a. := null;
      while[for_next(j,10)

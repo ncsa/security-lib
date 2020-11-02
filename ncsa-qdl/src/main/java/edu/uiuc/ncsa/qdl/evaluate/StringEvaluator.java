@@ -278,7 +278,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                       }
                       if(pos < 0 ){
                           // not found
-                          r.result = s0;
+                          r.result = "";
                       }else{
                           r.result = s0.substring(0, pos);
                       }

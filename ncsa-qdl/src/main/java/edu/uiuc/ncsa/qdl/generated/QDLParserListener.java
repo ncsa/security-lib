@@ -1,4 +1,4 @@
-// Generated from QDLInterpreter.g4 by ANTLR 4.7.2
+// Generated from QDLParser.g4 by ANTLR 4.7.2
 package edu.uiuc.ncsa.qdl.generated;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 

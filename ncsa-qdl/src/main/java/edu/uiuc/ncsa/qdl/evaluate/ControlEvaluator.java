@@ -20,9 +20,11 @@ import edu.uiuc.ncsa.qdl.workspace.QDLWorkspace;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,10 +41,9 @@ import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
  */
 public class ControlEvaluator extends AbstractFunctionEvaluator {
 
-    public static final String EXECUTE = "execute";
-    public static final String FQ_EXECUTE = SYS_FQ + EXECUTE;
-
     public static final int CONTROL_BASE_VALUE = 5000;
+
+
     // Looping stuff
     public static final String CONTINUE = "continue";
     public static final String FQ_CONTINUE = SYS_FQ + CONTINUE;
@@ -67,6 +68,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String INTERRUPT = "halt";
     public static final String FQ_INTERRUPT = SYS_FQ + INTERRUPT;
     public static final int INTERRUPT_TYPE = 6 + CONTROL_BASE_VALUE;
+
+    public static final String EXECUTE = "execute";
+    public static final String FQ_EXECUTE = SYS_FQ + EXECUTE;
+    public static final int EXECUTE_TYPE = 10 + CONTROL_BASE_VALUE;
+
+    public static final String CHECK_SYNTAX = "check_syntax";
+    public static final String FQ_CHECK_SYNTAX = SYS_FQ + CHECK_SYNTAX;
+    public static final int CHECK_SYNTAX_TYPE = 11 + CONTROL_BASE_VALUE;
 
     // function stuff
     public static final String RETURN = "return";
@@ -143,6 +152,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             CONTINUE,
             INTERRUPT,
             BREAK,
+            EXECUTE,
+            CHECK_SYNTAX,
             FOR_KEYS,
             FOR_NEXT,
             CHECK_AFTER,
@@ -163,6 +174,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             FQ_CONSTANTS,
             FQ_CONTINUE,
             FQ_INTERRUPT,
+            FQ_EXECUTE,
+            FQ_CHECK_SYNTAX,
             FQ_BREAK,
             FQ_FOR_KEYS,
             FQ_FOR_NEXT,
@@ -215,6 +228,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case CONTINUE:
             case FQ_CONTINUE:
                 return CONTINUE_TYPE;
+            case EXECUTE:
+            case FQ_EXECUTE:
+                return EXECUTE_TYPE;
+            case CHECK_SYNTAX:
+            case FQ_CHECK_SYNTAX:
+                return CHECK_SYNTAX_TYPE;
             case INTERRUPT:
             case FQ_INTERRUPT:
                 return INTERRUPT_TYPE;
@@ -334,28 +353,59 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case FQ_EXECUTE:
                 doExecute(polyad, state);
                 return true;
+            case CHECK_SYNTAX:
+            case FQ_CHECK_SYNTAX:
+                doCheckSyntax(polyad, state);
+                return true;
         }
         return false;
     }
 
+    private void doCheckSyntax(Polyad polyad, State state) {
+        if(polyad.getArgCount() != 1){
+            throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " requires a single argument.");
+        }
+        Object arg0 = polyad.evalArg(0, state);
+        if (!isString(arg0)) {
+            throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " must be a string.");
+        }
+        StringReader r = new StringReader((String) arg0);
+        String message = "";
+        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newDebugState());
+        try {
+            QDLRunner runner = new QDLRunner(driver.parse(r));
+        } catch (ParseCancellationException pc) {
+            message = pc.getMessage();
+        }catch(AssignmentException ax){
+            message = ax.getMessage();
+        }catch (Throwable t) {
+            message = "non-syntax error:" + t.getMessage();
+
+        }
+
+        polyad.setEvaluated(true);
+        polyad.setResult(message);
+        polyad.setResultType(Constant.STRING_TYPE);
+    }
+
     protected void doInterrupt(Polyad polyad, State state) {
-        if(state.isServerMode()){
+        if (state.isServerMode()) {
             // no interrupts in server mode.
             polyad.setResult(-1L);
             polyad.setResultType(Constant.LONG_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-         String message = "";
-        switch (polyad.getArgCount()){
+        String message = "";
+        switch (polyad.getArgCount()) {
             case 0:
                 // do nothing.
                 break;
             case 1:
                 Object obj = polyad.evalArg(0, state);
-                if(obj == null || (obj instanceof QDLNull)){
+                if (obj == null || (obj instanceof QDLNull)) {
                     message = "(null)";
-                }else{
+                } else {
                     message = obj.toString();
                 }
                 break;
@@ -382,19 +432,21 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         return getLogLevel(myLevel.intValue());
     }
 
-    private boolean isValidLoggingLevel(Long longLevel){
+    private boolean isValidLoggingLevel(Long longLevel) {
         int value = longLevel.intValue();
-        switch(value){
-            case LOG_LEVEL_NONE  :
-            case LOG_LEVEL_TRACE :
-            case LOG_LEVEL_INFO  :
-            case LOG_LEVEL_WARN  :
-            case LOG_LEVEL_ERROR :
+        switch (value) {
+            case LOG_LEVEL_NONE:
+            case LOG_LEVEL_TRACE:
+            case LOG_LEVEL_INFO:
+            case LOG_LEVEL_WARN:
+            case LOG_LEVEL_ERROR:
             case LOG_LEVEL_SEVERE:
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
+
     private Level getLogLevel(int myLevel) {
         switch (myLevel) {
             default:
@@ -438,7 +490,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (isDebug) {
             currentIntLevel = state.getDebugUtil().getDebugLevel();
         } else {
-            if(state.getLogger() != null) {
+            if (state.getLogger() != null) {
                 currentIntLevel = getMyLogLevel(state.getLogger().getLogger().getLevel());
             }
         }
@@ -458,7 +510,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 1) {
             if (isLong(arg0)) {
                 // Cannot reset logging levels in server mode or server loses control of logging
-                if(!state.isServerMode()) {
+                if (!state.isServerMode()) {
                     // Then they are setting the logging level
                     if (!isValidLoggingLevel((Long) arg0)) {
                         throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
@@ -479,11 +531,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             // Use whatever the current level is at as the default for the message
             if (isString(arg0)) {
                 message = (String) arg0;
-                 newLogLevel = LOG_LEVEL_INFO; // default if nothing supplied
+                newLogLevel = LOG_LEVEL_INFO; // default if nothing supplied
             }
         }
-
-
 
 
         if (polyad.getArgCount() == 2) {
@@ -492,7 +542,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
             if (isLong(arg0)) {
                 newLogLevel = ((Long) arg0).intValue();
-                if(!isValidLoggingLevel((Long)arg0)){
+                if (!isValidLoggingLevel((Long) arg0)) {
                     throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
                 }
 

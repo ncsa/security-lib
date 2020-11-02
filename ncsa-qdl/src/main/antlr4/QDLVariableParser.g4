@@ -30,6 +30,10 @@ grammar QDLVariableParser;
 
 
 // Constants. These are here so they are lexical units and the parser can access them as such.
+// Note: we have a single equals sign here as a lexical unit so the parser can later flag it as an error
+// If it is not here, then statments like a=2 are turned into the variable a and the rest of the
+// statement is simply ignored.  Since this is the most common error for beginners (using the wrong
+// assignment operator), this just must get flagged as a syntax error in parsing.
 
     Times   : '*';
     Divide  : '/';
@@ -39,6 +43,7 @@ grammar QDLVariableParser;
        Minus: '-';
     LessThan: '<';
  GreaterThan: '>';
+ SingleEqual: '=';
   LessEquals: '<=';
   MoreEquals: '>=';
      Equals : '==';

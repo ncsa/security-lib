@@ -16,11 +16,14 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
+import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.FileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.security.core.Logable;
@@ -30,6 +33,7 @@ import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
@@ -166,10 +170,29 @@ public class WorkspaceCommands implements Logable {
 
     }
 
+    /**
+     * Replaces ) commands prefixed with a > by their value from the symbol table.
+     *
+     * @param inputLine
+     * @return
+     */
+    protected InputLine variableLookup(InputLine inputLine) {
+        for (int i = 1; i < inputLine.size(); i++) {
+            String input = inputLine.getArg(i);
+            if (input.startsWith(">")) {
+                Object rawValue = getState().getValue(input.substring(1));
+                if (rawValue != null && !(rawValue instanceof QDLNull)) {
+                    inputLine.setArg(i, rawValue.toString());
+                }
+            }
+        }
+        return inputLine;
+    }
 
     public int execute(String inline) {
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
+        inputLine = variableLookup(inputLine);
 
         switch (inputLine.getCommand()) {
             case FILE_COMMAND:
@@ -271,12 +294,13 @@ public class WorkspaceCommands implements Logable {
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "--help":
                 say("State indicator commands:");
-                sayi("--help - this messages");
-                sayi("[list] - list all current states in the indicator by process id (pid)");
-                sayi("reset - clear the entire state indicator, restoring the system process as the default");
+                sayi("      --help - this messages");
+                sayi("        list - list all current states in the indicator by process id (pid)");
+                sayi("       reset - clear the entire state indicator, restoring the system process as the default");
                 sayi("resume [pid] - resume running the given process. No arguments means restart the current one.");
-                sayi("rm pid - remove the given state from the system, losing all of it. If it is the current state, the system default will replace it.");
-                sayi("set [pid] - set the current process id. No argument means to display the current pid.");
+                sayi("      rm pid - remove the given state from the system, losing all of it. If it is the");
+                sayi("               current state, the system default will replace it.");
+                sayi("   set [pid] - set the current process id. No argument means to display the current pid.");
                 return RC_NO_OP;
             case "list":
                 // list all current pids.
@@ -487,12 +511,12 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("File commands:");
-                sayi("copy");
-                sayi("delete or rm");
-                sayi("ls or dir");
-                sayi("mkdir");
-                sayi("rmdir");
-                sayi("vfs");
+                sayi("    copy source target - copy the source to the target, overwriting its contents.");
+                sayi("delete or rm file_name - delete the given file");
+                sayi("             ls or dir - list the contents of a directory. Directories end with a /");
+                sayi("            mkdir path - make a directory. This makes all intermediate directories as needed.");
+                sayi("            rmdir path - remove a single directory. This fails if there are any entries in the directory.");
+                sayi("                   vfs - list information about all currently mounted virtual file systems.");
                 return RC_NO_OP;
             case "copy":
                 return _fileCopy(inputLine);
@@ -525,18 +549,22 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("buffer commands:");
-                sayi("create");
-                sayi("delete or rm");
-                sayi("edit");
-                sayi("link");
-                sayi("ls or list");
-                sayi("reset");
-                sayi("run");
-                sayi("show");
-                sayi("write or save");
+                say("# refers to the buffer number");
+                sayi("create - create a new buffer.");
+                sayi("check # - run the buffer through the parser and check for syntax errors. Do not execute.");
+                sayi("delete or rm #- delete the buffer. This does not delete the file.");
+                sayi("edit # - Start the built-in line editor and load the given buffer ");
+                sayi("link target source - create a link for given target to the source");
+                sayi("ls or list - display all the active buffers and their numbers");
+                sayi("reset - deletes all buffers and sets the start number to zero. This clears the buffer state.");
+                sayi("run # [&] -  Run the buffer. If & is there, do it in its own environment");
+                sayi("show # - identical to ls. ");
+                sayi("write or save # - save the buffer. If linked, source is copied to target.");
                 return RC_NO_OP;
             case "create":
                 return _doBufferCreate(inputLine);
+            case "check":
+                return _doBufferCheck(inputLine);
             case "reset":
                 return _doBufferReset(inputLine);
             case "delete":
@@ -561,6 +589,53 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
         }
 
+    }
+
+    private int _doBufferCheck(InputLine inputLine) {
+        boolean showStackTrace = inputLine.hasArg("-st");
+        BufferManager.BufferRecord br = getBR(inputLine);
+        List<String> content;
+        if (br.hasContent()) {
+            content = br.getContent();
+        } else {
+            try {
+                if (br.isLink()) {
+                    content = bufferManager.readFile(br.link);
+                } else {
+                    content = bufferManager.readFile(br.src);
+                }
+            } catch (Throwable t) {
+                say("sorry, could not read the file:" + t.getMessage());
+                return RC_NO_OP;
+            }
+        }
+        if (content.isEmpty()) {
+            say("empty buffer");
+            return RC_NO_OP;
+        }
+        StringBuffer stringBuffer = new StringBuffer();
+        for (String x : content) {
+            stringBuffer.append(x + "\n");
+        }
+        StringReader r = new StringReader(stringBuffer.toString());
+        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newDebugState());
+        try {
+            QDLRunner runner = new QDLRunner(driver.parse(r));
+        } catch (ParseCancellationException pc) {
+            if (showStackTrace) {
+                pc.printStackTrace();
+            }
+            say("syntax error:" + pc.getMessage());
+            return RC_CONTINUE;
+        } catch (Throwable t) {
+            if (showStackTrace) {
+                t.printStackTrace();
+            }
+            say("there was a non-syntax error:" + t.getMessage());
+            return RC_CONTINUE;
+        }
+        say("syntax ok");
+        return RC_NO_OP;
     }
 
     protected int _doBufferReset(InputLine inputLine) {
@@ -612,10 +687,15 @@ public class WorkspaceCommands implements Logable {
             if (br.hasContent()) {
                 content = br.getContent();
             } else {
-                if (br.isLink()) {
-                    content = bufferManager.readFile(br.link);
-                } else {
-                    content = bufferManager.readFile(br.src);
+                try {
+                    if (br.isLink()) {
+                        content = bufferManager.readFile(br.link);
+                    } else {
+                        content = bufferManager.readFile(br.src);
+                    }
+                } catch (Throwable t) {
+                    say("sorry, could not read the file:" + t.getMessage());
+                    return RC_NO_OP;
                 }
             }
         }
@@ -638,7 +718,7 @@ public class WorkspaceCommands implements Logable {
 
             case 2:
                 State newState = state.newDebugState();
-                  newState.setPID(state.getPID()+1); // anything other than zero
+                newState.setPID(state.getPID() + 1); // anything other than zero
                 interpreter = new QDLInterpreter(newState);
                 interpreter.setPrettyPrint(isPrettyPrint());
                 interpreter.setEchoModeOn(isEchoModeOn());
@@ -1077,14 +1157,14 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Environment commands");
-                sayi("clear");
-                sayi("drop");
-                sayi("get");
-                sayi("list");
-                sayi("load");
-                sayi("save");
-                sayi("set");
-                sayi("name");
+                sayi("        clear - remove all entries in the current environment.");
+                sayi("     drop var - remove the variable.");
+                sayi("      get var - show the value of the variable");
+                sayi("         list - show the entire contents of the environment");
+                sayi("         name - list the name (i.e. file path) of the currently loaded environment if there is one.");
+                sayi("    load file - load a saved environment from a file");
+                sayi("    save file - save the entire current environment to the file");
+                sayi("set var value - set the given variable to the given value");
                 return RC_NO_OP;
             case "clear":
                 if (_doHelp(inputLine)) {
@@ -1274,8 +1354,8 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Modules commands:");
-                sayi("list");
-                sayi("imports");
+                sayi("   list - list all loaded modules.");
+                sayi("imports - list all of the loaded modules that have been imported along with their aliases.");
                 return RC_NO_OP;
             case "list":
                 return _modulesList(inputLine);
@@ -1338,10 +1418,10 @@ public class WorkspaceCommands implements Logable {
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "--help":
                 say("Function commands:");
-                sayi("drop");
-                sayi("help");
-                sayi("list");
-                sayi("system");
+                sayi("drop name - Remove the (user defined) function from the system");
+                sayi("     help - this menu");
+                sayi("     list - list all known functions. Allows display options.");
+                sayi("   system - list all known system functions. Allows display options.");
                 return RC_NO_OP;
             case "drop":
                 return _funcsDrop(inputLine);
@@ -1541,10 +1621,10 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Variable commands");
-                sayi("system");
-                say("list");
-                say("drop");
-                say("size");
+                say("   drop - remove a variable from the system");
+                say("   list - list all user defined variables");
+                say("   size - try to guestimate the size of all the symbols used.");
+                sayi("system - list all system variables.");
                 return RC_NO_OP;
             case "system":
                 return _varsSystem(inputLine);
@@ -1661,35 +1741,7 @@ public class WorkspaceCommands implements Logable {
 
         return RC_CONTINUE;
     }
-    /*
-            if (!inputLine.hasArgAt(FIRST_ARG_INDEX) || inputLine.getArg(FIRST_ARG_INDEX).startsWith("-")) {
-            // so they entered )funcs help Print off first lines of help
-            TreeSet<String> treeSet = new TreeSet<>();
-            treeSet.addAll(getState().listAllDocumentation());
-            return printList(inputLine, treeSet);
-        }
-        String fName = inputLine.getArg(FIRST_ARG_INDEX);
 
-        int argCount = -1; // means return every similarly named function.
-        String rawArgCount = null;
-        if (inputLine.hasArgAt(1 + FIRST_ARG_INDEX)) {
-            rawArgCount = inputLine.getArg(1 + FIRST_ARG_INDEX);
-        }
-
-        try {
-            if (rawArgCount != null) {
-                argCount = Integer.parseInt(rawArgCount);
-            }
-        } catch (Throwable t) {
-            say("Sorry, but \"" + rawArgCount + "\" is not an integer");
-            return RC_CONTINUE;
-        }
-        List<String> doxx = getState().listFunctionDoc(fName, argCount);
-        for (String x : doxx) {
-            say(x);
-        }
-        return RC_CONTINUE;
-     */
 
     HashMap<String, String> onlineHelp = new HashMap<>();
 
@@ -1714,12 +1766,14 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Workspace commands");
-                sayi("load");
-                sayi("save");
-                sayi("clear");
-                sayi("echo");
-                sayi("id");
-                sayi("memory");
+                sayi("  load file - load a saved workspace.");
+                sayi("save [file] - save the current workspace to the given file. If the current workspace");
+                sayi("              has been loaded or saved, you may omit the file.");
+                sayi("      clear - removes all user defined variables and functions");
+                sayi("       echo - change how the workspace processes used input.");
+                sayi("        name - give the file name of the currently loaded workspace.");
+                say("                If no workspace has been loaded, no name is returned.");
+                sayi("      memory - give the amount of memory available to the workspace.");
                 return RC_NO_OP;
             case "load":
                 return _wsLoad(inputLine);
@@ -1729,7 +1783,7 @@ public class WorkspaceCommands implements Logable {
                 return _wsClear(inputLine);
             case "echo":
                 return _wsEchoMode(inputLine);
-            case "id":
+            case "name":
                 if (currentWorkspace == null) {
                     say("No workspace loaded");
 
