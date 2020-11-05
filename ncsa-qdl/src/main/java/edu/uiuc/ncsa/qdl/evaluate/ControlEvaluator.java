@@ -33,6 +33,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
+import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
 
 /**
  * For control structure in loops, conditionals etc.
@@ -421,12 +422,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
 
     public static final int LOG_LEVEL_UNKNOWN = -100;
-    public static final int LOG_LEVEL_NONE = -1;
-    public static final int LOG_LEVEL_TRACE = 0;
-    public static final int LOG_LEVEL_INFO = 1;
-    public static final int LOG_LEVEL_WARN = 2;
-    public static final int LOG_LEVEL_ERROR = 3;
-    public static final int LOG_LEVEL_SEVERE = 4;
+    public static final int LOG_LEVEL_NONE = DEBUG_LEVEL_OFF;
+    public static final int LOG_LEVEL_INFO = DEBUG_LEVEL_INFO;
+    public static final int LOG_LEVEL_WARN = DEBUG_LEVEL_WARN;
+    public static final int LOG_LEVEL_ERROR = DEBUG_LEVEL_ERROR;
+    public static final int LOG_LEVEL_SEVERE = DEBUG_LEVEL_SEVERE;
+    public static final int LOG_LEVEL_TRACE = DEBUG_LEVEL_TRACE;
 
     private Level getLogLevel(Long myLevel) {
         return getLogLevel(myLevel.intValue());

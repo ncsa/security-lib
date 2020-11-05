@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.servlet;
 
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import javax.servlet.ServletException;
@@ -24,9 +26,11 @@ public class BasicExceptionHandler implements ExceptionHandler {
     }
 
     @Override
-    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
-
-
+    public void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (t instanceof NFWException) {
+            // Make SURE this gets logged some place else too in case its hard to find.
+            DebugUtil.severe(this, "internal exception encountered", t);
+        }
         if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
         }

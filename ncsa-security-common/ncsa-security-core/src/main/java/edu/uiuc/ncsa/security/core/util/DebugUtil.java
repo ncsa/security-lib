@@ -166,7 +166,6 @@ public class DebugUtil implements DebugConstants{
     }
 
     public static void trace(Object obj, String message) {
-
         getInstance().trace(obj, message);
     }
 

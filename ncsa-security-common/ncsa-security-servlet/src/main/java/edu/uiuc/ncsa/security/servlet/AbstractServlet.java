@@ -91,6 +91,10 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
         getMyLogger().error(x);
     }
 
+    public void error(String x, Throwable t) {
+        getMyLogger().error(x,t);
+    }
+
     public void info(String x) {
         getMyLogger().info(x);
     }
@@ -116,7 +120,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * @throws ServletException
      */
     protected void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage())); // log it appropriately
+        error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()),t); // log it appropriately
         // ok, if it is a strange error, print a stack if you need to.
         getExceptionHandler().handleException(t, request, response);
 

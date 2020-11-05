@@ -78,6 +78,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_TO_NUMBER = SYS_FQ + TO_NUMBER;
     public static final int TO_NUMBER_TYPE = 20 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String TO_BOOLEAN = "to_boolean";
+    public static final String FQ_TO_BOOLEAN = SYS_FQ + TO_BOOLEAN;
+    public static final int TO_BOOLEAN_TYPE = 21 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String VFS_MOUNT = "vfs_mount";
     public static final String IO_VFS_MOUNT = IO_FQ + "mount";
@@ -91,6 +94,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static String[] FUNC_NAMES = new String[]{
             TO_NUMBER,
             TO_STRING,
+            TO_BOOLEAN,
             SAY_FUNCTION,
             PRINT_FUNCTION,
             SCAN_FUNCTION,
@@ -103,6 +107,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static String[] FQ_FUNC_NAMES = new String[]{
             FQ_TO_NUMBER,
             FQ_TO_STRING,
+            FQ_TO_BOOLEAN,
             IO_SAY_FUNCTION,
             IO_PRINT_FUNCTION,
             IO_SCAN_FUNCTION,
@@ -135,7 +140,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             case TO_STRING:
             case FQ_TO_STRING:
                 return TO_STRING_TYPE;
-
+            case TO_BOOLEAN:
+            case FQ_TO_BOOLEAN:
+                return TO_BOOLEAN_TYPE;
             case PRINT_FUNCTION:
             case IO_PRINT_FUNCTION:
             case IO_SAY_FUNCTION:
@@ -179,6 +186,10 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             case TO_NUMBER:
             case FQ_TO_NUMBER:
                 doToNumber(polyad, state);
+                return true;
+            case TO_BOOLEAN:
+            case FQ_TO_BOOLEAN:
+                doToBoolean(polyad, state);
                 return true;
             case PRINT_FUNCTION:
             case IO_PRINT_FUNCTION:
@@ -228,6 +239,53 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    // Convert a wide variety of inputs to boolean. This is useful in scripts where the arguments might
+    // be string from external sources, e.g.
+    private void doToBoolean(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("" + TO_BOOLEAN_TYPE + " requires an argument");
+        }
+        Object arg = polyad.evalArg(0, state);
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                switch (Constant.getType(objects[0])) {
+                    case Constant.BOOLEAN_TYPE:
+                        r.result = ((Boolean) objects[0]);
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.STRING_TYPE:
+                        String x = (String) objects[0];
+                        r.result = x.equals("true");
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.LONG_TYPE:
+                        Long y = (Long) objects[0];
+                        r.result = y.equals(1L);
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        BigDecimal bd = (BigDecimal) objects[0];
+
+                        r.result = bd.longValue() == 1;
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.NULL_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert null.");
+                    case Constant.STEM_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert a stem.");
+                    case Constant.UNKNOWN_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " unknown argument type.");
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TO_BOOLEAN, state);
+
+
     }
 
     //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
@@ -472,7 +530,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 vfs = state.getVFS(fileName);
                 if (vfs != null) {
                     rc = vfs.mkdir(fileName);
-                }else{
+                } else {
                     DebugUtil.trace(this, "in " + MKDIR + ": NO VFS");
 
                 }
@@ -537,7 +595,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     DebugUtil.trace(this, "in " + DIR + " command: got a VFS=" + vfs);
 
                     entries = vfs.dir(fileName);
-                }else{
+                } else {
                     DebugUtil.trace(this, "in " + DIR + " command: NO VFS");
 
                 }

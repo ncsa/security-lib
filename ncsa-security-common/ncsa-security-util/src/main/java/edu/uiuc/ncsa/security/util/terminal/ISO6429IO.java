@@ -66,6 +66,15 @@ public class ISO6429IO implements IOInterface {
     }
 
     boolean bufferingOn = false;
+    /*
+     * For debugging, use the ansi shell script in ~/security-all (top-level). This will do the minimal
+     * compile then start up the minimal QDL workspace from maven, so the entire build does not have to be done.
+    */
+    // This next flag will keep a running list of the debug output and paste it into the current
+    // terminal when you toggle paste mode (ctrl+p). This is very useful in isolating exactly what you
+    // just did rather than digging in the logs for it.
+    // Use in conjunction with the ansi script mentioned above.
+    boolean showDebugBuffer = false;
 
     @Override
     public String readline(String prompt) throws IOException {
@@ -135,10 +144,13 @@ public class ISO6429IO implements IOInterface {
                     }
                     debug("inserting char " + character);
                     currentLine.insert(position, character);
-                    debug("printing line length = " + currentLine.length() + " from position " + position);
-                    print(currentLine.substring(position));
+                    debug("preprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
 
+                    print(currentLine.substring(position));
                     currentCol0++; // increment the cursor position.
+
+                    debug("postprint length = " + currentLine.length() + " position =" + position + " cursor=" + terminal.getCursorCol() + " my cursor=" + currentCol0);
+                    terminal.setCursorCol(currentCol0);
                     if (currentCol0 % width == 0) {
                         debug("adding CR/LF");
                         // insert new line so it wraps. This  moves cursor to start of line  + a line feed .
@@ -160,12 +172,16 @@ public class ISO6429IO implements IOInterface {
                     Plan B is this: Tell it turn turn off cursor addressing and just snarf everything onto a single line.
                       
                      */
+                    if(!pasteModeOn && showDebugBuffer){
+                        System.out.println(stringBuffer.toString());
+                        stringBuffer = new StringBuffer();
+                    }
                     pasteModeOn = !pasteModeOn;
                     if (pasteModeOn) {
                         debug("paste mode ON");
                         terminal.setBold(false);
                         terminal.setColor(32);
-                        println("<paste mode on>");
+                        println("<paste mode on. ^v pastes from clipboard>");
                     } else {
                         debug("paste mode OFF");
 
@@ -203,7 +219,7 @@ public class ISO6429IO implements IOInterface {
 
                 case ArrowLeft:
                     // overrunning the end of the line is forbidden
-                    currentCol0 = Math.max(0, terminal.getCursorCol() - 1);
+                    currentCol0 = Math.max(startCol, terminal.getCursorCol() - 1);
                     terminal.setCursorCol(currentCol0);
                     break;
                 case ArrowRight:
@@ -444,8 +460,11 @@ public class ISO6429IO implements IOInterface {
             loggingFacade.warn(x, t);
         }
     }
-
+      StringBuffer stringBuffer = new StringBuffer();
     protected void debug(String x) {
+        if(showDebugBuffer) {
+            stringBuffer.append(x + "\n");
+        }
         if (loggingFacade != null) {
             loggingFacade.debug(x);
         }

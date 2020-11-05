@@ -99,6 +99,16 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         return logFileName;
     }
 
+    public boolean isPrintTimestamp() {
+        return printTimestamp;
+    }
+
+    public void setPrintTimestamp(boolean printTimestamp) {
+        this.printTimestamp = printTimestamp;
+    }
+
+    protected boolean printTimestamp = true;
+
     @Override
     public MyLoggingFacade get() {
 
@@ -134,14 +144,24 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                     fileHandler.setFormatter(new SimpleFormatter(){
                         //private static final String format = "%1$tF %1$tT %2$-7s %3$s %n";
                         private static final String format = "%1$tY-%1$tm-%1$tdT%1$tH:%1$tm:%1tS%1$tz %2$s %3$s %n";
+                        private static final String format2 = "2$s %3$s %n";
 
                                  @Override
                                  public synchronized String format(LogRecord lr) {
-                                     return String.format(format,
+                                     if(isPrintTimestamp()){
+                                         return String.format(format,
+                                                 new Date(lr.getMillis()),
+                                                 lr.getLevel().getLocalizedName(),
+                                                 lr.getMessage()
+                                         );
+
+                                     }
+                                     return String.format(format2,
                                              new Date(lr.getMillis()),
                                              lr.getLevel().getLocalizedName(),
                                              lr.getMessage()
                                      );
+
                                  }
                     }); // don't get carried away. XML is really verbose.
                     logger.getLogger().addHandler(fileHandler);

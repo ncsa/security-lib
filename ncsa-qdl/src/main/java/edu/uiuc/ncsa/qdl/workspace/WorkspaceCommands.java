@@ -319,6 +319,8 @@ public class WorkspaceCommands implements Logable {
                 return _doSIRemove(inputLine);
             case "set":
                 return _doSISet(inputLine);
+            default:
+                say("sorry, unknown command.");
         }
 
         return RC_NO_OP;
@@ -1200,9 +1202,11 @@ public class WorkspaceCommands implements Logable {
                     say(envFile.getAbsolutePath());
                 }
                 return RC_CONTINUE;
+            default:
+                say("Unknown environment command.");
+                return RC_CONTINUE;
+
         }
-        say("Unknown environment command.");
-        return RC_CONTINUE;
     }
 
     private int _envSave(InputLine inputLine) {
@@ -1361,8 +1365,9 @@ public class WorkspaceCommands implements Logable {
                 return _modulesList(inputLine);
             case "imports":
                 return _moduleImports(inputLine);
+            default:
+                say("Unknown modules command");
         }
-        say("Unknown modules command");
         return RC_CONTINUE;
     }
 
@@ -1635,8 +1640,10 @@ public class WorkspaceCommands implements Logable {
             case "size":
                 say(state.getStackSize() + " symbols defined.");
                 return RC_CONTINUE;
+            default:
+                say("Unknown variable command.");
+
         }
-        say("Unknown variable command.");
         return RC_CONTINUE;
     }
 
@@ -1771,9 +1778,9 @@ public class WorkspaceCommands implements Logable {
                 sayi("              has been loaded or saved, you may omit the file.");
                 sayi("      clear - removes all user defined variables and functions");
                 sayi("       echo - change how the workspace processes used input.");
-                sayi("        name - give the file name of the currently loaded workspace.");
-                say("                If no workspace has been loaded, no name is returned.");
-                sayi("      memory - give the amount of memory available to the workspace.");
+                sayi("       name - give the file name of the currently loaded workspace.");
+                say("               If no workspace has been loaded, no name is returned.");
+                sayi("     memory - give the amount of memory available to the workspace.");
                 return RC_NO_OP;
             case "load":
                 return _wsLoad(inputLine);

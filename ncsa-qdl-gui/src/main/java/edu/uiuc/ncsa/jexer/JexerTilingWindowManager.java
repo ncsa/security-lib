@@ -23,6 +23,8 @@ import jexer.menu.TMenu;
  * TTerminalWindow that has extra fields and/or communicates more with
  * JexerTilingWindowManager to get full coverage of tile creation,
  * destruction, placement, movement, and so on.
+ * run with
+ * mvn compile exec:java -Dexec.mainClass="edu.uiuc.ncsa.jexer.JexerTilingWindowManager"
  */
 public class JexerTilingWindowManager extends TApplication {
 

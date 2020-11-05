@@ -11,7 +11,18 @@ import java.util.logging.Logger;
  * on Nov 9, 2010 at  10:59:40 AM
  */
 public class MyLoggingFacade implements Logable {
-    String host;
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    String host = null;
+    public boolean hasHost(){
+        return host != null;
+    }
     // This implements Logable so it is easier to pass implementing classes through to it.
 
     public MyLoggingFacade(Logger logger) {
@@ -85,7 +96,10 @@ public class MyLoggingFacade implements Logable {
     }
 
       protected String msg(String x){
-        return getClassName()+ ":" + x;
+        if(hasHost()) {
+            return host  + " " + getClassName() + ":" + x;
+        }
+          return getClassName() + ":" + x;
       }
     /**
      * If debug is set on, print the string with the classname and date. Otherwise, do not print debug

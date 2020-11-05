@@ -8,6 +8,8 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import javax.inject.Provider;
 import java.io.File;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
@@ -82,10 +84,11 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
             currentNode = (ConfigurationNode) list.get(0);
         }
         if (logger == null) {
+            LoggerProvider loggerProvider2 = null;
             if (currentNode != null) {
-                loggerProvider = new LoggerProvider(currentNode);
+                 loggerProvider2 = new LoggerProvider(currentNode);
             } else {
-                loggerProvider = new LoggerProvider(defaultFile == null ? "delegation.xml" : defaultFile,
+                 loggerProvider2 = new LoggerProvider(defaultFile == null ? "delegation.xml" : defaultFile,
                         defaultName == null ? "NCSA Delegation" : defaultName,
                         1,
                         1000000,
@@ -93,12 +96,31 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
                         false,
                         true);
             }
+            loggerProvider2.setPrintTimestamp(false);
+            this.loggerProvider = loggerProvider2;
         } else {
             loggerProvider = new MyLoggerProvider(logger);
         }
+
         // yes, dump it to the console.
         String startupVersion = getVersionString() + " startup on " + (new Date());
+
         this.myLogger = loggerProvider.get();
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            String machineName =  ip.getHostName();
+            if(-1 < machineName.indexOf(".")) {
+                machineName = machineName.substring(0, machineName.indexOf("."));
+            }
+            if(StringUtils.isTrivial(machineName)){
+                this.myLogger.setHost(machineName);
+            }else{
+                this.myLogger.setHost(ip.getHostName());
+            }
+        }catch(UnknownHostException u){
+            // rock on. Cannot determine host
+            DebugUtil.trace(this,"could note determine host name for the logger. ");
+        }
         // now we have a log to stick it in.
         info(startupVersion);
     }

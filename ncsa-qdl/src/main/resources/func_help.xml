@@ -661,6 +661,19 @@ Note: The print or say function effectively calls this and spits out the result 
 ]]>
             </body>
         </entry>
+    <entry id="to_boolean">
+            <body>
+                <![CDATA[
+to_boolean(arg) - arg is anything and the result is a boolean representation of it.
+                  Note that this means
+                  strings - true is only returned if the value is 'true'
+                  integers - true is only returned if the value is 1
+                  decimals - true is only returned if the integer part is 1
+                  booleans - returned unchanged.
+                  stems - applied to each element.
+]]>
+            </body>
+        </entry>
     <entry id="var_type">
             <body>
                 <![CDATA[
