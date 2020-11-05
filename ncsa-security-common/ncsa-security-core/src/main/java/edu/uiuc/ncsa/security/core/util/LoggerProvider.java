@@ -6,9 +6,7 @@ import org.apache.commons.configuration.tree.ConfigurationNode;
 import javax.inject.Provider;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.logging.FileHandler;
-import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
 
 import static edu.uiuc.ncsa.security.core.configuration.Configurations.getFirstAttribute;
@@ -99,16 +97,6 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         return logFileName;
     }
 
-    public boolean isPrintTimestamp() {
-        return printTimestamp;
-    }
-
-    public void setPrintTimestamp(boolean printTimestamp) {
-        this.printTimestamp = printTimestamp;
-    }
-
-    protected boolean printTimestamp = true;
-
     @Override
     public MyLoggingFacade get() {
 
@@ -132,38 +120,7 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
                         logFileName = logFile;
                     }
                     fileHandler = new FileHandler(logFile, maxFileSize, fileCount, appendOn);
-
-                    // The formatting strings to use are here: https://docs.oracle.com/javase/7/docs/api/java/util/Formatter.html
-                    // Timestamp format is yyyy-MM-dd'T'HH:mm:ss.SSSZ
-                    // 1$ is the timestamp
-                    // 2$ is the source
-                    // 3$ logger name
-                    // 4$ is the log level
-                    // 5$ log message
-                    // 6$ is the stack trace (if any)
-                    fileHandler.setFormatter(new SimpleFormatter(){
-                        //private static final String format = "%1$tF %1$tT %2$-7s %3$s %n";
-                        private static final String format = "%1$tY-%1$tm-%1$tdT%1$tH:%1$tm:%1tS%1$tz %2$s %3$s %n";
-                        private static final String format2 = "2$s %3$s %n";
-
-                                 @Override
-                                 public synchronized String format(LogRecord lr) {
-                                     if(isPrintTimestamp()){
-                                         return String.format(format,
-                                                 new Date(lr.getMillis()),
-                                                 lr.getLevel().getLocalizedName(),
-                                                 lr.getMessage()
-                                         );
-
-                                     }
-                                     return String.format(format2,
-                                             new Date(lr.getMillis()),
-                                             lr.getLevel().getLocalizedName(),
-                                             lr.getMessage()
-                                     );
-
-                                 }
-                    }); // don't get carried away. XML is really verbose.
+                    fileHandler.setFormatter(new SimpleFormatter()); // don't get carried away. XML is really verbose.
                     logger.getLogger().addHandler(fileHandler);
                     logger.getLogger().setUseParentHandlers(false); // suppresses console output.
                     logger.info("Logging to file " + logFileName);
