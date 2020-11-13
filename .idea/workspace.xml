@@ -3,12 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Improvements, Added a head function, tests.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_extensions.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_extensions.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_scripting.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_scripting.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_server_scripts.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_server_scripts.odt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-gui/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl-website/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Version.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/constant-values.html" beforeDir="false" />
@@ -229,12 +228,13 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT-tests.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/AbstractServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/AbstractServlet.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/BasicExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/BasicExceptionHandler.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore$IdentifierFileFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore$IdentifierFileFilter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" afterDir="false" />
@@ -242,6 +242,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionParameters.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" afterDir="false" />
@@ -277,8 +278,9 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/constant-values.html" beforeDir="false" />
@@ -360,12 +362,14 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/script.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/stylesheet.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/RTResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/RTResponse.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/constant-values.html" beforeDir="false" />
@@ -497,11 +501,23 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/ClientApprovalKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/ClientApprovalKeys.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/JSONUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/JSONUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransaction.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransaction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionKeys.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionTable.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/FSTransactionStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/FSTransactionStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore$TokenIndex.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore$TokenIndex.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AccessToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AccessToken.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AuthorizationGrant.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AuthorizationGrant.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/RefreshToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/RefreshToken.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/Verifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/Verifier.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AccessTokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AccessTokenImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AuthorizationGrantImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AuthorizationGrantImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/VerifierImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/VerifierImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
@@ -515,10 +531,16 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/admin/CMTester.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/admin/CMTester.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/BaseTransactionStoreTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/BaseTransactionStoreTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FakeTokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FakeTokenImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAccessToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAccessToken.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/constant-values.html" beforeDir="false" />
@@ -643,6 +665,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/constant-values.html" beforeDir="false" />
@@ -715,8 +738,19 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/script.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/serialized-form.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/stylesheet.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$4.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$5.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/AuthorizationServerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/AuthorizationServerImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/PAServerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/PAServerImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGResponseImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGResponseImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATResponseImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATResponseImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PARequestImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PARequestImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/javadoc-bundle-options/package-list" beforeDir="false" />
@@ -727,11 +761,28 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/FlowStates.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/FlowStates.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Constants.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2RefreshTokenImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$3.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$4.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/AGServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/AGServer2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATResponse2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATResponse2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATServer2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/RTServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/RTServer2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATI2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATIResponse2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATIResponse2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTI2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIResponse.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -755,7 +806,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="5.0.2" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -788,7 +839,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="Application.QDL default">
+  <component name="RunManager" selected="JUnit.FileStoreTest">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -1014,20 +1065,6 @@
       <option name="USE_KEYWORD" value="false" />
       <method />
     </configuration>
-    <configuration name="CLIRunner" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.CLIRunner" />
-      <module name="ncsa-qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.qdl.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="HOCONDemo" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.demo.HOCONDemo" />
       <module name="ncsa-qdl-gui" />
@@ -1067,6 +1104,20 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="XProperties" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.XProperties" />
+      <module name="ncsa-security-core" />
+      <option name="PROGRAM_PARAMETERS" value="/tmp/xp-test.txt" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -1097,6 +1148,22 @@
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
       <option name="PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FileStoreTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ncsa-security-delegation-common" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.delegation.storage.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.delegation.storage" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.delegation.storage.FileStoreTest" />
+      <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -1159,18 +1226,19 @@
       <item itemvalue="Application.QDL basic" />
       <item itemvalue="Application.QDL default" />
       <item itemvalue="Application.QDL GUI" />
-      <item itemvalue="Application.CLIRunner" />
       <item itemvalue="Application.HOCONDemo" />
+      <item itemvalue="Application.XProperties" />
       <item itemvalue="JUnit.TestSuite" />
       <item itemvalue="JUnit.Delegation Test Suite" />
+      <item itemvalue="JUnit.FileStoreTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.FileStoreTest" />
+        <item itemvalue="JUnit.Delegation Test Suite" />
+        <item itemvalue="Application.XProperties" />
         <item itemvalue="JUnit.TestSuite" />
-        <item itemvalue="JUnit.Delegation Test Suite" />
         <item itemvalue="Application.HOCONDemo" />
-        <item itemvalue="Application.CLIRunner" />
-        <item itemvalue="JUnit.Delegation Test Suite" />
       </list>
     </recent_temporary>
   </component>
@@ -1206,7 +1274,8 @@
       <workItem from="1603540687464" duration="5340000" />
       <workItem from="1603654489357" duration="27558000" />
       <workItem from="1603969307338" duration="12303000" />
-      <workItem from="1603996543000" duration="82634000" />
+      <workItem from="1603996543000" duration="89223000" />
+      <workItem from="1604930190601" duration="46604000" />
     </task>
     <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
       <created>1602796126004</created>
@@ -1313,7 +1382,21 @@
       <option name="project" value="LOCAL" />
       <updated>1604600285809</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Updating version numbers in PDFs">
+      <created>1604676383576</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1604676383576</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Checkin before fixes for 5.0.3">
+      <created>1605279475143</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1605279475143</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1336,17 +1419,19 @@
     <MESSAGE value="Check in for 5.0.2" />
     <MESSAGE value="Set version numbers" />
     <MESSAGE value="Improvements, Added a head function, tests." />
-    <option name="LAST_COMMIT_MESSAGE" value="Improvements, Added a head function, tests." />
+    <MESSAGE value="Updating version numbers in PDFs" />
+    <MESSAGE value="Checkin before fixes for 5.0.3" />
+    <option name="LAST_COMMIT_MESSAGE" value="Checkin before fixes for 5.0.3" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1604443247966">
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605098664721">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1604443247966" />
-    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser" timestamp="1604585733619">
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1605098664721" />
+    <state x="684" y="257" width="522" height="576" key="#com.intellij.ide.util.MemberChooser" timestamp="1605101155803">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="684" y="257" width="374" height="569" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1604585733619" />
+    <state x="684" y="257" width="522" height="576" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1605101155803" />
     <state x="608" y="325" width="525" height="433" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1604423895261">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1363,46 +1448,50 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="469" y="27" width="804" height="1023" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1603894139462" />
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1604600285021">
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1605279472645">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1604600285021" />
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1605279472645" />
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog" timestamp="1604593169800">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1604593169800" />
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1604591559435">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1605279815235">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1604591559435" />
-    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1604591559434">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1605279815235" />
+    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1605279815234">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1604591559434" />
-    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1604591559433">
+    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1605279815234" />
+    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1605279815234">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1604591559433" />
-    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1604591559434">
+    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1605279815234" />
+    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1605279815235">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1604591559434" />
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1604423928459">
+    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1605279815235" />
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1605128587905">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1604423928459" />
-    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1604423928459">
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1605128587905" />
+    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1605128587904">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1604423928459" />
-    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1604423928458">
+    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1605128587904" />
+    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1605128587904">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1604423928458" />
-    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1604423928459">
+    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1605128587904" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1605128587904">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1604423928459" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1605128587904" />
+    <state x="586" y="256" width="570" height="572" key="MultipleFileMergeDialog" timestamp="1605279669003">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="586" y="256" width="570" height="572" key="MultipleFileMergeDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1605279669003" />
     <state x="425" y="252" width="891" height="580" key="RollbackChangesDialog" timestamp="1604445062894">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1411,30 +1500,38 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1602070095217" />
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1604600287596">
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1605279478201">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1604600287596" />
-    <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1603969442404">
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1605279478201" />
+    <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1604931499680">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="555" y="366" key="com.intellij.ide.util.TipDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1603969442404" />
-    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1604419732781">
+    <state x="555" y="366" key="com.intellij.ide.util.TipDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1604931499680" />
+    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1605279691797">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1604419732781" />
-    <state x="444" y="313" width="944" height="562" key="find.popup" timestamp="1604599900513">
+    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1605279691797" />
+    <state x="444" y="27" width="1125" height="613" key="dock-window-1" timestamp="1605105153370">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="444" y="313" width="944" height="562" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1604599900513" />
+    <state x="444" y="27" width="1125" height="613" key="dock-window-1/72.27.1608.1023@72.27.1608.1023" timestamp="1605105153370" />
+    <state x="444" y="313" width="977" height="562" key="find.popup" timestamp="1605279828659">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="444" y="313" width="977" height="562" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1605279828659" />
+    <state x="631" y="255" width="479" height="573" key="git4idea.branch.GitSmartOperationDialog" timestamp="1605279661397">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="631" y="255" width="479" height="573" key="git4idea.branch.GitSmartOperationDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1605279661397" />
     <state x="540" y="244" width="672" height="677" key="run.anything.popup" timestamp="1604445372327">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="540" y="244" width="672" height="677" key="run.anything.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1604445372327" />
-    <state x="539" y="251" width="672" height="678" key="search.everywhere.popup" timestamp="1604446591943">
+    <state x="539" y="251" width="672" height="678" key="search.everywhere.popup" timestamp="1604933575377">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="539" y="251" width="672" height="678" key="search.everywhere.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1604446591943" />
+    <state x="539" y="251" width="672" height="678" key="search.everywhere.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1604933575377" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
