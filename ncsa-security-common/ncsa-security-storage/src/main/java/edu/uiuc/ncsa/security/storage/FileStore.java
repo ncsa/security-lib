@@ -5,10 +5,7 @@ import edu.uiuc.ncsa.security.core.IdentifiableProvider;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.SimpleEntryImpl;
-import edu.uiuc.ncsa.security.core.exceptions.FilePermissionsException;
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
+import edu.uiuc.ncsa.security.core.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -183,6 +180,12 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                 map.toXML(fos);
                 fos.flush();
                 fos.close();
+                if (!f.exists()) {
+                    // Generally this is indicative of some strange internal issue between Java and the underlying OS...
+                    // Also there is an issue with Intellij and temp directories at times.
+                    // Serious enough (and hard enough to ferret out) that in the unlikely case it fails, we need to know asap.
+                    throw new NFWException("Error creating file \"" + f.getAbsolutePath() + "\"");
+                } 
             } else {
                 throw new IllegalStateException("Error: no converter");
             }
@@ -373,8 +376,8 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         }
         int count = 0;
         Set<Identifier> keys = keySet();
-        for(Identifier key : keys){
-            if(!key.toString().contains(VERSION_TAG)){
+        for (Identifier key : keys) {
+            if (!key.toString().contains(VERSION_TAG)) {
                 count++;
             }
         }

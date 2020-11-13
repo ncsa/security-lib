@@ -9,13 +9,12 @@ import java.net.URI;
  * on Mar 16, 2011 at  1:01:13 PM
  */
 public class AccessTokenImpl extends TokenImpl implements AccessToken {
-
-    public AccessTokenImpl(URI token, URI sharedSecret) {
-        super(token, sharedSecret);
+    public AccessTokenImpl(String rawToken) {
+        super(rawToken);
     }
 
     public AccessTokenImpl(URI token) {
-        super(token, null);
+        super(token);
     }
 
     @Override

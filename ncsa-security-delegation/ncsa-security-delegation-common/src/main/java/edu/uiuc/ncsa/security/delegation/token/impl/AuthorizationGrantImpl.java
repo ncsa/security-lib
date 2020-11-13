@@ -10,11 +10,19 @@ import java.net.URI;
  * on Mar 16, 2011 at  1:00:30 PM
  */
 public class AuthorizationGrantImpl extends TokenImpl implements AuthorizationGrant {
-    public AuthorizationGrantImpl(URI token, URI sharedSecret) {
-        super(token, sharedSecret);
+    public AuthorizationGrantImpl(URI token) {
+        super(token);
     }
 
-    public AuthorizationGrantImpl(URI token) {
-        super(token, null);
+    public AuthorizationGrantImpl(String rawToken) {
+        super(rawToken);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AuthorizationGrantImpl)) {
+            return false;
+        }
+        return super.equals(obj);
     }
 }

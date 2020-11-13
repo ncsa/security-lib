@@ -5,10 +5,8 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.client.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.client.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
@@ -119,14 +117,14 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             throw new IllegalArgumentException("Error: No access token found in server response");
         }
         AccessTokenImpl at = new AccessTokenImpl(URI.create(jsonObject.getString(ACCESS_TOKEN)));
-        OA2RefreshTokenImpl rt = null;
+        RefreshTokenImpl rt = null;
         if (jsonObject.containsKey(REFRESH_TOKEN)) {
             // the refresh token is optional, so if it is missing then there is nothing to do.
-            rt = new OA2RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
+            rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
             try {
                 if (jsonObject.containsKey(EXPIRES_IN)) {
                     long expiresIn = Long.parseLong(jsonObject.getString(EXPIRES_IN)) * 1000L; // convert from sec to ms.
-                    rt.setExpiresIn(expiresIn);
+                    rt.setExpiresAt(expiresIn);
                 }
             } catch (NumberFormatException nfx) {
                 // This is optional to return, so it is possible that this might not work.
@@ -174,7 +172,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         return atr;
     }
 
-    protected ATResponse2 createResponse(AccessToken at, RefreshToken rt) {
+    protected ATResponse2 createResponse(AccessTokenImpl at, RefreshTokenImpl rt) {
         return new ATResponse2(at, rt);
     }
 

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
-import edu.uiuc.ncsa.security.delegation.token.Token;
+import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
 
 import java.net.URI;
 
@@ -8,41 +8,44 @@ import java.net.URI;
  * <p>Created by Jeff Gaynor<br>
  * on May 6, 2011 at  3:18:38 PM
  */
-public class FakeTokenImpl implements Token {
-    public String getSharedSecret() {
-        return sharedSecret;
+public class FakeTokenImpl extends TokenImpl {
+
+    @Override
+    public String toString() {
+        return "FakeTokenImpl{" +
+                "token='" + getToken() + '\'' +
+                '}';
     }
 
-    public void setSharedSecret(String sharedSecret) {
-        this.sharedSecret = sharedSecret;
-    }
 
-    String sharedSecret;
 
     public FakeTokenImpl(URI token) {
         this(token.toString());
     }
 
     public FakeTokenImpl(String token) {
-        this.token = token;
+        super(token);
     }
 
-    public String getToken() {
-        return token;
-    }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
+/*
     @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (!(obj instanceof Token)) return false;
-        if (!((Token) obj).getToken().equals(getToken())) return false;
-        ;
+        Token token = (Token) obj;
+        if (getToken() == null) {
+            if (token.getToken() == null) return true;
+            return false;
+        } else {
+            if (token.getToken() == null) return false;
+        }
+        if (!token.getToken().equals(getToken())) return false;
         return true;
     }
 
     String token;
+
+*/
+
 }

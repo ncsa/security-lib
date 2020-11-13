@@ -112,6 +112,7 @@ public abstract class BaseTransactionStoreTest extends TestBase {
 
         store.save(t);
         BasicTransaction t2 = (BasicTransaction) store.get(t.getIdentifier());
+        assert t2 != null : "Internal error: Could not save file for id=\"" + t.getIdentifierString() + "\"";
         assert t.equals(t2);
         assert t.equals(store.get(ag));
         assert t.equals(store.get(v));
@@ -171,17 +172,20 @@ public abstract class BaseTransactionStoreTest extends TestBase {
         t.setAccessToken(at);
 
 
-        int beforeSaveSize = store.keySet().size();
+        int beforeSaveSize = store.size();
         store.save(t);
-        assert beforeSaveSize + 1 == store.keySet().size();
+        assert beforeSaveSize + 1 == store.size();
 
         assert !store.isEmpty();
         assert store.containsValue(t);
         assert store.containsKey(t.getIdentifier());
 
         t.setAccessToken(at);
-        store.put(t.getIdentifier(), t);
+        //store.put(t.getIdentifier(), t);
+        store.save( t);
         // Check it gets stored right, then retrieve it.
+
+
         assert t.equals(store.get(t.getIdentifier()));
 
         store.remove(t.getIdentifier());

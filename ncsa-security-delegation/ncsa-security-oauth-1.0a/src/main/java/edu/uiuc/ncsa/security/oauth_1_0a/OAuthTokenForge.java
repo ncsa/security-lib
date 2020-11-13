@@ -8,9 +8,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import net.oauth.OAuth;
 
 import javax.servlet.http.HttpServletRequest;
@@ -114,13 +112,13 @@ public class OAuthTokenForge implements TokenForge {
     public AuthorizationGrant getAuthorizationGrant(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new AuthorizationGrantImpl(agIdProvider.get().getUri(), agssIdProvider.get().getUri());
+                return new OA1AuthorizationGrantImpl(agIdProvider.get().getUri(), agssIdProvider.get().getUri());
 
             case 1:
-                return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]));
+                return new OA1AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]), null);
 
             default:
-                return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]),
+                return new OA1AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]),
                         tokens[1] == null ? null : URI.create(tokens[1]));
         }
     }
@@ -148,13 +146,13 @@ public class OAuthTokenForge implements TokenForge {
     public AccessToken getAccessToken(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new AccessTokenImpl(atIdProvider.get().getUri(), atssIdProvider.get().getUri());
+                return new OA1AccessTokenImpl(atIdProvider.get().getUri(), atssIdProvider.get().getUri());
 
             case 1:
-                return new AccessTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]));
+                return new OA1AccessTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]), null);
 
             default:
-                return new AccessTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]),
+                return new OA1AccessTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]),
                         tokens[1] == null ? null : URI.create(tokens[1]));
 
         }

@@ -6,10 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTokenException;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.delegation.server.MissingTokenException;
 import edu.uiuc.ncsa.security.delegation.token.*;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.TokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -156,10 +153,10 @@ public class OA2TokenForge implements TokenForge {
     public TokenImpl getIDToken(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new TokenImpl(getIDTokenProvider().get().getUri(), null);
+                return new TokenImpl(getIDTokenProvider().get().getUri());
 
             default:
-                return new TokenImpl(tokens[0] == null ? null : URI.create(tokens[0]), null);
+                return new TokenImpl(tokens[0] == null ? null : URI.create(tokens[0]));
         }
     }
 
@@ -249,19 +246,19 @@ public class OA2TokenForge implements TokenForge {
         }
     }
 
-    public RefreshToken getRefreshToken(String... tokens) {
+    public RefreshTokenImpl getRefreshToken(String... tokens) {
         switch (tokens.length) {
             case 0:
-                return new OA2RefreshTokenImpl(getRefreshTokenProvider().get().getUri());
+                return new RefreshTokenImpl(getRefreshTokenProvider().get().getUri());
 
             default:
-                return new OA2RefreshTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]));
+                return new RefreshTokenImpl(tokens[0] == null ? null : URI.create(tokens[0]));
         }
     }
 
 
     @Override
-    public AccessToken getAccessToken(String... tokens) {
+    public AccessTokenImpl getAccessToken(String... tokens) {
         switch (tokens.length) {
             case 0:
                 return new AccessTokenImpl(getAtIdProvider().get().getUri());

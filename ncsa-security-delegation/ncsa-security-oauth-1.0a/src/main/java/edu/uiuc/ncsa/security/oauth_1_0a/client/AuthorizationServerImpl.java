@@ -16,9 +16,7 @@ import edu.uiuc.ncsa.security.delegation.server.UnapprovedClientException;
 import edu.uiuc.ncsa.security.delegation.services.AddressableServer;
 import edu.uiuc.ncsa.security.delegation.services.Request;
 import edu.uiuc.ncsa.security.delegation.services.Response;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
-import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import net.oauth.OAuth;
@@ -73,15 +71,15 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
     }
 
     protected ATResponse getAccessToken(ATRequest atRequest) {
-        AccessTokenImpl accessToken = null;
-        AuthorizationGrantImpl ag = null;
+        OA1AccessTokenImpl accessToken = null;
+        OA1AuthorizationGrantImpl ag = null;
         VerifierImpl vImpl = null;
 
         OAClient oaClient = (OAClient) atRequest.getClient();
         OAuthAccessor accessor = OAuthUtilities.createOAuthAccessor(this, oaClient);
 
         if (atRequest.getAuthorizationGrant() instanceof AuthorizationGrantImpl) {
-            ag = (AuthorizationGrantImpl) atRequest.getAuthorizationGrant();
+            ag = (OA1AuthorizationGrantImpl) atRequest.getAuthorizationGrant();
         } else {
             // This should never happen, but is here since *someday* the codebase may change and this will intercept
             // such an error.
@@ -121,7 +119,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
             }
             OAuthMessage message = oauthClient.getAccessToken(accessor, "GET", OAuth.newList(arrayList.toArray(new String[arrayList.size()])));
             HashMap m = whittleParameters(message);
-            accessToken = new AccessTokenImpl(URI.create(message.getParameter(OAUTH_TOKEN)), URI.create(message.getParameter(OAUTH_TOKEN_SECRET)));
+            accessToken = new OA1AccessTokenImpl(URI.create(message.getParameter(OAUTH_TOKEN)), URI.create(message.getParameter(OAUTH_TOKEN_SECRET)));
             ATResponse atr = new ATResponse(accessToken);
             atr.setParameters(m);
             return atr;
@@ -152,7 +150,7 @@ public class AuthorizationServerImpl implements AddressableServer, AGServer, ATS
             if (!((OAClient) agRequest.getClient()).getSignatureMethod().equals(RSA_SHA1) && (rtss == null || rtss.length() == 0)) {
                 throw new IllegalArgumentException("Error: delegation server did not return a shared secret");
             }
-            AuthorizationGrantImpl agi = new AuthorizationGrantImpl(URI.create(rt), URI.create(rtss));
+            OA1AuthorizationGrantImpl agi = new OA1AuthorizationGrantImpl(URI.create(rt), URI.create(rtss));
             AGResponse agr = new AGResponse(agi);
             HashMap m = whittleParameters(message);
             // grab any unused parameters from the server, as per OAuth spec.

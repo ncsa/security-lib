@@ -4,12 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cacheable;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.ProtectedAsset;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
-
-import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
+import edu.uiuc.ncsa.security.delegation.token.*;
 
 /**
  * A bean holding a transaction.
@@ -82,14 +77,24 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
     public void setProtectedAsset(ProtectedAsset protectedAsset) {
         this.protectedAsset = protectedAsset;
     }
+    protected boolean checkTokenEquals(NewToken token1, NewToken token2){
+        if(token1 == null){
+            if(token2 == null) return true;
+            return false;
+        }else{
+            if(token2 == null) return false;
+            return token1.equals(token2);
+        }
 
+    }
     public boolean equals(Object obj) {
         if (!super.equals(obj)) return false;
         if (!(obj instanceof BasicTransaction)) return false;
         BasicTransaction t = (BasicTransaction) obj;
-        if (!checkEquals(getAuthorizationGrant(), t.getAuthorizationGrant())) return false;
-        if (!checkEquals(getAccessToken(), t.getAccessToken())) return false;
-        if (!checkEquals(getVerifier(), t.getVerifier())) return false;
+
+        if(!checkTokenEquals(getAuthorizationGrant(), t.getAuthorizationGrant())) return false;
+        if(!checkTokenEquals(getAccessToken(), t.getAccessToken())) return false;
+        if(!checkTokenEquals(getVerifier(), t.getVerifier())) return false;
         return true;
     }
 

@@ -5,14 +5,14 @@ package edu.uiuc.ncsa.security.delegation.token;
  * <p>Created by Jeff Gaynor<br>
  * on Mar 11, 2011 at  4:10:50 PM
  */
-public interface AuthorizationGrant extends Token {
+public interface AuthorizationGrant extends NewToken {
     /**
      * An <b>optional</b> shared secret for those implementations that support or require it. Ignored if
      * unused.
      *
      * @return
      */
-    String getSharedSecret();
+/*    String getSharedSecret();
 
-    void setSharedSecret(String sharedSecret);
+    void setSharedSecret(String sharedSecret);*/
 }

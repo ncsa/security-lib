@@ -76,7 +76,7 @@ public class AGServer2 extends ASImpl implements AGServer, OA2Constants {
         // optional but send it along if it is there.
         map.put(STATE, state);
 
-        AuthorizationGrantImpl agi = new AuthorizationGrantImpl(URI.create(accessCode), null);
+        AuthorizationGrantImpl agi = new AuthorizationGrantImpl(URI.create(accessCode));
         AGResponse agr = new AGResponse(agi);
         agr.setParameters(map);
         return agr;

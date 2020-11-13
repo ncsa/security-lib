@@ -5,8 +5,8 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.AbstractIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.PAIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.PARequest;
 import edu.uiuc.ncsa.security.delegation.server.request.PAResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import edu.uiuc.ncsa.security.oauth_1_0a.client.OAClient;
@@ -52,10 +52,10 @@ public class PAIImpl extends AbstractIssuer implements PAIssuer {
                 accessor.consumer.setProperty(OAuthConstants.PUBLIC_KEY, pk);
                 accessor.setProperty(OAuthConstants.PUBLIC_KEY, pk);
             }
-            AccessToken at = protectedAssetRequest.getAccessToken();
+            OA1AccessTokenImpl at = (OA1AccessTokenImpl) protectedAssetRequest.getAccessToken();
 
             if (at == null) {
-                at = tokenForge.getAccessToken(protectedAssetRequest.getParameters());
+                at = (OA1AccessTokenImpl) tokenForge.getAccessToken(protectedAssetRequest.getParameters());
             }
             accessor.tokenSecret = at.getSharedSecret();
 

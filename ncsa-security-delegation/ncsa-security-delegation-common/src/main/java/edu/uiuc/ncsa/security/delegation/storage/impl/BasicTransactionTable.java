@@ -30,6 +30,7 @@ abstract public class BasicTransactionTable extends Table {
     @Override
     public void createColumnDescriptors() {
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().tempCred(), LONGVARCHAR, false, true));
+        getColumnDescriptor().add(new ColumnDescriptorEntry(btk().authGrant(), LONGVARCHAR, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().accessToken(), LONGVARCHAR, true, false));
         getColumnDescriptor().add(new ColumnDescriptorEntry(btk().verifier(), LONGVARCHAR, true, false));
 

@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.MyX509Certificates;
-import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import edu.uiuc.ncsa.security.util.pkcs.CertUtil;
@@ -60,9 +60,9 @@ public class PAServerImpl implements AddressableServer, PAServer {
 
     protected PAResponse getAsset(Client client, Map props, AccessToken accessToken) {
         MyX509Certificates myX509Certificate = null;
-        AccessTokenImpl atImpl = null;
-        if (accessToken instanceof AccessTokenImpl) {
-            atImpl = (AccessTokenImpl) accessToken;
+        OA1AccessTokenImpl atImpl = null;
+        if (accessToken instanceof OA1AccessTokenImpl) {
+            atImpl = (OA1AccessTokenImpl) accessToken;
         } else {
             throw new GeneralException("Error: unsupported access token implementation");
         }

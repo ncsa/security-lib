@@ -7,8 +7,8 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.AGIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AbstractIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.AGRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import edu.uiuc.ncsa.security.oauth_1_0a.client.OAClient;
@@ -19,7 +19,7 @@ import java.net.URI;
 import java.security.PublicKey;
 import java.util.Map;
 
-import static edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants.*;
+import static edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants.CERT_LIFETIME;
 import static edu.uiuc.ncsa.security.util.pkcs.KeyUtil.fromX509PEM;
 
 /**
@@ -51,7 +51,7 @@ public class AGIImpl extends AbstractIssuer implements AGIssuer {
             }
             // Now that we have the message and accessor, validate it or refuse to do anything.
             OAuthUtilities.validate(m, accessor);
-            AuthorizationGrant ag = tokenForge.getAuthorizationGrant();
+            OA1AuthorizationGrantImpl ag = (OA1AuthorizationGrantImpl) tokenForge.getAuthorizationGrant();
             AGResponseImpl agResponse = new AGResponseImpl();
             agResponse.setGrant(ag);
             // convert the list to a map.

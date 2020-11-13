@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
@@ -37,14 +38,18 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
 
     @Override
     public V fromMap(ConversionMap<String, Object> data, V v) {
-
         BasicTransaction b = super.fromMap(data, v); // this sets the temp token
-        Object token = data.get(getBTKeys().tempCred());
+        // save it for later since it is derived from the auth grant and if that is not set, there may be
+        // contention over the value later. The id never changes.
+        Identifier id = b.getIdentifier();
+        Object token = data.get(getBTKeys().authGrant());
         if (token != null) {
             if (token instanceof AuthorizationGrant) {
                 b.setAuthorizationGrant((AuthorizationGrant) token);
             } else {
-                b.setAuthorizationGrant(tokenForge.getAuthorizationGrant(token.toString()));
+                AuthorizationGrant ag = tokenForge.getAuthorizationGrant();
+                ag.fromString(token.toString());
+                b.setAuthorizationGrant(ag);
             }
         }
 
@@ -53,7 +58,9 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof AccessToken) {
                 b.setAccessToken((AccessToken) token);
             } else {
-                b.setAccessToken(tokenForge.getAccessToken(token.toString()));
+                AccessToken at = tokenForge.getAccessToken();
+                at.fromString(token.toString());
+                b.setAccessToken(at);
             }
         }
 
@@ -64,10 +71,12 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof Verifier) {
                 b.setVerifier((Verifier) token);
             } else {
-                b.setVerifier(tokenForge.getVerifier(token.toString()));
+                Verifier verifier = tokenForge.getVerifier();
+                verifier.fromString(token.toString());
+                b.setVerifier(verifier);
             }
         }
-
+        b.setIdentifier(id);  // Make sure it is right!
 
         return (V) b;
     }
@@ -76,13 +85,13 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         if (value.hasAuthorizationGrant()) {
-            data.put(getBTKeys().tempCred(), value.getAuthorizationGrant().getToken());
+            data.put(getBTKeys().authGrant(), value.getAuthorizationGrant().toJSON().toString());
         }
         if (value.hasAccessToken()) {
-            data.put(getBTKeys().accessToken(), value.getAccessToken().getToken());
+            data.put(getBTKeys().accessToken(), value.getAccessToken().toJSON().toString());
         }
         if (value.hasVerifier()) {
-            data.put(getBTKeys().verifier(), value.getVerifier().getToken());
+            data.put(getBTKeys().verifier(), value.getVerifier().toJSON().toString());
         }
     }
 }

@@ -2,8 +2,6 @@ package edu.uiuc.ncsa.security.oauth_2_0.server;
 
 import edu.uiuc.ncsa.security.delegation.server.issuers.AbstractIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerRequest;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
@@ -30,10 +28,9 @@ public class RTI2 extends AbstractIssuer {
         ServletDebugUtil.trace(this,"Request parameters:" + reqParamMap);
         reqParamMap.put(OA2Constants.CLIENT_ID, req.getClient().getIdentifierString());
         OA2TokenForge tokenForge2 = (OA2TokenForge) tokenForge;
-        RefreshToken refreshToken = tokenForge2.getRefreshToken();
-        AccessToken accessToken = tokenForge2.getAccessToken(); // spec says all new access token
 
-        RTIResponse resp = new RTIResponse(accessToken,refreshToken,isOIDC);
+        // spec says all new access token
+        RTIResponse resp = new RTIResponse(tokenForge2.getAccessToken(), tokenForge2.getRefreshToken(), isOIDC);
         resp.setParameters(reqParamMap);
         return resp;
     }

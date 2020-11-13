@@ -5,9 +5,9 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.ATIssuer;
 import edu.uiuc.ncsa.security.delegation.server.issuers.AbstractIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthUtilities;
 import edu.uiuc.ncsa.security.oauth_1_0a.client.OAClient;
@@ -44,10 +44,10 @@ public class ATIImpl extends AbstractIssuer implements ATIssuer {
                 accessor.consumer.setProperty(OAuthConstants.PUBLIC_KEY, pk);
                 accessor.setProperty(OAuthConstants.PUBLIC_KEY, pk);
             }
-            AuthorizationGrant ag = accessTokenRequest.getAuthorizationGrant();
+            OA1AuthorizationGrantImpl ag = (OA1AuthorizationGrantImpl) accessTokenRequest.getAuthorizationGrant();
             // If the authorization grant is not set, try to get it from the arguments.
             if (ag == null) {
-                ag = tokenForge.getAuthorizationGrant(x);
+                ag = (OA1AuthorizationGrantImpl) tokenForge.getAuthorizationGrant(x);
                 accessor.tokenSecret = null;
             } else {
                 accessor.tokenSecret = ag.getSharedSecret();
@@ -56,7 +56,7 @@ public class ATIImpl extends AbstractIssuer implements ATIssuer {
             if (accessTokenRequest.getVerifier() == null) {
                 throw new GeneralException("Error, missing verifier");
             }
-            AccessToken at = tokenForge.getAccessToken();
+            OA1AccessTokenImpl at = (OA1AccessTokenImpl) tokenForge.getAccessToken();
             ATResponseImpl atResp = new ATResponseImpl();
             atResp.setVerifier(accessTokenRequest.getVerifier());
             atResp.setAccessToken(at);

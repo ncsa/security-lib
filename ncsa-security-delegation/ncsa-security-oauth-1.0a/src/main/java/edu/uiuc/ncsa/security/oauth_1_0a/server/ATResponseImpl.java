@@ -2,8 +2,8 @@ package edu.uiuc.ncsa.security.oauth_1_0a.server;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import net.oauth.OAuth;
 
@@ -30,14 +30,14 @@ public class ATResponseImpl implements ATResponse {
 
     Map<String, String> parameters;
 
-    AccessToken accessToken;
+    OA1AccessTokenImpl accessToken;
     Verifier verifier;
 
-    public AccessToken getAccessToken() {
+    public OA1AccessTokenImpl getAccessToken() {
         return accessToken;
     }
 
-    public void setAccessToken(AccessToken accessToken) {
+    public void setAccessToken(OA1AccessTokenImpl accessToken) {
         this.accessToken = accessToken;
     }
 

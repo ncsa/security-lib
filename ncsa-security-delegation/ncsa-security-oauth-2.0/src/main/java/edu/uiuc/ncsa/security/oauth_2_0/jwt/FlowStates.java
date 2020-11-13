@@ -41,6 +41,7 @@ public class FlowStates {
         return jsonObject;
     }
 
+
     public void fromJSON(JSONObject jsonObject) {
         acceptRequests = jsonObject.getBoolean(ACCEPT_REQUESTS.getValue());
         accessToken = jsonObject.getBoolean(ACCESS_TOKEN.getValue());
@@ -49,7 +50,15 @@ public class FlowStates {
         idToken = jsonObject.getBoolean(ID_TOKEN.getValue());
         refreshToken = jsonObject.getBoolean(REFRESH_TOKEN.getValue());
         userInfo = jsonObject.getBoolean(USER_INFO.getValue());
-        at_do_templates = jsonObject.getBoolean(AT_DO_TEMPLATES.getValue());
+        if(jsonObject.containsKey(AT_DO_TEMPLATES.getValue())) {
+            // Some old, serialized versions (such as with long-term refresh tokens)
+            // Do not have this. Rather than an NPE, this will fail with a
+            // message like
+            // net.sf.json.JSONException: JSONObject["at_do_templates"] is not a Boolean.
+            at_do_templates = jsonObject.getBoolean(AT_DO_TEMPLATES.getValue());
+        }else{
+            at_do_templates = true;
+        }
     }
 
     @Override

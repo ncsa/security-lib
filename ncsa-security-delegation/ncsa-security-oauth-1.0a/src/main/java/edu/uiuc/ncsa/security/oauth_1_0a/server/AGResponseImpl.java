@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.security.oauth_1_0a.server;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.server.request.AGResponse;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
-import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.security.delegation.token.impl.OA1AuthorizationGrantImpl;
 import edu.uiuc.ncsa.security.oauth_1_0a.OAuthConstants;
 import net.oauth.OAuth;
 
@@ -35,15 +35,15 @@ public class AGResponseImpl implements AGResponse {
     }
 
     ServiceTransaction transaction;
-    public AuthorizationGrant getGrant() {
+    public OA1AuthorizationGrantImpl getGrant() {
         return grant;
     }
 
-    public void setGrant(AuthorizationGrant grant) {
+    public void setGrant(OA1AuthorizationGrantImpl grant) {
         this.grant = grant;
     }
 
-    AuthorizationGrant grant;
+    OA1AuthorizationGrantImpl grant;
 
     public void write(HttpServletResponse response) throws IOException {
         response.setContentType(OAuthConstants.FORM_ENCODING);

@@ -14,8 +14,14 @@ public class BasicTransactionKeys extends SerializationKeys {
     }
 
     String tempCred = "temp_token";
+    String authGrant = "auth_grant"; // Changes require that temp_token be used solely as the id.
     String accessToken = "access_token";
     String verifier = "oauth_verifier";
+
+    public String authGrant(String... x) {
+        if (0 < x.length) authGrant = x[0];
+        return authGrant;
+    }
 
 
     public String tempCred(String... x) {

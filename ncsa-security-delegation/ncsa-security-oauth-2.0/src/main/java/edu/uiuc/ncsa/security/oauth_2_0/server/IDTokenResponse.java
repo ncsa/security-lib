@@ -2,8 +2,9 @@ package edu.uiuc.ncsa.security.oauth_2_0.server;
 
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
@@ -23,8 +24,8 @@ import static edu.uiuc.ncsa.security.oauth_2_0.OA2Constants.*;
  * on 8/17/17 at  1:03 PM
  */
 public abstract class IDTokenResponse extends IResponse2 {
-    public IDTokenResponse(AccessToken accessToken,
-                           RefreshToken refreshToken,
+    public IDTokenResponse(AccessTokenImpl accessToken,
+                           RefreshTokenImpl refreshToken,
                            boolean isOIDC) {
         super(isOIDC);
         this.accessToken = accessToken;
@@ -40,13 +41,13 @@ public abstract class IDTokenResponse extends IResponse2 {
     }
 
     AccessToken accessToken;
-    RefreshToken refreshToken;
+    RefreshTokenImpl refreshToken;
 
-    public RefreshToken getRefreshToken() {
+    public RefreshTokenImpl getRefreshToken() {
         return refreshToken;
     }
 
-    public void setRefreshToken(RefreshToken refreshToken) {
+    public void setRefreshToken(RefreshTokenImpl refreshToken) {
         this.refreshToken = refreshToken;
     }
 
@@ -121,7 +122,7 @@ public abstract class IDTokenResponse extends IResponse2 {
         m.put(TOKEN_TYPE, "Bearer");
         if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
             m.put(REFRESH_TOKEN, getRefreshToken().getToken());
-            m.put(EXPIRES_IN, (getRefreshToken().getExpiresIn() / 1000));
+            m.put(EXPIRES_IN, (getRefreshToken().getExpiresAt() / 1000));
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.

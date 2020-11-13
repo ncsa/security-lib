@@ -45,6 +45,9 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         @Override
         public AuthorizationGrant getAuthorizationGrant(String... tokens) {
+            if(tokens.length == 0 ){
+                return new FakeAuthorizationGrant((String) null);
+            }
             return new FakeAuthorizationGrant(tokens[0]);
         }
 
@@ -55,6 +58,9 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         @Override
         public AccessToken getAccessToken(String... tokens) {
+            if(tokens.length == 0 ) {
+                return new FakeAccessToken((String) null);
+            }
             return new FakeAccessToken(tokens[0]);
 
         }
@@ -71,6 +77,9 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
         @Override
         public Verifier getVerifier(String... tokens) {
+            if(tokens.length == 0 ) {
+                return new FakeVerifier((String) null);
+            }
             return new FakeVerifier(tokens[0]);
         }
     }
@@ -150,6 +159,7 @@ public class FileStoreTest extends BaseTransactionStoreTest {
         public FakeVerifier(URI token) {
             super(token);
         }
+
     }
 
     /**
@@ -169,8 +179,6 @@ public class FileStoreTest extends BaseTransactionStoreTest {
         public boolean equals(Object obj) {
             if (!super.equals(obj)) return false;
             if (!(obj instanceof AuthorizationGrant)) return false;
-            if (getSharedSecret() == null && ((AuthorizationGrant) obj).getSharedSecret() == null) return true;
-            if (!getSharedSecret().equals(((AuthorizationGrant) obj).getSharedSecret())) return false;
             return true;
 
         }
@@ -181,6 +189,8 @@ public class FileStoreTest extends BaseTransactionStoreTest {
      * on May 6, 2011 at  3:19:16 PM
      */
     public static class FakeAccessToken extends FakeTokenImpl implements AccessToken {
+
+
         public FakeAccessToken(String token) {
             super(token);
         }
@@ -193,8 +203,6 @@ public class FileStoreTest extends BaseTransactionStoreTest {
         public boolean equals(Object obj) {
             if (!super.equals(obj)) return false;
             if (!(obj instanceof AccessToken)) return false;
-            if (getSharedSecret() == null && ((AccessToken) obj).getSharedSecret() == null) return true;
-            if (!getSharedSecret().equals(((AccessToken) obj).getSharedSecret())) return false;
             return true;
         }
     }

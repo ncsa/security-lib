@@ -5,5 +5,5 @@ package edu.uiuc.ncsa.security.delegation.token;
  * <p>Created by Jeff Gaynor<br>
  * on Apr 28, 2011 at  11:09:11 AM
  */
-public interface Verifier extends Token {
+public interface Verifier extends NewToken {
 }

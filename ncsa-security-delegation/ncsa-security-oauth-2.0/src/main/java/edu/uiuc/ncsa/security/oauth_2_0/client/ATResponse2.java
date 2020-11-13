@@ -1,8 +1,8 @@
 package edu.uiuc.ncsa.security.oauth_2_0.client;
 
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
-import edu.uiuc.ncsa.security.delegation.token.AccessToken;
-import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 
 /**
  * Since the OAuth 2 protocol supports getting a refresh token back from the server with the access token,
@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
  * on 3/12/14 at  12:05 PM
  */
 public class ATResponse2 extends RTResponse {
-    public ATResponse2(AccessToken accessToken, RefreshToken refreshToken) {
+    public ATResponse2(AccessTokenImpl accessToken, RefreshTokenImpl refreshToken) {
         super(accessToken,refreshToken);
     }
    // Note this is now mostly legacy since access tokens and refresh tokens may be returned

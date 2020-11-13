@@ -4,7 +4,7 @@ package edu.uiuc.ncsa.security.delegation.token;
  * <p>Created by Jeff Gaynor<br>
  * on 2/21/14 at  3:45 PM
  */
-public interface RefreshToken extends Token{
+public interface RefreshToken extends NewToken{
     /**
      * The time interval, in milliseconds, that this token remains valid.
      * <h3>Caveat</h3>
@@ -12,6 +12,6 @@ public interface RefreshToken extends Token{
      * before putting it in a refresh token.
      * @return
      */
-    public long getExpiresIn();
-    public void setExpiresIn(long expiresIn);
+/*    public long getExpiresIn();
+    public void setExpiresIn(long expiresIn);*/
 }

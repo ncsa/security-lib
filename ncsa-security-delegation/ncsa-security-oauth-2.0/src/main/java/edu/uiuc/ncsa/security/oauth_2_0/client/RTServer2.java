@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2RefreshTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;
 
@@ -45,9 +45,9 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         }
         long expiresIn = Long.parseLong(exp) * 1000;
 
-        OA2RefreshTokenImpl refreshTokenImpl2 = new OA2RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
-        AccessToken newAT = new AccessTokenImpl(URI.create(returnedAT));
-        refreshTokenImpl2.setExpiresIn(expiresIn);
+        RefreshTokenImpl refreshTokenImpl2 = new RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
+        AccessTokenImpl newAT = new AccessTokenImpl(URI.create(returnedAT));
+        refreshTokenImpl2.setExpiresAt(expiresIn);
         RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2);
         if (oidcEnabled) {
             JSONObject idToken = getAndCheckIDToken(json, rtRequest);
@@ -67,7 +67,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         return response;
     }
 
-    public RTResponse createResponse(AccessToken at, RefreshToken rt) {
+    public RTResponse createResponse(AccessTokenImpl at, RefreshTokenImpl rt) {
         return new RTResponse(at, rt);
     }
 }

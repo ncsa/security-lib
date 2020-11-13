@@ -23,6 +23,7 @@ public interface  RFC8693Constants extends OA2Constants {
     String ISSUED_TOKEN_TYPE = "issued_token_type";
     String ACTOR_TOKEN = "actor_token";
     String ACTOR_TOKEN_TYPE = "actor_token_type";
+    String REQUESTED_TOKEN_TYPE = "requested_token_type";
     String SUBJECT_TOKEN = "subject_token";
     String SUBJECT_TOKEN_TYPE = "subject_token_type";
     String AUDIENCE = "audience";
