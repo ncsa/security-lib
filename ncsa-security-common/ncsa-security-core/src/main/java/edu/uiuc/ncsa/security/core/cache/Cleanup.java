@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.cache;
 
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.*;
@@ -45,9 +46,12 @@ public class Cleanup<K, V> extends Thread {
         for (K key : getSortedKeys()) {
             V co = getMap().get(key);
             for (RetentionPolicy rp : getRetentionPolicies()) {
+                DebugUtil.trace(this, "checking retention policy " + rp.getClass().getSimpleName());
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
+                        DebugUtil.trace(this, "removing entry");
+
                         getMap().remove(key);
                         linkedList.add(co);
                     }
@@ -156,6 +160,7 @@ public class Cleanup<K, V> extends Thread {
 
     @Override
     public void run() {
+        DebugUtil.trace(this, "start cleanup");
         log("starting cleanup thread for " + getMap());
         while (!isStopThread()) {
             try {

@@ -41,7 +41,6 @@ public class FlowStates {
         return jsonObject;
     }
 
-
     public void fromJSON(JSONObject jsonObject) {
         acceptRequests = jsonObject.getBoolean(ACCEPT_REQUESTS.getValue());
         accessToken = jsonObject.getBoolean(ACCESS_TOKEN.getValue());
@@ -58,6 +57,7 @@ public class FlowStates {
             at_do_templates = jsonObject.getBoolean(AT_DO_TEMPLATES.getValue());
         }else{
             at_do_templates = true;
+
         }
     }
 

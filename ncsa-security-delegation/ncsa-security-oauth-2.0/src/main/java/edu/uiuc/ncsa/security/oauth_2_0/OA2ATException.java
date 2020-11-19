@@ -12,6 +12,7 @@ import org.apache.http.HttpStatus;
 public class OA2ATException extends GeneralException {
 
     public OA2ATException(String error, String description, int statusCode) {
+        super(description); // Or no error message is in the logs
         this.description = description;
         this.error = error;
         this.statusCode = statusCode;
