@@ -17,6 +17,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkNoNulls;
  */
 public class TokenImpl implements NewToken {
 
+
     public TokenImpl(URI token) {
         this.token = token;
     }
