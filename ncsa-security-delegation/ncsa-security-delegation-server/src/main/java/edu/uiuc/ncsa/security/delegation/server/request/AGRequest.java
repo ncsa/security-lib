@@ -19,6 +19,11 @@ public class AGRequest extends IssuerRequest {
     }
 
     @Override
+    public int getType() {
+        return AG_TYPE;
+    }
+
+    @Override
     public Response process(Server server) {
         if (server instanceof AGIssuer) {
             return ((AGIssuer) server).processAGRequest(this);

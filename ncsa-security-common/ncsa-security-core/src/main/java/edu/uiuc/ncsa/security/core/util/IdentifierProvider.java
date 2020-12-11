@@ -10,13 +10,15 @@ import java.util.Date;
 
 /**
  * Creates Identifiers for use by {@link edu.uiuc.ncsa.security.core.Identifiable} objects.
- * Override for specific semantics.
+ * Override for specific semantics. These are created for the various token types when
+ * the system is loaded.
  * <p>Created by Jeff Gaynor<br>
  * on 4/3/12 at  1:54 PM
  */
 public abstract class IdentifierProvider<V extends Identifier> implements Provider<V> {
     public static String SCHEME = "myproxy";
     public static String SCHEME_SPECIFIC_PART = "oa4mp,2012:"; // NB trailing colon is needed by us
+     public static String VERSION_2_0 = "v2.0";
 
     public static void setScheme(String SCHEME) {
         IdentifierProvider.SCHEME = SCHEME;
@@ -33,11 +35,22 @@ public abstract class IdentifierProvider<V extends Identifier> implements Provid
         IdentifierProvider.SCHEME_SPECIFIC_PART = SCHEME_SPECIFIC_PART;
     }
 
-    protected IdentifierProvider(URI uri, String component, boolean useTimestamps) {
+   String versionString = null;
+    protected IdentifierProvider(URI uri,
+                                 String component,
+                                 boolean useTimestamps) {
+        this(uri, component, null, useTimestamps);
+    }
+
+    protected IdentifierProvider(URI uri,
+                                 String component,
+                                 String versionString,
+                                 boolean useTimestamps) {
         uriScheme = uri.getScheme();
         schemeSpecificPart = uri.getSchemeSpecificPart();
         this.component = component;
         this.useTimestamps = useTimestamps;
+        this.versionString = versionString;
     }
 
     protected IdentifierProvider(String component) {
@@ -133,7 +146,7 @@ public abstract class IdentifierProvider<V extends Identifier> implements Provid
         if (useTimestamps) {
             t = "/" + Long.toString(new Date().getTime());
         }
-        return Identifiers.uniqueIdentifier(getCaput() + h, t);
+        return Identifiers.uniqueIdentifier(getCaput() + (versionString==null?"":versionString+"/") + h, t);
         //return URI.create(getCaput() + h + getHexString() + t);
     }
 

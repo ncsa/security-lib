@@ -13,6 +13,11 @@ import javax.servlet.http.HttpServletRequest;
  * on 2/26/14 at  11:32 AM
  */
 public class RTIRequest extends IssuerRequest {
+    @Override
+    public int getType() {
+        return RT_TYPE;
+    }
+
     boolean isOIDC = true;
     public RTIRequest(ServiceTransaction transaction, boolean isOIDC) {
         super(transaction);

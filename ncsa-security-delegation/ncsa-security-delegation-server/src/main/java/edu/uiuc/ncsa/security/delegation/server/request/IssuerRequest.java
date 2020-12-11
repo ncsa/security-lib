@@ -15,6 +15,14 @@ import javax.servlet.http.HttpServletRequest;
  * on May 13, 2011 at  11:57:57 AM
  */
 public abstract class IssuerRequest implements Request {
+    public static final int AG_TYPE = 1;
+    public static final int AT_TYPE = 2;
+    public static final int CB_TYPE = 3;
+    public static final int PA_TYPE = 4;
+    public static final int RT_TYPE = 5;
+    public static final int UI_TYPE = 6;
+
+    public abstract int getType();
     public IssuerRequest(ServiceTransaction transaction) {
         this.transaction = transaction;
     }

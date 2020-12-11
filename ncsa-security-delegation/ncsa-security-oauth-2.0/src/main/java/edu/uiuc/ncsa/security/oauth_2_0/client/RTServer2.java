@@ -47,7 +47,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
 
         RefreshTokenImpl refreshTokenImpl2 = new RefreshTokenImpl(URI.create(json.getString(OA2Constants.REFRESH_TOKEN)));
         AccessTokenImpl newAT = new AccessTokenImpl(URI.create(returnedAT));
-        refreshTokenImpl2.setExpiresAt(expiresIn);
+        //refreshTokenImpl2.setLifetime(expiresIn);
         RTResponse rtResponse = createResponse(newAT, refreshTokenImpl2);
         if (oidcEnabled) {
             JSONObject idToken = getAndCheckIDToken(json, rtRequest);

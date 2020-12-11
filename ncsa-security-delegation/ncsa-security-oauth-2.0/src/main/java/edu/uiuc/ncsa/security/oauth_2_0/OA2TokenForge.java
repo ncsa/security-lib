@@ -3,10 +3,16 @@ package edu.uiuc.ncsa.security.oauth_2_0;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.InvalidTokenException;
-import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.security.core.util.IP2;
 import edu.uiuc.ncsa.security.delegation.server.MissingTokenException;
+import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
+import edu.uiuc.ncsa.security.delegation.server.request.IssuerRequest;
 import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.delegation.token.impl.*;
+import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
+import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -18,7 +24,89 @@ import java.util.Map;
  */
 public class OA2TokenForge implements TokenForge {
 
+    public AuthorizationGrantImpl createToken(AGRequest2 request) {
+        return new AuthorizationGrantImpl(getAgIdProvider().get(request.getLifetime()));
+    }
 
+    public AccessTokenImpl createToken(ATRequest request) {
+        return new AccessTokenImpl(metaCT(request, getAtIdProvider()));
+    }
+
+    public RefreshTokenImpl createToken(RTIRequest request) {
+        return new RefreshTokenImpl(metaCT(request, getRefreshTokenProvider()));
+    }
+
+    /**
+     * Does some grunt work of figuring out the lifetime then creates the URI. This is
+     * <b>the</b> token and is used to create the various implementations.
+     *
+     * @param request
+     * @param ip2
+     * @return
+     */
+    protected URI metaCT(IssuerRequest request, IP2 ip2) {
+        // meta create-token method.
+        OIDCServiceTransactionInterface t = (OIDCServiceTransactionInterface) request.getTransaction();
+        long lifetime = -1L;
+        //long lifetime = t.getAuthzGrantLifetime();
+        switch (request.getType()) {
+            case IssuerRequest.AG_TYPE:
+                lifetime = t.getAuthzGrantLifetime();
+                break;
+            case IssuerRequest.AT_TYPE:
+                lifetime = t.getAccessTokenLifetime();
+                break;
+            case IssuerRequest.RT_TYPE:
+                lifetime = t.getRefreshTokenLifetime();
+                break;
+            default:
+                throw new NotImplementedException("Lifetime for request of type " + request.getClass().getSimpleName() + " not implemented.");
+        }
+        return ip2.get(lifetime);
+    }
+
+  /*  public NewToken createToken(IssuerRequest request) {
+        OIDCServiceTransactionInterface t = (OIDCServiceTransactionInterface) request.getTransaction();
+        String component;
+        String uid;
+        long lifetime = -1L; // not all tokens have this
+        switch (request.getType()) {
+            case IssuerRequest.AG_TYPE:
+                component = authzGrant();
+                lifetime = t.getAuthzGrantLifetime();
+                break;
+            case IssuerRequest.AT_TYPE:
+                component = accessToken();
+                lifetime = t.getAccessTokenLifetime();
+                break;
+            case IssuerRequest.RT_TYPE:
+                component = refreshToken();
+                lifetime = t.getRefreshTokenLifetime();
+                break;
+            case IssuerRequest.UI_TYPE:
+                component = userInfo();
+                break;
+            case IssuerRequest.PA_TYPE:
+                component = asset();
+                break;
+            default:
+                throw new IllegalArgumentException("Error: unknown token request type");
+        }
+        IP2<Identifier> ip2 = new IP2(getServerURI(), component, true);
+        URI tokken = ip2.get(lifetime);
+        switch (request.getType()) {
+            case IssuerRequest.AG_TYPE:
+                return new AuthorizationGrantImpl(tokken);
+            case IssuerRequest.AT_TYPE:
+                return new AccessTokenImpl(tokken);
+            case IssuerRequest.RT_TYPE:
+                return new RefreshTokenImpl(tokken);
+            default:
+                throw new IllegalArgumentException("Error: unknown token request type");
+        }
+    }
+
+*/
     public OA2TokenForge(String server) {
         this.server = server;
         // setup();
@@ -26,7 +114,7 @@ public class OA2TokenForge implements TokenForge {
 
     /**
      * This and similarly named methods are provided so you can override the specific path components and enforce
-     * your own semantics on the tokens. Note that these are called once in  and are immutable
+     * your own semantics on the tokens. Note that these are called once  and are immutable
      * after that. If you need something really exotic you should override the setup() method.
      *
      * @return
@@ -47,6 +135,16 @@ public class OA2TokenForge implements TokenForge {
         return refreshToken;
     }
 
+    protected String asset(String... x) {
+        if (1 == x.length) asset = x[0];
+        return asset;
+    }
+
+    protected String userInfo(String... x) {
+        if (1 == x.length) userInfo = x[0];
+        return userInfo;
+    }
+
     protected String verifierToken(String... x) {
         if (1 == x.length) verifierToken = x[0];
         return verifierToken;
@@ -61,12 +159,23 @@ public class OA2TokenForge implements TokenForge {
         return server;
     }
 
+    URI serverURI = null;
+
+    protected URI getServerURI() {
+        if (serverURI == null) {
+            serverURI = URI.create(getServer());
+        }
+        return serverURI;
+    }
+
     String server;
     public String authzGrant = "authzGrant";
     public String accessToken = "accessToken";
     public String refreshToken = "refreshToken";
     public String verifierToken = "verifierToken";
     public String idToken = "idToken";
+    public String asset = "asset";
+    public String userInfo = "userInfo";
 
     @Override
     public AccessToken getAccessToken(Map<String, String> parameters) {
@@ -84,18 +193,13 @@ public class OA2TokenForge implements TokenForge {
         return getAccessToken(authCode);
     }
 
+    // These are used in the token introspection endpoint.
     public static final int TYPE_AUTH_GRANT = 1;
     public static final int TYPE_ACCESS_TOKEN = 10;
     public static final int TYPE_REFRESH_TOKEN = 100;
     public static final int TYPE_UNKNOWN = 0;
 
 
-    /**
-     * Given a token string, return the type of token this is or a unknown
-     *
-     * @param x
-     * @return
-     */
     public int getType(String x) {
         String s = getServer();
         if (!s.endsWith("/")) {
@@ -169,74 +273,81 @@ public class OA2TokenForge implements TokenForge {
         }
     }
 
-    public IdentifierProvider<Identifier> getAgIdProvider() {
+    public IP2<Identifier> getAgIdProvider() {
         if (agIdProvider == null) {
-            agIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), authzGrant(), true) {
+            //agIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), authzGrant(), true) {
+            agIdProvider = new IP2<Identifier>(URI.create(getServer()), authzGrant(), true) {
             };
         }
         return agIdProvider;
     }
 
-    public void setAgIdProvider(IdentifierProvider<Identifier> agIdProvider) {
+  /*  public void setAgIdProvider(IdentifierProvider<Identifier> agIdProvider) {
         this.agIdProvider = agIdProvider;
-    }
+    }*/
 
-    public IdentifierProvider<Identifier> getAtIdProvider() {
+    public IP2<Identifier> getAtIdProvider() {
         if (atIdProvider == null) {
-            atIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), accessToken(), true) {
+            //atIdProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), accessToken(), true) {
+            atIdProvider = new IP2<Identifier>(URI.create(getServer()), accessToken(), true) {
             };
         }
         return atIdProvider;
     }
 
-    public void setAtIdProvider(IdentifierProvider<Identifier> atIdProvider) {
+  /*  public void setAtIdProvider(IdentifierProvider<Identifier> atIdProvider) {
         this.atIdProvider = atIdProvider;
-    }
+    }*/
 
-    public IdentifierProvider<Identifier> getRefreshTokenProvider() {
+    public IP2<Identifier> getRefreshTokenProvider() {
         if (refreshTokenProvider == null) {
-            refreshTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), refreshToken(), true) {
+            //   refreshTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), refreshToken(), true) {
+            refreshTokenProvider = new IP2<Identifier>(URI.create(getServer()), refreshToken(), true) {
             };
         }
         return refreshTokenProvider;
     }
 
-    public void setRefreshTokenProvider(IdentifierProvider<Identifier> refreshTokenProvider) {
+/*    public void setRefreshTokenProvider(IdentifierProvider<Identifier> refreshTokenProvider) {
         this.refreshTokenProvider = refreshTokenProvider;
-    }
+    }*/
 
-    public IdentifierProvider<Identifier> getIDTokenProvider() {
+    public IP2<Identifier> getIDTokenProvider() {
         if (idTokenprovider == null) {
-            idTokenprovider = new IdentifierProvider<edu.uiuc.ncsa.security.core.Identifier>(URI.create(getServer()),
+          /*  idTokenprovider = new IdentifierProvider<edu.uiuc.ncsa.security.core.Identifier>(URI.create(getServer()),
+                    idToken(), true) {*/
+            idTokenprovider = new IP2<edu.uiuc.ncsa.security.core.Identifier>(URI.create(getServer()),
                     idToken(), true) {
-
             };
         }
         return idTokenprovider;
     }
 
-    IdentifierProvider<Identifier> idTokenprovider = null;
 
-    public IdentifierProvider<Identifier> getVerifierTokenProvider() {
+    public IP2<Identifier> getVerifierTokenProvider() {
         if (verifierTokenProvider == null) {
-            verifierTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), verifierToken(), true) {
+            //verifierTokenProvider = new IdentifierProvider<Identifier>(URI.create(getServer()), verifierToken(), true) {
+            verifierTokenProvider = new IP2(URI.create(getServer()), verifierToken(), true) {
             };
         }
         return verifierTokenProvider;
     }
 
+/*
     public void setVerifierTokenProvider(IdentifierProvider<Identifier> verifierTokenProvider) {
         this.verifierTokenProvider = verifierTokenProvider;
     }
+*/
 
     /*
        Note that our specification dictates that grants, verifiers  and access tokens conform to the
        semantics of identifiers. We have to provide these.
         */
-    IdentifierProvider<Identifier> atIdProvider;
-    IdentifierProvider<Identifier> agIdProvider;
-    IdentifierProvider<Identifier> refreshTokenProvider;
-    IdentifierProvider<Identifier> verifierTokenProvider;
+    IP2<Identifier> atIdProvider;
+    IP2<Identifier> agIdProvider;
+    IP2<Identifier> refreshTokenProvider;
+    IP2<Identifier> verifierTokenProvider;
+    IP2<Identifier> idTokenprovider = null;
 
     protected URI getURI(String token) {
         try {

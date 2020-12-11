@@ -52,7 +52,10 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
 
     public void setAuthorizationGrant(AuthorizationGrant authorizationGrant) {
         this.authorizationGrant = authorizationGrant;
-        setIdentifier(BasicIdentifier.newID(authorizationGrant.getToken()));
+        if(getIdentifier() == null) {
+            // only reset the identifier if it is not already set.
+            setIdentifier(BasicIdentifier.newID(authorizationGrant.getToken()));
+        }
     }
 
 
@@ -64,7 +67,7 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
         this.verifier = verifier;
     }
 
-    AuthorizationGrant authorizationGrant;
+   protected AuthorizationGrant authorizationGrant;
     AccessToken accessToken;
     Verifier verifier;
     ProtectedAsset protectedAsset;

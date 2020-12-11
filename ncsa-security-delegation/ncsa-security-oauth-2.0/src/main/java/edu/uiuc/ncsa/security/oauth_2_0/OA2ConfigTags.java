@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
 /**
+ * These are the tags in (XML) configuration files.
  * <p>Created by Jeff Gaynor<br>
  * on 3/28/14 at  10:37 AM
  */
@@ -10,9 +11,11 @@ public interface OA2ConfigTags {
      * on a per client basis as well.
      */
     public String ISSUER = "issuer";
-    public String MAX_CLIENT_REFRESH_TOKEN_LIFETIME = "maxClientRefreshTokenLifetime"; // in seconds, convert to ms.
-    public String REFRESH_TOKEN_LIFETIME = "refreshTokenLifetime"; // in seconds, convert to ms.
+    public String AUTH_GRANT_LIFETIME = "authorizationGrantLifetime"; // in seconds, convert to ms.
+    public String ACCESS_TOKEN_LIFETIME = "accessTokenLifetime"; // in seconds, convert to ms.
     public String REFRESH_TOKEN_ENABLED = "refreshTokenEnabled"; // Enable or disable refresh tokens for this server.
+    public String REFRESH_TOKEN_LIFETIME = "refreshTokenLifetime"; // in seconds, convert to ms.
+    public String MAX_CLIENT_REFRESH_TOKEN_LIFETIME = "maxClientRefreshTokenLifetime"; // in seconds, convert to ms.
     public String OIDC_SUPPORT_ENABLED = "OIDCEnabled"; // Enable or disable OIDC support for this server.
     public String CLIENT_SECRET_LENGTH= "clientSecretLength"; // in bytes.
     public String ENABLE_TWO_FACTOR_SUPPORT= "enableTwoFactorSupport"; // boolean for enabling two factor support.

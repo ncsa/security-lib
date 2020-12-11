@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletRequest;
  * on May 13, 2011 at  12:32:22 PM
  */
 public class PARequest extends IssuerRequest {
+    @Override
+    public int getType() {
+        return PA_TYPE;
+    }
+
     public PARequest(HttpServletRequest servletRequest, ServiceTransaction transaction) {
         super(servletRequest, transaction);
     }

@@ -11,10 +11,16 @@ import java.net.URI;
 
 /**
  * Request to a callback server.
+ * <br/>OAuth 1 specific.
  * <p>Created by Jeff Gaynor<br>
  * on May 23, 2011 at  11:30:10 AM
  */
 public class CBRequest extends IssuerRequest {
+    @Override
+    public int getType() {
+        return CB_TYPE;
+    }
+
     /**
      * How long should the issuer wait for a response to this request? A value of 0 (or less)
      * means to accept whatever the defaults are for the underlying library.

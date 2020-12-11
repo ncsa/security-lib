@@ -1,29 +1,63 @@
 package edu.uiuc.ncsa.security.delegation.token.impl;
 
-import edu.uiuc.ncsa.security.core.util.DateUtils;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.NewToken;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkNoNulls;
+import static edu.uiuc.ncsa.security.core.util.Identifiers.*;
 
 /**
- * OAuth 1.0 tokens always have an associated shared secret.
+ * OAuth 1.0 tokens always have an associated shared secret. These do not.
  * <p>Created by Jeff Gaynor<br>
  * on Mar 16, 2011 at  12:58:52 PM
  */
 public class TokenImpl implements NewToken {
+    XProperties params = new XProperties();
+    String version = null;
 
+    @Override
+    public String getVersion() {
+        if (version == null) {
+            if (params.containsKey(VERSION_2_0_TAG)) {
+                version = params.getString(VERSION_2_0_TAG);
+            }
+        }
+        return version;
+    }
+
+    /**
+     * Checks if the version is null, effectively meaning it was created before versions existed.
+     *
+     * @return
+     */
+    public boolean isOldVersion() {
+        return getVersion() == null;
+    }
 
     public TokenImpl(URI token) {
         this.token = token;
+        init(token);
     }
 
-    public TokenImpl(String rawToken) {
-        fromString(rawToken);
+    protected void init(URI uri) {
+        if(uri == null){
+            return; // can happen. Return so there is not an NPE.
+        }
+        String s = uri.getQuery();
+        if (StringUtils.isTrivial(uri.getQuery())) {
+            // Version 1.0 tokens.
+
+        } else {
+            // Version 2.0+ tokens.
+            Map<String, String> parameters = getParameters(uri);
+            params.putAll(parameters);
+        }
+
     }
 
     URI token;
@@ -49,9 +83,9 @@ public class TokenImpl implements NewToken {
         // special case is that this has null values and the object is null.
         // These then should be considered equal.
         if (!checkNoNulls(getURIToken(), at.getURIToken())) return false;
-        if(!at.getToken().equals(getToken())) return false;
-        if(at.getExpiresAt() != getExpiresAt()) return false;
-        if(at.getIssuedAt() != getIssuedAt()) return false;
+        if (!at.getToken().equals(getToken())) return false;
+        if (at.getLifetime() != getLifetime()) return false;
+        if (at.getIssuedAt() != getIssuedAt()) return false;
         return true;
     }
 
@@ -64,12 +98,13 @@ public class TokenImpl implements NewToken {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getClass().getSimpleName() + "[");
         if (getToken() == null) {
-            stringBuilder.append(TOKEN_KEY + "=(null)");
+            stringBuilder.append("token=(null)");
         } else {
-            stringBuilder.append(TOKEN_KEY + "=" + getToken());
+            stringBuilder.append("token=" + getToken());
         }
-        stringBuilder.append(", " + ISSUED_AT_KEY + "=" + issuedAt);
-        stringBuilder.append(", " + EXPIRES_AT_KEY + "=" + expiresAt);
+        stringBuilder.append(", " + TIMESTAMP_TAG + "=" + getIssuedAt());
+        stringBuilder.append(", " + LIFETIME_TAG + "=" + getLifetime());
+        stringBuilder.append(", " + VERSION_TAG + "=" + getVersion());
         return stringBuilder;
 
     }
@@ -82,79 +117,56 @@ public class TokenImpl implements NewToken {
 
     @Override
     public boolean isExpired() {
-        if(getExpiresAt()< System.currentTimeMillis()) return true;
+        if (getLifetime() + getIssuedAt() < System.currentTimeMillis()) return true;
         return false;
     }
 
-    public void setExpiresAt(long expiresAt) {
-        this.expiresAt = expiresAt;
-    }
 
-    public void setIssuedAt(long issuedAt) {
-        this.issuedAt = issuedAt;
-    }
-
-    long expiresAt = -1L;
+    long lifetime = -1L;
 
     @Override
-    public long getExpiresAt() {
-        return expiresAt;
+    public long getLifetime() {
+        if (lifetime < 0) {
+            if (params.containsKey(LIFETIME_TAG)) {
+                lifetime = params.getLong(LIFETIME_TAG);
+            }
+        }
+        return lifetime;
     }
 
     long issuedAt = -1L;
 
     @Override
     public long getIssuedAt() {
+        if (issuedAt < 0) {
+            if (params.containsKey(TIMESTAMP_TAG)) {
+                issuedAt = params.getLong(TIMESTAMP_TAG);
+            }
+        }
         return issuedAt;
     }
 
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
-         json.put(TOKEN_KEY, token.toString());
-         json.put(ISSUED_AT_KEY, issuedAt);
-         json.put(EXPIRES_AT_KEY, expiresAt);
+        json.put("token", token.toString());
+        json.put(TIMESTAMP_TAG, issuedAt);
+        json.put(LIFETIME_TAG, lifetime);
         return json;
     }
 
 
     @Override
     public void fromJSON(JSONObject json) {
-        if(!json.containsKey(TOKEN_KEY)){
+        if (!json.containsKey("token")) {
             throw new IllegalArgumentException("Error: the json object is not a token");
         }
-        token =  URI.create(json.getString(TOKEN_KEY));
-        if(json.containsKey(ISSUED_AT_KEY)) {
-            issuedAt = json.getLong(ISSUED_AT_KEY);
+        token = URI.create(json.getString("token"));
+        if (json.containsKey(TIMESTAMP_TAG)) {
+            issuedAt = json.getLong(TIMESTAMP_TAG);
         }
-        if(json.containsKey(EXPIRES_AT_KEY)) {
-            expiresAt = json.getLong(EXPIRES_AT_KEY);
-        }
-    }
-
-    /**
-     * For use deserializing tokens from a backend. This tries to figure out if the token is new or old format
-     * and then to do the right thing.
-     * @param rawToken
-     */
-    public void fromString(String rawToken){
-        if(StringUtils.isTrivial(rawToken)){
-            return; // nothing to do...
-        }
-        rawToken = rawToken.trim();
-        if(rawToken.startsWith("{")){
-            // Assume its JSON
-            fromJSON(JSONObject.fromObject(rawToken));
-            return;
-        }
-        // it's a legacy token
-        token = URI.create(rawToken);
-        try {
-            issuedAt = DateUtils.getDate(token).getTime();
-            expiresAt = issuedAt + NewToken.OLD_SYSTEM_DEFAULT_LIFETIME; // no other option.
-        }catch (Throwable t){
-            DebugUtil.trace(this, "error: unable to determine date for token \"" + rawToken + "\"");
+        if (json.containsKey(LIFETIME_TAG)) {
+            lifetime = json.getLong(LIFETIME_TAG);
         }
     }
-
 }

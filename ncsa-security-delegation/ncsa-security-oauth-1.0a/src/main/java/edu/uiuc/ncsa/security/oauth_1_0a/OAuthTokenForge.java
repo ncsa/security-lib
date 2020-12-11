@@ -16,7 +16,7 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * A forge for OAuth 1.0a tokens following semantics of the delelgation framework.
+ * A forge for OAuth 1.0a tokens following semantics of the delegation framework.
  * <p>Created by Jeff Gaynor<br>
  * on 4/10/12 at  11:21 AM
  */

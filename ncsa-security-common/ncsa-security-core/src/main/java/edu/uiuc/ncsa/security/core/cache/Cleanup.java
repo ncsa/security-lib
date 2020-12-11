@@ -50,14 +50,16 @@ public class Cleanup<K, V> extends Thread {
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
-                        DebugUtil.trace(this, "removing entry");
 
                         getMap().remove(key);
+                        DebugUtil.trace(this, "removed entry \"" + key + "\"");
                         linkedList.add(co);
                     }
                 }
             }
         }
+        DebugUtil.trace(this, "removed " + linkedList.size() + " elements.");
+
         return linkedList;
     }
 

@@ -16,6 +16,11 @@ import javax.servlet.http.HttpServletRequest;
  * on May 13, 2011 at  12:30:35 PM
  */
 public class ATRequest extends IssuerRequest {
+    @Override
+    public int getType() {
+        return AT_TYPE;
+    }
+
     public ATRequest(HttpServletRequest httpServletRequest, ServiceTransaction transaction) {
         super(httpServletRequest, transaction);
     }
@@ -47,7 +52,7 @@ public class ATRequest extends IssuerRequest {
     }
 
     Verifier verifier;
-    public long getExpiresIn() {
+/*    public long getExpiresIn() {
            return expiresIn;
        }
 
@@ -55,5 +60,5 @@ public class ATRequest extends IssuerRequest {
            this.expiresIn = expiresIn;
        }
 
-       long expiresIn;
+       long expiresIn;*/
 }

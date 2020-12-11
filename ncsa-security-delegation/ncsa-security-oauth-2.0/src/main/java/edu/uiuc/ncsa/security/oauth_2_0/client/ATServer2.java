@@ -121,14 +121,14 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         if (jsonObject.containsKey(REFRESH_TOKEN)) {
             // the refresh token is optional, so if it is missing then there is nothing to do.
             rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
-            try {
+            /*try {
                 if (jsonObject.containsKey(EXPIRES_IN)) {
                     long expiresIn = Long.parseLong(jsonObject.getString(EXPIRES_IN)) * 1000L; // convert from sec to ms.
-                    rt.setExpiresAt(expiresIn);
+                 //   rt.setLifetime(expiresIn);
                 }
             } catch (NumberFormatException nfx) {
                 // This is optional to return, so it is possible that this might not work.
-            }
+            }*/
         }
         ServletDebugUtil.trace(this, "Is OIDC enabled? " + oidcEnabled);
 
@@ -159,7 +159,8 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
                 params.put(AUTHORIZATION_TIME, idToken.getLong(AUTHORIZATION_TIME));
             }
             params.put(ID_TOKEN, idToken);
-            params.put(EXPIRES_IN, expiresIn/1000 ); //convert to seconds.
+            //params.put(EXPIRES_IN, expiresIn/1000 ); //convert to seconds.
+            params.put(EXPIRES_IN, at.getLifetime()/1000 ); // AT is definitive. Convert to seconds.
             ServletDebugUtil.trace(this, "Adding idTokenEntry with id = " + at.getToken() + " to the ID Token store. Store has " + getIDTokenStore().size() + " entries");
             getIDTokenStore().put(at.getToken(), idTokenEntry);
             ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());

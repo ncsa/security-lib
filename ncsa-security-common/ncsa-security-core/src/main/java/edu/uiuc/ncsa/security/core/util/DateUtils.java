@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidTimestampException;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * General Date utilities. This allows for checking if a token has an expired timestamp
@@ -32,8 +33,18 @@ public class DateUtils {
      * @return
      */
     public static Date getDate(String token) {
-        token = token.substring(token.lastIndexOf("/") + 1);
         Date d = new Date();
+
+        if(token.contains("?")){
+            // try to interpret as version 2,0+ token.
+            Map<String,String> params = Identifiers.getParameters(URI.create(token));
+            if(params.containsKey(Identifiers.TIMESTAMP_TAG)){
+               long ts = Long.parseLong(params.get(Identifiers.TIMESTAMP_TAG));
+               d.setTime(ts);
+            }
+            return d;
+        }
+        token = token.substring(token.lastIndexOf("/") + 1);
         d.setTime(Long.parseLong(token));
         return d;
     }

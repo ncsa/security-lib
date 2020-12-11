@@ -8,14 +8,12 @@ import net.sf.json.JSONObject;
  */
 public interface NewToken extends Token{
     boolean isExpired();
-    long getExpiresAt();
+    String getVersion();
+    long getLifetime();
     long getIssuedAt();
     JSONObject toJSON();
     void fromJSON(JSONObject json);
-    void fromString(String rawToken);
+   // void fromString(String rawToken);
 
-    String TOKEN_KEY = "token";
-    String EXPIRES_AT_KEY = "expires_at";
-    String ISSUED_AT_KEY = "issued_at";
     long OLD_SYSTEM_DEFAULT_LIFETIME = 1000L*60L*15L; // 15 minutes.
 }

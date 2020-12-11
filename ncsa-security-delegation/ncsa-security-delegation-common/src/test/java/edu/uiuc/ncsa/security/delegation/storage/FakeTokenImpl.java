@@ -24,28 +24,8 @@ public class FakeTokenImpl extends TokenImpl {
     }
 
     public FakeTokenImpl(String token) {
-        super(token);
+        super(URI.create(token));
     }
 
-
-/*
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (!(obj instanceof Token)) return false;
-        Token token = (Token) obj;
-        if (getToken() == null) {
-            if (token.getToken() == null) return true;
-            return false;
-        } else {
-            if (token.getToken() == null) return false;
-        }
-        if (!token.getToken().equals(getToken())) return false;
-        return true;
-    }
-
-    String token;
-
-*/
 
 }

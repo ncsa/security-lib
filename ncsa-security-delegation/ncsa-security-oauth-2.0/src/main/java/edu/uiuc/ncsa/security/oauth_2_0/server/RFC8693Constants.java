@@ -30,4 +30,5 @@ public interface  RFC8693Constants extends OA2Constants {
     String RESOURCE = "resource";
     String TOKEN_TYPE_BEARER = "Bearer"; //as per RFC 6750
     String TOKEN_TYPE_MAC = "MAC"; //as per RFC 6750
+    String TOKEN_TYPE_N_A = "N_A"; //as per RFC 6750, used when the tokencannot be a bearer or other token (e.g. refresh token).
 }

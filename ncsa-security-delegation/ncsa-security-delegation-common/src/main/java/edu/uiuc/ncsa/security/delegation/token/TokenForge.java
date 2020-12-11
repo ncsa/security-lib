@@ -32,4 +32,5 @@ public interface TokenForge {
     Verifier getVerifier(Map<String, String> parameters);
     Verifier getVerifier(HttpServletRequest request);
     Verifier getVerifier(String... tokens);
+
 }

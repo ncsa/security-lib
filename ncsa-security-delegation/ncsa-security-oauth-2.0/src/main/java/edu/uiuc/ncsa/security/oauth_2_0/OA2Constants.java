@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
 /**
+ * Constants that are used as e.g. parameters in client requests
  * <p>Created by Jeff Gaynor<br>
  * on 9/24/13 at  1:17 PM
  */
@@ -16,6 +17,7 @@ public interface OA2Constants {
      */
     public static String AUTHORIZATION_CODE = "code";
     public static String REFRESH_LIFETIME = "rt_lifetime";
+    public static String ACCESS_TOKEN_LIFETIME = "at_lifetime";
     public static String STRICT_SCOPES = "strict_scopes";
     public static String CERT_LIFETIME = "certlifetime";
     public static String CERT_REQ = "certreq";

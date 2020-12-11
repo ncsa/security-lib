@@ -5,6 +5,8 @@ import edu.uiuc.ncsa.security.delegation.server.issuers.AbstractIssuer;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2TokenForge;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Utilities;
 
@@ -37,9 +39,13 @@ public class ATI2 extends AbstractIssuer implements ATIssuer {
     public ATResponse processATRequest(ATRequest accessTokenRequest) {
         Map<String,String> reqParamMap = OA2Utilities.getParameters(accessTokenRequest.getServletRequest());
         // get access token
+        RTIRequest rtiRequest = new RTIRequest(accessTokenRequest.getTransaction(), isOIDC);
         OA2TokenForge tf2 = (OA2TokenForge) tokenForge;
-        ATIResponse2 atResp = new ATIResponse2(tf2.getAccessToken(), tf2.getRefreshToken(), isOIDC);
+        AccessTokenImpl accessToken =tf2.createToken(accessTokenRequest);
+        RefreshTokenImpl refreshToken = tf2.createToken(rtiRequest);
+        ATIResponse2 atResp = new ATIResponse2(accessToken, refreshToken, isOIDC);
         atResp.setParameters(reqParamMap);
+        atResp.setServiceTransaction(accessTokenRequest.getTransaction());
         return atResp;
     }
 }

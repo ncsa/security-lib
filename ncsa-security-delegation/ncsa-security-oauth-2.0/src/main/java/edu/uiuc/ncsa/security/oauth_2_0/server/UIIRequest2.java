@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletRequest;
  * on 10/7/13 at  2:36 PM
  */
 public class UIIRequest2 extends IssuerRequest{
+    @Override
+    public int getType() {
+        return UI_TYPE;
+    }
+
     public String getUsername() {
         return username;
     }

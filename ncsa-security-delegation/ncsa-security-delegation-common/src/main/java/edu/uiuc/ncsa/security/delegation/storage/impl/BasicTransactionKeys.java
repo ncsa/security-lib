@@ -43,6 +43,7 @@ public class BasicTransactionKeys extends SerializationKeys {
     public List<String> allKeys() {
         List<String> allKeys = super.allKeys();
         allKeys.add(tempCred());
+        allKeys.add(authGrant());
         allKeys.add(accessToken());
         allKeys.add(verifier());
         return allKeys;

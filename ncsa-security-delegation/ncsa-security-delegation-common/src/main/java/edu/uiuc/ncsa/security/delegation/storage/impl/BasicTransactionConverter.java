@@ -6,9 +6,14 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.AuthorizationGrantImpl;
+import edu.uiuc.ncsa.security.delegation.token.impl.VerifierImpl;
 import edu.uiuc.ncsa.security.storage.data.ConversionMap;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.data.SerializationKeys;
+
+import java.net.URI;
 
 /**
  * A map converter bridging the gap between the interface and the backing store.
@@ -47,9 +52,7 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof AuthorizationGrant) {
                 b.setAuthorizationGrant((AuthorizationGrant) token);
             } else {
-                AuthorizationGrant ag = tokenForge.getAuthorizationGrant();
-                ag.fromString(token.toString());
-                b.setAuthorizationGrant(ag);
+                b.setAuthorizationGrant(new AuthorizationGrantImpl(URI.create(token.toString())));
             }
         }
 
@@ -58,8 +61,7 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof AccessToken) {
                 b.setAccessToken((AccessToken) token);
             } else {
-                AccessToken at = tokenForge.getAccessToken();
-                at.fromString(token.toString());
+                AccessTokenImpl at = new AccessTokenImpl(URI.create(token.toString()));
                 b.setAccessToken(at);
             }
         }
@@ -71,8 +73,7 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             if (token instanceof Verifier) {
                 b.setVerifier((Verifier) token);
             } else {
-                Verifier verifier = tokenForge.getVerifier();
-                verifier.fromString(token.toString());
+                VerifierImpl verifier = new VerifierImpl(URI.create(token.toString()));
                 b.setVerifier(verifier);
             }
         }
@@ -85,13 +86,13 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
     public void toMap(V value, ConversionMap<String, Object> data) {
         super.toMap(value, data);
         if (value.hasAuthorizationGrant()) {
-            data.put(getBTKeys().authGrant(), value.getAuthorizationGrant().toJSON().toString());
+            data.put(getBTKeys().authGrant(), value.getAuthorizationGrant().getToken());
         }
         if (value.hasAccessToken()) {
-            data.put(getBTKeys().accessToken(), value.getAccessToken().toJSON().toString());
+            data.put(getBTKeys().accessToken(), value.getAccessToken().getToken());
         }
         if (value.hasVerifier()) {
-            data.put(getBTKeys().verifier(), value.getVerifier().toJSON().toString());
+            data.put(getBTKeys().verifier(), value.getVerifier().getToken());
         }
     }
 }

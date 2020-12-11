@@ -42,6 +42,9 @@ public abstract class IDTokenResponse extends IResponse2 {
 
     AccessToken accessToken;
     RefreshTokenImpl refreshToken;
+    public boolean hasRefreshToken(){
+        return refreshToken != null;
+    }
 
     public RefreshTokenImpl getRefreshToken() {
         return refreshToken;
@@ -122,7 +125,7 @@ public abstract class IDTokenResponse extends IResponse2 {
         m.put(TOKEN_TYPE, "Bearer");
         if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
             m.put(REFRESH_TOKEN, getRefreshToken().getToken());
-            m.put(EXPIRES_IN, (getRefreshToken().getExpiresAt() / 1000));
+            m.put(EXPIRES_IN, (getRefreshToken().getLifetime() / 1000));
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.
