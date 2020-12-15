@@ -108,6 +108,26 @@ public class JWTRunner {
         doTokenClaims(true);
     }
 
+    public void doTokenExchange() throws Throwable {
+        for (PayloadHandler h : handlers) {
+             h.setAccountingInformation();
+         }
+        doScript(SRE_PRE_EXCHANGE);
+
+        doScript(SRE_POST_EXCHANGE);
+        for (PayloadHandler h : handlers) {
+            h.checkClaims();
+        }
+
+        for (PayloadHandler h : handlers) {
+            h.saveState();
+        }
+
+        for (PayloadHandler h : handlers) {
+            h.finish();
+        }
+    }
+
     public void doTokenClaims() throws Throwable {
         doTokenClaims(false);
     }
@@ -136,6 +156,13 @@ public class JWTRunner {
         }
     }
 
+    /**
+     * Get the claims sources for the ID token. This is needed only if the handler will attempt to get
+     * claims at some point.
+     * @param flowStates
+     * @param checkAuthClaims
+     * @throws Throwable
+     */
     protected void getSources(FlowStates flowStates, boolean checkAuthClaims) throws Throwable {
         for (PayloadHandler h : handlers) {
             if (!h.getSources().isEmpty()) {

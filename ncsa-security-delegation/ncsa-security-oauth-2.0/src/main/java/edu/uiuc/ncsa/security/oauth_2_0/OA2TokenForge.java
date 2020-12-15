@@ -65,48 +65,6 @@ public class OA2TokenForge implements TokenForge {
         return ip2.get(lifetime);
     }
 
-  /*  public NewToken createToken(IssuerRequest request) {
-        OIDCServiceTransactionInterface t = (OIDCServiceTransactionInterface) request.getTransaction();
-        String component;
-        String uid;
-        long lifetime = -1L; // not all tokens have this
-        switch (request.getType()) {
-            case IssuerRequest.AG_TYPE:
-                component = authzGrant();
-                lifetime = t.getAuthzGrantLifetime();
-                break;
-            case IssuerRequest.AT_TYPE:
-                component = accessToken();
-                lifetime = t.getAccessTokenLifetime();
-                break;
-            case IssuerRequest.RT_TYPE:
-                component = refreshToken();
-                lifetime = t.getRefreshTokenLifetime();
-                break;
-            case IssuerRequest.UI_TYPE:
-                component = userInfo();
-                break;
-            case IssuerRequest.PA_TYPE:
-                component = asset();
-                break;
-            default:
-                throw new IllegalArgumentException("Error: unknown token request type");
-        }
-        IP2<Identifier> ip2 = new IP2(getServerURI(), component, true);
-        URI tokken = ip2.get(lifetime);
-        switch (request.getType()) {
-            case IssuerRequest.AG_TYPE:
-                return new AuthorizationGrantImpl(tokken);
-            case IssuerRequest.AT_TYPE:
-                return new AccessTokenImpl(tokken);
-            case IssuerRequest.RT_TYPE:
-                return new RefreshTokenImpl(tokken);
-            default:
-                throw new IllegalArgumentException("Error: unknown token request type");
-        }
-    }
-
-*/
     public OA2TokenForge(String server) {
         this.server = server;
         // setup();

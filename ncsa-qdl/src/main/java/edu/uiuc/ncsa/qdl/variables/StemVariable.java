@@ -159,11 +159,12 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * Adds a list of objects to this stem, giving them indices appropriate indices
      * This is mostly a convenience for people writing in java to create lists
-     * programatically
+     * programatically. Note there is no parameter for this list since that will blow up
+     * if there are mixed entries.
      *
      * @param list
      */
-    public void addList(List<Object> list) {
+    public void addList(List list) {
         long startIndex = -1L;
         if (!getStemList().isEmpty()) {
             startIndex = getStemList().last().index;
@@ -173,6 +174,7 @@ public class StemVariable extends HashMap<String, Object> {
             getStemList().add(stemEntry);
         }
     }
+
 
     public Object get(StemMultiIndex w) {
         StemVariable currentStem = this;
@@ -1030,7 +1032,6 @@ public class StemVariable extends HashMap<String, Object> {
         }
         for (StemEntry entry : list) {
             getStemList().add(new StemEntry(startIndex++, entry.entry));
-            // put(startIndex++, entry.entry); // Or they get simple indices, not stem indices.
         }
     }
 

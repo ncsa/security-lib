@@ -19,6 +19,8 @@ public class DataDescriptorEntry implements Comparable {
 
     /**
      * If this column may be nulled.
+     * <br/>Update for version 5.0+: Changed default from false to true since non primary key
+     * entries consistently blow up. If this is to be required, set it explicitly to true now.
      *
      * @return
      */
@@ -30,7 +32,7 @@ public class DataDescriptorEntry implements Comparable {
         this.nullable = nullable;
     }
 
-    boolean nullable = false;
+    boolean nullable = true;
 
 
     String name;
