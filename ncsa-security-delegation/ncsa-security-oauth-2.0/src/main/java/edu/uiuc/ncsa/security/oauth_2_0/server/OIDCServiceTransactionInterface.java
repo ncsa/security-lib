@@ -27,6 +27,9 @@ public interface OIDCServiceTransactionInterface {
 
     void setExtendedAttributes(JSONObject xas);
 
+    public JSONObject getUserMetaData();
+    public void setUserMetaData(JSONObject claims);
+
     public long getAccessTokenLifetime() ;
     public long getRefreshTokenLifetime() ;
     public long getAuthzGrantLifetime() ;

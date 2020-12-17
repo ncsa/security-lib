@@ -61,6 +61,16 @@ public class TF2Test extends TestBase {
         }
 
         @Override
+        public JSONObject getUserMetaData() {
+            return new JSONObject();
+        }
+
+        @Override
+        public void setUserMetaData(JSONObject claims) {
+
+        }
+
+        @Override
         public Collection<String> getScopes() {
             return null;
         }

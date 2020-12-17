@@ -215,6 +215,9 @@ public class JWTRunner {
 
             @Override
             public Map<String, Object> getArgs() {
+                map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
+                // Any claim sources are injected by the appropriate handler since they typically
+                // require a great deal of state that is not available yet.
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());
                 map.put(SRE_REQ_AUDIENCE, transaction.getAudience());
                 map.put(SRE_REQ_EXTENDED_ATTRIBUTES, transaction.getExtendedAttributes());
@@ -263,6 +266,7 @@ public class JWTRunner {
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
                 transaction.setFlowStates((FlowStates) scriptRunResponse.getReturnedValues().get(SRE_REQ_FLOW_STATES));
+                return;
             case ScriptRunResponse.RC_NOT_RUN:
                 return;
 
@@ -280,8 +284,9 @@ public class JWTRunner {
         if (getScriptRuntimeEngine() == null) {
             return;
         }
-        ScriptRunRequest req = newSRR(transaction, phase);
         if (handlers.isEmpty()) {
+            ScriptRunRequest req = newSRR(transaction, phase);
+
             // Functors do not have handlers, it all comes through the script engine.
             // Therefore, if this does not have handlers, try to run it as legacy code
 
@@ -291,6 +296,8 @@ public class JWTRunner {
         } else {
             // This has handlers so it new and should be run as such.
             for (PayloadHandler h : handlers) {
+                // request makes copies of everything to turn in to QDL state, make it at the last second,  keep it is up to date.
+                ScriptRunRequest req = newSRR(transaction, phase);
                 h.addRequestState(req);
                 getScriptRuntimeEngine().clearScriptSet();
                 getScriptRuntimeEngine().setScriptSet(h.getPhCfg().getScriptSet());

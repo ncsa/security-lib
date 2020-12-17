@@ -46,19 +46,15 @@ public class Cleanup<K, V> extends Thread {
         for (K key : getSortedKeys()) {
             V co = getMap().get(key);
             for (RetentionPolicy rp : getRetentionPolicies()) {
-                DebugUtil.trace(this, "checking retention policy " + rp.getClass().getSimpleName());
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
-
                         getMap().remove(key);
-                        DebugUtil.trace(this, "removed entry \"" + key + "\"");
                         linkedList.add(co);
                     }
                 }
             }
         }
-        DebugUtil.trace(this, "removed " + linkedList.size() + " elements.");
 
         return linkedList;
     }

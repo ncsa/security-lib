@@ -117,6 +117,10 @@ public interface OA2Errors {
      String INVALID_TOKEN = "invalid_token";
      public static int  INVALID_TOKEN_CODE  = 116;
 
+    /**
+     * Used in the access servlet when a grant is presented that is either expired or invalid.
+     */
+    String INVALID_GRANT = "invalid_grant";
 
     /**
      * Returned code if an error is returned but cannot be found on the list of standard errors
