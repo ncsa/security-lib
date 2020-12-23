@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage;
 
 import edu.uiuc.ncsa.security.core.*;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -86,7 +87,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     }
 
     protected void realSave(V value) {
-        if(value.getIdentifier() == null){
+        if (value.getIdentifier() == null) {
             throw new UnsupportedOperationException("Error: null identifiers are not allowed");
         }
         put(value.getIdentifier(), value);
@@ -105,7 +106,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     @Override
     public List<V> getAll() {
         LinkedList<V> allEntries = new LinkedList<>();
-        for(Identifier d: keySet()){
+        for (Identifier d : keySet()) {
             allEntries.add(get(d));
         }
         return allEntries;
@@ -113,6 +114,11 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx) {
+        return search(key, condition, isRegEx);
+    }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         /*
         This is boilerplated from the FileStore class. Searching a memory store is really almost never
         needed in practice and this should be treated as a debugging tool more than anything else.
@@ -122,7 +128,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
         Collection<V> values = values();
         Iterator iterator = values.iterator();
         Pattern pattern = null;
-        if(isRegEx) {
+        if (isRegEx) {
             pattern = Pattern.compile(condition);
         }
         while (iterator.hasNext()) {
@@ -131,6 +137,7 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
 
             getXMLConverter().toMap(v, map);
             String targetValue = map.get(key).toString();
+
             if (isRegEx) {
                 if (pattern.matcher(targetValue).matches()) {
                     results.add(v);
@@ -147,15 +154,19 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
 
     @Override
     public int size(boolean includeVersions) {
-        if(includeVersions){
+        if (includeVersions) {
             return super.size();
         }
         int count = 0;
-        for(Identifier id : keySet() ){
-            if(!id.toString().contains(VERSION_TAG)){
-                    count++;
+        for (Identifier id : keySet()) {
+            if (!id.toString().contains(VERSION_TAG)) {
+                count++;
             }
         }
         return count;
+    }
+
+    public MapConverter getMapConverter(){
+        return null;
     }
 }

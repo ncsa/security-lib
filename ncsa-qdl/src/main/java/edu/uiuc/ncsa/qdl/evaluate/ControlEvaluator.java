@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -1152,7 +1153,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalStateException("no such module '" + moduleNS + "'");
         }
         String alias = null;
-        Module newInstance = m.newInstance(state.newModuleState());
+        State newModuleState = state.newModuleState();
+        Module newInstance = m.newInstance(newModuleState);
+        if(newInstance instanceof JavaModule){
+            ((JavaModule)newInstance).init(newModuleState);
+        }
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
             if (arg2 == null || !isString(arg2)) {

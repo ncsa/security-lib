@@ -1601,8 +1601,9 @@ public class WorkspaceCommands implements Logable {
 
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list");
+            say("list [" + COMPACT_ALIAS_SWITCH +"]");
             sayi("List all user defined functions.");
+            sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
         }
 
@@ -1671,8 +1672,9 @@ public class WorkspaceCommands implements Logable {
 
     private int _varsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list");
+            say("list ["+COMPACT_ALIAS_SWITCH + "]");
             sayi("Lists the variables in the current workspace.");
+            sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
         }
 

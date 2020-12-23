@@ -252,7 +252,7 @@ public class VFSTest extends AbstractQDLTester {
     }
 
     /**
-     * Change both teh scheme and mount point at the same time. This is a test just in case.
+     * Change both the scheme and mount point at the same time. This is a test just in case.
      *
      * @param vfs
      * @throws Throwable

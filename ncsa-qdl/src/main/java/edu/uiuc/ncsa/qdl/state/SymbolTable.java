@@ -51,5 +51,6 @@ public interface SymbolTable extends Serializable {
      * then
      */
     String var_regex = "^[a-zA-Z0-9_$]+[a-zA-Z0-9_$\\.]*";
+    String int_regex = "[1-9][0-9]*";
 
 }

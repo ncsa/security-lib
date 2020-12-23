@@ -22,6 +22,8 @@ public class MapConverter<V extends Identifiable> implements XMLConverter<V> {
         return keys;
     }
 
+    public IdentifiableProvider<V> getProvider(){return provider;}
+    
     public MapConverter(SerializationKeys keys, IdentifiableProvider<V> provider) {
         this.keys = keys;
         this.provider = provider;

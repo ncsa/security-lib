@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.TokenForge;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
@@ -138,10 +139,12 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
     };
 
+        @Override
+        public MapConverter getMapConverter() {
+            throw new NotImplementedException("Error:  Method not implemented");
+        }
 
-
-
-    @Override
+        @Override
     public BasicTransaction create() {
         return new BasicTransaction((Identifier) null);
     }

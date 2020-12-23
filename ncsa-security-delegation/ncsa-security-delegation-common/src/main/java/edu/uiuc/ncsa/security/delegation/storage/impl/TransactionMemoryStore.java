@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
-import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
@@ -9,8 +8,10 @@ import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * In-memory transaction storage. This does nto persist between server restarts.
@@ -150,4 +151,14 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
         throw new NotImplementedException("Error: Method not implemented");
     }
 
+    @Override
+    public MapConverter getMapConverter() {
+        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+    }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
+        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+
+    }
 }

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.security.core.Identifier;
 
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,4 +73,10 @@ public interface ConversionMap<K, V> extends Map<K, V> {
      * @return
      */
     byte[] getBytes(K key);
+
+    /**
+     * Returns a copy of this with the given keyus removed.
+     * @param attr
+     */
+    ConversionMap<K,V> removeKeys(List<String> attr);
 }

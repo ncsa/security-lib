@@ -707,8 +707,8 @@ common_keys(stem1., stem2.) - returns a list of keys common to both stems.
     <entry id="contains">
             <body>
                 <![CDATA[
-contains(source, snippets) - returns a conformable result for any combination of stems and strings. If both areguments
-                         are string, teh result is a boolean. If source is a stem and snippets is a string, then the result is
+contains(source, snippets) - returns a conformable result for any combination of stems and strings. If both arguments
+                         are string, the result is a boolean. If source is a stem and snippets is a string, then the result is
                          a boolean stem witha  true for each entry that contains the snippet etc.
 contains(source, snippets, case_sensitive) -- if case_sensitive is true (default) all testing is done preserving case.
                          if false, all arguments are converted to lower case first.

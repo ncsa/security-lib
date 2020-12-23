@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
@@ -36,8 +37,15 @@ public class QDLWorkspace {
         if (getLogger() != null) {
             getLogger().error(t);
         }
-        if(t instanceof InterruptException){
-            InterruptException ie = (InterruptException)t;
+        if (t instanceof StackOverflowError) {
+            workspaceCommands.say("Error: Stack overflow.");
+            return;
+        }
+        if (t instanceof UndefinedFunctionException) {
+            workspaceCommands.say("Error: No such function.");
+            return;
+        }
+        if (t instanceof InterruptException) {
             // add a bunch of stuff to state table.
             workspaceCommands.say("sorry, cannot interrupt main workspace process.");
             return;
@@ -121,12 +129,12 @@ public class QDLWorkspace {
                 // figure it `out and turn it back on.
                 workspaceCommands.setEchoModeOn(echoMode);
                 workspaceCommands.setPrettyPrint(prettyPrint);
-               handleException(t);
+                handleException(t);
             }
         }
     }
 
-     //  {'x':{'a':'b'},'c':'d'} ~ {'y':{'p':'q'},'r':'s'}
+    //  {'x':{'a':'b'},'c':'d'} ~ {'y':{'p':'q'},'r':'s'}
     public static void main(String[] args) throws Throwable {
         Vector<String> vector = new Vector<>();
         vector.add("dummy"); // Dummy zero-th arg.

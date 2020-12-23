@@ -90,5 +90,8 @@ public abstract class FSTransactionStore<V extends BasicTransaction> extends Fil
         return getIndexEntry(verifier.getToken());
     }
 
-
+    @Override
+    public MapConverter getMapConverter() {
+        return converter;
+    }
 }

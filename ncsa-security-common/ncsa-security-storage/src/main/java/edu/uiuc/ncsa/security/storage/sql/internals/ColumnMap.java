@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Helper class with a bunch of built in casts. It contains key value pairs,
@@ -47,50 +48,52 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
 
     /**
      * Returns zero if the value is null;
+     *
      * @param key
      * @return
      */
     public long getLong(String key) {
         Object obj = get(key);
-        if(obj instanceof Long){
+        if (obj instanceof Long) {
             return (Long) get(key);
 
         }
-        if(obj == null) return 0L;
+        if (obj == null) return 0L;
         return Long.parseLong(obj.toString());
     }
 
     /**
      * Returns zero if the value is null;
+     *
      * @param key
      * @return
      */
     public int getInteger(String key) {
         Object obj = get(key);
-        if(obj instanceof Integer){
+        if (obj instanceof Integer) {
             return (Integer) get(key);
 
         }
-        if(obj == null) return 0;
+        if (obj == null) return 0;
         return Integer.parseInt(obj.toString());
     }
 
     public boolean getBoolean(String key) {
         Object obj = get(key);
-        if(obj instanceof Boolean){
+        if (obj instanceof Boolean) {
             return (Boolean) get(key);
         }
-        if(obj == null) return false;
+        if (obj == null) return false;
         return Boolean.parseBoolean(obj.toString());
     }
 
     @Override
     public Date getDate(String key) {
-        if(!containsKey(key)) return null;
+        if (!containsKey(key)) return null;
         Object obj = get(key);
-       if(obj instanceof Date){
-        return (Date) get(key);
-       }
+        if (obj instanceof Date) {
+            return (Date) get(key);
+        }
         try {
             return Iso8601.string2Date(obj.toString()).getTime();
         } catch (ParseException e) {
@@ -101,7 +104,7 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
     @Override
     public Identifier getIdentifier(String key) {
         Object obj = get(key);
-        if(obj == null) return null;
+        if (obj == null) return null;
         if (obj instanceof Identifier) return (Identifier) obj;
         return BasicIdentifier.newID(obj.toString());
     }
@@ -109,7 +112,7 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
     @Override
     public URI getURI(String key) {
         Object obj = get(key);
-        if(obj == null) return null;
+        if (obj == null) return null;
         if (obj instanceof URI) return (URI) obj;
         return URI.create(obj.toString());
     }
@@ -130,5 +133,17 @@ public class ColumnMap extends HashMap<String, Object> implements ConversionMap<
         return (Timestamp) get(key);
     }
 
+    @Override
+    public ColumnMap removeKeys(List<String> attr) {
+        ColumnMap columnMap = new ColumnMap();
+        columnMap.putAll(columnMap);
+        if (attr == null || attr.isEmpty()) {
+            return columnMap;
+        }
+        for (String key : attr) {
+            columnMap.remove(key);
+        }
+       return columnMap;
 
+    }
 }

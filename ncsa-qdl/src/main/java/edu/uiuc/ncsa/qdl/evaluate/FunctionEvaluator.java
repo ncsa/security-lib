@@ -99,6 +99,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
         // Direct analog of func(polyad, state):
+        if(qfr == null){
+            throw new UndefinedFunctionException("this function is not defined");
+        }
         Object result = qfr.qdlFunction.evaluate(argList, state);
         polyad.setResult(result);
         polyad.setEvaluated(true);

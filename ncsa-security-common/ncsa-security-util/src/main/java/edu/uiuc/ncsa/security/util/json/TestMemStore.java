@@ -65,4 +65,9 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     public List<V> search(String key, String condition, boolean isRegEx) {
         return null;
     }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
+        return null;
+    }
 }

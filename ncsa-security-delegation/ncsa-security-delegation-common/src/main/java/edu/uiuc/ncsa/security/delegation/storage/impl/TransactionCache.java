@@ -12,6 +12,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
 import edu.uiuc.ncsa.security.delegation.token.Verifier;
+import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.net.URI;
 import java.util.*;
@@ -499,6 +500,16 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx) {
-        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
+    }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
+    }
+
+    @Override
+    public MapConverter getMapConverter() {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
     }
 }

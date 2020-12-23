@@ -16,8 +16,10 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.state.SymbolTable.int_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -272,8 +274,16 @@ public abstract class VariableState extends NamespaceAwareState {
         throw new NFWException("Internal error; unknown operation type on stem variables.");
     }
 
+    Pattern intPattern = Pattern.compile(int_regex);
 
     protected Object gsrNSScalarOp(String variableName, int op, Object value) {
+        // if(!pattern.matcher(v.getName()).matches()){
+        if(variableName.equals("0") || intPattern.matcher(variableName).matches()){
+            // so its an actual index, like 0, 1, ...
+            // Short circuit all the machinery because it will never resolve
+            // and there is no need to jump through all of this.
+               return null;
+           }
         checkNSClash(variableName); // just check first since its quick
         if (isNSQname(variableName)) {
             // get the module, hand back the value.
@@ -349,6 +359,7 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     protected String resolveStemIndex(String index, ResolveState resolveState) {
+   
         Object obj = getValue(index);
         if (obj == null) {
             return index; // null value means does not resolve to anything

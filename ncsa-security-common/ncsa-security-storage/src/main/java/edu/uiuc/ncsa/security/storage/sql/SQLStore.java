@@ -249,8 +249,17 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
 
-    public List<V> search(String key, String condition, boolean isRegEx) {
-        String searchString = "select * from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
+        String attributes = null;
+        if(attr == null || attr.isEmpty()){
+            attributes = "*";
+        }else{
+            attributes = "";
+            for(String a : attr){
+                attributes = attributes + a + " ";
+            }
+        }
+        String searchString = "select "+ attributes + " from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
         List<V> values = new ArrayList<>();
         Connection c = getConnection();
         V t = null;
@@ -275,6 +284,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
         }
         return values;
+
+    }
+    public List<V> search(String key, String condition, boolean isRegEx) {
+        return search(key, condition, isRegEx, null);
     }
 
 
@@ -611,4 +624,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     public XMLConverter<V> getXMLConverter() {
         return converter;
     }
+
+       public MapConverter getMapConverter() {
+           return converter;
+       }
 }

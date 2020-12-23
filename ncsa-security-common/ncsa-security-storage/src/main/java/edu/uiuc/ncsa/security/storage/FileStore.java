@@ -113,6 +113,9 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         this.removeEmptyFiles = removeEmptyFiles;
     }
 
+     public MapConverter getMapConverter(){
+        return converter;
+     }
     /**
      * Accepts a directory for both the index and data and creates the subdirectories.
      *
@@ -185,7 +188,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
                     // Also there is an issue with Intellij and temp directories at times.
                     // Serious enough (and hard enough to ferret out) that in the unlikely case it fails, we need to know asap.
                     throw new NFWException("Error creating file \"" + f.getAbsolutePath() + "\"");
-                } 
+                }
             } else {
                 throw new IllegalStateException("Error: no converter");
             }
@@ -510,7 +513,7 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
     }
 
     @Override
-    public List<V> search(String key, String condition, boolean isRegEx) {
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         /*
         This can be a very expensive way to do this, but it does allow for searching through an
         entire file store for things.
@@ -529,18 +532,24 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
             getXMLConverter().toMap(v, map);
             String targetValue = map.get(key).toString();
+            map.removeKeys(attr);
             if (isRegEx) {
                 if (pattern.matcher(targetValue).matches()) {
                     results.add(v);
                 }
+
             } else {
                 if (targetValue.equals(condition)) {
                     results.add(v);
                 }
             }
-
         }
         return results;
+    }
+
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx) {
+        return search(key, condition, isRegEx, null);
     }
 
 }

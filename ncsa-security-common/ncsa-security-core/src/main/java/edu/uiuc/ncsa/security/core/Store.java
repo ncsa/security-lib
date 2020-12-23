@@ -58,6 +58,7 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
     public List<V> getAll();
 
     public XMLConverter<V> getXMLConverter();
+    
 
     /**
      * Allows for searching via a reg ex. Note that this may be very expensive for certain stores!
@@ -67,6 +68,16 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @return
      */
     public List<V> search(String key, String condition, boolean isRegEx);
+
+    /**
+     * Return a subset of all the attributes. For non-SQL stores performance may be slow.
+     * @param key
+     * @param condition
+     * @param isRegEx
+     * @param attr
+     * @return
+     */
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr);
 
     public int size(boolean includeVersions);
 

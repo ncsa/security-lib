@@ -50,8 +50,18 @@ public abstract  class JavaModule extends Module {
         vars.addAll(variables);
     }
      Pattern pattern = Pattern.compile(var_regex);
+    boolean initialized = false;
 
+    /**
+     * This is critical in that it puts all the functions and variables (with their correct alias) in
+     * to the state for this module. Normally this is called when module_import is invoked
+     * on each module, so generally you do not need to call this ever. It is, however, what makes
+     * any module work.
+     * @param state
+     */
     public void init(State state) {
+        if(initialized) return;
+        if(state == null) return;
         setState(state);
         for (QDLVariable v : vars) {
             if(Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE){
@@ -75,6 +85,7 @@ public abstract  class JavaModule extends Module {
 
             }
         }
+        initialized = true;
     }
 
 }

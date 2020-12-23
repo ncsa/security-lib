@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.qdl.variables;
 import java.math.BigDecimal;
 
 /**
- * Utility class to manage constants for teh system. This is the value recorded at parse time
+ * Utility class to manage constants for the system. This is the value recorded at parse time
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:07 PM
  */

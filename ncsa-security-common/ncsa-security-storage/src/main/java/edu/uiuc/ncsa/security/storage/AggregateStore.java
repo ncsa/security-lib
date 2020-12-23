@@ -259,7 +259,12 @@ public class AggregateStore<V extends Store> implements Store {
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx) {
-        throw new NotImplementedException("Error: This is not yet implemented for memory stores");
+        throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
+    }
+
+    @Override
+    public List search(String key, String condition, boolean isRegEx, List attr) {
+        throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }
 }
 
