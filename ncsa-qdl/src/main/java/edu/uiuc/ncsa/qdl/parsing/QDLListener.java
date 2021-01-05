@@ -694,14 +694,18 @@ public class QDLListener implements QDLParserListener {
 
     protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
         FunctionRecord functionRecord = new FunctionRecord();
-        functionRecord.sourceCode = defineContext.getText();
+        // not quite the original source... The issue is that this comes parsed and stripped of any original
+        // end of line markers, so we cannot tell what was there. Since it may include documentation lines
+        // we have to add back in EOLs at the end of every statement so the comments don't get lost.
+        // Best we can do with ANTLR...
+
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < defineContext.getChildCount(); i++) {
             stringBuffer.append(defineContext.getChild(i).getText() + "\n");
         }
-        if (!functionRecord.sourceCode.endsWith(";")) {
-            functionRecord.sourceCode = functionRecord.sourceCode + ";";
-        }
+        String rawText = stringBuffer.toString();
+        functionRecord.sourceCode = rawText + (rawText.endsWith(";")?"":";"); // ANTLR may strip final terminator. Put it back as needed.
+
         QDLParserParser.FunctionContext nameAndArgsNode = defineContext.function();
         String name = nameAndArgsNode.getChild(0).getText();
         if (name.endsWith("(")) {

@@ -1,11 +1,16 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
@@ -13,6 +18,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STACKS_TAG;
 
 /**
  * /**
@@ -67,6 +73,7 @@ public class SymbolStack extends AbstractSymbolTable {
 
     /**
      * Get the current most local symbol table.
+     *
      * @return
      */
     public SymbolTable getLocalST() {
@@ -76,13 +83,14 @@ public class SymbolStack extends AbstractSymbolTable {
     /**
      * Looks through the symbol tables in this state and returns the value for the variable <b>or</b>
      * null if there is no value.
+     *
      * @param var
      * @return
      */
     protected Object findValueInATable(String var) {
         for (SymbolTable s : getParentTables()) {
             Object obj = s.resolveValue(var);
-            if(obj != null){
+            if (obj != null) {
                 return obj;
             }
         }
@@ -90,7 +98,7 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     public Object resolveValue(String variableName) {
-                  return findValueInATable(variableName); // to keep current code working
+        return findValueInATable(variableName); // to keep current code working
     }
 
     /**
@@ -160,7 +168,7 @@ public class SymbolStack extends AbstractSymbolTable {
         SymbolTable st = getRightST(variableName);
         if (st == null) {
             // nothing like this exists, so it goes in the local environment
-             st = getLocalST();
+            st = getLocalST();
         }
         st.setValue(variableName, value);
 /*
@@ -297,9 +305,48 @@ public class SymbolStack extends AbstractSymbolTable {
     @Override
     public int getSymbolCount() {
         int count = 0;
-        for(SymbolTable symbolTable : getParentTables()){
+        for (SymbolTable symbolTable : getParentTables()) {
             count = count + symbolTable.getSymbolCount();
         }
         return count;
+    }
+
+    @Override
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        xsw.writeStartElement(XMLConstants.STACKS_TAG);
+        xsw.writeComment("The list of symbol tables for this state.");
+        for (SymbolTable st : getParentTables()) {
+            st.toXML(xsw);
+        }
+        xsw.writeEndElement();
+    }
+
+    public void fromXML(XMLEventReader xer) throws XMLStreamException {
+        // points to stacks tag
+        XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        // no attributes or such with the stacks tag.
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case XMLConstants.STACK_TAG:
+                            SymbolTableImpl si = new SymbolTableImpl();
+                            si.fromXML(xer);
+                            if(0 < si.getSymbolCount()) {
+                                addParent(si);
+                            }
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(STACKS_TAG)) {
+                        return;
+                    }
+                    break;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STACKS_TAG );
+
     }
 }

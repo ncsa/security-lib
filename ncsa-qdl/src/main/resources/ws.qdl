@@ -1,0 +1,18 @@
+/*
+   A set of commands to test ws serialization to/from XML. Note that this loads a function (armstrong)
+   and a pair of minimal modules, one embedded in the other.
+   load this as (in default configuration, which  has a java module) as
+   script_load('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws.qdl');
+   Then save it, reload it or whatever. It also gives some basic types.
+*/
+script_load('armstrong_numbers.qdl');
+module_load('module_example.mdl');
+module_import('a:a');
+a#foo := 'my custom value'; // set this to check that the variables are being saved.
+module_import('b:b');
+b := true;
+d := -43.235;
+r. := [2,4]~{'a':['p','q']};
+s. := random_string(16, 3);
+i := 3456789;
+n := null;

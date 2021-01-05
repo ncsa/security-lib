@@ -243,19 +243,37 @@ public abstract class AbstractState implements StateInterface, Logable {
         return scriptPaths;
     }
 
+    public List<String> getModulePaths() {
+        return modulePaths;
+    }
+    public void setModulePaths(List<String> newModulePaths) {
+        modulePaths = newModulePaths;
+    }
+
+    public void setModulePaths(String rawPath){
+        modulePaths = pathToList(rawPath);
+    }
+    
+    List<String> modulePaths = new ArrayList<>();
+
+    protected List<String> pathToList(String rawPath) {
+        List<String> x = new ArrayList<>();
+        StringTokenizer st = new StringTokenizer(rawPath, ":");
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            token = token + (token.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
+            x.add(token);
+        }
+        return x;
+    }
+
     /**
      * Sets the script path from a string like path0:path1:path2. Each path in normalized form ends with a /.
      *
      * @param rawPath
      */
     public void setScriptPaths(String rawPath) {
-        scriptPaths = new ArrayList<String>();
-        StringTokenizer st = new StringTokenizer(rawPath, ":");
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            token = token + (token.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
-            scriptPaths.add(token);
-        }
+        scriptPaths = pathToList(rawPath);
     }
 
     public void setScriptPaths(List<String> scriptPaths) {

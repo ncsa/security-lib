@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.xml.XMLSerializable;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.util.Set;
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/20 at  7:33 AM
  */
-public interface SymbolTable extends Serializable {
+public interface SymbolTable extends Serializable, XMLSerializable {
 
     void setValue(String variableName, Object value);
     void setStringValue(String variableName, String value);

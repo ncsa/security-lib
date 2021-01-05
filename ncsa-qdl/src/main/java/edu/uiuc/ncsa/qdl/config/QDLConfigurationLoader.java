@@ -79,6 +79,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
           return x==null?"":x;
       }
 
+    protected String getModulePath() {
+          String x =  getFirstAttribute(cn, MODULE_PATH_TAG);
+          return x==null?"":x;
+      }
     protected boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
         if (node == null) return defaultValue;
         try {
@@ -251,6 +255,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getVFSConfigs(),
                 getModuleConfigs(),
                 getScriptPath(),
+                getModulePath(),
                 getDebugLevel());
     }
 

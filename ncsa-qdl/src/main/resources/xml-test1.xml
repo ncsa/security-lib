@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workspace>
+  <env current_pid="0" debug_mode="true" echo_mode="true"
+    env_file="/home/ncsa/dev/qdl/etc/qdl.properties" pretty_print="true"
+    root_dir="/home/ncsa/dev/qdl" save_dir="/home/ncsa/dev/qdl" start_ts="2021-01-05T17:10:52.870Z">
+    <env_properties><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>workspace serialization</comment>
+<entry key="aa"> a. := to_list(5);</entry>
+<entry key="cfg_file">/home/ncsa/dev/csd/config/servers.xml</entry>
+<entry key="q">/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources </entry>
+<entry key="id">ashigaru:command.line2</entry>
+<entry key="java_modules">edu.uiuc.ncsa.qdl.extensions.example.QDLLoaderImpl</entry>
+<entry key="externalModules">edu.uiuc.ncsa.myproxy.oa4mp.qdl.OA2QDLLoader</entry>
+<entry key="m">load_script('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/module_example.qdl')</entry>
+<entry key="boot_script">/home/ncsa/dev/ncsa-git/oa4mp/oa4mp-qdl/src/main/resources/oa2-boot.qdl</entry>
+<entry key="qdl_root">/home/ncsa/dev/qdl</entry>
+<entry key="home_dir">/home/ncsa/dev/qdl</entry>
+<entry key="d">load_module('/tmp/boot.qdl'); </entry>
+<entry key="foo">12345 </entry>
+<entry key="a">armstrong(600); </entry>
+<entry key="cfg_name">localhost:oa4mp.oa2.mariadb</entry>
+<entry key="json">'{ abc : foo , JÃ¤ger-GroÃ&#159; : baz }'</entry>
+<entry key="arf">abc d goldfish </entry>
+<entry key="save_dir">/home/ncsa/dev/qdl/var/ws</entry>
+</properties>
+]]></env_properties>
+  </env>
+  <buffer_manager>
+    <records>
+      <record deleted="false" edited="true" src="/tmp/test0.qdl">
+        <content>
+          <stem>
+            <entry key="0">
+              <string>say(2+2);</string>
+            </entry>
+          </stem>
+        </content>
+      </record>
+      <record deleted="false" edited="false" link="/tmp/test2.qdl" src="/tmp/test1.qdl"/>
+    </records>
+  </buffer_manager>
+  <script_path>
+    <stem>
+      <entry key="0">
+        <string>vfs#/mysql/</string>
+      </entry>
+      <entry key="1">
+        <string>vfs#/pt/temp/</string>
+      </entry>
+      <entry key="2">
+        <string>vfs#/pt/</string>
+      </entry>
+      <entry key="3">
+        <string>ex#/</string>
+      </entry>
+    </stem>
+  </script_path>
+  <module_path>
+    <stem>
+      <entry key="0">
+        <string>ex#/</string>
+      </entry>
+    </stem>
+  </module_path>
+  <templates>
+    <!--Loaded modules, templates available when importing modules.-->
+    <module alias="a" namespace="a:a">
+      <state internal_id="3fe01059-d056-41a8-83a6-f3d2687bdcfc">
+        <stacks>
+          <!--The list of symbol tables for this state.-->
+          <stack>
+            <var name="foo">
+              <string>my custom value</string>
+            </var>
+          </stack>
+        </stacks>
+        <functions>
+          <!--The functions for this state.-->
+          <func arg_count="1" name="f"><![CDATA[define[
+f(n)
+]body[
+return(n+1)
+;
+]
+;]]></func>
+        </functions>
+      </state>
+    </module>
+    <module alias="b" namespace="b:b">
+      <state internal_id="25942e00-c8a0-47e7-907e-fc13c992afbb">
+        <stacks>
+          <!--The list of symbol tables for this state.-->
+          <stack>
+            <var name="foo">
+              <string>bbar</string>
+            </var>
+          </stack>
+        </stacks>
+        <functions>
+          <!--The functions for this state.-->
+          <func arg_count="1" name="f"><![CDATA[define[
+f(n)
+]body[
+return(n-1)
+;
+]
+;]]></func>
+        </functions>
+      </state>
+    </module>
+    <module alias="java"
+      class_name="edu.uiuc.ncsa.qdl.extensions.example.MyModule"
+      namespace="qdl:/examples/java" type="java"/>
+  </templates>
+  <state internal_id="dedffa37-f7de-4e87-8fc3-a2462314cdd3">
+    <imports>
+      <!--The imported modules with their state and alias.-->
+      <module alias="a" namespace="a:a">
+        <state internal_id="3fe01059-d056-41a8-83a6-f3d2687bdcfc">
+          <stacks>
+            <!--The list of symbol tables for this state.-->
+            <stack>
+              <var name="foo">
+                <string>my custom value</string>
+              </var>
+            </stack>
+          </stacks>
+          <functions>
+            <!--The functions for this state.-->
+            <func arg_count="1" name="f"><![CDATA[define[
+f(n)
+]body[
+return(n+1)
+;
+]
+;]]></func>
+          </functions>
+        </state>
+      </module>
+      <!--The imported modules with their state and alias.-->
+      <module alias="b" namespace="b:b">
+        <state internal_id="25942e00-c8a0-47e7-907e-fc13c992afbb">
+          <stacks>
+            <!--The list of symbol tables for this state.-->
+            <stack>
+              <var name="foo">
+                <string>bbar</string>
+              </var>
+            </stack>
+          </stacks>
+          <functions>
+            <!--The functions for this state.-->
+            <func arg_count="1" name="f"><![CDATA[define[
+f(n)
+]body[
+return(n-1)
+;
+]
+;]]></func>
+          </functions>
+        </state>
+      </module>
+      <!--The imported modules with their state and alias.-->
+      <module alias="java"
+        class_name="edu.uiuc.ncsa.qdl.extensions.example.MyModule"
+        namespace="qdl:/examples/java" type="java"/>
+    </imports>
+    <stacks>
+      <!--The list of symbol tables for this state.-->
+      <stack>
+        <var name="b">
+          <boolean>true</boolean>
+        </var>
+        <var name="d">
+          <decimal>-43.235</decimal>
+        </var>
+        <var name="i">
+          <integer>3456789</integer>
+        </var>
+        <var name="s.">
+          <stem>
+            <entry key="0">
+              <string>QVL0goG6Gu9PnGKkJOgcOA</string>
+            </entry>
+            <entry key="1">
+              <string>mVkSkbWFzPrrgUn2FAlHyg</string>
+            </entry>
+            <entry key="2">
+              <string>Eoxe99qXCcXpghBkd2kXRg</string>
+            </entry>
+          </stem>
+        </var>
+        <var name="r.">
+          <stem>
+            <entry key="0">
+              <integer>2</integer>
+            </entry>
+            <entry key="1">
+              <integer>4</integer>
+            </entry>
+            <entry key="a">
+              <stem>
+                <entry key="0">
+                  <string>p</string>
+                </entry>
+                <entry key="1">
+                  <string>q</string>
+                </entry>
+              </stem>
+            </entry>
+          </stem>
+        </var>
+        <var name="n">
+          <null/>
+        </var>
+      </stack>
+      <stack/>
+    </stacks>
+    <functions>
+      <!--The functions for this state.-->
+      <func arg_count="1" name="armstrong"><![CDATA[define[
+armstrong(m)
+]body[
+>> An Armstrong number is a 3 digit number that is equal to the sum of its cubed digits. This computes them for 100 < n < 1000.
+>> So for example 407 is an Armstrong number since 407 = 4^3 + 0^3 + 7^3
+if[m<100]then[say('sorry, m must be 100 or larger');return();]
+;
+if[1000<m]then[say('sorry, m must be less than 1000');return();]
+;
+sum:=0
+;
+while[for_next(j,m)]do[n:=j;while[0<n]do[b:=mod(n,10);sum:=sum+b^3;n:=n%10;];if[sum==j]then[say(sum);];sum:=0;]
+;
+]
+;]]></func>
+    </functions>
+  </state>
+</workspace>
+

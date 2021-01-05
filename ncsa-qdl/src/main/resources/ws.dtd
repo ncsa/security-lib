@@ -1,0 +1,34 @@
+<!DOCTYPE QDL_workspace [
+        <!ELEMENT QDL_workspace (workspace)*>
+        <!ATTLIST QDL_workspace
+                xmlns CDATA #REQUIRED>
+        <!ELEMENT workspace (env|templates|state)*>
+        <!ELEMENT env (env_properties)*>
+        <!ATTLIST env
+                debug_mode CDATA #REQUIRED
+                echo_mode CDATA #REQUIRED
+                pretty_print CDATA #REQUIRED
+                root_dir CDATA #REQUIRED
+                save_dir CDATA #REQUIRED
+                start_ts CDATA #REQUIRED>
+        <!ELEMENT env_properties (#PCDATA)>
+        <!ELEMENT templates (module)*>
+        <!ELEMENT module (#PCDATA)>
+        <!ATTLIST module
+                alias CDATA #REQUIRED
+                class_name CDATA #REQUIRED
+                namespace CDATA #REQUIRED
+                type CDATA #REQUIRED>
+        <!ELEMENT state (script_path|module_path|stacks|modules)*>
+        <!ELEMENT script_path (stem)*>
+        <!ELEMENT stem (entry)*>
+        <!ELEMENT entry (string)*>
+        <!ATTLIST entry
+                key CDATA #REQUIRED>
+        <!ELEMENT string (#PCDATA)>
+        <!ELEMENT module_path (stem)*>
+        <!ELEMENT stacks (stack)*>
+        <!ELEMENT stack (#PCDATA)>
+        <!ELEMENT modules (imports)*>
+        <!ELEMENT imports (module)*>
+        ]>

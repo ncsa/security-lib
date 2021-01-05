@@ -28,6 +28,7 @@ public class QDLScript extends FileEntry implements ScriptInterface {
     public QDLScript(List<String> lines, XProperties xp) {
         super(lines, xp);
     }
+
     StemVariable scriptArglist = null;
     boolean isRunScript = false;
 
@@ -46,8 +47,10 @@ public class QDLScript extends FileEntry implements ScriptInterface {
     public void setScriptArgName(String scriptArgName) {
         this.scriptArgName = scriptArgName;
     }
+
     public static String DEFAULT_ARG_NAME = "__args" + StemVariable.STEM_INDEX_MARKER;
     String scriptArgName = DEFAULT_ARG_NAME; // default
+
     public boolean isRunScript() {
         return isRunScript;
     }
@@ -92,9 +95,9 @@ public class QDLScript extends FileEntry implements ScriptInterface {
 
     public void execute(StateInterface state) {
         QDLInterpreter parser = new QDLInterpreter((State) state);
-        if(isRunScript()){
-            if(getScriptArglist() != null && !getScriptArglist().isEmpty()){
-                ((State) state).getSymbolStack().setValue(getScriptArgName(), getScriptArglist()); 
+        if (isRunScript()) {
+            if (getScriptArglist() != null && !getScriptArglist().isEmpty()) {
+                ((State) state).getSymbolStack().setValue(getScriptArgName(), getScriptArglist());
             }
         }
         try {
@@ -110,30 +113,10 @@ public class QDLScript extends FileEntry implements ScriptInterface {
 
     @Override
     public String toString() {
-        String x =  "QDLScript{" +
+        String x = "QDLScript{" +
                 Scripts.CODE + "=\n" + getText() +
                 "properties=" + getProperties();
-        /*if(isRunScript()){
-            if(getScriptArglist()== null || getScriptArglist().size() == 0){
-                x = x + "args=(none)";
-
-            }else{
-                if(!StringUtils.isTrivial(getScriptArgName())){
-                    x = x + "arg_name=" + getScriptArgName() + ",\n";
-                }
-                x = x + "args=[";
-                for(int i = 0; i < getScriptArglist().size(); i++){
-                    if(i != 0){
-                        x = x + ",";
-                    }
-                    x = x + getScriptArglist().get(new Long(i));
-                }
-                x = x + "]";
-            }
-
-        }
-*/
-                return x + "\n}";
+        return x + "\n}";
     }
 
 }

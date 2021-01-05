@@ -57,11 +57,11 @@ public class LineEditor extends AbstractEditor {
         this.buffer = buffer;
     }
 
-    public LinkedList<String> getClipboard() {
+    public List<String> getClipboard() {
         return clipboard;
     }
 
-    public void setClipboard(LinkedList<String> clipboard) {
+    public void setClipboard(List<String> clipboard) {
         this.clipboard = clipboard;
     }
 
@@ -664,7 +664,7 @@ public class LineEditor extends AbstractEditor {
         sayv(tempBuffer.size() + " lines inserted, " + size + " characters.");
     }
 
-    LinkedList<String> clipboard = new LinkedList<>();
+    List<String> clipboard = new LinkedList<>();
 
     protected void doCopyHelp() {
         say(COPY_COMMAND + "|" + COPY_COMMAND_LONG + " [x,y] = copies the lines x through y to the clipboard. ");

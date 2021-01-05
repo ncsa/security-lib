@@ -4,9 +4,14 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.codec.binary.Base64;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -15,9 +20,9 @@ import java.util.zip.GZIPOutputStream;
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/20 at  1:33 PM
  */
-public class StateUtils {
+public abstract class StateUtils {
     /**
-     * Take the current state and make a complete copy of it.
+     * Take the current state and make a complete copy of it. Note this serialized then deserializes it.
      *
      * @param state
      * @return
@@ -28,12 +33,13 @@ public class StateUtils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         save(state, baos);
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        State newState =  load(bais);
+        State newState = load(bais);
         // Now set all the transient fields that were not serialized.
         newState.setOpEvaluator(state.getOpEvaluator());
         newState.setMetaEvaluator(state.getMetaEvaluator());
         newState.setLogger(state.getLogger());
         newState.setScriptPaths(state.getScriptPaths());
+        newState.setModulePaths(state.getModulePaths());
         newState.setVfsFileProviders(state.getVfsFileProviders());
         newState.setServerMode(state.isServerMode());
         return newState;
@@ -46,7 +52,7 @@ public class StateUtils {
             save(state, baos);
             return baos.toByteArray().length;
         } catch (IOException iox) {
-             iox.printStackTrace();
+            iox.printStackTrace();
         }
         return 0;
     }
@@ -59,7 +65,7 @@ public class StateUtils {
      * @throws IOException
      */
     public static void save(State state, OutputStream outputStream) throws IOException {
-                saveObject(state, outputStream);
+        saveObject(state, outputStream);
     }
 
     public static void saveObject(Object object, OutputStream outputStream) throws IOException {
@@ -109,29 +115,91 @@ public class StateUtils {
         return object;
 
     }
+
+    /**
+     * See note on {@link #load(State, XMLEventReader)}
+     * @param inputStream
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public static State load(InputStream inputStream) throws IOException, ClassNotFoundException {
-        return (State)loadObject(inputStream);
+        return (State) loadObject(inputStream);
+    }
+
+    /**
+     * Read in the state from an even reader. Notes that this is used in cases where there is
+     * <b><i>no</i></b> workspace, such as in scripts, but there is a (possibly custom) state object
+     * that needs to be populated.
+     * @param state
+     * @param xer
+     * @return
+     * @throws XMLStreamException
+     */
+    public static State load(State state, XMLEventReader xer) throws XMLStreamException {
+        state.fromXML(xer,null);
+        return state;
+
+    }
+    public static State load(XMLEventReader xer) throws XMLStreamException {
+        State state = newInstance();
+        return load(state, xer);
+    }
+
+    public static State newInstance() {
+        if (factory == null) {
+            // default is plain vanilla State object.
+            factory = new StateUtils() {
+                @Override
+                public State create() {
+                    return new State(new ImportManager(),
+                            new SymbolStack(),
+                            new OpEvaluator(),
+                            MetaEvaluator.getInstance(),
+                            new FunctionTable(),
+                            new ModuleMap(),
+                            new MyLoggingFacade("foo"),
+                            false);
+                }
+            };
+        }
+        return getFactory().create();
     }
 
     public static void main(String[] args) {
         try {
             // Just a quick test for this
-            State state = new State(new ImportManager(),
-                    new SymbolStack(),
-                    new OpEvaluator(),
-                    new MetaEvaluator(),
-                    new FunctionTable(),
-                    new ModuleMap(),
-                    new MyLoggingFacade("foo"),
-                    false);
+            State state = StateUtils.newInstance();
             state.setValue("foo", 42L);
             String b = saveb64(state);
             System.out.println("b = " + b);
             System.out.println("size = " + b.length());
             state = loadb64(b);
             System.out.println("state ok? " + state.getValue("foo").equals(42L));
+
+            StringWriter sw = new StringWriter();
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();
+            XMLStreamWriter xsw = xof.createXMLStreamWriter(sw);
+            state.toXML(xsw);
+            System.out.println(XMLUtils.prettyPrint2(sw.toString()));
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    public abstract State create();
+
+    protected static StateUtils factory;
+
+    public static boolean isFactorySet() {
+        return factory != null;
+    }
+
+    public static StateUtils getFactory() {
+        return factory;
+    }
+
+    public static void setFactory(StateUtils f) {
+        factory = f;
     }
 }

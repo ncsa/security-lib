@@ -15,12 +15,22 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
  * This is a facade for the various stateful components we have to track.
@@ -32,6 +42,18 @@ import java.util.List;
 public class State extends FunctionState implements QDLConstants {
     private static final long serialVersionUID = 0xcafed00d1L;
 
+    public String getInternalID() {
+        if(internalID==null){
+            internalID = UUID.randomUUID().toString();
+        }
+        return internalID;
+    }
+
+    public void setInternalID(String internalID) {
+        this.internalID = internalID;
+    }
+
+    String internalID = null;
     public int getPID() {
         return pid;
     }
@@ -173,7 +195,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public MetaDebugUtil getDebugUtil() {
-        if(debugUtil == null){
+        if (debugUtil == null) {
             debugUtil = new MetaDebugUtil();
             debugUtil.setDebugLevel(MetaDebugUtil.DEBUG_LEVEL_OFF_LABEL);
         }
@@ -185,6 +207,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     MetaDebugUtil debugUtil = null;
+
     /**
      * If this is packaged in a jar, read off the information from the manifest file.
      * If no manifest, skip this.
@@ -358,6 +381,7 @@ public class State extends FunctionState implements QDLConstants {
                 isServerMode());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
         return newState;
 
     }
@@ -382,6 +406,7 @@ public class State extends FunctionState implements QDLConstants {
         newState.setImportedModules(getImportedModules());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
@@ -428,7 +453,7 @@ public class State extends FunctionState implements QDLConstants {
         // NOTE this has no parents. Modules have completely clear state when starting!
         ImportManager r = new ImportManager();
         SymbolStack newStack = new SymbolStack();
-        newStack.addParent(new SymbolTableImpl());
+        //      newStack.addParent(new SymbolTableImpl());
         State newState = new State(r,
                 newStack,
                 getOpEvaluator(),
@@ -440,6 +465,7 @@ public class State extends FunctionState implements QDLConstants {
         // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
@@ -448,27 +474,29 @@ public class State extends FunctionState implements QDLConstants {
      * This will return a pristine copy of the current state for debugging purposes.
      * Generally only use this in the state indicator when explicitly asked, since there
      * are no imports and such. It will send along the VFS's, if in server mode and the script path
+     *
      * @return
      */
     public State newDebugState() {
-           // NOTE this has no parents. Modules have completely clear state when starting!
-           ImportManager r = new ImportManager();
-           SymbolStack newStack = new SymbolStack();
-           newStack.addParent(new SymbolTableImpl());
-           State newState = new State(r,
-                   newStack,
-                   getOpEvaluator(),
-                   getMetaEvaluator(),
-                   new FunctionTable(),
-                   new ModuleMap(), // so no modules
-                   getLogger(),
-                   isServerMode());
-           // May want to rethink setting these...
-           newState.setScriptArgs(getScriptArgs());
-           newState.setScriptPaths(getScriptPaths());
-           newState.setVfsFileProviders(getVfsFileProviders());
-           return newState;
-       }
+        // NOTE this has no parents. Modules have completely clear state when starting!
+        ImportManager r = new ImportManager();
+        SymbolStack newStack = new SymbolStack();
+        //       newStack.addParent(new SymbolTableImpl());
+        State newState = new State(r,
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                new FunctionTable(),
+                new ModuleMap(), // so no modules
+                getLogger(),
+                isServerMode());
+        // May want to rethink setting these...
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
+        newState.setVfsFileProviders(getVfsFileProviders());
+        return newState;
+    }
 
     /**
      * Add the module under the default alias
@@ -486,5 +514,126 @@ public class State extends FunctionState implements QDLConstants {
         return getSymbolStack().getSymbolCount();
     }
 
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        xsw.writeStartElement(STATE_TAG);
+        xsw.writeAttribute(STATE_ID_TAG, getInternalID());
 
+        // The list of aliases and their corresponding modules
+        if (!getImportedModules().isEmpty()) {
+            xsw.writeStartElement(IMPORTED_MODULES);
+            for (String alias : getImportedModules().keySet()) {
+                Module module = getImportedModules().get(alias);
+                xsw.writeComment("The imported modules with their state and alias.");
+                module.toXML(xsw, alias);
+            }
+            xsw.writeEndElement(); //end imports
+        }
+        // NOTE that the order in which things are serialized matters! Do module declarations first
+        // then variables and functions. This means that on deserialization (which follows document order exactly)
+        // any modules are prcocessed (including the setting of variables and functions) then the user's modifications
+        // overwrite what is there. This way if the user has modified things, it is preserved.
+
+        // Symbol stack has the variables
+        getSymbolStack().toXML(xsw);
+        // Function table has the functions
+        getFunctionTable().toXML(xsw);
+        additionalToXML(xsw);
+        xsw.writeEndElement(); // end state tag
+    }
+
+    public void fromXML(XMLEventReader xer, XProperties xp) throws XMLStreamException {
+        // At this point, caller peeked and knows this is the right type of event,
+        // so we know where in the stream we are starting automatically.
+
+        XMLEvent xe = xer.nextEvent(); // start iteration it should be at the state tag
+        if(xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
+            internalID = xe.asStartElement().getAttributeByName(new QName(STATE_ID_TAG)).getValue();
+        }
+        while (xer.hasNext()) {
+            xe = xer.peek(); // start iteration
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case STACKS_TAG:
+                            SymbolStack st = new SymbolStack();
+                            st.fromXML(xer);
+                            setSymbolStack(st);
+                            break;
+                        case FUNCTIONS_TAG:
+                            XMLUtils.deserializeFunctions(xer, xp, this);
+                            break;
+                        case IMPORTED_MODULES:
+                            XMLUtils.deserializeImports(xer, xp, this);
+                            break;
+                        case MODULE_TEMPLATE_TAG:
+                            XMLUtils.deserializeTemplates(xer, xp, this);
+                            break;
+                        default:
+                            additionalFromXML(xe,xer);
+                            break;
+                    }
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(STATE_TAG)) {
+                        return;
+                    }
+                    break;
+            }
+            xer.next(); // advance cursor
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STATE_TAG);
+    }
+
+    /**
+     * This just drives running through a bunch of modules
+     *
+     * @param xer
+     * @throws XMLStreamException
+     */
+    protected void doXMLImportedModules(XMLEventReader xer) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
+                        Module module = new Module() {
+                            @Override
+                            public Module newInstance(State state) {
+                                return null;
+                            }
+                        };
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(IMPORTED_MODULES)) {
+                        return;
+                    }
+            }
+            xe = xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + IMPORTED_MODULES);
+
+    }
+
+    /**
+     * This is invoked at the end of the serialization and lets you add additional things to be serialized
+     * in the State. All new elements are added right before the final closing tag for the state object.
+     * @param xsr
+     * @throws XMLStreamException
+     */
+    public void additionalToXML(XMLStreamWriter xsr) throws XMLStreamException{
+
+    }
+
+    /**
+     * This passes in the current start event so you can add your own event loop and cases.
+     * @param xe
+     * @param xer
+     * @throws XMLStreamException
+     */
+
+    public void additionalFromXML(XMLEvent xe, XMLEventReader xer) throws XMLStreamException{
+
+    }
 }

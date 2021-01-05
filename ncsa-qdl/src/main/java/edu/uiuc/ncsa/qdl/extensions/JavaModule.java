@@ -3,7 +3,11 @@ package edu.uiuc.ncsa.qdl.extensions;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +22,7 @@ import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
  * <p>Created by Jeff Gaynor<br>
  * on 1/27/20 at  12:03 PM
  */
-public abstract  class JavaModule extends Module {
+public abstract class JavaModule extends Module {
     /**
      * Used by {@link QDLLoader}
      */
@@ -30,8 +34,19 @@ public abstract  class JavaModule extends Module {
         return true;
     }
 
+    String className;
+
+    public String getClassname() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     /**
      * Used by the factory method {@link #newInstance(State)}
+     *
      * @param namespace
      * @param alias
      */
@@ -40,7 +55,7 @@ public abstract  class JavaModule extends Module {
     }
 
     public void addFunctions(List<QDLFunction> functions) {
-            funcs.addAll(functions);
+        funcs.addAll(functions);
     }
 
     protected List<QDLVariable> vars = new ArrayList<>();
@@ -49,7 +64,8 @@ public abstract  class JavaModule extends Module {
     public void addVariables(List<QDLVariable> variables) {
         vars.addAll(variables);
     }
-     Pattern pattern = Pattern.compile(var_regex);
+
+    Pattern pattern = Pattern.compile(var_regex);
     boolean initialized = false;
 
     /**
@@ -57,35 +73,46 @@ public abstract  class JavaModule extends Module {
      * to the state for this module. Normally this is called when module_import is invoked
      * on each module, so generally you do not need to call this ever. It is, however, what makes
      * any module work.
+     *
      * @param state
      */
     public void init(State state) {
-        if(initialized) return;
-        if(state == null) return;
+        if (initialized) return;
+        if (state == null) return;
         setState(state);
         for (QDLVariable v : vars) {
-            if(Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE){
+            if (Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE) {
                 throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");
             }
-            if(!pattern.matcher(v.getName()).matches()){
-                throw new IllegalArgumentException("Error: The variable name \"" + v.getName() + "\" is not a legal variable name.") ;
+            if (!pattern.matcher(v.getName()).matches()) {
+                throw new IllegalArgumentException("Error: The variable name \"" + v.getName() + "\" is not a legal variable name.");
             }
             state.setValue(v.getName(), v.getValue());
         }
-        for(QDLFunction f : funcs){
-            for(int i : f.getArgCount()){
+        for (QDLFunction f : funcs) {
+            for (int i : f.getArgCount()) {
                 QDLFunctionRecord fr = new QDLFunctionRecord();
                 fr.qdlFunction = f;
                 fr.argCount = i;
                 fr.name = f.getName();
-                if(f.getDocumentation(i)!=null && !f.getDocumentation(i).isEmpty()) {
+                if (f.getDocumentation(i) != null && !f.getDocumentation(i).isEmpty()) {
                     fr.documentation = f.getDocumentation(i);
                 }
                 state.getFunctionTable().put(fr);
 
             }
         }
+        setClassName(this.getClass().getCanonicalName());
         initialized = true;
     }
 
+    @Override
+    public void toXML(XMLStreamWriter xsw, String alias) throws XMLStreamException {
+        xsw.writeStartElement(XMLConstants.MODULE_TAG);
+        xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias)?getAlias():alias);
+        xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
+        xsw.writeAttribute(XMLConstants.MODULE_TYPE_TAG, XMLConstants.MODULE_TYPE_JAVA_TAG);
+        xsw.writeAttribute(XMLConstants.MODULE_CLASS_NAME_TAG, getClassname());
+        xsw.writeEndElement();
+    }
 }

@@ -26,6 +26,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
@@ -40,6 +41,7 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.*;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
@@ -59,6 +61,8 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
  * on 1/30/20 at  9:21 AM
  */
 public class WorkspaceCommands implements Logable {
+
+
     public WorkspaceCommands() {
     }
 
@@ -75,6 +79,14 @@ public class WorkspaceCommands implements Logable {
     public MyLoggingFacade logger;
 
     XProperties env;
+
+    public XProperties getEnv() {
+        return env;
+    }
+
+    public void setEnv(XProperties xp) {
+        env = xp;
+    }
 
     CommandLineTokenizer CLT = new CommandLineTokenizer();
     protected static final String FUNCS_COMMAND = ")funcs";
@@ -122,6 +134,8 @@ public class WorkspaceCommands implements Logable {
         } else {
             say("QDL Workspace, version " + QDLVersion.VERSION);
         }
+        say("debug note: \n\n))) [-f filename] \n\ndoes XML serialization of workspace. No file = dump to std out.");
+        say("debug note: \n\n)]] -f filename \n\ndeserializes XML serialization of workspace");
     }
 
     boolean showBanner = true;
@@ -193,7 +207,32 @@ public class WorkspaceCommands implements Logable {
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
         inputLine = variableLookup(inputLine);
+        if (inputLine.getCommand().equals(")]]")) {
+            try {
+                if (inputLine.hasArg("-f")) {
+                    testXMLReader(inputLine.getNextArgFor("-f"));
+                } else {
+                    testXMLReader(null);
 
+                }
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+            return RC_CONTINUE;
+        }
+        if (inputLine.getCommand().equals(")))")) {
+            try {
+                if (inputLine.hasArg("-f")) {
+                    testXMLWriter(true, inputLine.getNextArgFor("-f"));
+                } else {
+                    testXMLWriter(false, null);
+
+                }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+            return RC_CONTINUE;
+        }
         switch (inputLine.getCommand()) {
             case FILE_COMMAND:
                 return doFileCommands(inputLine);
@@ -281,6 +320,13 @@ public class WorkspaceCommands implements Logable {
         State activeState;
         Date startTimestamp;
 
+        public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+
+        }
+
+        public void fromXML(XMLEventReader xer) throws XMLStreamException {
+
+        }
     }
 
     private int doSICommand(InputLine inputLine) {
@@ -794,7 +840,7 @@ public class WorkspaceCommands implements Logable {
 
     }
 
-    LinkedList<String> editorClipboard = new LinkedList<>();
+    List<String> editorClipboard = new LinkedList<>();
 
     private int _doBufferEdit(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -1601,7 +1647,7 @@ public class WorkspaceCommands implements Logable {
 
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list [" + COMPACT_ALIAS_SWITCH +"]");
+            say("list [" + COMPACT_ALIAS_SWITCH + "]");
             sayi("List all user defined functions.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
@@ -1672,7 +1718,7 @@ public class WorkspaceCommands implements Logable {
 
     private int _varsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list ["+COMPACT_ALIAS_SWITCH + "]");
+            say("list [" + COMPACT_ALIAS_SWITCH + "]");
             sayi("Lists the variables in the current workspace.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
@@ -1915,48 +1961,97 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename");
+            say("save filename [-java] | [-show]");
             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
+            sayi("-java = save using Java serialization format. The default is XML.");
+            sayi("-show = (XML format only) dump the result to the console instead. No file is needed.");
             sayi("See the corresponding load command to recover it.");
             return RC_NO_OP;
         }
+        boolean showFile = inputLine.hasArg("-show");
+        File target = null;
 
         try {
-            if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-                say("sorry, no file given");
-                return RC_CONTINUE;
-            }
-            String fName = inputLine.getArg(FIRST_ARG_INDEX);
-            File target = new File(fName);
-            if (target.isAbsolute()) {
-                if (saveDir == null) {
-                    saveDir = target.getParentFile();
-                    say("Default save path updated to " + saveDir.getCanonicalPath());
+
+            if (!showFile) {
+                if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+                    say("sorry, no file given");
+                    return RC_CONTINUE;
                 }
-            } else {
-                if (saveDir == null) {
-                    target = new File(rootDir, fName);
+                String fName = inputLine.getArg(FIRST_ARG_INDEX);
+                target = new File(fName);
+                if (target.isAbsolute()) {
+                    if (saveDir == null) {
+                        saveDir = target.getParentFile();
+                        say("Default save path updated to " + saveDir.getCanonicalPath());
+                    }
                 } else {
-                    target = new File(saveDir, fName);
+                    if (saveDir == null) {
+                        target = new File(rootDir, fName);
+                    } else {
+                        target = new File(saveDir, fName);
+                    }
                 }
+
             }
-            FileOutputStream fos = new FileOutputStream(target);
-            logger.info("saving workspace '" + target.getAbsolutePath() + "'");
-            WSInternals wsInternals = new WSInternals();
-            wsInternals.defaultState = defaultState;
-            wsInternals.currentPID = currentPID;
-            wsInternals.activeState = state;
-            wsInternals.siEntries = siEntries;
-            wsInternals.startTimestamp = startTimeStamp;
-            StateUtils.saveObject(wsInternals, fos);
-            //StateUtils.save(state, fos);
-            say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
+            if (inputLine.hasArg("-java")) {
+                _realSave(target);
+            } else {
+                _xmlSave(target, showFile);
+            }
+            if (!showFile) {
+                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
+            }
         } catch (Throwable t) {
             logger.error("could not save workspace.", t);
             say("could not save the workspace:" + t.getMessage());
         }
         return RC_NO_OP;
+    }
+
+    private void _xmlSave(File f, boolean showIt) throws Throwable {
+        Writer w = new StringWriter();
+
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
+        toXML(xsw);
+        if (showIt) {
+            System.out.println(XMLUtils.prettyPrint2(w.toString()));
+        } else {
+            FileWriter fw = new FileWriter(f);
+            fw.write(XMLUtils.prettyPrint2(w.toString()));
+            fw.flush();
+            fw.close();
+        }
+        w.flush();
+        w.close();
+
+    }
+
+    private void _realSave(File target) throws IOException {
+        FileOutputStream fos = new FileOutputStream(target);
+        logger.info("saving workspace '" + target.getAbsolutePath() + "'");
+        WSInternals wsInternals = new WSInternals();
+        wsInternals.defaultState = defaultState;
+        wsInternals.currentPID = currentPID;
+        wsInternals.activeState = state;
+        wsInternals.siEntries = siEntries;
+        wsInternals.startTimestamp = startTimeStamp;
+        StateUtils.saveObject(wsInternals, fos);
+    }
+
+    private void _xmlLoad(File f) {
+        try {
+            Reader reader = new FileReader(f);
+            say("reading XML from " + f.getAbsolutePath());
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
+            XMLEventReader xer = xmlif.createXMLEventReader(reader);
+            fromXML(xer);
+            currentWorkspace = f;
+        } catch (Throwable t) {
+            say("workspace not loaded:" + t.getMessage());
+        }
     }
 
     /*
@@ -1998,17 +2093,23 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsLoad(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("load filename");
+            say("load filename [-java]");
             sayi("Loads a saved workspace. If the name is relative, it will be resolved against " +
                     "the default location or it may be an absolute path.");
+            sayi("-java means to use Java serialization, which allows for preserving the state indicator");
+            sayi("The default is XML.");
             return RC_NO_OP;
         }
-
+        boolean doJava = inputLine.hasArg("-java");
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             if (currentWorkspace == null) {
                 say("Sorry, no file given and no workspace has been loaded.");
             } else {
-                _realLoad(currentWorkspace);
+                if (doJava) {
+                    _realLoad(currentWorkspace);
+                } else {
+                    _xmlLoad(currentWorkspace);
+                }
             }
             return RC_CONTINUE;
         }
@@ -2024,7 +2125,11 @@ public class WorkspaceCommands implements Logable {
                 f = new File(saveDir, fName);
             }
         }
-        _realLoad(f);
+        if (doJava) {
+            _realLoad(f);
+        } else {
+            _xmlLoad(f);
+        }
         return RC_CONTINUE;
     }
 
@@ -2130,8 +2235,9 @@ public class WorkspaceCommands implements Logable {
 
     protected void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
         for (Module m : loader.load()) {
-            state.addModule(m); // done!
+            state.addModule(m); // done!  Add it to the templates
             if (importASAP) {
+                // Add it to the imported modules, i.e., create an instance.
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
                 state.getImportedModules().put(m.getAlias(), m);
             }
@@ -2313,10 +2419,46 @@ public class WorkspaceCommands implements Logable {
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         interpreter.setPrettyPrint(qe.isPrettyPrint());
         getState().setScriptPaths(qe.getScriptPath());
+        getState().setModulePaths(qe.getModulePath());
         defaultInterpreter = interpreter;
         defaultState = state;
         runScript(inputLine); // run any script if that mode is enabled.
 
+    }
+
+    private void testXMLReader(String filename) throws Throwable {
+        if (StringUtils.isTrivial(filename)) {
+            filename = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws-test.xml";
+        }
+        File file = new File(filename);
+        Reader reader = new FileReader(file);
+        say("reading from " + filename);
+        XMLInputFactory xmlif = XMLInputFactory.newInstance();
+        XMLEventReader xer = xmlif.createXMLEventReader(reader);
+        fromXML(xer);
+    }
+
+    private void testXMLWriter(boolean doFile, String filename) throws Throwable {
+        Writer w = null;
+        if (doFile) {
+            if (StringUtils.isTrivial(filename)) {
+                filename = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws-test.xml";
+            }
+            File file = new File(filename);
+            w = new FileWriter(file);
+        } else {
+
+            w = new StringWriter();
+        }
+        XMLOutputFactory xof = XMLOutputFactory.newInstance();
+        XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
+        toXML(xsw);
+        if (doFile) {
+            System.out.println("wrote file " + filename);
+        } else {
+            System.out.println(XMLUtils.prettyPrint2(w.toString()));
+        }
+        w.close();
     }
 
     Date startTimeStamp = new Date(); // default is now
@@ -2363,6 +2505,7 @@ public class WorkspaceCommands implements Logable {
         // Old input line
         // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl" -qdlroot /home/ncsa/dev/qdl -env etc/qdl.properties -log log/qdl.log -v
         fromCommandLine(inputLine);
+
     }
 
     public boolean isRunScript() {
@@ -2586,4 +2729,36 @@ public class WorkspaceCommands implements Logable {
         getState().setIoInterface(ioInterface);
     }
 
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        WSXMLSerializer serializer = new WSXMLSerializer(this);
+        serializer.toXML(xsw);
+    }
+
+    public void fromXML(XMLEventReader xer) throws XMLStreamException {
+        WSXMLSerializer serializer = new WSXMLSerializer(this);
+        WorkspaceCommands newCommands = null;
+        try {
+            newCommands = serializer.fromXML(xer);
+            State oldState = getState();
+            newCommands.getState().injectTransientFields(oldState);
+            state = newCommands.getState();
+            // now setup the workspace constants
+            setDebugOn(newCommands.isDebugOn());
+            setEchoModeOn(newCommands.isEchoModeOn());
+            setPrettyPrint(newCommands.isPrettyPrint());
+            currentPID = newCommands.currentPID;
+            currentWorkspace = newCommands.currentWorkspace;
+            rootDir = newCommands.rootDir;
+            saveDir = newCommands.saveDir;
+            startTimeStamp = newCommands.startTimeStamp;
+            interpreter = new QDLInterpreter(env, newCommands.getState());
+            interpreter.setEchoModeOn(newCommands.isEchoModeOn());
+                   interpreter.setPrettyPrint(newCommands.isPrettyPrint());
+
+        } catch (Throwable t) {
+            // This should return a nice message to display.
+            say(t.getMessage());
+        }
+
+    }
 }

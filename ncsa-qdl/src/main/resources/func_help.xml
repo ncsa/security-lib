@@ -638,10 +638,23 @@ See also: is_defined
 script_path() - returns the list of paths used to resolve scripts
 script_path(arg) - sets the script path. Either this is a string each of whose paths are separated with
                    a colon, e.g. 'path0:path1' or it is a stem of paths.
-Note: When invoking a script with an absolute path, that is run. If the path is relative, then the script pats
+Note: When invoking a script with an absolute path, that is run. If the path is relative, then the script paths
       are used to resolve it. Note that if relative path has a scheme for a VFS, then this restricts resolution to those
       paths. If the path is unqualified, every path is checked.
 See also: script_load, script_run
+]]>
+            </body>
+        </entry>
+    <entry id="module_path">
+            <body>
+                <![CDATA[
+   module_path() -  returns the list of paths used to resolve loading modules
+module_path(arg) - sets the module path. Either this is a string each of whose paths are separated with
+                   a colon, e.g. 'path0:path1' or it is a stem of paths.
+Note: When loading a module with an absolute path, that is run. If the path is relative, then the module paths
+      are used to resolve it. Note that if relative path has a scheme for a VFS, then this restricts resolution to those
+      paths. If the path is unqualified, every path is checked.
+See also: module_load
 ]]>
             </body>
         </entry>

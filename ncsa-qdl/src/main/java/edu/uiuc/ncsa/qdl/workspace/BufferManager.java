@@ -9,12 +9,18 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
  * This manages buffers, i.e., things that may be edited and run.
@@ -23,13 +29,14 @@ import java.util.List;
  */
 public class BufferManager implements Serializable {
 
-    LinkedList<String> clipboard = new LinkedList<>();
 
     public static class BufferRecord {
         String src;
         String link;
         boolean edited = false;
         boolean deleted = false;
+        List<String> content = null;
+
 
         public List<String> getContent() {
             return content;
@@ -39,7 +46,6 @@ public class BufferManager implements Serializable {
             this.content = content;
         }
 
-        List<String> content = null;
 
         public boolean hasContent() {
             if (content == null) {
@@ -55,12 +61,83 @@ public class BufferManager implements Serializable {
         public String toString() {
             return src + (isLink() ? " --> " + link : "");
         }
+
+        public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+            xsw.writeStartElement(BUFFER_RECORD);
+            if (!StringUtils.isTrivial(src)) {
+                xsw.writeAttribute(BR_SOURCE, src);
+            }
+            if (!StringUtils.isTrivial(link)) {
+                xsw.writeAttribute(BR_LINK, link);
+            }
+            xsw.writeAttribute(BR_EDITED, Boolean.toString(edited));
+            xsw.writeAttribute(BR_DELETED, Boolean.toString(deleted));
+            if (content != null && !content.isEmpty()) {
+                xsw.writeStartElement(BR_CONTENT);
+                StemVariable s = new StemVariable();
+                s.addList(content);
+                XMLUtils.write(xsw, s);
+                xsw.writeEndElement(); //end content tag
+            }
+            xsw.writeEndElement(); //end BR tag
+        }
+
+        public void fromXML(XMLEventReader xer) throws XMLStreamException {
+            XMLEvent xe = xer.nextEvent(); // position at start
+            // get the attributes
+            Iterator iterator = xe.asStartElement().getAttributes(); // Use iterator since it tracks state
+            while (iterator.hasNext()) {
+                Attribute a = (Attribute) iterator.next();
+                String v = a.getValue();
+                switch (a.getName().getLocalPart()) {
+                    case BR_SOURCE:
+                        src = v;
+                        break;
+                    case BR_LINK:
+                        link = v;
+                        break;
+                    case BR_DELETED:
+                        deleted = Boolean.parseBoolean(v);
+                        break;
+                    case BR_EDITED:
+                        edited = Boolean.parseBoolean(v);
+                        break;
+                }
+
+            }
+            while (xer.hasNext()) {
+                xe = xer.peek();
+                switch (xe.getEventType()) {
+                    case XMLEvent.START_ELEMENT:
+                        if (xe.asStartElement().getName().getLocalPart().equals(STEM_TAG)) {
+                            Object obj = XMLUtils.resolveConstant(xer);
+                            if (obj instanceof StemVariable) {
+                                content = ((StemVariable) obj).getStemList().toJSON();
+                            }
+                        }
+                        break;
+                    case XMLEvent.END_ELEMENT:
+                        if (xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORD)) {
+                            return;
+                        }
+                        break;
+                }
+
+                xer.next();
+            }
+            throw new IllegalStateException("Error: XML file corrupt. No end tag for " + BUFFER_RECORD);
+
+        }
     }
 
     public ArrayList<BufferRecord> getBufferRecords() {
         return bufferRecords;
     }
 
+    /*
+    These have the same buffer records. The list lets us display them with indices
+    the map allows for lookup by key.
+     */
     ArrayList<BufferRecord> bufferRecords = new ArrayList<>();
     HashMap<String, BufferRecord> brMap = new HashMap<>();
 
@@ -83,12 +160,13 @@ public class BufferManager implements Serializable {
         return bufferRecords.get(index);
     }
 
-    public boolean anyEdited(){
-        for(String key : brMap.keySet()){
-            if(getBufferRecord(key).edited) return true;
+    public boolean anyEdited() {
+        for (String key : brMap.keySet()) {
+            if (getBufferRecord(key).edited) return true;
         }
         return false;
     }
+
     public BufferRecord getBufferRecord(String name) {
         if (!brMap.containsKey(name)) {
             return null;
@@ -140,7 +218,7 @@ public class BufferManager implements Serializable {
         BufferRecord br = brMap.get(name);
         // We don't actually remove the record since we do not want indices to change.
         // If they recreate it later, they will get a different index. Best we can do...
-        
+
         br.deleted = true;
         brMap.remove(br.src);
         br.src = null;
@@ -228,4 +306,63 @@ public class BufferManager implements Serializable {
         return defaultBR = br;
     }
 
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        xsw.writeStartElement(BUFFER_MANAGER);
+        xsw.writeStartElement(BUFFER_RECORDS);
+        for (BufferRecord br : bufferRecords) {
+            br.toXML(xsw);
+        }
+        xsw.writeEndElement(); // records
+        xsw.writeEndElement(); // buffer manager
+    }
+
+    public void fromXML(XMLEventReader xer) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+           switch(xe.getEventType()){
+               case XMLEvent.START_ELEMENT:
+                   if(xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORDS)){
+                       doBRecs(xer);
+                   }
+                   break;
+               case XMLEvent.END_ELEMENT:
+                   if(xe.asEndElement().getName().getLocalPart().equals(BUFFER_MANAGER)){
+                       return;
+                   }
+                   break;
+           }
+            xer.next();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + BUFFER_MANAGER);
+
+    }
+
+    protected void doBRecs(XMLEventReader xer) throws XMLStreamException{
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+           switch(xe.getEventType()) {
+               case XMLEvent.START_ELEMENT:
+                   if(xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORD)){
+                       BufferRecord br = new BufferRecord();
+                       br.fromXML(xer);
+                       bufferRecords.add(br);
+                       brMap.put(br.src, br);
+                   }
+                   break;
+               case XMLEvent.END_ELEMENT:
+                   if(xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORDS)){
+                       return;
+                   }
+                   break;
+           }
+           xer.next();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + BUFFER_RECORDS);
+
+    }
+    public boolean isEmpty(){
+        return bufferRecords.isEmpty();
+    }
 }

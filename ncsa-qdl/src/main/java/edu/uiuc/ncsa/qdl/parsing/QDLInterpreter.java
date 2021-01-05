@@ -80,4 +80,10 @@ public class QDLInterpreter implements Serializable {
     }
 
     boolean prettyPrint = false;
+    /*
+    Mostly this is needed for deserializing workspaces
+     */
+    public State getState(){
+        return state;
+    }
 }

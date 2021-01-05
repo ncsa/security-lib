@@ -37,6 +37,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs,
                           String scriptPath,
+                          String modulePath,
                           String debugLevel) {
         super(myLogger);
         this.cfgFile = cfgFile;
@@ -55,6 +56,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.showBanner = showBanner;
         this.scriptPath = scriptPath;
         this.debugLevel = debugLevel;
+        this.modulePath = modulePath;
     }
 
     public String getDebugLevel() {
@@ -173,5 +175,10 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
 
     public String getScriptPath() {
         return scriptPath;
+    }
+
+    String modulePath = null;
+    public String getModulePath(){
+        return modulePath;
     }
 }

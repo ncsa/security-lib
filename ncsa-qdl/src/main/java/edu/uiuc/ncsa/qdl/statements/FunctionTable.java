@@ -1,9 +1,18 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -140,5 +149,62 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
             if (key.startsWith(almostMungedName)) return get(key);
         }
         return null;
+    }
+
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        if (isEmpty()) {
+            return;
+        }
+        xsw.writeStartElement(XMLConstants.FUNCTIONS_TAG);
+        xsw.writeComment("The functions for this state.");
+        for (String key : keySet()) {
+            String name = key.substring(0, key.lastIndexOf(munger)); // de-munge
+
+            xsw.writeStartElement(XMLConstants.FUNCTION_TAG);
+            xsw.writeAttribute(XMLConstants.FUNCTION_NAME_TAG, name);
+            xsw.writeAttribute(XMLConstants.FUNCTION_ARG_COUNT_TAG, Integer.toString(get(key).getArgCount()));
+
+            xsw.writeCData(get(key).sourceCode);
+            xsw.writeEndElement();
+        }
+        xsw.writeEndElement();
+    }
+
+
+
+
+    /**
+     * Deserialize a single function using the interpreter (and its current state);
+     * @param xer
+     * @param qi
+     * @throws XMLStreamException
+     */
+    public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
+                        return;
+                    }
+                case XMLEvent.CHARACTERS:
+                    if (!xe.asCharacters().isIgnorableWhiteSpace()) {
+                        try {
+                            qi.execute(xe.asCharacters().getData());
+                        } catch (Throwable t) {
+                            // should do something else??
+                            System.err.println("Error deserializing function:" + t.getMessage());
+                        }
+                    }
+            }
+            xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TAG);
+
+
     }
 }

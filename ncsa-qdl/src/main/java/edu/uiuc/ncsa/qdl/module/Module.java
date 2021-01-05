@@ -1,8 +1,14 @@
 package edu.uiuc.ncsa.qdl.module;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.Serializable;
 import java.net.URI;
 
@@ -13,11 +19,13 @@ import java.net.URI;
 public abstract class Module implements Serializable {
     /**
      * This returns true only if the module is from another language than a QDL module.
+     *
      * @return
      */
-    public boolean isExternal(){
+    public boolean isExternal() {
         return false;
     }
+
     public Module() {
     }
 
@@ -75,6 +83,7 @@ public abstract class Module implements Serializable {
         return "Module{" +
                 ", namespace=" + namespace +
                 ", alias='" + alias + '\'' +
+                (isExternal()?", isJava":"") +
                 '}';
     }
 
@@ -83,8 +92,23 @@ public abstract class Module implements Serializable {
      * module is required and the contract is to create a new instance of this module with the state.
      * Note that the state passed in may have nothing to do with the state here. You are creating
      * a new module for the given state using this as a template.
+     *
      * @param state
      * @return
      */
     public abstract Module newInstance(State state);
+
+    public void toXML(XMLStreamWriter xsw, String alias) throws XMLStreamException {
+        xsw.writeStartElement(XMLConstants.MODULE_TAG);
+        xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
+        xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias)?getAlias():alias);
+        getState().toXML(xsw);
+        xsw.writeEndElement();
+    }
+
+    public void fromXML(XMLEventReader xer, State state){
+        QDLInterpreter qi = new QDLInterpreter(state);
+
+    }
+
 }
