@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.qdl.xml;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
@@ -13,21 +11,23 @@ import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.*;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A class for all those XML related snippets that are re-used everywhere.
@@ -93,6 +93,26 @@ public class XMLUtils implements XMLConstants {
         xsw.writeEndElement();
     }
 
+    /**
+     * write a list of anything Java (String, URIs etc.)  as a stem of strings.
+     *
+     * @param xsw
+     * @param list
+     * @throws XMLStreamException
+     */
+    public static void write(XMLStreamWriter xsw, List list) throws XMLStreamException {
+        if (list != null && !list.isEmpty()) {
+            StemVariable s = new StemVariable();
+            for (Object obj : list) {
+                if (obj != null) {
+                    s.listAppend(obj.toString());
+                }
+            }
+            write(xsw, s);
+        }
+
+    }
+
     public static void write(XMLStreamWriter xsw, StemVariable stem) throws XMLStreamException {
         xsw.writeStartElement(STEM_TAG);
         if (0 < stem.size()) {
@@ -127,6 +147,22 @@ public class XMLUtils implements XMLConstants {
 
         return null;
 
+    }
+
+    /**
+     * Note that this requires the stem to be exactly a standard list.
+     *
+     * @param xer
+     * @return
+     * @throws XMLStreamException
+     */
+    public static List<String> readStemAsStrings(XMLEventReader xer) throws XMLStreamException {
+        Object obj = resolveConstant(xer);
+        if (!(obj instanceof StemVariable)) {
+            throw new IllegalArgumentException("Error: expected a stem and got a " + obj.getClass().getSimpleName());
+        }
+        StemVariable stem = new StemVariable();
+        return stem.getStemList().toJSON();
     }
 
     /**
@@ -358,6 +394,7 @@ public class XMLUtils implements XMLConstants {
      * @param state
      * @throws XMLStreamException
      */
+
     protected static Module deserializeModule(XMLEventReader xer,
                                               ModuleAttributes moduleAttributes,
                                               XProperties xp,
@@ -365,6 +402,7 @@ public class XMLUtils implements XMLConstants {
         // Cursor management: The stream points to the module tag or we would not be here, but we need to
         // create the
         Module module = null;
+        State moduleState = state.newModuleState();
 
         if (moduleAttributes.isJavaModule()) {
             if (StringUtils.isTrivial(moduleAttributes.className)) {
@@ -373,24 +411,25 @@ public class XMLUtils implements XMLConstants {
             try {
                 Class klasse = state.getClass().forName(moduleAttributes.className);
                 module = (JavaModule) klasse.newInstance();
+                ((JavaModule) module).init(state.newModuleState());
             } catch (Throwable t) {
                 throw new IllegalStateException("Error: cannot deserialize class \"" + moduleAttributes.className + "\".");
             }
 
         } else {
             module = new QDLModule();
+            module.setState(state.newModuleState());
 
         }
         module.setAlias(moduleAttributes.alias);
         module.setNamespace(moduleAttributes.ns);
-        module.setState(state.newModuleState());
 
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
-                     // *** IF *** it has a state object, process it.
+                    // *** IF *** it has a state object, process it.
                     if (xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
                         module.getState().fromXML(xer, xp);
                     }
@@ -402,9 +441,7 @@ public class XMLUtils implements XMLConstants {
             }
             xer.next();
         }
-        throw new
-
-                IllegalStateException("Error: XML file corrupt. No end tag for " + MODULE_TAG);
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + MODULE_TAG);
     }
 
     /**
@@ -449,21 +486,25 @@ public class XMLUtils implements XMLConstants {
         return moduleAttributes;
     }
 
-    public static String prettyPrint2(String input) throws Throwable {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        InputSource is = new InputSource(new StringReader(input));
 
-        Document document = db.parse(is);
-        OutputFormat format = new OutputFormat(document);
-        format.setLineWidth(65);
-        format.setIndenting(true);
-        format.setIndent(2);
-        Writer out = new StringWriter();
-        XMLSerializer serializer = new XMLSerializer(out, format);
-        serializer.serialize(document);
-
-        return out.toString();
+    public static String prettyPrint(String input) throws Throwable {
+        return prettyPrint(input, 2);
     }
 
+    public static String prettyPrint(String input, int indent) throws Throwable {
+
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(indent));
+        StringWriter stringWriter = new StringWriter();
+        StreamResult xmlOutput = new StreamResult(stringWriter);
+
+        Source xmlInput = new StreamSource(new StringReader(input));
+        transformer.transform(xmlInput, xmlOutput);
+
+        return xmlOutput.getWriter().toString();
+
+    }
 }

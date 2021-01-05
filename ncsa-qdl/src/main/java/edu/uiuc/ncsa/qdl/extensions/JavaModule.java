@@ -113,6 +113,8 @@ public abstract class JavaModule extends Module {
         xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
         xsw.writeAttribute(XMLConstants.MODULE_TYPE_TAG, XMLConstants.MODULE_TYPE_JAVA_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_CLASS_NAME_TAG, getClassname());
+        getState().toXML(xsw);
+
         xsw.writeEndElement();
     }
 }

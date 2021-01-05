@@ -51,7 +51,7 @@ public class XMLTest {
         //  testModuleState(xsw);
         xsw.writeEndElement();
         xsw.writeEndDocument();
-        System.out.print(prettyPrint2(sw.toString()));
+        System.out.print(prettyPrint(sw.toString()));
     }
 
     public static void testEvent() throws Throwable {

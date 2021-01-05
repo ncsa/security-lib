@@ -611,7 +611,14 @@ public class StemVariable extends HashMap<String, Object> {
                     if (convertVars) {
                         put(codec.encode(key), v);
                     } else {
-                        put(key, v);
+                        if(v instanceof Integer){
+                            put(key, ((Integer)v).longValue());
+                        }else
+                        if(v instanceof Float){
+                            put(key, new BigDecimal(Float.toString((Float)v)));
+                        }else{
+                            put(key, v);
+                        }
                     }
                 }
             }

@@ -181,7 +181,7 @@ public abstract class StateUtils {
             XMLOutputFactory xof = XMLOutputFactory.newInstance();
             XMLStreamWriter xsw = xof.createXMLStreamWriter(sw);
             state.toXML(xsw);
-            System.out.println(XMLUtils.prettyPrint2(sw.toString()));
+            System.out.println(XMLUtils.prettyPrint(sw.toString()));
         } catch (Throwable t) {
             t.printStackTrace();
         }

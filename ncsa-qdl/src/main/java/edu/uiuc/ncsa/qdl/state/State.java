@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -517,7 +518,7 @@ public class State extends FunctionState implements QDLConstants {
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(STATE_TAG);
         xsw.writeAttribute(STATE_ID_TAG, getInternalID());
-
+        writeAdditionalXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
         if (!getImportedModules().isEmpty()) {
             xsw.writeStartElement(IMPORTED_MODULES);
@@ -548,6 +549,7 @@ public class State extends FunctionState implements QDLConstants {
         XMLEvent xe = xer.nextEvent(); // start iteration it should be at the state tag
         if(xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
             internalID = xe.asStartElement().getAttributeByName(new QName(STATE_ID_TAG)).getValue();
+            readAdditionalXMLAttributes(xe.asStartElement());
         }
         while (xer.hasNext()) {
             xe = xer.peek(); // start iteration
@@ -627,13 +629,34 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     /**
+     * This exists to let you add additional attributes to the state tag. It should <b><i>only</i></b>
+     * contain {@link XMLStreamWriter#writeAttribute(String, String)} calls, nothing else.
+     * @param xsw
+     * @throws XMLStreamException
+     */
+    public void writeAdditionalXMLAttributes(XMLStreamWriter xsw ) throws XMLStreamException{
+
+    }
+
+    /**
      * This passes in the current start event so you can add your own event loop and cases.
+     * Note you need have only a switch on the tag names you want.
      * @param xe
      * @param xer
      * @throws XMLStreamException
      */
 
     public void additionalFromXML(XMLEvent xe, XMLEventReader xer) throws XMLStreamException{
+
+    }
+
+    /**
+     * Allows you to read custome attributes from teh state tag. This should <b><i>only</i></b> contain
+     * calls to {@link StartElement#getAttributeByName(QName)} by name calls.
+     * @param xe
+     * @throws XMLStreamException
+     */
+    public void readAdditionalXMLAttributes(StartElement xe) throws XMLStreamException{
 
     }
 }

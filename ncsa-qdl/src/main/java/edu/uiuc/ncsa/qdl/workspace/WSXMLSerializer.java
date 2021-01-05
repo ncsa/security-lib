@@ -225,9 +225,14 @@ public class WSXMLSerializer {
                         return;
                     }
                 case XMLEvent.CHARACTERS:
+                    if(xe.asCharacters().isIgnorableWhiteSpace()){
+                        break;
+                    }
                     String rawEnv = xe.asCharacters().getData();
                     rawEnv = rawEnv.trim();
-
+                    if(StringUtils.isTrivial(rawEnv)){
+                        break;
+                    }
                     ByteArrayInputStream bais = new ByteArrayInputStream(rawEnv.getBytes());
                     XProperties xp = new XProperties();
                     try {
@@ -240,7 +245,7 @@ public class WSXMLSerializer {
                         }
 
                     } catch (IOException e) {
-                        say("Could not deserialize stored properties");
+                        say("Could not deserialize stored properties:" + e.getMessage() + (e.getCause()==null?"":", cause = " + e.getCause().getMessage()));
                     }
                 default:
                     // Skip unknown tags.

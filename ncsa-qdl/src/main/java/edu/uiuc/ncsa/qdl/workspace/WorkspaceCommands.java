@@ -2017,10 +2017,10 @@ public class WorkspaceCommands implements Logable {
         XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
         toXML(xsw);
         if (showIt) {
-            System.out.println(XMLUtils.prettyPrint2(w.toString()));
+            System.out.println(XMLUtils.prettyPrint(w.toString()));
         } else {
             FileWriter fw = new FileWriter(f);
-            fw.write(XMLUtils.prettyPrint2(w.toString()));
+            fw.write(XMLUtils.prettyPrint(w.toString()));
             fw.flush();
             fw.close();
         }
@@ -2436,6 +2436,8 @@ public class WorkspaceCommands implements Logable {
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
         XMLEventReader xer = xmlif.createXMLEventReader(reader);
         fromXML(xer);
+        xer.close();
+
     }
 
     private void testXMLWriter(boolean doFile, String filename) throws Throwable {
@@ -2456,9 +2458,10 @@ public class WorkspaceCommands implements Logable {
         if (doFile) {
             System.out.println("wrote file " + filename);
         } else {
-            System.out.println(XMLUtils.prettyPrint2(w.toString()));
+            System.out.println(XMLUtils.prettyPrint(w.toString()));
         }
-        w.close();
+        xsw.flush();
+        xsw.close();
     }
 
     Date startTimeStamp = new Date(); // default is now
