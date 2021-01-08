@@ -69,7 +69,7 @@ public abstract class StateUtils {
     }
 
     public static void saveObject(Object object, OutputStream outputStream) throws IOException {
-        GZIPOutputStream gos = new GZIPOutputStream(outputStream);
+        GZIPOutputStream gos = new GZIPOutputStream(outputStream,65536);
         ObjectOutputStream out = new ObjectOutputStream(gos);
 
         // Method for serialization of object
@@ -106,9 +106,8 @@ public abstract class StateUtils {
     }
 
     public static Object loadObject(InputStream inputStream) throws IOException, ClassNotFoundException {
-        GZIPInputStream gis = new GZIPInputStream(inputStream);
+        GZIPInputStream gis = new GZIPInputStream(inputStream,65536); // *trick* set buffer size large really ups speed
         ObjectInputStream in = new ObjectInputStream(gis);
-
         // Method for deserialization of object
         Object object = in.readObject();
         in.close();

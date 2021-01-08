@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -105,16 +104,12 @@ public abstract class JavaModule extends Module {
         setClassName(this.getClass().getCanonicalName());
         initialized = true;
     }
+    
 
     @Override
-    public void toXML(XMLStreamWriter xsw, String alias) throws XMLStreamException {
-        xsw.writeStartElement(XMLConstants.MODULE_TAG);
-        xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias)?getAlias():alias);
-        xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
+    public void writeExtraXMLAttributes(XMLStreamWriter xsw) throws XMLStreamException {
+        super.writeExtraXMLAttributes(xsw);
         xsw.writeAttribute(XMLConstants.MODULE_TYPE_TAG, XMLConstants.MODULE_TYPE_JAVA_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_CLASS_NAME_TAG, getClassname());
-        getState().toXML(xsw);
-
-        xsw.writeEndElement();
     }
 }

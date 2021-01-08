@@ -207,8 +207,14 @@ public class WSXMLSerializer {
             if (t.getCause() != null) {
                 message = t.getCause().getMessage();
             }
-            String m = "Error parsing XML at line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber() +
-                    ": " + message;
+            String m;
+            if(t instanceof XMLStreamException) {
+                m = "Error parsing XML at line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber() +
+                        ": " ;
+            }else{
+                m = "Error processing XML:";
+            }
+            m = m + (message == null ? "(no message)" : message);
             throw new QDLRuntimeException(m, t);
 
         }

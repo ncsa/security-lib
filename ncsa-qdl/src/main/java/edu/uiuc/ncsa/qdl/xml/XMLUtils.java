@@ -22,12 +22,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * A class for all those XML related snippets that are re-used everywhere.
@@ -222,7 +222,7 @@ public class XMLUtils implements XMLConstants {
             }
             xe = xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + tagName);
+        throw new XMLMissingCloseTagException(tagName);
 
     }
 
@@ -336,7 +336,7 @@ public class XMLUtils implements XMLConstants {
             }
             xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTIONS_TAG);
+        throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 
     public static void deserializeImports(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
@@ -360,7 +360,7 @@ public class XMLUtils implements XMLConstants {
             }
             xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + IMPORTED_MODULES);
+        throw new XMLMissingCloseTagException(IMPORTED_MODULES);
     }
 
 
@@ -384,11 +384,13 @@ public class XMLUtils implements XMLConstants {
             }
             xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + MODULE_TEMPLATE_TAG);
+        throw new XMLMissingCloseTagException( MODULE_TEMPLATE_TAG);
     }
 
     /**
-     * process a single module.
+     * process a single module. This is charged with creating the module (Java modules require introspection)
+     * and then deserializing any addtional state. Modules should put additional (de)serialization into
+     * their definitions.
      *
      * @param xer
      * @param state
@@ -410,38 +412,26 @@ public class XMLUtils implements XMLConstants {
             }
             try {
                 Class klasse = state.getClass().forName(moduleAttributes.className);
-                module = (JavaModule) klasse.newInstance();
-                ((JavaModule) module).init(state.newModuleState());
+                module = ((JavaModule) klasse.newInstance()).newInstance(moduleState); // this populates the functions and variables!!
             } catch (Throwable t) {
                 throw new IllegalStateException("Error: cannot deserialize class \"" + moduleAttributes.className + "\".");
             }
 
         } else {
             module = new QDLModule();
-            module.setState(state.newModuleState());
-
         }
+        module.setState(moduleState);
         module.setAlias(moduleAttributes.alias);
         module.setNamespace(moduleAttributes.ns);
 
-        XMLEvent xe = xer.nextEvent();
-        while (xer.hasNext()) {
-            xe = xer.peek();
-            switch (xe.getEventType()) {
-                case XMLEvent.START_ELEMENT:
-                    // *** IF *** it has a state object, process it.
-                    if (xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
-                        module.getState().fromXML(xer, xp);
-                    }
-                    break;
-                case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(MODULE_TAG)) {
-                        return module;
-                    }
-            }
-            xer.next();
+        // scorecard: at this point, enough information existed in the attributes to re-assemble the module
+        // The cursor is still on this tag. Now send it to the module for further processing.
+        module.fromXML(xer, xp);
+        if(module instanceof JavaModule){
+            // call this at the right time -- after everything else has been done.
+            ((JavaModule) module).init(moduleState);
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + MODULE_TAG);
+        return module;
     }
 
     /**
@@ -507,4 +497,42 @@ public class XMLUtils implements XMLConstants {
         return xmlOutput.getWriter().toString();
 
     }
+
+    public static XMLEventReader getReader(File f) {
+        try {
+            FileReader reader = new FileReader(f);
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
+            return xmlif.createXMLEventReader(reader);
+        } catch (Throwable t) {
+        }
+        return null;
+
+    }
+
+    public static XMLEventReader getZippedReader(File f) {
+        FileInputStream fis = null;
+        XMLEventReader xer = null;
+        GZIPInputStream gzipInputStream = null;
+        try {
+            fis = new FileInputStream(f);
+            byte[] b = new byte[(int) f.length()];
+            fis.read(b);
+            fis.close();
+            ByteArrayInputStream bais = new ByteArrayInputStream(b);
+            // Reconstruct the XML as a string, preserving whitespace.
+            gzipInputStream = new GZIPInputStream(bais, 65536);
+            Reader r = new InputStreamReader(gzipInputStream);
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
+            return xmlif.createXMLEventReader(r);
+        } catch (Throwable t) {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException iox) {
+                }
+            }
+        }
+        return null;
+    }
+
 }

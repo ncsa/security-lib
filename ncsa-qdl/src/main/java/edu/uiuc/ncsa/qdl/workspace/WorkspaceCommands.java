@@ -46,6 +46,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
@@ -1961,11 +1962,12 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename [-java] | [-show]");
+            say("save filename [-java] | [-show] | [-compress]");
             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
             sayi("-java = save using Java serialization format. The default is XML.");
             sayi("-show = (XML format only) dump the result to the console instead. No file is needed.");
+            sayi("-compress = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
             sayi("See the corresponding load command to recover it.");
             return RC_NO_OP;
         }
@@ -1998,7 +2000,7 @@ public class WorkspaceCommands implements Logable {
             if (inputLine.hasArg("-java")) {
                 _realSave(target);
             } else {
-                _xmlSave(target, showFile);
+                _xmlSave(target, inputLine.hasArg("-compress"), showFile);
             }
             if (!showFile) {
                 say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
@@ -2010,19 +2012,36 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
-    private void _xmlSave(File f, boolean showIt) throws Throwable {
+    private void _xmlSave(File f, boolean compressSerialization, boolean showIt) throws Throwable {
+
         Writer w = new StringWriter();
 
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
         toXML(xsw);
         if (showIt) {
-            System.out.println(XMLUtils.prettyPrint(w.toString()));
+            String xml = XMLUtils.prettyPrint(w.toString());
+            say(xml);
+            say("size = " + xml.length());
         } else {
-            FileWriter fw = new FileWriter(f);
-            fw.write(XMLUtils.prettyPrint(w.toString()));
-            fw.flush();
-            fw.close();
+
+            if (compressSerialization || isCompressSerialization()) {
+                String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
+                gzipOutputStream.write(xml2.getBytes("UTF-8"));
+                gzipOutputStream.flush();
+                gzipOutputStream.close();
+                FileOutputStream fos = new FileOutputStream(f);
+                fos.write(baos.toByteArray());
+                fos.flush();
+                fos.close();
+            } else {
+                FileWriter fw = new FileWriter(f);
+                fw.write(XMLUtils.prettyPrint(w.toString()));
+                fw.flush();
+                fw.close();
+            }
         }
         w.flush();
         w.close();
@@ -2042,16 +2061,66 @@ public class WorkspaceCommands implements Logable {
     }
 
     private void _xmlLoad(File f) {
-        try {
-            Reader reader = new FileReader(f);
-            say("reading XML from " + f.getAbsolutePath());
-            XMLInputFactory xmlif = XMLInputFactory.newInstance();
-            XMLEventReader xer = xmlif.createXMLEventReader(reader);
-            fromXML(xer);
-            currentWorkspace = f;
-        } catch (Throwable t) {
-            say("workspace not loaded:" + t.getMessage());
+        say("reading XML from " + f.getAbsolutePath());
+        // The file may be in XML format. If not, then it is assumed to be
+        // zipped and binary.
+        // First attempt is to assume no compression
+        XMLEventReader xer = null;
+
+        if (isCompressSerialization()) {
+            xer = XMLUtils.getZippedReader(f);
+            // user is dictating to use compress.
+        } else {
+            xer = XMLUtils.getReader(f);
         }
+        if (xer != null) {
+            try {
+                fromXML(xer);
+                xer.close();
+                currentWorkspace = f;
+                say("done!");
+                return;
+            } catch (XMLStreamException e) {
+                say("error reading XML at line " + e.getLocation().getLineNumber() + ", col " + e.getLocation().getColumnNumber()
+                        + ":\"" + e.getMessage() + "\"");
+            }catch(Throwable t){
+                // First attempt can fail for, e.g., the default is compression but the file is not compressed.
+                // So this is benign.
+            }
+        }
+
+        if (xer == null) {
+            // so that didn't work, most likely because the file is or is not compressed,
+            // try the other way
+            if (isCompressSerialization()) {
+                // user is dictating to use compress.
+                xer = XMLUtils.getReader(f);
+            } else {
+                xer = XMLUtils.getZippedReader(f);
+            }
+
+        }
+        if (xer == null) {
+            say("sorry, cannot get the file \"" + f.getAbsolutePath() + "\"");
+            return;
+        }
+
+        if (xer != null) {
+            try {
+                fromXML(xer);
+                xer.close();
+                currentWorkspace = f;
+                say("done!");
+                return;
+            } catch (XMLStreamException e) {
+                say("error reading XML at line " + e.getLocation().getLineNumber() + ", col " + e.getLocation().getColumnNumber()
+                        + ":\"" + e.getMessage() + "\"");
+            }catch(Throwable t){
+                say("error reading XML file: " + t.getMessage());
+            }
+        }
+
+
     }
 
     /*
@@ -2272,6 +2341,16 @@ public class WorkspaceCommands implements Logable {
     // turns on some low-level tracing of this class with DebugUtil when it initializes. Not for public use.
     String TRACE_ARG = "-trace";
 
+    public boolean isCompressSerialization() {
+        return compressSerialization;
+    }
+
+    public void setCompressSerialization(boolean compressSerialization) {
+        this.compressSerialization = compressSerialization;
+    }
+
+    boolean compressSerialization = true;
+
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
         ConfigurationNode node = ConfigUtil.findConfiguration(
@@ -2292,7 +2371,7 @@ public class WorkspaceCommands implements Logable {
             // This is overrides configuration file.
             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
         }
-
+        compressSerialization = qe.isCompressionOn();
         // Setting this flag at the command line will turn on lower level debugging.
         // The actual option in the configuration file turns on logging debug (so info and trace are enabled).
         if (inputLine.hasArg(TRACE_ARG)) {
@@ -2744,6 +2823,8 @@ public class WorkspaceCommands implements Logable {
             newCommands = serializer.fromXML(xer);
             State oldState = getState();
             newCommands.getState().injectTransientFields(oldState);
+            // later this is injected into the state. Set it here or custom IO fails later.
+            newCommands.setIoInterface(getIoInterface());
             state = newCommands.getState();
             // now setup the workspace constants
             setDebugOn(newCommands.isDebugOn());
@@ -2756,7 +2837,7 @@ public class WorkspaceCommands implements Logable {
             startTimeStamp = newCommands.startTimeStamp;
             interpreter = new QDLInterpreter(env, newCommands.getState());
             interpreter.setEchoModeOn(newCommands.isEchoModeOn());
-                   interpreter.setPrettyPrint(newCommands.isPrettyPrint());
+            interpreter.setPrettyPrint(newCommands.isPrettyPrint());
 
         } catch (Throwable t) {
             // This should return a nice message to display.

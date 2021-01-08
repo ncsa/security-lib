@@ -34,6 +34,9 @@ public class QDLWorkspace {
     }
 
     protected void handleException(Throwable t) {
+        if (workspaceCommands.isDebugOn()) {
+            t.printStackTrace();
+        }
         if (getLogger() != null) {
             getLogger().error(t);
         }
@@ -84,7 +87,6 @@ public class QDLWorkspace {
             workspaceCommands.say("error: " + t.getMessage());
         }
     }
-
 
     public void run(InputLine inputLine) throws Throwable {
         boolean isExit = false;

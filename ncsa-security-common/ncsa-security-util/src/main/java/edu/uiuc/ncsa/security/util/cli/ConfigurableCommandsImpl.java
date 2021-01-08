@@ -3,20 +3,22 @@ package edu.uiuc.ncsa.security.util.cli;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.LoggerProvider;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.cli.*;
 import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.apache.commons.lang.StringUtils;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Basic implementation of Commands. This supports loading configurations.
@@ -58,11 +60,27 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     }
 
     String configName;
+
     public void load(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showLoadHelp();
             return;
         }
+        if(inputLine.getArgCount() == 0){
+            if(StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())){
+                say("no configuration set");
+                return;
+            }
+            String m = StringUtils.isTrivial(configName)?"no config name":"current config name= \"" + configName;
+            m = m + " " + (StringUtils.isTrivial(getConfigFile())?"no file set":("from file " + getConfigFile()));
+            say(m);
+            return;
+        }
+        if (inputLine.hasArg(LIST_CFGS)) {
+            listConfigs(inputLine);
+            return;
+        }
+
         String fileName = null;
         configName = inputLine.getArg(1);
 
@@ -78,9 +96,63 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         say("done!");
     }
 
+    protected void listConfigs(InputLine inputLine) throws Exception {
+        String targetFilename = getConfigFile();
+        if (1 < inputLine.getArgCount()) {
+            targetFilename = inputLine.getArg(1);
+        }
+        if (StringUtils.isTrivial(targetFilename)) {
+            say("Sorry no configuration file specified.");
+            return;
+        }
+        File target = new File(targetFilename);
+
+        if (!target.exists()) {
+            say("Sorry but \"" + target.getAbsolutePath() + "\" does not exist.");
+            return;
+        }
+        if (!target.isFile()) {
+            say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
+            return;
+        }
+        String component = getComponentName();
+        FileReader fr = new FileReader(target);
+        XMLInputFactory xmlif = XMLInputFactory.newInstance();
+        XMLEventReader xer = xmlif.createXMLEventReader(fr);
+        TreeSet<String> names = new TreeSet<>(); // To keep sorted
+        if (!xer.hasNext()) {
+            say("sorry but \"" + target.getAbsolutePath() + "\" does not contain XML.");
+            xer.close();
+            return;
+        }
+        XMLEvent xe;
+        say("reading " + component + " names from " + target.getAbsolutePath());
+        // really stupid loop to look for exactly one attribute in a specific tag.
+        while (xer.hasNext()) {
+            xe = xer.nextEvent();
+            if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(component)) {
+                Attribute a = xe.asStartElement().getAttributeByName(new QName("name"));
+                if (a != null) {
+                    names.add(a.getValue());
+                }
+            }
+        }
+        if(names.isEmpty()){
+            say("no configurations found.");
+        }else{
+            for(String x : names){
+                say("  " + x);
+            }
+            say("found " + names.size() + " entries. Done!");
+        }
+        xer.close();
+    }
+
+    String LIST_CFGS = "-list";
 
     protected void showLoadHelp() {
-        say("load [config_name config_file] a configuration from the file. The options are");
+        say("load [config_file] " + LIST_CFGS + " = list the configurations by name in the file or current file");
+        say("load [config_name config_file]  a configuration from the file. The options are");
         say("   load - displays current configuration file and name of the current configuration.");
         say("   load configName - loads the named configuration from the currently active configuration file.");
         say("   load configName fileName - loads the configuration named \"configName\" from the fully qualified name of the file and sets it active");
@@ -161,6 +233,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     Map<Object, Object> globalEnv;
     String currentEnvFile = null;
+
     protected void readEnv(String path) {
         // All errors loading the environment are benign.
         File f = new File(path);
@@ -216,7 +289,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
 
     @Override
     public void print_help(InputLine inputLine) throws Exception {
-    say("Need to write help.");
+        say("Need to write help.");
     }
 
     /**
@@ -256,7 +329,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             }
             throw new GeneralException("Error initializing CLI:" + x.getMessage(), x);
         }
-        if(hasOption(ENV_OPTION, ENV_LONG_OPTION)){
+        if (hasOption(ENV_OPTION, ENV_LONG_OPTION)) {
             String envFile = getCommandLine().getOptionValue(ENV_OPTION);
             readEnv(envFile);
         }
@@ -475,7 +548,8 @@ public abstract class ConfigurableCommandsImpl implements Commands {
      * @return
      */
     protected String padLineWithBlanks(String x, int width) {
-        String xx = StringUtils.rightPad(x, width, " ");
+        // argh!
+        String xx = org.apache.commons.lang.StringUtils.rightPad(x, width, " ");
         return xx;
     }
 

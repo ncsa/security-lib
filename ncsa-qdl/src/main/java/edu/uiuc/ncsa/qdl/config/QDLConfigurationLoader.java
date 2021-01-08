@@ -74,6 +74,11 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getNodeValue(node, WS_HOME_DIR_TAG, "");
     }
 
+    protected boolean getCompressionOn() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_COMPRESS_SERIALIZATION_TAG, true);
+    }
+
     protected String getScriptPath() {
           String x =  getFirstAttribute(cn, SCRIPT_PATH_TAG);
           return x==null?"":x;
@@ -251,6 +256,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 isEchoModeOn(),
                 isPrettyPrint(),
                 isWSVerboseOn(),
+                getCompressionOn(),
                 showBanner(),
                 getVFSConfigs(),
                 getModuleConfigs(),

@@ -34,6 +34,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean prettyPrint,
                           boolean verboseOn,
                           boolean showBanner,
+                          boolean compressionOn,
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs,
                           String scriptPath,
@@ -57,7 +58,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.scriptPath = scriptPath;
         this.debugLevel = debugLevel;
         this.modulePath = modulePath;
+        this.compressionOn = compressionOn;
     }
+
+    public boolean isCompressionOn() {
+        return compressionOn;
+    }
+
+    public void setCompressionOn(boolean compressionOn) {
+        this.compressionOn = compressionOn;
+    }
+
+    public boolean compressionOn = false;
 
     public String getDebugLevel() {
         return debugLevel;

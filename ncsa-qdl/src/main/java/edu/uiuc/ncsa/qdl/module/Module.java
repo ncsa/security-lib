@@ -1,16 +1,21 @@
 package edu.uiuc.ncsa.qdl.module;
 
-import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
 import java.net.URI;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STATE_TAG;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -83,7 +88,7 @@ public abstract class Module implements Serializable {
         return "Module{" +
                 ", namespace=" + namespace +
                 ", alias='" + alias + '\'' +
-                (isExternal()?", isJava":"") +
+                (isExternal() ? ", isJava" : "") +
                 '}';
     }
 
@@ -99,15 +104,79 @@ public abstract class Module implements Serializable {
     public abstract Module newInstance(State state);
 
     public void toXML(XMLStreamWriter xsw, String alias) throws XMLStreamException {
-        xsw.writeStartElement(XMLConstants.MODULE_TAG);
+        xsw.writeStartElement(MODULE_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
-        xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias)?getAlias():alias);
+        xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias) ? getAlias() : alias);
+        writeExtraXMLAttributes(xsw);
         getState().toXML(xsw);
+        writeExtraXMLElements(xsw);
         xsw.writeEndElement();
     }
 
-    public void fromXML(XMLEventReader xer, State state){
-        QDLInterpreter qi = new QDLInterpreter(state);
+    /**
+     * Add any attributes you want to the module tag (you must read them later).
+     *
+     * @param xsw
+     * @throws XMLStreamException
+     */
+    public void writeExtraXMLAttributes(XMLStreamWriter xsw) throws XMLStreamException {
+
+    }
+
+    /**
+     * Write extra elements. You must control for the opening and closing tags. These are
+     * inserted right after the state element.
+     * @param xsw
+     * @throws XMLStreamException
+     */
+    public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
+
+    }
+
+    public void fromXML(XMLEventReader xer, XProperties xp) throws XMLStreamException {
+        readExtraXMLAttributes(xer.peek());
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    // *** IF *** it has a state object, process it.
+                    if (xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
+                        getState().fromXML(xer, xp);
+                    }else {
+                        readExtraXMLElements(xe, xer);  // contract is that it gets the start tag...
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(MODULE_TAG)) {
+                        return;
+                    }
+                default:
+                    break;
+            }
+            xer.next();
+        }
+        throw new XMLMissingCloseTagException(MODULE_TAG);
+
+    }
+
+    /**
+     * This is passed the current event and should only have calls to read the attributes.
+     * @param xe
+     * @throws XMLStreamException
+     */
+    public void readExtraXMLAttributes(XMLEvent xe) throws XMLStreamException {
+
+    }
+
+    /**
+     * This passes in the current start event so you can add your own event loop and cases.
+      * Note you need have only a switch on the tag names you want.
+     * @param xe
+     * @param xer
+     * @throws XMLStreamException
+     */
+    public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
 
     }
 

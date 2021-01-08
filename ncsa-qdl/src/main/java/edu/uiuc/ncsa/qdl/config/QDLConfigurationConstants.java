@@ -45,6 +45,7 @@ public interface QDLConfigurationConstants {
     String WS_ATTR_PRETTY_PRINT = "prettyPrint";
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";
+    String WS_COMPRESS_SERIALIZATION_TAG = "compressOn";
     String SCRIPT_PATH_TAG = "script_path";
     String MODULE_PATH_TAG = "module_path";
 }

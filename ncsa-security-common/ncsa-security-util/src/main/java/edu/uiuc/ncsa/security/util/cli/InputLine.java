@@ -217,9 +217,15 @@ public class InputLine {
         return parsedInput.isEmpty();
     }
 
+    /**
+     * This number of all arguments *including* the original command. To get the number of arguments,
+     * call {@link #getArgCount()}.
+     * @return
+     */
     public int size() {
         return parsedInput.size();
     }
+
 
     /**
      * Check if the input line has the given argument. False is returned otherwise.

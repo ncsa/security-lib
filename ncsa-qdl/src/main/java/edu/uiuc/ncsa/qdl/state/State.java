@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -441,6 +442,7 @@ public class State extends FunctionState implements QDLConstants {
         for (String mod : getImportedModules().keySet()) {
             getImportedModules().get(mod).getState().injectTransientFields(oldState);
         }
+        System.out.println("Setting IO interface to " + oldState.getIoInterface() + ", was " + getIoInterface());
         setIoInterface(oldState.getIoInterface());
     }
 
@@ -518,13 +520,13 @@ public class State extends FunctionState implements QDLConstants {
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(STATE_TAG);
         xsw.writeAttribute(STATE_ID_TAG, getInternalID());
-        writeAdditionalXMLAttributes(xsw);
+        writeExtraXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
         if (!getImportedModules().isEmpty()) {
             xsw.writeStartElement(IMPORTED_MODULES);
+            xsw.writeComment("The imported modules with their state and alias.");
             for (String alias : getImportedModules().keySet()) {
                 Module module = getImportedModules().get(alias);
-                xsw.writeComment("The imported modules with their state and alias.");
                 module.toXML(xsw, alias);
             }
             xsw.writeEndElement(); //end imports
@@ -538,7 +540,7 @@ public class State extends FunctionState implements QDLConstants {
         getSymbolStack().toXML(xsw);
         // Function table has the functions
         getFunctionTable().toXML(xsw);
-        additionalToXML(xsw);
+        writeExtraXMLElements(xsw);
         xsw.writeEndElement(); // end state tag
     }
 
@@ -549,7 +551,7 @@ public class State extends FunctionState implements QDLConstants {
         XMLEvent xe = xer.nextEvent(); // start iteration it should be at the state tag
         if(xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
             internalID = xe.asStartElement().getAttributeByName(new QName(STATE_ID_TAG)).getValue();
-            readAdditionalXMLAttributes(xe.asStartElement());
+            readExtraXMLAttributes(xe.asStartElement());
         }
         while (xer.hasNext()) {
             xe = xer.peek(); // start iteration
@@ -571,7 +573,7 @@ public class State extends FunctionState implements QDLConstants {
                             XMLUtils.deserializeTemplates(xer, xp, this);
                             break;
                         default:
-                            additionalFromXML(xe,xer);
+                            readExtraXMLElements(xe,xer);
                             break;
                     }
 
@@ -584,7 +586,7 @@ public class State extends FunctionState implements QDLConstants {
             }
             xer.next(); // advance cursor
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STATE_TAG);
+        throw new XMLMissingCloseTagException( STATE_TAG);
     }
 
     /**
@@ -614,7 +616,7 @@ public class State extends FunctionState implements QDLConstants {
             }
             xe = xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + IMPORTED_MODULES);
+        throw new XMLMissingCloseTagException(IMPORTED_MODULES);
 
     }
 
@@ -624,7 +626,7 @@ public class State extends FunctionState implements QDLConstants {
      * @param xsr
      * @throws XMLStreamException
      */
-    public void additionalToXML(XMLStreamWriter xsr) throws XMLStreamException{
+    public void writeExtraXMLElements(XMLStreamWriter xsr) throws XMLStreamException{
 
     }
 
@@ -634,7 +636,7 @@ public class State extends FunctionState implements QDLConstants {
      * @param xsw
      * @throws XMLStreamException
      */
-    public void writeAdditionalXMLAttributes(XMLStreamWriter xsw ) throws XMLStreamException{
+    public void writeExtraXMLAttributes(XMLStreamWriter xsw ) throws XMLStreamException{
 
     }
 
@@ -646,7 +648,7 @@ public class State extends FunctionState implements QDLConstants {
      * @throws XMLStreamException
      */
 
-    public void additionalFromXML(XMLEvent xe, XMLEventReader xer) throws XMLStreamException{
+    public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException{
 
     }
 
@@ -656,7 +658,7 @@ public class State extends FunctionState implements QDLConstants {
      * @param xe
      * @throws XMLStreamException
      */
-    public void readAdditionalXMLAttributes(StartElement xe) throws XMLStreamException{
+    public void readExtraXMLAttributes(StartElement xe) throws XMLStreamException{
 
     }
 }
