@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.*;
 import java.io.*;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
@@ -52,8 +53,7 @@ import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_BINARY;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_TEXT_STRING;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.LJustify;
-import static edu.uiuc.ncsa.security.core.util.StringUtils.RJustify;
+import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
 /**
@@ -77,6 +77,8 @@ public class WorkspaceCommands implements Logable {
     public static final String REGEX_SWITCH = SWITCH + "r";
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
     public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
+    public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
+
     public MyLoggingFacade logger;
 
     XProperties env;
@@ -135,8 +137,6 @@ public class WorkspaceCommands implements Logable {
         } else {
             say("QDL Workspace, version " + QDLVersion.VERSION);
         }
-        say("debug note: \n\n))) [-f filename] \n\ndoes XML serialization of workspace. No file = dump to std out.");
-        say("debug note: \n\n)]] -f filename \n\ndeserializes XML serialization of workspace");
     }
 
     boolean showBanner = true;
@@ -208,32 +208,6 @@ public class WorkspaceCommands implements Logable {
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
         inputLine = variableLookup(inputLine);
-        if (inputLine.getCommand().equals(")]]")) {
-            try {
-                if (inputLine.hasArg("-f")) {
-                    testXMLReader(inputLine.getNextArgFor("-f"));
-                } else {
-                    testXMLReader(null);
-
-                }
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-            return RC_CONTINUE;
-        }
-        if (inputLine.getCommand().equals(")))")) {
-            try {
-                if (inputLine.hasArg("-f")) {
-                    testXMLWriter(true, inputLine.getNextArgFor("-f"));
-                } else {
-                    testXMLWriter(false, null);
-
-                }
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            }
-            return RC_CONTINUE;
-        }
         switch (inputLine.getCommand()) {
             case FILE_COMMAND:
                 return doFileCommands(inputLine);
@@ -320,6 +294,8 @@ public class WorkspaceCommands implements Logable {
         SIEntries siEntries;
         State activeState;
         Date startTimestamp;
+        String id;
+        String description;
 
         public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
 
@@ -521,29 +497,29 @@ public class WorkspaceCommands implements Logable {
         // timestamp is when created
         // size is the size of the state object.
         // message is the message
-        say(StringUtils.pad2("pid", ___SI_PID) +
+        say(pad2("pid", ___SI_PID) +
                 " | active | " +
-                StringUtils.pad2("stmt", ___SI_LINE_NR) + " | " +
-                StringUtils.pad2("time", ___SI_TIMESTAMP) + " | " +
-                StringUtils.pad2("size", ___SI_SIZE) + " | " +
+                pad2("stmt", ___SI_LINE_NR) + " | " +
+                pad2("time", ___SI_TIMESTAMP) + " | " +
+                pad2("size", ___SI_SIZE) + " | " +
                 "message");
         // do system separate since it is never stored in the si entries
-        String lineOut = StringUtils.pad2(0, ___SI_PID) +
-                " | " + StringUtils.pad2((0 == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
-                " | " + StringUtils.pad2(" ", ___SI_LINE_NR) + // line number
-                " | " + StringUtils.pad2(startTimeStamp, ___SI_TIMESTAMP) + // timestamp
-                " | " + StringUtils.pad2(StateUtils.size(defaultState), ___SI_SIZE) +
+        String lineOut = pad2(0, ___SI_PID) +
+                " | " + pad2((0 == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
+                " | " + pad2(" ", ___SI_LINE_NR) + // line number
+                " | " + pad2(startTimeStamp, ___SI_TIMESTAMP) + // timestamp
+                " | " + pad2(StateUtils.size(defaultState), ___SI_SIZE) +
                 " | " + "system";
         say(lineOut);
 
         for (Integer key : siEntries.keySet()) {
             SIEntry siEntry = siEntries.get(key);
             int lineNr = siEntry.lineNumber;
-            lineOut = StringUtils.pad2(key, ___SI_PID) +
-                    " | " + StringUtils.pad2((siEntry.pid == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
-                    " | " + StringUtils.pad2(lineNr, ___SI_LINE_NR) +
-                    " | " + StringUtils.pad2(siEntry.timestamp, ___SI_TIMESTAMP) +
-                    " | " + StringUtils.pad2(StateUtils.size(siEntry.state), ___SI_SIZE) +
+            lineOut = pad2(key, ___SI_PID) +
+                    " | " + pad2((siEntry.pid == currentPID ? "  * " : " ---"), ___SI_ACTIVE) +
+                    " | " + pad2(lineNr, ___SI_LINE_NR) +
+                    " | " + pad2(siEntry.timestamp, ___SI_TIMESTAMP) +
+                    " | " + pad2(StateUtils.size(siEntry.state), ___SI_SIZE) +
                     " | " + siEntry.message;
             say(lineOut);
         }
@@ -1822,14 +1798,16 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Workspace commands");
-                sayi("  load file - load a saved workspace.");
+                sayi(" load file  - load a saved workspace.");
                 sayi("save [file] - save the current workspace to the given file. If the current workspace");
                 sayi("              has been loaded or saved, you may omit the file.");
                 sayi("      clear - removes all user defined variables and functions");
-                sayi("       echo - change how the workspace processes used input.");
+                sayi("        get -  get a workspace value.");
+                sayi("        lib - list the entries in a library.");
+                sayi("     memory - give the amount of memory available to the workspace.");
                 sayi("       name - give the file name of the currently loaded workspace.");
                 say("               If no workspace has been loaded, no name is returned.");
-                sayi("     memory - give the amount of memory available to the workspace.");
+                sayi("        set -  set a workspace value.");
                 return RC_NO_OP;
             case "load":
                 return _wsLoad(inputLine);
@@ -1837,8 +1815,13 @@ public class WorkspaceCommands implements Logable {
                 return _wsSave(inputLine);
             case "clear":
                 return _wsClear(inputLine);
-            case "echo":
-                return _wsEchoMode(inputLine);
+            case "get":
+                return _wsGet(inputLine);
+            case "set":
+                return _wsSet(inputLine);
+
+            case "lib":
+                return _wsLibList(inputLine);
             case "name":
                 if (currentWorkspace == null) {
                     say("No workspace loaded");
@@ -1860,6 +1843,7 @@ public class WorkspaceCommands implements Logable {
         }
 
     }
+
 
     private int _fileVFS(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -1904,6 +1888,588 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean prettyPrint = false;
+
+    protected boolean isOnOrTrue(String x) {
+        return x.equals("on") || x.equals("true");
+    }
+
+    protected String onOrOff(boolean b) {
+        return b ? "on" : "off";
+    }
+
+    protected void printAllWSVars() {
+        TreeSet<String> t = new TreeSet<>();
+        // alphabetizes them
+        for (String s : ALL_WS_VARS) {
+            t.add(s);
+        }
+        for (String s : t) {
+            say(s);
+        }
+    }
+
+    private int _wsGet(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("get [ws_variable]");
+            sayi("Retrieve the value of the given variable for the workspace.");
+            sayi("No value means to return a list of supported variables.");
+            sayi("You can get online help using the )help facility.");
+            return RC_NO_OP;
+        }
+        // remember that the input line reads )ws get so the 1st argument is the name of this command
+        if (inputLine.getArgCount() == 1) {
+            printAllWSVars();
+            return RC_CONTINUE;
+        }
+        switch (inputLine.getArg(2)) {
+            case PRETTY_PRINT:
+            case PRETTY_PRINT_SHORT:
+                say(onOrOff(isPrettyPrint()));
+                break;
+            case ECHO:
+                say(onOrOff(isEchoModeOn()));
+                break;
+            case DEBUG:
+                say(onOrOff(isDebugOn()));
+                break;
+            case START_TS:
+                if (startTimeStamp != null) {
+                    say("startup time at " + Iso8601.date2String(startTimeStamp));
+                } else {
+                    say("(not set)");
+                }
+                break;
+            case DESCRIPTION:
+                if (isTrivial(getDescription())) {
+                    say("(no description set)");
+                } else {
+                    say(getDescription());
+                }
+                break;
+            case WS_ID:
+                if (isTrivial(getWSID())) {
+                    say("(workspace id not set)");
+                } else {
+                    say(getWSID());
+                }
+                break;
+            case COMPRESS_XML:
+                say(onOrOff(isCompressXML()));
+                break;
+            case SAVE_DIR:
+                if (saveDir == null) {
+                    say("(save directory not set)");
+                } else {
+                    say(saveDir.getAbsolutePath());
+                }
+                break;
+            case ROOT_DIR:
+                if (rootDir == null) {
+                    say("(root directory not set)");
+                } else {
+                    say(rootDir.getAbsolutePath());
+                }
+                break;
+            default:
+                say("unknown workspace variable");
+                break;
+        }
+        return RC_CONTINUE;
+    }
+
+    public static final String PRETTY_PRINT_SHORT = "pp";
+    public static final String PRETTY_PRINT = "pretty_print";
+    public static final String ECHO = "echo";
+    public static final String DEBUG = "debug";
+    public static final String START_TS = "start_ts";
+    public static final String ROOT_DIR = "root_dir";
+    public static final String SAVE_DIR = "save_dir";
+    public static final String COMPRESS_XML = "compress_xml";
+    public static final String WS_ID = "id";
+    public static final String DESCRIPTION = "description";
+
+    /**
+     * This will either print out the information about a single workspace (if a file is given)
+     * or every workspace in a directory. It accepts regexes as a file filter too
+     * <br/>
+     * <pre>
+     * )ws lib /home/me/qdl/var/ws -r ws.*\\.*
+     * </pre>
+     * Prints out all the ws info for ws*.* in the directory. If a file is given, the regex is ignored.
+     *
+     * @param inputLine
+     * @return
+     */
+    protected int _wsLibList(InputLine inputLine) {
+        String fileName = null;
+        File currentFile = null;
+        boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON); // print everything
+        boolean isLongFormat = inputLine.hasArg(CLA_LONG_FORMAT_ON); // print long format
+        boolean isShortFormat = !(isVerbose || isLongFormat);
+        boolean showFailures = inputLine.hasArg(SHOW_FAILURES);
+        int displayWidth = 120; //default
+        if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
+            displayWidth = inputLine.getNextIntArg(DISPLAY_WIDTH_SWITCH);
+        }
+        // remove any switch so we can figure out what the arguments are.
+        inputLine.removeSwitch(CLA_VERBOSE_ON);
+        inputLine.removeSwitch(CLA_LONG_FORMAT_ON);
+        inputLine.removeSwitch(SHOW_FAILURES);
+        inputLine.removeSwitchAndValue(DISPLAY_WIDTH_SWITCH);
+        Pattern pattern = null;
+        String regex = null;
+
+        FilenameFilter regexff = null;
+        if (inputLine.hasArg(REGEX_SWITCH)) {
+            pattern = Pattern.compile(inputLine.getNextArgFor(REGEX_SWITCH));
+
+            regexff = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    System.out.println("Foof");
+                    return true;
+                }
+            };
+            regexff = new RegexFileFilter(pattern);
+            inputLine.removeSwitchAndValue(REGEX_SWITCH);
+        }
+        if (1 < inputLine.getArgCount()) {
+            fileName = inputLine.getArg(2);
+            currentFile = new File(fileName);
+        } else {
+            if (saveDir != null) {
+                currentFile = saveDir;
+
+            } else {
+                currentFile = rootDir;
+            }
+            if (currentFile == null) {
+                say("Sorry no root or save dir specified and no argument. Nothing to show.");
+                return RC_NO_OP;
+            }
+        }
+
+        if (!currentFile.isAbsolute()) {
+            if (saveDir == null) {
+                currentFile = new File(rootDir, fileName);
+            } else {
+                currentFile = new File(saveDir, fileName);
+            }
+        }
+        // That's been resolved.
+        // currentFile is either a single file or a directory.
+
+
+        if (currentFile.isFile()) {
+            say("processing file " + currentFile.getAbsolutePath());
+            WSLibEntry w = _getWSLibEntry(currentFile);
+            if (w != null) {
+                if (!showFailures && w.failed) {
+                    return RC_CONTINUE;
+                }
+                if (isShortFormat) {
+                    say(w.shortFormat(displayWidth));
+                } else {
+                    List<String> out = formatMap(w.toMap(),
+                            null,
+                            true, isVerbose, 1, displayWidth);
+                    for (String x : out) {
+                        say(x);
+                    }
+                }
+            }
+            return RC_CONTINUE;
+        }
+        File[] wsFileList;
+
+        wsFileList = currentFile.listFiles(regexff);
+        if (wsFileList == null || wsFileList.length == 0) {
+            say("no workspaces found");
+            return RC_CONTINUE;
+        }
+        TreeMap<String, File> sortedFiles = new TreeMap<>();
+        for (File file : wsFileList) {
+            sortedFiles.put(file.getAbsolutePath(), file);
+        }
+
+        boolean firstPass = true;
+        for (
+                String absPath : sortedFiles.keySet()) {
+            File fff = sortedFiles.get(absPath);
+            WSLibEntry w = _getWSLibEntry(fff);
+            if (w == null) continue;
+            if (!showFailures && w.failed) {
+                continue;
+            }
+            if (isShortFormat) {
+                say(w.shortFormat(displayWidth));
+            } else {
+                if (firstPass) {
+                    firstPass = false;
+                } else {
+                    say("-----");
+                }
+                List<String> out = formatMap(w.toMap(),
+                        null,
+                        true, isVerbose, 1, displayWidth);
+                for (String x : out) {
+                    say(x);
+                }
+
+            }
+
+        }
+
+        return RC_CONTINUE;
+    }
+
+    public static class RegexFileFilter implements FilenameFilter {
+        public RegexFileFilter(Pattern pattern) {
+            this.pattern = pattern;
+        }
+
+        Pattern pattern;
+
+        @Override
+        public boolean accept(File dir, String name) {
+            return pattern.matcher(name).matches();
+        }
+    }
+
+    public static class WSLibEntry {
+        Date ts;
+        String id;
+        String description;
+        boolean isCompressed = false;
+        String filename;
+        String filepath;
+        Date lastSaved_ts;
+        String fileFormat;
+        long length = -1L;
+        boolean failed = false; // only set true when it actually fails.
+        String failMessage;
+        Throwable exception;
+
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+            if (failed) {
+                map.put("create_ts", ts);
+                map.put("length", length);
+                map.put("file_name", filename);
+                map.put("file_path", filepath);
+                map.put("last_modified", lastSaved_ts);
+                map.put("message", failMessage);
+                map.put("status", "FAILED");
+                return map;
+            }
+            map.put("create_ts", ts);
+            map.put(WS_ID, id);
+            map.put(DESCRIPTION, description);
+            map.put("compressed", isCompressed);
+            map.put("file_name", filename);
+            map.put("file_path", filepath);
+            map.put("last_modified", lastSaved_ts);
+            map.put("length", length);
+            map.put("format", fileFormat);
+            return map;
+        }
+
+        @Override
+        public String toString() {
+            return "WSLibEntry{" +
+                    "ts=" + ts +
+                    ", id='" + id + '\'' +
+                    ", description='" + description + '\'' +
+                    ", isCompressed=" + isCompressed +
+                    ", filename='" + filename + '\'' +
+                    ", filepath='" + filepath + '\'' +
+                    ", lastSaved_ts=" + lastSaved_ts +
+                    ", length=" + length +
+                    '}';
+        }
+
+        public String shortFormat(int displayWidth) {
+            if (failed) {
+                String out = pad2(isTrivial(filename) ? "(no file)" : filename, 15);
+                out = out + "   failed:" + pad2(failMessage, displayWidth - 23);
+                return out;
+            }
+            String out = pad2(isTrivial(filename) ? "(no file)" : filename, 15);
+            out = out + " " + (isCompressed ? "*" : " ");
+            if (isTrivial(id)) {
+                out = out + " " + pad2("(no id)", 10);
+            } else {
+                out = out + " " + pad2(id, 10);
+            }
+            if (ts == null) {
+                out = out + " " + pad2("(no date)", 25);
+            } else {
+                out = out + " " + pad2(ts, 25);
+            }
+            if (isTrivial(description)) {
+                out = out + " " + pad2("(no description)", displayWidth - 55);
+            } else {
+                out = out + " " + pad2(description, displayWidth - 55);
+            }
+
+            return out;
+        }
+
+    }
+
+    /**
+     * Reads a file and tries to figure out how it was serialized, then returns the information needed to
+     * display basic information. Since there may be many files that have nothign to do with QDL, these are just skipped.
+     *
+     * @param currentFile
+     * @return
+     */
+    private WSLibEntry _getWSLibEntry(File currentFile) {
+
+        if (!currentFile.isFile()) {
+            return null;
+        }
+        WSLibEntry wsLibEntry = null;
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(currentFile);
+        } catch (FileNotFoundException e) {
+            return null; // just skip it if can't open the file
+        }
+        wsLibEntry = new WSLibEntry();
+
+        try {
+            WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
+            fis.close();
+            wsLibEntry.ts = wsInternals.startTimestamp;
+            wsLibEntry.id = wsInternals.id;
+            wsLibEntry.description = wsInternals.description;
+            wsLibEntry.isCompressed = true;
+            wsLibEntry.filename = currentFile.getName();
+            wsLibEntry.length = currentFile.length();
+            Date lastMod = new Date();
+            lastMod.setTime(currentFile.lastModified());
+            wsLibEntry.lastSaved_ts = lastMod;
+            wsLibEntry.filepath = currentFile.getParent();
+            wsLibEntry.fileFormat = "java";
+            return wsLibEntry;
+        } catch (java.io.InvalidClassException icx) {
+            // Means it was indeed serialized, but that blew up (probably due serialization change).
+            // Just kick it back.
+            wsLibEntry.failed = true;
+            wsLibEntry.failMessage = icx.getMessage();
+            wsLibEntry.exception = icx;
+            wsLibEntry.filename = currentFile.getName();
+            wsLibEntry.filepath = currentFile.getParent();
+
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return wsLibEntry;
+        } catch (Throwable t) {
+            // grab bag. This failed usually because it was not gzipped ==> no serialized objects
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        XMLEventReader xer = null;
+
+        boolean gotCompressed = false;
+        if (isCompressXML()) {
+            xer = XMLUtils.getZippedReader(currentFile);
+            gotCompressed = true;
+            // user is dictating to use compress.
+        } else {
+            xer = XMLUtils.getReader(currentFile);
+            gotCompressed = false;
+        }
+
+        if (xer == null) {
+            // reverse these
+            if (isCompressXML()) {
+                xer = XMLUtils.getReader(currentFile);
+                gotCompressed = false;
+            } else {
+                xer = XMLUtils.getZippedReader(currentFile);
+                gotCompressed = true;
+            }
+        }
+        if (xer == null) {
+            return null; // probably empty file???
+        }
+
+        WSXMLSerializer serializer = new WSXMLSerializer();
+        try {
+            WorkspaceCommands tempWSC = serializer.fromXML(xer);
+            xer.close();
+            wsLibEntry = getWsLibEntry(currentFile, gotCompressed, tempWSC);
+            wsLibEntry.fileFormat = "xml";
+            return wsLibEntry;
+        } catch (Throwable t) {
+            wsLibEntry.failed = true;
+            wsLibEntry.failMessage = t.getMessage().replace('\n', ' ');// some messages have embedded line feeds
+            wsLibEntry.exception = t;
+            wsLibEntry.filename = currentFile.getName();
+            wsLibEntry.filepath = currentFile.getParent();
+
+            try {
+                xer.close();
+            } catch (XMLStreamException e) {
+                // fail silently, go to next.
+            }
+
+        }
+        return wsLibEntry;
+    }
+
+    private WSLibEntry getWsLibEntry(File currentFile, boolean gotCompressed, WorkspaceCommands tempWSC) {
+        WSLibEntry wsLibEntry;
+        wsLibEntry = new WSLibEntry();
+        wsLibEntry.id = tempWSC.getWSID();
+        wsLibEntry.description = tempWSC.getDescription();
+        wsLibEntry.ts = tempWSC.startTimeStamp;
+        wsLibEntry.isCompressed = gotCompressed;
+        wsLibEntry.filename = currentFile.getName();
+        wsLibEntry.length = currentFile.length();
+        Date lastMod = new Date();
+        lastMod.setTime(currentFile.lastModified());
+        wsLibEntry.lastSaved_ts = lastMod;
+        wsLibEntry.filepath = currentFile.getParent();
+        return wsLibEntry;
+    }
+
+    private int _wsSet(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("set ws_variable value");
+            sayi("Set the value of the given workspace variable topo the given value.");
+            sayi("Remember that strings should be in double quotes and you may also pipe in QDL variables.");
+            return RC_NO_OP;
+        }
+        if (inputLine.getArgCount() == 1) {
+            printAllWSVars();
+            return RC_CONTINUE;
+        }
+
+        if (inputLine.getArgCount() < 3) {
+            say("Missing argument. This requires two arguments.");
+            return RC_NO_OP;
+
+        }
+        String value = inputLine.getArg(3);
+        switch (inputLine.getArg(2)) {
+            case PRETTY_PRINT:
+            case PRETTY_PRINT_SHORT:
+                setPrettyPrint(isOnOrTrue(value));
+                say("pretty print " + (prettyPrint ? "on" : "off"));
+                break;
+            case ECHO:
+                setEchoModeOn(isOnOrTrue(value));
+                say("echo mode " + (echoModeOn ? "on" : "off"));
+                break;
+            case DEBUG:
+                setDebugOn(isOnOrTrue(value));
+                say("debug " + (debugOn ? "on" : "off"));
+
+                break;
+            case START_TS:
+                try {
+                    Long rawDate = Long.parseLong(value);
+                    startTimeStamp = new Date();
+                    startTimeStamp.setTime(rawDate);
+                } catch (NumberFormatException nfx) {
+                    try {
+                        Iso8601.string2Date(value);
+                    } catch (ParseException e) {
+                        say("sorry but \"" + value + "\" could not be parsed as a date");
+                    }
+                }
+                say("start time for workspace changed to " + Iso8601.date2String(startTimeStamp));
+                break;
+            case DESCRIPTION:
+                setDescription(value);
+                say("description updated");
+                break;
+            case WS_ID:
+                setWSID(value);
+                say("workspace id set to " + getWSID());
+                break;
+            case COMPRESS_XML:
+                setCompressXML(isOnOrTrue(value));
+                say("xml compression " + (compressXML ? "on" : "off"));
+                break;
+            case SAVE_DIR:
+                saveDir = new File(value);
+                if (!saveDir.exists()) {
+                    say("warning the directory \"" + saveDir.getAbsolutePath() + "\" does not exist");
+                    return RC_NO_OP;
+                }
+                if (!saveDir.isDirectory()) {
+                    say("warning  \"" + saveDir.getAbsolutePath() + "\" is not a directory");
+                    return RC_NO_OP;
+                }
+                say("default save directory is now " + saveDir.getAbsolutePath());
+                break;
+            case ROOT_DIR:
+                rootDir = new File(value);
+                if (!rootDir.exists()) {
+                    say("warning the directory \"" + rootDir.getAbsolutePath() + "\" does not exist");
+                    return RC_NO_OP;
+                }
+                if (!rootDir.isDirectory()) {
+                    say("warning  \"" + rootDir.getAbsolutePath() + "\" is not a directory");
+                    return RC_NO_OP;
+                }
+                say("root directory is now " + rootDir.getAbsolutePath());
+
+                break;
+            default:
+                say("unknown ws variable");
+                break;
+        }
+
+        return RC_CONTINUE;
+
+    }
+
+
+    protected String[] ALL_WS_VARS = new String[]{
+            COMPRESS_XML,
+            DESCRIPTION,
+            ECHO, DEBUG,
+            PRETTY_PRINT,
+            PRETTY_PRINT_SHORT,
+            SAVE_DIR,
+            START_TS,
+            ROOT_DIR,
+            WS_ID
+    };
+    String wsID;
+
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Human readable dscription of this workspace.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    String description;
+
+    public String getWSID() {
+        return wsID;
+    }
+
+    public void setWSID(String wsID) {
+        this.wsID = wsID;
+    }
+
 
     private int _wsEchoMode(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -1960,19 +2526,36 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
+    String JAVA_FLAG = "-java";
+    String COMPRESS_FLAG = "-compress";
+    String SHOW_FLAG = "-show";
+
     private int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename [-java] | [-show] | [-compress]");
+            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off]");
             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
-            sayi("-java = save using Java serialization format. The default is XML.");
-            sayi("-show = (XML format only) dump the result to the console instead. No file is needed.");
-            sayi("-compress = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
+            sayi(JAVA_FLAG + " = save using Java serialization format. The default is XML.");
+            sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
+            sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
             sayi("See the corresponding load command to recover it.");
             return RC_NO_OP;
         }
-        boolean showFile = inputLine.hasArg("-show");
+        if (inputLine.getArgCount() == 1) {
+            if (saveDir == null) {
+                say("save dir = " + rootDir.getAbsolutePath());
+            } else {
+                say("save dir = " + saveDir.getAbsolutePath());
+            }
+            return RC_CONTINUE;
+        }
+        boolean showFile = inputLine.hasArg(SHOW_FLAG);
         File target = null;
+
+        boolean compressionOn = true;
+        if (inputLine.hasArg(COMPRESS_FLAG)) {
+            compressionOn = inputLine.getNextArgFor(COMPRESS_FLAG).equalsIgnoreCase("on");
+        }
 
         try {
 
@@ -1997,13 +2580,17 @@ public class WorkspaceCommands implements Logable {
                 }
 
             }
+            long uncompressedXMLSize = -1L;
             if (inputLine.hasArg("-java")) {
                 _realSave(target);
             } else {
-                _xmlSave(target, inputLine.hasArg("-compress"), showFile);
+                uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
             }
             if (!showFile) {
-                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()));
+                String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
+                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
+            } else {
+                say(uncompressedXMLSize + " bytes.");
             }
         } catch (Throwable t) {
             logger.error("could not save workspace.", t);
@@ -2012,21 +2599,24 @@ public class WorkspaceCommands implements Logable {
         return RC_NO_OP;
     }
 
-    private void _xmlSave(File f, boolean compressSerialization, boolean showIt) throws Throwable {
+    private long _xmlSave(File f, boolean compressSerialization, boolean showIt) throws Throwable {
 
         Writer w = new StringWriter();
 
         XMLOutputFactory xof = XMLOutputFactory.newInstance();
         XMLStreamWriter xsw = xof.createXMLStreamWriter(w);
+        long uncompressedSize = -1L;
+
         toXML(xsw);
         if (showIt) {
             String xml = XMLUtils.prettyPrint(w.toString());
             say(xml);
-            say("size = " + xml.length());
+            return xml.length();
         } else {
 
-            if (compressSerialization || isCompressSerialization()) {
+            if (compressSerialization || isCompressXML()) {
                 String xml2 = XMLUtils.prettyPrint(w.toString()); // We do this because whitespace matters. This controls it.
+                uncompressedSize = xml2.length();
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(baos);
                 gzipOutputStream.write(xml2.getBytes("UTF-8"));
@@ -2036,16 +2626,18 @@ public class WorkspaceCommands implements Logable {
                 fos.write(baos.toByteArray());
                 fos.flush();
                 fos.close();
+
             } else {
                 FileWriter fw = new FileWriter(f);
                 fw.write(XMLUtils.prettyPrint(w.toString()));
                 fw.flush();
                 fw.close();
+                uncompressedSize = f.length();
             }
         }
         w.flush();
         w.close();
-
+        return uncompressedSize;
     }
 
     private void _realSave(File target) throws IOException {
@@ -2057,17 +2649,18 @@ public class WorkspaceCommands implements Logable {
         wsInternals.activeState = state;
         wsInternals.siEntries = siEntries;
         wsInternals.startTimestamp = startTimeStamp;
+        wsInternals.id = wsID;
+        wsInternals.description = description;
         StateUtils.saveObject(wsInternals, fos);
     }
 
-    private void _xmlLoad(File f) {
-        say("reading XML from " + f.getAbsolutePath());
+    private boolean _xmlLoad(File f) {
         // The file may be in XML format. If not, then it is assumed to be
         // zipped and binary.
         // First attempt is to assume no compression
         XMLEventReader xer = null;
 
-        if (isCompressSerialization()) {
+        if (isCompressXML()) {
             xer = XMLUtils.getZippedReader(f);
             // user is dictating to use compress.
         } else {
@@ -2078,12 +2671,8 @@ public class WorkspaceCommands implements Logable {
                 fromXML(xer);
                 xer.close();
                 currentWorkspace = f;
-                say("done!");
-                return;
-            } catch (XMLStreamException e) {
-                say("error reading XML at line " + e.getLocation().getLineNumber() + ", col " + e.getLocation().getColumnNumber()
-                        + ":\"" + e.getMessage() + "\"");
-            }catch(Throwable t){
+                return true;
+            } catch (Throwable t) {
                 // First attempt can fail for, e.g., the default is compression but the file is not compressed.
                 // So this is benign.
             }
@@ -2092,7 +2681,7 @@ public class WorkspaceCommands implements Logable {
         if (xer == null) {
             // so that didn't work, most likely because the file is or is not compressed,
             // try the other way
-            if (isCompressSerialization()) {
+            if (isCompressXML()) {
                 // user is dictating to use compress.
                 xer = XMLUtils.getReader(f);
             } else {
@@ -2101,34 +2690,29 @@ public class WorkspaceCommands implements Logable {
 
         }
         if (xer == null) {
-            say("sorry, cannot get the file \"" + f.getAbsolutePath() + "\"");
-            return;
+            //say("sorry, cannot get the file \"" + f.getAbsolutePath() + "\"");
+            return false;
         }
 
-        if (xer != null) {
-            try {
-                fromXML(xer);
-                xer.close();
-                currentWorkspace = f;
-                say("done!");
-                return;
-            } catch (XMLStreamException e) {
-                say("error reading XML at line " + e.getLocation().getLineNumber() + ", col " + e.getLocation().getColumnNumber()
-                        + ":\"" + e.getMessage() + "\"");
-            }catch(Throwable t){
-                say("error reading XML file: " + t.getMessage());
-            }
+        try {
+            fromXML(xer);
+            xer.close();
+            currentWorkspace = f;
+            return true;
+        } catch (XMLStreamException e) {
+            say("error reading XML at line " + e.getLocation().getLineNumber() + ", col " + e.getLocation().getColumnNumber()
+                    + ":\"" + e.getMessage() + "\"");
+        } catch (Throwable t) {
+            say("error reading XML file: " + t.getMessage());
         }
-
-
+        return false;
     }
 
     /*
     Does the actual work of loading a file once the logic for what to do has been done.
      */
-    private void _realLoad(File f) {
+    private boolean _realLoad(File f) {
         try {
-            long lastModified = f.lastModified();
             FileInputStream fis = new FileInputStream(f);
             WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
 
@@ -2138,6 +2722,8 @@ public class WorkspaceCommands implements Logable {
             defaultState = wsInternals.defaultState;
             siEntries = wsInternals.siEntries;
             startTimeStamp = wsInternals.startTimestamp;
+            wsID = wsInternals.id;
+            description = wsInternals.description;
             /*
             Now set the stuff that cannot be serialized.
              */
@@ -2152,10 +2738,10 @@ public class WorkspaceCommands implements Logable {
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
-            say(f.getCanonicalPath() + " loaded " + f.length() + " bytes. Last saved " + new Date(lastModified));
+            return true;
         } catch (Throwable t) {
-            say("workspace not loaded:" + t.getMessage());
         }
+        return false;
     }
 
     File currentWorkspace;
@@ -2169,18 +2755,34 @@ public class WorkspaceCommands implements Logable {
             sayi("The default is XML.");
             return RC_NO_OP;
         }
+        if (inputLine.getArgCount() == 1) {
+            if (saveDir == null) {
+                say("load dir = " + rootDir.getAbsolutePath());
+            } else {
+                say("load dir = " + saveDir.getAbsolutePath());
+            }
+            return RC_CONTINUE;
+        }
         boolean doJava = inputLine.hasArg("-java");
+        // so no workspace given ,reload current.
+        boolean loadOK = false;
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             if (currentWorkspace == null) {
                 say("Sorry, no file given and no workspace has been loaded.");
             } else {
-                if (doJava) {
-                    _realLoad(currentWorkspace);
+                loadOK = _xmlLoad(currentWorkspace);
+
+                if (!loadOK) {
+                    loadOK = _realLoad(currentWorkspace);
+                }
+                if (loadOK) {
+                    say("reloaded" + currentWorkspace.getAbsolutePath() + currentWorkspace.length() + " bytes. Last saved on " + new Date(currentWorkspace.lastModified()));
+                    return RC_CONTINUE;
                 } else {
-                    _xmlLoad(currentWorkspace);
+                    say("Sorry, could not reload current workspace");
+                    return RC_NO_OP;
                 }
             }
-            return RC_CONTINUE;
         }
 
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
@@ -2194,10 +2796,21 @@ public class WorkspaceCommands implements Logable {
                 f = new File(saveDir, fName);
             }
         }
-        if (doJava) {
-            _realLoad(f);
+        loadOK = _realLoad(f);
+        if (!loadOK) {
+            loadOK = _xmlLoad(f);
+        }
+        if (loadOK) {
+            say(f.getAbsolutePath() + " loaded " + f.length() + " bytes. Last saved on " + new Date(f.lastModified()));
+
+            if (!isTrivial(getWSID())) {
+                say(getWSID() + " loaded.");
+            }
+            if (!isTrivial(getDescription())) {
+                say(getDescription());
+            }
         } else {
-            _xmlLoad(f);
+            say("Could not load workspace for file " + f.getAbsolutePath());
         }
         return RC_CONTINUE;
     }
@@ -2323,6 +2936,7 @@ public class WorkspaceCommands implements Logable {
     public static final String CLA_LOG_DIR = "-log";
     public static final String CLA_BOOT_SCRIPT = "-boot_script";
     public static final String CLA_VERBOSE_ON = "-v";
+    public static final String CLA_LONG_FORMAT_ON = "-l";
     public static final String CLA_NO_BANNER = "-noBanner";
     public static final String CLA_DEBUG_ON = "-debug";
     public static final String CLA_RUN_SCRIPT_ON = "-run";
@@ -2341,15 +2955,15 @@ public class WorkspaceCommands implements Logable {
     // turns on some low-level tracing of this class with DebugUtil when it initializes. Not for public use.
     String TRACE_ARG = "-trace";
 
-    public boolean isCompressSerialization() {
-        return compressSerialization;
+    public boolean isCompressXML() {
+        return compressXML;
     }
 
-    public void setCompressSerialization(boolean compressSerialization) {
-        this.compressSerialization = compressSerialization;
+    public void setCompressXML(boolean compressXML) {
+        this.compressXML = compressXML;
     }
 
-    boolean compressSerialization = true;
+    boolean compressXML = true;
 
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
@@ -2371,7 +2985,7 @@ public class WorkspaceCommands implements Logable {
             // This is overrides configuration file.
             rootDir = new File(inputLine.getNextArgFor("-home_dir"));
         }
-        compressSerialization = qe.isCompressionOn();
+        compressXML = qe.isCompressionOn();
         // Setting this flag at the command line will turn on lower level debugging.
         // The actual option in the configuration file turns on logging debug (so info and trace are enabled).
         if (inputLine.hasArg(TRACE_ARG)) {
@@ -2506,7 +3120,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     private void testXMLReader(String filename) throws Throwable {
-        if (StringUtils.isTrivial(filename)) {
+        if (isTrivial(filename)) {
             filename = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws-test.xml";
         }
         File file = new File(filename);
@@ -2522,7 +3136,7 @@ public class WorkspaceCommands implements Logable {
     private void testXMLWriter(boolean doFile, String filename) throws Throwable {
         Writer w = null;
         if (doFile) {
-            if (StringUtils.isTrivial(filename)) {
+            if (isTrivial(filename)) {
                 filename = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws-test.xml";
             }
             File file = new File(filename);
@@ -2724,12 +3338,21 @@ public class WorkspaceCommands implements Logable {
         runScript(inputLine); // If there is a script, run it.
     }
 
+    /**
+     * Runs the script from the command line if the -run argument is passed.
+     * Contract is that there is the argument is of the form
+     * <pre>-run path_to_script x y z ... </pre>
+     * path_to_script is the name of QDL file. Below it is referred to as {@link #runScriptPath}
+     * and x,y,z,... are passed to the script.
+     * <br/><br/>
+     * Note especially that {@link #runScriptPath} is set as state for the workspace, but normally not settable by
+     * the user.
+     *
+     * @param inputLine
+     */
     private void runScript(InputLine inputLine) {
         if (isRunScript) {
 
-            // get the args for the script
-            // contract is that there is the -run file x y z ...
-            // so x,y,z,... are passed tot the script.
             ArrayList<String> argList = new ArrayList<>();
 
             boolean addArg = false;
@@ -2812,12 +3435,12 @@ public class WorkspaceCommands implements Logable {
     }
 
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        WSXMLSerializer serializer = new WSXMLSerializer(this);
-        serializer.toXML(xsw);
+        WSXMLSerializer serializer = new WSXMLSerializer();
+        serializer.toXML(this, xsw);
     }
 
-    public void fromXML(XMLEventReader xer) throws XMLStreamException {
-        WSXMLSerializer serializer = new WSXMLSerializer(this);
+    public boolean fromXML(XMLEventReader xer) throws XMLStreamException {
+        WSXMLSerializer serializer = new WSXMLSerializer();
         WorkspaceCommands newCommands = null;
         try {
             newCommands = serializer.fromXML(xer);
@@ -2831,6 +3454,8 @@ public class WorkspaceCommands implements Logable {
             setEchoModeOn(newCommands.isEchoModeOn());
             setPrettyPrint(newCommands.isPrettyPrint());
             currentPID = newCommands.currentPID;
+            wsID = newCommands.wsID;
+            description = newCommands.description;
             currentWorkspace = newCommands.currentWorkspace;
             rootDir = newCommands.rootDir;
             saveDir = newCommands.saveDir;
@@ -2838,10 +3463,11 @@ public class WorkspaceCommands implements Logable {
             interpreter = new QDLInterpreter(env, newCommands.getState());
             interpreter.setEchoModeOn(newCommands.isEchoModeOn());
             interpreter.setPrettyPrint(newCommands.isPrettyPrint());
-
+            return true;
         } catch (Throwable t) {
             // This should return a nice message to display.
-            say(t.getMessage());
+            getState().getLogger().error("Could not deserialize file", t);
+            return false;
         }
 
     }

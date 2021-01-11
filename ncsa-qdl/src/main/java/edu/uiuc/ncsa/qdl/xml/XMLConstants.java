@@ -38,6 +38,9 @@ public interface XMLConstants {
     String ENV_PROPERTIES = "env_properties";
     String SCRIPT_PATH = "script_path";
     String MODULE_PATH = "module_path";
+    String COMPRESS_XML = "compress_xml";
+    String WS_ID = "ws_id";
+    String DESCRIPTION = "description";
 
 
     String VARIABLE_TAG = "var";

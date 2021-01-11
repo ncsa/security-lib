@@ -31,6 +31,20 @@ public abstract class Module implements Serializable {
         return false;
     }
 
+    /**
+     * The system will mark loaded modules as template.
+     * @return
+     */
+    public boolean isTemplate() {
+        return template;
+    }
+
+    public void setTemplate(boolean template) {
+        this.template = template;
+    }
+
+    boolean template = false;
+
     public Module() {
     }
 

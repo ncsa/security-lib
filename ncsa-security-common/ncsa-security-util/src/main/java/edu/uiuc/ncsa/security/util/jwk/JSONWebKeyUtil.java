@@ -6,6 +6,12 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -20,6 +26,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * A utility for <a href="https://tools.ietf.org/html/rfc7517">RFC 7515</a>, the JSON web key format.
@@ -140,24 +148,30 @@ public class JSONWebKeyUtil {
         JSONArray array = new JSONArray();
         for (String key : webKeys.keySet()) {
             JSONWebKey webKey = webKeys.get(key);
-            if (webKey.type.equals("RSA")) {
-                JSONObject jsonKey = new JSONObject();
-                RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
-                jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
-                jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
-                jsonKey.put(ALGORITHM, webKey.algorithm);
-                jsonKey.put(KEY_ID, webKey.id);
-                jsonKey.put(USE, webKey.use);
-                jsonKey.put(KEY_TYPE, "RSA");
-                if (webKey.privateKey != null) {
-                    RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
-                    jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
-                }
-                array.add(jsonKey);
-            }
+            array.add(toJSON(webKeys.get(key)));
         }
         json.put("keys", array);
         return json;
+    }
+
+    public static JSONObject toJSON(JSONWebKey webKey) {
+
+        if (webKey.type.equals("RSA")) {
+            JSONObject jsonKey = new JSONObject();
+            RSAPublicKey rsaPub = (RSAPublicKey) webKey.publicKey;
+            jsonKey.put(MODULUS, bigIntToString(rsaPub.getModulus()));
+            jsonKey.put(PUBLIC_EXPONENT, bigIntToString(rsaPub.getPublicExponent()));
+            jsonKey.put(ALGORITHM, webKey.algorithm);
+            jsonKey.put(KEY_ID, webKey.id);
+            jsonKey.put(USE, webKey.use);
+            jsonKey.put(KEY_TYPE, "RSA");
+            if (webKey.privateKey != null) {
+                RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
+                jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
+            }
+            return jsonKey;
+        }
+        throw new IllegalArgumentException("Unsupported webkey type \"" + webKey.type + "\".");
     }
 
     /**
@@ -180,6 +194,64 @@ public class JSONWebKeyUtil {
         }
         // now we have a clone with no private keys, we need to c
         return newKeys;
+    }
+
+
+    public static final String DEFAULT_KEY_ID_TAG = "default_key_id";
+    public static final String JSON_WEB_KEYS_TAG = "json_web_keys";
+
+    /**
+     * Not a complete serialization -- this is used to insert JSONweb keys into a larger
+     * serialization scheme.
+     *
+     * @param jwks
+     * @param xsw
+     * @throws XMLStreamException
+     */
+    public static void toXML(JSONWebKeys jwks, XMLStreamWriter xsw) throws XMLStreamException {
+        xsw.writeStartElement(JSON_WEB_KEYS_TAG);
+        if (!isTrivial(jwks.getDefaultKeyID())) {
+            xsw.writeAttribute(DEFAULT_KEY_ID_TAG, jwks.getDefaultKeyID());
+        }
+        xsw.writeCData(Base64.encodeBase64URLSafeString(toJSON(jwks).toString().getBytes()));
+        xsw.writeEndElement(); // end JSON web keys
+    }
+
+    /**
+     * This is not a complete deserialization, but is part of a larger scheme. The assumption is that
+     * the cursor for the stream is positioned at the start tag for JSON web keys.
+     *
+     * @param xer
+     * @throws XMLStreamException
+     */
+    public static JSONWebKeys fromXML(XMLEventReader xer) throws XMLStreamException, InvalidKeySpecException, NoSuchAlgorithmException {
+        XMLEvent xe = xer.peek();
+        String defaultKeyId = "";
+        Attribute a = xe.asStartElement().getAttributeByName(new QName(DEFAULT_KEY_ID_TAG));
+        if (a != null) {
+            defaultKeyId = a.getValue();
+        }
+        JSONWebKeys jwks = new JSONWebKeys(defaultKeyId);
+
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.CHARACTERS:
+                    if (!xe.asCharacters().isWhiteSpace()) {
+                        byte[] b = Base64.decodeBase64(xe.asCharacters().getData());
+                        jwks = fromJSON(new String(b));
+                    }
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(JSON_WEB_KEYS_TAG)) {
+                        return jwks;
+                    }
+                    break;
+            }
+
+            xe = xer.nextEvent();
+        }
+        throw new IllegalArgumentException("Error: missing closing tag for element " + JSON_WEB_KEYS_TAG);
     }
 
 }

@@ -39,17 +39,17 @@ See also: encode_b64
     </entry>
 
     <entry id="encode_b64">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 encode_b64(arg) - encode a string or stem of string into base 64.
 See also: decode_b64
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="head">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 head(target, stopChar[,is_case_sensitive]) - Return up to stopChar in the target. Both of the first arguments
                  may be conformable stems. The result is always conformable to target.
                  is_case_sensitive - if true (default) does case sensitive checking.
@@ -58,20 +58,20 @@ E.g.
 [bob,todd,]
     Note that there is no match for the last element, so an empty string is returned.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="from_hex">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 from_hex(arg) - convert a hexadecimal string or stem of strings to a string.
 See also: to_hex
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="check_syntax">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 check_syntax(string) - This will take the (possibly very long) string and run it through the
                         parser checking for syntax errors. Note that this does not run anything!
                         Its use is to help you track down errors like missing semi-colons, illegal
@@ -87,100 +87,100 @@ syntax error:line 11:27 mismatched input '=' expecting {'^', '=<', '=>', ...
 Meaning that on line 11, position 27 there was an error in the file.
 See also: execute
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="hash">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 hash(arg) - calculates the SHA-1 digest of a string or stem of strings.
             The output is a hexadecimal string. Note that this has nothing to
             do with converting to or from hex strings.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="mod">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 mod(a,b) - compute the modulus, i.e., the remainder after long division, of two integer.
            the arguments are either scalar or stems.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="numeric_digits">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
    numeric_digits() - display the current precision
 numeric_digits(arg) - set the precision to the value of arg, which is a positive integer.
                       The result displayed is the old precision.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="random">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
  random() - return a random number
 random(n) - return n (an integer) random numbers as a stem list.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="random_string">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
     random_string() - return a random string of 16 bytes, base 64 encoded.
    random_string(n) - return a random string of n bytes, base 64 encoded
 random_string(n, m) - return a list containing m entries with n bytes each, base 64 encoded
 See also: encode_b64, decode_b64
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_hex">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_hex(arg) - convert a string or stem of strings to hexadecimal numbers.
 Note: Since the representation relies on the underlying character set, this is of less use
 generally than encoding a string in base 64. However, from_hex is guaranteed to be its inverse.
 See also: encode_b64, decode_b64, from_hex
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="box">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 box(arg0, arg1, ...) - take any collection of variables and turn them into a single stem, their
                        names becoming keys. They are removed from the symbol table.
                        There must be at least one argument and the result is a boolean true if it
                        succeeded and false otherwise (so you can test programatically if it worked).
 See also: unbox
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="exclude_keys">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 exclude_keys(target., list.) - remove the list. of keys (and their values) from target.
 Note: The result will be a subset of target. that contains none of the keys listed in the list. argument.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="encode_b64">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="from_json">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
          from_json(arg) - takes the argument with is a string representation of JSON and turns it into a stem.
 from_json(arg, convert) - as per single argument case, but allows a flag (true or false) if vencode is to be
                           applied to each key. The default is false.
 See also: vencode, to_json
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="list_keys">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 list_keys(arg.) - returns a list of the keys in the argument.
 list_keys(arg., scalars_only) - returns a list of the keys in the argument.
                                 scalars_only is a boolean that when true will return only those keys whose
@@ -188,34 +188,34 @@ list_keys(arg., scalars_only) - returns a list of the keys in the argument.
 Note: Strings are scalars.
 See also: keys
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="has_keys">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 has_keys(target., key_list.) - returns a boolean list that is the same size as key_list. and
                                has a true or false if that entry is a key in target.
 See also: list_keys
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="include_keys">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 include_keys(target., key_list.) - returns a stem that is the subset of target. including only
                                    keys found in key_list.
 See also: exclude_keys
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="indices">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 indices(n) - make a stem list whose values are 0,..., n-1
 Note: This is extremely useful in certain looping constructs.
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="has_value">
         <body>
             <![CDATA[
@@ -229,32 +229,32 @@ See also: mask
         </body>
     </entry>
     <entry id="is_list">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are integers.
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="keys">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 keys(stem.) - returns a list of the keys in stem.
 Note: There is no canonical ordering of keys, so these are effectively random.
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="list_append">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 list_append(list0., arg) - append arg to list0., adjusting the indices as needed.
 Note: If arg is a scalar, the single value is appended. If arg is a list, then the
       entire list is appended.
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="list_copy">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 list_copy(source., start_index, length, target., target_index) - copy one list into another, overwriting old elements.
 
      source. = the stem that is the source of the copy.
@@ -266,11 +266,11 @@ target_index = the index in the target that will receive the copy. Note that any
                consider using the list_insert_at command.
 See also: list_insert_at
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="list_insert_at">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 list_insert_at(source., start_index, length, target., target_index) -  insert one list in another, moving the old elements.
 
      source. = the stem that is the source of the copy.
@@ -280,111 +280,111 @@ list_insert_at(source., start_index, length, target., target_index) -  insert on
 target_index = the index in the target that will receive the copy. Note that any elements already
                in these locations will be moved. If you intend to replace a section of this list,
                consider using the list_copy command.                 ]]>
-See also: list_copy
-             </body>
-         </entry>
+            See also: list_copy
+        </body>
+    </entry>
     <entry id="list_subset">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 list_subset(source_list., start_index) - return a subset of the source_list starting at the given index.
 list_subset(source_list., start_index, n) - return a subset of the source_list starting at the given index,
                                             but only return n elements.
 Note: If n is omiited, then the rest of the list is returned from the start index on. The source is not altered
       and the resulting list has 0 as its first index.
                  ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="mask">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 mask(target., bit_mask.) - returns a subset of target. corresponding to each true value in the mask.
 Note: This operates generally on stems. Many operations return boolean stems which can be used with this function.
                ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
     <entry id="rename_keys">
-             <body>
-                 <![CDATA[
+        <body>
+            <![CDATA[
 rename_keys(target., new_names.) - rename the keys in target. using the new_names.
 Note: The keys in new_names. are a subset of target. and their values become the keys in target.
       If a key is in new_names. but not in target. it is ignored.
                 ]]>
-             </body>
-         </entry>
+        </body>
+    </entry>
 
     <entry id="set_default">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 set_default(stem., scalar) - sets the default value for this stem to the value of scalar.
 Note: the default value is not returned in any key operations, so setting the default for a new
       stem and using the keys() function on it returns an empty list, for instance.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="size">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 size(arg) -  return the size of the argument.
 
 arg is a stem - return the number of elements in the stem
 arg is a string - return the number of characters in the string, i.e., its length
 args is a scalar - zero, since scalars (such as integers) have no size.
             ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_json">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
                  to_json(stem.) - convert the stem to a JSON string.
         to_json(stem., convert) - if convert is true, vencode all keys in the JSON for the stem
 to_json(stem., convert, indent) - (requires convert), indent is an integer giving the number of spaces to indent the JSON string
 See also: from_json
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_list">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_list(arg0, arg1, ...) - takes any set of arguments (including stems) and converts to a list,
                            whose elements are the arguments.
 Note: This does not remove the arguments from the symbol table.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="unbox">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
                             safeModeOn (default is true) will NOT overwrite any variables in the current workspace
                             Turning safeModeOn to false will.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="to_uri">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_uri(string) - Takes a string that is a valid URI and returns a stem variable with all the parts (scheme, query, etc.)
                  put into entries. This is RFC 3986 compliant.
 See also: constants() for the field names, from_uri.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="from_uri">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the variable x, then
    x == from_uri(to_uri(x))
 should be true.
 See also: constants() for the field names, to_uri.
 
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="unique">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 unique(list.) - Take a list (of scalars) and return a list of the unique elements.
 E.g.
   unique(['a',2,4,true]~['a','b',0,3,true])
@@ -392,78 +392,78 @@ E.g.
 
  If this is used on a stem, it will only alter any list.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="halt">
-              <body>
-                  <![CDATA[
+        <body>
+            <![CDATA[
   halt([message]]) - This will halt the system on this line and update the workspace state indicator, passing along
                      the message. Note that this is properly a debugging tool. This is disabled in server mode.
 ]]>
-              </body>
-          </entry>
+        </body>
+    </entry>
     <entry id="union">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 union(arg0., arg1., ...) - takes the union of all stems, returning a single stem all of whose keys-values are taken
                            form the arguments. Note that the stems are processed in order and values may be over-written.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="dir">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 dir(arg) - list the names of the files in a given location. Note that this is VFS aware.
 Note: Directory names will have a / appended to them.
            ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="mkdir">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 mkdir(arg) - make a directory. Note that if there are path components that do not exist, they will be
              created. This returns true if it worked.
 Note: One major reason for this to fail is that, e.g., a virtual file system is mounted in read only mode.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="rmdir">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 rmdir(path) - remove the last component of this path (which must be a directory).
 Note that the directory must be empty first.
 See also: rm - remove a single file
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="rm">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 rm(file_name) - removes the given file.
              ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="say">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 say(arg) - print anything.
 say(arg, pretty_print) - print anything, but make the format more vertical if its a stem.
 Note: say returns the value of its argument so this can be used in statements for debugging too.
 See also: print
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="print">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 print - this is a synonym for the say function, so read the help for that.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="file_read">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 file_read(file_name) - read a file in. The result is a single string of the file contents
 file_read(file_name, type) - type is an integer that determines the result:
 -1 = as string (default)
@@ -471,37 +471,37 @@ file_read(file_name, type) - type is an integer that determines the result:
  1 = stem. A stem list whose entries are each line in the file.
 See also: decode_64
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="scan">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 scan([prompt]) - get user input. The prompt is optional, but will be printed. Input from the console blocks until
                  the user hits enter.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="vsf_mount">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 vfs_mount(cfg.) - mount a virtual file system.
 Note: The cfg. contains the configuration and is not trivial to describe. Read the reference manual for the details.
              ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="file_write">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 file_write(file_name, contents) = write the contents to the given file. contents can be a string or a list of strings.
 file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,, then the contents are decoded to binary
                                  before writing. The default is that this flag is false.
 See also: file_read, decode_b64, encode_b64
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="list_starts_with">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 list_starts_with(x., y.) - returns a left conformable list that has the indices of the right argument.  If there
                            is no such element, an index of -1 is returned.
 E.g.
@@ -516,12 +516,12 @@ To get a list of these, use mask, e.g.
 {0=a, 2=pqr}
 See also: mask
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="shuffle">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target. according to keys.
                           Argument keys. must have the same keys as the target. AND the values
                           of keys. are (as a set) the same as the keys. in the target.
@@ -533,87 +533,87 @@ E.g.
      This works generally with stems too.
 See also: rename_keys, which lets you rename some of the keys in a stem.
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="execute">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 execute(arg) - take the argument which is a string and execute it as if it were typed in.
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="script_args">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 script_args() - print out the list of arguments to this script
 script_args(n) - print the n-1 argument (first argument is 0).
 Note: This is specific to scripts. If the script is called in QDL, the arguments may be any QDL data type.
       If this is called from the command line by another process, the arguments will all be strings (even if they
       are passed in as, e.g. numbers).
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="script_load">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 script_load(file_name) - load the script and run it.
 script_load(file_name, arg0, arg1, ...) load the script, passing in the given arguments
 Note: Loading a script means to run it in the current session.
 See Also: script_run, script_args
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="script_run">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 script_run(file_name) - run the script
 script_run(file_name, arg0, arg1,...) - run the script, passing in the given arguments
 Note: Running a script means that a new clean environment is created and the script is run there.
       Output and input, however, are done in the current console.
 See Alsp: script_load, script_run, scan, say, print
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="info">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 info() -- a stem of all current information about the session (such as load paths, memory and such).
 info(key) - key is a string. This returns the single value for the given key.
 E.g. info('user.home_dir') prints out the current user's home directory.
 See also: constants()
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="constants">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 constants() - all constants associated with the system
 constants(key) - key is a string. This returns the value of a specific key.
 E.g. constants('file_type.binary') returns the integer that can be used in the file_read function.
 See also: info()
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="is_defined">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 is_defined(var) - a boolean-valued function that tells you if a given variable has been named.
 Note: the argument is not a string, it is the actual variable.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="is_function">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 is_function(name) - checks if the value of name (it is a string) is defined.
 is_function(name, arg_count) checks if a function given in name with the number of arguments is defined.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="os_env">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 os_env() - return a stem of all operating system environment values currently known by the system
 os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with each name as a key. If a property
                        is not found, that entry is omitted.
@@ -621,20 +621,20 @@ E.g. os_env('PATH') will give you the values of the PATH variable on most system
 Note 1: If you set environment variables in a shell script that invokes QDL, you may recover them using this call.
 Note 2: This is always empty in server mode! Scripts have no access to the underlying system.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="remove">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 remove(var) - remove a variable and its value from the symbol table.
 Note: This expunges it from the session and any future attempts to access it will result in errors until it is set again.
 See also: is_defined
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="script_path">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 script_path() - returns the list of paths used to resolve scripts
 script_path(arg) - sets the script path. Either this is a string each of whose paths are separated with
                    a colon, e.g. 'path0:path1' or it is a stem of paths.
@@ -643,11 +643,11 @@ Note: When invoking a script with an absolute path, that is run. If the path is 
       paths. If the path is unqualified, every path is checked.
 See also: script_load, script_run
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="module_path">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
    module_path() -  returns the list of paths used to resolve loading modules
 module_path(arg) - sets the module path. Either this is a string each of whose paths are separated with
                    a colon, e.g. 'path0:path1' or it is a stem of paths.
@@ -656,27 +656,27 @@ Note: When loading a module with an absolute path, that is run. If the path is r
       paths. If the path is unqualified, every path is checked.
 See also: module_load
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_number">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_number(arg) - convert a string or stem of strings to numbers. Each number must be a valid string representation.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_string">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_string(arg) - arg is anything and the result is a string representation of it.
 to_string(arg, is_pretty_print) - attempt to put the result in to a nicer format.
 Note: The print or say function effectively calls this and spits out the result to the console.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_boolean">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_boolean(arg) - arg is anything and the result is a boolean representation of it.
                   Note that this means
                   strings - true is only returned if the value is 'true'
@@ -685,41 +685,41 @@ to_boolean(arg) - arg is anything and the result is a boolean representation of 
                   booleans - returned unchanged.
                   stems - applied to each element.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="var_type">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 var_type(arg0, arg1,...) -  returns a list of integers that show the type of each argument. 
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="break">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 break() - immediately terminates a loop.
 See also: continue, return
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="check_after">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 check_after(conditional) - in loops, this means that the conditional is checked at the end of an interation
                rather than before the iteration. This effectively gives a post-positional loop.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="common_keys">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 common_keys(stem1., stem2.) - returns a list of keys common to both stems.
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="contains">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 contains(source, snippets) - returns a conformable result for any combination of stems and strings. If both arguments
                          are string, the result is a boolean. If source is a stem and snippets is a string, then the result is
                          a boolean stem witha  true for each entry that contains the snippet etc.
@@ -727,19 +727,19 @@ contains(source, snippets, case_sensitive) -- if case_sensitive is true (default
                          if false, all arguments are converted to lower case first.
 Note: Original arguments are never altered.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="continue">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 continue() - jumps to the next iteration in a loop
 See also: break, return
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="for_keys">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 for_keys(var, stem.)
 
   var - is a simple variable and will contain the current key during the loop.
@@ -747,11 +747,11 @@ for_keys(var, stem.)
 stem. - is a stem variable. The keys of this stem will be assigned to the var and may be accessed  in the loop.
 Note: This only operates inside of looping constructs.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="for_next">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 for_next(var, stop_value [,start_value, increment])
 
         var - the variable to be used. As the loop is executed, this value will change.
@@ -761,96 +761,96 @@ start_value - (optional, default is 0). The first value assigned to var.
   increment - (optional, default is 1). How much the loop variable should be incremented on each iteration.
 Note: This only functions in looping constructs.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="index_of">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 index_of(source, snippets) - returns a conformable stem of integers giving the location of the snippet or a -1 if
                   the snippet is not found.
 index_of(source, snippets, case_sensitive) - if true (default) all comparisons are case sensitive. If false,
                   all are converted to lower case first.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="module_import">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 module_import(urn)- import the given module using its default alias.
 module_import(urn, alias) - import the module, assigning it a different alias.
 Note: A module must be loaded before it can be imported or the system does not know about it.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="module_load">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 module_load(path) - load the module into the current session from the given file. It cannot be used until it is imported.
 module_load(path, type) - load the module. If type is 'file' (default) then this is assumed to be QDL and loaded.
                           If the type is 'java' then the path is actually the fully qualified class name and this is loaded from
                           the Java virtual machine.
              ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="raise_error">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 raise_error(message) - raises an error and propagates the message in to the catch block
 raise_error(message, code) - add and option numeric code
 Note: This ONLY works inside a try[ ... ]catch[] block!
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="return">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 return() - return from a function with no value.
 return(value)  - return value from this function as the result
 Note: This only works for functions.
 See also: continue, break
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="replace">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 replace(source, old, new) - replaces all occurences of old wit new in the source. These may be various combinations of stems
               and strings.
 E.g.   replace('abcde', 'cd', '23') yields 'ab23e'
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="substring">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 substring(arg, n) - take a substring of the arg starting at the given index, n, and going to the rest of the string. This
                   will also be done on each element if arg is a stem.
 substring(arg, n,length) - start the substring at index n and continue for length characters.
 substring(arg, n ,length ,padding) - start at the index, retrieve length characters and if there are not enough,
                  cyclically pad the result with the string padding.
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_lower">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_lower(arg) - convert a string or stem of strings to lower case. No effect on non-strings.
 See also: to_upper
                 ]]>
 
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="to_upper">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 to_upper(arg) - convert a string or stem of strings to upper case. No effect on non-strings.
 See also: to_upper
                ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="tokenize">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 tokenize(arg, delimiter) - tokenize a string or stem of strings using the given delimeter.
 E.g. tokenize('abd:def:123', ':') yeilds the stem
 {
@@ -859,12 +859,12 @@ E.g. tokenize('abd:def:123', ':') yeilds the stem
  2=123
 }
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
     <entry id="detokenize">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 detokenize(arg, delimiter) - converts  a string or stem of strings (tokens) into a string using the delimiter between entries.
 detokenize(arg, delimiter, options) - options is an integer which is the sum of
           1 for prepend
@@ -879,42 +879,165 @@ E.g. detokenize(indices(4), ' ') yields the string
 See also: truncate, constants (which contains the option values for reference)
 
                 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="trim">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
  trim(arg) - remove all leading and trailing blanks from the arg. The argument may also be a stem of strings.
 ]]>
-            </body>
-        </entry>
+        </body>
+    </entry>
 
 
     <entry id="vencode">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 vencode(arg) -  encode a string or stem of them.
 Note: This is supremely useful for non-western character sets that must be preserved.
 E.g. vencode('你浣') yields $E4$BD$A0$E6$B5$A3
 See also: vdecode
 ]]>
 
-            </body>
-        </entry>
+        </body>
+    </entry>
     <entry id="vdecode">
-            <body>
-                <![CDATA[
+        <body>
+            <![CDATA[
 vdecode(arg) -  decode an encoded string or stem.
 See also: vencode
 ]]>
+        </body>
+    </entry>
+
+    <!--
+         Variable entries
+    -->
+    <entry id="pp">
+            <body>
+                <![CDATA[
+(workspace variable)
+pp - short form for pretty_print.
+See pretty_print
+                ]]>
             </body>
         </entry>
-<!--    <entry id="vfs_unmount">
+
+    <entry id="pretty_print">
+            <body>
+                <![CDATA[
+(workspace variable)
+pretty_print - toggle printing stems on one line (off | false) or vertically (on | true).
+               pp is the short form for this.
+                ]]>
+            </body>
+        </entry>
+    <entry id="echo">
+            <body>
+                <![CDATA[
+(workspace variable)
+echo - toggle echo mode in the workspace. If (on | true), this allows you to enter QDl commands without the final
+       semi-colon (;) and the result is printed to the console. The default is on.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="ws_id">
+            <body>
+                <![CDATA[
+(workspace variable)
+ws_id - the internal identifier for this workspace. This is especially useful if the file name is
+        munged or strange.
+See also: name, description
+                ]]>
+            </body>
+        </entry>
+    <entry id="description">
+            <body>
+                <![CDATA[
+(workspace variable)
+description - A human readable description of this workspace. This is printed on load if present.
+              It should tell the user what the workspace does for instance. Note that you can set
+              it using a QDL variable too so
+
+ )ws set description >my_descr.
+
+               Would set the contents of this to the list of strings given. Note that this will be turned into
+               a single string with linefeeds after each entry.
+                ]]>
+            </body>
+        </entry>
+    <entry id="debug">
+            <body>
+                <![CDATA[
+(workspace variable)
+debug - Toggle low-level debugging of the innards of the workspace and QDL. This is only useful if you are having
+        a serious issue (such as writing a Java module and need to see stack traces). This may be (on | true)
+        or (off | false)
+        Generally you do not need this.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="start_ts">
+            <body>
+                <![CDATA[
+(workspace variable)
+start_ts - The time stamp when this was first created. You *may* change this, but probably just want the system
+           to manage. Set it using either as an integer (in milliseconds) or as an ISO 8601 date.
+                ]]>
+            </body>
+        </entry>
+    <entry id="root_dir">
+            <body>
+                <![CDATA[
+(workspace variable)
+root_dir - The root directory for all relative file directories. If you attempt to save the workspace and
+           the file name is relative (so does not e.g., start with a /) then it is assumed to reside
+           in this directory. At startup, this is set to the directory where QDL was started by default.
+E.g.
+
+)save ws/var/my_ws.zml
+
+            would resolve this to root_dir/ws/var/my_ws.zml when saving it.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="save_dir">
+            <body>
+                <![CDATA[
+(workspace variable)
+save_dir - The default directory for saving and loading files. This is set at startup automatically
+           This overrides relativizing the path from the root_dir.
+                ]]>
+            </body>
+        </entry>
+
+
+    <entry id="compress_xml">
+            <body>
+                <![CDATA[
+(workspace variable)
+compress_xml - toggle compression of XML on WS save. Options are (on | true) or (off | false).
+               Note that on loading workspaces, this not used -- the workspace will figure out
+               if it was saved with compression and decompress it, so you don't have to worry about
+               the compression of stored workspaces.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="">
             <body>
                 <![CDATA[
                 ]]>
             </body>
-        </entry>-->
+        </entry>
+
+    <!--
+        entry template
+    -->
+
     <!--
     <entry id="">
             <body>

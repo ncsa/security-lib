@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.config;
 
+import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -187,10 +188,14 @@ public class QDLConfigurationLoaderUtils {
 
     public static void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
         for (Module m : loader.load()) {
+            m.setTemplate(true);
             state.addModule(m); // done!
             if (importASAP) {
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
-                state.getImportedModules().put(m.getAlias(), m);
+                State state1 = state.newModuleState();
+                Module mm = m.newInstance(state1);
+                ((JavaModule)mm).init(state1);
+                state.getImportedModules().put(m.getAlias(), mm);
             }
         }
     }

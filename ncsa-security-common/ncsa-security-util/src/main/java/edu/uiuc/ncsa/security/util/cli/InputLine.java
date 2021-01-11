@@ -75,6 +75,9 @@ public class InputLine {
      * @param value
      */
     public void removeSwitchAndValue(String value) {
+        if(!hasArg(value)){
+            return;
+        }
         String x = getNextArgFor(value);
         removeSwitch(x);
         removeSwitch(value);
@@ -207,6 +210,13 @@ public class InputLine {
         }
     }
 
+    public int getNextIntArg(String key) {
+        try {
+            return Integer.parseInt(getNextArgFor(key));
+        } catch (NumberFormatException nfx) {
+            throw new ArgumentNotFoundException("Error: the argument /" + getNextArgFor(key) + "/ cannot be parsed. Did you forget the object index?");
+        }
+    }
 
     /**
      * Returns true if this command line was created with an empty string.
@@ -220,6 +230,7 @@ public class InputLine {
     /**
      * This number of all arguments *including* the original command. To get the number of arguments,
      * call {@link #getArgCount()}.
+     *
      * @return
      */
     public int size() {

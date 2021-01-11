@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.core.util;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.StringTokenizer;
+import net.sf.json.JSON;
+import net.sf.json.JSONSerializer;
+
+import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -96,6 +96,22 @@ public class StringUtils {
         String x = null;
         System.out.println(isTrivial(x));
         testWrap();
+        System.out.println("\n------ test map formatting -----");
+        HashMap<String, Object> testMap = new HashMap<>();
+        testMap.put("mairzy", "doats");
+        testMap.put("and does", "eat stoats");
+        testMap.put("and little", "lambsey divey, A kiddle-dee divey too wouldn't you??");
+        testMap.put("now", new Date());
+        List<String> formattedMap = formatMap(testMap,
+                null, // do not take a subset
+                false,// do not sort the keys
+                true, // split the values over several lines if needed
+                3,// indent the whole output 3 spaces from the left.
+                60 // The total display must fit within 60 chars.
+        );
+        for (String formattedLine : formattedMap) {
+            System.out.println(formattedLine);
+        }
     }
 
     /*
@@ -253,21 +269,22 @@ public class StringUtils {
 
     /**
      * Convience to wrap a single string.
+     *
      * @param source
      * @param width
      * @return
      */
-    public static String wrap(String source, int width){
+    public static String wrap(String source, int width) {
         String formattedString = "";
 
         for (int i = 0; i < source.length() / width; i++) {
-             formattedString = formattedString + source.substring(i * width, (i + 1) * width) + "\n";
-         }
-         if (0 != source.length() % width) {
-             // if there is anything left over, append it, otherwise, skip this.
-             formattedString = formattedString + source.substring(source.length() - source.length() % width);
-         }
-         return formattedString;
+            formattedString = formattedString + source.substring(i * width, (i + 1) * width) + "\n";
+        }
+        if (0 != source.length() % width) {
+            // if there is anything left over, append it, otherwise, skip this.
+            formattedString = formattedString + source.substring(source.length() - source.length() % width);
+        }
+        return formattedString;
     }
 
     public static List<String> toList(String x) {
@@ -289,10 +306,11 @@ public class StringUtils {
 
     /**
      * Checks if towo strings have equal content.
+     *
      * @param x
      * @param y
      * @param ignoreCase ignore case. Everything is converted to lower case before checking
-     * @param trimEnds remove any lead or trailing whitespace before checking
+     * @param trimEnds   remove any lead or trailing whitespace before checking
      * @return
      */
     public static boolean equals(String x,
@@ -307,7 +325,7 @@ public class StringUtils {
             x = x.trim();
             y = y.trim();
         }
-        if(ignoreCase){
+        if (ignoreCase) {
             x = x.toLowerCase();
             y = y.toLowerCase();
         }
@@ -315,15 +333,15 @@ public class StringUtils {
         if (x.length() != y.length()) return false;
         char[] yChar = y.toCharArray();
         char[] xChar = x.toCharArray();
-        for(int i = 0; i < xChar.length; i++){
-            if(xChar[i] != yChar[i]) return false;
+        for (int i = 0; i < xChar.length; i++) {
+            if (xChar[i] != yChar[i]) return false;
         }
         return true;
     }
 
     public static boolean equals(String x,
-                                 String y){
-        return equals(x,y,false,false);
+                                 String y) {
+        return equals(x, y, false, false);
     }
 
     /**
@@ -341,6 +359,7 @@ public class StringUtils {
     }
 
     protected static String STARS = "**************************************************************************************";
+
     public static String pad2(int value, int commandBufferMaxWidth) {
         String x = Integer.toString(value);
         return pad2(x, false, commandBufferMaxWidth);
@@ -348,9 +367,9 @@ public class StringUtils {
 
     public static String pad2(Date value, boolean isISO, int commandBufferMaxWidth) {
         String x;
-        if(isISO){
+        if (isISO) {
             x = Iso8601.date2String(value);
-        }else{
+        } else {
             x = value.toString();
         }
         return pad2(x, false, commandBufferMaxWidth);
@@ -358,6 +377,7 @@ public class StringUtils {
 
     /**
      * Default is ISO 8601 dates
+     *
      * @param value
      * @param commandBufferMaxWidth
      * @return
@@ -369,7 +389,7 @@ public class StringUtils {
 
     /**
      * Pad the string to the given length with blanks. This makes sure every line
-     * is the same length. If the line is too long, it is
+     * is the same length. If the line is too long, it is  truncated
      *
      * @param s
      * @param commandBufferMaxWidth
@@ -379,11 +399,15 @@ public class StringUtils {
     public static String pad2(String s, int commandBufferMaxWidth) {
         return pad2(s, true, commandBufferMaxWidth); // default is to truncate lines too long
     }
+
     public static String pad2(String s, boolean isTruncate, int commandBufferMaxWidth) {
-        if(commandBufferMaxWidth <= s.length()){
-            if(isTruncate){
-                s = s.substring(0,commandBufferMaxWidth);
-            }else {
+        if(isTrivial(s)){
+            return getBlanks(commandBufferMaxWidth);
+        }
+        if (commandBufferMaxWidth <= s.length()) {
+            if (isTruncate) {
+                s = s.substring(0, commandBufferMaxWidth);
+            } else {
                 s = STARS.substring(0, Math.min(5, commandBufferMaxWidth));
             }
         }
@@ -391,4 +415,131 @@ public class StringUtils {
 
     }
 
+    /**
+     * Format a map of objects.
+     *
+     * @param map          The map to be displayed
+     * @param keySubset    An optional (may be null or empty) subset of keys. Only these will be used id present
+     * @param sortKeys     if true, the keys in the map will be sorted.
+     * @param multiLine    Split the formatting of the vlues in the map over several lines (true) or truncate with ellipses (false)
+     * @param indent       The amount for the whole thing to be indented from the left
+     * @param displayWidth The total width that this must fit in.
+     * @return
+     */
+    public static List<String> formatMap(Map<String, Object> map,
+                                         List<String> keySubset,
+                                         boolean sortKeys,
+                                         boolean multiLine,
+                                         int indent,
+                                         int displayWidth) {
+
+        List<String> outputList = new ArrayList<>();
+        Map<String, Object> tMap;
+        if (sortKeys) {
+            tMap = new TreeMap<>(); // sorts the keys
+        } else {
+            tMap = new HashMap<>();
+        }
+        if (keySubset == null || keySubset.isEmpty()) {
+            tMap.putAll(map);
+        } else {
+            // take only a subset
+            for (String k : keySubset) {
+                if (map.containsKey(k)) {
+                    tMap.put(k, map.get(k));
+                }
+            }
+        }
+        int width = 0;
+        for (String key : tMap.keySet()) {
+            width = Math.max(width, key.length());
+        }
+        // Use the order of the tmap (so its sorted) but the XMLMap has information we need to get these.
+        for (String key : tMap.keySet()) {
+            //String v = map.getString(key);
+            Object rawValue = map.get(key);
+            if(rawValue==null){
+                continue;
+            }
+
+            String v = map.get(key).toString();
+            if (!StringUtils.isTrivial(v)) {
+                if (rawValue instanceof JSON) {
+                    v = ((JSON) rawValue).toString(1);
+                } else {
+                    if (rawValue instanceof Date) {
+                        v = Iso8601.date2String((Date) rawValue);
+                    } else {
+                        v = rawValue.toString();
+                        try {
+                            // Check if it's serialized JSON.
+                            JSON json = JSONSerializer.toJSON(v);
+                            v = json.toString(1);
+                        } catch (Throwable t) {
+
+                        }
+                    }
+
+                }
+                outputList.add(formatMapEntry(key, v, indent, displayWidth, width, multiLine));
+            }
+        }
+        return outputList;
+    }
+
+    /**
+     * Format an entry from a map. This will take a (key, value) pair within margins so that colons align
+     * and format it as a line of the form (multiLine false):
+     * <pre>
+     *     key : value...
+     * </pre>
+     * This truncates the value to fit on a single line and within the displayWidth. If multiLine is true it
+     * will be of the form:
+     * <pre>
+     *     key : value split
+     *           over several lines as
+     *           needed.
+     * </pre>
+     * Note that the leftColumWidth is the length of the longest key in the map, usually. The key will be right
+     * justified within this field and hence all the colons will end up in the same place, making the output
+     * extremely readable.
+     *
+     * @param key            The key from the entry
+     * @param value          The value of the entry
+     * @param indentWidth    The indent on the left of the whole entry
+     * @param displayWidth   The actual width that this is to fit in
+     * @param leftColumWidth The total width of the key field.
+     * @param multiLine      Split the value over several lines if too long, otherwise truncate with ellipsis.
+     * @return
+     */
+    public static String formatMapEntry(String key,
+                                        String value,
+                                        int indentWidth,
+                                        int displayWidth,
+                                        int leftColumWidth,
+                                        boolean multiLine) {
+        // the given indent plus space for the " : " in the middle
+        indentWidth = indentWidth + 3;
+        int realWidth = displayWidth - indentWidth;
+        boolean shortLine = value.length() + leftColumWidth + 1 <= realWidth;
+        if (multiLine) {
+
+            List<String> flowedtext = wrap(0, StringUtils.toList(value), realWidth - leftColumWidth);
+
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(RJustify(key, leftColumWidth) + " : " + flowedtext.get(0) + ((flowedtext.size() <= 1 && shortLine) ? "" : "\n"));
+            boolean isFirstLine = true;
+            for (int i = 1; i < flowedtext.size(); i++) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    stringBuffer.append(getBlanks(indentWidth + leftColumWidth) + flowedtext.get(i));
+                } else {
+                    stringBuffer.append("\n" + getBlanks(indentWidth + leftColumWidth) + flowedtext.get(i));
+                }
+            }
+            return stringBuffer.toString();
+
+        }
+        return RJustify(key, leftColumWidth) + " : " + truncate(value.replace("\n", "").replace("\r", ""));
+    }
 }
