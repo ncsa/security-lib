@@ -40,6 +40,16 @@ public class WSXMLSerializer {
     public void toXML(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
 
         xsw.writeStartElement(WORKSPACE_TAG);
+        String comment = "";
+        String indent = "     ";
+        if (!isTrivial(workspaceCommands.getWSID())) {
+            comment = "\n" + indent + "workspace id: " + workspaceCommands.getWSID() + "\n";
+        }
+        if (!isTrivial(workspaceCommands.getDescription())) {
+            comment = comment + indent + workspaceCommands.getDescription() + "\n";
+        }
+        comment = comment + indent + "saved on " + Iso8601.date2String(System.currentTimeMillis()) + "\n";
+        xsw.writeComment(comment);
         xsw.writeStartElement(WS_ENV_TAG);
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
         xsw.writeAttribute(ECHO_MODE, Boolean.toString(workspaceCommands.echoModeOn));
@@ -50,7 +60,7 @@ public class WSXMLSerializer {
         if (!isTrivial(workspaceCommands.getWSID())) {
             // Note that since we want this to be an attribute, we are limited to what characters normally
             // can be set. Base64 encoding the id allows the user to give this id of just about anything
-            // Without destroying the integrity.
+            // without having to do a bunch of complex escaping.
             xsw.writeAttribute(WS_ID, Base64.encodeBase64String(workspaceCommands.getWSID().getBytes()));
         }
         if (workspaceCommands.envFile != null) {
@@ -148,6 +158,11 @@ public class WSXMLSerializer {
     }
 
     public WorkspaceCommands fromXML(XMLEventReader xer) throws XMLStreamException {
+        return fromXML(xer, false);
+
+    }
+
+    public WorkspaceCommands fromXML(XMLEventReader xer, boolean workspaceAttributesOnly) throws XMLStreamException {
         if (!xer.hasNext()) {
             say("Error! no XML found to deserialize");
         }
@@ -191,23 +206,36 @@ public class WSXMLSerializer {
                                 testCommands.setDescription(getDescription(xer));
                                 break;
                             case EDITOR_CLIPBOARD:
-                                testCommands.editorClipboard = getStemAsListFromXML(EDITOR_CLIPBOARD, xer);
+                                if (!workspaceAttributesOnly) {
+                                    testCommands.editorClipboard = getStemAsListFromXML(EDITOR_CLIPBOARD, xer);
+                                }
                                 break;
                             case STATE_TAG:
-                                testCommands.state = StateUtils.load(testCommands.state, xer);
+                                if (!workspaceAttributesOnly) {
+                                    testCommands.state = StateUtils.load(testCommands.state, xer);
+                                }
                                 break;
                             case BUFFER_MANAGER:
-                                testCommands.bufferManager = new BufferManager();
-                                testCommands.bufferManager.fromXML(xer);
+                                if (!workspaceAttributesOnly) {
+
+                                    testCommands.bufferManager = new BufferManager();
+                                    testCommands.bufferManager.fromXML(xer);
+                                }
                                 break;
                             case ENV_PROPERTIES:
-                                doEnvProps(testCommands, xer);
+                                if (!workspaceAttributesOnly) {
+                                    doEnvProps(testCommands, xer);
+                                }
                                 break;
                             case IMPORTS_COMMAND:
-                                XMLUtils.deserializeImports(xer, testCommands.getEnv(), testCommands.getState());
+                                if (!workspaceAttributesOnly) {
+                                    XMLUtils.deserializeImports(xer, testCommands.getEnv(), testCommands.getState());
+                                }
                                 break;
                             case MODULE_TEMPLATE_TAG:
-                                XMLUtils.deserializeTemplates(xer, testCommands.getEnv(), testCommands.getState());
+                                if (!workspaceAttributesOnly) {
+                                    XMLUtils.deserializeTemplates(xer, testCommands.getEnv(), testCommands.getState());
+                                }
                                 break;
                         }
                         break;
@@ -239,24 +267,24 @@ public class WSXMLSerializer {
         throw new NFWException("Error: Could not deserialize the file from XML."); // should not happen, and yet...
     }
 
-    protected String getDescription(XMLEventReader xer) throws XMLStreamException{
+    protected String getDescription(XMLEventReader xer) throws XMLStreamException {
         String description = null;
         XMLEvent xe = xer.nextEvent();
-        while(xer.hasNext()){
-                switch(xe.getEventType()){
-                    case XMLEvent.CHARACTERS:
-                        if (xe.asCharacters().isWhiteSpace()) {
-                            break;
-                        }
-                        description = new String(Base64.decodeBase64(xe.asCharacters().getData()));
-
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.CHARACTERS:
+                    if (xe.asCharacters().isWhiteSpace()) {
                         break;
-                    case XMLEvent.END_ELEMENT:
-                        if(xe.asEndElement().getName().getLocalPart().equals(DESCRIPTION)){
-                            return description;
-                        }
-                }
-            xe =  xer.nextEvent();
+                    }
+                    description = new String(Base64.decodeBase64(xe.asCharacters().getData()));
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(DESCRIPTION)) {
+                        return description;
+                    }
+            }
+            xe = xer.nextEvent();
         }
         throw new XMLMissingCloseTagException(DESCRIPTION);
     }

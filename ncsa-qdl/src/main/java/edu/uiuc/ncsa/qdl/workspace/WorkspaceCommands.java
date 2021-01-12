@@ -64,6 +64,7 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 public class WorkspaceCommands implements Logable {
 
 
+
     public WorkspaceCommands() {
     }
 
@@ -78,6 +79,8 @@ public class WorkspaceCommands implements Logable {
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
     public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
+    public static final String SAVE_AS_JAVA_FLAG = SWITCH  +"java";
+    public static final String KEEP_WSF = SWITCH + "keep_wsf";
 
     public MyLoggingFacade logger;
 
@@ -1946,6 +1949,13 @@ public class WorkspaceCommands implements Logable {
                     say(getDescription());
                 }
                 break;
+            case CURRENT_WORKSPACE_FILE:
+                if (currentWorkspace == null) {
+                    say("not set");
+                } else {
+                    say(currentWorkspace.getAbsolutePath());
+                }
+                break;
             case WS_ID:
                 if (isTrivial(getWSID())) {
                     say("(workspace id not set)");
@@ -1987,6 +1997,7 @@ public class WorkspaceCommands implements Logable {
     public static final String COMPRESS_XML = "compress_xml";
     public static final String WS_ID = "id";
     public static final String DESCRIPTION = "description";
+    public static final String CURRENT_WORKSPACE_FILE = "ws_file";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -2304,7 +2315,7 @@ public class WorkspaceCommands implements Logable {
 
         WSXMLSerializer serializer = new WSXMLSerializer();
         try {
-            WorkspaceCommands tempWSC = serializer.fromXML(xer);
+            WorkspaceCommands tempWSC = serializer.fromXML(xer, true);
             xer.close();
             wsLibEntry = getWsLibEntry(currentFile, gotCompressed, tempWSC);
             wsLibEntry.fileFormat = "xml";
@@ -2392,6 +2403,18 @@ public class WorkspaceCommands implements Logable {
             case DESCRIPTION:
                 setDescription(value);
                 say("description updated");
+                break;
+            case CURRENT_WORKSPACE_FILE:
+                File temp = new File(value);
+                if (temp.exists()) {
+                    if (!temp.isFile()) {
+                        say("sorry, " + temp.getAbsolutePath() + " is not a file.");
+                        return RC_NO_OP;
+                    }
+                } else {
+                    say("warning " + temp.getAbsolutePath() + " does not exist yet.");
+                }
+                currentWorkspace = temp;
                 break;
             case WS_ID:
                 setWSID(value);
@@ -2526,62 +2549,78 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
-    String JAVA_FLAG = "-java";
+    String JAVA_FLAG = SAVE_AS_JAVA_FLAG;
     String COMPRESS_FLAG = "-compress";
     String SHOW_FLAG = "-show";
 
     private int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off]");
+            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] ["+
+                    KEEP_WSF + "]");
             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
             sayi(JAVA_FLAG + " = save using Java serialization format. The default is XML.");
             sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
             sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
+            sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
             sayi("See the corresponding load command to recover it.");
             return RC_NO_OP;
         }
-        if (inputLine.getArgCount() == 1) {
-            if (saveDir == null) {
-                say("save dir = " + rootDir.getAbsolutePath());
-            } else {
-                say("save dir = " + saveDir.getAbsolutePath());
-            }
-            return RC_CONTINUE;
-        }
+
         boolean showFile = inputLine.hasArg(SHOW_FLAG);
-        File target = null;
+        boolean doJava = inputLine.hasArg(SAVE_AS_JAVA_FLAG);
+        boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
 
         boolean compressionOn = true;
+
         if (inputLine.hasArg(COMPRESS_FLAG)) {
             compressionOn = inputLine.getNextArgFor(COMPRESS_FLAG).equalsIgnoreCase("on");
         }
 
+        inputLine.removeSwitch(SHOW_FLAG);
+        inputLine.removeSwitch(COMPRESS_FLAG);
+        inputLine.removeSwitchAndValue(SAVE_AS_JAVA_FLAG);
+        inputLine.removeSwitch(KEEP_WSF);
+
+        // Remove switches before looking at positional arguments.
+
+        File target = null;
+        String fName = null;
+
+        if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            fName = inputLine.getArg(FIRST_ARG_INDEX);
+            target = new File(fName);
+        } else {
+            if (currentWorkspace == null) {
+                say("sorry, no default file set.");
+                return RC_NO_OP;
+            } else {
+                target = currentWorkspace;
+            }
+        }
+
+
         try {
 
             if (!showFile) {
-                if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-                    say("sorry, no file given");
-                    return RC_CONTINUE;
-                }
-                String fName = inputLine.getArg(FIRST_ARG_INDEX);
-                target = new File(fName);
-                if (target.isAbsolute()) {
-                    if (saveDir == null) {
-                        saveDir = target.getParentFile();
-                        say("Default save path updated to " + saveDir.getCanonicalPath());
-                    }
-                } else {
+
+                if (!target.isAbsolute()) {
                     if (saveDir == null) {
                         target = new File(rootDir, fName);
                     } else {
                         target = new File(saveDir, fName);
                     }
                 }
+                if (!target.isFile()) {
+                    say("sorry, but " + target.getAbsolutePath() + " is not a file.");
+                    return RC_NO_OP;
+                }
 
             }
+
+
             long uncompressedXMLSize = -1L;
-            if (inputLine.hasArg("-java")) {
+            if (doJava) {
                 _realSave(target);
             } else {
                 uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
@@ -2589,6 +2628,9 @@ public class WorkspaceCommands implements Logable {
             if (!showFile) {
                 String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
                 say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
+                if(!keepCurrentWS) {
+                    currentWorkspace = target;
+                }
             } else {
                 say(uncompressedXMLSize + " bytes.");
             }
@@ -2748,60 +2790,53 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsLoad(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("load filename [-java]");
+            say("load [filename] [" + KEEP_WSF + "]");
             sayi("Loads a saved workspace. If the name is relative, it will be resolved against " +
                     "the default location or it may be an absolute path.");
-            sayi("-java means to use Java serialization, which allows for preserving the state indicator");
-            sayi("The default is XML.");
+            sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
+            sayi("If there is no file given, the current workspace is used.");
+            sayi("See also: save, setting the current workspace.");
             return RC_NO_OP;
         }
-        if (inputLine.getArgCount() == 1) {
-            if (saveDir == null) {
-                say("load dir = " + rootDir.getAbsolutePath());
-            } else {
-                say("load dir = " + saveDir.getAbsolutePath());
-            }
-            return RC_CONTINUE;
-        }
-        boolean doJava = inputLine.hasArg("-java");
-        // so no workspace given ,reload current.
-        boolean loadOK = false;
-        if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            if (currentWorkspace == null) {
-                say("Sorry, no file given and no workspace has been loaded.");
-            } else {
-                loadOK = _xmlLoad(currentWorkspace);
 
-                if (!loadOK) {
-                    loadOK = _realLoad(currentWorkspace);
-                }
-                if (loadOK) {
-                    say("reloaded" + currentWorkspace.getAbsolutePath() + currentWorkspace.length() + " bytes. Last saved on " + new Date(currentWorkspace.lastModified()));
-                    return RC_CONTINUE;
-                } else {
-                    say("Sorry, could not reload current workspace");
-                    return RC_NO_OP;
-                }
-            }
-        }
+        File target;
+        String fName = null;
+        boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
+        inputLine.removeSwitch(KEEP_WSF);
 
-        String fName = inputLine.getArg(FIRST_ARG_INDEX);
-        File f = new File(fName);
-        if (f.isAbsolute()) {
-            // don't change save directory on load. (???) May change this
+        if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+            fName = inputLine.getArg(FIRST_ARG_INDEX);
+            target = new File(fName);
         } else {
-            if (saveDir == null) {
-                f = new File(rootDir, fName);
+            if (currentWorkspace == null) {
+                say("sorry, no default file set.");
+                return RC_NO_OP;
             } else {
-                f = new File(saveDir, fName);
+                target = currentWorkspace;
             }
         }
-        loadOK = _realLoad(f);
+
+        boolean loadOK = false;
+
+        if (!target.isAbsolute()) {
+
+            if (saveDir == null) {
+                target = new File(rootDir, fName);
+            } else {
+                target = new File(saveDir, fName);
+            }
+            if (!target.isFile()) {
+                say("sorry, but " + target.getAbsolutePath() + " is not a file.");
+                return RC_NO_OP;
+            }
+        }
+        loadOK = _realLoad(target);
         if (!loadOK) {
-            loadOK = _xmlLoad(f);
+            loadOK = _xmlLoad(target);
         }
         if (loadOK) {
-            say(f.getAbsolutePath() + " loaded " + f.length() + " bytes. Last saved on " + new Date(f.lastModified()));
+            say(target.getAbsolutePath() + " loaded " + target.length() + " bytes. Last saved on " +
+                    Iso8601.date2String(rootDir.lastModified()));
 
             if (!isTrivial(getWSID())) {
                 say(getWSID() + " loaded.");
@@ -2809,8 +2844,11 @@ public class WorkspaceCommands implements Logable {
             if (!isTrivial(getDescription())) {
                 say(getDescription());
             }
+            if(!keepCurrentWS) {
+                currentWorkspace = target;
+            }
         } else {
-            say("Could not load workspace for file " + f.getAbsolutePath());
+            say("Could not load workspace for file " + target.getAbsolutePath());
         }
         return RC_CONTINUE;
     }

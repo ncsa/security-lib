@@ -1027,9 +1027,17 @@ compress_xml - toggle compression of XML on WS save. Options are (on | true) or 
             </body>
         </entry>
 
-    <entry id="">
+    <entry id="ws_file">
             <body>
                 <![CDATA[
+(workspace variable)
+ws_file - the current file to save to/load from by default. If you save or load a file
+          this is set to that value. You may then issue commands like
+
+)save
+
+          (so no file argument) and the workspace is saved. Note that this is independent of the
+          save_dir, which used for resolving all relative path loads and saves.
                 ]]>
             </body>
         </entry>
