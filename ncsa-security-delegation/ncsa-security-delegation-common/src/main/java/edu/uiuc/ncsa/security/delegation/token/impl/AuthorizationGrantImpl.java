@@ -14,9 +14,9 @@ public class AuthorizationGrantImpl extends TokenImpl implements AuthorizationGr
         super(token);
     }
 
- /*   public AuthorizationGrantImpl(String rawToken) {
-        super(rawToken);
-    }*/
+    public AuthorizationGrantImpl(String sciToken, URI jti) {
+        super(sciToken, jti);
+    }
 
     @Override
     public boolean equals(Object obj) {

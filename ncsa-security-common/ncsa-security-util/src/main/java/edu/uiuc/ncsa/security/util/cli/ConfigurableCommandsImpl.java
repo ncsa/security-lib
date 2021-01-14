@@ -66,13 +66,13 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             showLoadHelp();
             return;
         }
-        if(inputLine.getArgCount() == 0){
-            if(StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())){
+        if (inputLine.getArgCount() == 0) {
+            if (StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())) {
                 say("no configuration set");
                 return;
             }
-            String m = StringUtils.isTrivial(configName)?"no config name":"current config name= \"" + configName;
-            m = m + " " + (StringUtils.isTrivial(getConfigFile())?"no file set":("from file " + getConfigFile()));
+            String m = StringUtils.isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
+            m = m + " " + (StringUtils.isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
             say(m);
             return;
         }
@@ -94,6 +94,28 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         info("loading configuration from " + fileName + ", named " + configName);
         loadConfig(fileName, configName);
         say("done!");
+    }
+
+    boolean traceOn = false;
+
+    public void trace(InputLine inputLine) throws Exception {
+        if (inputLine.getArgCount() == 0 || showHelp(inputLine)) {
+            say("trace [on  off] ");
+            say("Turn on low level trace for all commands. This is only useful if there are ");
+            say("issues with the running of the CLI itself and is a debugging tool for system programmers.");
+            say("No argument displays the current status.");
+            say("Trace is currently " + (traceOn ? "on" : "off"));
+            return;
+        }
+        traceOn =  inputLine.getArg(1).equals("on");
+        DebugUtil.setIsEnabled(traceOn);
+        setDebugOn(traceOn);
+        if (traceOn) {
+            DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
+        } else {
+            DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+        }
+        say("trace " + (traceOn ? "on" : "off"));
     }
 
     protected void listConfigs(InputLine inputLine) throws Exception {
@@ -137,10 +159,10 @@ public abstract class ConfigurableCommandsImpl implements Commands {
                 }
             }
         }
-        if(names.isEmpty()){
+        if (names.isEmpty()) {
             say("no configurations found.");
-        }else{
-            for(String x : names){
+        } else {
+            for (String x : names) {
                 say("  " + x);
             }
             say("found " + names.size() + " entries. Done!");

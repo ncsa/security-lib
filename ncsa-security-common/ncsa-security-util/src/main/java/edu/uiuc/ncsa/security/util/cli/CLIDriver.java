@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
 import java.io.*;
@@ -35,6 +37,8 @@ public class CLIDriver {
     public static final String SHORT_EXIT_COMMAND = "/q";
     public static final String REPEAT_LAST_COMMAND = "/r";
     public static final String WRITE_BUFFER_COMMAND = "/w";
+    public static final String LIST_ALL_METHODS_COMMAND = "/commands";
+    public static final String TRACE_COMMAND = "/trace";
 
     /*
     Added Environment support. This allows for having any extension od CommonCommands use the set_env call
@@ -79,27 +83,11 @@ public class CLIDriver {
     protected void setCLICommands(Commands[] commands) {
         this.commands = commands;
     }
-/*
-    public void setBufferedReader(BufferedReader bufferedReader) {
-        this.bufferedReader = bufferedReader;
-    }
 
-    public BufferedReader getBufferedReader() {
-        if (bufferedReader == null) {
-            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        }
-        return bufferedReader;
-    }
-
-    BufferedReader bufferedReader;*/
 
     protected String readline(String prompt) throws IOException {
-            return getIoInterface().readline(prompt);
+        return getIoInterface().readline(prompt);
     }
- /*   protected String readline() throws IOException {
-        return getIoInterface().readline();
-        //return getBufferedReader().readLine();
-    }*/
 
     protected static final int NEW_COMMAND_VALUE = 0;
     protected static final int REPEAT_COMMAND_VALUE = 10;
@@ -109,6 +97,8 @@ public class CLIDriver {
     protected static final int CLEAR_BUFFER_COMMAND_VALUE = 50;
     protected static final int SHORT_EXIT_COMMAND_VALUE = 60;
     protected static final int PRINT_HELP_COMMAND_VALUE = 70;
+    protected static final int LIST_ALL_METHODS_COMMAND_VALUE = 80;
+    protected static final int TRACE_COMMAND_VALUE = 90;
 
     // TODO - Add more CLI-level commands?
     // Might very well want to fold this into the standard flow rather than intercept it first.
@@ -123,20 +113,24 @@ public class CLIDriver {
         if (nextToken.equals(CLEAR_BUFFER_COMMAND)) return CLEAR_BUFFER_COMMAND_VALUE;
         if (nextToken.equals(SHORT_EXIT_COMMAND)) return SHORT_EXIT_COMMAND_VALUE;
         if (nextToken.equals(PRINT_HELP_COMMAND)) return PRINT_HELP_COMMAND_VALUE;
+        if (nextToken.equals(LIST_ALL_METHODS_COMMAND)) return LIST_ALL_METHODS_COMMAND_VALUE;
+        if (nextToken.equals(TRACE_COMMAND)) return TRACE_COMMAND_VALUE;
         return NEW_COMMAND_VALUE;
     }
 
-    protected void printHelp(){
+    protected void printHelp() {
         String indent = "  ";
         // This is help for the built in commands here
         say("--General commands:");
         say(indent + EXIT_COMMAND + " or " + SHORT_EXIT_COMMAND + " = exit this component");
         say(indent + PRINT_HELP_COMMAND + " = print this help");
+        say(indent + LIST_ALL_METHODS_COMMAND + " = list all of the currently available commands.");
+        say(indent + TRACE_COMMAND + " on | off = turn *low level* debugging on or off. USe with care.");
         say("--Command buffer: These are understood at all times and are interpreted before");
         say(indent + "any commands are issued.");
         say(indent + CLEAR_BUFFER_COMMAND + " =  clear the command history");
         say(indent + LOAD_BUFFER_COMMAND + " path = load the command history saved in the path");
-        say(indent + WRITE_BUFFER_COMMAND + " path = write the command history to the given file" );
+        say(indent + WRITE_BUFFER_COMMAND + " path = write the command history to the given file");
         say("--Command history:");
         say(indent + HISTORY_LIST_COMMAND + " [index] = either print the entire command history (no argument)");
         say(indent + indent + " or re-execute the command at the given index.");
@@ -147,6 +141,7 @@ public class CLIDriver {
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
         say("---");
     }
+
     protected String doRepeatCommand() {
         if (0 < commandHistory.size()) {
             return commandHistory.get(0);
@@ -254,6 +249,13 @@ public class CLIDriver {
         while (!isDone) {
             try {
                 //say2(prompt);
+                if (isTraceOn()) {
+                    // getIoInterface().flush();
+                    // System.err.flush();
+                    // This is because there may be cruft left over from debug statements and
+                    // if we don't do this, the cursor ends up in weird places.
+                    say("");
+                }
                 cmdLine = readline(prompt);
                 if (hasEnv()) {
                     cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
@@ -287,6 +289,13 @@ public class CLIDriver {
                     case PRINT_HELP_COMMAND_VALUE:
                         printHelp();
                         continue;
+                    case LIST_ALL_METHODS_COMMAND_VALUE:
+                        listCLIMethods();
+                        ;
+                        continue;
+                    case TRACE_COMMAND_VALUE:
+                        doTrace(cmdLine);
+                        continue;
                     case NEW_COMMAND_VALUE:
                     default:
                 }
@@ -311,22 +320,50 @@ public class CLIDriver {
                     case ABNORMAL_RC:
                     default:
                         say("Command not found/understood. Try typing help or exit.");
-                        listCLIMethods();
+                        say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
                 }
             } catch (Throwable ioe) {
                 if (debug) {
                     ioe.printStackTrace();
                 }
-                say("Internal error reading line:/n" + ioe.getMessage());
+                say("Internal error reading line:" + (StringUtils.isTrivial(ioe.getMessage()) ? "\n" + ioe.getMessage() : ""));
             }
         }
     }
-    
+
+    public boolean isTraceOn() {
+        return traceOn;
+    }
+
+    public void setTraceOn(boolean traceOn) {
+        this.traceOn = traceOn;
+    }
+
+    boolean traceOn = false;
+
+    private void doTrace(String cmdLine) {
+        StringTokenizer st = new StringTokenizer(cmdLine, " ");
+        st.nextToken(); // This is the "/trace" which we already know about
+        if (st.hasMoreTokens()) {
+            traceOn = st.nextToken().equalsIgnoreCase("on");
+            debug = traceOn;
+            DebugUtil.setIsEnabled(traceOn);
+            if (traceOn) {
+                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_TRACE);
+            } else {
+                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+            }
+            say("trace " + (traceOn ? "on" : "off"));
+        } else {
+            say("trace is currently " + (traceOn ? "on" : "off"));
+        }
+    }
+
 
     public int execute(String cmdLine) {
         Vector cmdV = CLT.tokenize(cmdLine);
         InputLine cliAV = new InputLine(cmdV);
-         cliAV.setOriginalLine(cmdLine);
+        cliAV.setOriginalLine(cmdLine);
         return execute(cliAV);
     }
 
@@ -372,8 +409,7 @@ public class CLIDriver {
 
                     } catch (Exception nsmx) {
                         if (debug) {
-                            say(" Could not execute command. Message:" + nsmx.getMessage());
-                            nsmx.printStackTrace();
+                            say("Could not execute command. Message:" + nsmx.getMessage());
                         }
                     }
                 }
@@ -432,7 +468,7 @@ public class CLIDriver {
     }
 
     public IOInterface getIoInterface() {
-        if(ioInterface == null){
+        if (ioInterface == null) {
             ioInterface = new BasicIO();
         }
         return ioInterface;

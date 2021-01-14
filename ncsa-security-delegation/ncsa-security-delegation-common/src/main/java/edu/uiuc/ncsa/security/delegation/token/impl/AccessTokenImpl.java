@@ -9,12 +9,21 @@ import java.net.URI;
  * on Mar 16, 2011 at  1:01:13 PM
  */
 public class AccessTokenImpl extends TokenImpl implements AccessToken {
- /*   public AccessTokenImpl(String rawToken) {
-        super(rawToken);
-    }
-*/
+    /**
+     * For tokens that a reno complex (e.g. not a WLCG token)
+     * @param token
+     */
     public AccessTokenImpl(URI token) {
         super(token);
+    }
+
+    /**
+     *
+     * @param sciToken an opaque string that is the encoded complex token.
+     * @param jti the unique id for th e token. Used to get lifetime etc.
+     */
+    public AccessTokenImpl(String sciToken, URI jti) {
+        super(sciToken, jti);
     }
 
     @Override

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import net.sf.json.JSONObject;
@@ -124,7 +125,6 @@ public abstract class CommonCommands implements Commands {
             throw new GeneralException("Error, could not read the input line due to IOException", iox);
         }
     }
-
 
     @Override
     public void print_help(InputLine inputLine) throws Exception{

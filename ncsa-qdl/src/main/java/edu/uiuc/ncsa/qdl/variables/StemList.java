@@ -15,6 +15,11 @@ import java.util.TreeSet;
  * on 2/20/20 at  8:39 AM
  */
 public class StemList<V extends StemEntry> extends TreeSet<V> {
+    /**
+     * Runs over <i>every</i> enetry in the stem list (including danglers).
+     * result is a standard list (starts at 0, no gaps) of unique elements.
+     * @return
+     */
     public StemList unique(){
         Iterator<V> iterator = iterator();
         HashSet set = new HashSet();

@@ -38,7 +38,10 @@ public class TokenImpl implements NewToken {
     public boolean isOldVersion() {
         return getVersion() == null;
     }
-
+    public TokenImpl(String sciToken, URI jti){
+        this.token = URI.create(sciToken);
+        init(jti);
+    }
     public TokenImpl(URI token) {
         this.token = token;
         init(token);
@@ -122,6 +125,10 @@ public class TokenImpl implements NewToken {
     }
 
 
+    public void setLifetime(long lifetime) {
+        this.lifetime = lifetime;
+    }
+
     long lifetime = -1L;
 
     @Override
@@ -135,6 +142,14 @@ public class TokenImpl implements NewToken {
     }
 
     long issuedAt = -1L;
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setIssuedAt(long issuedAt) {
+        this.issuedAt = issuedAt;
+    }
 
     @Override
     public long getIssuedAt() {

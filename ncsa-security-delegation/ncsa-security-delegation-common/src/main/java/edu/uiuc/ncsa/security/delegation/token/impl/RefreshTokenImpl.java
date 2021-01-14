@@ -13,9 +13,9 @@ public class RefreshTokenImpl extends TokenImpl implements RefreshToken {
         super(token);
     }
 
-   /* public RefreshTokenImpl(String rawToken) {
-        super(rawToken);
-    }*/
+    public RefreshTokenImpl(String sciToken, URI jti) {
+        super(sciToken, jti);
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -122,10 +122,11 @@ public abstract class IDTokenResponse extends IResponse2 {
         // claims are part of this and keyed to the id_token.
         HashMap m = new HashMap();
         m.put(ACCESS_TOKEN, accessToken.getToken());
+        m.put(EXPIRES_IN, (accessToken.getLifetime() / 1000));
+
         m.put(TOKEN_TYPE, "Bearer");
         if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
             m.put(REFRESH_TOKEN, getRefreshToken().getToken());
-            m.put(EXPIRES_IN, (getRefreshToken().getLifetime() / 1000));
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.

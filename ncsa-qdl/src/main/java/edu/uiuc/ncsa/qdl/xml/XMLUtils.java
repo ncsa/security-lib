@@ -177,7 +177,7 @@ public class XMLUtils implements XMLConstants {
         // scalar or a stem.
         XMLEvent xe = xer.nextEvent(); // get current event
         if (!xe.isStartElement()) {
-            throw new IllegalStateException("Error: Wrong XML tag type."); // just in case
+            throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
         }
         Object output = null;
         String tagName = xe.asStartElement().getName().getLocalPart();
@@ -194,7 +194,7 @@ public class XMLUtils implements XMLConstants {
                 output = QDLNull.getInstance();
             } else {
                 if (xe.getEventType() != XMLEvent.CHARACTERS) {
-                    throw new IllegalStateException("Error: Wrong XML tag type."); // just in case
+                    throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
                 }
                 String raw = xe.asCharacters().getData();
                 // several of these strip out the whitespace (which may include line feeds and other cruft.

@@ -110,6 +110,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String VARS_COMMAND = ")vars";
     protected static final String ENV_COMMAND = ")env";
     protected static final String WS_COMMAND = ")ws";
+    protected static final String LIB_COMMAND = ")lib";
     protected static final String EDIT_COMMAND = ")edit";
     protected static final String FILE_COMMAND = ")file";
     protected static final String STATE_INDICATOR_COMMAND = ")si";
@@ -251,6 +252,10 @@ public class WorkspaceCommands implements Logable {
                 return doVars(inputLine);
             case WS_COMMAND:
                 return doWS(inputLine);
+            case LIB_COMMAND:
+                inline = inline.replace(LIB_COMMAND, WS_COMMAND + " lib ");
+                inputLine = new InputLine(CLT.tokenize(inline));
+                return _wsLibList(inputLine);
             case SAVE_COMMAND:
                 inline = inline.replace(SAVE_COMMAND, WS_COMMAND + " save ");
                 inputLine = new InputLine(CLT.tokenize(inline));
@@ -2587,23 +2592,22 @@ public class WorkspaceCommands implements Logable {
         File target = null;
         String fName = null;
 
-        if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-            fName = inputLine.getArg(FIRST_ARG_INDEX);
-            target = new File(fName);
-        } else {
-            if (currentWorkspace == null) {
-                say("sorry, no default file set.");
-                return RC_NO_OP;
-            } else {
-                target = currentWorkspace;
-            }
-        }
+
 
 
         try {
-
             if (!showFile) {
-
+                if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+                    fName = inputLine.getArg(FIRST_ARG_INDEX);
+                    target = new File(fName);
+                } else {
+                    if (currentWorkspace == null) {
+                        say("sorry, no default file set.");
+                        return RC_NO_OP;
+                    } else {
+                        target = currentWorkspace;
+                    }
+                }
                 if (!target.isAbsolute()) {
                     if (saveDir == null) {
                         target = new File(rootDir, fName);
@@ -2611,8 +2615,8 @@ public class WorkspaceCommands implements Logable {
                         target = new File(saveDir, fName);
                     }
                 }
-                if (!target.isFile()) {
-                    say("sorry, but " + target.getAbsolutePath() + " is not a file.");
+                if (target.exists() && target.isDirectory()) {
+                    say("sorry, but " + target.getAbsolutePath() + " is not a directory.");
                     return RC_NO_OP;
                 }
 

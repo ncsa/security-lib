@@ -176,6 +176,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Object arg1 = polyad.evalArg(0, state);
         if (arg1 == null) {
+            if(polyad.getArguments().get(0) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
+            }
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
         if (!isStem(arg1)) {
@@ -241,8 +244,17 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
+        if(arg1 == null){
+            if(polyad.getArguments().get(0) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
+            }
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
         Object arg2 = polyad.evalArg(1, state);
-        if (arg1 == null || arg2 == null) {
+        if (arg2 == null) {
+            if(polyad.getArguments().get(1) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(1)).getVariableReference() + "'");
+            }
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
         Object[] argList = new Object[polyad.getArgCount()];
@@ -320,8 +332,28 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
+        if(arg1 == null){
+            if(polyad.getArguments().get(0) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol " + ((VariableNode)polyad.getArguments().get(0)).getVariableReference());
+            }
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
         Object arg2 = polyad.evalArg(1, state);
+        if(arg2 == null){
+            if(polyad.getArguments().get(1) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol " + ((VariableNode)polyad.getArguments().get(1)).getVariableReference());
+            }
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
+
         Object arg3 = polyad.evalArg(2, state);
+        if(arg2 == null){
+            if(polyad.getArguments().get(2) instanceof VariableNode){
+                throw new UnknownSymbolException("Error: unknown symbol " + ((VariableNode)polyad.getArguments().get(2)).getVariableReference());
+            }
+            throw new UnknownSymbolException("Error: Unknown symbol");
+        }
+
         if (arg1 == null || arg2 == null || arg3 == null) {
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
