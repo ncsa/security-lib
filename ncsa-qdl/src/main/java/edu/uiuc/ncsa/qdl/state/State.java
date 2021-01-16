@@ -88,10 +88,18 @@ public class State extends FunctionState implements QDLConstants {
         return systemConstants;
     }
 
+    public void setSystemConstants(StemVariable systemConstants) {
+        this.systemConstants = systemConstants;
+    }
+
     StemVariable systemConstants = null;
 
     public StemVariable getSystemInfo() {
         return systemInfo;
+    }
+
+    public void setSystemInfo(StemVariable systemInfo) {
+        this.systemInfo = systemInfo;
     }
 
     StemVariable systemInfo = null;

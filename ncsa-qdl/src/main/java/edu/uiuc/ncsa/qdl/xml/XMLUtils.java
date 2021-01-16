@@ -229,6 +229,9 @@ public class XMLUtils implements XMLConstants {
     protected static StemVariable resolveStem(XMLEventReader xer) throws XMLStreamException {
         StemVariable stem = new StemVariable();
         XMLEvent xe = xer.nextEvent();
+        if(xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STEM_TAG)){
+            return stem; // this covers the edge case that the entry is exactly <stem/>
+        }
         while (xer.hasNext()) {
             xe = xer.peek();
             switch (xe.getEventType()) {
@@ -237,6 +240,7 @@ public class XMLUtils implements XMLConstants {
                         String key = xe.asStartElement().getAttributeByName(new QName(STEM_KEY_TAG)).getValue();
                         xer.next(); // advance cursor to contents, hand it off.
                         XMLEvent xe1 = xer.peek();
+
                         while (xe1.getEventType() != XMLEvent.START_ELEMENT) {
                             xer.nextEvent();
                             xe1 = xer.peek();

@@ -32,5 +32,4 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         return super.equals(obj);
     }
 
-
 }

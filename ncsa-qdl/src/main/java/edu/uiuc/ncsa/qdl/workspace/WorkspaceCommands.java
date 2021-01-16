@@ -64,7 +64,6 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 public class WorkspaceCommands implements Logable {
 
 
-
     public WorkspaceCommands() {
     }
 
@@ -79,7 +78,7 @@ public class WorkspaceCommands implements Logable {
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
     public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
-    public static final String SAVE_AS_JAVA_FLAG = SWITCH  +"java";
+    public static final String SAVE_AS_JAVA_FLAG = SWITCH + "java";
     public static final String KEEP_WSF = SWITCH + "keep_wsf";
 
     public MyLoggingFacade logger;
@@ -116,6 +115,7 @@ public class WorkspaceCommands implements Logable {
     protected static final String STATE_INDICATOR_COMMAND = ")si";
 
     public static final int RC_NO_OP = -1;
+    public static final int RC_RELOAD = -2;
     public static final int RC_CONTINUE = 1;
     public static final int RC_EXIT_NOW = 0;
 
@@ -2537,19 +2537,31 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsClear(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("clear");
+            say("clear [" + RELOAD_FLAG + "]");
             sayi("Clear the state *completely*. This includes all virtual file systems and buffers.");
+            sayi(RELOAD_FLAG + " = relaod the current workspace from the configuration. Nothing current will be saved.");
             return RC_NO_OP;
+        }
+        if(inputLine.hasArg(RELOAD_FLAG)){
+            boolean clearIt = readline("Are you sure you want to lose all state and revert the workspace back to the initial load? (Y/n)[n]").equals("Y");
+           if(clearIt){
+               return  RC_RELOAD;
+           }
         }
         boolean clearIt = readline("Are you sure you want to clear the worskapce state? (Y/n)[n]").equals("Y");
         if (!clearIt) {
             say("WS clear aborted.");
             return RC_NO_OP;
         }
-        state = null;
+        State oldState = state;
         // Get rid of everything.
+        state = null;
+        state = getState();
 
-        interpreter = new QDLInterpreter(getState());
+        state.createSystemConstants();
+        state.setSystemInfo(oldState.getSystemInfo());
+
+        interpreter = new QDLInterpreter(state);
         say("workspace cleared");
         return RC_CONTINUE;
     }
@@ -2560,7 +2572,7 @@ public class WorkspaceCommands implements Logable {
 
     private int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] ["+
+            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] [" +
                     KEEP_WSF + "]");
             sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
             sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
@@ -2591,8 +2603,6 @@ public class WorkspaceCommands implements Logable {
 
         File target = null;
         String fName = null;
-
-
 
 
         try {
@@ -2632,7 +2642,7 @@ public class WorkspaceCommands implements Logable {
             if (!showFile) {
                 String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
                 say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
-                if(!keepCurrentWS) {
+                if (!keepCurrentWS) {
                     currentWorkspace = target;
                 }
             } else {
@@ -2791,10 +2801,11 @@ public class WorkspaceCommands implements Logable {
     }
 
     File currentWorkspace;
-
+    public final String RELOAD_FLAG = SWITCH + "reload";
     private int _wsLoad(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("load [filename] [" + KEEP_WSF + "]");
+            say("load [filename] [" + KEEP_WSF + "] ");
+
             sayi("Loads a saved workspace. If the name is relative, it will be resolved against " +
                     "the default location or it may be an absolute path.");
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
@@ -2848,7 +2859,7 @@ public class WorkspaceCommands implements Logable {
             if (!isTrivial(getDescription())) {
                 say(getDescription());
             }
-            if(!keepCurrentWS) {
+            if (!keepCurrentWS) {
                 currentWorkspace = target;
             }
         } else {
@@ -3495,6 +3506,8 @@ public class WorkspaceCommands implements Logable {
             setDebugOn(newCommands.isDebugOn());
             setEchoModeOn(newCommands.isEchoModeOn());
             setPrettyPrint(newCommands.isPrettyPrint());
+            state.createSystemInfo(null);
+            state.createSystemConstants();
             currentPID = newCommands.currentPID;
             wsID = newCommands.wsID;
             description = newCommands.description;

@@ -110,6 +110,8 @@ public class QDLWorkspace {
                     case RC_NO_OP:
                     case RC_CONTINUE:
                         continue;
+                    case RC_RELOAD:
+                      workspaceCommands.say("not quite ready for prime time. Check back later");
                 }
             }
             boolean echoMode = workspaceCommands.isEchoModeOn();
