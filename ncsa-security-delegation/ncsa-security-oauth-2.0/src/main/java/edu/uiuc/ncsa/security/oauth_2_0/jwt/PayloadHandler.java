@@ -98,10 +98,14 @@ public interface PayloadHandler extends Serializable {
 
     public void setPhCfg(PayloadHandlerConfig phCfg);
 
+    boolean hasScript();
+
     /**
      * Returns the payload from this handler encoded with a key, if applicable.
      * @param key
      * @return
      */
     public String getToken(JSONWebKey key);
+    public void setResponseCode(int responseCode);
+    public int getResponseCode();
 }

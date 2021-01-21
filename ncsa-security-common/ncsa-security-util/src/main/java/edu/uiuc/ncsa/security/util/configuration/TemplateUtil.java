@@ -8,8 +8,16 @@ import java.util.Map;
  * on 3/1/18 at  10:14 AM
  */
 public class TemplateUtil {
+    /*
+      The way that replacements are made is that a regex-friendly expression is created. The REGEX_*
+      expressions are for internal consumption.
+
+      Applications that need to use these, should use the LEFT_DELIMITER and RIGHT_DELIMITER
+     */
     public static String REGEX_LEFT_DELIMITER = "\\$\\{";
     public static String REGEX_RIGHT_DELIMITER = "\\}";
+    public static String LEFT_DELIMITER = "${";
+    public static String RIGHT_DELIMITER = "}";
 
     /**
      * Simple-minded template replacement. This works well for small, simple  arguments.
@@ -55,7 +63,7 @@ public class TemplateUtil {
     public static String rr(String template, Map replacements) {
         String out = template;
         for (Object key : replacements.keySet()) {
-            String newKey = "${" + key.toString() + "}";
+            String newKey = LEFT_DELIMITER + key.toString() + RIGHT_DELIMITER;
             if (replacements.containsKey(key) && (replacements.get(key) != null)) {
                 out = out.replace(newKey, replacements.get(key).toString());
             }

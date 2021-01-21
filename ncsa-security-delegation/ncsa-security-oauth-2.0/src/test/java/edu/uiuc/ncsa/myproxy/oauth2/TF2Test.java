@@ -46,6 +46,16 @@ public class TF2Test extends TestBase {
     }
 
     public static class FakeST extends ServiceTransaction implements OIDCServiceTransactionInterface {
+        @Override
+        public List<String> getResource() {
+            return null;
+        }
+
+        @Override
+        public void setResource(List<String> resource) {
+
+        }
+
         public FakeST(Identifier identifier) {
             super(identifier);
         }

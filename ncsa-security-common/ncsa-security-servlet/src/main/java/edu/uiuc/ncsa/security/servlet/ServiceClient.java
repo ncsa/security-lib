@@ -241,7 +241,8 @@ public class ServiceClient {
                    // If there was a proper error thrown on the server then we should be able to parse the contents of the
                    // response.
 
-                   ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " + response.getStatusLine().getStatusCode());
+                   ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " +
+                           response.getStatusLine().getStatusCode() + ":\n" + URLDecoder.decode(x, "UTF-8"));
                    xx.setContent(x);
                    xx.setStatus(response.getStatusLine().getStatusCode());
                    clientPool.destroy(client);

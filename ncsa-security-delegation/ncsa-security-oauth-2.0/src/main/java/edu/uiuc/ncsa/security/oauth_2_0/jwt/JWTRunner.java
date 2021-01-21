@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
+import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
@@ -20,6 +21,8 @@ import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.DebugUtil.trace;
 import static edu.uiuc.ncsa.security.oauth_2_0.jwt.ScriptingConstants.*;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK;
+import static edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse.RC_OK_NO_SCRIPTS;
 
 /**
  * This will create a JWT. The contract is generally that it has (multiple) {@link PayloadHandler}s
@@ -43,6 +46,20 @@ public class JWTRunner {
 
     AccessTokenHandlerInterface accessTokenHandler = null;
 
+    public IDTokenHandlerInterface getIdTokenHandlerInterface() {
+        return idTokenHandlerInterface;
+    }
+
+    public void setIdTokenHandlerInterface(IDTokenHandlerInterface idTokenHandlerInterface) {
+        this.idTokenHandlerInterface = idTokenHandlerInterface;
+        addHandler(idTokenHandlerInterface);
+    }
+
+    IDTokenHandlerInterface idTokenHandlerInterface = null;
+
+    public boolean hasIDTokenHander() {
+        return idTokenHandlerInterface != null;
+    }
 
     public boolean hasATHandler() {
         return accessTokenHandler != null;
@@ -110,8 +127,8 @@ public class JWTRunner {
 
     public void doTokenExchange() throws Throwable {
         for (PayloadHandler h : handlers) {
-             h.setAccountingInformation();
-         }
+            h.setAccountingInformation();
+        }
         doScript(SRE_PRE_EXCHANGE);
 
         doScript(SRE_POST_EXCHANGE);
@@ -159,6 +176,7 @@ public class JWTRunner {
     /**
      * Get the claims sources for the ID token. This is needed only if the handler will attempt to get
      * claims at some point.
+     *
      * @param flowStates
      * @param checkAuthClaims
      * @throws Throwable
@@ -261,7 +279,7 @@ public class JWTRunner {
 
     protected void handleSREResponse(OIDCServiceTransactionInterface transaction, ScriptRunResponse scriptRunResponse) throws IOException {
         switch (scriptRunResponse.getReturnCode()) {
-            case ScriptRunResponse.RC_OK:
+            case RC_OK:
                 // Note that the returned values from a script are very unlikely to be the same object we sent
                 // even if the contents are the same, since scripts may have to change these in to other data structures
                 // to make them accessible to their machinery, then convert them back.
@@ -295,18 +313,42 @@ public class JWTRunner {
 
         } else {
             // This has handlers so it new and should be run as such.
+            // only try to do a handler if it has a script for this phase.
             for (PayloadHandler h : handlers) {
+                if (h.hasScript() && h.getPhCfg().getScriptSet().get(Scripts.EXEC_PHASE, phase) != null) {
+                    ScriptRunRequest req = newSRR(transaction, phase);
+                    h.addRequestState(req);
+                    getScriptRuntimeEngine().clearScriptSet();
+                    getScriptRuntimeEngine().setScriptSet(h.getPhCfg().getScriptSet());
+                    ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
+                    handleSREResponse(transaction, resp);
+                    h.handleResponse(resp);
+                } else {
+                    // plain handler cases -- no scripting
+                    // These are executed at exactly on phase.
+                    // All that has happened at this point is that they have been initialized (so config
+                    // info put in place) and then we save the results of that.
+                    switch (phase) {
+                        case SRE_POST_AUTH:
+                            if (h instanceof IDTokenHandlerInterface) {
+                                h.setResponseCode(RC_OK_NO_SCRIPTS);
+                                h.finish();
+                                h.saveState();
+                            }
+                            break;
+                        case SRE_POST_AT:
+                        case SRE_POST_REFRESH:
+                        case SRE_POST_EXCHANGE:
+                            if (h instanceof AccessTokenHandlerInterface || h instanceof RefreshTokenHandlerInterface) {
+                                h.setResponseCode(RC_OK_NO_SCRIPTS);
+                                h.finish();
+                                h.saveState();
+                            }
+                    }
+                }
                 // request makes copies of everything to turn in to QDL state, make it at the last second,  keep it is up to date.
-                ScriptRunRequest req = newSRR(transaction, phase);
-                h.addRequestState(req);
-                getScriptRuntimeEngine().clearScriptSet();
-                getScriptRuntimeEngine().setScriptSet(h.getPhCfg().getScriptSet());
-                ScriptRunResponse resp = getScriptRuntimeEngine().run(req);
-                handleSREResponse(transaction, resp);
-                h.handleResponse(resp);
             }
         }
-
     }
 
     // This next method did not clear the script set and reset it. It is kept for reference in case some

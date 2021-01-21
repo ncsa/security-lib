@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.token.impl;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.delegation.token.NewToken;
 import net.sf.json.JSONObject;
@@ -38,17 +39,19 @@ public class TokenImpl implements NewToken {
     public boolean isOldVersion() {
         return getVersion() == null;
     }
-    public TokenImpl(String sciToken, URI jti){
+
+    public TokenImpl(String sciToken, URI jti) {
         this.token = URI.create(sciToken);
         init(jti);
     }
+
     public TokenImpl(URI token) {
         this.token = token;
         init(token);
     }
 
     protected void init(URI uri) {
-        if(uri == null){
+        if (uri == null) {
             return; // can happen. Return so there is not an NPE.
         }
         String s = uri.getQuery();
@@ -120,7 +123,10 @@ public class TokenImpl implements NewToken {
 
     @Override
     public boolean isExpired() {
-        if (getLifetime() + getIssuedAt() < System.currentTimeMillis()) return true;
+        DebugUtil.trace(this, "current time " + System.currentTimeMillis() + " exp at " + (getLifetime() + getIssuedAt()));
+        if (getLifetime() + getIssuedAt() < System.currentTimeMillis()) {
+            return true;
+        }
         return false;
     }
 

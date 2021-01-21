@@ -7,7 +7,9 @@ import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.regex.Pattern;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.LJustify;
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
 
 /**
@@ -290,8 +292,9 @@ public class CLIDriver {
                         printHelp();
                         continue;
                     case LIST_ALL_METHODS_COMMAND_VALUE:
-                        listCLIMethods();
-                        ;
+
+                        InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+                        listCLIMethods(inputLine);
                         continue;
                     case TRACE_COMMAND_VALUE:
                         doTrace(cmdLine);
@@ -305,7 +308,9 @@ public class CLIDriver {
                 }
                 switch (execute(cmdLine)) {
                     case HELP_RC:
-                        listCLIMethods();
+                        InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+
+                        listCLIMethods(inputLine);
                         break;
                     case SHUTDOWN_RC:
                         isDone = false; // just in case.
@@ -421,14 +426,15 @@ public class CLIDriver {
     }
 
 
-    protected void listCLIMethods() {
-        say("Here are the commands available:");
+    protected void listCLIMethods(InputLine inputLine) {
         String[] tempCCIN = CLIReflectionUtil.getCommandsNameList(getCLICommands());
-        Arrays.sort(tempCCIN); // make it in sorted order.
-        for (int i = 0; i < tempCCIN.length; i++) {
-            say(tempCCIN[i]);
+        List<String> list = new ArrayList<>();
+        for (String x : tempCCIN) {
+            list.add(x);
         }
-        say("To get help on the CLI, type /?");
+        formatList(inputLine, list);
+
+        say("\nTo get help on the CLI, type /?");
         say("To get general information on the current component in use, type --help at the prompt.");
         say("To get more information on a specific command\n");
         say("command --help");
@@ -479,4 +485,104 @@ public class CLIDriver {
     }
 
     IOInterface ioInterface;
+    String REGEX_SWITCH = "-r";
+    String COLUMNS_VIEW_SWITCH = "-col";
+    String DISPLAY_WIDTH_SWITCH = "-w";
+
+    /**
+     * This allows for setting the formatting
+     * @param inputLine
+     * @param listOf
+     */
+    public void formatList(InputLine inputLine, List<String> listOf) {
+        if(inputLine.hasArg("--help")){
+            say(inputLine.getCommand() + " [" + DISPLAY_WIDTH_SWITCH +
+                    " width | "+ COLUMNS_VIEW_SWITCH + " | "+ REGEX_SWITCH  + " regex]");
+            say(DISPLAY_WIDTH_SWITCH + " width = sets the width of the output.");
+            say(COLUMNS_VIEW_SWITCH + " = single column only (overrides " + DISPLAY_WIDTH_SWITCH + ")");
+            say(REGEX_SWITCH + " regex = filter the result using a regex");
+            return;
+        }
+        if (listOf.isEmpty()) {
+            return;
+        }
+        if (listOf.size() == 1) {
+            say(listOf.get(0));
+            return;
+        }
+
+        TreeSet<String> list;
+        list = new TreeSet<>();
+        list.addAll(listOf);
+
+        Pattern pattern = null;
+        if (inputLine.hasArg(REGEX_SWITCH)) {
+            try {
+                pattern = Pattern.compile(inputLine.getNextArgFor(REGEX_SWITCH));
+                TreeSet<String> list2 = new TreeSet<>();
+                //pattern.
+                for (String x : list) {
+                    if (pattern.matcher(x).matches()) {
+                        list2.add(x);
+                    }
+                }
+                list = list2;
+            } catch (Throwable t) {
+                say("sorry but there was a problem with your regex \"" + inputLine.getNextArgFor(REGEX_SWITCH) + "\":" + t.getMessage());
+            }
+
+        }
+        if (inputLine.hasArg(COLUMNS_VIEW_SWITCH)) {
+            for (String func : list) {
+                say(func); // one per line
+            }
+            return;
+        }
+        int displayWidth = 120; // just to keep thing simple
+        if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
+            try {
+                displayWidth = Integer.parseInt(inputLine.getNextArgFor(DISPLAY_WIDTH_SWITCH));
+            } catch (Throwable t) {
+                say("sorry, but " + inputLine.getArg(0) + " is not a number. Formatting for default width of " + displayWidth);
+            }
+        }
+
+        // Find longest entry
+        int maxWidth = 0;
+        for (String x : list) {
+            maxWidth = Math.max(maxWidth, x.length());
+        }
+        // special case. If the longest element is too long, just print as columns
+        if (displayWidth <= maxWidth) {
+            for (String x : list) {
+                say(x);
+            }
+            return;
+        }
+        maxWidth = 2 + maxWidth; // so the widest + 2 chars to make it readable.
+        // number of columns are display / width, possibly plus 1 if there is a remainder
+        //int colCount = displayWidth / maxWidth + (displayWidth % maxWidth == 0 ? 0 : 1);
+        int colCount = displayWidth / maxWidth;
+        colCount = colCount + (colCount == 0 ? 1 : 0); // Make sure there is at least 1 columns
+        int rowCount = list.size() / colCount;
+        rowCount = rowCount + (rowCount == 0 ? 1 : 0); // and at least one row
+        String[] output = new String[rowCount];
+        for (int i = 0; i < rowCount; i++) {
+            output[i] = ""; // initialize it
+        }
+        int pointer = 0;
+        for (String func : list) {
+            int currentLine = pointer++ % rowCount;
+            if (rowCount == 1) {
+                // single row, so don't pad, just a blank between entries
+                output[currentLine] = output[currentLine] + func + "  ";
+            } else {
+                output[currentLine] = output[currentLine] + LJustify(func, maxWidth);
+            }
+        }
+        for (String x : output) {
+            say(x);
+        }
+
+    }
 }

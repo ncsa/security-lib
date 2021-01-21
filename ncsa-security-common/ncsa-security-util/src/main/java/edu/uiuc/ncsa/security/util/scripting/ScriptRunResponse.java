@@ -23,6 +23,7 @@ public class ScriptRunResponse {
     public static final int RC_SCRIPT_ERROR = -1;
     public static final int RC_NOT_RUN = 0;
     public static final int RC_OK = 1;
+    public static final int RC_OK_NO_SCRIPTS = 2;
     String message = "";
     Map<String, Object> map;
     int rc = RC_NOT_RUN;

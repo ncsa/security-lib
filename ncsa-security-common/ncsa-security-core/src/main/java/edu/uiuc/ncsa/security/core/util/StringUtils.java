@@ -416,12 +416,12 @@ public class StringUtils {
     }
 
     /**
-     * Format a map of objects.
+     * Format a map of objects as easily readable key value pairs.
      *
      * @param map          The map to be displayed
      * @param keySubset    An optional (may be null or empty) subset of keys. Only these will be used id present
      * @param sortKeys     if true, the keys in the map will be sorted.
-     * @param multiLine    Split the formatting of the vlues in the map over several lines (true) or truncate with ellipses (false)
+     * @param multiLine    Split the formatting of the values in the map over several lines (true) or truncate with ellipses (false)
      * @param indent       The amount for the whole thing to be indented from the left
      * @param displayWidth The total width that this must fit in.
      * @return
@@ -542,4 +542,5 @@ public class StringUtils {
         }
         return RJustify(key, leftColumWidth) + " : " + truncate(value.replace("\n", "").replace("\r", ""));
     }
+
 }

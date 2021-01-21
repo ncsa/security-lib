@@ -11,6 +11,7 @@ public interface OA2Claims {
      */
     public static String SUBJECT = "sub";
     public static String AUDIENCE = "aud";
+    public static String RESOURCE = "resource"; // RFC8707
     public static String EXPIRATION = "exp";
     public static String ISSUED_AT = "iat";
     public static String NOT_VALID_BEFORE = "nbf";

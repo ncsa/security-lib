@@ -92,6 +92,12 @@ public class ConfigUtil {
         if (isTrivial(x)) {
             return null;
         }
+        x = x.trim();
+        if(x.endsWith(".")){
+            // allows for "100 sec." or "100000 ms."
+            x = x.substring(0, x.length() - 1);
+        }
+        // do in order of length of units or collisions happen.
         if(x.endsWith(UNITS_SECONDS_LONG)){
             x = x.substring(0,x.length() - UNITS_SECONDS_LONG.length());
         }

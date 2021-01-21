@@ -75,12 +75,25 @@ public class InputLine {
      * @param value
      */
     public void removeSwitchAndValue(String value) {
-        if(!hasArg(value)){
+        if (!hasArg(value)) {
             return;
         }
         String x = getNextArgFor(value);
         removeSwitch(x);
         removeSwitch(value);
+    }
+
+    public void removeSwitchAndValue(String... values) {
+        for (String value : values) {
+
+            if (!hasArg(value)) {
+                continue;
+            }
+            String x = getNextArgFor(value);
+            removeSwitch(x);
+            removeSwitch(value);
+        }
+
     }
 
     /**
@@ -92,6 +105,14 @@ public class InputLine {
     public void removeSwitch(String value) {
         if (parsedInput != null) {
             parsedInput.remove(value);
+        }
+    }
+
+    public void removeSwitch(String... value) {
+        if (parsedInput != null) {
+            for (String v : value) {
+                parsedInput.remove(v);
+            }
         }
     }
 
@@ -246,6 +267,25 @@ public class InputLine {
      */
     public boolean hasArg(String arg) {
         return -1 != indexOf(arg);
+    }
+
+    /**
+     * Check a list of args, e.g.
+     * hasArg(SWITCH, SHORT_SWITCH, SHORTER_SWITCH)
+     *
+     * @param args
+     * @return
+     */
+    public boolean hasArg(String... args) {
+        if (args.length == 0) {
+            return false;
+        }
+        for (String arg : args) {
+            if (indexOf(arg) != -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

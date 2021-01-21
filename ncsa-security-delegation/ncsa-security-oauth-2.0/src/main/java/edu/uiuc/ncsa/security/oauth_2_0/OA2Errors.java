@@ -122,6 +122,8 @@ public interface OA2Errors {
      */
     String INVALID_GRANT = "invalid_grant";
 
+    String INVALID_TARGET = "invalid_target";
+    int INVALID_TARGET_CODE = 117;
     /**
      * Returned code if an error is returned but cannot be found on the list of standard errors
      */
@@ -148,6 +150,7 @@ public interface OA2Errors {
             if(errorDescription.equals(TEMPORARILY_UNAVAILABLE)) return TEMPORARILY_UNAVAILABLE_CODE;
             if(errorDescription.equals(SERVER_ERROR)) return SERVER_ERROR_CODE;
             if(errorDescription.equals(INVALID_TOKEN)) return INVALID_TOKEN_CODE;
+            if(errorDescription.equals(INVALID_TARGET)) return INVALID_TARGET_CODE;
             return UNKNOWN_ERROR;
         }
     }

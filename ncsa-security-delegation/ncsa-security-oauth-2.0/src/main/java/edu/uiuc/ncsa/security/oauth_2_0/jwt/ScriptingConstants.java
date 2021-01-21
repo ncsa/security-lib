@@ -24,6 +24,7 @@ public interface ScriptingConstants {
     String SRE_REQ_SCOPES = "scopes";
     String SRE_TX_REQ_SCOPES = "tx_scopes";
     String SRE_REQ_AUDIENCE = "audience";
+    String SRE_REQ_RESOURCE = "resource";
     String SRE_TX_REQ_RESOURCES = "tx_resources";
     String SRE_TX_REQ_AUDIENCE = "tx_audience";
     String SRE_REQ_FLOW_STATES = "flow_states";

@@ -76,7 +76,7 @@ public class WorkspaceCommands implements Logable {
     public static final String FQ_SWITCH = SWITCH + "fq";
     public static final String REGEX_SWITCH = SWITCH + "r";
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
-    public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols";
+    public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols"; // force single column view
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
     public static final String SAVE_AS_JAVA_FLAG = SWITCH + "java";
     public static final String KEEP_WSF = SWITCH + "keep_wsf";

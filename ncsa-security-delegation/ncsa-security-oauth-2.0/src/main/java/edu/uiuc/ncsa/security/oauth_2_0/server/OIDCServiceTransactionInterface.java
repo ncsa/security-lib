@@ -23,6 +23,10 @@ public interface OIDCServiceTransactionInterface {
 
     void setAudience(List<String> audience);
 
+    List<String> getResource();
+
+    void setResource(List<String> resource);
+
     JSONObject getExtendedAttributes();
 
     void setExtendedAttributes(JSONObject xas);

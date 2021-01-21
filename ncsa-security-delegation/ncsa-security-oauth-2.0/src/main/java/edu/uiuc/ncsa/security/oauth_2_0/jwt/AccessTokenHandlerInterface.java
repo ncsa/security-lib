@@ -15,7 +15,5 @@ public interface AccessTokenHandlerInterface extends PayloadHandler {
      */
     AccessToken getAccessToken();
     void setAccessToken(AccessToken accessToken);
-
-
     AccessToken getSignedAT(JSONWebKey key);
 }
