@@ -29,6 +29,7 @@ public class CLIDriver {
     public static final int USER_EXIT_RC = 10;
     public static final int SHUTDOWN_RC = -10;
     public static final int HELP_RC = 100;
+    public static final String HELP_SWITCH = "--help";
 
 
     List<String> commandHistory = new LinkedList<>();
@@ -127,7 +128,7 @@ public class CLIDriver {
         say(indent + EXIT_COMMAND + " or " + SHORT_EXIT_COMMAND + " = exit this component");
         say(indent + PRINT_HELP_COMMAND + " = print this help");
         say(indent + LIST_ALL_METHODS_COMMAND + " = list all of the currently available commands.");
-        say(indent + TRACE_COMMAND + " on | off = turn *low level* debugging on or off. USe with care.");
+        say(indent + TRACE_COMMAND + " on | off = turn *low level* debugging on or off. Use with care.");
         say("--Command buffer: These are understood at all times and are interpreted before");
         say(indent + "any commands are issued.");
         say(indent + CLEAR_BUFFER_COMMAND + " =  clear the command history");
@@ -144,7 +145,11 @@ public class CLIDriver {
         say("---");
     }
 
-    protected String doRepeatCommand() {
+    protected String doRepeatCommand(String cmdLine) {
+        if(cmdLine.contains(HELP_SWITCH)){
+            say(REPEAT_LAST_COMMAND + " = repeat the last command. Identical to " + HISTORY_LIST_COMMAND + " 0");
+            return null;
+        }
         if (0 < commandHistory.size()) {
             return commandHistory.get(0);
         }
@@ -153,6 +158,11 @@ public class CLIDriver {
     }
 
     protected String doHistory(String cmdLine) {
+        if(cmdLine.contains(HELP_SWITCH)){
+            say(HISTORY_LIST_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
+            say("See also:" + WRITE_BUFFER_COMMAND + ", " + LOAD_BUFFER_COMMAND + ", " + REPEAT_LAST_COMMAND);
+            return null; // do nothing
+        }
         // Either of the following work:
         // /h == print history with line numbers
         // /h int = execute line # int, or print history if that fails
@@ -179,6 +189,11 @@ public class CLIDriver {
     }
 
     protected void doBufferWrite(String cmdLine) throws Exception {
+        if(cmdLine.contains(HELP_SWITCH)){
+            say(WRITE_BUFFER_COMMAND + " file = write current command history to a file.");
+            say("See also:" +LOAD_BUFFER_COMMAND);
+            return;
+        }
         String rawFile = cmdLine.substring(WRITE_BUFFER_COMMAND.length()).trim();
         if (rawFile == null || rawFile.isEmpty()) {
             say("Sorry, missing file path.");
@@ -203,6 +218,12 @@ public class CLIDriver {
     }
 
     protected void doBufferRead(String cmdLine) throws Exception {
+        if(cmdLine.contains(HELP_SWITCH)){
+            say(LOAD_BUFFER_COMMAND + " file = load a saved command history, replacing the current one.");
+            say("See also: " + WRITE_BUFFER_COMMAND);
+            return;
+        }
+
         String rawFile = cmdLine.substring(LOAD_BUFFER_COMMAND.length()).trim();
         if (rawFile == null || rawFile.isEmpty()) {
             say("Sorry, missing file path.");
@@ -265,7 +286,7 @@ public class CLIDriver {
                 boolean storeLine = true;
                 switch (getCommandType(cmdLine)) {
                     case REPEAT_COMMAND_VALUE:
-                        cmdLine = doRepeatCommand();
+                        cmdLine = doRepeatCommand(cmdLine);
                         storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
                         break;
                     case HISTORY_COMMAND_VALUE:
@@ -282,6 +303,10 @@ public class CLIDriver {
                         doBufferRead(cmdLine);
                         continue;
                     case CLEAR_BUFFER_COMMAND_VALUE:
+                        if(cmdLine.contains(HELP_SWITCH)){
+                            say(CLEAR_BUFFER_COMMAND + " = clear the entire command history.");
+                            continue;
+                        }
                         commandHistory = new LinkedList<>();
                         say("Command history cleared.");
                         continue;
@@ -292,7 +317,6 @@ public class CLIDriver {
                         printHelp();
                         continue;
                     case LIST_ALL_METHODS_COMMAND_VALUE:
-
                         InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
                         listCLIMethods(inputLine);
                         continue;
@@ -347,6 +371,10 @@ public class CLIDriver {
     boolean traceOn = false;
 
     private void doTrace(String cmdLine) {
+        if(cmdLine.equals(HELP_SWITCH)){
+            say(TRACE_COMMAND + " [on | off] Turn on or off low-level debugging for the client. Mostly for system programmers.");
+            return;
+        }
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
         st.nextToken(); // This is the "/trace" which we already know about
         if (st.hasMoreTokens()) {
@@ -390,7 +418,7 @@ public class CLIDriver {
                     // This intercepts quitting so we don't have to jump through hoops to exit.
                     return SHUTDOWN_RC;
                 }
-                if (cmdS.toLowerCase().equals("help") || cmdS.toLowerCase().equals("--help")) {
+                if (cmdS.toLowerCase().equals("help") || cmdS.toLowerCase().equals(HELP_SWITCH)) {
                     //    commands[0].help();
                     return HELP_RC;
                 }
@@ -495,7 +523,7 @@ public class CLIDriver {
      * @param listOf
      */
     public void formatList(InputLine inputLine, List<String> listOf) {
-        if(inputLine.hasArg("--help")){
+        if(inputLine.hasArg(HELP_SWITCH)){
             say(inputLine.getCommand() + " [" + DISPLAY_WIDTH_SWITCH +
                     " width | "+ COLUMNS_VIEW_SWITCH + " | "+ REGEX_SWITCH  + " regex]");
             say(DISPLAY_WIDTH_SWITCH + " width = sets the width of the output.");

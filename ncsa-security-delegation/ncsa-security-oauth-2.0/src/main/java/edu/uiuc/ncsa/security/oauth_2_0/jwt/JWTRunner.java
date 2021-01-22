@@ -92,14 +92,18 @@ public class JWTRunner {
         handlers.add(handler);
     }
 
-    public void doAuthClaims() throws Throwable {
-        DebugUtil.trace(this, "Starting Auth claims");
-        transaction.setFlowStates(new FlowStates());
+    public void initializeHandlers() throws Throwable {
         for (PayloadHandler h : handlers) {
             DebugUtil.trace(this, "Running init for handler " + h);
             h.init();
             h.setAccountingInformation();
         }
+    }
+
+    public void doAuthClaims() throws Throwable {
+        DebugUtil.trace(this, "Starting Auth claims");
+        transaction.setFlowStates(new FlowStates());
+        initializeHandlers();
         /*
         In point of fact init and pre-auth are redundant, however, some older
         scripting frameworks (well, functors) allowed for both since they

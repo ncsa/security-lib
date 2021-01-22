@@ -4,12 +4,11 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.delegation.client.request.RTRequest;
 import edu.uiuc.ncsa.security.delegation.client.request.RTResponse;
 import edu.uiuc.ncsa.security.delegation.client.server.RTServer;
-import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.RefreshToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import net.sf.json.JSONObject;
 
@@ -33,7 +32,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         if (refreshToken == null) {
             throw new GeneralException("Error: There is no refresh token, so it is not possible to refresh it.");
         }
-        String raw = getRTResponse(getAddress(), refreshToken, rtRequest.getClient());
+        String raw = getRTResponse(getAddress(), rtRequest);
         JSONObject json = getAndCheckResponse(raw);
         String returnedAT = json.getString(OA2Constants.ACCESS_TOKEN);
         if (accessToken.getToken().equals(returnedAT)) {
@@ -56,13 +55,13 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         return rtResponse;
     }
 
-    protected String getRTResponse(URI uri, RefreshToken refreshToken, Client client) {
+    protected String getRTResponse(URI uri,  RTRequest rtRequest) {
         HashMap map = new HashMap();
         map.put(OA2Constants.GRANT_TYPE, OA2Constants.REFRESH_TOKEN);
-        map.put(OA2Constants.REFRESH_TOKEN, refreshToken.getToken());
-        map.put(OA2Constants.CLIENT_ID, client.getIdentifierString());
-        map.put(OA2Constants.CLIENT_SECRET, client.getSecret());
-        map.put(OA2Constants.SCOPE, "edu.uiuc.ncsa.myproxy");
+        map.put(OA2Constants.REFRESH_TOKEN, rtRequest.getRefreshToken().getToken());
+        map.put(OA2Constants.CLIENT_ID, rtRequest.getClient().getIdentifierString());
+        map.put(OA2Constants.CLIENT_SECRET, rtRequest.getClient().getSecret());
+        map.putAll(rtRequest.getParameters());
         String response = getServiceClient().getRawResponse(map);
         return response;
     }

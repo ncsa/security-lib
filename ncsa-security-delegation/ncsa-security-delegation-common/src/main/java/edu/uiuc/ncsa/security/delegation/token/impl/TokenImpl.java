@@ -57,11 +57,13 @@ public class TokenImpl implements NewToken {
         String s = uri.getQuery();
         if (StringUtils.isTrivial(uri.getQuery())) {
             // Version 1.0 tokens.
+            version = VERSION_1_0_TAG;
 
         } else {
             // Version 2.0+ tokens.
             Map<String, String> parameters = getParameters(uri);
             params.putAll(parameters);
+            version = VERSION_2_0_TAG;
         }
 
     }
@@ -89,6 +91,7 @@ public class TokenImpl implements NewToken {
         // special case is that this has null values and the object is null.
         // These then should be considered equal.
         if (!checkNoNulls(getURIToken(), at.getURIToken())) return false;
+        if (!checkNoNulls(getVersion(), at.getVersion())) return false;
         if (!at.getToken().equals(getToken())) return false;
         if (at.getLifetime() != getLifetime()) return false;
         if (at.getIssuedAt() != getIssuedAt()) return false;

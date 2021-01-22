@@ -13,6 +13,18 @@ import java.util.Map;
  * on 4/10/12 at  11:56 AM
  */
 public class Identifiers {
+    public static final int TOKEN_TYPE_INDEX = 0;
+    public static final int TIMESTAMP_INDEX = 1;
+    public static final int VERSION_INDEX = 2;
+    public static final int LIFETIME_INDEX = 3;
+    public static final int COUNT = 4; // number of components. May change with version someday
+
+    public static final String TOKEN_TYPE_TAG = "type";
+    public static final String TIMESTAMP_TAG = "ts";
+    public static final String VERSION_TAG = "version";
+    public static final String LIFETIME_TAG = "lifetime";
+    public static final String VERSION_2_0_TAG = "v2.0";
+    public static final String VERSION_1_0_TAG = "v1.0";
 
     public static int DEFAULT_BYTE_COUNT = 16; // 16*8 = 128 bits length of identifiers
     public static int byteCount = -1; // illegal value to show it hasn't been set.
@@ -132,15 +144,4 @@ public class Identifiers {
         System.out.println(uniqueIdentifier("https://foo.bar/oauth2/", "accessToken", VERSION_2_0_TAG, 1000000L));
     }
 
-    public static final int TOKEN_TYPE_INDEX = 0;
-    public static final int TIMESTAMP_INDEX = 1;
-    public static final int VERSION_INDEX = 2;
-    public static final int LIFETIME_INDEX = 3;
-    public static final int COUNT = 4; // number of components. May change with version someday
-
-    public static final String TOKEN_TYPE_TAG = "type";
-    public static final String TIMESTAMP_TAG = "ts";
-    public static final String VERSION_TAG = "version";
-    public static final String LIFETIME_TAG = "lifetime";
-    public static final String VERSION_2_0_TAG = "v2.0";
 }
