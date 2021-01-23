@@ -317,9 +317,9 @@ public class JWTRunner {
 
         } else {
             // This has handlers so it new and should be run as such.
-            // only try to do a handler if it has a script for this phase.
+            // only try to do a handler if it has a script for this phase OR if you know it use functors.
             for (PayloadHandler h : handlers) {
-                if (h.hasScript() && h.getPhCfg().getScriptSet().get(Scripts.EXEC_PHASE, phase) != null) {
+                if (h.getPhCfg().isLegacyHandler() || (h.hasScript() && h.getPhCfg().getScriptSet().get(Scripts.EXEC_PHASE, phase) != null)) {
                     ScriptRunRequest req = newSRR(transaction, phase);
                     h.addRequestState(req);
                     getScriptRuntimeEngine().clearScriptSet();

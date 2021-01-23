@@ -8,4 +8,8 @@ import edu.uiuc.ncsa.security.util.scripting.ScriptSet;
  */
 public interface PayloadHandlerConfig {
     ScriptSet getScriptSet();
+
+     boolean isLegacyHandler() ;
+
+     void setLegacyHandler(boolean b);
 }
