@@ -112,11 +112,11 @@ public class JWTRunner {
         Any new scripting support should only support pre/post auth and pre/post token.
          */
         doScript(SRE_EXEC_INIT);
-        doScript(ScriptingConstants.SRE_PRE_AUTH);
+        doScript(SRE_PRE_AUTH);
 
         // now for the actual getting of the claims
 
-        getSources(transaction.getFlowStates(), true);
+        getSources(transaction.getFlowStates(),SRE_PRE_AUTH, true);
 
         doScript(ScriptingConstants.SRE_POST_AUTH);
 
@@ -145,7 +145,7 @@ public class JWTRunner {
         }
 
         for (PayloadHandler h : handlers) {
-            h.finish();
+            h.finish(SRE_POST_EXCHANGE);
         }
     }
 
@@ -156,7 +156,7 @@ public class JWTRunner {
     protected void doTokenClaims(boolean isRefresh) throws Throwable {
         doScript(isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT);
 
-        getSources(transaction.getFlowStates(), false);
+        getSources(transaction.getFlowStates(),isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT, false);
         if (isRefresh) {
             for (PayloadHandler h : handlers) {
                 h.setAccountingInformation();
@@ -173,7 +173,7 @@ public class JWTRunner {
         }
 
         for (PayloadHandler h : handlers) {
-            h.finish();
+            h.finish(isRefresh ? SRE_POST_REFRESH : SRE_POST_AT);
         }
     }
 
@@ -185,7 +185,7 @@ public class JWTRunner {
      * @param checkAuthClaims
      * @throws Throwable
      */
-    protected void getSources(FlowStates flowStates, boolean checkAuthClaims) throws Throwable {
+    protected void getSources(FlowStates flowStates, String execPhase, boolean checkAuthClaims) throws Throwable {
         for (PayloadHandler h : handlers) {
             if (!h.getSources().isEmpty()) {
                 JSONObject claims = h.getClaims();
@@ -206,7 +206,7 @@ public class JWTRunner {
                     if (!flowStates.acceptRequests) {
                         // This practically means that the come situation has arisen whereby the user is
                         // immediately banned from access -- e.g. they were found to be on a blacklist.
-                        h.finish();
+                        h.finish(execPhase);
                         throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
                     }
                     trace(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
@@ -336,7 +336,7 @@ public class JWTRunner {
                         case SRE_POST_AUTH:
                             if (h instanceof IDTokenHandlerInterface) {
                                 h.setResponseCode(RC_OK_NO_SCRIPTS);
-                                h.finish();
+                                h.finish(phase);
                                 h.saveState();
                             }
                             break;
@@ -345,7 +345,7 @@ public class JWTRunner {
                         case SRE_POST_EXCHANGE:
                             if (h instanceof AccessTokenHandlerInterface || h instanceof RefreshTokenHandlerInterface) {
                                 h.setResponseCode(RC_OK_NO_SCRIPTS);
-                                h.finish();
+                                h.finish(phase);
                                 h.saveState();
                             }
                     }

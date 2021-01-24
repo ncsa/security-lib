@@ -64,8 +64,9 @@ public interface PayloadHandler extends Serializable {
     /**
      * Called at the very end of all processing, this lets the handler, clean up or whatever it needs to do.
      * It is called before {@link #saveState()}.
+     * @param execPhase - the current execution phase.
      */
-    void finish()  throws Throwable;
+    void finish(String execPhase)  throws Throwable;
     /**
      * Called at the end of each block, this lets the handler save its state. E.g. if you are storing state
      * in a database, this is where you make that call.
