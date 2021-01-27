@@ -17,8 +17,9 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 /**
  * Basic implementation of Commands. This supports loading configurations.
@@ -60,7 +61,9 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     }
 
     String configName;
+    public static class ListOnlyNotification extends GeneralException{
 
+    }
     public void load(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showLoadHelp();
@@ -78,7 +81,9 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         if (inputLine.hasArg(LIST_CFGS)) {
             listConfigs(inputLine);
-            return;
+            // no way to return a value and have it findable with introspection (since cignature would change).
+            // Only way to send notification. 
+            throw new ListOnlyNotification();
         }
 
         String fileName = null;
@@ -91,7 +96,6 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             fileName = getConfigFile();
         }
         say("loading configuration from " + fileName + ", named " + configName);
-        info("loading configuration from " + fileName + ", named " + configName);
         loadConfig(fileName, configName);
         say("done!");
     }
@@ -117,11 +121,12 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         say("trace " + (traceOn ? "on" : "off"));
     }
-
+    String FILE_SWITCH = "-file";
     protected void listConfigs(InputLine inputLine) throws Exception {
         String targetFilename = getConfigFile();
-        if (1 < inputLine.getArgCount()) {
-            targetFilename = inputLine.getArg(1);
+        if(inputLine.hasArg(FILE_SWITCH)){
+            targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
+            inputLine.removeSwitchAndValue(FILE_SWITCH);
         }
         if (StringUtils.isTrivial(targetFilename)) {
             say("Sorry no configuration file specified.");
@@ -141,7 +146,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         FileReader fr = new FileReader(target);
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
         XMLEventReader xer = xmlif.createXMLEventReader(fr);
-        TreeSet<String> names = new TreeSet<>(); // To keep sorted
+        List<String> names = new ArrayList<>(); // To keep sorted
         if (!xer.hasNext()) {
             say("sorry but \"" + target.getAbsolutePath() + "\" does not contain XML.");
             xer.close();
@@ -159,21 +164,20 @@ public abstract class ConfigurableCommandsImpl implements Commands {
                 }
             }
         }
+        xer.close();
+
         if (names.isEmpty()) {
             say("no configurations found.");
         } else {
-            for (String x : names) {
-                say("  " + x);
-            }
+            FormatUtil.formatList(inputLine, names);
             say("found " + names.size() + " entries. Done!");
         }
-        xer.close();
     }
 
     String LIST_CFGS = "-list";
 
     protected void showLoadHelp() {
-        say("load [config_file] " + LIST_CFGS + " = list the configurations by name in the file or current file");
+        say("load [" + FILE_SWITCH + " config_file] " + LIST_CFGS + " = list the configurations by name in the file or current file");
         say("load [config_name config_file]  a configuration from the file. The options are");
         say("   load - displays current configuration file and name of the current configuration.");
         say("   load configName - loads the named configuration from the currently active configuration file.");

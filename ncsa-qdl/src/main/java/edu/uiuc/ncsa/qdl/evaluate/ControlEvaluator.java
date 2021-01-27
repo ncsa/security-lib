@@ -14,7 +14,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.workspace.QDLWorkspace;
@@ -908,14 +908,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             name = name.substring(1);
             File file = new File(name);
             if (file.isAbsolute()) {
-                return new QDLScript(FileUtil.readFileAsLines(name), null);
+                return new QDLScript(QDLFileUtil.readFileAsLines(name), null);
             }
             // so its relative.
             for (String p : paths) {
                 if (!p.contains(SCHEME_DELIMITER)) {
                     File test = new File(p, name);
                     if (test.exists() && test.isFile() && test.canRead()) {
-                        return new QDLScript(FileUtil.readFileAsLines(test.getCanonicalPath()), null);
+                        return new QDLScript(QDLFileUtil.readFileAsLines(test.getCanonicalPath()), null);
                     }
                 }
             }
@@ -951,7 +951,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 if (state.isServerMode()) {
                     throw new IllegalArgumentException("File access forbidden in server mode.");
                 } else {
-                    return new QDLScript(FileUtil.readFileAsLines(name), null);
+                    return new QDLScript(QDLFileUtil.readFileAsLines(name), null);
                 }
             }
             for (String p : paths) {
@@ -968,7 +968,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     }
                 } else {
                     if (testFile.exists() && testFile.isFile() && testFile.canRead()) {
-                        return new QDLScript(FileUtil.readFileAsLines(testFile.getCanonicalPath()), null);
+                        return new QDLScript(QDLFileUtil.readFileAsLines(testFile.getCanonicalPath()), null);
                     }
                 }
             }

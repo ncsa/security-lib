@@ -37,7 +37,7 @@ public class TokenImpl implements NewToken {
      * @return
      */
     public boolean isOldVersion() {
-        return getVersion() == null;
+        return getVersion() == null || getVersion().equals(VERSION_1_0_TAG);
     }
 
     public TokenImpl(String sciToken, URI jti) {

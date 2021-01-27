@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 
 import java.io.File;
 
@@ -46,9 +46,9 @@ public class VFSPassThruFileProvider extends AbstractVFSFileProvider {
         super.put(path, entry);
 
         if (entry.isBinaryType()) {
-            FileUtil.writeFileAsBinary(getRealPath(path), entry.getText());
+            QDLFileUtil.writeFileAsBinary(getRealPath(path), entry.getText());
         } else {
-            FileUtil.writeStringToFile(getRealPath(path), entry.getText());
+            QDLFileUtil.writeStringToFile(getRealPath(path), entry.getText());
         }
     }
 

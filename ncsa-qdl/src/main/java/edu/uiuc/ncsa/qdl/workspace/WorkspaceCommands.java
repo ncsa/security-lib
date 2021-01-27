@@ -20,7 +20,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.*;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -708,7 +708,7 @@ public class WorkspaceCommands implements Logable {
             File f = new File(inputLine.getLastArg());
             if (f.exists() && f.isFile()) {
                 try {
-                    content = FileUtil.readFileAsLines(f.getCanonicalPath());
+                    content = QDLFileUtil.readFileAsLines(f.getCanonicalPath());
                 } catch (Throwable throwable) {
                 }
             }
@@ -3372,7 +3372,7 @@ public class WorkspaceCommands implements Logable {
         if (inputLine.hasArg(CLA_BOOT_SCRIPT)) {
             String bootFile = inputLine.getNextArgFor(CLA_BOOT_SCRIPT);
             try {
-                String bootScript = FileUtil.readFileAsString(bootFile);
+                String bootScript = QDLFileUtil.readFileAsString(bootFile);
                 interpreter.execute(bootScript);
                 if (isVerbose) {
                     say("loaded boot script " + bootFile);
@@ -3422,7 +3422,7 @@ public class WorkspaceCommands implements Logable {
             String[] args = argList.toArray(new String[0]);
             getState().setScriptArgs(args);
             try {
-                String runScript = FileUtil.readFileAsString(runScriptPath);
+                String runScript = QDLFileUtil.readFileAsString(runScriptPath);
                 if (runScript != null && !runScript.isEmpty()) {
                     interpreter.execute(runScript);
                     System.exit(0); // make sure to use this so external programs (like shell scripts) know all is ok

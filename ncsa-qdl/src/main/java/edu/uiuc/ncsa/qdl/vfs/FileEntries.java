@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -86,10 +86,10 @@ public class FileEntries {
         if (isBinary(f)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
             contents = new ArrayList<>();
-            contents.add(FileUtil.readFileAsBinary(f.getAbsolutePath()));  // one string
+            contents.add(QDLFileUtil.readFileAsBinary(f.getAbsolutePath()));  // one string
         } else {
             xp.put(CONTENT_TYPE, TEXT_TYPE);
-            contents = FileUtil.readFileAsLines(f.getAbsolutePath());
+            contents = QDLFileUtil.readFileAsLines(f.getAbsolutePath());
         }
         FileEntry fileEntry = new FileEntry(contents, xp);
         return toJSON(fileEntry);

@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -164,7 +164,7 @@ public class QDLConfigurationLoaderUtils {
                 }// end if for java modules
                 if (moduleConfig.getType().equals(MODULE_TYPE_QDL)) {
                     QDLModuleConfig qmc = (QDLModuleConfig) moduleConfig;
-                    String module = FileUtil.readFileAsString(qmc.getPath());
+                    String module = QDLFileUtil.readFileAsString(qmc.getPath());
                     interpreter.execute(module);
                     config.getMyLogger().info("loaded qdl module " + module);
                     if (isFirstQDLModules) {
@@ -205,7 +205,7 @@ public class QDLConfigurationLoaderUtils {
             QDLInterpreter interpreter = new QDLInterpreter(state);
             String bootFile = config.getBootScript();
             try {
-                String bootScript = FileUtil.readFileAsString(bootFile);
+                String bootScript = QDLFileUtil.readFileAsString(bootFile);
                 interpreter.execute(bootScript);
 
                 config.getMyLogger().info("loaded boot script " + bootFile);

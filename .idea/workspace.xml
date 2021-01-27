@@ -2,7 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Improvements, Added a head function, tests.">
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/exceptions/QDLIllegalAccessException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/util/QDLFileUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/FileUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/FormatUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/IOEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/IOEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/util/FileUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/FileEntries.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/FileEntries.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/VFSPassThruFileProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/VFSPassThruFileProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/constant-values.html" beforeDir="false" />
@@ -231,6 +244,8 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" afterDir="false" />
@@ -356,6 +371,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/constant-values.html" beforeDir="false" />
@@ -528,6 +544,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/ClientApproval.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/ClientApproval.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-frame.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-noframe.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/constant-values.html" beforeDir="false" />
@@ -749,8 +766,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/PayloadHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/PayloadHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTUtil2.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/JWTUtil2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
@@ -806,8 +822,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -1315,7 +1331,7 @@
       <workItem from="1607952157272" duration="53277000" />
       <workItem from="1608813440893" duration="98031000" />
       <workItem from="1609770779207" duration="214389000" />
-      <workItem from="1611057718927" duration="51832000" />
+      <workItem from="1611057718927" duration="78962000" />
     </task>
     <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
       <created>1602796126004</created>
@@ -1562,14 +1578,20 @@
       <option name="project" value="LOCAL" />
       <updated>1611443537563</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="More tracking claims in the correct leg.">
+      <created>1611496313401</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1611496313401</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Still tracking down uncommitted files." />
     <MESSAGE value="Improvements, Added a head function, tests. Might have improved logging output." />
     <MESSAGE value="Found small annoying edge case in parser. Many impovements to documentation both outside and inside QDL. Syntax check function added so can check scripts more easily." />
     <MESSAGE value="Check in for 5.0.2" />
@@ -1594,17 +1616,22 @@
     <MESSAGE value="Many small improvements to template handling as well as the command line client (which is actually getting to be a pretty darned slick and useful tool)." />
     <MESSAGE value="Many improvements. Documentation in CL client, making execution more modular. Added some constants." />
     <MESSAGE value="Found and fixed regression bug for functors." />
-    <option name="LAST_COMMIT_MESSAGE" value="Found and fixed regression bug for functors." />
+    <MESSAGE value="More tracking claims in the correct leg." />
+    <option name="LAST_COMMIT_MESSAGE" value="More tracking claims in the correct leg." />
   </component>
   <component name="WindowStateProjectService">
+    <state x="471" y="200" width="800" height="684" key="#Auto_Import" timestamp="1611616536939">
+      <screen x="72" y="27" width="1608" height="1023" />
+    </state>
+    <state x="471" y="200" width="800" height="684" key="#Auto_Import/72.27.1608.1023@72.27.1608.1023" timestamp="1611616536939" />
     <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611403297637">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1611403297637" />
-    <state x="684" y="257" width="522" height="597" key="#com.intellij.ide.util.MemberChooser" timestamp="1611174734509">
+    <state x="684" y="257" width="522" height="597" key="#com.intellij.ide.util.MemberChooser" timestamp="1611591371666">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="684" y="257" width="522" height="597" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1611174734509" />
+    <state x="684" y="257" width="522" height="597" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1611591371666" />
     <state x="608" y="325" width="525" height="433" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1607702081925">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1617,10 +1644,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="469" y="27" width="804" height="1023" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1603894139462" />
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1611443537372">
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1611496313208">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1611443537372" />
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1611496313208" />
     <state x="172" y="127" width="1408" height="823" key="DiffContextDialog" timestamp="1610744592792">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1633,22 +1660,22 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="646" y="283" width="449" height="517" key="FileChooserDialogImpl/72.27.1608.1023@72.27.1608.1023" timestamp="1609264182805" />
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1611488257336">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1611670541558">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1611488257336" />
-    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1611488257336">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1611670541558" />
+    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1611670541557">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1611488257336" />
-    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1611488257335">
+    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1611670541557" />
+    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1611670541557">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1611488257335" />
-    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1611488257336">
+    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1611670541557" />
+    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1611670541558">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1611488257336" />
+    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1611670541558" />
     <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1611009736241">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1673,34 +1700,34 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="425" y="252" width="891" height="580" key="RollbackChangesDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1604445062894" />
-    <state x="359" y="116" width="1024" height="852" key="SettingsEditor" timestamp="1609886572829">
+    <state x="359" y="116" width="1024" height="852" key="SettingsEditor" timestamp="1611590247472">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1609886572829" />
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1611443538917">
+    <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1611590247472" />
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1611496315188">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1611443538917" />
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1611496315188" />
     <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1611057765757">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="555" y="366" key="com.intellij.ide.util.TipDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1611057765757" />
-    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1611174147373">
+    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1611617713085">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1611174147373" />
-    <state x="444" y="27" width="1125" height="613" key="dock-window-1" timestamp="1605105153370">
+    <state x="522" y="156" width="698" height="771" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1611617713085" />
+    <state x="619" y="27" width="1061" height="565" key="dock-window-1" timestamp="1611616698069">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="444" y="27" width="1125" height="613" key="dock-window-1/72.27.1608.1023@72.27.1608.1023" timestamp="1605105153370" />
+    <state x="619" y="27" width="1061" height="565" key="dock-window-1/72.27.1608.1023@72.27.1608.1023" timestamp="1611616698069" />
     <state x="609" y="297" width="524" height="504" key="extract.method.dialog" timestamp="1610370304768">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="609" y="297" width="524" height="504" key="extract.method.dialog/72.27.1608.1023@72.27.1608.1023" timestamp="1610370304768" />
-    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1611488024984">
+    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1611753019812">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1611488024984" />
+    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1611753019812" />
     <state x="631" y="255" width="479" height="573" key="git4idea.branch.GitSmartOperationDialog" timestamp="1605279661397">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>

@@ -7,9 +7,7 @@ import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.regex.Pattern;
 
-import static edu.uiuc.ncsa.security.core.util.StringUtils.LJustify;
 import static edu.uiuc.ncsa.security.util.cli.CLIReflectionUtil.invokeMethod;
 
 /**
@@ -92,7 +90,8 @@ public class CLIDriver {
         return getIoInterface().readline(prompt);
     }
 
-    protected static final int NEW_COMMAND_VALUE = 0;
+    protected static final int USER_DEFINED_COMMAND = -1;
+    protected static final int NO_OP_VALUE = 0;
     protected static final int REPEAT_COMMAND_VALUE = 10;
     protected static final int HISTORY_COMMAND_VALUE = 20;
     protected static final int WRITE_BUFFER_COMMAND_VALUE = 30;
@@ -107,6 +106,9 @@ public class CLIDriver {
     // Might very well want to fold this into the standard flow rather than intercept it first.
     //  /i file = interpret all the commands in a file, i.e. run a script. No arg runs command buffer as batch file????
     protected int getCommandType(String cmdLine) {
+        if (StringUtils.isTrivial(cmdLine.trim())) {
+            return NO_OP_VALUE;
+        }
         StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
         String nextToken = st.nextToken();
         if (nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND_VALUE;
@@ -118,7 +120,7 @@ public class CLIDriver {
         if (nextToken.equals(PRINT_HELP_COMMAND)) return PRINT_HELP_COMMAND_VALUE;
         if (nextToken.equals(LIST_ALL_METHODS_COMMAND)) return LIST_ALL_METHODS_COMMAND_VALUE;
         if (nextToken.equals(TRACE_COMMAND)) return TRACE_COMMAND_VALUE;
-        return NEW_COMMAND_VALUE;
+        return USER_DEFINED_COMMAND;
     }
 
     protected void printHelp() {
@@ -146,7 +148,7 @@ public class CLIDriver {
     }
 
     protected String doRepeatCommand(String cmdLine) {
-        if(cmdLine.contains(HELP_SWITCH)){
+        if (cmdLine.contains(HELP_SWITCH)) {
             say(REPEAT_LAST_COMMAND + " = repeat the last command. Identical to " + HISTORY_LIST_COMMAND + " 0");
             return null;
         }
@@ -158,7 +160,7 @@ public class CLIDriver {
     }
 
     protected String doHistory(String cmdLine) {
-        if(cmdLine.contains(HELP_SWITCH)){
+        if (cmdLine.contains(HELP_SWITCH)) {
             say(HISTORY_LIST_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
             say("See also:" + WRITE_BUFFER_COMMAND + ", " + LOAD_BUFFER_COMMAND + ", " + REPEAT_LAST_COMMAND);
             return null; // do nothing
@@ -189,9 +191,9 @@ public class CLIDriver {
     }
 
     protected void doBufferWrite(String cmdLine) throws Exception {
-        if(cmdLine.contains(HELP_SWITCH)){
+        if (cmdLine.contains(HELP_SWITCH)) {
             say(WRITE_BUFFER_COMMAND + " file = write current command history to a file.");
-            say("See also:" +LOAD_BUFFER_COMMAND);
+            say("See also:" + LOAD_BUFFER_COMMAND);
             return;
         }
         String rawFile = cmdLine.substring(WRITE_BUFFER_COMMAND.length()).trim();
@@ -218,7 +220,7 @@ public class CLIDriver {
     }
 
     protected void doBufferRead(String cmdLine) throws Exception {
-        if(cmdLine.contains(HELP_SWITCH)){
+        if (cmdLine.contains(HELP_SWITCH)) {
             say(LOAD_BUFFER_COMMAND + " file = load a saved command history, replacing the current one.");
             say("See also: " + WRITE_BUFFER_COMMAND);
             return;
@@ -284,7 +286,8 @@ public class CLIDriver {
                     cmdLine = TemplateUtil.replaceAll(cmdLine, getEnv());
                 }
                 boolean storeLine = true;
-                switch (getCommandType(cmdLine)) {
+                int commandType = getCommandType(cmdLine);
+                switch (commandType) {
                     case REPEAT_COMMAND_VALUE:
                         cmdLine = doRepeatCommand(cmdLine);
                         storeLine = cmdLine == null; // if there is nothing in the buffer, cmdLine is null, don't store it.
@@ -303,7 +306,7 @@ public class CLIDriver {
                         doBufferRead(cmdLine);
                         continue;
                     case CLEAR_BUFFER_COMMAND_VALUE:
-                        if(cmdLine.contains(HELP_SWITCH)){
+                        if (cmdLine.contains(HELP_SWITCH)) {
                             say(CLEAR_BUFFER_COMMAND + " = clear the entire command history.");
                             continue;
                         }
@@ -323,17 +326,23 @@ public class CLIDriver {
                     case TRACE_COMMAND_VALUE:
                         doTrace(cmdLine);
                         continue;
-                    case NEW_COMMAND_VALUE:
+                    case NO_OP_VALUE:
+                        continue;
+                    case USER_DEFINED_COMMAND:
                     default:
+                }
+                if (commandType == NO_OP_VALUE ) {
+                    // The user entered a blank line or nothing but blanks. Skip it all.
+                    continue;
                 }
                 if (storeLine) {
                     // Store it if it was not retrieved from the command history.
                     commandHistory.add(0, cmdLine);
                 }
+
                 switch (execute(cmdLine)) {
                     case HELP_RC:
                         InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
-
                         listCLIMethods(inputLine);
                         break;
                     case SHUTDOWN_RC:
@@ -371,7 +380,7 @@ public class CLIDriver {
     boolean traceOn = false;
 
     private void doTrace(String cmdLine) {
-        if(cmdLine.equals(HELP_SWITCH)){
+        if (cmdLine.equals(HELP_SWITCH)) {
             say(TRACE_COMMAND + " [on | off] Turn on or off low-level debugging for the client. Mostly for system programmers.");
             return;
         }
@@ -460,7 +469,7 @@ public class CLIDriver {
         for (String x : tempCCIN) {
             list.add(x);
         }
-        formatList(inputLine, list);
+        FormatUtil.formatList(inputLine, list);
 
         say("\nTo get help on the CLI, type /?");
         say("To get general information on the current component in use, type --help at the prompt.");
@@ -513,104 +522,6 @@ public class CLIDriver {
     }
 
     IOInterface ioInterface;
-    String REGEX_SWITCH = "-r";
-    String COLUMNS_VIEW_SWITCH = "-col";
-    String DISPLAY_WIDTH_SWITCH = "-w";
 
-    /**
-     * This allows for setting the formatting
-     * @param inputLine
-     * @param listOf
-     */
-    public void formatList(InputLine inputLine, List<String> listOf) {
-        if(inputLine.hasArg(HELP_SWITCH)){
-            say(inputLine.getCommand() + " [" + DISPLAY_WIDTH_SWITCH +
-                    " width | "+ COLUMNS_VIEW_SWITCH + " | "+ REGEX_SWITCH  + " regex]");
-            say(DISPLAY_WIDTH_SWITCH + " width = sets the width of the output.");
-            say(COLUMNS_VIEW_SWITCH + " = single column only (overrides " + DISPLAY_WIDTH_SWITCH + ")");
-            say(REGEX_SWITCH + " regex = filter the result using a regex");
-            return;
-        }
-        if (listOf.isEmpty()) {
-            return;
-        }
-        if (listOf.size() == 1) {
-            say(listOf.get(0));
-            return;
-        }
 
-        TreeSet<String> list;
-        list = new TreeSet<>();
-        list.addAll(listOf);
-
-        Pattern pattern = null;
-        if (inputLine.hasArg(REGEX_SWITCH)) {
-            try {
-                pattern = Pattern.compile(inputLine.getNextArgFor(REGEX_SWITCH));
-                TreeSet<String> list2 = new TreeSet<>();
-                //pattern.
-                for (String x : list) {
-                    if (pattern.matcher(x).matches()) {
-                        list2.add(x);
-                    }
-                }
-                list = list2;
-            } catch (Throwable t) {
-                say("sorry but there was a problem with your regex \"" + inputLine.getNextArgFor(REGEX_SWITCH) + "\":" + t.getMessage());
-            }
-
-        }
-        if (inputLine.hasArg(COLUMNS_VIEW_SWITCH)) {
-            for (String func : list) {
-                say(func); // one per line
-            }
-            return;
-        }
-        int displayWidth = 120; // just to keep thing simple
-        if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
-            try {
-                displayWidth = Integer.parseInt(inputLine.getNextArgFor(DISPLAY_WIDTH_SWITCH));
-            } catch (Throwable t) {
-                say("sorry, but " + inputLine.getArg(0) + " is not a number. Formatting for default width of " + displayWidth);
-            }
-        }
-
-        // Find longest entry
-        int maxWidth = 0;
-        for (String x : list) {
-            maxWidth = Math.max(maxWidth, x.length());
-        }
-        // special case. If the longest element is too long, just print as columns
-        if (displayWidth <= maxWidth) {
-            for (String x : list) {
-                say(x);
-            }
-            return;
-        }
-        maxWidth = 2 + maxWidth; // so the widest + 2 chars to make it readable.
-        // number of columns are display / width, possibly plus 1 if there is a remainder
-        //int colCount = displayWidth / maxWidth + (displayWidth % maxWidth == 0 ? 0 : 1);
-        int colCount = displayWidth / maxWidth;
-        colCount = colCount + (colCount == 0 ? 1 : 0); // Make sure there is at least 1 columns
-        int rowCount = list.size() / colCount;
-        rowCount = rowCount + (rowCount == 0 ? 1 : 0); // and at least one row
-        String[] output = new String[rowCount];
-        for (int i = 0; i < rowCount; i++) {
-            output[i] = ""; // initialize it
-        }
-        int pointer = 0;
-        for (String func : list) {
-            int currentLine = pointer++ % rowCount;
-            if (rowCount == 1) {
-                // single row, so don't pad, just a blank between entries
-                output[currentLine] = output[currentLine] + func + "  ";
-            } else {
-                output[currentLine] = output[currentLine] + LJustify(func, maxWidth);
-            }
-        }
-        for (String x : output) {
-            say(x);
-        }
-
-    }
 }

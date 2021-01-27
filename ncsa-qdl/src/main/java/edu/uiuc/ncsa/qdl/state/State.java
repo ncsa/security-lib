@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
@@ -228,7 +228,7 @@ public class State extends FunctionState implements QDLConstants {
         StemVariable versionInfo = new StemVariable();
         List<String> manifest = null;
         try {
-            manifest = FileUtil.readFileAsLines(path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
+            manifest = QDLFileUtil.readFileAsLines(path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");
         } catch (Throwable throwable) {
             if (getLogger() != null) {
                 getLogger().info("Could not find the build info file. Looked in " + path + (path.endsWith("/") ? "" : "/") + "lib/build-info.txt");

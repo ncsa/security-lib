@@ -122,7 +122,7 @@ public class ClientApproval extends IdentifiableImpl {
         ca.setApprover(getApprover());
         ca.setStatus(getStatus());
         ca.setApprovalTimestamp(getApprovalTimestamp());
-        setApproved(isApproved());
+        ca.setApproved(isApproved());
         return ca;
     }
 

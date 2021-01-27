@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.util.FileUtil;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -790,15 +790,15 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         } else {
             try {
                 if (isStem(obj2)) {
-                    FileUtil.writeStemToFile(fileName, (StemVariable) obj2);
+                    QDLFileUtil.writeStemToFile(fileName, (StemVariable) obj2);
                     didIt = true;
                 }
                 if (isString(obj2)) {
-                    FileUtil.writeStringToFile(fileName, (String) obj2);
+                    QDLFileUtil.writeStringToFile(fileName, (String) obj2);
                     didIt = true;
                 }
                 if (isBase64) {
-                    FileUtil.writeFileAsBinary(fileName, (String) obj2);
+                    QDLFileUtil.writeFileAsBinary(fileName, (String) obj2);
                     didIt = true;
                 }
             } catch (Throwable t) {
@@ -856,7 +856,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     if (hasVF) {
                         polyad.setResult(vfsEntry.getText());// if this is binary, the contents are a single base64 encoded string.
                     } else {
-                        polyad.setResult(FileUtil.readFileAsBinary(fileName));
+                        polyad.setResult(QDLFileUtil.readFileAsBinary(fileName));
                     }
                     polyad.setResultType(Constant.STRING_TYPE);
                     polyad.setEvaluated(true);
@@ -865,7 +865,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     if (hasVF) {
                         polyad.setResult(vfsEntry.convertToStem());// if this is binary, the contents are a single base64 encoded string.
                     } else {
-                        polyad.setResult(FileUtil.readFileAsStem(fileName));
+                        polyad.setResult(QDLFileUtil.readFileAsStem(fileName));
                     }
                     // Read as lines, put in a stem
                     polyad.setResultType(Constant.STEM_TYPE);
@@ -877,7 +877,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     if (hasVF) {
                         polyad.setResult(vfsEntry.getText());
                     } else {
-                        polyad.setResult(FileUtil.readFileAsString(fileName));
+                        polyad.setResult(QDLFileUtil.readFileAsString(fileName));
                     }
                     polyad.setResultType(Constant.STRING_TYPE);
                     polyad.setEvaluated(true);
