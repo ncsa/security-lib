@@ -15,6 +15,7 @@ public class OA2GeneralError extends GeneralException {
     /**
      * Convert a redirectable error to a general one. The default is to set the status code
      * to 400 = bad request so something is there.
+     *
      * @param error
      */
     public OA2GeneralError(OA2RedirectableError error) {
@@ -23,32 +24,34 @@ public class OA2GeneralError extends GeneralException {
         setHttpStatus(HttpStatus.SC_BAD_REQUEST);
     }
 
-    public OA2GeneralError(String error,String description,  int httpStatus) {
-        super("error: "+error+" (status: "+httpStatus+", description: "+description+")");
-        this.description = description;
-        this.error = error;
-        this.httpStatus = httpStatus;
-    }
-
-    public OA2GeneralError(Throwable cause,String error, String description,  int httpStatus) {
+    public OA2GeneralError(Throwable cause) {
         super(cause);
-        this.description = description;
-        this.error = error;
-        this.httpStatus = httpStatus;
     }
 
-    public OA2GeneralError(String message, String error, String description, int httpStatus) {
+    public OA2GeneralError() {
+
+    }
+    public OA2GeneralError(String message) {
         super(message);
-        this.description = description;
-        this.error = error;
-        this.httpStatus = httpStatus;
     }
 
-    public OA2GeneralError(String message, Throwable cause, String error, String description,  int httpStatus) {
+    public OA2GeneralError(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public OA2GeneralError(String error,
+                           String description,
+                           int httpStatus,
+                           String state) {
+        super("error: " + error + " (status: " + httpStatus + ", description: " + description +  (state==null?"":", state:" + state) + ")");
+        setValues(error, description, httpStatus, state);
+    }
+
+    public void setValues(String error, String description, int httpStatus, String state){
         this.description = description;
         this.error = error;
         this.httpStatus = httpStatus;
+        this.state = state;
     }
 
     public int getHttpStatus() {
@@ -60,6 +63,19 @@ public class OA2GeneralError extends GeneralException {
     }
 
     int httpStatus;
+    String error;
+    String description;
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    String state;
+
 
     public String getError() {
         return error;
@@ -69,8 +85,6 @@ public class OA2GeneralError extends GeneralException {
         this.error = error;
     }
 
-    String error;
-    String description;
 
     public String getDescription() {
         return description;

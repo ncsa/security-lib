@@ -1,17 +1,15 @@
 package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
+import edu.uiuc.ncsa.security.core.exceptions.IllegalAccessException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2Errors;
-import edu.uiuc.ncsa.security.oauth_2_0.OA2GeneralError;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
 import edu.uiuc.ncsa.security.oauth_2_0.server.claims.ClaimSource;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunRequest;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRunResponse;
 import edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine;
 import net.sf.json.JSONObject;
-import org.apache.http.HttpStatus;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -207,7 +205,8 @@ public class JWTRunner {
                         // This practically means that the come situation has arisen whereby the user is
                         // immediately banned from access -- e.g. they were found to be on a blacklist.
                         h.finish(execPhase);
-                        throw new OA2GeneralError(OA2Errors.ACCESS_DENIED, "access denied", HttpStatus.SC_UNAUTHORIZED);
+                        //throw new IllegalAccessException(OA2Errors.ACCESS_DENIED, "access denied", null, HttpStatus.SC_UNAUTHORIZED);
+                        throw new IllegalAccessException();
                     }
                     trace(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }

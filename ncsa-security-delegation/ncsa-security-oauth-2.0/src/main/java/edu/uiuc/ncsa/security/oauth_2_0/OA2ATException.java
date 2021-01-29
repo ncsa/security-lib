@@ -1,52 +1,53 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import org.apache.http.HttpStatus;
 
 /**
- * This is thrown by the AT servlet and is used to construct the response.
+ * This is thrown by the AT servlet and is used to construct the response which
+ * must include JSON.  Mostly we need this for the type to make sure it can
+ * be identified and handled properly. Note the error from the token endpoint
+ * is never a redirect to the client's error endpoint, but the response is always
+ * a JSON object.
  * <p>Created by Jeff Gaynor<br>
  * on 9/14/16 at  12:26 PM
  */
 // This class is part of the fix for CIL-332.
-public class OA2ATException extends GeneralException {
+public class OA2ATException extends OA2GeneralError {
 
-    public OA2ATException(String error, String description, int statusCode) {
-        super(description); // Or no error message is in the logs
-        this.description = description;
-        this.error = error;
-        this.statusCode = statusCode;
+    public OA2ATException(OA2RedirectableError error) {
+        super(error);
     }
 
+    /**
+     * Case for very early failure, e.g., invalid client id. No way to get the callback, state, etc.
+     * @param error
+     * @param description
+     */
     public OA2ATException(String error, String description) {
-        this(error, description, HttpStatus.SC_BAD_REQUEST);
+        this(error,description,null);
     }
 
-    String error;
-    String description;
-    int statusCode;
-
-    public String getDescription() {
-        return description;
+    /**
+     * The vast majority of error from the token endpoint are required by the RFC (section 5.2)
+     * to return a bad request (400) http status.
+     * @param error
+     * @param description
+     * @param state
+     */
+    public OA2ATException(String error, String description,  String state) {
+        super(error, description, HttpStatus.SC_BAD_REQUEST, state);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    /**
+     * Most general exception if something more exotic than error + description + bad request is needed.
+     * @param error
+     * @param description
+     * @param httpStatus
+     * @param state
+     */
+    public OA2ATException(String error, String description, int httpStatus, String state) {
+        super(error, description, httpStatus, state);
     }
 
-    public String getError() {
-        return error;
-    }
 
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
 }

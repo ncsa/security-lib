@@ -1,7 +1,5 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
-import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-
 import java.net.URI;
 
 /**
@@ -11,10 +9,8 @@ import java.net.URI;
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/15 at  11:33 AM
  */
-public class OA2RedirectableError extends GeneralException {
-    String error;
-    String description;
-    String state;
+public class OA2RedirectableError extends OA2GeneralError {
+    URI callback;
 
     public URI getCallback() {
         return callback;
@@ -24,62 +20,24 @@ public class OA2RedirectableError extends GeneralException {
         this.callback = callback;
     }
 
-    URI callback;
-
-    public int getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    int errorCode;
-
-    public OA2RedirectableError(String error, String description, String state, URI callback) {
-        this(error, description, state);
+    public OA2RedirectableError(String error,
+                                String description,
+                                int httpStatus,
+                                String state,
+                                URI callback) {
+        this(error, description, httpStatus, state);
         this.callback = callback;
     }
 
-    public OA2RedirectableError(String error, String description, String state, String callback) {
-        this(error, description, state);
-        if (callback != null) {
-            // if there is a missing callback, then keep going rather than get a nullpointer exception.
-            this.callback = URI.create(callback);
-        }
-    }
 
-    public OA2RedirectableError(String error, String description, String state) {
+    public OA2RedirectableError(String error, String description, int httpStatus, String state) {
         super("error: "+error+" (description: "+description+")");
         this.error = error;
         this.description = description;
         this.state = state;
-        this.errorCode = OA2Errors.ErrorUtil.lookupErrorCode(error);
+        this.httpStatus = httpStatus;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
-    }
-
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
 
     public OA2RedirectableError() {
     }
@@ -96,4 +54,7 @@ public class OA2RedirectableError extends GeneralException {
         super(message, cause);
     }
 
+    public boolean hasCallback(){
+        return callback != null;
+    }
 }

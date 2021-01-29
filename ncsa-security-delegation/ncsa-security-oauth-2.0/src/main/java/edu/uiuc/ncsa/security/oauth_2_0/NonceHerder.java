@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.oauth_2_0.server.InvalidNonceException;
 import org.apache.commons.codec.binary.Base64;
 
@@ -24,10 +25,26 @@ public class NonceHerder {
     public static void removeNonce(String nonce){
                     getNonces().remove(nonce);
     }
+
+    /**
+     * Checks if this herder knows about this nonce. It returns a boolean. To test for nonces, use
+     * {@link #checkNonce(String)}
+     * @param nonce
+     * @return
+     */
     public static boolean hasNonce(String nonce) {
         return getNonces().contains(nonce);
     }
+
+    /**
+     * Checks if a non-trivial nonce is here and if so, throws an exception. If not,
+     * the new nonce is added.
+     * @param nonce
+     */
     public static void checkNonce(String nonce) {
+        if(StringUtils.isTrivial(nonce)){
+            return; // not a lot we can do if they don't give us a nonce.
+        }
         if (hasNonce(nonce)) {
             throw new InvalidNonceException("Error: nonce used");
         }
