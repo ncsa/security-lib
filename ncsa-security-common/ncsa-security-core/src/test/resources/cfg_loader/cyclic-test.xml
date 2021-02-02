@@ -1,0 +1,10 @@
+<!--
+     This has a cycle in it and should throw an exception when called.
+-->
+
+<config>
+    <service name="A" alias = "B" overrides="X"/>  <!-- X B -->
+    <service name="B" alias="C" overrides="A"/>    <!-- X B C-->
+    <service name="C"/>  <!-- C -->
+    <service name="X"/>  <!-- X -->
+</config>

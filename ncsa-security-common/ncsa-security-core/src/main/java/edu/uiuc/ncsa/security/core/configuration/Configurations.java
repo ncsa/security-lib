@@ -27,6 +27,9 @@ import java.util.TreeSet;
  */
 public class Configurations {
 
+    public static final String FILE_TAG = "file";
+    public static final String INCLUDE_TAG = "include";
+
     /**
      * Useful utility call. This explicitly kills off logging from log 4 java. This is needed since some
      * dependency (don't know which) has a misconfigured log4j properties file in its library which
@@ -64,7 +67,8 @@ public class Configurations {
     }
 
     /**
-     * This will look for file references to include in the current XML configuration
+     * This will look for file references to include in the current XML configuration and load them all
+     * into a single {@link XMLConfiguration}
      *
      * @param file
      * @return
@@ -88,10 +92,10 @@ public class Configurations {
      * @throws ConfigurationException
      */
     protected static XMLConfiguration resolveFileReferences(XMLConfiguration cfg, TreeSet<String> visitedFiles) throws ConfigurationException {
-        List list = cfg.getRoot().getChildren("file");
+        List list = cfg.getRoot().getChildren(FILE_TAG);
         for (int i = 0; i < list.size(); i++) {
             ConfigurationNode cn = (ConfigurationNode) list.get(i);
-            List nameAttribs = cn.getAttributes("include");
+            List nameAttribs = cn.getAttributes(INCLUDE_TAG);
             for (int j = 0; j < nameAttribs.size(); j++) {
                 ConfigurationNode attrcn = (ConfigurationNode) nameAttribs.get(j);
                 String currentFile = (String) attrcn.getValue();
@@ -239,6 +243,14 @@ public class Configurations {
         return getConfig(cfg, topNodeName, configName, checkedAliases);
     }
 
+    /**
+     *
+     * @param cfg
+     * @param topNodeName The tag inside the outermost tag you want, e.g. "service", "client"
+     * @param configName The name (i.e. value of name attributes)
+     * @param checkedAliases Any aliases encountered so far.
+     * @return
+     */
     protected static ConfigurationNode getConfig(XMLConfiguration cfg, String topNodeName, String configName, TreeSet<String> checkedAliases) {
         List list = cfg.configurationsAt(topNodeName);
         ConfigurationNode configurationNode = null;
@@ -267,5 +279,6 @@ public class Configurations {
         throw new MyConfigurationException("Configuration \"" + configName + "\" not found");
 
     }
+
 
 }

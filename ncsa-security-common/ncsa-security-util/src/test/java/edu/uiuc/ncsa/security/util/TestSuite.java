@@ -18,7 +18,7 @@ import org.junit.runners.Suite;
         JFunctorTest.class,
         JSONPreprocessorTest.class,
         CacheTest.class,
-        EditorTest.class
+        EditorTest.class,
 })
 public class TestSuite extends junit.framework.TestSuite {
 }

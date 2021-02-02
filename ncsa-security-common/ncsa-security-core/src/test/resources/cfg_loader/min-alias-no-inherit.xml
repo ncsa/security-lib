@@ -1,0 +1,7 @@
+<!--
+     Simplest alias test with no inhertiance
+-->
+<config>
+    <service name="A" alias="B"/>  <!-- B -->
+    <service name="B" />
+</config>

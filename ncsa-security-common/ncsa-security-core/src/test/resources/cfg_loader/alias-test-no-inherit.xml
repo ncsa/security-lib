@@ -1,0 +1,10 @@
+<!--
+     Several aliases but no inheritance,showing if the engine can resolve everything.
+-->
+<config>
+    <service name="A" alias="B"/>  <!-- Y -->
+    <service name="B" alias="X"/>  <!-- Y -->
+    <service name="C" alias="X"/>  <!-- Y -->
+    <service name="X" alias="Y"/>  <!-- Y -->
+    <service name="Y" />           <!-- Y -->
+</config>

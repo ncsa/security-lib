@@ -1,0 +1,8 @@
+<!--
+     Most minimal test involving inheritance.
+-->
+<config>
+    <service name="A" alias="B" overrides="X"/>  <!-- X B -->
+    <service name="B" />
+    <service name="X" />
+</config>

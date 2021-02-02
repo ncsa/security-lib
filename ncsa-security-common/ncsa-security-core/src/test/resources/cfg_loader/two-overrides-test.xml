@@ -1,0 +1,12 @@
+<!--
+     A couple of overrides
+-->
+<config>
+    <service name="A" alias="B" overrides="X"/>  <!--   X Y C Z -->
+    <service name="B" alias="C" overrides="Y"/>  <!-- Y C Z -->
+    <service name="C" overrides="Z"/>            <!-- C Z -->
+
+    <service name="X"/>
+    <service name="Y"/>
+    <service name="Z"/>
+</config>
