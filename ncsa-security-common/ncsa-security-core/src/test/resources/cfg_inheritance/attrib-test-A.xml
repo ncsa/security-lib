@@ -1,0 +1,12 @@
+<!--
+      test that overriding an attribute is resolved right.
+-->
+<config>
+    <service name="A"
+             overrides="X"
+             test_attrib="Attribute A">
+    </service>
+    <service name="X"
+             test_attrib="Attribute X">
+    </service>
+</config>

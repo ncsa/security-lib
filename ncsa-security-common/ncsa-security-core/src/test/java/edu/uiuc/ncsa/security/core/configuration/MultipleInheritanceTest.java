@@ -2,12 +2,8 @@ package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
 import edu.uiuc.ncsa.security.core.inheritance.UnresolvedReferenceException;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +17,10 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 1/19/12 at  10:49 AM
  */
-public class MultipleInheritanceTest extends TestCase {
+public class MultipleInheritanceTest extends AbstractInheritanceTest {
+    protected String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/";
 
 
-    String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/";
 
     /**
      * The huge and messy test for this that shows how everything works. This is probably the
@@ -187,12 +183,7 @@ public class MultipleInheritanceTest extends TestCase {
 
     }
 
-    protected MultiConfigurations getConfigurations2(String fileName) throws ConfigurationException {
-        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(fileName));
-        MultiConfigurations configurations2 = new MultiConfigurations();
-        configurations2.ingestConfig(xmlConfiguration, "service");
-        return configurations2;
-    }
+
 
     @Test
     public void testMultipleOverrides() throws Exception {

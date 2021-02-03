@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import net.sf.json.JSONObject;
@@ -321,6 +320,33 @@ public abstract class CommonCommands implements Commands {
 
     }
 
+    protected void printGetEnvHelp() {
+        say("get_env [" + ENV_KEY_FLAG + "] key ");
+        sayi("Gets a single environment value for a given key. The flag is optional.");
+        sayi("E.g.\n\n");
+        sayi("get_env " + ENV_KEY_FLAG + " foo ");
+        sayi("the quick brown fox");
+        sayi("\n\nwhich is the value stored in \"foo\"");
+        say("See also: set_env, clear_env");
+    }
+
+    public void get_env(InputLine inputline) throws Exception {
+        if (showHelp(inputline)) {
+            printGetEnvHelp();
+            return;
+        }
+        String key = inputline.getLastArg();
+        if(inputline.hasArg(ENV_KEY_FLAG)){
+            key = inputline.getNextArgFor(ENV_KEY_FLAG);
+        }
+        Object r = getDriver().getEnv().get(key);
+        if(r == null){
+            say("value not found for \"" + key + "\"");
+            return;
+        }
+                   say(r.toString());
+    }
+
     String curentEnvFile = null;
 
     public void read_env(InputLine inputline) throws Exception {
@@ -589,12 +615,14 @@ public abstract class CommonCommands implements Commands {
         // A little bit trickier than it looks since we have an internal flag for the negation of this.
         // We also want to be sure they really want to turn off output, so we only test for logical true
         // That way if they screw it up they still at least get output...
-        if (inputLine.hasArg("true")) {
-            logit("Turning output on");
-            setPrintOuput(true);
-        } else {
+        // Also, this will only set the output to off if it is explicitly told to, otherwise users can shut it
+        // off by accident and not get any output and not know why.
+        if (inputLine.hasArg("false")) {
             logit("Turning output off");
             setPrintOuput(false);
+        } else {
+            logit("Turning output on");
+            setPrintOuput(true);
         }
     }
 

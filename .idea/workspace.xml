@@ -1,789 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Improvements, Added a head function, tests.">
-      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/UnresolvedReferenceException.java" afterDir="false" />
+    <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="More tests. Added an exception. renamed a class">
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/AbstractInheritanceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/alias-override-test.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-A.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-B.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test2.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/Configurations2.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/cyclic-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/cyclic-test.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/test-cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/test-big-cfg.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/allclasses-noframe.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/constant-values.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/deprecated-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Identifiable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/IdentifiableProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Identifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Initializable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Logable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Store.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/Version.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/Cache.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/Cacheable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/CachedMapFacade.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/CachedObject.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/Cleanup.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/MaxAgePolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/MaxCacheSizePolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/RetentionPolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/SimpleEntryImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/ValidTimestampPolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/Cache.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/Cacheable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/CachedMapFacade.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/CachedObject.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/Cleanup.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/MaxAgePolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/MaxCacheSizePolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/RetentionPolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/SimpleEntryImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/class-use/ValidTimestampPolicy.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/cache/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Identifiable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/IdentifiableProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Identifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Initializable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Logable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Store.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/class-use/Version.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/ConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/Configurations.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/NSProperties.StringLengthComparator.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/NSProperties.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/StorageConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/XProperties.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/ConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/Configurations.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/NSProperties.StringLengthComparator.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/NSProperties.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/StorageConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/class-use/XProperties.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/CfgEvent.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/CfgEventListener.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/DefaultStoreDisabledException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/HierarchicalConfigProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/MultiTypeProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/TypedProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/CfgEvent.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/CfgEventListener.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/DefaultStoreDisabledException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/HierarchicalConfigProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/MultiTypeProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/class-use/TypedProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/configuration/provider/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/ConnectionException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/DestroyedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/FilePermissionsException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/GeneralException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/IllegalAccessException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/InvalidCertRequestException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/InvalidTimestampException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/InvalidTokenException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/InvalidURIException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/MyConfigurationException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/NFWException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/NotImplementedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/RetryException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/ServerRedirectException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/ServerSideException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/TransactionNotFoundException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/UninitializedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/UnknownClientException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/UnknownOptionException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/UnregisteredObjectException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/UnsupportedProtocolException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/ConnectionException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/DestroyedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/FilePermissionsException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/GeneralException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/IllegalAccessException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/InvalidCertRequestException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/InvalidTimestampException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/InvalidTokenException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/InvalidURIException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/MyConfigurationException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/NFWException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/NotImplementedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/RetryException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/ServerRedirectException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/ServerSideException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/TransactionNotFoundException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/UninitializedException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/UnknownClientException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/UnknownOptionException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/UnregisteredObjectException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/class-use/UnsupportedProtocolException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/exceptions/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/IPCBean.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/IPCEvent.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/IPCEventListener.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/class-use/IPCBean.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/class-use/IPCEvent.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/class-use/IPCEventListener.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/ipc/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/AbstractEnvironment.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/BasicIdentifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/BeanUtils.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/Benchmarker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/ConfigurationLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/DateUtils.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/DebugUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/DoubleHashMap.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/HostUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/IdentifiableImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/IdentifiableProviderImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/IdentifierProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/Identifiers.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/Iso8601.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/LoggerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.MyLoggerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/LoggingConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/MapUtilities.MapEntry.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/MapUtilities.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/MyLoggingFacade.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/Pool.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/PoolException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/QueuePopulationThread.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/QueueWithSpare.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/AbstractEnvironment.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BasicIdentifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/BeanUtils.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Benchmarker.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/ConfigurationLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DateUtils.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DebugUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/DoubleHashMap.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/HostUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/IdentifiableImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/IdentifiableProviderImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/IdentifierProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Identifiers.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Iso8601.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/LoggerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/LoggingConfigLoader.MyLoggerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/LoggingConfigLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/LoggingConfigurationTags.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/MapUtilities.MapEntry.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/MapUtilities.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/MyLoggingFacade.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/Pool.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/PoolException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/QueuePopulationThread.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/class-use/QueueWithSpare.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/edu/uiuc/ncsa/security/core/util/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/help-doc.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/index-all.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/overview-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/overview-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/overview-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/serialized-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/apidocs/stylesheet.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/StorageConfigurationTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/StorageConfigurationTags.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/XProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/XProperties.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/BasicIdentifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/BasicIdentifier.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DateUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DateUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DoubleHashMap.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DoubleHashMap.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/IdentifierProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/IdentifierProvider.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Identifiers.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Identifiers.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Iso8601.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Iso8601.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggerProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggerProvider.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader$MyLoggerProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader$MyLoggerProvider.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/MyLoggingFacade.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/MyLoggingFacade.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT-test-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT-tests.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/ncsa-security-core-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/test-classes/edu/uiuc/ncsa/security/core/configuration/ConfigTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/BasicSorter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIReflectionUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLITool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLITool.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommandLineTokenizer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommandLineTokenizer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/Commands.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/Commands.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommonCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommonCommands.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/ConfigurableCommandsImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/InputLine.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/InputLine.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/StoreCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/StoreCommands.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/CLITools.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/CLITools.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtilProvider.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil$MySunPKCS_CR.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil$MySunPKCS_CR.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyPairPopulationThread.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyPairPopulationThread.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyPairQueue.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyPairQueue.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/KeyUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/PEMFormatUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/PEMFormatUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/python/javaCrypto.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/python/javaCrypto.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/MyTrustManager.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/MyTrustManager.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLConfiguration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLConfigurationUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLConfigurationUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLKeystoreConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/SSLKeystoreConfiguration.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/VerifyingHTTPClientFactory$X509TrustManagerFacade.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/VerifyingHTTPClientFactory$X509TrustManagerFacade.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/VerifyingHTTPClientFactory.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/ssl/VerifyingHTTPClientFactory.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestConfigLoader$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestConfigLoader$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestConfigLoader.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestData.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/testing/TestData.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/javadoc-bundle-options/package-list" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CommonCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/allclasses-noframe.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/constant-values.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/deprecated-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/AbstractClientEnvironment.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/AbstractDelegationServiceProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/DelegationService.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/class-use/AbstractClientEnvironment.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/class-use/AbstractDelegationServiceProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/class-use/DelegationService.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/AGRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/AGResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/ATResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/BasicRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/BasicResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/CallbackRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/CallbackResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/DelegationRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/DelegationResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/PARequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/PAResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/RTRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/RTResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/UIRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/UIResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/AGRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/AGResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/ATRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/ATResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/BasicRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/BasicResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/CallbackRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/CallbackResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/DelegatedAssetRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/DelegatedAssetResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/DelegationRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/DelegationResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/PARequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/PAResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/RTRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/RTResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/UIRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/class-use/UIResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/request/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/AGServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/ATServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/CBServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/PAServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/RTServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/ResourceOwner.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/UIServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/AGServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/ATServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/CBServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/PAServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/RTServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/ResourceOwner.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/class-use/UIServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/edu/uiuc/ncsa/security/delegation/client/server/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/help-doc.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/index-all.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/overview-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/overview-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/overview-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/apidocs/stylesheet.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/RTResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/RTResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/ncsa-security-delegation-client-3.4-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/allclasses-noframe.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/constant-values.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/deprecated-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/AddressableServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/DoubleDispatchServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/Request.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/Response.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/Server.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/class-use/AddressableServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/class-use/DoubleDispatchServer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/class-use/Request.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/class-use/Response.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/class-use/Server.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/services/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/DBConfigLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/TransactionFilter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/TransactionState.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/class-use/DBConfigLoader.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/class-use/TransactionFilter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/class-use/TransactionState.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/servlet/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/AggregateTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/BaseClient.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/Client.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/ClientApprovalKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/ClientKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/ClientProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/JSONUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/TransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/AggregateTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/BaseClient.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/BaseClientKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/Client.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/ClientApprovalKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/ClientKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/ClientProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/JSONUtil.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/class-use/TransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransaction.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionTable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/ClientConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/FSTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/SQLBaseTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.TransactionIndices.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.TokenIndex.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionStoreProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BaseClientConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BasicTransaction.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BasicTransactionConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BasicTransactionKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BasicTransactionProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/BasicTransactionTable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/ClientConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/FSTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/SQLBaseTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/TransactionCache.TransactionIndices.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/TransactionCache.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/TransactionMemoryStore.TokenIndex.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/TransactionMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/class-use/TransactionStoreProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/impl/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/storage/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/AccessToken.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/AuthorizationGrant.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/Credential.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/MyX509Certificates.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/ProtectedAsset.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/RefreshToken.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/Token.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/TokenForge.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/Verifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/AccessToken.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/AuthorizationGrant.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/Credential.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/MyX509Certificates.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/ProtectedAsset.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/RefreshToken.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/Token.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/TokenForge.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/class-use/Verifier.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/AccessTokenImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/AuthorizationGrantImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/VerifierImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/class-use/AccessTokenImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/class-use/AuthorizationGrantImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/class-use/TokenImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/class-use/VerifierImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/impl/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/edu/uiuc/ncsa/security/delegation/token/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/help-doc.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/index-all.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/overview-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/overview-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/overview-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/serialized-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/apidocs/stylesheet.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/AggregateTransactionStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/AggregateTransactionStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClient.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/ClientApprovalKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/ClientApprovalKeys.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/JSONUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/JSONUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/TransactionStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/TransactionStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransaction.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransaction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionKeys.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionTable.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/FSTransactionStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/FSTransactionStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore$TokenIndex.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore$TokenIndex.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionMemoryStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AccessToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AccessToken.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AuthorizationGrant.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/AuthorizationGrant.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/RefreshToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/RefreshToken.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/Verifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/Verifier.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AccessTokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AccessTokenImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AuthorizationGrantImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/AuthorizationGrantImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/VerifierImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/VerifierImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/ncsa-security-delegation-common-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/ncsa-security-delegation-common-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/ncsa-security-delegation-common-3.4-SNAPSHOT-test-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/ncsa-security-delegation-common-3.4-SNAPSHOT-tests.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/ncsa-security-delegation-common-3.4-SNAPSHOT.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/admin/CMTester.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/admin/CMTester.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/BaseTransactionStoreTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/BaseTransactionStoreTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FakeTokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FakeTokenImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAccessToken.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAccessToken.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeAuthorizationGrant.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$FakeVerifier.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestFileStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest$TestTokenForge.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/test-classes/edu/uiuc/ncsa/security/delegation/storage/FileStoreTest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/allclasses-noframe.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/constant-values.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/deprecated-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/ExceptionWrapper.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/MissingTokenException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/ServiceTransaction.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/ServiceTransactionProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/UnapprovedClientException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/class-use/ExceptionWrapper.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/class-use/MissingTokenException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/class-use/ServiceTransaction.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/class-use/ServiceTransactionProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/class-use/UnapprovedClientException.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/AGIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/ATIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/AbstractIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/CBIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/IssuerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/PAIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/AGIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/ATIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/AbstractIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/CBIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/IssuerProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/class-use/PAIssuer.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/issuers/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/AGRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/AGResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/ATRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/ATResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/CBRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/CBResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/IssuerRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/IssuerResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/PARequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/PAResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/AGRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/AGResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/ATRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/ATResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/CBRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/CBResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/IssuerRequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/IssuerResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/PARequest.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/class-use/PAResponse.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/request/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/AggregateClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/ClientApproval.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/ClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/SQLServiceTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/AggregateCAStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/AggregateClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/BaseClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/ClientApproval.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/ClientApprovalStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/ClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/class-use/SQLServiceTransactionStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientApprovalMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientStoreProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientApprovalStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/class-use/ClientApprovalMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/class-use/ClientMemoryStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/class-use/ClientStoreProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/class-use/FSClientApprovalStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/class-use/FSClientStore.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/impl/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/ServiceTransactionConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/ServiceTransactionKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/ServiceTransactionTable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/class-use/ServiceTransactionConverter.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/class-use/ServiceTransactionKeys.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/class-use/ServiceTransactionTable.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/edu/uiuc/ncsa/security/delegation/server/storage/support/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/help-doc.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/index-all.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/overview-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/overview-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/overview-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/serialized-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/apidocs/stylesheet.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/AGRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/AGRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/AGResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/AGResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/ATRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/ATRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/CBRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/CBRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/IssuerRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/IssuerRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/PARequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/request/PARequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApproval.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApproval.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientApprovalMemoryStore.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientApprovalStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientApprovalStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/allclasses-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/allclasses-noframe.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/constant-values.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/deprecated-list.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/OAuthConstants.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/OAuthHTTPSClientPool.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/OAuthUtilities.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/class-use/OAuthConstants.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/class-use/OAuthHTTPSClientPool.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/class-use/OAuthTokenForge.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/class-use/OAuthUtilities.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/AuthorizationServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/CBServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/DelegationServiceImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/DelegationServiceImplProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/OAClient.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/OAClientProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/PAServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/AuthorizationServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/CBServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/DelegationServiceImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/DelegationServiceImplProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/OAClient.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/OAClientProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/class-use/PAServerImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/client/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/AGResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/ATResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/CBIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/CBResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/PARequestImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/PAResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/AGIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/AGIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/AGResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/ATIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/ATIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/ATResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/CBIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/CBResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/PAIImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/PAIProvider.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/PARequestImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/class-use/PAResponseImpl.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/package-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/package-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/package-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/edu/uiuc/ncsa/security/oauth_1_0a/server/package-use.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/help-doc.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/index-all.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/overview-frame.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/overview-summary.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/overview-tree.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/package-list" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/serialized-form.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/apidocs/stylesheet.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge$5.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/OAuthTokenForge.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/AuthorizationServerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/AuthorizationServerImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/PAServerImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/client/PAServerImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGIImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGResponseImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/AGResponseImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATIImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATResponseImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/ATResponseImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PAIImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PARequestImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/classes/edu/uiuc/ncsa/security/oauth_1_0a/server/PARequestImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/javadoc-bundle-options/javadoc-options-javadoc-resources.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/javadoc-bundle-options/package-list" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT-javadoc.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT-test-sources.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/ncsa-security-oauth-1.0a-3.4-SNAPSHOT.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/NonceHerder.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/NonceHerder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigTags.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Constants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Errors$ErrorUtil.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Errors.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Errors.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2RedirectableError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2RedirectableError.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2RefreshTokenImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2Utilities.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/AGServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/AGServer2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATResponse2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATResponse2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/ATServer2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/RTServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/RTServer2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/AGI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/AGI2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATI2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATIResponse2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/ATIResponse2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTI2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTI2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/RTIResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/UIIRequest2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/UIIRequest2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -857,7 +103,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="extract.method.default.visibility" value="protected" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/pom.xml" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -870,6 +116,9 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader" />
     </key>
@@ -879,7 +128,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.MultipleInheritanceTest">
+  <component name="RunManager" selected="JUnit.ConfigInheritanceTest">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -1172,20 +421,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
-      <module name="ncsa-security-core" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <method v="2">
@@ -1202,6 +437,22 @@
       <setting name="depsClasspath" value="false" />
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <method v="2" />
+    </configuration>
+    <configuration name="ConfigInheritanceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ncsa-security-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.core.configuration" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <configuration name="MultipleInheritanceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="ncsa-security-core" />
@@ -1270,20 +521,20 @@
       <item itemvalue="Application.QDL basic" />
       <item itemvalue="Application.QDL default" />
       <item itemvalue="Application.QDL GUI" />
-      <item itemvalue="Application.StringUtils" />
       <item itemvalue="Application.Configurations" />
       <item itemvalue="Application.InheritanceList" />
       <item itemvalue="JUnit.QDL Test Suite" />
       <item itemvalue="JUnit.MultipleInheritanceTest" />
       <item itemvalue="Application.MultiConfigurations" />
+      <item itemvalue="JUnit.ConfigInheritanceTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ConfigInheritanceTest" />
         <item itemvalue="JUnit.MultipleInheritanceTest" />
         <item itemvalue="Application.MultiConfigurations" />
         <item itemvalue="Application.InheritanceList" />
         <item itemvalue="Application.Configurations" />
-        <item itemvalue="Application.StringUtils" />
       </list>
     </recent_temporary>
   </component>
@@ -1333,7 +584,7 @@
       <workItem from="1609770779207" duration="214389000" />
       <workItem from="1611057718927" duration="104019000" />
       <workItem from="1612038505279" duration="52042000" />
-      <workItem from="1612279583820" duration="28456000" />
+      <workItem from="1612279583820" duration="39326000" />
     </task>
     <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
       <created>1602796126004</created>
@@ -1608,14 +859,20 @@
       <option name="project" value="LOCAL" />
       <updated>1612307887293</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="More tests. Added an exception. renamed a class">
+      <created>1612368811989</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1612368811989</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Set version numbers" />
     <MESSAGE value="Updating version numbers in PDFs" />
     <MESSAGE value="Checkin before fixes for 5.0.3" />
     <MESSAGE value="5.0.3 branch creations" />
@@ -1640,17 +897,18 @@
     <MESSAGE value="Found and fixed a bug in client approvals. Moved a utility class so it was visible in more packages. Lots of little tweaks to command line clients. Better messages on errors and such." />
     <MESSAGE value="Many little fixes, but mostly this is a re-working of the error handling to fix CIL-697." />
     <MESSAGE value="Upcoming changes to configuration file handling. These are isolated and have zero effect on current code but should get committed." />
-    <option name="LAST_COMMIT_MESSAGE" value="Upcoming changes to configuration file handling. These are isolated and have zero effect on current code but should get committed." />
+    <MESSAGE value="More tests. Added an exception. renamed a class" />
+    <option name="LAST_COMMIT_MESSAGE" value="More tests. Added an exception. renamed a class" />
   </component>
   <component name="WindowStateProjectService">
     <state x="471" y="200" width="800" height="684" key="#Auto_Import" timestamp="1611616536939">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="471" y="200" width="800" height="684" key="#Auto_Import/72.27.1608.1023@72.27.1608.1023" timestamp="1611616536939" />
-    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612281170786">
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612374231822">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612281170786" />
+    <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612374231822" />
     <state x="684" y="257" width="522" height="611" key="#com.intellij.ide.util.MemberChooser" timestamp="1612366217555">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1667,14 +925,14 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="469" y="27" width="804" height="1023" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612274688441" />
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1612307886225">
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2" timestamp="1612368810277">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1612307886225" />
-    <state x="205" y="145" width="1408" height="823" key="DiffContextDialog" timestamp="1612096432765">
+    <state x="262" y="238" width="1217" height="608" key="CommitChangelistDialog2/72.27.1608.1023@72.27.1608.1023" timestamp="1612368810277" />
+    <state x="205" y="145" width="1408" height="823" key="DiffContextDialog" timestamp="1612379444024">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="205" y="145" width="1408" height="823" key="DiffContextDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612096432765" />
+    <state x="205" y="145" width="1408" height="823" key="DiffContextDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612379444024" />
     <state x="639" y="310" width="515" height="480" key="EnvironmentVariablesDialog" timestamp="1611403286729">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1683,22 +941,22 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="646" y="283" width="449" height="517" key="FileChooserDialogImpl/72.27.1608.1023@72.27.1608.1023" timestamp="1609264182805" />
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1612368400954">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1612377787093">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612368400954" />
-    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1612368400954">
+    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612377787093" />
+    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1612377787093">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612368400954" />
-    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1612368400954">
+    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612377787093" />
+    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1612377787093">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612368400954" />
-    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1612368400954">
+    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612377787093" />
+    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1612377787093">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612368400954" />
+    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612377787093" />
     <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1612364828919">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1727,10 +985,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="359" y="116" width="1024" height="852" key="SettingsEditor/72.27.1608.1023@72.27.1608.1023" timestamp="1611783774017" />
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1612307890377">
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2" timestamp="1612368814352">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1612307890377" />
+    <state x="471" y="274" width="800" height="535" key="Vcs.Push.Dialog.v2/72.27.1608.1023@72.27.1608.1023" timestamp="1612368814352" />
     <state x="555" y="366" key="com.intellij.ide.util.TipDialog" timestamp="1612038527643">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1751,10 +1009,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="609" y="297" width="524" height="511" key="extract.method.dialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612281259822" />
-    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1612366101988">
+    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1612382313769">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1612366101988" />
+    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1612382313769" />
     <state x="631" y="255" width="479" height="573" key="git4idea.branch.GitSmartOperationDialog" timestamp="1605279661397">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1863,7 +1121,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java</url>
-          <line>248</line>
+          <line>239</line>
           <option name="timeStamp" value="216" />
         </line-breakpoint>
       </breakpoints>

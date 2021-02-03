@@ -1,0 +1,18 @@
+<!--
+      test that a sub attribute is found that is not overridden..
+-->
+<config>
+    <service name="A" alias="B" overrides="X"/>
+    <service name="B" alias="C"/>
+
+    <service name="C"
+             myattrib="attribute C">
+        <mynode>node C</mynode>
+    </service>
+
+    <service name="X"
+        myattrib="attribute X">
+        <mynode>node X</mynode>
+    </service>
+
+</config>

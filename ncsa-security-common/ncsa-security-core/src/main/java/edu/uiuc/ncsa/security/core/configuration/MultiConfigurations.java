@@ -177,7 +177,29 @@ public class MultiConfigurations {
         return null;
     }
 
+    /**
+     * Use this to get <b>all</b> the named nodes off the list. Rather than overrides, this
+     * returns the kitchen sink. This is the equivalent of glomming together all of
+     * the like-named nodes into one big virtual node. This also gets other nodes in the configuration
+     * too so if there are multiple ones in any configuration, they are added in as well.
+     *
+     * Sometimes this is necessary.
+     * @param nodes
+     * @param name
+     * @return
+     */
+    public  List<ConfigurationNode> getAllNodes(List<ConfigurationNode> nodes, String name) {
+        List<ConfigurationNode> returnedNodes = new ArrayList<>();
+        if(nodes.isEmpty()) return returnedNodes;
+        for(ConfigurationNode node : nodes){
+            List list = node.getChildren(name);
+            if (!list.isEmpty()) {
+                returnedNodes.addAll(list);
+            }
 
+        }
+        return returnedNodes;
+    }
     /**
      * Convenience method for getting the value of a single node, i.e. the contents, so
      * <br><br>
@@ -214,6 +236,25 @@ public class MultiConfigurations {
         return getNodeContents(nodes,name, null);
     }
 
+    /**
+     * Finds the first attribute with the given name and then converts to boolean.
+     * If the conversion fails, the default is returned.
+     * @param nodes
+     * @param attrib
+     * @param defaultValue
+     * @return
+     */
+    public boolean getFirstBooleanValue(List<ConfigurationNode> nodes, String attrib, boolean defaultValue) {
+        if (nodes.isEmpty()) return defaultValue;
+        try {
+            String x = getFirstAttribute(nodes, attrib);
+            if(isTrivial(x)){return defaultValue;} //  Null argument returns false.
+            return Boolean.parseBoolean(x);
+        } catch (Throwable t) {
+
+        }
+        return defaultValue;
+    }
     /**
      * Looks for the given node and returns the first attribute. This is the method that lets you override
      * a single attribute in a tag.
