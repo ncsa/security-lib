@@ -1,6 +1,0 @@
-edu.uiuc.ncsa.security.delegation.server
-edu.uiuc.ncsa.security.delegation.server.issuers
-edu.uiuc.ncsa.security.delegation.server.request
-edu.uiuc.ncsa.security.delegation.server.storage
-edu.uiuc.ncsa.security.delegation.server.storage.impl
-edu.uiuc.ncsa.security.delegation.server.storage.support
