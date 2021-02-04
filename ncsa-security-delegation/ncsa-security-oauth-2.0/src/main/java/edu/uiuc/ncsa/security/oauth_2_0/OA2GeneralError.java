@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.oauth_2_0;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
-import org.apache.http.HttpStatus;
 
 /**
  * This is for use places where there is no redirect url available. Examples are the userInfo and getCert endpoints for OA4MP.
@@ -19,9 +18,17 @@ public class OA2GeneralError extends GeneralException {
      * @param error
      */
     public OA2GeneralError(OA2RedirectableError error) {
+        super("error: " + error.getError()
+                + " (status: " + error.getHttpStatus()
+                + ", description: "
+                + error.getDescription()
+                +  (error.getState()==null?"":", state:" + error.getState())
+                + ")");
+
         setDescription(error.getDescription());
         setError(error.getError());
-        setHttpStatus(HttpStatus.SC_BAD_REQUEST);
+        setHttpStatus(error.getHttpStatus());
+        setState(error.getState());
     }
 
     public OA2GeneralError(Throwable cause) {
