@@ -23,8 +23,8 @@ public interface QDLConfigurationConstants {
     String VFS_ZIP_FILE_PATH = "zip_file";
     String VFS_SCHEME_TAG = "scheme";
     String VFS_MOUNT_POINT_TAG = "mount_point";
-    String  VFS_TYPE_PASS_THROUGH = "pass_through";
-    String  VFS_TYPE_MYSQL = "mysql";
+    String VFS_TYPE_PASS_THROUGH = "pass_through";
+    String VFS_TYPE_MYSQL = "mysql";
     String VFS_TYPE_MEMORY = "memory";
     String VFS_TYPE_ZIP = "zip";
 
@@ -43,6 +43,9 @@ public interface QDLConfigurationConstants {
     String WS_ATTR_SHOW_BANNER = "showBanner";
     String WS_ATTR_ECHO_MODE_ON = "echoModeOn";
     String WS_ATTR_PRETTY_PRINT = "prettyPrint";
+    String WS_ATTR_AUTOSAVE_ON = "autoSaveOn";
+    String WS_ATTR_AUTOSAVE_INTERVAL = "autoSaveInterval";
+    String WS_ATTR_AUTOSAVE_MESSAGES_ON = "autoSaveMessagesOn";
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";
     String WS_COMPRESS_SERIALIZATION_TAG = "compress_xml";

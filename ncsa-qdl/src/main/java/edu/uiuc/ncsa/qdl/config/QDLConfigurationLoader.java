@@ -4,10 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
-import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
-import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -142,7 +139,25 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
           ConfigurationNode node = getFirstNode(cn, WS_TAG);
           return getFirstBooleanValue(node, WS_ATTR_PRETTY_PRINT, false);
       }
+    protected boolean isAutosaveOn() {
+          ConfigurationNode node = getFirstNode(cn, WS_TAG);
+          return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_ON, false);
+      }
 
+    protected boolean isAutosaveMessagesOn() {
+          ConfigurationNode node = getFirstNode(cn, WS_TAG);
+          return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_MESSAGES_ON, false);
+      }
+
+    protected long getAutosaveInterval() {
+          ConfigurationNode node = getFirstNode(cn, WS_TAG);
+          String rawValue = getFirstAttribute(node, WS_ATTR_AUTOSAVE_INTERVAL);
+          long autosaveInterval = 10*60*1000L; // 10 minutes in milliseconds.
+          if(rawValue != null){
+              autosaveInterval = ConfigUtil.getValueSecsOrMillis(rawValue);
+          }
+          return autosaveInterval;
+      }
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
         if (isTrivial(raw)) {
@@ -262,7 +277,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getModuleConfigs(),
                 getScriptPath(),
                 getModulePath(),
-                getDebugLevel());
+                getDebugLevel(),
+                isAutosaveOn(),
+                getAutosaveInterval(),
+                isAutosaveMessagesOn());
     }
 
     @Override

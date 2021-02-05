@@ -5,7 +5,13 @@ import java.util.*;
 /**
  * Resolves ordered multiple inheritance lists, used e.g. in configurations.
  * This only works on names and relations between them. It returns a list of
- * names (all names and aliases are assumed unique)
+ * names (all names and aliases are assumed unique).
+ * <h3>Multiple Inheritance Model</h3>
+ * <p>There are many multiple inheritance schemes. This supports linearly order-based inheritance.
+ * So this engine gets lists of overrides (unique names) and aliases (unique) and makes a list. It is then
+ * up to the calling program to navigate the inheritance order. This allows for an easy solution to the
+ * so-called diamond problem which cannot exist here because of the linear ordering.
+ * </p>
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/21 at  6:29 AM
  */
@@ -292,8 +298,6 @@ public class MultipleInheritanceEngine {
                         resolvedOverrides.put(foundName, overrides2);
                         unresolvedAliases.remove(foundName);
                         unresolvedOverrides.remove(foundName);
-                    } else {
-                        System.out.println("Skipping " + foundName + " for " + name);
                     }
                 }
             }

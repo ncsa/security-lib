@@ -74,7 +74,8 @@ public class ConfigUtil {
      * x + ms for milliseconds
      * x (no units) for milliseconds
      * </pre>
-     * Using this assumes that the default is milliseconds for the field.
+     * Using this assumes that the default is milliseconds for the field. If you need
+     * to set the default for the field as seconds, use {@link ConfigUtil#getValueSecsOrMillis(String, boolean)}.
      * @param x
      * @return
      */
@@ -98,21 +99,21 @@ public class ConfigUtil {
             x = x.substring(0, x.length() - 1);
         }
         // do in order of length of units or collisions happen.
+        long unitMultiplier = isSeconds?1000L:1L;  // sets default if no override
         if(x.endsWith(UNITS_SECONDS_LONG)){
+            unitMultiplier = 1000L;
             x = x.substring(0,x.length() - UNITS_SECONDS_LONG.length());
         }
         if (x.endsWith(UNITS_MILLISECONDS)) {
+            unitMultiplier = 1L;
             x = x.substring(0, x.length() - UNITS_MILLISECONDS.length());
         }
         if (x.endsWith(UNITS_SECONDS)) {
+            unitMultiplier = 1000L;
             x = x.substring(0, x.length() - UNITS_SECONDS.length());
-            isSeconds = true;
         }
         long rawValue = Long.parseLong(x.trim()); // blanks make it blow up, FYI...
-        if (isSeconds) {
-            return rawValue * 1000;
-        }
-        return rawValue;
+        return rawValue * unitMultiplier;
 
     }
 

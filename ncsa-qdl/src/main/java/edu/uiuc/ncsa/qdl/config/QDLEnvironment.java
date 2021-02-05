@@ -39,7 +39,10 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           List<ModuleConfig> moduleConfigs,
                           String scriptPath,
                           String modulePath,
-                          String debugLevel) {
+                          String debugLevel,
+                          boolean autosaveOn,
+                          long autosaveInterval,
+                          boolean autosaveMessagesOn) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -59,7 +62,38 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.debugLevel = debugLevel;
         this.modulePath = modulePath;
         this.compressionOn = compressionOn;
+        this.autosaveOn = autosaveOn;
+        this.autosaveInterval = autosaveInterval;
+        this.autosaveMessagesOn = autosaveMessagesOn;
     }
+
+    public boolean isAutosaveMessagesOn() {
+        return autosaveMessagesOn;
+    }
+
+    public void setAutosaveMessagesOn(boolean autosaveMessagesOn) {
+        this.autosaveMessagesOn = autosaveMessagesOn;
+    }
+
+    boolean autosaveMessagesOn;
+    public long getAutosaveInterval() {
+        return autosaveInterval;
+    }
+
+    public void setAutosaveInterval(long autosaveInterval) {
+        this.autosaveInterval = autosaveInterval;
+    }
+
+    long autosaveInterval;
+    public boolean isAutosaveOn() {
+        return autosaveOn;
+    }
+
+    public void setAutosaveOn(boolean autosaveOn) {
+        this.autosaveOn = autosaveOn;
+    }
+
+    boolean autosaveOn;
 
     public boolean isCompressionOn() {
         return compressionOn;

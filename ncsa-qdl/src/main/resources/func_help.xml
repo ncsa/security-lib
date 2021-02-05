@@ -1014,6 +1014,43 @@ save_dir - The default directory for saving and loading files. This is set at st
             </body>
         </entry>
 
+    <entry id="autosave_on">
+            <body>
+                <![CDATA[
+(workspace variable)
+autosave_on - Turn on automatically saving workspace. If on then every time the autosave_interval (measured in
+              milliseconds) passes, the current workspace is saved.
+              See also: autosave_messages_on, autosave_interval
+]]>
+            </body>
+        </entry>
+
+    <entry id="autosave_messages_on">
+            <body>
+                <![CDATA[
+(workspace variable)
+autosave_messages_on - Turn on notifications by the autosave system. If on then every time the workspace is
+             automatically saved, the usual messages (size, time) are printed. If false, nothing is printed.
+             See also: autosave_on, autosave_interval
+]]>
+            </body>
+        </entry>
+
+    <entry id="autosave_interval">
+            <body>
+                <![CDATA[
+(workspace variable)
+autosave_interval - The interval in either seconds or milliseconds that determines how often the workspace is saved.
+             The default is 10 minutes or 600000 ms. You may enter this as milliseconds (default units) or
+             as seconds.
+E.g.
+   )ws set autosave_interval 900 sec.
+
+             Would set the autosave interval to 900 seconds or 15 minutes.
+             See also: autosave_on, autosave_interval
+]]>
+            </body>
+        </entry>
 
     <entry id="compress_xml">
             <body>

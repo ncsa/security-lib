@@ -2,14 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="More tests. Added an exception. renamed a class">
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/AutosaveThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_workspace.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/wish-list.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/wish-list.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WSXMLSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WSXMLSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommonCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommonCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
@@ -20,7 +33,6 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
     </list>
@@ -74,7 +86,7 @@
     </excluded-from-favorite>
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="5.1.0" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -120,7 +132,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.MultipleInheritanceTest">
+  <component name="RunManager" selected="JUnit.QDL Test Suite">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -503,9 +515,9 @@
       <item itemvalue="Application.QDL basic" />
       <item itemvalue="Application.QDL default" />
       <item itemvalue="Application.QDL GUI" />
+      <item itemvalue="Application.MultiConfigurations" />
       <item itemvalue="JUnit.QDL Test Suite" />
       <item itemvalue="JUnit.MultipleInheritanceTest" />
-      <item itemvalue="Application.MultiConfigurations" />
       <item itemvalue="JUnit.ConfigInheritanceTest" />
       <item itemvalue="JUnit.All in ncsa-security-all" />
       <item itemvalue="JUnit.All in ncsa-security-all (1)" />
@@ -566,7 +578,7 @@
       <workItem from="1609770779207" duration="214389000" />
       <workItem from="1611057718927" duration="104019000" />
       <workItem from="1612038505279" duration="52042000" />
-      <workItem from="1612279583820" duration="44818000" />
+      <workItem from="1612279583820" duration="62786000" />
     </task>
     <task id="LOCAL-00001" summary="Fix for CIL-849. Some reshuffling of classes.">
       <created>1602796126004</created>
@@ -862,14 +874,20 @@
       <option name="project" value="LOCAL" />
       <updated>1612386687285</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Slight modification for new error handling.">
+      <created>1612453118513</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1612453118513</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="5.0.3 branch creations" />
     <MESSAGE value="Version 5.0.3 fixes" />
     <MESSAGE value="Merge from 5.0.3" />
     <MESSAGE value="Minor change. Want to keep in sync with other changes and do a push." />
@@ -894,7 +912,8 @@
     <MESSAGE value="More tests. Added an exception. renamed a class" />
     <MESSAGE value="Final checkin before cutting release. Just added some tests." />
     <MESSAGE value="5.1.0 checkin" />
-    <option name="LAST_COMMIT_MESSAGE" value="5.1.0 checkin" />
+    <MESSAGE value="Slight modification for new error handling." />
+    <option name="LAST_COMMIT_MESSAGE" value="Slight modification for new error handling." />
   </component>
   <component name="WindowStateProjectService">
     <state x="471" y="200" width="800" height="684" key="#Auto_Import" timestamp="1611616536939">
@@ -905,10 +924,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="360" y="205" key="#com.intellij.execution.impl.EditConfigurationsDialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612374231822" />
-    <state x="684" y="257" width="522" height="611" key="#com.intellij.ide.util.MemberChooser" timestamp="1612366217555">
+    <state x="684" y="257" width="522" height="611" key="#com.intellij.ide.util.MemberChooser" timestamp="1612547522539">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="684" y="257" width="522" height="611" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1612366217555" />
+    <state x="684" y="257" width="522" height="611" key="#com.intellij.ide.util.MemberChooser/72.27.1608.1023@72.27.1608.1023" timestamp="1612547522539" />
     <state x="608" y="325" width="525" height="433" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1607702081925">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -937,38 +956,38 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="646" y="283" width="449" height="517" key="FileChooserDialogImpl/72.27.1608.1023@72.27.1608.1023" timestamp="1609264182805" />
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom" timestamp="1612385600699">
+    <state width="1566" height="342" key="GridCell.Tab.0.bottom" timestamp="1612562914839">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612385600699" />
-    <state width="1566" height="390" key="GridCell.Tab.0.center" timestamp="1612385600698">
+    <state width="1566" height="342" key="GridCell.Tab.0.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914839" />
+    <state width="1566" height="342" key="GridCell.Tab.0.center" timestamp="1612562914839">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612385600698" />
-    <state width="1566" height="390" key="GridCell.Tab.0.left" timestamp="1612385600698">
+    <state width="1566" height="342" key="GridCell.Tab.0.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914839" />
+    <state width="1566" height="342" key="GridCell.Tab.0.left" timestamp="1612562914838">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612385600698" />
-    <state width="1566" height="390" key="GridCell.Tab.0.right" timestamp="1612385600698">
+    <state width="1566" height="342" key="GridCell.Tab.0.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914838" />
+    <state width="1566" height="342" key="GridCell.Tab.0.right" timestamp="1612562914839">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="390" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612385600698" />
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1612364828919">
+    <state width="1566" height="342" key="GridCell.Tab.0.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914839" />
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom" timestamp="1612562914840">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612364828919" />
-    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1612364828918">
+    <state width="1566" height="342" key="GridCell.Tab.1.bottom/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914840" />
+    <state width="1566" height="342" key="GridCell.Tab.1.center" timestamp="1612562914840">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612364828918" />
-    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1612364828918">
+    <state width="1566" height="342" key="GridCell.Tab.1.center/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914840" />
+    <state width="1566" height="342" key="GridCell.Tab.1.left" timestamp="1612562914840">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612364828918" />
-    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1612364828919">
+    <state width="1566" height="342" key="GridCell.Tab.1.left/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914840" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right" timestamp="1612562914840">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612364828919" />
+    <state width="1566" height="342" key="GridCell.Tab.1.right/72.27.1608.1023@72.27.1608.1023" timestamp="1612562914840" />
     <state x="586" y="256" width="570" height="572" key="MultipleFileMergeDialog" timestamp="1605279669003">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1005,10 +1024,10 @@
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
     <state x="609" y="297" width="524" height="511" key="extract.method.dialog/72.27.1608.1023@72.27.1608.1023" timestamp="1612281259822" />
-    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1612394056087">
+    <state x="449" y="316" width="977" height="637" key="find.popup" timestamp="1612553929791">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
-    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1612394056087" />
+    <state x="449" y="316" width="977" height="637" key="find.popup/72.27.1608.1023@72.27.1608.1023" timestamp="1612553929791" />
     <state x="631" y="255" width="479" height="573" key="git4idea.branch.GitSmartOperationDialog" timestamp="1605279661397">
       <screen x="72" y="27" width="1608" height="1023" />
     </state>
@@ -1037,17 +1056,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>789</line>
+          <line>806</line>
           <option name="timeStamp" value="29" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>468</line>
+          <line>485</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>772</line>
+          <line>789</line>
           <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1119,6 +1138,21 @@
           <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java</url>
           <line>239</line>
           <option name="timeStamp" value="216" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>2507</line>
+          <option name="timeStamp" value="218" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java</url>
+          <line>92</line>
+          <option name="timeStamp" value="219" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
+          <line>2489</line>
+          <option name="timeStamp" value="223" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

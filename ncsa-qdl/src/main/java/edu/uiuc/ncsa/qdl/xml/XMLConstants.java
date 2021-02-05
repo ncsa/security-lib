@@ -28,6 +28,9 @@ public interface XMLConstants {
     String PRETTY_PRINT = "pretty_print";
     String ECHO_MODE = "echo_mode";
     String DEBUG_MODE = "debug_mode";
+    String AUTOSAVE_ON = "autosave_on";
+    String AUTOSAVE_INTERVAL = "autosave_interval";
+    String AUTOSAVE_MESSAGES_ON = "autosave_messages_on";
     String START_TS = "start_ts";
     String ROOT_DIR = "root_dir";
     String SAVE_DIR = "save_dir";

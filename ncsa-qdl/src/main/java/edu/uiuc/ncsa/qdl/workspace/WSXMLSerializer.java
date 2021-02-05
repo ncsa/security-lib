@@ -54,6 +54,9 @@ public class WSXMLSerializer {
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
         xsw.writeAttribute(ECHO_MODE, Boolean.toString(workspaceCommands.echoModeOn));
         xsw.writeAttribute(DEBUG_MODE, Boolean.toString(workspaceCommands.debugOn));
+        xsw.writeAttribute(AUTOSAVE_ON, Boolean.toString(workspaceCommands.isAutosaveOn()));
+        xsw.writeAttribute(AUTOSAVE_INTERVAL, Long.toString(workspaceCommands.getAutosaveInterval()));
+        xsw.writeAttribute(AUTOSAVE_MESSAGES_ON, Boolean.toString(workspaceCommands.isAutosaveMessagesOn()));
         xsw.writeAttribute(START_TS, Iso8601.date2String(workspaceCommands.startTimeStamp));
         xsw.writeAttribute(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
         xsw.writeAttribute(COMPRESS_XML, Boolean.toString(workspaceCommands.compressXML));
@@ -365,6 +368,17 @@ public class WSXMLSerializer {
             switch (a.getName().getLocalPart()) {
                 case PRETTY_PRINT:
                     testCommands.setPrettyPrint(Boolean.parseBoolean(v));
+                    break;
+                case AUTOSAVE_INTERVAL:
+                    if(v!= null) {
+                        testCommands.setAutosaveInterval(Long.parseLong(v));
+                    }
+                    break;
+                case AUTOSAVE_MESSAGES_ON:
+                    testCommands.setAutosaveMessagesOn(Boolean.parseBoolean(v));
+                    break;
+                case AUTOSAVE_ON:
+                    testCommands.setAutosaveOn(Boolean.parseBoolean(v));
                     break;
                 case ECHO_MODE:
                     testCommands.setEchoModeOn(Boolean.parseBoolean(v));

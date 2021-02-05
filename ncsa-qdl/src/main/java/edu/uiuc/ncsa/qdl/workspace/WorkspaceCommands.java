@@ -41,7 +41,10 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.*;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.net.URI;
 import java.text.ParseException;
@@ -80,6 +83,10 @@ public class WorkspaceCommands implements Logable {
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
     public static final String SAVE_AS_JAVA_FLAG = SWITCH + "java";
     public static final String KEEP_WSF = SWITCH + "keep_wsf";
+
+    public MyLoggingFacade getLogger() {
+        return logger;
+    }
 
     public MyLoggingFacade logger;
 
@@ -241,9 +248,11 @@ public class WorkspaceCommands implements Logable {
                 return doSICommand(inputLine);
             case OFF_COMMAND:
                 if (inputLine.hasArg("y")) {
+                    shutdown();
                     return RC_EXIT_NOW;
                 }
                 if (readline("Do you want to exit?" + (bufferManager.anyEdited() ? " There are unsaved buffers. " : " ") + "(y/n)").equals("y")) {
+                    shutdown();
                     return RC_EXIT_NOW;
                 }
                 say("System exit cancelled.");
@@ -267,6 +276,14 @@ public class WorkspaceCommands implements Logable {
         }
         say("Unknown command.");
         return RC_NO_OP;
+    }
+
+    protected void shutdown() {
+        if (autosaveThread != null) {
+            autosaveThread.setStopThread(true);
+            autosaveThread.interrupt();
+        }
+
     }
 
     public static class SIEntries extends TreeMap<Integer, SIEntry> {
@@ -1978,6 +1995,15 @@ public class WorkspaceCommands implements Logable {
                     say(saveDir.getAbsolutePath());
                 }
                 break;
+            case AUTOSAVE_ON:
+                say("autosave is " + (isAutosaveOn() ? "on" : "off"));
+                break;
+            case AUTOSAVE_MESSAGES_ON:
+                say("autosave messages are " + (isAutosaveMessagesOn() ? "on" : "off"));
+                break;
+            case AUTOSAVE_INTERVAL:
+                say("autosave interval is " + getAutosaveInterval() + " ms.");
+                break;
             case ROOT_DIR:
                 if (rootDir == null) {
                     say("(root directory not set)");
@@ -2003,6 +2029,9 @@ public class WorkspaceCommands implements Logable {
     public static final String WS_ID = "id";
     public static final String DESCRIPTION = "description";
     public static final String CURRENT_WORKSPACE_FILE = "ws_file";
+    public static final String AUTOSAVE_ON = "autosave_on";
+    public static final String AUTOSAVE_MESSAGES_ON = "autosave_messages_on";
+    public static final String AUTOSAVE_INTERVAL = "autosave_interval";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -2454,6 +2483,35 @@ public class WorkspaceCommands implements Logable {
                 say("root directory is now " + rootDir.getAbsolutePath());
 
                 break;
+            case AUTOSAVE_ON:
+                if (currentWorkspace == null) {
+                    say("warning: you have not a set a file for saves. Please set " + CURRENT_WORKSPACE_FILE + " first.");
+                } else {
+                    setAutosaveOn(isOnOrTrue(value));
+                    if(autosaveThread != null){
+                        autosaveThread.interrupt();
+                        autosaveThread.setStopThread(true);
+                        autosaveThread = null; // old one gets garbage collected, force a new one
+                    }
+                    if(isAutosaveOn()) {
+                        initAutosave();
+                    }
+                        say("autosave is now " + (isAutosaveOn() ? "on" : "off"));
+
+                }
+                break;
+            case AUTOSAVE_MESSAGES_ON:
+                setAutosaveMessagesOn(isOnOrTrue(value));
+                say("autosave messages are now " + (isAutosaveMessagesOn() ? "on" : "off"));
+                break;
+            case AUTOSAVE_INTERVAL:
+                String rawTime = value;
+                if (4 <= inputLine.getArgCount()) {
+                    rawTime = rawTime + " " + inputLine.getArg(4);
+                }
+                setAutosaveInterval(ConfigUtil.getValueSecsOrMillis(rawTime));
+                say("autosave interval is now " + getAutosaveInterval() + " ms.");
+                break;
             default:
                 say("unknown ws variable");
                 break;
@@ -2471,6 +2529,9 @@ public class WorkspaceCommands implements Logable {
             PRETTY_PRINT,
             PRETTY_PRINT_SHORT,
             SAVE_DIR,
+            AUTOSAVE_INTERVAL,
+            AUTOSAVE_MESSAGES_ON,
+            AUTOSAVE_ON,
             START_TS,
             ROOT_DIR,
             WS_ID
@@ -2542,11 +2603,11 @@ public class WorkspaceCommands implements Logable {
             sayi(RELOAD_FLAG + " = relaod the current workspace from the configuration. Nothing current will be saved.");
             return RC_NO_OP;
         }
-        if(inputLine.hasArg(RELOAD_FLAG)){
+        if (inputLine.hasArg(RELOAD_FLAG)) {
             boolean clearIt = readline("Are you sure you want to lose all state and revert the workspace back to the initial load? (Y/n)[n]").equals("Y");
-           if(clearIt){
-               return  RC_RELOAD;
-           }
+            if (clearIt) {
+                return RC_RELOAD;
+            }
         }
         boolean clearIt = readline("Are you sure you want to clear the worskapce state? (Y/n)[n]").equals("Y");
         if (!clearIt) {
@@ -2569,8 +2630,12 @@ public class WorkspaceCommands implements Logable {
     String JAVA_FLAG = SAVE_AS_JAVA_FLAG;
     String COMPRESS_FLAG = "-compress";
     String SHOW_FLAG = "-show";
+    public static String SILENT_SAVE_FLAG = "-silent";
 
-    private int _wsSave(InputLine inputLine) {
+    /*
+    Has to be public so save thread can access it.
+     */
+    protected int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] [" +
                     KEEP_WSF + "]");
@@ -2580,13 +2645,15 @@ public class WorkspaceCommands implements Logable {
             sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
             sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
-            sayi("See the corresponding load command to recover it.");
+            sayi(SILENT_SAVE_FLAG + " = print no messages when saving.");
+            sayi("See the corresponding load command to recover it. It will print error messages, however.");
             return RC_NO_OP;
         }
 
         boolean showFile = inputLine.hasArg(SHOW_FLAG);
         boolean doJava = inputLine.hasArg(SAVE_AS_JAVA_FLAG);
         boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
+        boolean silentMode = inputLine.hasArg(SILENT_SAVE_FLAG);
 
         boolean compressionOn = true;
 
@@ -2598,6 +2665,7 @@ public class WorkspaceCommands implements Logable {
         inputLine.removeSwitch(COMPRESS_FLAG);
         inputLine.removeSwitchAndValue(SAVE_AS_JAVA_FLAG);
         inputLine.removeSwitch(KEEP_WSF);
+        inputLine.removeSwitch(SILENT_SAVE_FLAG);
 
         // Remove switches before looking at positional arguments.
 
@@ -2632,7 +2700,6 @@ public class WorkspaceCommands implements Logable {
 
             }
 
-
             long uncompressedXMLSize = -1L;
             if (doJava) {
                 _realSave(target);
@@ -2641,12 +2708,16 @@ public class WorkspaceCommands implements Logable {
             }
             if (!showFile) {
                 String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
-                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
+                if (!silentMode) {
+                    say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
+                }
                 if (!keepCurrentWS) {
                     currentWorkspace = target;
                 }
             } else {
-                say(uncompressedXMLSize + " bytes.");
+                if (!silentMode) {
+                    say(uncompressedXMLSize + " bytes.");
+                }
             }
         } catch (Throwable t) {
             logger.error("could not save workspace.", t);
@@ -2802,6 +2873,7 @@ public class WorkspaceCommands implements Logable {
 
     File currentWorkspace;
     public final String RELOAD_FLAG = SWITCH + "reload";
+
     private int _wsLoad(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("load [filename] [" + KEEP_WSF + "] ");
@@ -3169,22 +3241,24 @@ public class WorkspaceCommands implements Logable {
         defaultInterpreter = interpreter;
         defaultState = state;
         runScript(inputLine); // run any script if that mode is enabled.
-
+        setAutosaveOn(qe.isAutosaveOn());
+        setAutosaveMessagesOn(qe.isAutosaveMessagesOn());
+        setAutosaveInterval(qe.getAutosaveInterval());
+        initAutosave();
     }
 
-    private void testXMLReader(String filename) throws Throwable {
-        if (isTrivial(filename)) {
-            filename = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/ws-test.xml";
+    AutosaveThread autosaveThread;
+protected void initAutosave(){
+    if(getState().isServerMode()){
+        return; // absolutely refuse to turn this feature on in server mode.
+    }
+    if (isAutosaveOn()) {
+        if(autosaveThread == null) {
+            autosaveThread = new AutosaveThread(this);
+            autosaveThread.start();
         }
-        File file = new File(filename);
-        Reader reader = new FileReader(file);
-        say("reading from " + filename);
-        XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        XMLEventReader xer = xmlif.createXMLEventReader(reader);
-        fromXML(xer);
-        xer.close();
-
     }
+}
 
     private void testXMLWriter(boolean doFile, String filename) throws Throwable {
         Writer w = null;
@@ -3514,6 +3588,22 @@ public class WorkspaceCommands implements Logable {
             currentWorkspace = newCommands.currentWorkspace;
             rootDir = newCommands.rootDir;
             saveDir = newCommands.saveDir;
+            autosaveInterval = newCommands.getAutosaveInterval();
+            autosaveMessagesOn = newCommands.isAutosaveMessagesOn();
+            autosaveOn = newCommands.isAutosaveOn();
+            if (autosaveOn) {
+                if (currentWorkspace == null) {
+                    say("warning you need to set " + CURRENT_WORKSPACE_FILE + " then enable autosave. Autosave is off.");
+                    autosaveOn = false;
+                } else {
+                    if (autosaveThread == null) {
+                        autosaveThread = new AutosaveThread(this);
+                        autosaveThread.setStopThread(false);
+                        autosaveThread.start();
+                    }
+                }
+
+            }
             startTimeStamp = newCommands.startTimeStamp;
             interpreter = new QDLInterpreter(env, newCommands.getState());
             interpreter.setEchoModeOn(newCommands.isEchoModeOn());
@@ -3526,4 +3616,35 @@ public class WorkspaceCommands implements Logable {
         }
 
     }
+
+    public boolean isAutosaveOn() {
+        return autosaveOn;
+    }
+
+    public void setAutosaveOn(boolean autosaveOn) {
+        this.autosaveOn = autosaveOn;
+    }
+
+    boolean autosaveOn;
+
+    public long getAutosaveInterval() {
+        return autosaveInterval;
+    }
+
+    public void setAutosaveInterval(long autosaveInterval) {
+        this.autosaveInterval = autosaveInterval;
+    }
+
+    long autosaveInterval;
+
+    boolean autosaveMessagesOn;
+
+    public boolean isAutosaveMessagesOn() {
+        return autosaveMessagesOn;
+    }
+
+    public void setAutosaveMessagesOn(boolean autosaveMessagesOn) {
+        this.autosaveMessagesOn = autosaveMessagesOn;
+    }
+
 }
