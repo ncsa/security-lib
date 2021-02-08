@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.configuration.Configurations;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
@@ -7,6 +8,7 @@ import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import net.sf.json.JSONObject;
 import org.apache.commons.cli.*;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import javax.xml.namespace.QName;
@@ -61,9 +63,11 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     }
 
     String configName;
-    public static class ListOnlyNotification extends GeneralException{
+
+    public static class ListOnlyNotification extends GeneralException {
 
     }
+
     public void load(InputLine inputLine) throws Exception {
         if (showHelp(inputLine)) {
             showLoadHelp();
@@ -111,7 +115,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
             say("Trace is currently " + (traceOn ? "on" : "off"));
             return;
         }
-        traceOn =  inputLine.getArg(1).equals("on");
+        traceOn = inputLine.getArg(1).equals("on");
         DebugUtil.setIsEnabled(traceOn);
         setDebugOn(traceOn);
         if (traceOn) {
@@ -121,10 +125,56 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         }
         say("trace " + (traceOn ? "on" : "off"));
     }
+
     String FILE_SWITCH = "-file";
+
     protected void listConfigs(InputLine inputLine) throws Exception {
         String targetFilename = getConfigFile();
-        if(inputLine.hasArg(FILE_SWITCH)){
+        if (inputLine.hasArg(FILE_SWITCH)) {
+            targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
+            inputLine.removeSwitchAndValue(FILE_SWITCH);
+        }
+        if (StringUtils.isTrivial(targetFilename)) {
+            say("Sorry no configuration file specified.");
+            return;
+        }
+        File target = new File(targetFilename);
+
+        if (!target.exists()) {
+            say("Sorry but \"" + target.getAbsolutePath() + "\" does not exist.");
+            return;
+        }
+        if (!target.isFile()) {
+            say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
+            return;
+        }
+        String component = getComponentName();
+        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(target);
+        ConfigurationNode rootNode = xmlConfiguration.getRoot();
+        List<String> names = new ArrayList<>(); // To keep sorted
+        for (ConfigurationNode node : rootNode.getChildren()) {
+            String name = Configurations.getFirstAttribute(node, "name");
+            if (name != null) {
+                names.add(name);
+            }
+        }
+        if (names.isEmpty()) {
+            say("no configurations found.");
+        } else {
+            FormatUtil.formatList(inputLine, names);
+            say("found " + names.size() + " entries. Done!");
+        }
+
+    }
+
+    /**
+     * Faster and smaller, but does not resolve file includes.
+     * @param inputLine
+     * @throws Exception
+     */
+    protected void oldlistConfigs(InputLine inputLine) throws Exception {
+        String targetFilename = getConfigFile();
+        if (inputLine.hasArg(FILE_SWITCH)) {
             targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
             inputLine.removeSwitchAndValue(FILE_SWITCH);
         }

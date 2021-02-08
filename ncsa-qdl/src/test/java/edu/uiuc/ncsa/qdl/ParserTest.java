@@ -431,12 +431,56 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * Tests that short-circuit conditionals work. There are two basic tests for && and ||
+     * then a couple of tests that show that it does not simply bail on all subsequent conditionals
+     * if one found.
+     * @throws Throwable
+     */
+    @Test
+    public void testShortCircuitLogical() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 1;");
+        // short circuits
+        // Note that d. is not defined, so this will throw an undefined symbol error
+        // if the evaluation is attempted.
+        addLine(script, "b := 0 < a ||  d.2 == 5;"); // true
+        addLine(script, "c := a < 1 &&  d.2 == 5;"); // false
+        addLine(script, "d := 2 < 3 && (0 < a || d.2 == 5);"); //true
+        addLine(script, "e := 3 < 2 || (a < 1 && d.2 == 5);"); //false
+        addLine(script, "f := 2 < 3 &&  1 < 3 && 4 < 3;"); //false
+        addLine(script, "g := 2 < 3 &&  4 < 3 && 1 < 3;"); //false
+        addLine(script, "h := 4 < 3 &&  1 < 3 && 1 < 3;"); //false
+        addLine(script, "i := 0 < 3 &&  1 < 3 && 2 < 3;"); //true
+        addLine(script, "j := false ||  true || d.5 == 5;"); //true
+        addLine(script, "k := true ||  false || d.5 == 5;"); //true
+        addLine(script, "l := is_defined(d.) && d.3 <= 5 ;"); //false -- d. undefined
+        // before implementing this, the last test would have failed since
+        // the system would still check d.3, which is undefined.
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("b", state);
+        assert !getBooleanValue("c", state);
+        assert getBooleanValue("d", state);
+        assert !getBooleanValue("e", state);
+        assert !getBooleanValue("f", state);
+        assert !getBooleanValue("g", state);
+        assert !getBooleanValue("h", state);
+        assert getBooleanValue("i", state);
+        assert getBooleanValue("j", state);
+        assert getBooleanValue("k", state);
+        assert !getBooleanValue("l", state);
+    }
+
+    /**
      * The parser should throw an exception on single equals, e.g.
      * <pre>
      *     a=1;
      * </pre>
      * should blow up. This is the most common beginner error (using wrong assignment operator)
      * and should not just fail silently.
+     *
      * @throws Throwable
      */
     @Test
@@ -448,8 +492,8 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
-            assert false:"Was able to interpret single equals without parser error";
-        }catch(ParseCancellationException pcx){
+            assert false : "Was able to interpret single equals without parser error";
+        } catch (ParseCancellationException pcx) {
             assert true;
         }
     }
@@ -1164,6 +1208,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("a", state) :
                 "Failed to parse a uri";
     }
+
     /**
      * Shows that variables can be set to null and that they exist in the symbol table.
      *

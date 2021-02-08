@@ -137,26 +137,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case TILDE:
                 return TILDE_VALUE;
         }
-//        if (oo.equals(ASSIGNMENT)) return ASSIGNMENT_VALUE;
-        // Dyadic operators
-        //      if (oo.equals(AND)) return AND_VALUE;
-        //    if (oo.equals(EQUALS)) return EQUALS_VALUE;
-        //  if (oo.equals(LESS_THAN)) return LESS_THAN_VALUE;
-        //   if (oo.equals(LESS_THAN_EQUAL) || oo.equals(LESS_THAN_EQUAL2)) return LESS_THAN_EQUAL_VALUE;
-//        if (oo.equals(MINUS)) return MINUS_VALUE;
-//        if (oo.equals(MORE_THAN)) return MORE_THAN_VALUE;
-//        if (oo.equals(MORE_THAN_EQUAL) || oo.equals(MORE_THAN_EQUAL2)) return MORE_THAN_EQUAL_VALUE;
-//        if (oo.equals(NOT_EQUAL)) return NOT_EQUAL_VALUE;
-//        if (oo.equals(OR)) return OR_VALUE;
-//        if (oo.equals(PLUS)) return PLUS_VALUE;
-//        if (oo.equals(POWER)) return POWER_VALUE;
-        //       if (oo.equals(TIMES)) return TIMES_VALUE;
-//        if (oo.equals(DIVIDE)) return DIVIDE_VALUE;
-//        if (oo.equals(INTEGER_DIVIDE)) return INTEGER_DIVIDE_VALUE;
-        // monadic operators.
-//        if (oo.equals(MINUS_MINUS)) return MINUS_MINUS_VALUE;
-//        if (oo.equals(NOT)) return NOT_VALUE;
-//        if (oo.equals(PLUS_PLUS)) return PLUS_PLUS_VALUE;
         return UNKNOWN_VALUE;
     }
 

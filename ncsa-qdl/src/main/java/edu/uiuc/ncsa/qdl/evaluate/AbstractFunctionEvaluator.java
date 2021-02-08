@@ -250,6 +250,29 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             }
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
+        // Short circuit dyadic logical && ||
+        if(arg1 instanceof Boolean){
+            if(polyad.getOperatorType() == OpEvaluator.OR_VALUE){
+                if((Boolean)arg1){
+                    polyad.setResult(Boolean.TRUE);
+                    polyad.setResultType(Constant.BOOLEAN_TYPE);
+                    polyad.setEvaluated(true);
+
+                    return;
+                }
+
+            }
+            if(polyad.getOperatorType() == OpEvaluator.AND_VALUE){
+                if(!((Boolean)arg1)){
+                    polyad.setResult(Boolean.FALSE);
+                    polyad.setResultType(Constant.BOOLEAN_TYPE);
+                    polyad.setEvaluated(true);
+                    return;
+                }
+
+            }
+
+        }
         Object arg2 = polyad.evalArg(1, state);
         if (arg2 == null) {
             if(polyad.getArguments().get(1) instanceof VariableNode){

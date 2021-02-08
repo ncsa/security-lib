@@ -4,8 +4,26 @@ but should be captured someplace.
 10/5/2020
 - Workspace Library mangement
     Be able to designate a command to run on load/reload
-    Set autosave interval. Allow for silent saves (so no output) vs. verbose (message printed on save).
-       This only works if an id has been set or maybe if it has already been saved once
+    Have a run_on_load property in WS that is the name of a command?
+    Or have a designated method like on_boot() or init() that is always run? Gives another keyword
+    basically in QDL.
 
 
+08/02/2021
+- Short circuit conditionals so we don't have to keep nesting them.
+  E.g.
+
+  if[A!=null && size(A) != 0][...];
+
+  if A is undefined, size(A) is never checked rather than throwing an exception.
+  Hard bit is making sure this works in nested conditionals
+  E.g.
+
+  if[B<0 && !(a == null || size(a) ==0)][...];
+  issues are
+  * a == null fails because a is undefined. Did we want to change that?
+       ** NO. Make them set the value first.
+  * each logical operator is a separate call (doDyadEqualsOperator etc.) so may need to
+  catch things at a higher level. Maybe throw a BadBooleanException or some such?
+  This is using exceptions in place of listeners which might be ok.
 

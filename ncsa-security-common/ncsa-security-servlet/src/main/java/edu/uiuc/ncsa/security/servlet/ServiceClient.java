@@ -220,7 +220,7 @@ public class ServiceClient {
                if(ServletDebugUtil.isEnabled()){
                    t.printStackTrace();
                }
-               throw new GeneralException("Error invoking client", t);
+               throw new GeneralException("Error invoking client:" + t.getMessage(), t);
            }
            try {
 
