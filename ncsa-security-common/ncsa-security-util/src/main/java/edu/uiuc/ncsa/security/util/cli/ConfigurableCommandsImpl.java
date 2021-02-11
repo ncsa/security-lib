@@ -408,6 +408,7 @@ public abstract class ConfigurableCommandsImpl implements Commands {
         if (hasOption(ENV_OPTION, ENV_LONG_OPTION)) {
             String envFile = getCommandLine().getOptionValue(ENV_OPTION);
             readEnv(envFile);
+            currentEnvFile = envFile;
         }
     }
 
@@ -437,7 +438,8 @@ public abstract class ConfigurableCommandsImpl implements Commands {
     CommandLine cmd = null;
 
     protected void parseCommandLine(String[] args) throws UnrecognizedOptionException, ParseException {
-        CommandLineParser clp = new BasicParser();
+        //CommandLineParser clp = new BasicParser();
+        CommandLineParser clp = new DefaultParser();
         try {
             cmd = clp.parse(getOptions(), args);
         } catch (UnrecognizedOptionException ux) {

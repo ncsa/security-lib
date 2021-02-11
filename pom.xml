@@ -9,7 +9,7 @@
     </parent>
     <groupId>edu.uiuc.ncsa.security</groupId>
     <artifactId>ncsa-security-all</artifactId>
-    <version>5.1.0</version>
+    <version>5.1-SNAPSHOT</version>
     <name>Parent module for everything of interest.</name>
     <packaging>pom</packaging>
     <description>Generic security code for delegation.</description>

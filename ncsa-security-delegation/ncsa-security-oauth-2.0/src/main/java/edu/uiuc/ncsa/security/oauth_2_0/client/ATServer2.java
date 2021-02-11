@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.client.request.ATResponse;
 import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC8628Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import net.sf.json.JSONObject;
@@ -76,7 +77,6 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
     }
 
 
-
     /**
      * Gets access token. This also returns the refresh token (if any) in the response.
      * Note that there are claims that are returned in the a parameter map for the
@@ -88,15 +88,27 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
      * @return Access token response
      */
     protected ATResponse2 getAccessToken(ATRequest atRequest) {
-        Map params = atRequest.getParameters();
-        if (params.get(REDIRECT_URI) == null) {
-            throw new GeneralException("Error: the client redirect uri was not set in the request.");
-        }
-        DebugUtil.trace(this, "getting access token, use http header for token? " + useBasicAuth);
-        // Create the request
         HashMap m = new HashMap();
-        m.put(AUTHORIZATION_CODE, atRequest.getAuthorizationGrant().getToken());
-        m.put(GRANT_TYPE, GRANT_TYPE_AUTHORIZATION_CODE);
+        Map params = atRequest.getParameters();
+        if (atRequest.getParameters() != null) {
+            m.putAll(params);
+        }
+        if (atRequest.isRfc8628()) {
+            DebugUtil.trace(this, "rfc 8628 case, use http header for token? " + useBasicAuth);
+            m.put(RFC8628Constants.DEVICE_CODE, atRequest.getAuthorizationGrant().getToken());
+            m.put(GRANT_TYPE, RFC8628Constants.GRANT_TYPE_DEVICE_CODE);
+            m.put(CLIENT_ID, atRequest.getClient().getIdentifierString());
+        } else {
+            if (params.get(REDIRECT_URI) == null) {
+                throw new GeneralException("Error: the client redirect uri was not set in the request.");
+            }
+            DebugUtil.trace(this, "getting access token, use http header for token? " + useBasicAuth);
+            // Create the request
+            m.put(AUTHORIZATION_CODE, atRequest.getAuthorizationGrant().getToken());
+            m.put(GRANT_TYPE, GRANT_TYPE_AUTHORIZATION_CODE);
+            m.put(REDIRECT_URI, params.get(REDIRECT_URI));
+        }
+
         String clientID = atRequest.getClient().getIdentifierString();
         String clientSecret = atRequest.getClient().getSecret();
         if (!useBasicAuth) {
@@ -105,7 +117,6 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             m.put(CLIENT_ID, clientID);
             m.put(CLIENT_SECRET, clientSecret);
         }
-        m.put(REDIRECT_URI, params.get(REDIRECT_URI));
         String response = null;
         if (useBasicAuth) {
             response = getServiceClient().getRawResponse(m, clientID, clientSecret);
@@ -121,14 +132,6 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         if (jsonObject.containsKey(REFRESH_TOKEN)) {
             // the refresh token is optional, so if it is missing then there is nothing to do.
             rt = new RefreshTokenImpl(URI.create(jsonObject.getString(REFRESH_TOKEN)));
-            /*try {
-                if (jsonObject.containsKey(EXPIRES_IN)) {
-                    long expiresIn = Long.parseLong(jsonObject.getString(EXPIRES_IN)) * 1000L; // convert from sec to ms.
-                 //   rt.setLifetime(expiresIn);
-                }
-            } catch (NumberFormatException nfx) {
-                // This is optional to return, so it is possible that this might not work.
-            }*/
         }
         ServletDebugUtil.trace(this, "Is OIDC enabled? " + oidcEnabled);
 
@@ -148,7 +151,9 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             ServletDebugUtil.trace(this, "idTokenEntry= " + idTokenEntry);
 
             // and now the specific checks for ID tokens returned by the AT server.
-            if (!idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
+            // It is possible (e.g. RFC 8628) that there is no nonce or that the client is not configured to
+            // send one, so only check if there was one in the request to start with.
+            if (m.containsKey(NONCE) && !idToken.getString(NONCE).equals(atRequest.getParameters().get(NONCE))) {
                 throw new GeneralException("Error: Incorrect nonce \"" + atRequest.getParameters().get(NONCE) + "\" returned from server");
             }
 
@@ -160,7 +165,7 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
             }
             params.put(ID_TOKEN, idToken);
             //params.put(EXPIRES_IN, expiresIn/1000 ); //convert to seconds.
-            params.put(EXPIRES_IN, at.getLifetime()/1000 ); // AT is definitive. Convert to seconds.
+            params.put(EXPIRES_IN, at.getLifetime() / 1000); // AT is definitive. Convert to seconds.
             ServletDebugUtil.trace(this, "Adding idTokenEntry with id = " + at.getToken() + " to the ID Token store. Store has " + getIDTokenStore().size() + " entries");
             getIDTokenStore().put(at.getToken(), idTokenEntry);
             ServletDebugUtil.trace(this, "ID Token store=" + getIDTokenStore().size());

@@ -171,6 +171,9 @@ public class Configurations {
      * @return
      */
     public static String getNodeValue(ConfigurationNode node, String name) {
+        if(node == null){
+            return null;
+        }
         ConfigurationNode node1 = getFirstNode(node, name);
         if (node1 == null) return null;
         return node1.getValue().toString();
@@ -202,6 +205,9 @@ public class Configurations {
      * @return
      */
     public static String getFirstAttribute(ConfigurationNode node, String name) {
+        if(node == null){
+            return null;
+        }
         List list = node.getAttributes(name);
         if (list.isEmpty()) {
             return null;

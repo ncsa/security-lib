@@ -426,7 +426,7 @@ public abstract class CommonCommands implements Commands {
             XProperties xp = new XProperties();
             xp.putAll(getDriver().getEnv());
             FileOutputStream fos = new FileOutputStream(f);
-            xp.save(fos, "OA4MP environment serialized on " + (new Date()));
+            xp.store(fos, "OA4MP environment serialized on " + (new Date()));
             fos.flush();
             fos.close();
         }
@@ -441,7 +441,7 @@ public abstract class CommonCommands implements Commands {
     public void print_env(InputLine inputLine) throws Exception {
         if (getDriver().hasEnv()) {
             if (curentEnvFile == null) {
-                say("no current environment file");
+                say("no current default environment file");
             } else {
                 say("current environment file is:" + curentEnvFile);
             }

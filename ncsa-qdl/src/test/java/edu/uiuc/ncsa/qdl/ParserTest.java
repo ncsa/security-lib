@@ -18,8 +18,6 @@ import java.math.BigDecimal;
  * on 1/21/20 at  11:27 AM
  */
 public class ParserTest extends AbstractQDLTester {
-    //TestUtils testUtils = TestUtils.newInstance();
-
     /**
      * Tests the rational function<br/><br/>
      * f(x,y)=(x^3 + x*y^2 - 3*x*y + 1)/(x^4 + y^2 +2)<br/><br/>

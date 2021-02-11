@@ -253,7 +253,8 @@ public abstract class CLITool implements Logable {
     CommandLine cmd = null;
 
     protected void parseCommandLine(String[] args) {
-        CommandLineParser clp = new BasicParser();
+        //CommandLineParser clp = new BasicParser();
+        CommandLineParser clp = new DefaultParser();
         try {
             cmd = clp.parse(getOptions(), args);
         } catch (UnrecognizedOptionException ux) {

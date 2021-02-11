@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli;
 
+import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
@@ -49,6 +50,9 @@ public class CLIDriver {
     Map env;
 
     public Map getEnv() {
+        if(env == null){
+            env = new XProperties();
+        }
         return env;
     }
 

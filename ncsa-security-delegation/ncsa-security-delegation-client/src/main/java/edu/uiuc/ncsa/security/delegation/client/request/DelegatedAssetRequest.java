@@ -58,4 +58,14 @@ public class DelegatedAssetRequest extends BasicRequest {
     }
 
     Map assetParameters;
+
+    public boolean isRfc8628() {
+        return rfc8628;
+    }
+
+    public void setRfc8628(boolean rfc8628) {
+        this.rfc8628 = rfc8628;
+    }
+
+    boolean rfc8628 = false;
 }

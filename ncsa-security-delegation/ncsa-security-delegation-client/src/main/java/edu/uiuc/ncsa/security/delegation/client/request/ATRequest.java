@@ -11,6 +11,21 @@ import edu.uiuc.ncsa.security.delegation.token.Verifier;
  * on Apr 13, 2011 at  4:02:13 PM
  */
 public class ATRequest extends BasicRequest {
+    public ATRequest() {
+    }
+
+    /**
+     * Pending removal of OAuth 1 stuff, this is about the best we are going to do.
+     * Have to stick stuff inside classes and use facades to pass newer parameters...
+     * @param dar
+     */
+    public ATRequest(DelegatedAssetRequest dar) {
+        setVerifier(dar.getVerifier());
+        setRfc8628(dar.isRfc8628());
+        setAuthorizationGrant(dar.getAuthorizationGrant());
+        setClient(dar.getClient());
+        setParameters(dar.getParameters());
+    }
 
     /**
      * Optional if supported. This should be set to null if it is not supported.
@@ -45,4 +60,13 @@ public class ATRequest extends BasicRequest {
 
     AuthorizationGrant authorizationGrant;
 
+    public boolean isRfc8628() {
+        return rfc8628;
+    }
+
+    public void setRfc8628(boolean rfc8628) {
+        this.rfc8628 = rfc8628;
+    }
+
+    boolean rfc8628 = false;
 }

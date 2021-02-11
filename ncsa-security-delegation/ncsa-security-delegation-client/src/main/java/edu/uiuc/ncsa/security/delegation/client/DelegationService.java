@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
-import edu.uiuc.ncsa.security.delegation.token.Verifier;
 
 import java.net.URI;
 import java.util.Map;
@@ -78,22 +77,13 @@ public abstract class DelegationService implements Server {
         return getAT(grant, client, parameters);
     }
 
-    protected ATResponse getAT(AuthorizationGrant grant, Verifier v, Client client, Map<String, String> parameters) {
-        ATRequest atr = new ATRequest();
-        atr.setAuthorizationGrant(grant);
-        atr.setVerifier(v);
-        atr.setClient(client);
-        atr.setParameters(parameters);
-        ATResponse atresp = (ATResponse) getAtServer().process(atr);
+    protected ATResponse getAT(ATRequest atRequest){
+        ATResponse atresp = (ATResponse) getAtServer().process(atRequest);
         return atresp;
-
     }
 
     public ATResponse getAT(DelegatedAssetRequest delegationAssetRequest) {
-        return getAT(delegationAssetRequest.getAuthorizationGrant(),
-                delegationAssetRequest.getVerifier(),
-                delegationAssetRequest.getClient(),
-                delegationAssetRequest.getParameters());
+        return getAT(new ATRequest(delegationAssetRequest));
     }
 
     /**
