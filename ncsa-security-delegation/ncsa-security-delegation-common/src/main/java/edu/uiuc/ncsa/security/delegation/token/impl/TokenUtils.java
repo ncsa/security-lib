@@ -3,11 +3,15 @@ package edu.uiuc.ncsa.security.delegation.token.impl;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifierProvider;
 import edu.uiuc.ncsa.security.core.util.Identifiers;
+import edu.uiuc.ncsa.security.delegation.token.Token;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * Utilities for working with tokens.
@@ -29,6 +33,29 @@ import java.util.Date;
  * on 11/24/20 at  9:37 AM
  */
 public class TokenUtils {
+    public static String encodeToken(Token token) {
+        if (token == null) {
+            return null;
+        }
+        return encodeToken(token.getToken());
+    }
+
+    public static String encodeToken(String token) {
+        if (isTrivial(token)) {
+            return "";
+        }
+        return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(token.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String decodeToken(String b64EncodedToken) {
+        String out =  new String(org.apache.commons.codec.binary.Base64.decodeBase64(b64EncodedToken));
+        return out;
+    }
+
+    public static boolean isBase64(String x) {
+        return org.apache.commons.codec.binary.Base64.isBase64(x);
+    }
+
     public static void main(String[] args) {
         IdentifierProvider ip = new IdentifierProvider<Identifier>(URI.create("https://cilogon.org/oauth2"), "my_token", true) {
         };

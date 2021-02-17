@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.security.oauth_2_0.server;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
-import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
+import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
@@ -121,12 +121,12 @@ public abstract class IDTokenResponse extends IResponse2 {
         // m contains the top-level JSON object that is serialized for the response. The
         // claims are part of this and keyed to the id_token.
         HashMap m = new HashMap();
-        m.put(ACCESS_TOKEN, accessToken.getToken());
+        m.put(ACCESS_TOKEN, accessToken.toB64());
         m.put(EXPIRES_IN, (accessToken.getLifetime() / 1000));
 
         m.put(TOKEN_TYPE, "Bearer");
         if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
-            m.put(REFRESH_TOKEN, getRefreshToken().getToken());
+            m.put(REFRESH_TOKEN, getRefreshToken().toB64());
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.

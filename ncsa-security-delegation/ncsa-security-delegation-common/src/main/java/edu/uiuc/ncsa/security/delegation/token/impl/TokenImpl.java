@@ -193,4 +193,14 @@ public class TokenImpl implements NewToken {
             lifetime = json.getLong(LIFETIME_TAG);
         }
     }
+
+    public String toB64(){
+        return TokenUtils.encodeToken(this);
+    }
+    public void fromB64(String b64Encoded){
+        String rawToken = TokenUtils.decodeToken(b64Encoded);
+        URI newToken = URI.create(rawToken);
+        setToken(newToken);
+        init(newToken);
+    }
 }

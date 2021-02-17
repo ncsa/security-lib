@@ -8,7 +8,10 @@ import edu.uiuc.ncsa.security.core.util.IP2;
 import edu.uiuc.ncsa.security.delegation.server.MissingTokenException;
 import edu.uiuc.ncsa.security.delegation.server.request.ATRequest;
 import edu.uiuc.ncsa.security.delegation.server.request.IssuerRequest;
-import edu.uiuc.ncsa.security.delegation.token.*;
+import edu.uiuc.ncsa.security.delegation.token.AccessToken;
+import edu.uiuc.ncsa.security.delegation.token.AuthorizationGrant;
+import edu.uiuc.ncsa.security.delegation.token.TokenForge;
+import edu.uiuc.ncsa.security.delegation.token.Verifier;
 import edu.uiuc.ncsa.security.delegation.token.impl.*;
 import edu.uiuc.ncsa.security.oauth_2_0.server.AGRequest2;
 import edu.uiuc.ncsa.security.oauth_2_0.server.OIDCServiceTransactionInterface;
@@ -17,6 +20,8 @@ import edu.uiuc.ncsa.security.oauth_2_0.server.RTIRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.Map;
+
+import static edu.uiuc.ncsa.security.delegation.token.impl.TokenUtils.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -137,11 +142,10 @@ public class OA2TokenForge implements TokenForge {
 
     @Override
     public AccessToken getAccessToken(Map<String, String> parameters) {
-
-
         String tokenVal = parameters.get(OA2Constants.ACCESS_TOKEN);
         if (tokenVal != null) {
             //return tokenVal;
+
             return new AccessTokenImpl(URI.create(tokenVal));
         }
         String authCode = parameters.get(OA2Constants.AUTHORIZATION_CODE);
@@ -207,7 +211,14 @@ public class OA2TokenForge implements TokenForge {
                 return new AuthorizationGrantImpl(getAgIdProvider().get().getUri());
 
             default:
-                return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(tokens[0]));
+                if(tokens[0] == null){
+                    return new AuthorizationGrantImpl(null);
+                }
+                if(isBase64(tokens[0])){
+                    return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(decodeToken(tokens[0])));
+                } else {
+                    return new AuthorizationGrantImpl(URI.create(tokens[0]));
+                }
         }
     }
 
