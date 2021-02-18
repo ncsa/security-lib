@@ -57,6 +57,8 @@ public interface PayloadHandler extends Serializable {
 
     /**
      * Runs this specific claim source against the internal state of this class.
+     * Note that the contract is that it returns the updated claims and if there
+     * are no new claims, it should just return its claims argument.
      * @param claims
      * @return
      */

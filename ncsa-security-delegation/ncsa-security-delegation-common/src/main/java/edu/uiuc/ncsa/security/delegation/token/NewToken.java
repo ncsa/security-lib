@@ -14,7 +14,7 @@ public interface NewToken extends Token{
     JSONObject toJSON();
     void fromJSON(JSONObject json);
    // void fromString(String rawToken);
-     void fromB64(String rawb64String);
-     String toB64();
+     void decodeToken(String rawb64String);
+     String encodeToken();
     long OLD_SYSTEM_DEFAULT_LIFETIME = 1000L*60L*15L; // 15 minutes.
 }

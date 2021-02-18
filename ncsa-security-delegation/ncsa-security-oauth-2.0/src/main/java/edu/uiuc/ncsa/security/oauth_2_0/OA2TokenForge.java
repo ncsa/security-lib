@@ -214,8 +214,8 @@ public class OA2TokenForge implements TokenForge {
                 if(tokens[0] == null){
                     return new AuthorizationGrantImpl(null);
                 }
-                if(isBase64(tokens[0])){
-                    return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(decodeToken(tokens[0])));
+                if(isBase32(tokens[0])){
+                    return new AuthorizationGrantImpl(tokens[0] == null ? null : URI.create(b32DecodeToken(tokens[0])));
                 } else {
                     return new AuthorizationGrantImpl(URI.create(tokens[0]));
                 }

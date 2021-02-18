@@ -114,7 +114,7 @@ public class JWTRunner {
 
         // now for the actual getting of the claims
 
-        getSources(transaction.getFlowStates(),SRE_PRE_AUTH, true);
+        getFromSources(transaction.getFlowStates(),SRE_PRE_AUTH, true);
 
         doScript(ScriptingConstants.SRE_POST_AUTH);
 
@@ -154,7 +154,7 @@ public class JWTRunner {
     protected void doTokenClaims(boolean isRefresh) throws Throwable {
         doScript(isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT);
 
-        getSources(transaction.getFlowStates(),isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT, false);
+        getFromSources(transaction.getFlowStates(),isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT, false);
         if (isRefresh) {
             for (PayloadHandler h : handlers) {
                 h.setAccountingInformation();
@@ -183,10 +183,11 @@ public class JWTRunner {
      * @param checkAuthClaims
      * @throws Throwable
      */
-    protected void getSources(FlowStates flowStates, String execPhase, boolean checkAuthClaims) throws Throwable {
+    protected void getFromSources(FlowStates flowStates, String execPhase, boolean checkAuthClaims) throws Throwable {
+        JSONObject claims = null;
         for (PayloadHandler h : handlers) {
             if (!h.getSources().isEmpty()) {
-                JSONObject claims = h.getClaims();
+                claims = h.getClaims();
                 // so there is
                 for (int i = 0; i < h.getSources().size(); i++) {
                     ClaimSource claimSource = h.getSources().get(i);
@@ -196,20 +197,27 @@ public class JWTRunner {
                     } else {
                         isRunAtAuthz = !claimSource.isRunAtAuthorization();
                     }
-                    if (isRunAtAuthz)
+                    if (isRunAtAuthz) {
                         claims = h.execute(claimSource, claims);
-                    //claimSource.process(claims, request, transaction);
+                        //claimSource.process(claims, request, transaction);
 
-                    // keep this in case this was set earlier.
-                    if (!flowStates.acceptRequests) {
-                        // This practically means that the come situation has arisen whereby the user is
-                        // immediately banned from access -- e.g. they were found to be on a blacklist.
+                        // keep this in case this was set earlier.
+                        if (!flowStates.acceptRequests) {
+                            // This practically means that the come situation has arisen whereby the user is
+                            // immediately banned from access -- e.g. they were found to be on a blacklist.
+                            //throw new IllegalAccessException(OA2Errors.ACCESS_DENIED, "access denied", null, HttpStatus.SC_UNAUTHORIZED);
+                            throw new IllegalAccessException();
+                        }
                         h.finish(execPhase);
-                        //throw new IllegalAccessException(OA2Errors.ACCESS_DENIED, "access denied", null, HttpStatus.SC_UNAUTHORIZED);
-                        throw new IllegalAccessException();
                     }
+
                     trace(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
+            }
+            if(claims != null){
+                // make sure that chained claims get stashed if there are any.
+                // In functors it might not get set right, so do it here and be sure.
+                transaction.setUserMetaData(claims);
             }
         }
     }
