@@ -192,7 +192,11 @@ public class XMLUtils implements XMLConstants {
             // A null is of the form <null/> so there is never any character data.
             if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(NULL_TAG)) {
                 output = QDLNull.getInstance();
+            } else if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STRING_TAG)) {
+                // A string may be emoty and of the form <string/> so there is never any character data too.
+                output = ""; // case of empty string tag
             } else {
+
                 if (xe.getEventType() != XMLEvent.CHARACTERS) {
                     throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
                 }
@@ -229,7 +233,7 @@ public class XMLUtils implements XMLConstants {
     protected static StemVariable resolveStem(XMLEventReader xer) throws XMLStreamException {
         StemVariable stem = new StemVariable();
         XMLEvent xe = xer.nextEvent();
-        if(xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STEM_TAG)){
+        if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STEM_TAG)) {
             return stem; // this covers the edge case that the entry is exactly <stem/>
         }
         while (xer.hasNext()) {
@@ -388,7 +392,7 @@ public class XMLUtils implements XMLConstants {
             }
             xer.nextEvent();
         }
-        throw new XMLMissingCloseTagException( MODULE_TEMPLATE_TAG);
+        throw new XMLMissingCloseTagException(MODULE_TEMPLATE_TAG);
     }
 
     /**
@@ -431,7 +435,7 @@ public class XMLUtils implements XMLConstants {
         // scorecard: at this point, enough information existed in the attributes to re-assemble the module
         // The cursor is still on this tag. Now send it to the module for further processing.
         module.fromXML(xer, xp);
-        if(module instanceof JavaModule){
+        if (module instanceof JavaModule) {
             // call this at the right time -- after everything else has been done.
             ((JavaModule) module).init(moduleState);
         }

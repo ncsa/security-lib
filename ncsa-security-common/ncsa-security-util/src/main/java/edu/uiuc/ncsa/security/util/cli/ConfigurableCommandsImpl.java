@@ -32,7 +32,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 5/20/13 at  11:35 AM
  */
-public abstract class ConfigurableCommandsImpl implements Commands {
+public abstract class ConfigurableCommandsImpl implements Commands, ComponentManager {
     protected ConfigurableCommandsImpl(MyLoggingFacade logger) {
         this.logger = logger;
     }

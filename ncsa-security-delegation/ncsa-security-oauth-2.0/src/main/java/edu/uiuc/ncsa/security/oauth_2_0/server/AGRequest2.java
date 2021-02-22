@@ -26,4 +26,6 @@ public class AGRequest2 extends AGRequest {
     }
 
     long lifetime;
+
+
 }

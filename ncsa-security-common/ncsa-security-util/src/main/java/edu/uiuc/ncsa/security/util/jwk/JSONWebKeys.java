@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.jwk;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
@@ -8,7 +9,7 @@ import java.util.HashMap;
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/17 at  10:37 AM
  */
-public class JSONWebKeys extends HashMap<String, JSONWebKey> {
+public class JSONWebKeys extends HashMap<String, JSONWebKey> implements Serializable {
     public JSONWebKey getDefault(){
          if(!hasDefaultKey()){  // This checks that the key is set AND the key is actually in this collection.
              throw new IllegalStateException("Error: No default key ID specified.");

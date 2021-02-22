@@ -901,16 +901,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         Object arg = polyad.evalArg(0, state);
         int returnScope = all_keys;
+        int returnType = Constant.UNKNOWN_TYPE;
+        boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            if (!isBoolean(arg2)) {
-                throw new IllegalArgumentException(LIST_KEYS + " second argument must be a boolean if present.");
+            if(isBoolean(arg2)){
+                returnByType = false;
+                if ((Boolean) arg2) {
+                    returnScope = only_scalars;
+                } else {
+                    returnScope = only_stems;
+                }
+
+            }else if(isLong(arg2)){
+               returnByType = true;
+               Long arg2Long = (Long)arg2;
+               returnType = arg2Long.intValue();
+            } else{
+                throw new IllegalArgumentException(LIST_KEYS + " second argument must be a boolean or integer if present.");
+
             }
-            if ((Boolean) arg2) {
-                returnScope = only_scalars;
-            } else {
-                returnScope = only_stems;
-            }
+
         }
         long size = 0;
         if (!isStem(arg)) {
@@ -921,23 +932,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stemVariable = (StemVariable) arg;
         StemVariable out = new StemVariable();
-        int i = 0;
-        for (String key : stemVariable.keySet()) {
-            switch (returnScope) {
-                case all_keys:
+        if(returnByType){
+            int i = 0;
+
+            for (String key : stemVariable.keySet()) {
+                if(returnType == Constant.getType(stemVariable.get(key))){
                     out.put(Integer.toString(i++), key);
-                    break;
-                case only_scalars:
-                    if (!state.isStem(key)) {
-                        out.put(Integer.toString(i++), key);
-                    }
-                    break;
-                case only_stems:
-                    if (state.isStem(key)) {
-                        out.put(Integer.toString(i++), key);
-                    }
-                    break;
+                }
             }
+        }else{
+            int i = 0;
+
+            for (String key : stemVariable.keySet()) {
+                switch (returnScope) {
+                    case all_keys:
+                        out.put(Integer.toString(i++), key);
+                        break;
+                    case only_scalars:
+                        if(Constant.getType(stemVariable.get(key))!= Constant.STEM_TYPE){
+                            out.put(Integer.toString(i++), key);
+                    }
+                        break;
+                    case only_stems:
+                        if(Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE){
+                            out.put(Integer.toString(i++), key);
+                    }
+                        break;
+                }
+            }
+
         }
         polyad.setResult(out);
         polyad.setResultType(Constant.STEM_TYPE);

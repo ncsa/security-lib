@@ -116,6 +116,12 @@ public class InputLine {
         }
     }
 
+    public InputLine removeArgAt(int index) {
+        if (parsedInput != null) {
+            parsedInput.remove(index);
+        }
+        return this;
+    }
     @Override
 
     public String toString() {

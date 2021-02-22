@@ -39,6 +39,7 @@ public class CLIDriver {
     public static final String SHORT_EXIT_COMMAND = "/q";
     public static final String REPEAT_LAST_COMMAND = "/r";
     public static final String WRITE_BUFFER_COMMAND = "/w";
+    public static final String COMPONENT_COMMAND = "//"; // For handing off *IF* there is a component manager.
     public static final String LIST_ALL_METHODS_COMMAND = "/commands";
     public static final String TRACE_COMMAND = "/trace";
 
@@ -50,7 +51,7 @@ public class CLIDriver {
     Map env;
 
     public Map getEnv() {
-        if(env == null){
+        if (env == null) {
             env = new XProperties();
         }
         return env;
@@ -73,7 +74,12 @@ public class CLIDriver {
 
     public CLIDriver(Commands... cci) {
         super();
+
         for (Commands xxx : cci) {
+            // Set exactly one instance of the component manager
+            if (xxx instanceof ComponentManager && componentManager == null) {
+                componentManager = (ComponentManager) xxx;
+            }
             if (xxx instanceof CommonCommands) {
                 ((CommonCommands) xxx).setDriver(this);
             }
@@ -105,6 +111,7 @@ public class CLIDriver {
     protected static final int PRINT_HELP_COMMAND_VALUE = 70;
     protected static final int LIST_ALL_METHODS_COMMAND_VALUE = 80;
     protected static final int TRACE_COMMAND_VALUE = 90;
+    protected static final int COMPONENT_COMMAND_VALUE = 100;
 
     // TODO - Add more CLI-level commands?
     // Might very well want to fold this into the standard flow rather than intercept it first.
@@ -115,15 +122,28 @@ public class CLIDriver {
         }
         StringTokenizer st = new StringTokenizer(cmdLine.trim(), " ");
         String nextToken = st.nextToken();
-        if (nextToken.equals(REPEAT_LAST_COMMAND)) return REPEAT_COMMAND_VALUE;
-        if (nextToken.equals(HISTORY_LIST_COMMAND)) return HISTORY_COMMAND_VALUE;
-        if (nextToken.equals(WRITE_BUFFER_COMMAND)) return WRITE_BUFFER_COMMAND_VALUE;
-        if (nextToken.equals(LOAD_BUFFER_COMMAND)) return READ_BUFFER_COMMAND_VALUE;
-        if (nextToken.equals(CLEAR_BUFFER_COMMAND)) return CLEAR_BUFFER_COMMAND_VALUE;
-        if (nextToken.equals(SHORT_EXIT_COMMAND)) return SHORT_EXIT_COMMAND_VALUE;
-        if (nextToken.equals(PRINT_HELP_COMMAND)) return PRINT_HELP_COMMAND_VALUE;
-        if (nextToken.equals(LIST_ALL_METHODS_COMMAND)) return LIST_ALL_METHODS_COMMAND_VALUE;
-        if (nextToken.equals(TRACE_COMMAND)) return TRACE_COMMAND_VALUE;
+        switch (nextToken) {
+            case REPEAT_LAST_COMMAND:
+                return REPEAT_COMMAND_VALUE;
+            case HISTORY_LIST_COMMAND:
+                return HISTORY_COMMAND_VALUE;
+            case WRITE_BUFFER_COMMAND:
+                return WRITE_BUFFER_COMMAND_VALUE;
+            case LOAD_BUFFER_COMMAND:
+                return READ_BUFFER_COMMAND_VALUE;
+            case CLEAR_BUFFER_COMMAND:
+                return CLEAR_BUFFER_COMMAND_VALUE;
+            case SHORT_EXIT_COMMAND:
+                return SHORT_EXIT_COMMAND_VALUE;
+            case PRINT_HELP_COMMAND:
+                return PRINT_HELP_COMMAND_VALUE;
+            case LIST_ALL_METHODS_COMMAND:
+                return LIST_ALL_METHODS_COMMAND_VALUE;
+            case TRACE_COMMAND:
+                return TRACE_COMMAND_VALUE;
+            case COMPONENT_COMMAND:
+                return COMPONENT_COMMAND_VALUE;
+        }
         return USER_DEFINED_COMMAND;
     }
 
@@ -150,6 +170,8 @@ public class CLIDriver {
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
         say("---");
     }
+
+    ComponentManager componentManager = null;
 
     protected String doRepeatCommand(String cmdLine) {
         if (cmdLine.contains(HELP_SWITCH)) {
@@ -265,6 +287,14 @@ public class CLIDriver {
         say(byteCount + " bytes read, " + lineCount + " line" + (lineCount == 1 ? "" : "s") + " added.");
     }
 
+    public ComponentManager getComponentManager() {
+        return componentManager;
+    }
+
+    public void setComponentManager(ComponentManager componentManager) {
+        this.componentManager = componentManager;
+    }
+
     /**
      * Actual method that starts up this driver and sets out prompts etc.
      *
@@ -330,12 +360,13 @@ public class CLIDriver {
                     case TRACE_COMMAND_VALUE:
                         doTrace(cmdLine);
                         continue;
+
                     case NO_OP_VALUE:
                         continue;
                     case USER_DEFINED_COMMAND:
                     default:
                 }
-                if (commandType == NO_OP_VALUE ) {
+                if (commandType == NO_OP_VALUE) {
                     // The user entered a blank line or nothing but blanks. Skip it all.
                     continue;
                 }
@@ -343,26 +374,34 @@ public class CLIDriver {
                     // Store it if it was not retrieved from the command history.
                     commandHistory.add(0, cmdLine);
                 }
-
-                switch (execute(cmdLine)) {
-                    case HELP_RC:
+                if (cmdLine.startsWith(COMPONENT_COMMAND)) {
+                    // execute a single command in another component.
+                    if (componentManager != null) {
+                        cmdLine = "use " + cmdLine.substring(COMPONENT_COMMAND.length());
                         InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
-                        listCLIMethods(inputLine);
-                        break;
-                    case SHUTDOWN_RC:
-                        isDone = false; // just in case.
-                        quit(null);
-                        return;
-                    case USER_EXIT_RC:
-                        say("User exit encountered");
-                        break;
-                    case OK_RC:
-                        // do nix.
-                        break;
-                    case ABNORMAL_RC:
-                    default:
-                        say("Command not found/understood. Try typing help or exit.");
-                        say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
+                        componentManager.use(inputLine);
+                    }
+                }else {
+                    switch (execute(cmdLine)) {
+                        case HELP_RC:
+                            InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
+                            listCLIMethods(inputLine);
+                            break;
+                        case SHUTDOWN_RC:
+                            isDone = false; // just in case.
+                            quit(null);
+                            return;
+                        case USER_EXIT_RC:
+                            say("User exit encountered");
+                            break;
+                        case OK_RC:
+                            // do nix.
+                            break;
+                        case ABNORMAL_RC:
+                        default:
+                            say("Command not found/understood. Try typing help or exit.");
+                            say("To see all commands currently available, type " + LIST_ALL_METHODS_COMMAND);
+                    }
                 }
             } catch (Throwable ioe) {
                 if (debug) {
