@@ -375,7 +375,8 @@ args is a scalar - zero, since scalars (such as integers) have no size.
             <![CDATA[
                  to_json(stem.) - convert the stem to a JSON string.
         to_json(stem., convert) - if convert is true, vencode all keys in the JSON for the stem
-to_json(stem., convert, indent) - (requires convert), indent is an integer giving the number of spaces to indent the JSON string
+to_json(stem., convert, indent) - (requires convert), indent is an integer giving the number of
+                                  spaces to indent the JSON string
 See also: from_json
                 ]]>
         </body>
@@ -392,9 +393,11 @@ Note: This does not remove the arguments from the symbol table.
     <entry id="unbox">
         <body>
             <![CDATA[
-unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element by (non-integer) key into a variable.
-                            safeModeOn (default is true) will NOT overwrite any variables in the current workspace
-                            Turning safeModeOn to false will.
+unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element
+                             by (non-integer) key into a variable.
+                             safeModeOn (default is true) will NOT overwrite
+                             any variables in the current workspace, turning
+                             safeModeOn to false will.
                 ]]>
         </body>
     </entry>
@@ -402,8 +405,9 @@ unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element 
     <entry id="to_uri">
         <body>
             <![CDATA[
-to_uri(string) - Takes a string that is a valid URI and returns a stem variable with all the parts (scheme, query, etc.)
-                 put into entries. This is RFC 3986 compliant.
+to_uri(string) - Takes a string that is a valid URI and returns a stem variable
+                 with all the parts (scheme, query, etc.) put into entries.
+                 This is RFC 3986 compliant.
 See also: constants() for the field names, from_uri.
 ]]>
         </body>
@@ -412,7 +416,8 @@ See also: constants() for the field names, from_uri.
     <entry id="from_uri">
         <body>
             <![CDATA[
-from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the variable x, then
+from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the
+                  variable x, then
    x == from_uri(to_uri(x))
 should be true.
 See also: constants() for the field names, to_uri.
@@ -423,7 +428,8 @@ See also: constants() for the field names, to_uri.
     <entry id="unique">
         <body>
             <![CDATA[
-unique(list.) - Take a list (of scalars) and return a list of the unique elements.
+unique(list.) - Take a list (of scalars) and return a list of the unique
+                elements.
 E.g.
   unique(['a',2,4,true]~['a','b',0,3,true])
 [0,a,2,b,3,4,true]
@@ -435,23 +441,28 @@ E.g.
     <entry id="halt">
         <body>
             <![CDATA[
-  halt([message]]) - This will halt the system on this line and update the workspace state indicator, passing along
-                     the message. Note that this is properly a debugging tool. This is disabled in server mode.
+  halt([message]]) - This will halt the system on this line and update the
+                     workspace state indicator, passing along the message.
+                     Note that this is properly a debugging tool.
+                     This is disabled in server mode.
 ]]>
         </body>
     </entry>
     <entry id="union">
         <body>
             <![CDATA[
-union(arg0., arg1., ...) - takes the union of all stems, returning a single stem all of whose keys-values are taken
-                           form the arguments. Note that the stems are processed in order and values may be over-written.
+union(arg0., arg1., ...) - takes the union of all stems, returning a single
+                           stem all of whose keys-values are taken form the
+                           arguments. Note that the stems are processed in
+                           order and values may be over-written.
                 ]]>
         </body>
     </entry>
     <entry id="dir">
         <body>
             <![CDATA[
-dir(arg) - list the names of the files in a given location. Note that this is VFS aware.
+dir(arg) - list the names of the files in a given location. Note that this
+           is VFS aware.
 Note: Directory names will have a / appended to them.
            ]]>
         </body>
@@ -459,16 +470,18 @@ Note: Directory names will have a / appended to them.
     <entry id="mkdir">
         <body>
             <![CDATA[
-mkdir(arg) - make a directory. Note that if there are path components that do not exist, they will be
-             created. This returns true if it worked.
-Note: One major reason for this to fail is that, e.g., a virtual file system is mounted in read only mode.
+mkdir(arg) - make a directory. Note that if there are path components that do
+             not exist, they will be created. This returns true if it worked.
+Note: One major reason for this to fail is that, e.g., a virtual file system
+      is mounted in read only mode.
 ]]>
         </body>
     </entry>
     <entry id="rmdir">
         <body>
             <![CDATA[
-rmdir(path) - remove the last component of this path (which must be a directory).
+rmdir(path) - remove the last component of this path (which must be a
+              directory).
 Note that the directory must be empty first.
 See also: rm - remove a single file
 ]]>
@@ -889,8 +902,9 @@ See also: to_upper
     <entry id="tokenize">
         <body>
             <![CDATA[
-tokenize(arg, delimiter) - tokenize a string or stem of strings using the given delimeter.
-E.g. tokenize('abd:def:123', ':') yeilds the stem
+tokenize(arg, delimiter) - tokenize a string or stem of strings using the
+                           given delimeter.
+E.g. tokenize('abd:def:123', ':') yields the stem
 {
  0=abd,
  1=def,

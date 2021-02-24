@@ -42,7 +42,8 @@ public abstract class IDTokenResponse extends IResponse2 {
 
     AccessToken accessToken;
     RefreshTokenImpl refreshToken;
-    public boolean hasRefreshToken(){
+
+    public boolean hasRefreshToken() {
         return refreshToken != null;
     }
 
@@ -121,12 +122,22 @@ public abstract class IDTokenResponse extends IResponse2 {
         // m contains the top-level JSON object that is serialized for the response. The
         // claims are part of this and keyed to the id_token.
         HashMap m = new HashMap();
-        m.put(ACCESS_TOKEN, accessToken.encodeToken());
+        if (accessToken.getToken().contains(".")) {
+            m.put(ACCESS_TOKEN, accessToken.getToken());  // its a JWT, don't encode it
+        } else {
+            m.put(ACCESS_TOKEN, accessToken.encodeToken()); // it is not a JWT, encode it
+
+        }
         m.put(EXPIRES_IN, (accessToken.getLifetime() / 1000));
 
         m.put(TOKEN_TYPE, "Bearer");
         if (getRefreshToken() != null && getRefreshToken().getToken() != null) {
-            m.put(REFRESH_TOKEN, getRefreshToken().encodeToken());
+            if (getRefreshToken().getToken().contains(".")) {
+                m.put(REFRESH_TOKEN, getRefreshToken().getToken()); // don't encode JWTs
+            } else {
+                m.put(REFRESH_TOKEN, getRefreshToken().encodeToken());
+            }
+
         }
         if (!getSupportedScopes().isEmpty()) {
             // construct the scope response.

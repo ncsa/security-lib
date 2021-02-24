@@ -321,7 +321,7 @@ public class JSONEditor extends AbstractEditor {
         say("  \"foo\"");
         say(" ]");
         say("}");
-        say("Issuing the tree command against this yeilds the nicely compact");
+        say("Issuing the tree command against this yields the nicely compact");
         say("+-/(3)");
         say("| +-b(1)");
         say("| +-array[3]");

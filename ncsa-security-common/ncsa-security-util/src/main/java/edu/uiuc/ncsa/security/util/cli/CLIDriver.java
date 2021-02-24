@@ -165,10 +165,21 @@ public class CLIDriver {
         say(indent + indent + " or re-execute the command at the given index.");
         say(indent + REPEAT_LAST_COMMAND + " = re-evaluate the most recent (0th index) command in the history");
         say(indent + indent + "This is equivalent to issuing " + HISTORY_LIST_COMMAND + " 0");
-
-        say("E.g.");
+        if (getComponentManager() != null) {
+            say(indent + COMPONENT_COMMAND + " = execute a command from a specific component, without switching to that component.");
+            say(indent + indent + "No arguments simply switch to that component, arguments are fed to the component and evaluated.IDTokenHan");
+        }
+        say("E.g. #1");
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");
         say("---");
+        if (getComponentManager() != null) {
+            say("E.g. #2");
+            say(COMPONENT_COMMAND + "clients set_id  dev:test/no_cfg");
+            say(COMPONENT_COMMAND + "clients ls >cfg");
+            say("would set the id in the clients component, then list the cfg attribute.");
+            say("---");
+        }
+
     }
 
     ComponentManager componentManager = null;
@@ -376,12 +387,14 @@ public class CLIDriver {
                 }
                 if (cmdLine.startsWith(COMPONENT_COMMAND)) {
                     // execute a single command in another component.
-                    if (componentManager != null) {
+                    if (componentManager == null) {
+                        say("Sorry, this does not have components.");
+                    } else {
                         cmdLine = "use " + cmdLine.substring(COMPONENT_COMMAND.length());
                         InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
                         componentManager.use(inputLine);
                     }
-                }else {
+                } else {
                     switch (execute(cmdLine)) {
                         case HELP_RC:
                             InputLine inputLine = new InputLine(CLT.tokenize(cmdLine));
