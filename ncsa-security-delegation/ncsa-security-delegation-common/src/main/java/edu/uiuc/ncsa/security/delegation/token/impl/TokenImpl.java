@@ -40,8 +40,19 @@ public class TokenImpl implements NewToken {
         return getVersion() == null || getVersion().equals(VERSION_1_0_TAG);
     }
 
+    public boolean isJWT() {
+        return isJWT;
+    }
+
+    public void setJWT(boolean JWT) {
+        isJWT = JWT;
+    }
+
+    boolean isJWT = false;
+
     public TokenImpl(String sciToken, URI jti) {
         this.token = URI.create(sciToken);
+        isJWT = true; // only place we can determine this
         init(jti);
     }
 

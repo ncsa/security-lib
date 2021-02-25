@@ -470,7 +470,7 @@ public abstract class StoreCommands extends CommonCommands {
         }
         Identifiable x = findItem(inputLine);
         //"Are you sure you want to remove this client(y/n)[n]:"
-        if (!"y".equals(getInput("Are you sure you want to remove this client(y/n)", "n"))) {
+        if (!"y".equals(getInput("Are you sure you want to remove this object(y/n)", "n"))) {
             say("remove aborted.");
             return;
         }

@@ -472,6 +472,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Set<String> foundKeys = new HashSet<>();
         // now look for common keys.
+        if(keys == null){
+            // no common keys found
+            return foundKeys;
+        }
         for (String key : keys) {
             if (allHaveKey(key, stems)) {
                 foundKeys.add(key);
