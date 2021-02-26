@@ -51,6 +51,7 @@ public class StemVariable extends HashMap<String, Object> {
         return new BigDecimal(obj.toString());
 
     }
+
     public BigDecimal getDecimal(String key) {
         Object obj = get(key);
         if (obj instanceof BigDecimal) {
@@ -352,6 +353,10 @@ public class StemVariable extends HashMap<String, Object> {
           rename_keys(b., keys(b.)-'OA2_')
      */
     public StemVariable excludeKeys(StemVariable keyList) {
+        return oldExcludeKeys(keyList);
+    }
+
+    protected StemVariable oldExcludeKeys(StemVariable keyList) {
         StemVariable result = new StemVariable();
         for (String key : keySet()) {
             if (!keyList.containsValue(key)) {
@@ -362,6 +367,10 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable includeKeys(StemVariable keyList) {
+        return oldIncludeKeys(keyList);
+    }
+
+    protected StemVariable oldIncludeKeys(StemVariable keyList) {
         StemVariable result = new StemVariable();
         for (int i = 0; i < keyList.size(); i++) {
             // for loop to be sure that everything is done in order.
@@ -373,6 +382,27 @@ public class StemVariable extends HashMap<String, Object> {
             if (containsKey(currentKey)) {
                 result.put(currentKey, get(currentKey));
             }
+        }
+        return result;
+    }
+    // Possible replacement for include and exclude keys. Thought there was a bug in exclide_keys but
+    // it turned out that there was another issue.
+    protected StemVariable keepOrRemoveKeys(StemVariable keyList, boolean retain) {
+        StemVariable result = new StemVariable();
+        for (int i = 0; i < keyList.size(); i++) {
+            // for loop to be sure that everything is done in order.
+            String index = Integer.toString(i);
+            if (!keyList.containsKey(index)) {
+                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
+            }
+            String currentKey = keyList.getString(index);
+            if (retain && containsKey(currentKey)) {
+                result.put(currentKey, get(currentKey));
+            }
+            if (!retain && !containsKey(currentKey)) {
+                result.put(currentKey, get(currentKey));
+            }
+
         }
         return result;
     }
@@ -572,11 +602,6 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
 
-
-
-
-
-
     public StemVariable fromJSON(JSONObject jsonObject) {
         return fromJSON(jsonObject, false);
     }
@@ -611,12 +636,11 @@ public class StemVariable extends HashMap<String, Object> {
                     if (convertVars) {
                         put(codec.encode(key), v);
                     } else {
-                        if(v instanceof Integer){
-                            put(key, ((Integer)v).longValue());
-                        }else
-                        if(v instanceof Float){
-                            put(key, new BigDecimal(Float.toString((Float)v)));
-                        }else{
+                        if (v instanceof Integer) {
+                            put(key, ((Integer) v).longValue());
+                        } else if (v instanceof Float) {
+                            put(key, new BigDecimal(Float.toString((Float) v)));
+                        } else {
                             put(key, v);
                         }
                     }
@@ -757,7 +781,7 @@ public class StemVariable extends HashMap<String, Object> {
             //rock on
         }
 //        String blanks = "                                                           ";
-  //      blanks = blanks + blanks + blanks + blanks; // lots of blanks
+        //      blanks = blanks + blanks + blanks + blanks; // lots of blanks
         String output = currentIndent + "{\n";
         boolean isFirst = true;
         String newIndent = currentIndent + StringUtils.getBlanks(indentFactor);
@@ -1012,7 +1036,12 @@ public class StemVariable extends HashMap<String, Object> {
         if (getStemList().isEmpty()) return false;
         // *sigh* have to look for it
         for (StemEntry s : getStemList()) {
+            // Have to check that values like '007' are checked first.
             if (s.entry.equals(value)) return true;
+            if(isIntVar(value.toString())){
+                if (s.entry.equals(Long.parseLong(value.toString()))) return true;
+
+            }
         }
         return false;
     }
@@ -1158,7 +1187,8 @@ public class StemVariable extends HashMap<String, Object> {
     public boolean isList() {
         return getStemList().size() == size();
     }
-    public StemVariable unique(){
+
+    public StemVariable unique() {
         StemVariable output = new StemVariable();
         output.setStemList(getStemList().unique());
         return output;

@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.namespace.QName;
@@ -25,6 +26,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -158,10 +160,15 @@ public class XMLUtils implements XMLConstants {
      */
     public static List<String> readStemAsStrings(XMLEventReader xer) throws XMLStreamException {
         Object obj = resolveConstant(xer);
+        DebugUtil.trace(XMLUtils.class, "returned obj= " + obj);
+        StemVariable stem = new StemVariable();
+
+        if (obj == null) {
+            return new ArrayList<>();
+        }
         if (!(obj instanceof StemVariable)) {
             throw new IllegalArgumentException("Error: expected a stem and got a " + obj.getClass().getSimpleName());
         }
-        StemVariable stem = new StemVariable();
         return stem.getStemList().toJSON();
     }
 

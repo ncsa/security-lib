@@ -222,6 +222,109 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
+    /**
+     * Test the keys() commands for filtering using the parser.
+     * @throws Throwable
+     */
+    @Test
+       public void testParserKeyFiltering() throws Throwable {
+        String cf = " a. := ['a',null,['x','y'],2]~{'p':123.34, 'q': -321, 'r':false};";
+        String cf2;
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, cf);
+        addLine(script, "b. := keys(a., 0);");    // null
+        addLine(script, "c. := keys(a., 1);");    // boolean
+        addLine(script, "d. := keys(a., 2);");    // integer
+        addLine(script, "e. := keys(a., 3);");    // string
+        addLine(script, "f. := keys(a., 4);");    // stem
+        addLine(script, "g. := keys(a., 5);");    //decimal
+        addLine(script, "h. := keys(a., true);");    //scalars only
+        addLine(script, "i. := keys(a., false);");    // stems only
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+
+        assert getStemValue("b.", state).size() == 1;
+        assert (Long)getStemValue("b.", state).get(1L) == 1L;
+
+        assert getStemValue("c.", state).size() == 1;
+        assert getStemValue("c.", state).get("r").equals("r");
+
+        assert getStemValue("d.", state).size() == 2;
+        assert (Long)getStemValue("d.", state).get(3L) == 3L;
+        assert getStemValue("d.", state).get("q").equals("q");
+
+        assert getStemValue("e.", state).size() == 1;
+        assert (Long)getStemValue("e.", state).get(0L) == 0L;
+
+        assert getStemValue("f.", state).size() == 1;
+        assert (Long)getStemValue("f.", state).get(2L) == 2L;
+
+        assert getStemValue("g.", state).size() == 1;
+        assert getStemValue("g.", state).get("p").equals("p");
+
+        assert getStemValue("h.", state).size() == 6;
+        assert getStemValue("h.", state).get("p").equals("p");
+        assert getStemValue("h.", state).get("q").equals("q");
+        assert getStemValue("h.", state).get("r").equals("r");
+        assert (Long)getStemValue("h.", state).get(0L) == 0L;
+        assert (Long)getStemValue("h.", state).get(1L) == 1L;
+        assert (Long)getStemValue("h.", state).get(3L) == 3L;
+
+        assert getStemValue("i.", state).size() == 1;
+        assert (Long)getStemValue("i.", state).get(2L) == 2L;
+
+    }
+
+    public void testParserListKeyFiltering() throws Throwable {
+        String cf = " a. := ['a',null,['x','y'],2]~{'p':123.34, 'q': -321, 'r':false};";
+        String cf2;
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, cf);
+        addLine(script, "b. := list_keys(a., 0);");    // null
+        addLine(script, "c. := list_keys(a., 1);");    // boolean
+        addLine(script, "d. := list_keys(a., 2);");    // integer
+        addLine(script, "e. := list_keys(a., 3);");    // string
+        addLine(script, "f. := list_keys(a., 4);");    // stem
+        addLine(script, "g. := list_keys(a., 5);");    //decimal
+        addLine(script, "h. := list_keys(a., true);");    //scalars only
+        addLine(script, "i. := list_keys(a., false);");    // stems only
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+
+        assert getStemValue("b.", state).size() == 1;
+        assert (Long)getStemValue("b.", state).get(0L) == 1L;
+
+        assert getStemValue("c.", state).size() == 1;
+        assert getStemValue("c.", state).get(0L).equals("r");
+
+        assert getStemValue("d.", state).size() == 2;
+        assert (Long)getStemValue("d.", state).get(0L) == 3L;
+        assert getStemValue("d.", state).get(1L).equals("q");
+
+        assert getStemValue("e.", state).size() == 1;
+        assert (Long)getStemValue("e.", state).get(0L) == 0L;
+
+        assert getStemValue("f.", state).size() == 1;
+        assert (Long)getStemValue("f.", state).get(0L) == 2L;
+
+        assert getStemValue("g.", state).size() == 1;
+        assert getStemValue("g.", state).get(0L).equals("p");
+
+        assert getStemValue("h.", state).size() == 6;
+        assert (Long)getStemValue("h.", state).get(0L) == 0L;
+        assert (Long)getStemValue("h.", state).get(1L) == 1L;
+        assert (Long)getStemValue("h.", state).get(2L) == 3L;
+        assert getStemValue("h.", state).get(3L).equals("p");
+        assert getStemValue("h.", state).get(4L).equals("q");
+        assert getStemValue("h.", state).get(5L).equals("r");
+
+        assert getStemValue("i.", state).size() == 1;
+        assert (Long)getStemValue("i.", state).get(0L) == 2L;
+
+    }
+
     @Test
     public void testRenameKeys() throws Exception {
         // Take a stem and a list of

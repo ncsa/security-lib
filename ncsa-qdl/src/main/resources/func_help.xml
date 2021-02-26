@@ -172,6 +172,10 @@ See also: unbox
             <![CDATA[
 exclude_keys(target., list.) - remove the list. of keys (and their values) from
                                target.
+E.g.
+  exclude_keys([2,4,6,8],[1,2])
+{0:2,3:8}
+
 Note: The result will be a subset of target. that contains none of the keys
       listed in the list. argument.
                 ]]>
@@ -226,6 +230,10 @@ See also: list_keys
             <![CDATA[
 include_keys(target., key_list.) - returns a stem that is the subset of target,
                                    including only keys found in key_list.
+E.g.
+  include_keys([2,4,6,8],[1,2])
+{1:4,2:6}
+
 See also: exclude_keys
                  ]]>
         </body>
@@ -262,8 +270,11 @@ is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are
     <entry id="keys">
         <body>
             <![CDATA[
-keys(stem.) - returns a list of the keys in stem.
+keys(stem.) - returns a list of the keys in stem. Every keys is paired
+              with itself as values. This is extremely useful in conjunction
+              with the rename_keys() call.
 Note: There is no canonical ordering of keys, so these are effectively random.
+See also: list_keys(), rename_keys()
                  ]]>
         </body>
     </entry>
@@ -340,7 +351,16 @@ Note: This operates generally on stems. Many operations return boolean stems
         <body>
             <![CDATA[
 rename_keys(target., new_names.) - rename the keys in target. using
-                                   the new_names.
+                      the new_names.
+                      new_names. is stem of the form
+                      {old0:new0, old1:new1,...}
+                      where old* are the current names of the keys in target.
+                      and new* are the new names
+E.g. To rename keys with a common prefix
+    a. := {'x_x':'A','x_y':'B'};
+    rename_keys(a., keys(a.)-'x_');
+{x:A,y:B}
+
 Note: The keys in new_names. are a subset of target. and their values
       become the keys in target. If a key is in new_names, but not in
       target, it is ignored.
@@ -499,8 +519,10 @@ rm(file_name) - removes the given file.
         <body>
             <![CDATA[
 say(arg) - print anything.
-say(arg, pretty_print) - print anything, but make the format more vertical if its a stem.
-Note: say returns the value of its argument so this can be used in statements for debugging too.
+say(arg, pretty_print) - print anything, but make the format more vertical if
+                         its a stem.
+Note: say returns the value of its argument so this can be used in statements
+for debugging too.
 See also: print
 ]]>
         </body>
@@ -515,10 +537,12 @@ print - this is a synonym for the say function, so read the help for that.
     <entry id="file_read">
         <body>
             <![CDATA[
-file_read(file_name) - read a file in. The result is a single string of the file contents
+file_read(file_name) - read a file in. The result is a single string of the
+                       file contents
 file_read(file_name, type) - type is an integer that determines the result:
 -1 = as string (default)
- 0 = binary. This reads the file and hands back a single base 64 encoded string of the contents.
+ 0 = binary. This reads the file and hands back a single base 64 encoded
+     string of the contents.
  1 = stem. A stem list whose entries are each line in the file.
 See also: decode_64
 ]]>
@@ -527,7 +551,8 @@ See also: decode_64
     <entry id="scan">
         <body>
             <![CDATA[
-scan([prompt]) - get user input. The prompt is optional, but will be printed. Input from the console blocks until
+scan([prompt]) - get user input. The prompt is optional, but will be printed.
+                 Input from the console blocks until
                  the user hits enter.
                 ]]>
         </body>
@@ -536,16 +561,19 @@ scan([prompt]) - get user input. The prompt is optional, but will be printed. In
         <body>
             <![CDATA[
 vfs_mount(cfg.) - mount a virtual file system.
-Note: The cfg. contains the configuration and is not trivial to describe. Read the reference manual for the details.
+Note: The cfg. contains the configuration and is not trivial to describe.
+      Read the reference manual for the details.
              ]]>
         </body>
     </entry>
     <entry id="file_write">
         <body>
             <![CDATA[
-file_write(file_name, contents) = write the contents to the given file. contents can be a string or a list of strings.
-file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,, then the contents are decoded to binary
-                                 before writing. The default is that this flag is false.
+file_write(file_name, contents) = write the contents to the given file.
+                                  contents can be a string or a list of strings.
+file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,
+                                  then the contents are decoded to binary
+                                  before writing. The default is that this flag is false.
 See also: file_read, decode_b64, encode_b64
 ]]>
         </body>
@@ -553,7 +581,8 @@ See also: file_read, decode_b64, encode_b64
     <entry id="list_starts_with">
         <body>
             <![CDATA[
-list_starts_with(x., y.) - returns a left conformable list that has the indices of the right argument.  If there
+list_starts_with(x., y.) - returns a left conformable list that has the
+                           indices of the right argument.  If there
                            is no such element, an index of -1 is returned.
 E.g.
   list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
@@ -563,7 +592,9 @@ How to read this: left element 0 starts with right element 0
                    "     "     2 starts with right element 1
 
 To get a list of these, use mask, e.g.
-     mask(['a','qrs','pqr'], -1 <list_starts_with(['a','qrs','pqr'],['a','p','s','t']))
+     mask(['a','qrs','pqr'], -1 <list_starts_with(
+                                 ['a','qrs','pqr'],
+                                 ['a','p','s','t']));
 {0=a, 2=pqr}
 See also: mask
                ]]>
@@ -573,15 +604,17 @@ See also: mask
     <entry id="shuffle">
         <body>
             <![CDATA[
-shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target. according to keys.
-                          Argument keys. must have the same keys as the target. AND the values
-                          of keys. are (as a set) the same as the keys. in the target.
+shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target.
+                          according to keys.
+                          Argument keys. must have the same keys as the target.
+                          AND the values of keys. are (as a set) the same as
+                          the keys. in the target.
 E.g.
     shuffle(2+3*indices(4), [2,1,3,0])
 [8,5,11,2]
 
-     In this case, the left argument is [2,5,8,11] and the right argument has 0->2, 1->1, 2->3, 3->0.
-     This works generally with stems too.
+     In this case, the left argument is [2,5,8,11] and the right argument
+     has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
 See also: rename_keys, which lets you rename some of the keys in a stem.
                ]]>
         </body>
@@ -589,7 +622,8 @@ See also: rename_keys, which lets you rename some of the keys in a stem.
     <entry id="execute">
         <body>
             <![CDATA[
-execute(arg) - take the argument which is a string and execute it as if it were typed in.
+execute(arg) - take the argument which is a string and execute it as if it
+               were typed in.
                ]]>
         </body>
     </entry>
@@ -598,8 +632,9 @@ execute(arg) - take the argument which is a string and execute it as if it were 
             <![CDATA[
 script_args() - print out the list of arguments to this script
 script_args(n) - print the n-1 argument (first argument is 0).
-Note: This is specific to scripts. If the script is called in QDL, the arguments may be any QDL data type.
-      If this is called from the command line by another process, the arguments will all be strings (even if they
+Note: This is specific to scripts. If the script is called in QDL, the
+      arguments may be any QDL data type. If this is called from the command
+      line by another process, the arguments will all be strings (even if they
       are passed in as, e.g. numbers).
                 ]]>
         </body>
@@ -608,7 +643,8 @@ Note: This is specific to scripts. If the script is called in QDL, the arguments
         <body>
             <![CDATA[
 script_load(file_name) - load the script and run it.
-script_load(file_name, arg0, arg1, ...) load the script, passing in the given arguments
+script_load(file_name, arg0, arg1, ...) - load the script, passing in the given
+                         arguments
 Note: Loading a script means to run it in the current session.
 See Also: script_run, script_args
 ]]>
@@ -618,10 +654,12 @@ See Also: script_run, script_args
         <body>
             <![CDATA[
 script_run(file_name) - run the script
-script_run(file_name, arg0, arg1,...) - run the script, passing in the given arguments
-Note: Running a script means that a new clean environment is created and the script is run there.
-      Output and input, however, are done in the current console.
-See Alsp: script_load, script_run, scan, say, print
+script_run(file_name, arg0, arg1,...) - run the script, passing in the given
+                        arguments
+Note: Running a script means that a new clean environment is created and the
+      script is run there. Output and input, however, are done in the current
+      console.
+See Also: script_load, script_run, scan, say, print
 ]]>
         </body>
     </entry>

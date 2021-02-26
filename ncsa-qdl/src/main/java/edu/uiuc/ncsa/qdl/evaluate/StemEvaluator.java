@@ -454,22 +454,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     private void doUniqueValues(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-                   throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
-               }
-               polyad.evalArg(0, state);
-               Object arg = polyad.getArguments().get(0).getResult();
-               if (!isStem(arg)) {
-                   polyad.setResult(new StemVariable()); // just an empty stem
-                   polyad.setResultType(Constant.STEM_TYPE);
-                   polyad.setEvaluated(true);
-                   return;
-               }
-               StemVariable stemVariable = (StemVariable) arg;
-               StemVariable out = stemVariable.unique();
+            throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
+        }
+        polyad.evalArg(0, state);
+        Object arg = polyad.getArguments().get(0).getResult();
+        if (!isStem(arg)) {
+            polyad.setResult(new StemVariable()); // just an empty stem
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        StemVariable stemVariable = (StemVariable) arg;
+        StemVariable out = stemVariable.unique();
 
-               polyad.setResult(out);
-               polyad.setResultType(Constant.STEM_TYPE);
-               polyad.setEvaluated(true);
+        polyad.setResult(out);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
     }
 
     /**
@@ -747,15 +747,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // should take either a stem or a variable reference to it.
         StemVariable stem = null;
         Boolean safeMode = Boolean.TRUE;
-        if(polyad.getArgCount() == 2){
-            Object o = polyad.evalArg(1,state);
-            if(!isBoolean(o)){
+        if (polyad.getArgCount() == 2) {
+            Object o = polyad.evalArg(1, state);
+            if (!isBoolean(o)) {
                 throw new IllegalArgumentException("The second argument of " + UNBOX + " must be a boolean.");
             }
-            safeMode = (Boolean)o;
+            safeMode = (Boolean) o;
         }
         String varName = null;
-                if (polyad.getArguments().get(0) instanceof VariableNode) {
+        if (polyad.getArguments().get(0) instanceof VariableNode) {
             VariableNode vn = (VariableNode) polyad.getArguments().get(0);
             varName = vn.getVariableReference();
             if (!(vn.getResult() instanceof StemVariable)) {
@@ -773,7 +773,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (stem == null) {
             throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
         }
-        if(stem.getStemList().size() != 0){
+        if (stem.getStemList().size() != 0) {
             throw new IllegalArgumentException("You can only unbox a stem without a list. List elements cannot be reasonably unboxed.");
         }
         // Make a safe copy of the state to unpack this in case something bombs
@@ -781,9 +781,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         State localState = state.newModuleState();
         for (String key : stem.keySet()) {
             Object ob = stem.get(key);
-            key = key + (isStem(ob)?STEM_INDEX_MARKER:"");
-            if(safeMode){
-                if(state.isDefined(key)){
+            key = key + (isStem(ob) ? STEM_INDEX_MARKER : "");
+            if (safeMode) {
+                if (state.isDefined(key)) {
                     throw new IllegalArgumentException("Error: name clash in safe mode for \"" + key + "\"");
                 }
             }
@@ -855,46 +855,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
-    /**
-     * Return a stem of nothing key the keys, so the final stem is of the form
-     * <pre>
-     *     {key0=key0,key1=key1,...}
-     * </pre>
-     * This is useful in conjunction with the rename keys call, so you can get the keys and do some
-     * operations on them then rename the keys in the original stem.
-     *
-     * @param polyad
-     * @param state
-     */
-    protected void doKeys(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("the " + LIST_KEYS + " function requires 1 argument");
-        }
-        polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        if (!isStem(arg)) {
-            polyad.setResult(new StemVariable()); // just an empty stem
-            polyad.setResultType(Constant.STEM_TYPE);
-            polyad.setEvaluated(true);
-            return;
-        }
-        StemVariable stemVariable = (StemVariable) arg;
-
-        StemVariable out = new StemVariable();
-
-        for (String key : stemVariable.keySet()) {
-            out.put(key, key);
-        }
-        polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-
-    }
 
     static final int all_keys = 0;
     static final int only_stems = 1;
     static final int only_scalars = 2;
 
+    /**
+     * Returns the keys in a stem as a list, filtering if wanted.
+     *
+     * @param polyad
+     * @param state
+     */
     protected void doListKeys(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("the " + LIST_KEYS + " function requires at least one argument");
@@ -905,7 +876,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            if(isBoolean(arg2)){
+            if (isBoolean(arg2)) {
                 returnByType = false;
                 if ((Boolean) arg2) {
                     returnScope = only_scalars;
@@ -913,15 +884,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                     returnScope = only_stems;
                 }
 
-            }else if(isLong(arg2)){
-               returnByType = true;
-               Long arg2Long = (Long)arg2;
-               returnType = arg2Long.intValue();
-            } else{
+            } else if (isLong(arg2)) {
+                returnByType = true;
+                Long arg2Long = (Long) arg2;
+                returnType = arg2Long.intValue();
+            } else {
                 throw new IllegalArgumentException(LIST_KEYS + " second argument must be a boolean or integer if present.");
-
             }
-
         }
         long size = 0;
         if (!isStem(arg)) {
@@ -932,31 +901,46 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stemVariable = (StemVariable) arg;
         StemVariable out = new StemVariable();
-        if(returnByType){
-            int i = 0;
-
+        if (returnByType) {
+            long i = 0L;
             for (String key : stemVariable.keySet()) {
-                if(returnType == Constant.getType(stemVariable.get(key))){
-                    out.put(Integer.toString(i++), key);
+                if (returnType == Constant.getType(stemVariable.get(key))) {
+                    if(out.isLongIndex(key)){
+                        out.put(i++, Long.parseLong(key));
+                    }else {
+                        out.put(i++, key);
+                    }
                 }
             }
-        }else{
-            int i = 0;
+        } else {
+            long i = 0L;
 
             for (String key : stemVariable.keySet()) {
                 switch (returnScope) {
                     case all_keys:
-                        out.put(Integer.toString(i++), key);
+                        if(out.isLongIndex(key)){
+                            out.put(i++, Long.parseLong(key));
+                        }else {
+                            out.put(i++, key);
+                        }
                         break;
                     case only_scalars:
-                        if(Constant.getType(stemVariable.get(key))!= Constant.STEM_TYPE){
-                            out.put(Integer.toString(i++), key);
-                    }
+                        if (Constant.getType(stemVariable.get(key)) != Constant.STEM_TYPE) {
+                            if(out.isLongIndex(key)){
+                                out.put(i++, Long.parseLong(key));
+                            }else {
+                                out.put(i++, key);
+                            }
+                        }
                         break;
                     case only_stems:
-                        if(Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE){
-                            out.put(Integer.toString(i++), key);
-                    }
+                        if (Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE) {
+                            if(out.isLongIndex(key)){
+                                out.put(i++, Long.parseLong(key));
+                            }else {
+                                out.put(i++, key);
+                            }
+                        }
                         break;
                 }
             }
@@ -968,6 +952,103 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    /**
+     * Return a stem of nothing key the keys, possibly filtering, so the final stem is of the form
+     * <pre>
+     *     {key0=key0,key1=key1,...}
+     * </pre>
+     * This is useful in conjunction with the rename keys call, so you can get the keys and do some
+     * operations on them then rename the keys in the original stem.
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doKeys(Polyad polyad, State state) {
+        if (0 == polyad.getArgCount()) {
+            throw new IllegalArgumentException("the " + KEYS + " function requires at least 1 argument");
+        }
+        polyad.evalArg(0, state);
+        Object arg = polyad.getArguments().get(0).getResult();
+        if (!isStem(arg)) {
+            polyad.setResult(new StemVariable()); // just an empty stem
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        int returnScope = all_keys;
+        int returnType = Constant.UNKNOWN_TYPE;
+        boolean returnByType = false;
+        if (polyad.getArgCount() == 2) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (isBoolean(arg2)) {
+                returnByType = false;
+                if ((Boolean) arg2) {
+                    returnScope = only_scalars;
+                } else {
+                    returnScope = only_stems;
+                }
+
+            } else if (isLong(arg2)) {
+                returnByType = true;
+                Long arg2Long = (Long) arg2;
+                returnType = arg2Long.intValue();
+            } else {
+                throw new IllegalArgumentException(LIST_KEYS + " second argument must be a boolean or integer if present.");
+            }
+        }
+        StemVariable stemVariable = (StemVariable) arg;
+
+        StemVariable out = new StemVariable();
+
+        if (returnByType) {
+            int i = 0;
+            for (String key : stemVariable.keySet()) {
+                if (returnType == Constant.getType(stemVariable.get(key))) {
+                    putLongOrStringKey(out, key);
+                }
+            }
+        } else {
+            for (String key : stemVariable.keySet()) {
+                switch (returnScope) {
+                    case all_keys:
+                        putLongOrStringKey(out, key);
+                        break;
+                    case only_scalars:
+                        if (Constant.getType(stemVariable.get(key)) != Constant.STEM_TYPE) {
+                            putLongOrStringKey(out, key);
+                        }
+                        break;
+                    case only_stems:
+                        if (Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE) {
+                            putLongOrStringKey(out, key);
+                        }
+                        break;
+                }
+            }
+        }
+        polyad.setResult(out);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+
+    }
+
+    /**
+     * Needed by list_keys and keys so that returned indices that are longs are indeed longs.
+     * Otherwise everything returned would be a string (e.g., '0' not 0) which makes subsequent
+     * algebraic operations  on them fail.
+     * @param out
+     * @param key
+     */
+    protected void putLongOrStringKey(StemVariable out, String key){
+        Long k = null;
+        if(out.isLongIndex(key)){
+            k = Long.parseLong(key);
+            out.put(k, k);
+        }else {
+            out.put(key, key);
+        }
+
+    }
     /**
      * has_keys(stem. var | keysList.) returns a var or  boolean stem if the key in the list is a key in the stem
      *
@@ -1149,10 +1230,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(LIST_APPEND + " requires 2 arguments");
         }
         // surgery. If the first argument is null and a stem, turn it in to one.
-            StemVariable stem1 = getOrCreateStem(
-                    polyad.getArguments().get(0),
-                    state,
-                    LIST_APPEND + " requires stem as its first argument");
+        StemVariable stem1 = getOrCreateStem(
+                polyad.getArguments().get(0),
+                state,
+                LIST_APPEND + " requires stem as its first argument");
         Object arg2 = polyad.evalArg(1, state);
         if (arg2 instanceof StemVariable) {
             stem1.listAppend((StemVariable) arg2);
@@ -1306,20 +1387,20 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doRenameKeys(Polyad polyad, State state) {
-       oldRenameKeys(polyad, state);
+        oldRenameKeys(polyad, state);
     }
 
     /**
      * Permute the elements in a stem. The right argument must contain every key in the left argument or
      * an exception is raised. This is really just using cycle notation from abstract algebra...
-    E.g.,
-      <pre>
-   10+3*indices(5)
-[10,13,16,19,22]
-   rename_keys(10+3*indices(5), [4,2,3,1,0])
-[22,19,13,16,10]
-     </pre>
-     read that in [4,2,3,1,0]: old --> new, so 0 --> 4, 1 --> 2, 2-->3, 3-->1, 4-->0
+     * E.g.,
+     * <pre>
+     * 10+3*indices(5)
+     * [10,13,16,19,22]
+     * rename_keys(10+3*indices(5), [4,2,3,1,0])
+     * [22,19,13,16,10]
+     * </pre>
+     * read that in [4,2,3,1,0]: old --> new, so 0 --> 4, 1 --> 2, 2-->3, 3-->1, 4-->0
      */
     /*
     Test commands
@@ -1327,7 +1408,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     b.q :='r';b.0:='q';b.1:=0;b.p:=1;b.r:='p';
      shuffle(a., b.);
      */
-    protected void shuffleKeys(Polyad polyad, State state){
+    protected void shuffleKeys(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
         }
@@ -1344,7 +1425,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
         }
         StemVariable target = (StemVariable) arg;
-        StemVariable newKeyStem = (StemVariable)arg2;
+        StemVariable newKeyStem = (StemVariable) arg2;
         Set<String> newKeys = newKeyStem.keySet();
         Set<String> usedKeys = target.keySet();
 
@@ -1352,21 +1433,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         Set<String> keys = target.keySet();
         // easy check is to count. If this fails, then we throw and exception.
-        if(keys.size() != newKeys.size()){
+        if (keys.size() != newKeys.size()) {
             throw new IllegalArgumentException("Error: the supplied set of keys must match every key in the source stem.");
         }
 
-        for(String key : keys){
-           if(newKeys.contains(key)){
-               String kk = newKeyStem.getString(key);
-               usedKeys.remove(kk);
-               Object vv = target.get(kk);
-               output.put(key, vv);
-           }else{
-               throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the second argument.");
-           }
+        for (String key : keys) {
+            if (newKeys.contains(key)) {
+                String kk = newKeyStem.getString(key);
+                usedKeys.remove(kk);
+                Object vv = target.get(kk);
+                output.put(key, vv);
+            } else {
+                throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the second argument.");
+            }
         }
-        if(!usedKeys.isEmpty()){
+        if (!usedKeys.isEmpty()) {
             throw new IllegalArgumentException("Error: each key in the left argument must be used as a value in the second argument. This assures that all elements are shuffled.");
         }
 
@@ -1374,33 +1455,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
+
     /*
     This only renames keys in situ, i.e. it changes the stem given.
      */
-    protected void oldRenameKeys(Polyad polyad, State state){
+    protected void oldRenameKeys(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2) {
-                throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
-            }
-            polyad.evalArg(0, state);
-            Object arg = polyad.getArguments().get(0).getResult();
-            if (!isStem(arg)) {
-                throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its first argument.");
-            }
-            polyad.evalArg(1, state);
+            throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
+        }
+        polyad.evalArg(0, state);
+        Object arg = polyad.getArguments().get(0).getResult();
+        if (!isStem(arg)) {
+            throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its first argument.");
+        }
+        polyad.evalArg(1, state);
 
-            Object arg2 = polyad.getArguments().get(1).getResult();
-            polyad.evalArg(1, state);
-            if (!isStem(arg2)) {
-                throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
-            }
+        Object arg2 = polyad.getArguments().get(1).getResult();
+        polyad.evalArg(1, state);
+        if (!isStem(arg2)) {
+            throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
+        }
 
-            StemVariable target = (StemVariable) arg;
-            target.renameKeys((StemVariable) arg2);
+        StemVariable target = (StemVariable) arg;
+        target.renameKeys((StemVariable) arg2);
 
-            polyad.setResult(target);
-            polyad.setResultType(Constant.STEM_TYPE);
-            polyad.setEvaluated(true);
+        polyad.setResult(target);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
     }
+
     /**
      * <code>common_keys(stem1., stem2.)</code><br/><br/> Return a list of keys common to both stems.
      *
