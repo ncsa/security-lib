@@ -423,8 +423,10 @@ public class WorkspaceCommands implements Logable {
             } else {
                 SIEntry sie = siEntries.get(pid);
                 interpreter = sie.interpreter;
+                // bare bones what new
                 interpreter.setEchoModeOn(isEchoModeOn());
                 interpreter.setPrettyPrint(isPrettyPrint());
+                sie.state.setIoInterface(state.getIoInterface());
                 state = sie.state;
             }
             currentPID = pid;
@@ -497,6 +499,7 @@ public class WorkspaceCommands implements Logable {
         try {
             State newState = StateUtils.clone(getState());
             QDLInterpreter qdlParser = new QDLInterpreter(newState);
+            newState.setIoInterface(getIoInterface()); // or IO won't work
             qdlParser.setEchoModeOn(interpreter.isEchoModeOn());
             qdlParser.setPrettyPrint(interpreter.isPrettyPrint());
             return qdlParser;
@@ -710,7 +713,7 @@ public class WorkspaceCommands implements Logable {
             say("run (index | name) [& | !]");
             sayi("Run the given buffer. This will execute as if you had types it in to the current session. ");
             sayi("If you supply an &, then the current workspace is cloned and the code is run in that. ");
-            sayi("If you supply an !, then completely clean state is created (VFS and script path is set,");
+            sayi("If you supply an !, then completely clean state is created (VFS and script path are still set,");
             sayi("but no imports etc.) and the code is run in that. ");
             sayi("See the state indicator documentation for more");
             sayi(" Synonyms: ");
@@ -749,6 +752,8 @@ public class WorkspaceCommands implements Logable {
                 }
             }
         }
+        // flag & = start new one
+        // !
         int flag = (inputLine.hasArg("&") ? 1 : 0) + (inputLine.hasArg("!") ? 2 : 0);
         if (flag == 3) {
             say("sorry, you have specified both to clone the workspace and ignore it. You can only do one of these.");
@@ -769,6 +774,7 @@ public class WorkspaceCommands implements Logable {
             case 2:
                 State newState = state.newDebugState();
                 newState.setPID(state.getPID() + 1); // anything other than zero
+                newState.setIoInterface(getIoInterface()); // Or IO fails
                 interpreter = new QDLInterpreter(newState);
                 interpreter.setPrettyPrint(isPrettyPrint());
                 interpreter.setEchoModeOn(isEchoModeOn());
