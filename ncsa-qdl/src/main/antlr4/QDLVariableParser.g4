@@ -35,6 +35,7 @@ grammar QDLVariableParser;
 // statement is simply ignored.  Since this is the most common error for beginners (using the wrong
 // assignment operator), this just must get flagged as a syntax error in parsing.
 
+   LambdaConnector : '->';
     Times   : '*';
     Divide  : '/';
     PlusPlus: '++';
@@ -56,6 +57,7 @@ grammar QDLVariableParser;
 
 // The left bracket, as the end of a control statement, has to be found in the lexer.
    LeftBracket: ']';
+   RightBracket: '[';
 
 // Control structures.
 

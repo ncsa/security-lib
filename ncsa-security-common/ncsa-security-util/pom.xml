@@ -44,7 +44,7 @@
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
-                <version>4.7.2</version>
+                <version>4.9.1</version>
                 <configuration>
                     <sourceDirectory>
                         /home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/antlr4/
@@ -128,7 +128,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.7.2</version>
+            <version>4.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>

@@ -474,6 +474,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitDefineStatement(QDLParserParser.DefineStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#lambdaStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambdaStatement(QDLParserParser.LambdaStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#lambdaStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambdaStatement(QDLParserParser.LambdaStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#moduleStatement}.
 	 * @param ctx the parse tree
 	 */

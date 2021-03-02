@@ -11,10 +11,7 @@ import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -1409,20 +1406,42 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      shuffle(a., b.);
      */
     protected void shuffleKeys(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
+        if (0 == polyad.getArgCount() || 2 < polyad.getArgCount() ) {
+            throw new IllegalArgumentException("the " + SHUFFLE + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArguments().get(0).getResult();
-        if (!isStem(arg)) {
-            throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its first argument.");
+        if(isLong(arg)){
+           Long argL = (Long)arg ;
+           int argInt = argL.intValue();
+            if(argL < 0L){
+                throw new IllegalArgumentException("the argument to" + SHUFFLE + " must be > 0");
+            }
+            Long[] array = new Long[argInt];
+            long j = 0L;
+            for(int i = 0; i<argInt; i++){
+                array[i] = j++; // fill it with longs
+            }
+            List<Long> longList = Arrays.asList(array);
+            Collections.shuffle(longList);
+            StemVariable stem = new StemVariable();
+            stem.addList(longList);
+            polyad.setResult(stem);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
         }
+
+        if (!isStem(arg)) {
+            throw new IllegalArgumentException("The " + SHUFFLE + " command requires a stem as its first argument.");
+        }
+
         polyad.evalArg(1, state);
 
         Object arg2 = polyad.getArguments().get(1).getResult();
         polyad.evalArg(1, state);
         if (!isStem(arg2)) {
-            throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
+            throw new IllegalArgumentException("The " + SHUFFLE + " command requires a stem as its second argument.");
         }
         StemVariable target = (StemVariable) arg;
         StemVariable newKeyStem = (StemVariable) arg2;

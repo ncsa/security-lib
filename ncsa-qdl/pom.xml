@@ -180,7 +180,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.7.2</version>
+            <version>4.9,1</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>

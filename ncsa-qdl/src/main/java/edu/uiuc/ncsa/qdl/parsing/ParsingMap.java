@@ -20,8 +20,14 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
     List<String> addedIds = null;
 
     public void startMark() {
+            startMark(true);
+    }
+
+    public void startMark(boolean clearAdded) {
+        if(addedIds == null || clearAdded){
+            addedIds = new ArrayList<>();
+        }
         markAdditions = true;
-        addedIds = new ArrayList<>();
     }
 
     public void endMark() {
@@ -75,6 +81,14 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
 
     }
 
+
+    public List<String> getAddedIds() {
+        return addedIds;
+    }
+
+    public void setAddedIds(List<String> addedIds) {
+        this.addedIds = addedIds;
+    }
 
     public void put(StatementRecord record) {
         if (markAdditions) {

@@ -16,6 +16,15 @@ public class StemEntryNode implements StatementWithResultInterface {
     StatementWithResultInterface key;
     StatementWithResultInterface value;
 
+    public boolean isDefaultValue() {
+        return isDefaultValue;
+    }
+
+    public void setDefaultValue(boolean defaultValue) {
+        isDefaultValue = defaultValue;
+    }
+
+    boolean isDefaultValue = false;
     public StatementWithResultInterface getKey() {
         return key;
     }
@@ -44,7 +53,9 @@ public class StemEntryNode implements StatementWithResultInterface {
 
     @Override
     public Object evaluate(State state) {
-        getKey().evaluate(state);
+        if(!isDefaultValue) {
+            getKey().evaluate(state);
+        }
         getValue().evaluate(state);
         setEvaluated(true);
         return null;

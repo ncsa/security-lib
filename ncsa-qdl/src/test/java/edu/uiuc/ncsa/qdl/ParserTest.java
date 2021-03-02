@@ -1484,4 +1484,51 @@ public class ParserTest extends AbstractQDLTester {
         assert state.getValue("a") == QDLNull.getInstance(); // QDLNull is a singleton, so we can check with ==
         assert state.getValue("A") == null;// This is what is returned for actual variables that are undefined.
     }
+
+    @Test
+    public void testLambda() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x)->x^2;");
+        addLine(script, "a := f(3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 9L;
+
+    }
+    @Test
+    public void testMultiArgLambda() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x,y,z)->x + y + z;");
+        addLine(script, "a := f(1,1,1);");
+        addLine(script, "b := f(3,2,1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 3L;
+        assert getLongValue("b", state) == 6L;
+    }
+    @Test
+    public void testMultiStatementLambda() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x)->[z:=x^2;return(z);];");
+        addLine(script, "a := f(3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 9L;
+    }
+
+    @Test
+    public void testMultiStatementMultiArgLambda() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x,y,z)->[q:=x; q:= q+y; q:= q+z;return(q);];");
+        addLine(script, "a := f(1,1,1);");
+        addLine(script, "b := f(3,2,1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 3L;
+        assert getLongValue("b", state) == 6L;
+    }
 }

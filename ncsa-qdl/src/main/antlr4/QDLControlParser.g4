@@ -18,6 +18,7 @@ statement :
           | stemVariable
           | stemList
           | expression
+          | lambdaStatement
           ;
 
 
@@ -37,10 +38,11 @@ loopStatement:
 switchStatement:
     SwitchStatement (ifStatement ';')* LeftBracket;
 
-
 defineStatement:
      DefineStatement function (BodyStatement | StatementConnector) fdoc* (statement ';')+ LeftBracket;
 
+lambdaStatement:
+    function LambdaConnector  (statement) | (RightBracket  (statement ';')+ LeftBracket)  ;
 
 moduleStatement:
      ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) (statement ';')* LeftBracket;

@@ -385,6 +385,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         return result;
     }
+
     // Possible replacement for include and exclude keys. Thought there was a bug in exclide_keys but
     // it turned out that there was another issue.
     protected StemVariable keepOrRemoveKeys(StemVariable keyList, boolean retain) {
@@ -762,7 +763,11 @@ public class StemVariable extends HashMap<String, Object> {
         for (StemVariable stemVariable : stemVariables) {
             super.putAll(stemVariable); // non-list
             listAppend(stemVariable); // list elements
+            if (stemVariable.getDefaultValue() != null) {
+                setDefaultValue(stemVariable.getDefaultValue());
+            }
         }
+
         return this;
     }
 
@@ -774,6 +779,9 @@ public class StemVariable extends HashMap<String, Object> {
             if (!getStemList().isEmpty()) {
                 list = getStemList().toString(indentFactor, currentIndent);
                 if (isList()) {
+                    if (getDefaultValue() != null) {
+                        list = "{*:" + getDefaultValue() + "}~" + list;
+                    }
                     return list;
                 }
             }
@@ -784,6 +792,10 @@ public class StemVariable extends HashMap<String, Object> {
         //      blanks = blanks + blanks + blanks + blanks; // lots of blanks
         String output = currentIndent + "{\n";
         boolean isFirst = true;
+        if (getDefaultValue() != null) {
+            isFirst = false;
+            output = output + "*:" + getDefaultValue();
+        }
         String newIndent = currentIndent + StringUtils.getBlanks(indentFactor);
         for (String key : super.keySet()) {
             if (isFirst) {
@@ -875,6 +887,9 @@ public class StemVariable extends HashMap<String, Object> {
             if (!getStemList().isEmpty()) {
                 list = getStemList().toString();
                 if (isList()) {
+                    if (getDefaultValue() != null) {
+                        list = "{*:" + getDefaultValue() + "}~" + list;
+                    }
                     return list;
                 }
             }
@@ -884,6 +899,11 @@ public class StemVariable extends HashMap<String, Object> {
 
         String output = "{";
         boolean isFirst = true;
+
+        if (getDefaultValue() != null) {
+            output = output + "*:" + getDefaultValue();
+            isFirst = false;
+        }
         Set<String> keys;
         if (list == null) {
             keys = keySet(); // process everything here.
@@ -1038,7 +1058,7 @@ public class StemVariable extends HashMap<String, Object> {
         for (StemEntry s : getStemList()) {
             // Have to check that values like '007' are checked first.
             if (s.entry.equals(value)) return true;
-            if(isIntVar(value.toString())){
+            if (isIntVar(value.toString())) {
                 if (s.entry.equals(Long.parseLong(value.toString()))) return true;
 
             }

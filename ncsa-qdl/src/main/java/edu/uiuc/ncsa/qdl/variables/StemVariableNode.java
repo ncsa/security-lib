@@ -45,10 +45,10 @@ public class StemVariableNode implements StatementWithResultInterface {
 
     @Override
     public void setResultType(int type) {
-        if(type != Constant.STEM_TYPE){
+        if (type != Constant.STEM_TYPE) {
             throw new NFWException("error: Attempt to reset stem to type " + type);
         }
-                       // result type is fixed since these are created to only manage
+        // result type is fixed since these are created to only manage
     }
 
     @Override
@@ -66,8 +66,14 @@ public class StemVariableNode implements StatementWithResultInterface {
         result = new StemVariable();
         for (StemEntryNode sen : getStatements()) {
             sen.evaluate(state);
-            StatementWithResultInterface  keyRI = sen.getKey();
             Object value = ((HasResultInterface) sen.getValue()).getResult();
+
+            if (sen.isDefaultValue) {
+                result.setDefaultValue(value);
+                return result;
+            }
+
+            StatementWithResultInterface keyRI = sen.getKey();
 
             switch (keyRI.getResultType()) {
                 case Constant.LONG_TYPE:
@@ -101,13 +107,13 @@ public class StemVariableNode implements StatementWithResultInterface {
     @Override
     public StatementWithResultInterface makeCopy() {
         StemVariableNode newSVN = new StemVariableNode();
-        for(StemEntryNode s : statements){
+        for (StemEntryNode s : statements) {
             newSVN.getStatements().add((StemEntryNode) s.makeCopy());
         }
         StemVariable newStem = new StemVariable();
 
         // Kludge, but it works.
-        newStem.fromJSON((JSONObject)((StemVariable)getResult()).toJSON());
+        newStem.fromJSON((JSONObject) ((StemVariable) getResult()).toJSON());
         newSVN.setResult(newStem);
         newSVN.setSourceCode(getSourceCode());
         newSVN.setEvaluated(isEvaluated());

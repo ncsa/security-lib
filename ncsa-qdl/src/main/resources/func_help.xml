@@ -243,6 +243,8 @@ See also: exclude_keys
             <![CDATA[
 indices(n) - make a stem list whose values are 0,..., n-1
 Note: This is extremely useful in certain looping constructs.
+See also: shuffle(n) which also creates the same list of integers, but in
+          random order.
                  ]]>
         </body>
     </entry>
@@ -270,11 +272,18 @@ is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are
     <entry id="keys">
         <body>
             <![CDATA[
-keys(stem.) - returns a list of the keys in stem. Every keys is paired
-              with itself as values. This is extremely useful in conjunction
-              with the rename_keys() call.
+keys(arg.) - returns a stem of all the keys in arg. Every key is returned and
+             the value is just the key itself
+keys(arg., boolean) - returns a stem of the keys in the argument.
+                      If the boolean is true will return only those keys whose
+                      values are scalars. if false, stem keys are returned.
+keys(arg., var_type)- returns a stem of the keys in the argument.
+                      for the given type (which is an integer).
+This is extremely useful
+in conjunction with the rename_keys() call.
+If you supply and integer for the variable type, only
 Note: There is no canonical ordering of keys, so these are effectively random.
-See also: list_keys(), rename_keys()
+See also: list_keys(), rename_keys(), var_type(), constants('var_type')
                  ]]>
         </body>
     </entry>
@@ -604,18 +613,25 @@ See also: mask
     <entry id="shuffle">
         <body>
             <![CDATA[
+shuffle(n) - n is a positive integer, shuffle the first n integers randomly
 shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target.
                           according to keys.
                           Argument keys. must have the same keys as the target.
                           AND the values of keys. are (as a set) the same as
                           the keys. in the target.
 E.g.
+   shuffle(7)
+[5,0,4,6,1,2,3]
+Note that if you run this example, the result will be very probably be
+different since the result is random.
+
+E.g.
     shuffle(2+3*indices(4), [2,1,3,0])
 [8,5,11,2]
 
      In this case, the left argument is [2,5,8,11] and the right argument
      has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
-See also: rename_keys, which lets you rename some of the keys in a stem.
+See also: indices, rename_keys, which lets you rename some of the keys in a stem.
                ]]>
         </body>
     </entry>

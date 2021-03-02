@@ -9,7 +9,7 @@ assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';
-    stemEntry : expression ':' stemValue;
+    stemEntry : (Times | expression) ':' stemValue;
      stemList : '[' stemValue (',' stemValue)* ']'
               | '[' ']';
       argList : stemValue (',' stemValue)*;

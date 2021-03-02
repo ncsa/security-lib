@@ -2,8 +2,8 @@
 # Run it from the command line
 # Make sure you "reload from disk" in the generated directory!!
 # THEN rebuild the *entire project.
-ANTLR4_ROOT=/home/ncsa/apps/java/antlr-4.7.2
-ANTLR4_CP=$ANTLR4_ROOT/antlr-4.7.2-complete.jar
+ANTLR4_ROOT=/home/ncsa/apps/java/antlr-4.9.1
+ANTLR4_CP=$ANTLR4_ROOT/antlr-4.9.1-complete.jar
 OUT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated"
 SOURCE_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/antlr4"
 OUT_PACKAGE="edu.uiuc.ncsa.qdl.generated"

@@ -166,6 +166,18 @@ public class QDLDebugListener extends QDLParserBaseListener {
     }
 
     @Override
+    public void enterLambdaStatement(QDLParserParser.LambdaStatementContext ctx) {
+        say("enter lamnda stme:" + enter("lambda"));
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitLambdaStatement(QDLParserParser.LambdaStatementContext ctx) {
+        sayi("exit lambda:" + xit("lambda"), ctx);
+        printKids(ctx);
+    }
+
+    @Override
     public void exitFunction(QDLParserParser.FunctionContext ctx) {
 
         sayi("exit Function:" + xit("function"), ctx);

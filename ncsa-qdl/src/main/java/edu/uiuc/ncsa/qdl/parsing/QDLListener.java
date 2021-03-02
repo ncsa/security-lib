@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
+import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
@@ -375,7 +376,7 @@ public class QDLListener implements QDLParserListener {
     }
 
     protected void finish(Dyad dyad, ParseTree parseTree) {
-            dyad.setLeftArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(0)));
+        dyad.setLeftArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(0)));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(2)));
         dyad.setSourceCode(parseTree.getText());
 
@@ -704,7 +705,7 @@ public class QDLListener implements QDLParserListener {
             stringBuffer.append(defineContext.getChild(i).getText() + "\n");
         }
         String rawText = stringBuffer.toString();
-        functionRecord.sourceCode = rawText + (rawText.endsWith(";")?"":";"); // ANTLR may strip final terminator. Put it back as needed.
+        functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
 
         QDLParserParser.FunctionContext nameAndArgsNode = defineContext.function();
         String name = nameAndArgsNode.getChild(0).getText();
@@ -749,6 +750,116 @@ public class QDLListener implements QDLParserListener {
     public void exitDefineStatement(QDLParserParser.DefineStatementContext ctx) {
         doDefine2(ctx);
     }
+
+
+    @Override
+    public void enterLambdaStatement(QDLParserParser.LambdaStatementContext ctx) {
+        // don't clear the functions added already.
+        // Special case since f(x) -> ... means f is added before we get here and won't get picked
+        // up. That means that the system will think f needs to be evaluated asap and you will
+        // get errors.
+        parsingMap.startMark(false);
+    }
+    //     define[g(x)][z:=x+1;return(x);]
+    //     h(x) -> [z:=x+1;return(z);];
+
+    @Override
+    public void exitLambdaStatement(QDLParserParser.LambdaStatementContext lambdaContext) {
+        QDLParserParser.FunctionContext nameAndArgsNode = lambdaContext.function();
+        if (nameAndArgsNode == null) {
+            return; // do nothing.
+        }
+        FunctionRecord functionRecord = new FunctionRecord();
+        // not quite the original source... The issue is that this comes parsed and stripped of any original
+        // end of line markers, so we cannot tell what was there. Since it may include documentation lines
+        // we have to add back in EOLs at the end of every statement so the comments don't get lost.
+        // Best we can do with ANTLR...
+
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < lambdaContext.getChildCount(); i++) {
+            stringBuffer.append(lambdaContext.getChild(i).getText() + "\n");
+        }
+        String rawText = stringBuffer.toString();
+        functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
+
+        String name = nameAndArgsNode.getChild(0).getText();
+        if (name.endsWith("(")) {
+            name = name.substring(0, name.length() - 1);
+        }
+        functionRecord.name = name;
+        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+            // this is a comma delimited list of arguments.
+            String allArgs = argListContext.getText();
+
+            StringTokenizer st = new StringTokenizer(allArgs, ",");
+            while (st.hasMoreElements()) {
+                functionRecord.argNames.add(st.nextToken());
+            }
+        }
+
+//       For fdoc support. Maybe enable in lambdas? Probably not, but maybe
+//        for (QDLParserParser.FdocContext fd : lambdaContext.fdoc()) {
+//           String doc = fd.getText();
+//           // strip off function comment marker
+//           if (doc.startsWith(">>")) {
+//               doc = doc.substring(2).trim();
+//           }
+//           functionRecord.documentation.add(doc);
+//       }
+        ParseTree p = lambdaContext.statement().get(0).getChild(0);
+        String x = p.getChild(0).getText();
+        if (x.equals("[")) {
+            // its a set of statements
+            for (int i = 0; i < p.getChildCount(); i++) {
+                ParseTree parserTree = p.getChild(i);
+                if (parserTree.getText().equals("[") ||
+                        parserTree.getText().equals(";") ||
+                        parserTree.getText().equals("]")) {
+                    continue;
+                }
+                functionRecord.statements.add(resolveChild(parserTree));
+
+            }
+/*
+            for (QDLParserParser.StatementContext sc : lambdaContext.statement()) {
+                System.out.println("lambda:" + sc.getText());
+                functionRecord.statements.add(resolveChild(sc));
+            }
+
+*/
+        } else {
+            // its a single expression most likely. Check to see if it needs wrapped in
+            // a return
+            QDLParserParser.StatementContext sc = lambdaContext.statement().get(0);
+            Statement stmt = resolveChild(sc);
+            // Contract: Wrap simple expressions in a return.
+            if (stmt instanceof ExpressionImpl) {
+                ExpressionImpl expr = (ExpressionImpl) stmt;
+                if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
+                    Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
+                    expr1.setName(ControlEvaluator.RETURN);
+                    expr1.addArgument(expr);
+                    functionRecord.statements.add(expr1); // wrapped in a return
+                } else {
+                    functionRecord.statements.add(expr); // already has a return
+                }
+            } else {
+                functionRecord.statements.add(stmt); // a statement, not merely an expression
+            }
+
+        }
+
+        if (isModule) {
+            // Functions defined in a module go there.
+            currentModule.getState().getFunctionTable().put(functionRecord);
+        } else {
+            state.getFunctionTable().put(functionRecord);
+        }
+        parsingMap.endMark();
+        parsingMap.rollback();
+        parsingMap.clearMark();
+    }
+
 
     @Override
     public void visitTerminal(TerminalNode terminalNode) {
@@ -819,7 +930,7 @@ public class QDLListener implements QDLParserListener {
     protected String getSource(ParserRuleContext ctx) {
         int a = ctx.start.getStartIndex();
         int b = ctx.stop.getStopIndex();
-        if(b < a){
+        if (b < a) {
             return "no source";
         }
         Interval interval = new Interval(a, b);
@@ -930,6 +1041,12 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitStemEntry(QDLParserParser.StemEntryContext ctx) {
         StemEntryNode svn = (StemEntryNode) parsingMap.getStatementFromContext(ctx);
+        if (ctx.getChild(0).getText().equals("*")) {
+            StatementWithResultInterface value = (StatementWithResultInterface) resolveChild(ctx.getChild(2));
+            svn.setDefaultValue(true);
+            svn.setValue(value);
+            return;
+        }
         StatementWithResultInterface key = (StatementWithResultInterface) resolveChild(ctx.getChild(0));
         StatementWithResultInterface value = (StatementWithResultInterface) resolveChild(ctx.getChild(2));
         svn.setKey(key);
