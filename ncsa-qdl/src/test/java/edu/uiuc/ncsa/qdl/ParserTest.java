@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import net.sf.json.JSONObject;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -152,11 +151,9 @@ public class ParserTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "define[");
-        addLine(script, "f(x,y)");
-        addLine(script, "]body[");
-        addLine(script, "return(" + cf + "-" + cf2 + ");");
-        addLine(script, "];");
+
+        addLine(script, "f(x,y)->" + cf);
+        addLine(script, "-" + cf2 + ";");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
@@ -491,7 +488,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to interpret single equals without parser error";
-        } catch (ParseCancellationException pcx) {
+        } catch (IllegalStateException  pcx) {
             assert true;
         }
     }
@@ -1111,7 +1108,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to make an assignment with = not :=";
-        } catch (ParseCancellationException t) {
+        } catch (IllegalStateException t) {
             assert true;
         }
 

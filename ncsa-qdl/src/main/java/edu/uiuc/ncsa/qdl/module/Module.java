@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.module;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
@@ -13,6 +14,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
 import java.net.URI;
+import java.util.List;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STATE_TAG;
@@ -71,7 +73,6 @@ public abstract class Module implements Serializable {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-
     String alias;
 
 
@@ -121,9 +122,11 @@ public abstract class Module implements Serializable {
         xsw.writeStartElement(MODULE_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
         xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias) ? getAlias() : alias);
+        // Note there is documenation in the source code, but since we save the source,
+        // there is no need to serialize it (or anything else in the source for that matter).
         writeExtraXMLAttributes(xsw);
+        writeExtraXMLElements(xsw); // Do this first so they get read first later on deserialization
         getState().toXML(xsw);
-        writeExtraXMLElements(xsw);
         xsw.writeEndElement();
     }
 
@@ -147,7 +150,7 @@ public abstract class Module implements Serializable {
 
     }
 
-    public void fromXML(XMLEventReader xer, XProperties xp) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XProperties xp, QDLInterpreter qi) throws XMLStreamException {
         readExtraXMLAttributes(xer.peek());
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
@@ -193,5 +196,9 @@ public abstract class Module implements Serializable {
     public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
 
     }
+
+    public abstract List<String> getDocumentation();
+
+    public abstract void setDocumentation(List<String> documentation);
 
 }

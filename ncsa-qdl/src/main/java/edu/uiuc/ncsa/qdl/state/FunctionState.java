@@ -172,6 +172,23 @@ public abstract class FunctionState extends VariableState {
 
     }
 
+    public List<String> listModuleDoc(String fname) {
+        if (!fname.contains(NS_DELIMITER)) {
+             return new ArrayList<>(); // no help
+        }
+        String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
+
+        if(!getModuleMap().containsKey(alias)){
+            return new ArrayList<>();
+        }
+        Module module = getModuleMap().get(alias);
+        List<String> docs = module.getDocumentation();
+        if (docs == null) {
+            return new ArrayList<>();
+        }
+        return docs;
+    }
+
     public List<String> listFunctionDoc(String fname, int argCount) {
         if (fname.contains(NS_DELIMITER)) {
             String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));

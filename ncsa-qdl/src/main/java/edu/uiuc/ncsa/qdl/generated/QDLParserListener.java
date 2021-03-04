@@ -1,4 +1,4 @@
-// Generated from QDLParser.g4 by ANTLR 4.7.2
+// Generated from QDLParser.g4 by ANTLR 4.9.1
 package edu.uiuc.ncsa.qdl.generated;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -37,6 +37,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNumber(QDLParserParser.NumberContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#integer}.
+	 * @param ctx the parse tree
+	 */
+	void enterInteger(QDLParserParser.IntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#integer}.
+	 * @param ctx the parse tree
+	 */
+	void exitInteger(QDLParserParser.IntegerContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#fdoc}.
 	 * @param ctx the parse tree
@@ -249,6 +259,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLogical(QDLParserParser.LogicalContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code integers}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntegers(QDLParserParser.IntegersContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code integers}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntegers(QDLParserParser.IntegersContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code orExpression}
 	 * labeled alternative in {@link QDLParserParser#expression}.

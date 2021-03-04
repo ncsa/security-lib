@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
@@ -88,6 +89,8 @@ public abstract class JavaModule extends Module {
             }
             state.setValue(v.getName(), v.getValue());
         }
+        setDocumentation(createDefaultDocs());
+
         for (QDLFunction f : funcs) {
             for (int i : f.getArgCount()) {
                 QDLFunctionRecord fr = new QDLFunctionRecord();
@@ -104,12 +107,75 @@ public abstract class JavaModule extends Module {
         setClassName(this.getClass().getCanonicalName());
         initialized = true;
     }
-    
+
 
     @Override
     public void writeExtraXMLAttributes(XMLStreamWriter xsw) throws XMLStreamException {
         super.writeExtraXMLAttributes(xsw);
         xsw.writeAttribute(XMLConstants.MODULE_TYPE_TAG, XMLConstants.MODULE_TYPE_JAVA_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_CLASS_NAME_TAG, getClassname());
+    }
+
+    /**
+     * Creates the documentation from the first of each line of every function. Use this or
+     * override as needed.
+     *
+     * @return
+     */
+    public List<String> createDefaultDocs() {
+        List<String> docs = new ArrayList<>();
+        docs.add("  module name : " + getClass().getSimpleName() );
+        docs.add("    namespace : " + getNamespace());
+        docs.add("default alias : " + getAlias());
+        docs.add("   java class : " + getClass().getCanonicalName());
+        if(getDescription() != null ){
+              docs.addAll(getDescription());
+        }
+        if(!funcs.isEmpty()) {
+            docs.add("functions:");
+            // Now sort the functions
+            TreeSet<String> treeSet = new TreeSet<>();
+            for (QDLFunction f : funcs) {
+                for (int argCount : f.getArgCount()) {
+                    List<String> x = f.getDocumentation(argCount);
+                    if (x != null && !x.isEmpty()) {
+                        treeSet.add("  " + f.getDocumentation(argCount).get(0));// indent too...
+                    }
+                }
+            }
+            docs.addAll(treeSet);
+        }
+        if(!vars.isEmpty()){
+            docs.add("variables:");
+            TreeSet<String> treeSet = new TreeSet<>();
+            for (QDLVariable variable : vars) {
+                treeSet.add("  " + variable.getName()); // indent
+            }
+            docs.addAll(treeSet);
+        }
+
+        return docs;
+    }
+
+    /**
+     * The {@link #createDefaultDocs()} will create basic documentation for functions and such,
+     * and is called automatically during module {@link #init(State)},
+     * but the actual description of this module -- if any -- is done here. Override and return your description.
+     * @return
+     */
+     public List<String> getDescription(){
+        return null;
+     }
+
+     List<String> documentation = new ArrayList<>();
+
+    @Override
+    public List<String> getDocumentation() {
+        return documentation;
+    }
+
+    @Override
+    public void setDocumentation(List<String> documentation) {
+                   this.documentation = documentation;
     }
 }

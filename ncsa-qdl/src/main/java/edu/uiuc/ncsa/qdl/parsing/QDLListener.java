@@ -66,6 +66,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterVariable(QDLParserParser.VariableContext ctx) {
         stash(ctx, new VariableNode(null));
+ //       StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
 
     }
 
@@ -141,6 +142,7 @@ public class QDLListener implements QDLParserListener {
         Assignment nextA = null;
         // The variable is the 0th child, the argument is the last child (it is an expression and ends up in the symbol table).
         int exprIndex = assignmentContext.children.size() - 1;
+   //     boolean isStem = false;
         for (int i = 0; i < exprIndex; i++) {
             String currentVar = assignmentContext.children.get(i).getText();
             // The general pattern (i.e.  the children of assignmentContext) is
@@ -197,6 +199,7 @@ public class QDLListener implements QDLParserListener {
                 // Chain them together if there are more to come
             }
             currentA = nextA;
+  //          i = nextIndex - 1; // back up cursor so on increment in loop it points to right place
         } //end for
     }
 
@@ -270,6 +273,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitVariables(QDLParserParser.VariablesContext ctx) {
 
+
     }
 
     @Override
@@ -304,17 +308,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitNumber(QDLParserParser.NumberContext ctx) {
-
-        ConstantNode constantNode;
-        if (ctx.getText().contains(".")) {
-            BigDecimal decimal = new BigDecimal(ctx.getText());
-            constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
-        } else {
-            Long value = Long.parseLong(ctx.getChild(0).getText());
-            constantNode = new ConstantNode(value, Constant.LONG_TYPE);
-        }
+        BigDecimal decimal = new BigDecimal(ctx.getText());
+        ConstantNode constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
         stash(ctx, constantNode);
-
     }
 
     @Override
@@ -917,11 +913,11 @@ public class QDLListener implements QDLParserListener {
     }
 
     /**
-     * There are various ways to try and get the source. Most of them strip off linefeeds so
+     * There are various ways to try and get the source. Most of them strip off line feeds so
      * if there is line comment (// ... ) the rest of the source turns into a comment *if*
      * the source ever gets reparsed. NOTE this is exactly what happens with module.
-     * This tries to get the original source with linefeeds
-     * and all. It ay be more fragile than the ANTLR documentation lets on, so be advised.
+     * This tries to get the original source with line feeds
+     * and all. It may be more fragile than the ANTLR documentation lets on, so be advised.
      * The ctx.getText() method, however, is definitely broken...
      *
      * @param ctx
@@ -934,6 +930,7 @@ public class QDLListener implements QDLParserListener {
             return "no source";
         }
         Interval interval = new Interval(a, b);
+        // Next line actually gets the original source:
         String txt = ctx.start.getInputStream().getText(interval);
         if (!StringUtils.isTrivial(txt)) {
             // Sometimes the parser strips the final ;. If the source is used later
@@ -953,6 +950,7 @@ public class QDLListener implements QDLParserListener {
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
         currentModule.setNamespace(namespace);
         currentModule.setAlias(alias);
+        moduleStatement.setSourceCode(getSource(moduleContext));
         state.getModuleMap().put(namespace, currentModule);
         for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
             // Issue is that resolving children as we do gets the function definitions.
@@ -968,6 +966,15 @@ public class QDLListener implements QDLParserListener {
                 moduleStatement.getStatements().add(kid);
             }
             //}
+        }
+        //       For fdoc support.  Probably not, but maybe
+        for (QDLParserParser.FdocContext fd : moduleContext.fdoc()) {
+            String doc = fd.getText();
+            // strip off function comment marker
+            if (doc.startsWith(">>")) {
+                doc = doc.substring(2).trim();
+            }
+            currentModule.getDocumentation().add(doc);
         }
         // Parser strips off trailing ; which in turn causes a parser error later when we are runnign the import command.
         moduleStatement.setSourceCode(getSource(moduleContext));
@@ -1112,5 +1119,60 @@ public class QDLListener implements QDLParserListener {
         Dyad dyad = new Dyad(OpEvaluator.TILDE_VALUE);
         stash(ctx, dyad);
         finish(dyad, ctx);
+    }
+
+ /*   @Override
+    public void enterExpressionStem(QDLParserParser.ExpressionStemContext ctx) {
+       System.out.println("enter exp stem");
+    }
+
+    @Override
+    public void exitExpressionStem(QDLParserParser.ExpressionStemContext ctx) {
+        System.out.println("exit exp stem");
+
+    }
+
+    @Override
+    public void enterExpressionStems(QDLParserParser.ExpressionStemsContext ctx) {
+        System.out.println("enter expressions stem");
+
+    }
+
+    @Override
+    public void exitExpressionStems(QDLParserParser.ExpressionStemsContext ctx) {
+
+    }*/
+  /*
+    @Override
+    public void enterDotOp(QDLParserParser.DotOpContext ctx) {
+        System.out.println("enter dot op");
+    }
+
+    @Override
+    public void exitDotOp(QDLParserParser.DotOpContext ctx) {
+        System.out.println("exit dot op");
+    }
+    */
+
+    @Override
+    public void enterInteger(QDLParserParser.IntegerContext ctx) {
+
+    }
+
+    @Override
+    public void exitInteger(QDLParserParser.IntegerContext ctx) {
+        Long value = Long.parseLong(ctx.getChild(0).getText());
+        ConstantNode constantNode = new ConstantNode(value, Constant.LONG_TYPE);
+        stash(ctx, constantNode);
+    }
+
+    @Override
+    public void enterIntegers(QDLParserParser.IntegersContext ctx) {
+
+    }
+
+    @Override
+    public void exitIntegers(QDLParserParser.IntegersContext ctx) {
+
     }
 }

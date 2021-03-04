@@ -45,7 +45,7 @@ lambdaStatement:
     function LambdaConnector  (statement) | (RightBracket  (statement ';')+ LeftBracket)  ;
 
 moduleStatement:
-     ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) (statement ';')* LeftBracket;
+     ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) fdoc* (statement ';')* LeftBracket;
 
 tryCatchStatement:
      TryStatement (statement ';')* CatchStatement (statement ';')* LeftBracket;

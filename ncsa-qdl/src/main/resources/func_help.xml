@@ -719,12 +719,17 @@ is_function(name, arg_count) checks if a function given in name with the number 
     <entry id="os_env">
         <body>
             <![CDATA[
-os_env() - return a stem of all operating system environment values currently known by the system
-os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with each name as a key. If a property
-                       is not found, that entry is omitted.
-E.g. os_env('PATH') will give you the values of the PATH variable on most systems
-Note 1: If you set environment variables in a shell script that invokes QDL, you may recover them using this call.
-Note 2: This is always empty in server mode! Scripts have no access to the underlying system.
+os_env() - return a stem of all operating system environment values currently
+           known by the system
+os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with
+                          each name as a key. If a property
+                          is not found, that entry is omitted.
+E.g: os_env('PATH') will give you the values of the PATH variable on most
+     systems
+Note 1: If you set environment variables in a shell script that invokes QDL,
+        you may recover them using this call.
+Note 2: This is always empty in server mode! Scripts have no access to the
+        underlying system.
                 ]]>
         </body>
     </entry>
@@ -732,7 +737,8 @@ Note 2: This is always empty in server mode! Scripts have no access to the under
         <body>
             <![CDATA[
 remove(var) - remove a variable and its value from the symbol table.
-Note: This expunges it from the session and any future attempts to access it will result in errors until it is set again.
+Note: This expunges it from the session and any future attempts to access it
+      will result in errors until it is set again.
 See also: is_defined
                 ]]>
         </body>
@@ -741,11 +747,13 @@ See also: is_defined
         <body>
             <![CDATA[
 script_path() - returns the list of paths used to resolve scripts
-script_path(arg) - sets the script path. Either this is a string each of whose paths are separated with
-                   a colon, e.g. 'path0:path1' or it is a stem of paths.
-Note: When invoking a script with an absolute path, that is run. If the path is relative, then the script paths
-      are used to resolve it. Note that if relative path has a scheme for a VFS, then this restricts resolution to those
-      paths. If the path is unqualified, every path is checked.
+script_path(arg) - sets the script path. Either this is a string each of whose
+                   paths are separated with a colon, e.g. 'path0:path1' or it
+                   is a stem of paths.
+Note: When invoking a script with an absolute path, that is run. If the path
+      is relative, then the script paths are used to resolve it. Note that if
+      relative path has a scheme for a VFS, then this restricts resolution to
+      those paths. If the path is unqualified, every path is checked.
 See also: script_load, script_run
 ]]>
         </body>
@@ -753,12 +761,14 @@ See also: script_load, script_run
     <entry id="module_path">
         <body>
             <![CDATA[
-   module_path() -  returns the list of paths used to resolve loading modules
-module_path(arg) - sets the module path. Either this is a string each of whose paths are separated with
-                   a colon, e.g. 'path0:path1' or it is a stem of paths.
-Note: When loading a module with an absolute path, that is run. If the path is relative, then the module paths
-      are used to resolve it. Note that if relative path has a scheme for a VFS, then this restricts resolution to those
-      paths. If the path is unqualified, every path is checked.
+   module_path() - returns the list of paths used to resolve loading modules
+module_path(arg) - sets the module path. Either this is a string each of whose
+                   paths are separated with a colon, e.g. 'path0:path1' or it
+                   is a stem of paths.
+Note: When loading a module with an absolute path, that is run. If the path is
+      relative, then the module paths are used to resolve it. Note that if
+      relative path has a scheme for a VFS, then this restricts resolution to
+      those paths. If the path is unqualified, every path is checked.
 See also: module_load
 ]]>
         </body>
@@ -766,23 +776,27 @@ See also: module_load
     <entry id="to_number">
         <body>
             <![CDATA[
-to_number(arg) - convert a string or stem of strings to numbers. Each number must be a valid string representation.
+to_number(arg) - convert a string or stem of strings to numbers. Each number
+                 must be a valid string representation.
                 ]]>
         </body>
     </entry>
     <entry id="to_string">
         <body>
             <![CDATA[
-to_string(arg) - arg is anything and the result is a string representation of it.
-to_string(arg, is_pretty_print) - attempt to put the result in to a nicer format.
-Note: The print or say function effectively calls this and spits out the result to the console.
+to_string(arg) - arg is anything and the result is a string representation
+                 of it.
+to_string(arg, is_pretty_print) - attempt to put the result in to a nicer
+                 format.
+Note: The print or say function effectively calls this and spits out the
+      result to the console.
 ]]>
         </body>
     </entry>
     <entry id="to_boolean">
         <body>
             <![CDATA[
-to_boolean(arg) - arg is anything and the result is a boolean representation of it.
+to_boolean(arg) - arg is anything and the result is a boolean representation.
                   Note that this means
                   strings - true is only returned if the value is 'true'
                   integers - true is only returned if the value is 1
@@ -795,7 +809,8 @@ to_boolean(arg) - arg is anything and the result is a boolean representation of 
     <entry id="var_type">
         <body>
             <![CDATA[
-var_type(arg0, arg1,...) -  returns a list of integers that show the type of each argument. 
+var_type(arg0, arg1,...) - returns a list of integers that show the type of
+                           each argument.
                ]]>
         </body>
     </entry>
@@ -810,8 +825,10 @@ See also: continue, return
     <entry id="check_after">
         <body>
             <![CDATA[
-check_after(conditional) - in loops, this means that the conditional is checked at the end of an interation
-               rather than before the iteration. This effectively gives a post-positional loop.
+check_after(conditional) - in loops, this means that the conditional is checked
+                           at the end of an interation rather than before the
+                           iteration. This effectively gives a post-positional
+                           loop.
                 ]]>
         </body>
     </entry>
@@ -825,11 +842,16 @@ common_keys(stem1., stem2.) - returns a list of keys common to both stems.
     <entry id="contains">
         <body>
             <![CDATA[
-contains(source, snippets) - returns a conformable result for any combination of stems and strings. If both arguments
-                         are string, the result is a boolean. If source is a stem and snippets is a string, then the result is
-                         a boolean stem witha  true for each entry that contains the snippet etc.
-contains(source, snippets, case_sensitive) -- if case_sensitive is true (default) all testing is done preserving case.
-                         if false, all arguments are converted to lower case first.
+contains(source, snippets) - returns a conformable result for any combination
+                             of stems and strings. If both arguments are
+                             string, the result is a boolean. If source is a
+                             stem and snippets is a string, then the result is
+                             a boolean stem with a true for each entry that
+                             contains the snippet etc.
+contains(source, snippets, case_sensitive) -- if case_sensitive is true, which
+                             is the default, all testing is done preserving
+                             case. If false, all arguments are converted to
+                             lower case first.
 Note: Original arguments are never altered.
 ]]>
         </body>
@@ -849,7 +871,8 @@ for_keys(var, stem.)
 
   var - is a simple variable and will contain the current key during the loop.
         If it has already been defined, its values will be over-written.
-stem. - is a stem variable. The keys of this stem will be assigned to the var and may be accessed  in the loop.
+stem. - is a stem variable. The keys of this stem will be assigned to the var
+        and may be accessed  in the loop.
 Note: This only operates inside of looping constructs.
                 ]]>
         </body>
@@ -858,12 +881,14 @@ Note: This only operates inside of looping constructs.
         <body>
             <![CDATA[
 for_next(var, stop_value [,start_value, increment])
-
-        var - the variable to be used. As the loop is executed, this value will change.
- stop_value - the final value for the loop. When the variable acquires this value, the loop is
-              terminated (so the loop body does not execute with this value!)
+        var - the variable to be used. As the loop is executed, this value will
+              change.
+ stop_value - the final value for the loop. When the variable acquires this value,
+              the loop is terminated (so the loop body does not execute with
+              this value!)
 start_value - (optional, default is 0). The first value assigned to var.
-  increment - (optional, default is 1). How much the loop variable should be incremented on each iteration.
+  increment - (optional, default is 1). How much the loop variable should be
+              incremented on each iteration.
 Note: This only functions in looping constructs.
                 ]]>
         </body>
@@ -871,10 +896,11 @@ Note: This only functions in looping constructs.
     <entry id="index_of">
         <body>
             <![CDATA[
-index_of(source, snippets) - returns a conformable stem of integers giving the location of the snippet or a -1 if
-                  the snippet is not found.
-index_of(source, snippets, case_sensitive) - if true (default) all comparisons are case sensitive. If false,
-                  all are converted to lower case first.
+index_of(source, snippets) - returns a conformable stem of integers giving the
+                  location of the snippet or a -1 if the snippet is not found.
+index_of(source, snippets, case_sensitive) - if true (default) all comparisons
+                  are case sensitive. If false, all are converted to lower
+                  case first.
                 ]]>
         </body>
     </entry>
@@ -883,24 +909,28 @@ index_of(source, snippets, case_sensitive) - if true (default) all comparisons a
             <![CDATA[
 module_import(urn)- import the given module using its default alias.
 module_import(urn, alias) - import the module, assigning it a different alias.
-Note: A module must be loaded before it can be imported or the system does not know about it.
+Note: A module must be loaded before it can be imported or the system does not
+      know about it.
 ]]>
         </body>
     </entry>
     <entry id="module_load">
         <body>
             <![CDATA[
-module_load(path) - load the module into the current session from the given file. It cannot be used until it is imported.
-module_load(path, type) - load the module. If type is 'file' (default) then this is assumed to be QDL and loaded.
-                          If the type is 'java' then the path is actually the fully qualified class name and this is loaded from
-                          the Java virtual machine.
+module_load(path) - load the module into the current session from the given
+                    file. It cannot be used until it is imported.
+module_load(path, type) - load the module. If type is 'file' (default) then
+                    this is assumed to be QDL and loaded. If the type is 'java'
+                    then the path is actually the fully qualified class name
+                    and this is loaded from the Java virtual machine.
              ]]>
         </body>
     </entry>
     <entry id="raise_error">
         <body>
             <![CDATA[
-raise_error(message) - raises an error and propagates the message in to the catch block
+raise_error(message) - raises an error and propagates the message in to the
+                       catch block
 raise_error(message, code) - add and option numeric code
 Note: This ONLY works inside a try[ ... ]catch[] block!
                 ]]>
@@ -919,27 +949,34 @@ See also: continue, break
     <entry id="replace">
         <body>
             <![CDATA[
-replace(source, old, new) - replaces all occurences of old wit new in the source. These may be various combinations of stems
-              and strings.
-E.g.   replace('abcde', 'cd', '23') yields 'ab23e'
+replace(source, old, new) - replaces all occurences of old with new in the
+                            source. These may be various combinations of stems
+                            and strings.
+E.g
+   replace('abcde', 'cd', '23');
+ab23e
                 ]]>
         </body>
     </entry>
     <entry id="substring">
         <body>
             <![CDATA[
-substring(arg, n) - take a substring of the arg starting at the given index, n, and going to the rest of the string. This
-                  will also be done on each element if arg is a stem.
-substring(arg, n,length) - start the substring at index n and continue for length characters.
-substring(arg, n ,length ,padding) - start at the index, retrieve length characters and if there are not enough,
-                 cyclically pad the result with the string padding.
+substring(arg, n) - take a substring of the arg starting at the given index, n,
+                    and going to the rest of the string. This will also be
+                    done on each element if arg is a stem.
+substring(arg, n,length) - start the substring at index n and continue for
+                    length characters.
+substring(arg, n ,length ,padding) - start at the index, retrieve length
+                    characters and if there are not enough, cyclically pad the
+                    result with the string padding.
                 ]]>
         </body>
     </entry>
     <entry id="to_lower">
         <body>
             <![CDATA[
-to_lower(arg) - convert a string or stem of strings to lower case. No effect on non-strings.
+to_lower(arg) - convert a string or stem of strings to lower case. No effect
+                on non-strings.
 See also: to_upper
                 ]]>
 
@@ -948,7 +985,8 @@ See also: to_upper
     <entry id="to_upper">
         <body>
             <![CDATA[
-to_upper(arg) - convert a string or stem of strings to upper case. No effect on non-strings.
+to_upper(arg) - convert a string or stem of strings to upper case. No effect
+                on non-strings.
 See also: to_upper
                ]]>
         </body>
@@ -958,12 +996,9 @@ See also: to_upper
             <![CDATA[
 tokenize(arg, delimiter) - tokenize a string or stem of strings using the
                            given delimeter.
-E.g. tokenize('abd:def:123', ':') yields the stem
-{
- 0=abd,
- 1=def,
- 2=123
-}
+E.g.
+   tokenize('abd:def:123', ':');
+[abd,def,123]
                 ]]>
         </body>
     </entry>
@@ -971,7 +1006,8 @@ E.g. tokenize('abd:def:123', ':') yields the stem
     <entry id="detokenize">
         <body>
             <![CDATA[
-detokenize(arg, delimiter) - converts  a string or stem of strings (tokens) into a string using the delimiter between entries.
+detokenize(arg, delimiter) - converts  a string or stem of strings (tokens)
+                             into a string using the delimiter between entries.
 detokenize(arg, delimiter, options) - options is an integer which is the sum of
           1 for prepend
           2 for omit dangling delimiter
@@ -990,7 +1026,8 @@ See also: truncate, constants (which contains the option values for reference)
     <entry id="trim">
         <body>
             <![CDATA[
- trim(arg) - remove all leading and trailing blanks from the arg. The argument may also be a stem of strings.
+ trim(arg) - remove all leading and trailing blanks from the arg. The argument
+             may also be a stem of strings.
 ]]>
         </body>
     </entry>
@@ -1000,8 +1037,11 @@ See also: truncate, constants (which contains the option values for reference)
         <body>
             <![CDATA[
 vencode(arg) -  encode a string or stem of them.
-Note: This is supremely useful for non-western character sets that must be preserved.
-E.g. vencode('你浣') yields $E4$BD$A0$E6$B5$A3
+Note: This is supremely useful for non-western character sets that must be
+      preserved.
+E.g.
+   vencode('你浣')
+$E4$BD$A0$E6$B5$A3
 See also: vdecode
 ]]>
 
@@ -1033,8 +1073,9 @@ See pretty_print
             <body>
                 <![CDATA[
 (workspace variable)
-pretty_print - toggle printing stems on one line (off | false) or vertically (on | true).
-               pp is the short form for this.
+pretty_print - toggle printing stems on one line (off | false) or
+               vertically (on | true).
+pp is the short form for this.
                 ]]>
             </body>
         </entry>
@@ -1042,8 +1083,9 @@ pretty_print - toggle printing stems on one line (off | false) or vertically (on
             <body>
                 <![CDATA[
 (workspace variable)
-echo - toggle echo mode in the workspace. If (on | true), this allows you to enter QDl commands without the final
-       semi-colon (;) and the result is printed to the console. The default is on.
+echo - toggle echo mode in the workspace. If (on | true), this allows you to
+       enter QDL commands without the final semi-colon (;) and the result is
+       printed to the console. The default is on.
                 ]]>
             </body>
         </entry>
@@ -1052,8 +1094,8 @@ echo - toggle echo mode in the workspace. If (on | true), this allows you to ent
             <body>
                 <![CDATA[
 (workspace variable)
-ws_id - the internal identifier for this workspace. This is especially useful if the file name is
-        munged or strange.
+ws_id - the internal identifier for this workspace. This is especially useful
+        if the file name is munged or strange.
 See also: name, description
                 ]]>
             </body>
@@ -1062,14 +1104,15 @@ See also: name, description
             <body>
                 <![CDATA[
 (workspace variable)
-description - A human readable description of this workspace. This is printed on load if present.
-              It should tell the user what the workspace does for instance. Note that you can set
-              it using a QDL variable too so
+description - A human readable description of this workspace. This is printed
+              on load if present. It should tell the user what the workspace
+              does for instance. Note that you can set it using a QDL variable
+              too so
+E.g.
+    )ws set description >my_descr.
 
- )ws set description >my_descr.
-
-               Would set the contents of this to the list of strings given. Note that this will be turned into
-               a single string with linefeeds after each entry.
+Would set the contents of this to the list of strings given. Note that this
+will be turned into a single string with linefeeds after each entry.
                 ]]>
             </body>
         </entry>
@@ -1077,10 +1120,10 @@ description - A human readable description of this workspace. This is printed on
             <body>
                 <![CDATA[
 (workspace variable)
-debug - Toggle low-level debugging of the innards of the workspace and QDL. This is only useful if you are having
-        a serious issue (such as writing a Java module and need to see stack traces). This may be (on | true)
-        or (off | false)
-        Generally you do not need this.
+debug - Toggle low-level debugging of the innards of the workspace and QDL.
+        This is only useful if you are having a serious issue (such as
+        writing a Java module and need to see stack traces). This may be
+        (on | true) or (off | false). Generally you do not need this.
                 ]]>
             </body>
         </entry>
@@ -1089,8 +1132,9 @@ debug - Toggle low-level debugging of the innards of the workspace and QDL. This
             <body>
                 <![CDATA[
 (workspace variable)
-start_ts - The time stamp when this was first created. You *may* change this, but probably just want the system
-           to manage. Set it using either as an integer (in milliseconds) or as an ISO 8601 date.
+start_ts - The time stamp when this was first created. You *may* change this,
+           but probably just want the system to manage. Set it using either
+           as an integer (in milliseconds) or as an ISO 8601 date.
                 ]]>
             </body>
         </entry>

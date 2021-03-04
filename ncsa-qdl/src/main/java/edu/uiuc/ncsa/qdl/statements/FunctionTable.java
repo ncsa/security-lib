@@ -159,7 +159,7 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
         xsw.writeStartElement(XMLConstants.FUNCTIONS_TAG);
         xsw.writeComment("The functions for this state.");
         for (String key : keySet()) {
-            if(StringUtils.isTrivial(get(key).sourceCode)){
+            if (StringUtils.isTrivial(get(key).sourceCode)) {
                 // No source code usually means it is from some external function
                 // and we cannot recreate it.
                 continue;
@@ -177,10 +177,9 @@ public class FunctionTable extends HashMap<String, FunctionRecord> implements Do
     }
 
 
-
-
     /**
      * Deserialize a single function using the interpreter (and its current state);
+     *
      * @param xer
      * @param qi
      * @throws XMLStreamException

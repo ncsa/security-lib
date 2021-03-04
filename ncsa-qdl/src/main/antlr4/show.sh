@@ -1,7 +1,7 @@
 # File to show the result of parsing. invoke the build file in this directory first
 # then invoke this with the name to a file to test parse.
-ANTLR4_ROOT=/home/ncsa/apps/java/antlr-4.7.2
-ANTLR4_CP=$ANTLR4_ROOT/antlr-4.7.2-complete.jar
+ANTLR4_ROOT=/home/ncsa/apps/java/antlr-4.9.1
+ANTLR4_CP=$ANTLR4_ROOT/antlr-4.9.1-complete.jar
 OUT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/qdl/generated"
 SCRIPT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-util/src/main/resources/antlr4/"
 echo "reading command file from "  $SCRIPT_DIR

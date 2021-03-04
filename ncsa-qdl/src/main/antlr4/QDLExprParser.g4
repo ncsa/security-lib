@@ -5,7 +5,7 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
+   assignment : (variable  op=ASSIGN)+  (expression | stemVariable | stemList);
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';
@@ -18,7 +18,6 @@ assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
               | stemVariable
               | stemList;
 
-   //   argList : expression (',' expression)*;
      function : FuncStart argList* ')';
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
@@ -27,7 +26,7 @@ assignment : (variable op=ASSIGN)+  (expression | stemVariable | stemList);
 
 expression
  :
-   function                                                              #functions
+   function                                                             #functions
  | stemVariable                                                          #stemVar
  | stemList                                                              #stemLi
  | expression postfix=('++' | '--')                                      #postfix
@@ -45,10 +44,13 @@ expression
  | '(' expression ')'                                                    #association
  | LeftBracket                                                           #leftBracket
  | number                                                                #numbers
+ | integer                                                               #integers
  | variable                                                              #variables
  | Bool                                                                  #logical
  | Null                                                                  #null
  | STRING                                                                #strings
  | ';'                                                                   #semi_for_empty_expressions
  ;
-
+// This *could* be added but does not work quite as expected because variables are allowed to have . to show they
+// are stems. A (probably quite substantial) rewrite of the parser would be in order to change this
+//  | expression '.' expression                                             #dotOp

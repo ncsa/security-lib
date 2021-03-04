@@ -542,10 +542,18 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void enterEveryRule(ParserRuleContext parserRuleContext) {
 
     }
+/*
+    @Override
+      public void enterDotOp(QDLParserParser.DotOpContext ctx) {
+          System.out.println("enter dot op");
+        printKids(ctx);
+      }
 
-  /*  @Override
-    public void exitEveryRule(ParserRuleContext parserRuleContext) {
-        say("exit every rule ", parserRuleContext);
+      @Override
+      public void exitDotOp(QDLParserParser.DotOpContext ctx) {
+          System.out.println("exit dot op");
+          printKids(ctx);
+      }
+      */
 
-    }*/
 }

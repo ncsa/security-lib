@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -612,6 +613,17 @@ public class State extends FunctionState implements QDLConstants {
                             @Override
                             public Module newInstance(State state) {
                                 return null;
+                            }
+                            List<String> doc = new ArrayList<>();
+
+                            @Override
+                            public List<String> getDocumentation() {
+                                return doc;
+                            }
+
+                            @Override
+                            public void setDocumentation(List<String> documentation) {
+                                                             doc = documentation;
                             }
                         };
                     }

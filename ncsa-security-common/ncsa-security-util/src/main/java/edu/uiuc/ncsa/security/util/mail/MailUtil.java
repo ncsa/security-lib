@@ -249,9 +249,7 @@ public class MailUtil extends TemplateUtil implements Logable {
             message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
             if(replacements.containsKey("reply-to")){
                 InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
-
                 message.setReplyTo(new Address[]{address});
-
             }
             tr.sendMessage(message, getMailEnvironment().recipients);
             info("Mail notification sent to " + Arrays.toString(getMailEnvironment().recipients));

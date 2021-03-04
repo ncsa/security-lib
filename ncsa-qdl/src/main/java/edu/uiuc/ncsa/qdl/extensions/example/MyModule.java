@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -45,4 +46,19 @@ public class MyModule extends JavaModule {
         }
         return myModule;
     }
+    List<String> description = null;
+
+    @Override
+    public List<String> getDescription() {
+        if (description == null) {
+            description = new ArrayList<>();
+            description.add("This module is a simple example from the toolkit to show how");
+            description.add("to create a module and import it and use it. It has a single function ");
+            description.add("concat(a,b) which is just concatenation of two strings.");
+            description.add("It also has a variable, e.g. that shows various bits of information.");
+            description.add("type: java" );
+        }
+        return description;
+    }
+
 }

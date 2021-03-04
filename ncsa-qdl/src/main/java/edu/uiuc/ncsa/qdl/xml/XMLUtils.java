@@ -420,6 +420,7 @@ public class XMLUtils implements XMLConstants {
         // create the
         Module module = null;
         State moduleState = state.newModuleState();
+        QDLInterpreter qi = new QDLInterpreter(xp, state);
 
         if (moduleAttributes.isJavaModule()) {
             if (StringUtils.isTrivial(moduleAttributes.className)) {
@@ -441,7 +442,7 @@ public class XMLUtils implements XMLConstants {
 
         // scorecard: at this point, enough information existed in the attributes to re-assemble the module
         // The cursor is still on this tag. Now send it to the module for further processing.
-        module.fromXML(xer, xp);
+        module.fromXML(xer, xp, qi);
         if (module instanceof JavaModule) {
             // call this at the right time -- after everything else has been done.
             ((JavaModule) module).init(moduleState);

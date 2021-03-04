@@ -28,7 +28,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int SIZE_TYPE = 1 + STEM_FUNCTION_BASE_VALUE;
 
 
+
     public static final String MAKE_INDICES = "indices";
+    public static final String SHORT_MAKE_INDICES = "i";
     public static final String FQ_MAKE_INDICES = STEM_FQ + MAKE_INDICES;
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 
@@ -157,6 +159,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static String FUNC_NAMES[] = new String[]{
             SIZE,
             MAKE_INDICES,
+            SHORT_MAKE_INDICES,
             HAS_VALUE,
             REMOVE,
             IS_DEFINED,
@@ -297,6 +300,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_SUBSET:
                 return LIST_SUBSET_TYPE;
             case MAKE_INDICES:
+            case SHORT_MAKE_INDICES:
             case FQ_MAKE_INDICES:
                 return MAKE_INDICES_TYPE;
             case REMOVE:
@@ -414,6 +418,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 doListStartsWith(polyad, state);
                 return true;
             case MAKE_INDICES:
+            case SHORT_MAKE_INDICES:
             case FQ_MAKE_INDICES:
                 doMakeIndex(polyad, state);
                 return true;

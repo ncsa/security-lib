@@ -16,7 +16,7 @@ import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
-import org.antlr.v4.runtime.misc.ParseCancellationException;
+import groovyjarjarantlr4.v4.runtime.misc.ParseCancellationException;
 
 import java.awt.*;
 import java.io.IOException;

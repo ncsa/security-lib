@@ -1158,6 +1158,12 @@ public class WorkspaceCommands implements Logable {
 
     }
 
+    /**
+     * Boolean values function that returns true if the inputline has some form of help in it.
+     *
+     * @param inputLine
+     * @return
+     */
     protected boolean _doHelp(InputLine inputLine) {
         if (inputLine.hasArg("help") || inputLine.hasArg("-help") || inputLine.hasArg("--help")) return true;
         return false;
@@ -1382,7 +1388,7 @@ public class WorkspaceCommands implements Logable {
 
     private int _envList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list");
+            say("-list");
             sayi("List all the variables and their values in the current environment.");
             return RC_NO_OP;
         }
@@ -1405,24 +1411,69 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doModulesCommand(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("Modules commands:");
+            sayi("list - list all loaded modules and their aliases.");
+            sayi("(uri | alias)+ - list all full information for that module, including any documentation.");
+            return RC_NO_OP;
+        }
+
         if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
             return _modulesList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
-            case "help":
-            case "--help":
-                say("Modules commands:");
-                sayi("   list - list all loaded modules.");
-                sayi("imports - list all of the loaded modules that have been imported along with their aliases.");
-                return RC_NO_OP;
             case "list":
                 return _modulesList(inputLine);
-            case "imports":
-                return _moduleImports(inputLine);
             default:
-                say("Unknown modules command");
+                _moduleHelp(inputLine);
         }
         return RC_CONTINUE;
+    }
+
+    /**
+     * Contract is that the argument(s) are either URIs for a module or aliases. Print out the complete
+     * help for each
+     *
+     * @param inputLine
+     */
+    private void _moduleHelp(InputLine inputLine) {
+        for (int i = ACTION_INDEX; i < inputLine.getArgCount() + 1; i++) {
+
+            String arg = inputLine.getArg(i);
+            Module module = null;
+            String importedString = "";
+            if (arg.endsWith(ImportManager.NS_DELIMITER)) {
+                arg = arg.substring(0, arg.length() - 1);
+            }
+            if (StringUtils.isTrivial(arg)) {
+                // They are asking for documentation for the default module, and there is none.
+            } else {
+                if (state.getImportedModules().containsKey(arg)) {
+                    module = state.getImportedModules().get(arg);
+                    importedString = getImportString(module.getNamespace());
+                }
+            }
+            if (module == null) {
+                try {
+                    URI uri = URI.create(arg);
+                    importedString = getImportString(uri);
+                    module = state.getModuleMap().get(uri);
+
+                } catch (Throwable t) {
+                }
+
+            }
+            if (module != null) {
+                say(importedString);
+                List<String> docs = module.getDocumentation();
+                for (String x : docs) {
+                    say(x);
+                }
+            }
+            if (1 < inputLine.getArgCount()) {
+                say("");
+            } // spacer
+        }
     }
 
     private int _moduleImports(InputLine inputLine) {
@@ -1445,18 +1496,34 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _modulesList(InputLine inputLine) {
-        if (_doHelp(inputLine)) {
-            say("list");
-            sayi("Lists the modules available (via " + ControlEvaluator.MODULE_LOAD + ") in to this workspace. " +
-                    "Note that to use one, you must import it with the " + ControlEvaluator.MODULE_IMPORT + " command.");
-            return RC_NO_OP;
-        }
-
         TreeSet<String> m = new TreeSet<>();
         for (URI key : getState().getModuleMap().keySet()) {
-            m.add(key.toString());
+            String out = getImportString(key);
+            m.add(out);
         }
-        return printList(inputLine, m);
+        // so these are sorted. Print them
+        //return printList(inputLine, m);
+        for (String x : m) {
+            say(x);
+        }
+        return RC_CONTINUE;
+    }
+
+    /**
+     * For a given URI, make the entry that is listed for the )modules -list command.
+     *
+     * @param key
+     * @return
+     */
+    private String getImportString
+    (URI key) {
+        String out = key.toString();
+        if (state.getImportManager().hasImports()) {
+            out = out + " " + state.getImportManager().getAlias(key);
+        } else {
+            out = out + " -";
+        }
+        return out;
     }
 
     /**
@@ -1774,6 +1841,18 @@ public class WorkspaceCommands implements Logable {
             say(onlineHelp.get(name));
             return RC_CONTINUE;
         }
+        if (name.endsWith(ImportManager.NS_DELIMITER)) {
+            List<String> doxx = getState().listModuleDoc(name);
+            if (doxx.isEmpty()) {
+                say("Sorry, no help for '" + name + "'");
+                return RC_CONTINUE;
+            }
+            for (String x : doxx) {
+                say(x);
+            }
+            return RC_CONTINUE;
+
+        }
         // Not a system function, so see if it is user defined. Find any arg count first
         int argCount = -1; // means return every similarly named function.
         String rawArgCount = null;
@@ -2052,13 +2131,32 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     protected int _wsLibList(InputLine inputLine) {
+        int displayWidth = 120; //default
+
+        if (_doHelp(inputLine)) {
+            say("lib [file] " + CLA_VERBOSE_ON + " | " + CLA_LONG_FORMAT_ON + " | "
+                    + SHOW_FAILURES + " | [" + DISPLAY_WIDTH_SWITCH + " cols] | [" +
+                    REGEX_SWITCH + " regex]");
+            say("display information about the given file. If no file is specified, a listing of everything is printed");
+            say(CLA_VERBOSE_ON + " = print out a very long listing");
+            say(CLA_LONG_FORMAT_ON + " - print out a listing restricting everything property to a single line");
+            say(SHOW_FAILURES + " = show output for files that cannot be deserialized and why.");
+            say(DISPLAY_WIDTH_SWITCH + " cols = set the printed output to the given number of columns. Default is " + displayWidth);
+            say(REGEX_SWITCH + " regex = filter output using the regex.");
+            say("E.g.");
+            say(")lib " + CLA_LONG_FORMAT_ON + " " + DISPLAY_WIDTH_SWITCH + " 80 " + REGEX_SWITCH + " wlcg.*");
+            say("shows all workspaces that start with wlcg, restricting the per attributes output to a single line");
+            say("(truncation is possible and denoted with an ellipsis), restricting the total width to 80 characters");
+            say("Note that if you just ask it to list the directory, every file will be read, so for a very large");
+            say("this may take some time");
+            return RC_CONTINUE;
+        }
         String fileName = null;
         File currentFile = null;
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON); // print everything
         boolean isLongFormat = inputLine.hasArg(CLA_LONG_FORMAT_ON); // print long format
         boolean isShortFormat = !(isVerbose || isLongFormat);
         boolean showFailures = inputLine.hasArg(SHOW_FAILURES);
-        int displayWidth = 120; //default
         if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
             displayWidth = inputLine.getNextIntArg(DISPLAY_WIDTH_SWITCH);
         }
@@ -2077,7 +2175,7 @@ public class WorkspaceCommands implements Logable {
             regexff = new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    System.out.println("Foof");
+                           System.out.println("Foof");
                     return true;
                 }
             };
@@ -2144,8 +2242,7 @@ public class WorkspaceCommands implements Logable {
         }
 
         boolean firstPass = true;
-        for (
-                String absPath : sortedFiles.keySet()) {
+        for (String absPath : sortedFiles.keySet()) {
             File fff = sortedFiles.get(absPath);
             WSLibEntry w = _getWSLibEntry(fff);
             if (w == null) continue;
@@ -2494,15 +2591,15 @@ public class WorkspaceCommands implements Logable {
                     say("warning: you have not a set a file for saves. Please set " + CURRENT_WORKSPACE_FILE + " first.");
                 } else {
                     setAutosaveOn(isOnOrTrue(value));
-                    if(autosaveThread != null){
+                    if (autosaveThread != null) {
                         autosaveThread.interrupt();
                         autosaveThread.setStopThread(true);
                         autosaveThread = null; // old one gets garbage collected, force a new one
                     }
-                    if(isAutosaveOn()) {
+                    if (isAutosaveOn()) {
                         initAutosave();
                     }
-                        say("autosave is now " + (isAutosaveOn() ? "on" : "off"));
+                    say("autosave is now " + (isAutosaveOn() ? "on" : "off"));
 
                 }
                 break;
@@ -2643,16 +2740,19 @@ public class WorkspaceCommands implements Logable {
      */
     protected int _wsSave(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("save filename [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] [" +
-                    KEEP_WSF + "]");
-            sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS to a file.");
-            sayi("This should be either a relative path (resolved against the default save location) or an absolute path.");
+            say("save [filename] [" + JAVA_FLAG + "] | [" + SHOW_FLAG + "] | [" + COMPRESS_FLAG + " on|off] [" +
+                    KEEP_WSF + "] | [" + SILENT_SAVE_FLAG + "]");
+            sayi("Saves the current state (variables, loaded functions but not pending buffers of VFS) to a file.");
+            sayi("If you have already loaded (or saved) a file, that is remembered in the " + KEEP_WSF + " variable");
+            sayi("and you do not need to specify it henceforth.");
+            sayi("The file should be either a relative path (resolved against the default save location) or an absolute path.");
             sayi(JAVA_FLAG + " = save using Java serialization format. The default is XML.");
             sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
             sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
             sayi(SILENT_SAVE_FLAG + " = print no messages when saving.");
             sayi("See the corresponding load command to recover it. It will print error messages, however.");
+            say("See also: autosave_on (ws variable)");
             return RC_NO_OP;
         }
 
@@ -3254,17 +3354,18 @@ public class WorkspaceCommands implements Logable {
     }
 
     AutosaveThread autosaveThread;
-protected void initAutosave(){
-    if(getState().isServerMode()){
-        return; // absolutely refuse to turn this feature on in server mode.
-    }
-    if (isAutosaveOn()) {
-        if(autosaveThread == null) {
-            autosaveThread = new AutosaveThread(this);
-            autosaveThread.start();
+
+    protected void initAutosave() {
+        if (getState().isServerMode()) {
+            return; // absolutely refuse to turn this feature on in server mode.
+        }
+        if (isAutosaveOn()) {
+            if (autosaveThread == null) {
+                autosaveThread = new AutosaveThread(this);
+                autosaveThread.start();
+            }
         }
     }
-}
 
     private void testXMLWriter(boolean doFile, String filename) throws Throwable {
         Writer w = null;

@@ -21,6 +21,7 @@ public interface XMLConstants {
     String MODULE_TYPE_TAG = "type";
     String MODULE_TYPE_JAVA_TAG = "java";
     String MODULE_CLASS_NAME_TAG = "class_name";
+    String MODULE_SOURCE_TAG = "source";
 
     String WORKSPACE_TAG = "workspace";
     String WS_ENV_TAG = "env";
