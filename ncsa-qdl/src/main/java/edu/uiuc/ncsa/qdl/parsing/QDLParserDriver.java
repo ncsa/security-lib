@@ -127,8 +127,8 @@ public class QDLParserDriver {
                 for (ANTLRErrorListener listener : parser.getErrorListeners()) {
                                   System.out.println("antlr listeners = " + listener);
                           }
-*/
 
+ */
             // The default is to have the error listener on and this in turn prints every little thing
             // to the console. Great for debugging, but very annoying for users who type in a boo-boo.
             lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);

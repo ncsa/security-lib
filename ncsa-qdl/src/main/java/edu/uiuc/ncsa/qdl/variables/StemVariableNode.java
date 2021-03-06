@@ -48,7 +48,7 @@ public class StemVariableNode implements StatementWithResultInterface {
         if (type != Constant.STEM_TYPE) {
             throw new NFWException("error: Attempt to reset stem to type " + type);
         }
-        // result type is fixed since these are created to only manage
+        // result type is fixed since these are created to only manage stems
     }
 
     @Override

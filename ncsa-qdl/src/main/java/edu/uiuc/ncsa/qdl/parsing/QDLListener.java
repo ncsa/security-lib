@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -66,7 +67,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterVariable(QDLParserParser.VariableContext ctx) {
         stash(ctx, new VariableNode(null));
- //       StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
+        //       StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
 
     }
 
@@ -142,7 +143,7 @@ public class QDLListener implements QDLParserListener {
         Assignment nextA = null;
         // The variable is the 0th child, the argument is the last child (it is an expression and ends up in the symbol table).
         int exprIndex = assignmentContext.children.size() - 1;
-   //     boolean isStem = false;
+        //     boolean isStem = false;
         for (int i = 0; i < exprIndex; i++) {
             String currentVar = assignmentContext.children.get(i).getText();
             // The general pattern (i.e.  the children of assignmentContext) is
@@ -199,7 +200,7 @@ public class QDLListener implements QDLParserListener {
                 // Chain them together if there are more to come
             }
             currentA = nextA;
-  //          i = nextIndex - 1; // back up cursor so on increment in loop it points to right place
+            //          i = nextIndex - 1; // back up cursor so on increment in loop it points to right place
         } //end for
     }
 
@@ -924,6 +925,10 @@ public class QDLListener implements QDLParserListener {
      * @return
      */
     protected String getSource(ParserRuleContext ctx) {
+        if(ctx.start == null || ctx.stop == null){
+            // odd ball case
+            return "no source";
+        }
         int a = ctx.start.getStartIndex();
         int b = ctx.stop.getStopIndex();
         if (b < a) {
@@ -1142,17 +1147,28 @@ public class QDLListener implements QDLParserListener {
     public void exitExpressionStems(QDLParserParser.ExpressionStemsContext ctx) {
 
     }*/
-  /*
+
     @Override
     public void enterDotOp(QDLParserParser.DotOpContext ctx) {
-        System.out.println("enter dot op");
+        ExpressionStemNode expressionStemNode = new ExpressionStemNode();
+        stash(ctx, expressionStemNode);
+
     }
 
     @Override
-    public void exitDotOp(QDLParserParser.DotOpContext ctx) {
-        System.out.println("exit dot op");
+    public void exitDotOp(QDLParserParser.DotOpContext dotOpContext) {
+        ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(dotOpContext);
+        expressionStemNode.setSourceCode(getSource(dotOpContext));
+        for (int i = 0; i < dotOpContext.getChildCount(); i++) {
+            ParseTree p = dotOpContext.getChild(i);
+            // If it is a termminal node (a node consisting of just be the stem marker) skip it
+            if (!(p instanceof TerminalNodeImpl)) {
+                expressionStemNode.getStatements().add((StatementWithResultInterface) resolveChild(p));
+            }
+        }
+
     }
-    */
+
 
     @Override
     public void enterInteger(QDLParserParser.IntegerContext ctx) {

@@ -42,6 +42,17 @@ public class StemVariable extends HashMap<String, Object> {
         return (Long) get(key);
     }
 
+    @Override
+    public Object get(Object key) {
+        if(key instanceof Long){
+            return get((Long)key);
+        }
+        if(key instanceof String){
+            return get((String)key);
+        }
+        return super.get(key);
+    }
+
     public BigDecimal getDecimal(Long key) {
         Object obj = get(key);
         if (obj instanceof BigDecimal) {

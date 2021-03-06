@@ -40,6 +40,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String MORE_THAN_EQUAL = ">=";
     public static final String MORE_THAN_EQUAL2 = "=>";
     public static final String NOT = "!";
+    public static final String DOT = ".";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -61,6 +62,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int POWER_VALUE = 211;
     public static final int INTEGER_DIVIDE_VALUE = 212;
     public static final int TILDE_VALUE = 213;
+    public static final int DOT_VALUE = 214;
 
     @Override
     public String[] getFunctionNames() {
@@ -136,6 +138,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return PLUS_PLUS_VALUE;
             case TILDE:
                 return TILDE_VALUE;
+            case DOT:
+                return DOT_VALUE;
         }
         return UNKNOWN_VALUE;
     }

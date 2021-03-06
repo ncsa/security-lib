@@ -28,6 +28,13 @@ public class StemMultiIndex {
       public boolean isEmpty(){
          return getRealLength() == 0 || (getRealLength() == 1 && (getComponents()[0].isEmpty()));
       }
+
+    /**
+     * Creates a new instants. Note that the name is the entire stem name, so
+     * a.i.j... and this parses it into components.  The very first component is
+     * always the name of the stem.
+     * @param variable
+     */
     public StemMultiIndex(String variable) {
         int first_index = variable.indexOf(STEM_INDEX_MARKER);
 

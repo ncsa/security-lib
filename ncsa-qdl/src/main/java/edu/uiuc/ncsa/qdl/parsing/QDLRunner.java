@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -129,7 +130,7 @@ public class QDLRunner implements Serializable {
                                 stmt = p;
                             }
                         }
-                        if (stmt instanceof StemVariableNode || stmt instanceof StemListNode) {
+                        if (stmt instanceof StemVariableNode || stmt instanceof StemListNode || stmt instanceof ExpressionStemNode) {
                             stmt.evaluate(state);
                             ConstantNode cNode = new ConstantNode(((StatementWithResultInterface) stmt).getResult(), Constant.STEM_TYPE);
                             Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);

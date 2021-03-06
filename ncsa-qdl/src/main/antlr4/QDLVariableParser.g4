@@ -5,7 +5,6 @@
 */
 grammar QDLVariableParser;
   variable : ID;
-//   no_stem : NO_STEM;
     number : Number;
    integer : Integer;
       fdoc : FDOC;
@@ -21,10 +20,10 @@ grammar QDLVariableParser;
     Integer : [0-9]+;
      Number : ([0-9]+ ('.')? [0-9]*)|('.'[0-9]+);
          ID : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;   // Implicit definition of stem variables here!
-//    NO_STEM : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // Implicit definition of stem variables here!
+ ID_NO_STEM : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : ':=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=';
-   FuncStart: ID '(';
+   FuncStart: ID_NO_STEM '(';
    BOOL_TRUE: 'true';
    BOOL_FALSE: 'false';
         Null : 'null';

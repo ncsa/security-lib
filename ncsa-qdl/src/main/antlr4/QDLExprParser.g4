@@ -26,9 +26,10 @@ import QDLVariableParser;
 
 expression
  :
-   function                                                             #functions
+   function                                                              #functions
  | stemVariable                                                          #stemVar
  | stemList                                                              #stemLi
+ | expression '.' expression                                             #dotOp
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
  | '!' expression                                                        #notExpression
@@ -53,4 +54,3 @@ expression
  ;
 // This *could* be added but does not work quite as expected because variables are allowed to have . to show they
 // are stems. A (probably quite substantial) rewrite of the parser would be in order to change this
-//  | expression '.' expression                                             #dotOp

@@ -1083,4 +1083,137 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert !test_c_a.getBoolean("bar");
 
      }
+
+    /*
+       Test presets
+       j(n)->n;j:=2;k:=1;p:=4;q:=5;r:=6;a. := [i(4),i(5),i(6)];
+             {'a':'b','c':'d'}.'a'
+     Not working
+     i(3).0 -- gives parser error for .0 since it thinks it is a decimal.
+
+  The following are working:
+       [i(5),-i(6)].j(1).j(3)
+       i(3).i(4).i(5).i(6).i(7).i(8).j;
+       i(3).i(4).i(5).i(6).j(2);
+       (4*i(5)-21).(i(3).i(4).j(2))
+       i(3).i(4).i(5).(a.k).i(6).i(7).j
+
+       */
+    /* *********** Here below are test for functional stem notation e.g. f(x).j(n) ******* */
+
+    @Test
+    public void testSimpleSF0() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j(n)->n;");
+        addLine(script, "x := {'a':'b','c':'d'}.j('a');");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("x", state).equals("b");
+    }
+    @Test
+    public void testSimpleSF1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := {'a':'b','c':'d'}.'a';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("x", state).equals("b");
+    }
+    @Test
+    public void testSimpleSF2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j(n)->n;");
+        addLine(script, "k := 1;");
+        addLine(script, "a := (i(4)^2-5).j(3);");
+        addLine(script, "b := [2+3*i(5),10 - i(4)].(k.0);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 4L;
+        assert getLongValue("b", state) == 10L;
+    }
+    @Test
+    public void testSimpleSF3() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j :=2;");
+        addLine(script, "x :=i(3).i(4).j;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 2L;
+
+    }
+
+    @Test
+    public void testSimpleSFReturnsStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "k := 1;");
+        addLine(script, "x. := [i(5),i(4)].k;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStemValue("x.", state).size() == 4; // Noit a great check, but sufficient.
+    }
+
+    @Test
+    public void testSFEmbeddedStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [-i(4),3*i(5),11+i(6)];");
+        addLine(script, " k := 1;");
+        addLine(script, " j := 2;");
+        addLine(script, " x := i(12).i(11).i(10).(a.k).i(6).i(7).j;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 6L;
+    }
+
+
+    /**
+     * In this case, the stem variable resolves correctly to the value of 6, but
+     * there is no 6th index, so an error condition should be raised.
+     * @throws Throwable
+     */
+    @Test
+    public void testBadSFEmbeddedStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [-i(4),3*i(5),11+i(6)];");
+        addLine(script, " k := 1;");
+        addLine(script, " j := 2;");
+        addLine(script, " x := i(2).i(3).i(4).(a.k).i(6).i(7).j;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+        }catch(Throwable t){
+            assert true;
+        }
+    }
+
+    /**
+     * Test that supplying the stem as the left most argument can be resolved.
+     * @throws Throwable
+     */
+    @Test
+    public void testInitialStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " j(n)-> n;");
+        addLine(script, " x := (4*i(5)-21).(i(3).i(4).j(2));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == -13L;
+    }
+
+    @Test
+    public void testThreeRankStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " j(n)-> n;");
+        addLine(script, " x := [[-i(4),3*i(5)],[11+i(6), 4-i(5)^2]].j(0).j(1).j(2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 6L;
+    }
 }
