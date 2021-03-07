@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
@@ -80,7 +81,10 @@ public class ExpressionStemNode implements StatementWithResultInterface {
    i(3).0 -- gives parser error for .0 since it thinks it is a decimal.
    b.j(0).j(1).j(2) --  syntax error at char 3, 'missing ; at ("
 
-   
+    j(n)->n;
+     b. := [[-i(4)^2,2+i(5)],[10 - 3*i(6),4+5*i(7)]];
+     (b.).j(0).j(1).(2) == b.0.1.2
+
    ** TO DO -- Find stem ex in documentation and create one with functions. w.x.y.z
 
 The following are working:
@@ -106,9 +110,9 @@ The following are working:
      */
     /*
     E.g. in
-         a. := [-i(4),3*i(5),11+i(6)];k:=1;j:=2;
-   x := i(12).i(11).i(10).(a.k).i(6).i(7).j;
-   the parse tree is (i(n) = in
+    a. := [-i(4),3*i(5),11+i(6)];k:=1;j:=2;
+    x := i(12).i(11).i(10).(a.k).i(6).i(7).j;
+   the parse tree is (i(n) written in)
 
                                 x
                               /  \
@@ -138,6 +142,7 @@ The following are working:
      *    / \
      *   A   B
      *  </pre>
+     *
      * @param state
      * @return
      */
@@ -145,8 +150,8 @@ The following are working:
     public Object evaluate(State state) {
         getLeftArg().evaluate(state);
         getRightArg().evaluate(state);
-        
-        if(getRightArg().getResultType() == STEM_TYPE){
+
+        if (getRightArg().getResultType() == STEM_TYPE) {
             // See note above in comment block. Since we get the tree in the wrong order
             // (which is fine, since we require it evaluate from right to left and the parser
             // doesn't do that) we skip over everything until we finally have a scalar as
@@ -171,10 +176,21 @@ The following are working:
         StatementWithResultInterface lastSWRI = getRightArg();
         Object r = null;
         ExpressionStemNode esn = null;
+        ArrayList<StatementWithResultInterface> indices = new ArrayList<>();
+
         while (swri instanceof ExpressionStemNode) {
             esn = (ExpressionStemNode) swri;
-            r = doLeftSVCase(esn.getRightArg(), lastSWRI, state);
-        //    System.out.println("Got " + r);
+            indices.add(lastSWRI);
+
+            if (esn.getRightArg().getResultType() == STEM_TYPE) {
+                r = doLeftSVCase(esn.getRightArg(), indices, state);
+                indices = new ArrayList<>();
+            } else {
+                r = esn.getRightArg().getResult();
+            }
+
+
+            System.out.println("Got " + r);
             esn.setResult(r);
             esn.setResultType(Constant.getType(r));
             esn.setEvaluated(true);
@@ -190,6 +206,12 @@ The following are working:
         return r1;
     }
 
+    protected Object doLeftSVCase(StatementWithResultInterface leftArg, StatementWithResultInterface rightArg, State state) {
+        List<StatementWithResultInterface> x = new ArrayList<>();
+        x.add(rightArg);
+        return doLeftSVCase(leftArg, x, state);
+    }
+
     /**
      * Case that the left hand argument is a stem variable. This does the lookup.
      * In the variable case, a {@link StemMultiIndex} is created and interacts with
@@ -199,35 +221,40 @@ The following are working:
      * @param state
      * @return
      */
-    protected Object doLeftSVCase(StatementWithResultInterface leftArg, StatementWithResultInterface rightArg, State state) {
+    protected Object doLeftSVCase(StatementWithResultInterface leftArg, List<StatementWithResultInterface> indices, State state) {
         StemVariable stemLeft = (StemVariable) leftArg.getResult();
         String rawMI = "_"; // dummy name for stem
-        boolean gotOne = false;
-        if (rightArg instanceof VariableNode) {
-            VariableNode vn = (VariableNode) rightArg;
-            if (vn.getResult() == null) {
-                // no such variable, so use name
-                StringTokenizer st = new StringTokenizer(vn.getVariableReference(), STEM_INDEX_MARKER);
-                while (st.hasMoreTokens()) {
-                    String name = st.nextToken();
-                    Object v = state.getValue(name);
-                    if (v == null) {
-                        rawMI = rawMI + STEM_INDEX_MARKER + name;
-                    } else {
-                        rawMI = rawMI + STEM_INDEX_MARKER + v;
+        for (StatementWithResultInterface rightArg : indices) {
+
+            boolean gotOne = false;
+            if (rightArg instanceof VariableNode) {
+                VariableNode vn = (VariableNode) rightArg;
+                if (vn.getResult() == null) {
+                    // no such variable, so use name
+                    StringTokenizer st = new StringTokenizer(vn.getVariableReference(), STEM_INDEX_MARKER);
+                    while (st.hasMoreTokens()) {
+                        String name = st.nextToken();
+                        Object v = state.getValue(name);
+                        if (v == null) {
+                            rawMI = rawMI + STEM_INDEX_MARKER + name;
+                        } else {
+                            rawMI = rawMI + STEM_INDEX_MARKER + v;
+                        }
                     }
+                    gotOne = true;
                 }
-                gotOne = true;
             }
-        }
-        if (!gotOne && (rightArg.getResultType() == STRING_TYPE || rightArg.getResultType() == LONG_TYPE)) {
-            rawMI = rawMI + STEM_INDEX_MARKER + rightArg.getResult().toString();
-        } else {
-            // do what?
-            if (rightArg.getResultType() == STEM_TYPE) {
-                result = getLeftArg();
-                return result;
+            if (!gotOne && (rightArg.getResultType() == STRING_TYPE || rightArg.getResultType() == LONG_TYPE)) {
+                rawMI = rawMI + STEM_INDEX_MARKER + rightArg.getResult().toString();
+            } else {
+                // do what?
+                if (rightArg.getResultType() == STEM_TYPE) {
+                    result = getLeftArg();
+                    return result;
+                }
             }
+
+
         }
 
         StemMultiIndex multiIndex = new StemMultiIndex(rawMI); // dummy variable

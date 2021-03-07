@@ -224,10 +224,11 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Test the keys() commands for filtering using the parser.
+     *
      * @throws Throwable
      */
     @Test
-       public void testParserKeyFiltering() throws Throwable {
+    public void testParserKeyFiltering() throws Throwable {
         String cf = " a. := ['a',null,['x','y'],2]~{'p':123.34, 'q': -321, 'r':false};";
         String cf2;
         State state = testUtils.getNewState();
@@ -245,20 +246,20 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
 
         assert getStemValue("b.", state).size() == 1;
-        assert (Long)getStemValue("b.", state).get(1L) == 1L;
+        assert (Long) getStemValue("b.", state).get(1L) == 1L;
 
         assert getStemValue("c.", state).size() == 1;
         assert getStemValue("c.", state).get("r").equals("r");
 
         assert getStemValue("d.", state).size() == 2;
-        assert (Long)getStemValue("d.", state).get(3L) == 3L;
+        assert (Long) getStemValue("d.", state).get(3L) == 3L;
         assert getStemValue("d.", state).get("q").equals("q");
 
         assert getStemValue("e.", state).size() == 1;
-        assert (Long)getStemValue("e.", state).get(0L) == 0L;
+        assert (Long) getStemValue("e.", state).get(0L) == 0L;
 
         assert getStemValue("f.", state).size() == 1;
-        assert (Long)getStemValue("f.", state).get(2L) == 2L;
+        assert (Long) getStemValue("f.", state).get(2L) == 2L;
 
         assert getStemValue("g.", state).size() == 1;
         assert getStemValue("g.", state).get("p").equals("p");
@@ -267,12 +268,12 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getStemValue("h.", state).get("p").equals("p");
         assert getStemValue("h.", state).get("q").equals("q");
         assert getStemValue("h.", state).get("r").equals("r");
-        assert (Long)getStemValue("h.", state).get(0L) == 0L;
-        assert (Long)getStemValue("h.", state).get(1L) == 1L;
-        assert (Long)getStemValue("h.", state).get(3L) == 3L;
+        assert (Long) getStemValue("h.", state).get(0L) == 0L;
+        assert (Long) getStemValue("h.", state).get(1L) == 1L;
+        assert (Long) getStemValue("h.", state).get(3L) == 3L;
 
         assert getStemValue("i.", state).size() == 1;
-        assert (Long)getStemValue("i.", state).get(2L) == 2L;
+        assert (Long) getStemValue("i.", state).get(2L) == 2L;
 
     }
 
@@ -294,34 +295,34 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
 
         assert getStemValue("b.", state).size() == 1;
-        assert (Long)getStemValue("b.", state).get(0L) == 1L;
+        assert (Long) getStemValue("b.", state).get(0L) == 1L;
 
         assert getStemValue("c.", state).size() == 1;
         assert getStemValue("c.", state).get(0L).equals("r");
 
         assert getStemValue("d.", state).size() == 2;
-        assert (Long)getStemValue("d.", state).get(0L) == 3L;
+        assert (Long) getStemValue("d.", state).get(0L) == 3L;
         assert getStemValue("d.", state).get(1L).equals("q");
 
         assert getStemValue("e.", state).size() == 1;
-        assert (Long)getStemValue("e.", state).get(0L) == 0L;
+        assert (Long) getStemValue("e.", state).get(0L) == 0L;
 
         assert getStemValue("f.", state).size() == 1;
-        assert (Long)getStemValue("f.", state).get(0L) == 2L;
+        assert (Long) getStemValue("f.", state).get(0L) == 2L;
 
         assert getStemValue("g.", state).size() == 1;
         assert getStemValue("g.", state).get(0L).equals("p");
 
         assert getStemValue("h.", state).size() == 6;
-        assert (Long)getStemValue("h.", state).get(0L) == 0L;
-        assert (Long)getStemValue("h.", state).get(1L) == 1L;
-        assert (Long)getStemValue("h.", state).get(2L) == 3L;
+        assert (Long) getStemValue("h.", state).get(0L) == 0L;
+        assert (Long) getStemValue("h.", state).get(1L) == 1L;
+        assert (Long) getStemValue("h.", state).get(2L) == 3L;
         assert getStemValue("h.", state).get(3L).equals("p");
         assert getStemValue("h.", state).get(4L).equals("q");
         assert getStemValue("h.", state).get(5L).equals("r");
 
         assert getStemValue("i.", state).size() == 1;
-        assert (Long)getStemValue("i.", state).get(0L) == 2L;
+        assert (Long) getStemValue("i.", state).get(0L) == 2L;
 
     }
 
@@ -730,24 +731,25 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * This is a different structure than a JSON object in that the list elements 0,1,2,3 are
      * just entries, so it is necessary to show the entries end up as part of the JSON object and
      * are not stashed in a list someplace.
+     *
      * @throws Exception
      */
     @Test
-    public void testMixedJSON() throws Exception{
+    public void testMixedJSON() throws Exception {
         StemVariable s = new StemVariable();
         String name = "bob";
         String issuer = "https://localhost:9443/oauth2";
         String tokenID = "https://localhost:9443/oauth2/idToken/7e3318d9e03b19a2a38ba88542abab0a/1591271860588";
-        s.put("sub",name);
-        s.put("iss",issuer);
-        s.put("token_id",tokenID);
-        s.put(0L,3L);
-        s.put(1L,"foo");
-        s.put(2L,new BigDecimal("23.4"));
+        s.put("sub", name);
+        s.put("iss", issuer);
+        s.put("token_id", tokenID);
+        s.put(0L, 3L);
+        s.put(1L, "foo");
+        s.put(2L, new BigDecimal("23.4"));
         s.put(3L, Boolean.TRUE);
-        JSON json =  s.toJSON();
+        JSON json = s.toJSON();
         assert json instanceof JSONObject;
-        JSONObject jo = (JSONObject)json;
+        JSONObject jo = (JSONObject) json;
         assert jo.size() == s.size();
         assert jo.getString("sub").equals(name);
         assert jo.getString("iss").equals(issuer);
@@ -757,6 +759,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert jo.getDouble("2") == 23.4;
         assert jo.getBoolean("3");
     }
+
     /**
      * Test that arrays are faithfully translated to and from stems
      *
@@ -991,13 +994,14 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Thse two tests make sure that w.z.y.x and w.z.y.x. (so long non-stem and long stem) resolutions work.
-     *  This creates two variables
-     *  <pre>
+     * This creates two variables
+     * <pre>
      *      w.2
      *      w.2.
      *  </pre>
-     *  and has a complicated resolution to get this. This requires that the multi-indices work
-     *  and keep track of a fair amount of state.
+     * and has a complicated resolution to get this. This requires that the multi-indices work
+     * and keep track of a fair amount of state.
+     *
      * @throws Throwable
      */
     @Test
@@ -1011,7 +1015,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getStemValue("test.",state).size() == 2;
+        assert getStemValue("test.", state).size() == 2;
     }
 
     @Test
@@ -1031,72 +1035,86 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * Test the has_value function. This test checks for conformability as well as results.
      * It is a bit long but it is critical that this work and in particular, if there is regression
      * it is found immediately.
+     *
      * @throws Throwable
      */
     @Test
-     public void testHasValue() throws Throwable {
-         StringBuffer script = new StringBuffer();
-         addLine(script, "a. := indices(3); b.:=2+indices(5);c.foo:=1;c.bar:='arf';");
-         addLine(script, "test_a_b. := has_value(a.,b.);");
-         addLine(script, "test_b_a. := has_value(b.,a.);");
-         addLine(script, "test_a_c. := has_value(a.,c.);");
-         addLine(script, "test_c_a. := has_value(c.,a.);");
-         addLine(script, "test_c := has_value('arf',c.);"); // scalar result
-         addLine(script, "test_1 := has_value(1,a.);"); // scalar result
-         addLine(script, "test_bad := has_value(42,b.);"); // scalar result
-         addLine(script, "test_bad2 := has_value(42,'woof');"); // scalar result
+    public void testHasValue() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := indices(3); b.:=2+indices(5);c.foo:=1;c.bar:='arf';");
+        addLine(script, "test_a_b. := has_value(a.,b.);");
+        addLine(script, "test_b_a. := has_value(b.,a.);");
+        addLine(script, "test_a_c. := has_value(a.,c.);");
+        addLine(script, "test_c_a. := has_value(c.,a.);");
+        addLine(script, "test_c := has_value('arf',c.);"); // scalar result
+        addLine(script, "test_1 := has_value(1,a.);"); // scalar result
+        addLine(script, "test_bad := has_value(42,b.);"); // scalar result
+        addLine(script, "test_bad2 := has_value(42,'woof');"); // scalar result
 
-         State state = testUtils.getNewState();
+        State state = testUtils.getNewState();
 
-         // really detailed tests since this is probably one of the most used functions.
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         // tests for scalar left arg:
-         assert getBooleanValue("test_c", state);
-         assert getBooleanValue("test_1", state);
-         assert !getBooleanValue("test_bad", state);
-         assert !getBooleanValue("test_bad2", state);
+        // really detailed tests since this is probably one of the most used functions.
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // tests for scalar left arg:
+        assert getBooleanValue("test_c", state);
+        assert getBooleanValue("test_1", state);
+        assert !getBooleanValue("test_bad", state);
+        assert !getBooleanValue("test_bad2", state);
 
-         StemVariable test_a_b = getStemValue("test_a_b.",state);
-         assert test_a_b.size()== 3;
-         assert !test_a_b.getBoolean(0L);
-         assert !test_a_b.getBoolean(1L);
-         assert test_a_b.getBoolean(2L);
+        StemVariable test_a_b = getStemValue("test_a_b.", state);
+        assert test_a_b.size() == 3;
+        assert !test_a_b.getBoolean(0L);
+        assert !test_a_b.getBoolean(1L);
+        assert test_a_b.getBoolean(2L);
 
-        StemVariable test_b_a = getStemValue("test_b_a.",state);
+        StemVariable test_b_a = getStemValue("test_b_a.", state);
         assert test_b_a.size() == 5;
-        assert  test_b_a.getBoolean(0L);
+        assert test_b_a.getBoolean(0L);
         assert !test_b_a.getBoolean(1L);
         assert !test_b_a.getBoolean(2L);
         assert !test_b_a.getBoolean(3L);
         assert !test_b_a.getBoolean(4L);
 
-        StemVariable test_a_c = getStemValue("test_a_c.",state);
+        StemVariable test_a_c = getStemValue("test_a_c.", state);
         assert test_a_c.size() == 3;
         assert !test_a_c.getBoolean(0L);
         assert test_a_c.getBoolean(1L);
         assert !test_a_c.getBoolean(2L);
 
-        StemVariable test_c_a = getStemValue("test_c_a.",state);
+        StemVariable test_c_a = getStemValue("test_c_a.", state);
         assert test_c_a.size() == 2;
-        assert  test_c_a.getBoolean("foo");
+        assert test_c_a.getBoolean("foo");
         assert !test_c_a.getBoolean("bar");
 
-     }
+    }
 
     /*
        Test presets
        j(n)->n;j:=2;k:=1;p:=4;q:=5;r:=6;a. := [i(4),i(5),i(6)];
-             {'a':'b','c':'d'}.'a'
      Not working
      i(3).0 -- gives parser error for .0 since it thinks it is a decimal.
 
-  The following are working:
-       [i(5),-i(6)].j(1).j(3)
-       i(3).i(4).i(5).i(6).i(7).i(8).j;
-       i(3).i(4).i(5).i(6).j(2);
-       (4*i(5)-21).(i(3).i(4).j(2))
-       i(3).i(4).i(5).(a.k).i(6).i(7).j
+  The following are working and have tests below:
+      (i(4)^2-5).j(3)
+     [i(5),-i(6)].j(1).j(3)
+     [i(5),i(4)].k
+     [2+3*i(5),10 - i(4)].(k.0)
+     {'a':'b','c':'d'}.j('a')
+     {'a':'b','c':'d'}.'a'
+     i(3).i(4).j
+     i(3).i(4).i(5).i(6).i(7).i(8).j;
+     i(3).i(4).i(5).i(6).j(2);
+     i(3).i(4).i(5).(a.k).i(6).i(7).j
+    (4*i(5)-21).(i(3).i(4).j(2))
+     3 rank exx.
+     [[-i(4),3*i(5)],[11+i(6), 4-i(5)^2]].j(0).j(1).j(2)
+     (b.).j(0).j(1).j(2)
+
+     Embedded stem example. This get a.1.2 in a very roundabout way
+    k:=1;j:=2;a.:=[-i(4),3*i(5),11+i(6)];
+    x := i(12).i(11).i(10).(a.k).i(6).i(7).j;
+    x==6;
 
        */
     /* *********** Here below are test for functional stem notation e.g. f(x).j(n) ******* */
@@ -1111,6 +1129,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getStringValue("x", state).equals("b");
     }
+
     @Test
     public void testSimpleSF1() throws Throwable {
         State state = testUtils.getNewState();
@@ -1120,6 +1139,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getStringValue("x", state).equals("b");
     }
+
     @Test
     public void testSimpleSF2() throws Throwable {
         State state = testUtils.getNewState();
@@ -1133,6 +1153,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 4L;
         assert getLongValue("b", state) == 10L;
     }
+
     @Test
     public void testSimpleSF3() throws Throwable {
         State state = testUtils.getNewState();
@@ -1164,15 +1185,18 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, " k := 1;");
         addLine(script, " j := 2;");
         addLine(script, " x := i(12).i(11).i(10).(a.k).i(6).i(7).j;");
+        addLine(script, " y := x == a.1.2;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 6L;
+        assert getBooleanValue("y", state);
     }
 
 
     /**
      * In this case, the stem variable resolves correctly to the value of 6, but
      * there is no 6th index, so an error condition should be raised.
+     *
      * @throws Throwable
      */
     @Test
@@ -1186,13 +1210,14 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
-        }catch(Throwable t){
+        } catch (Throwable t) {
             assert true;
         }
     }
 
     /**
      * Test that supplying the stem as the left most argument can be resolved.
+     *
      * @throws Throwable
      */
     @Test
@@ -1201,9 +1226,12 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, " j(n)-> n;");
         addLine(script, " x := (4*i(5)-21).(i(3).i(4).j(2));");
+        addLine(script, " y := -13 == (4*i(5)-21).(i(3).i(4).j(2));");
+        // redundant check is to ensure that everything is being run right as expressions
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == -13L;
+        assert getBooleanValue("y", state);
     }
 
     @Test
@@ -1215,5 +1243,64 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 6L;
+    }
+
+    /**
+     * In the manual, the example given is
+     * <pre>
+     *       x := 0;
+     *     y.0 := 1;
+     *     z.1 := 2;
+     *     w.2 := 3;
+     *     w.z.y.x
+     *  3
+     * </pre>
+     * This next test does that with functions, showing that tail resolution works.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testTailResolution() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " j(n)-> n;");
+        addLine(script, " x := (1+i(4)).(1+i(3)).(1+i(2)).j(0);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 3L;
+    }
+
+    @Test
+    public void testTailResolution2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " j(n)-> n;");
+        addLine(script, " b. := [[-i(4)^2,2+i(5)],[10 - 3*i(6),4+5*i(7)]];");
+        addLine(script, " x := (b.).(0).j(1).(3);");
+        addLine(script, " y := b.0.1.3 == (b.).(0).j(1).(3);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 5L;
+        assert getBooleanValue("y", state);
+    }
+
+    /**
+     * Test heavily parenthesized tail.
+     * @throws Throwable
+     */
+    @Test
+    public void testTailParentheses() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " j(n)-> n;");
+        // Expr is (A).((B).(C).(D)))
+        addLine(script, " x := 3 == (1+i(4)).((1+i(3)).((1+i(2)).(j(0))));");
+        // Expr is (A).((B).(C)).(D))
+        addLine(script, " y := 3 == (1+i(4)).((1+i(3)).((1+i(2))).(j(0)));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("x", state);
+        assert getBooleanValue("y", state);
     }
 }
