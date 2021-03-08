@@ -139,6 +139,10 @@ public abstract class FunctionState extends VariableState {
      */
     public TreeSet<String> listFunctions(boolean useCompactNotation, String regex) {
         TreeSet<String> out = getFunctionTable().listFunctions(regex);
+        // no module templates, so no need to snoop through them
+        if(getModuleMap().isEmpty()){
+            return out;
+        }
         for (URI key : getImportManager().keySet()) {
             TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions(useCompactNotation, regex);
             for (String x : uqVars) {

@@ -213,8 +213,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         // wihout warning.
   //       stem0 = (StemVariable) stem0.clone();
   //       stem1 = (StemVariable)stem1.clone();
-        stem0.union(stem1);
-        dyad.setResult(stem0);
+        StemVariable newStem =  stem0.union(stem1);
+        dyad.setResult(newStem);
         dyad.setResultType(Constant.STEM_TYPE);
         dyad.setEvaluated(true);
     }

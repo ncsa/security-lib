@@ -188,9 +188,6 @@ The following are working:
             } else {
                 r = esn.getRightArg().getResult();
             }
-
-
-            System.out.println("Got " + r);
             esn.setResult(r);
             esn.setResultType(Constant.getType(r));
             esn.setEvaluated(true);

@@ -123,7 +123,6 @@ public class QDLDebugListener extends QDLParserBaseListener {
     }*/
 
 
-
     @Override
     public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
         say("enter assignment:" + enter("assignment"), ctx);
@@ -138,6 +137,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
         sayii("[" + Integer.toHexString(ctx.hashCode()) + "]");
         sayii("expr=" + ctx.expression());
         sayii("variable=" + ctx.variable());
+        //sayii("expression 1 =" + ctx.expression(1));
         sayii("parent id [" + Integer.toHexString(ctx.getParent().hashCode()) + "]");
         for (ParseTree parseTree : ctx.children) {
             sayii("child =[" + Integer.toHexString(parseTree.hashCode()) +
@@ -239,7 +239,6 @@ public class QDLDebugListener extends QDLParserBaseListener {
     }
 
 
-
     @Override
     public void enterAssociation(QDLParserParser.AssociationContext ctx) {
         say("enter association");
@@ -288,7 +287,6 @@ public class QDLDebugListener extends QDLParserBaseListener {
         sayi("exit variables ", ctx);
 
     }
-
 
 
     @Override
@@ -498,7 +496,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     @Override
     public void exitLoopStatement(QDLParserParser.LoopStatementContext ctx) {
         say("exit LoopStatement ", ctx);
-         printKids(ctx);
+        printKids(ctx);
     }
 
     @Override
@@ -544,16 +542,27 @@ public class QDLDebugListener extends QDLParserBaseListener {
     }
 /*
     @Override
-      public void enterDotOp(QDLParserParser.DotOpContext ctx) {
-          System.out.println("enter dot op");
+    public void enterStem_ref(QDLParserParser.Stem_refContext ctx) {
+        System.out.println("enter stem-ref");
         printKids(ctx);
-      }
+    }
 
-      @Override
-      public void exitDotOp(QDLParserParser.DotOpContext ctx) {
-          System.out.println("exit dot op");
-          printKids(ctx);
-      }
-      */
+    @Override
+    public void exitStem_ref(QDLParserParser.Stem_refContext ctx) {
+        System.out.println("exit stem-ref");
+        printKids(ctx);
+    }
+
+    @Override
+    public void enterStem_refs(QDLParserParser.Stem_refsContext ctx) {
+        System.out.println("enter stem-refs");
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitStem_refs(QDLParserParser.Stem_refsContext ctx) {
+        System.out.println("exit stem_refs");
+        printKids(ctx);
+    }*/
 
 }

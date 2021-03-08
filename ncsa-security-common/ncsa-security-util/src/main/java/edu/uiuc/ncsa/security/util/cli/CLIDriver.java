@@ -167,7 +167,7 @@ public class CLIDriver {
         say(indent + indent + "This is equivalent to issuing " + HISTORY_LIST_COMMAND + " 0");
         if (getComponentManager() != null) {
             say(indent + COMPONENT_COMMAND + " = execute a command from a specific component, without switching to that component.");
-            say(indent + indent + "No arguments simply switch to that component, arguments are fed to the component and evaluated.IDTokenHan");
+            say(indent + indent + "No arguments simply switch to that component, arguments are fed to the component and evaluated.");
         }
         say("E.g. #1");
         say(LOAD_BUFFER_COMMAND + "  /tmp/foo.txt would load the file \"/tmp/foo.txt\" in to the command history, replacing it");

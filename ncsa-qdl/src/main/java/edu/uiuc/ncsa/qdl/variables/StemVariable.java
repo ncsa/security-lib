@@ -771,15 +771,16 @@ public class StemVariable extends HashMap<String, Object> {
     a.~[[mod(random(3),100)],mod(random(4),100)];
      */
     public StemVariable union(StemVariable... stemVariables) {
+        StemVariable newStem = (StemVariable) clone();
         for (StemVariable stemVariable : stemVariables) {
-            super.putAll(stemVariable); // non-list
-            listAppend(stemVariable); // list elements
+            newStem.putAll(stemVariable); // non-list
+            newStem.listAppend(stemVariable); // list elements
             if (stemVariable.getDefaultValue() != null) {
-                setDefaultValue(stemVariable.getDefaultValue());
+                newStem.setDefaultValue(stemVariable.getDefaultValue());
             }
         }
 
-        return this;
+        return newStem;
     }
 
     public static String STEM_ENTRY_CONNECTOR = ":";

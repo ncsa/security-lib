@@ -5,7 +5,17 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-   assignment : (variable  op=ASSIGN)+  (expression | stemVariable | stemList);
+/*
+  Uncomment the next line to allow the parser to recognize expressions, e.g.
+     f().j(4) := 42;
+ You can enable it now, but actually turning the left hand into something reasonable
+ is going to be quite tricky. Now the solution is to just use variables, so
+     a. := f(); n := j(4);
+     a. n := 42;
+*/
+//   assignment : (expression  op=ASSIGN)+  expression;
+
+   assignment : (variable  op=ASSIGN)+  expression;
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';
@@ -27,6 +37,7 @@ import QDLVariableParser;
 expression
  :
    function                                                              #functions
+ //| stem_ref                                                              #stem_refs
  | stemVariable                                                          #stemVar
  | stemList                                                              #stemLi
  | expression '.' expression                                             #dotOp
@@ -44,8 +55,8 @@ expression
  | expression '||' expression                                            #orExpression
  | '(' expression ')'                                                    #association
  | LeftBracket                                                           #leftBracket
- | number                                                                #numbers
  | integer                                                               #integers
+ | number                                                                #numbers
  | variable                                                              #variables
  | Bool                                                                  #logical
  | Null                                                                  #null

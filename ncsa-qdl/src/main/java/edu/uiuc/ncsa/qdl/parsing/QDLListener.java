@@ -102,7 +102,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
-
         stash(ctx, new Assignment());
     }
 
@@ -273,8 +272,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitVariables(QDLParserParser.VariablesContext ctx) {
-
-
     }
 
     @Override
@@ -1191,4 +1188,29 @@ public class QDLListener implements QDLParserListener {
     public void exitIntegers(QDLParserParser.IntegersContext ctx) {
 
     }
+
+/*    @Override
+    public void enterStem_ref(QDLParserParser.Stem_refContext ctx) {
+        System.out.println("enter stem-ref");
+        stash(ctx, new VariableNode(null));
+
+    }
+
+    @Override
+    public void exitStem_ref(QDLParserParser.Stem_refContext ctx) {
+        System.out.println("exit stem-ref");
+        StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
+        ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
+    }
+
+    @Override
+    public void enterStem_refs(QDLParserParser.Stem_refsContext ctx) {
+        System.out.println("enter stem-refs");
+    }
+
+    @Override
+    public void exitStem_refs(QDLParserParser.Stem_refsContext ctx) {
+        System.out.println("exit stem_refs");
+    }*/
+
 }
