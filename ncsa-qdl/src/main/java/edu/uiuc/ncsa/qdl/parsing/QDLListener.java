@@ -144,7 +144,19 @@ public class QDLListener implements QDLParserListener {
         int exprIndex = assignmentContext.children.size() - 1;
         //     boolean isStem = false;
         for (int i = 0; i < exprIndex; i++) {
-            String currentVar = assignmentContext.children.get(i).getText();
+            boolean isVariableCase = true;
+            String currentVar = null;
+            if (assignmentContext.children.get(i) instanceof QDLParserParser.VariablesContext) {
+                currentVar = assignmentContext.children.get(i).getText();
+                currentA.setVariableReference(currentVar);
+            } else {
+                Statement s = resolveChild(assignmentContext.children.get(i));
+                if (!(s instanceof StatementWithResultInterface)) {
+                    throw new IllegalArgumentException("error: illegal assignment expression ");
+                }
+                currentA.setExpStatement((StatementWithResultInterface) s);
+                isVariableCase = false;
+            }
             // The general pattern (i.e.  the children of assignmentContext) is
             //   V0 op0 V1 op1 V2 op2 V3 op3 Expr
             // (The final argument must always be an expression). So this gets
@@ -153,11 +165,14 @@ public class QDLListener implements QDLParserListener {
             //   V1 op1 V2
             // In this way it has enough information at each iteration to make the
             // right type of assignment operator.
-            currentA.setVariableReference(currentVar);
             String op = assignmentContext.children.get(++i).getText(); // this is the operator
             String nextVar;
             if (currentA.getSourceCode() == null) {
-                currentA.setSourceCode(currentVar + op + assignmentContext.children.get(i + 1).getText());
+                if (isVariableCase) {
+                    currentA.setSourceCode(currentVar + op + assignmentContext.children.get(i + 1).getText());
+                } else {
+                    currentA.setSourceCode(currentA.getExpStatement().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
+                }
             }
 
             nextA = new Assignment();
@@ -167,9 +182,22 @@ public class QDLListener implements QDLParserListener {
                 // Throw an  exception they can understand rather than an index out of bounds.
                 throw new AssignmentException("missing/unparseable right-hand expression for assignment");
             }
-            nextVar = assignmentContext.children.get(i + 1).getText();
-            nextA.setVariableReference(nextVar);
 
+            if (assignmentContext.children.get(i+1) instanceof QDLParserParser.VariablesContext) {
+                nextVar = assignmentContext.children.get(i + 1).getText();
+                nextA.setVariableReference(nextVar);
+            } else {
+                Statement s = resolveChild(assignmentContext.children.get(i + 1));
+                if (!(s instanceof StatementWithResultInterface)) {
+                    throw new IllegalArgumentException("error: illegal assignment expression ");
+                }
+                nextA.setExpStatement((StatementWithResultInterface) s);
+                // isVariableCase = false;
+            }
+//            nextVar = assignmentContext.children.get(i + 1).getText();
+            //          nextA.setVariableReference(nextVar);
+            // Special cases. := means assignment, if not then, then it is one
+            // of +=, *=,..., so create the appropriate dyad
             if (op.equals(":=")) {
                 if (i + 1 == exprIndex) {
                     Statement arg = resolveChild(assignmentContext.children.get(i + 1));
@@ -190,7 +218,11 @@ public class QDLListener implements QDLParserListener {
                 Statement arg = resolveChild(assignmentContext.children.get(i + 1));
                 // If this is not here, you will create a variable with the name of the argument,
                 // e.g. 'qqq'
-                nextA.setVariableReference(currentA.getVariableReference());
+                if(isVariableCase){
+                    nextA.setVariableReference(currentA.getVariableReference());
+                }else{
+                    nextA.setExpStatement(currentA.getExpStatement());
+                }
                 nextA.setArgument(arg);
                 return;
                 //  A := 'a'; B := 'b';
@@ -922,7 +954,7 @@ public class QDLListener implements QDLParserListener {
      * @return
      */
     protected String getSource(ParserRuleContext ctx) {
-        if(ctx.start == null || ctx.stop == null){
+        if (ctx.start == null || ctx.stop == null) {
             // odd ball case
             return "no source";
         }

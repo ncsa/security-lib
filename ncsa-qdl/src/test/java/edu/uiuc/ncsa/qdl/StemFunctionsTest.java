@@ -1144,10 +1144,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testSimpleSF2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "j(n)->n;");
         addLine(script, "k := 1;");
-        addLine(script, "a := (i(4)^2-5).j(3);");
-        addLine(script, "b := [2+3*i(5),10 - i(4)].(k.0);");
+        addLine(script, "a := (n(4)^2-5).i(3);");
+        addLine(script, "b := [2+3*n(5),10 - n(4)].(k.0);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 4L;
@@ -1159,7 +1158,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "j :=2;");
-        addLine(script, "x :=i(3).i(4).j;");
+        addLine(script, "x :=n(3).n(4).j;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 2L;
@@ -1171,7 +1170,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "k := 1;");
-        addLine(script, "x. := [i(5),i(4)].k;");
+        addLine(script, "x. := [n(5),n(4)].k;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStemValue("x.", state).size() == 4; // Noit a great check, but sufficient.
@@ -1181,10 +1180,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testSFEmbeddedStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := [-i(4),3*i(5),11+i(6)];");
+        addLine(script, "a. := [-n(4),3*n(5),11+n(6)];");
         addLine(script, " k := 1;");
         addLine(script, " j := 2;");
-        addLine(script, " x := i(12).i(11).i(10).(a.k).i(6).i(7).j;");
+        addLine(script, " x := n(12).n(11).n(10).(a.k).n(6).n(7).j;");
         addLine(script, " y := x == a.1.2;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1203,10 +1202,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testBadSFEmbeddedStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := [-i(4),3*i(5),11+i(6)];");
+        addLine(script, "a. := [-n(4),3*n(5),11+n(6)];");
         addLine(script, " k := 1;");
         addLine(script, " j := 2;");
-        addLine(script, " x := i(2).i(3).i(4).(a.k).i(6).i(7).j;");
+        addLine(script, " x := n(2).n(3).n(4).(a.k).n(6).n(7).j;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
@@ -1224,9 +1223,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testInitialStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " j(n)-> n;");
-        addLine(script, " x := (4*i(5)-21).(i(3).i(4).j(2));");
-        addLine(script, " y := -13 == (4*i(5)-21).(i(3).i(4).j(2));");
+        addLine(script, " x := (4*n(5)-21).(n(3).n(4).i(2));");
+        addLine(script, " y := -13 == (4*n(5)-21).(n(3).n(4).i(2));");
         // redundant check is to ensure that everything is being run right as expressions
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1238,8 +1236,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testThreeRankStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " j(n)-> n;");
-        addLine(script, " x := [[-i(4),3*i(5)],[11+i(6), 4-i(5)^2]].j(0).j(1).j(2);");
+        addLine(script, " x := [[-n(4),3*n(5)],[11+n(6), 4-n(5)^2]].i(0).i(1).i(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 6L;
@@ -1263,8 +1260,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testTailResolution() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " j(n)-> n;");
-        addLine(script, " x := (1+i(4)).(1+i(3)).(1+i(2)).j(0);");
+        addLine(script, " x := (1+n(4)).(1+n(3)).(1+n(2)).i(0);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 3L;
@@ -1274,10 +1270,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testTailResolution2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " j(n)-> n;");
-        addLine(script, " b. := [[-i(4)^2,2+i(5)],[10 - 3*i(6),4+5*i(7)]];");
-        addLine(script, " x := (b.).(0).j(1).(3);");
-        addLine(script, " y := b.0.1.3 == (b.).(0).j(1).(3);");
+        addLine(script, " b. := [[-n(4)^2,2+n(5)],[10 - 3*n(6),4+5*n(7)]];");
+        addLine(script, " x := (b.).(0).i(1).(3);");
+        addLine(script, " y := b.0.1.3 == (b.).(0).i(1).(3);");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1293,11 +1288,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testTailParentheses() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " j(n)-> n;");
         // Expr is (A).((B).(C).(D)))
-        addLine(script, " x := 3 == (1+i(4)).((1+i(3)).((1+i(2)).(j(0))));");
+        addLine(script, " x := 3 == (1+n(4)).((1+n(3)).((1+n(2)).(i(0))));");
         // Expr is (A).((B).(C)).(D))
-        addLine(script, " y := 3 == (1+i(4)).((1+i(3)).((1+i(2))).(j(0)));");
+        addLine(script, " y := 3 == (1+n(4)).((1+n(3)).((1+n(2))).(i(0)));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("x", state);

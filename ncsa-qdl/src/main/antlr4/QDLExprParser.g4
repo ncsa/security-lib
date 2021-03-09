@@ -13,9 +13,9 @@ import QDLVariableParser;
      a. := f(); n := j(4);
      a. n := 42;
 */
-//   assignment : (expression  op=ASSIGN)+  expression;
+   assignment : (expression  op=ASSIGN)+  expression;
 
-   assignment : (variable  op=ASSIGN)+  expression;
+//   assignment : (variable  op=ASSIGN)+  expression;
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';

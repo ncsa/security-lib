@@ -42,6 +42,10 @@ public class StemVariable extends HashMap<String, Object> {
         return (Long) get(key);
     }
 
+    public Long getLong(Long key){
+        return (Long) get(key);
+    }
+
     @Override
     public Object get(Object key) {
         if(key instanceof Long){

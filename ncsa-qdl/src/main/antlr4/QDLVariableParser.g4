@@ -31,7 +31,6 @@ grammar QDLVariableParser;
 */
 //   Stem_ref : Identifier '.';
     Integer : [0-9]+;
-    Decimal : (Integer '.' Integer) | ('.' Integer);
  Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
@@ -42,6 +41,7 @@ grammar QDLVariableParser;
  BOOL_FALSE : 'false';
        Null : 'null';
      STRING : '\'' (ESC|.)*? '\'';
+    Decimal : (Integer '.' Integer) | ('.' Integer);
 
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
@@ -69,7 +69,7 @@ grammar QDLVariableParser;
           Backtick : '`';
            Percent : '%';
              Tilde : '~';
-               Dot : '.';
+ //              Dot : '.';
 
 // The left bracket, as the end of a control statement, has to be found in the lexer.
    LeftBracket: ']';

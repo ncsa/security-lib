@@ -46,8 +46,11 @@ public interface RFC8628Constants {
      * that are confused. So there is zero, but no lower/uppercase "oh". Similar no lower case
      * "L" which looks like a 1 in a lot of fonts.
      */
+    // next is if you want lower case as well
     //char[] CODE_CHARS="0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz".toCharArray();
-    char[] CODE_CHARS = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ".toCharArray();
+    // next has upper case vowels in it.
+    //char[] CODE_CHARS="0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ".toCharArray();
+    char[] CODE_CHARS = "0123456789BCDFGHJKLMNPQRSTVWXZ".toCharArray();
 
     /**
      * Number of bytes in a user code.

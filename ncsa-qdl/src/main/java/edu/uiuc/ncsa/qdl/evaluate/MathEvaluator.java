@@ -72,8 +72,15 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_NUMERIC_DIGITS = MATH_FQ + NUMERIC_DIGITS;
     public static final int NUMERIC_DIGITS_TYPE = 12 + MATH_FUNCTION_BASE_VALUE;
 
+    public static final String IDENTITY_FUNCTION = "i";
+    public static final String LONG_IDENTITY_FUNCTION = "identity";
+    public static final String FQ_IDENTITY_FUNCTION = MATH_FQ + IDENTITY_FUNCTION;
+    public static final String FQ_LONG_IDENTITY_FUNCTION = MATH_FQ + "identity";
+    public static final int IDENTITY_FUNCTION_TYPE = 14 + MATH_FUNCTION_BASE_VALUE;
 
     public static String FUNC_NAMES[] = new String[]{
+            IDENTITY_FUNCTION,
+            LONG_IDENTITY_FUNCTION,
             ABS_VALUE,
             RANDOM,
             RANDOM_STRING,
@@ -89,6 +96,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             DATE_ISO};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
+            FQ_IDENTITY_FUNCTION,
             FQ_ABS_VALUE,
             FQ_RANDOM,
             FQ_RANDOM_STRING,
@@ -121,6 +129,9 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case IDENTITY_FUNCTION:
+            case LONG_IDENTITY_FUNCTION:
+                    return IDENTITY_FUNCTION_TYPE;
             case ABS_VALUE:
             case FQ_ABS_VALUE:
                 return ABS_VALUE_TYPE;
@@ -165,6 +176,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case IDENTITY_FUNCTION:
+            case LONG_IDENTITY_FUNCTION:
+                doIdentityFunction(polyad, state);
+                return true;
             case ABS_VALUE:
             case FQ_ABS_VALUE:
                 doAbs(polyad, state);
@@ -215,6 +230,22 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * The identity function returns its argument. Simple as that.
+     * @param polyad
+     * @param state
+     */
+    protected void doIdentityFunction(Polyad polyad, State state) {
+         if(polyad.getArgCount() != 1){
+             throw new IllegalArgumentException("error: " + IDENTITY_FUNCTION + " requires a single argument");
+         }
+         polyad.evalArg(0,state);
+         polyad.setResult(polyad.getArguments().get(0).getResult());
+         polyad.setResultType(polyad.getArguments().get(0).getResultType());
+         polyad.setEvaluated(true);
+
     }
 
     protected void doAbs(Polyad polyad, State state) {

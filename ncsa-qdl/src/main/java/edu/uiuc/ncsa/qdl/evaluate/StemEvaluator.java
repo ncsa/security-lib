@@ -30,7 +30,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
     public static final String MAKE_INDICES = "indices";
-    public static final String SHORT_MAKE_INDICES = "i";
+    public static final String SHORT_MAKE_INDICES = "n";
     public static final String FQ_MAKE_INDICES = STEM_FQ + MAKE_INDICES;
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 

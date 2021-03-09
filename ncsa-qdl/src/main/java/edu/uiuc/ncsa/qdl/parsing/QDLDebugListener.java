@@ -129,6 +129,43 @@ public class QDLDebugListener extends QDLParserBaseListener {
         printKids(ctx);
     }
 
+    @Override
+    public void enterNumber(QDLParserParser.NumberContext ctx) {
+        say("Enter number");
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitNumber(QDLParserParser.NumberContext ctx) {
+        say("exit number");
+        printKids(ctx);
+    }
+
+    @Override
+    public void enterInteger(QDLParserParser.IntegerContext ctx) {
+        say("enter integer");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void exitInteger(QDLParserParser.IntegerContext ctx) {
+        say("exit integer");
+        printKids(ctx);
+    }
+
+
+    @Override
+    public void enterIntegers(QDLParserParser.IntegersContext ctx) {
+        say("enter integers");
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitIntegers(QDLParserParser.IntegersContext ctx) {
+        say("exit integers");
+                printKids(ctx);
+    }
 
     @Override
     public void exitAssignment(QDLParserParser.AssignmentContext ctx) {
@@ -136,8 +173,8 @@ public class QDLDebugListener extends QDLParserBaseListener {
         sayii("op=" + ctx.op);
         sayii("[" + Integer.toHexString(ctx.hashCode()) + "]");
         sayii("expr=" + ctx.expression());
-        sayii("variable=" + ctx.variable());
-        //sayii("expression 1 =" + ctx.expression(1));
+        //sayii("variable=" + ctx.variable());
+        sayii("expression 1 =" + ctx.expression(1));
         sayii("parent id [" + Integer.toHexString(ctx.getParent().hashCode()) + "]");
         for (ParseTree parseTree : ctx.children) {
             sayii("child =[" + Integer.toHexString(parseTree.hashCode()) +

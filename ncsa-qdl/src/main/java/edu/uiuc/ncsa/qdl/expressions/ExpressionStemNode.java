@@ -74,45 +74,46 @@ public class ExpressionStemNode implements StatementWithResultInterface {
     }
 
     /*
-     Test presets
-     j(n)->n;j:=2;k:=1;p:=4;q:=5;r:=6;a. := [i(4),i(5),i(6)];
-     b. := [[i(4),i(5)],[i(6),i(7)]]
-   Not working
-   i(3).0 -- gives parser error for .0 since it thinks it is a decimal.
-   b.j(0).j(1).j(2) --  syntax error at char 3, 'missing ; at ("
+       Extended notes, just in case I have to revisit this later and figure out what it does.
 
-    j(n)->n;
-     b. := [[-i(4)^2,2+i(5)],[10 - 3*i(6),4+5*i(7)]];
-     (b.).j(0).j(1).(2) == b.0.1.2
+       Test presets
+       j:=2;k:=1;p:=4;q:=5;r:=6;a. := [n(4),n(5),n(6)];
+       b. := [[n(4),n(5)],[n(6),n(7)]]
+       Not working
+       n(3).0 -- gives parser error for .0 since it thinks it is a decimal.
+       b.i(0).i(1).i(2) --  syntax error at char 3, 'missing ; at ("
 
-   ** TO DO -- Find stem ex in documentation and create one with functions. w.x.y.z
+        b. := [[-n(4)^2,2+n(5)],[10 - 3*n(6),4+5*n(7)]];
+        (b.).i(0).i(1).(2) == b.0.1.2
+
+      ** TO DO -- Find stem ex in documentation and create one with functions. w.x.y.z
 
 The following are working:
-     (i(4)^2-5).j(3)
-     [i(5),-i(6)].j(1).j(3)
-     [i(5),i(4)].k
-     [2+3*i(5),10 - i(4)].(k.0)
-     {'a':'b','c':'d'}.j('a')
-     {'a':'b','c':'d'}.'a'
-     i(3).i(4).j
-     i(3).i(4).i(5).i(6).i(7).i(8).j;
-     i(3).i(4).i(5).i(6).j(2);
-     i(3).i(4).i(5).(a.k).i(6).i(7).j
-    (4*i(5)-21).(i(3).i(4).j(2))
-     3 rank exx.
-     [[-i(4),3*i(5)],[11+i(6), 4-i(5)^2]].j(0).j(1).j(2)
-     (b.).j(0).j(1).j(2)
+         (n(4)^2-5).i(3)
+         [n(5),-n(6)].i(1).i(3)
+         [n(5),n(4)].k
+         [2+3*n(5),10 - n(4)].(k.0)
+         {'a':'b','c':'d'}.i('a')
+         {'a':'b','c':'d'}.'a'
+         n(3).n(4).j
+         n(3).n(4).n(5).n(6).n(7).n(8).j;
+         n(3).n(4).n(5).n(6).i(2);
+         n(3).n(4).n(5).(a.k).n(6).n(7).j
+        (4*n(5)-21).(n(3).n(4).i(2))
+         3 rank exx.
+         [[-n(4),3*n(5)],[11+n(6), 4-n(5)^2]].i(0).i(1).i(2)
+         (b.).i(0).i(1).i(2)
 
-     Embedded stem example. This get a.1.2 in a very roundabout way
-    k:=1;j:=2;a.:=[-i(4),3*i(5),11+i(6)];
-    x := i(12).i(11).i(10).(a.k).i(6).i(7).j;
-    x==6;
+        Embedded stem example. This get a.1.2 in a very roundabout way
+        k:=1;j:=2;a.:=[-n(4),3*n(5),11+n(6)];
+        x := n(12).n(11).n(10).(a.k).n(6).n(7).j;
+        x==6;
      */
     /*
     E.g. in
-    a. := [-i(4),3*i(5),11+i(6)];k:=1;j:=2;
-    x := i(12).i(11).i(10).(a.k).i(6).i(7).j;
-   the parse tree is (i(n) written in)
+    a. := [-n(4),3*n(5),11+n(6)];k:=1;j:=2;
+    x := n(12).n(11).n(10).(a.k).n(6).n(7).j;
+   the parse tree is (n(n) written in)
 
                                 x
                               /  \
@@ -148,6 +149,14 @@ The following are working:
      */
     @Override
     public Object evaluate(State state) {
+        return getOrSetValue(state, false, null);
+    }
+
+    public Object setValue(State state, Object newValue) {
+        return getOrSetValue(state, true, newValue);
+    }
+
+    protected Object getOrSetValue(State state, boolean setValue, Object newValue) {
         getLeftArg().evaluate(state);
         getRightArg().evaluate(state);
 
@@ -161,15 +170,42 @@ The following are working:
 
         // Simplest case.
         if (getLeftArg().getResultType() == STEM_TYPE) {
-            result = doLeftSVCase(getLeftArg(), getRightArg(), state);
+            if (setValue) {
+                StemVariable s = (StemVariable) getLeftArg().getResult();
+                if (getRightArg().getResult() instanceof Long) {
+                    s.put((Long) getRightArg().getResult(), newValue);
+                } else {
+                    String targetKey = null;
+                    if(getRightArg().getResult() == null){
+                        if(getRightArg() instanceof VariableNode){
+                            VariableNode v = (VariableNode) getRightArg();
+                            if(v.getResult() == null){
+                                targetKey = v.getVariableReference();
+                            }else{
+                                targetKey = v.getResult().toString();
+                            }
+                        }else{
+                            throw new IllegalArgumentException("error: could not determine key for stem");
+                        }
+
+                    }else{
+                        targetKey = getRightArg().getResult().toString();
+                    }
+                    s.put(targetKey, newValue);
+                }
+                result = newValue;
+            } else {
+                result = doLeftSVCase(getLeftArg(), getRightArg(), state);
+            }
             setResultType(Constant.getType(result));
             setEvaluated(true);
             return result;
         }
         // other case is that the left hand argumement is this class.
         if (!(getLeftArg() instanceof ExpressionStemNode)) {
-            // do this for now. Should not happen though.
-            throw new IllegalStateException("Error: left hand argument not an expression stemNode.");
+            // This means the user passed in something as the left most argument that
+            // cannot be a stem, e.g. (1).(2).
+            throw new IllegalStateException("Error: left hand argument not a valid stem.");
         }
 
         StatementWithResultInterface swri = getLeftArg();
@@ -196,11 +232,18 @@ The following are working:
         }
 
         StemVariable stemVariable = (StemVariable) esn.getLeftArg().getResult();
-        Object r1 = stemVariable.get(r);
+        Object r1 = null;
+        if (setValue) {
+            r1 = stemVariable.put(r.toString(), newValue);
+        } else {
+            r1 = stemVariable.get(r);
+        }
+
         setResult(r1);
         setEvaluated(true);
         setResultType(Constant.getType(r1));
         return r1;
+
     }
 
     protected Object doLeftSVCase(StatementWithResultInterface leftArg, StatementWithResultInterface rightArg, State state) {

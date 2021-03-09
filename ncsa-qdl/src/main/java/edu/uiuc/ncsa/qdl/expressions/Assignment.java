@@ -4,9 +4,11 @@ import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
+import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -18,10 +20,24 @@ public class Assignment implements Statement, HasResultInterface {
     Object result;
 
     public Object getResult() {
-        if(!isEvaluated()){
-            throw new UnevaluatedExpressionException("source='" + (getSourceCode() == null?"(none)":getSourceCode()) + "\'");
+        if (!isEvaluated()) {
+            throw new UnevaluatedExpressionException("source='" + (getSourceCode() == null ? "(none)" : getSourceCode()) + "\'");
         }
         return result;
+    }
+
+    public StatementWithResultInterface getExpStatement() {
+        return expStatement;
+    }
+
+    public void setExpStatement(StatementWithResultInterface expStatement) {
+        this.expStatement = expStatement;
+    }
+
+    StatementWithResultInterface expStatement = null;
+
+    public boolean hasExpStatement() {
+        return expStatement != null;
     }
 
     public int getResultType() {
@@ -70,10 +86,14 @@ public class Assignment implements Statement, HasResultInterface {
 
     String variableReference;
     Statement argument;
+
     // just a case
-    protected HasResultInterface getHRI(){return (HasResultInterface) argument;}
+    protected HasResultInterface getHRI() {
+        return (HasResultInterface) argument;
+    }
+
     public Object evaluate(State state) {
-        if(QDLConstants.isReservedWord(variableReference)){
+        if (QDLConstants.isReservedWord(variableReference)) {
             throw new IllegalArgumentException("Error: Cannnot use reserved word \"" + variableReference + "\" as a variable.");
         }
         result = argument.evaluate(state);
@@ -81,28 +101,65 @@ public class Assignment implements Statement, HasResultInterface {
         setResult(getHRI().getResult());
         evaluated = true;
         resultType = getHRI().getResultType();
+        if (hasExpStatement()) {
+            return setExpValue(state, resultType, result);
+        }
+        return setVariableValue(state, resultType, result);
+    }
+     /*
+       j(n)->n;a.:=i(5);(a.).j(2) :=100;
+
+      */
+    protected Object setExpValue(State state, int resultType, Object result) {
+        if (getExpStatement() instanceof ExpressionStemNode) {
+            ExpressionStemNode esn = (ExpressionStemNode) getExpStatement();
+            return esn.setValue(state, result);
+        }
+        Object target = getExpStatement().evaluate(state);
+        getExpStatement().setEvaluated(true);
+        getExpStatement().setResultType(Constant.getType(target));
+
+        switch (resultType) {
+            case STEM_TYPE:
+                break;
+            case NULL_TYPE:
+                break;
+            case STRING_TYPE:
+            case BOOLEAN_TYPE:
+            case LONG_TYPE:
+            case DECIMAL_TYPE:
+                break;
+            default:
+                throw new IllegalArgumentException("error, the type of the value \"" + getHRI().getResult() + "\" is unknown");
+
+        }
+        return result;
+    }
+
+    protected Object setVariableValue(State state, int resultType, Object result) {
         // Now the real work -- set the value of the variable in the symbol table.
         // Mostly this just traps if some how we get an unknown type, but this is the
         // right place to do it, before it gets in to the symbol table.
+
         switch (resultType) {
 
-            case Constant.STEM_TYPE:
-               if(!getVariableReference().endsWith(STEM_INDEX_MARKER)){
-                    throw new IllegalArgumentException("Error: Cannot set the stem \"" + getVariableReference() +"\" to a non-stem variable");
+            case STEM_TYPE:
+                if (!getVariableReference().endsWith(STEM_INDEX_MARKER)) {
+                    throw new IllegalArgumentException("Error: Cannot set the stem \"" + getVariableReference() + "\" to a non-stem variable");
                 }
 
                 state.setValue(variableReference, result);
                 break;
-            case Constant.NULL_TYPE:
+            case NULL_TYPE:
                 // Can set any variable to null
                 state.setValue(variableReference, QDLNull.getInstance());
                 break;
 
-            case Constant.STRING_TYPE:
-            case Constant.BOOLEAN_TYPE:
-            case Constant.LONG_TYPE:
-            case Constant.DECIMAL_TYPE:
-                if(getVariableReference().endsWith(STEM_INDEX_MARKER)){
+            case STRING_TYPE:
+            case BOOLEAN_TYPE:
+            case LONG_TYPE:
+            case DECIMAL_TYPE:
+                if (getVariableReference().endsWith(STEM_INDEX_MARKER)) {
                     throw new IllegalArgumentException("Error: Cannot set the scalar value to a stem variable");
                 }
 
@@ -110,6 +167,7 @@ public class Assignment implements Statement, HasResultInterface {
                 break;
             default:
                 throw new IllegalArgumentException("error, the type of the value \"" + getHRI().getResult() + "\" is unknown");
+
         }
         return result;
     }

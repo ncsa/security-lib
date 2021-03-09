@@ -1,5 +1,14 @@
 This is scrapbook of things That I would like to consider for QDL that are not fully formed
 but should be captured someplace.
+4/8/2021
+Allow for some expressions on the rhs of assignment operator. This is easy to enable
+in the parser, but the trick is going to be
+  (1) The ExpressionStemNode needs to have a method to only resolve the stem
+      to a multi index.
+  (2) Multiple assignments will have to be supported, so
+      (w.).j(n).j(m) := n += mod(m, 17)
+      which would take an existing variable, n, increment it and then use it in
+      an expression
 
 4/3/2021
 - Improve stems so that functions may be used.
@@ -29,7 +38,7 @@ E.g.
 
 should be allowed.
 
-There are a few ways tio fix it.
+There are a few ways to fix it.
 1. (Deluxe version)
     - Redefine variables so that . is not allowed.
     - define DIGITS to be used for indexes

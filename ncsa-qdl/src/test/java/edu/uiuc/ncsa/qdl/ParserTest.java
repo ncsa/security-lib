@@ -1528,4 +1528,69 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 3L;
         assert getLongValue("b", state) == 6L;
     }
+    @Test
+    public void testExpAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "f().j(2) := 100;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        // check that exactly the value was updated
+        assert stemVariable.getLong(0L) == 0L;
+        assert stemVariable.getLong(1L) == 1L;
+        assert stemVariable.getLong(2L) == 100L;
+        assert stemVariable.getLong(3L) == 3L;
+        assert stemVariable.getLong(4L) == 4L;
+    }
+
+    /**
+     * Check that expressions for stems with multiple indices can be resolved and
+     * have the value set. This is a crucial operation in many instances.
+     * @throws Throwable
+     */
+    @Test
+    public void testMultiIndexExpAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [-indices(5), indices(6)^2];j(n)->n;f()->a.;");
+        addLine(script, "f().j(1).j(2) := 100;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a.1.2", state) == 100L;
+    }
+
+    @Test
+    public void testChainExpAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "q := 99; a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "f().j(2) := p := q += 1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        // check that exactly the value was updated
+        assert getLongValue("p", state) == 100L;
+        assert getLongValue("q", state) == 100L;
+        assert stemVariable.getLong(0L) == 0L;
+        assert stemVariable.getLong(1L) == 1L;
+        assert stemVariable.getLong(2L) == 100L;
+        assert stemVariable.getLong(3L) == 3L;
+        assert stemVariable.getLong(4L) == 4L;
+    }
+
+    @Test
+      public void testBadExpressionStem() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "(0).(1);");
+          try {
+              QDLInterpreter interpreter = new QDLInterpreter(null, state);
+              interpreter.execute(script.toString());
+              assert false : "Was able to create a stem from (0).(1)";
+          }catch(IllegalStateException t){
+              assert true;
+          }
+      }
 }
