@@ -181,7 +181,7 @@ public class ISO6429IO implements IOInterface {
                         debug("paste mode ON");
                         terminal.setBold(false);
                         terminal.setColor(32);
-                        println("<paste mode on. ^v pastes from clipboard>");
+                        println("<paste mode on. ^v pastes from clipboard, ^p toggles paste mode>");
                     } else {
                         debug("paste mode OFF");
 
@@ -325,10 +325,10 @@ public class ISO6429IO implements IOInterface {
                     break;
                 case ClipboardPaste:
                     debug("Got paste, pasting");
-                    Toolkit toolKit = Toolkit.getDefaultToolkit();
-                    Clipboard clipboard = toolKit.getSystemClipboard();
 
                     try {
+                        Toolkit toolKit = Toolkit.getDefaultToolkit();
+                        Clipboard clipboard = toolKit.getSystemClipboard();
                         String result = (String) clipboard.getData(DataFlavor.stringFlavor);
 
                         String[] lines = result.split("\n");
@@ -364,7 +364,8 @@ public class ISO6429IO implements IOInterface {
                             return currentLine.toString();
 
                         }
-                    } catch (UnsupportedFlavorException e) {
+                    } catch (Throwable e) {
+                        println("cannot read from clipboard");
                         warn("unable to get clipboard", e);
                     }
                     break;

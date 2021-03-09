@@ -1505,6 +1505,38 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 3L;
         assert getLongValue("b", state) == 6L;
     }
+
+    /**
+     * Since the body of a lambda function can be either a single statement or enclosed in brackets [... ]
+     * what happens if the single statement is standard list notation?
+     * @throws Throwable
+     */
+    @Test
+    public void testLambdaStemList() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g(n) -> [[-n(n), 3-n(n)^2],[3*n(n+2), (n+3)*n(n+1)^3]];");
+        addLine(script, "a := g(3).i(1).i(1).i(3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 162L;
+    }
+
+    /**
+     * Lambda with body of function in brackets.
+     * @throws Throwable
+     */
+    @Test
+        public void testLambdaInBracket() throws Throwable {
+            State state = testUtils.getNewState();
+            StringBuffer script = new StringBuffer();
+            addLine(script, "h(x)->[n:=2*x;return(1+3*n(n));];");
+            addLine(script, "a := h(3).i(5);");
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert getLongValue("a", state) == 16L;
+        }
+
     @Test
     public void testMultiStatementLambda() throws Throwable {
         State state = testUtils.getNewState();

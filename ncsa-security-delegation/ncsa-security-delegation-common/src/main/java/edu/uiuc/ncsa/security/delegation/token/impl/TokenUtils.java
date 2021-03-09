@@ -37,7 +37,9 @@ import static org.apache.commons.codec.binary.Base64.decodeBase64;
  */
 public class TokenUtils {
     public static char trailingChar = '_';
+    public static String padding32 = "" + trailingChar + trailingChar + trailingChar + trailingChar + trailingChar + trailingChar + trailingChar;
     static Base32 base32 = new Base32((byte) trailingChar); // replace standard trailing = with an underscore.
+
     public static String b64EncodeToken(Token token) {
         if (token == null) {
             return null;
@@ -49,7 +51,6 @@ public class TokenUtils {
         if (isTrivial(token)) {
             return "";
         }
-
         return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(token.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -61,19 +62,26 @@ public class TokenUtils {
     }
 
     public static String b32EncodeToken(String token) {
-          if (isTrivial(token)) {
-              return "";
-          }
-          return base32.encodeToString(token.getBytes(StandardCharsets.UTF_8));
-      }
+        if (isTrivial(token)) {
+            return "";
+        }
+        String x = base32.encodeToString(token.getBytes(StandardCharsets.UTF_8));
+        // shave off padding.
+        int index = x.indexOf(trailingChar);
+        if (0 < index) {
+            return x.substring(0, index);
+        }
+        return x;
+    }
 
     public static String b64DecodeToken(String b64EncodedToken) {
         String out = new String(decodeBase64(b64EncodedToken.toUpperCase()));
         return out;
     }
 
-    public static String b32DecodeToken(String b64EncodedToken) {
-        String out = new String(base32.decode(b64EncodedToken));
+    public static String b32DecodeToken(String b32EncodedToken) {
+        b32EncodedToken = b32EncodedToken + padding32.substring(b32EncodedToken.length() % 8);
+        String out = new String(base32.decode(b32EncodedToken));
         return out;
     }
 
@@ -92,9 +100,6 @@ public class TokenUtils {
      * @return
      */
     public static boolean isBase32(String x) {
-        if (x.length() % 8 != 0) {
-            return false;
-        }
         return pattern.matcher(x.toUpperCase()).matches();
     }
 

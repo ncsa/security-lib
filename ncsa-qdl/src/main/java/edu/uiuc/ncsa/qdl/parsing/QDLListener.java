@@ -183,7 +183,7 @@ public class QDLListener implements QDLParserListener {
                 throw new AssignmentException("missing/unparseable right-hand expression for assignment");
             }
 
-            if (assignmentContext.children.get(i+1) instanceof QDLParserParser.VariablesContext) {
+            if (assignmentContext.children.get(i + 1) instanceof QDLParserParser.VariablesContext) {
                 nextVar = assignmentContext.children.get(i + 1).getText();
                 nextA.setVariableReference(nextVar);
             } else {
@@ -218,9 +218,9 @@ public class QDLListener implements QDLParserListener {
                 Statement arg = resolveChild(assignmentContext.children.get(i + 1));
                 // If this is not here, you will create a variable with the name of the argument,
                 // e.g. 'qqq'
-                if(isVariableCase){
+                if (isVariableCase) {
                     nextA.setVariableReference(currentA.getVariableReference());
-                }else{
+                } else {
                     nextA.setExpStatement(currentA.getExpStatement());
                 }
                 nextA.setArgument(arg);
@@ -834,7 +834,7 @@ public class QDLListener implements QDLParserListener {
 //       }
         ParseTree p = lambdaContext.statement().get(0).getChild(0);
         String x = p.getChild(0).getText();
-        if (x.equals("[")) {
+        if ((!(p instanceof QDLParserParser.StemListContext)) && x.equals("[")) {
             // its a set of statements
             for (int i = 0; i < p.getChildCount(); i++) {
                 ParseTree parserTree = p.getChild(i);
@@ -859,15 +859,22 @@ public class QDLListener implements QDLParserListener {
             QDLParserParser.StatementContext sc = lambdaContext.statement().get(0);
             Statement stmt = resolveChild(sc);
             // Contract: Wrap simple expressions in a return.
-            if (stmt instanceof ExpressionImpl) {
-                ExpressionImpl expr = (ExpressionImpl) stmt;
-                if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
+            if (stmt instanceof StatementWithResultInterface) {
+                if (stmt instanceof ExpressionImpl) {
+                    ExpressionImpl expr = (ExpressionImpl) stmt;
+                    if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
+                        Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
+                        expr1.setName(ControlEvaluator.RETURN);
+                        expr1.addArgument(expr);
+                        functionRecord.statements.add(expr1); // wrapped in a return
+                    } else {
+                        functionRecord.statements.add(expr); // already has a return
+                    }
+                } else {
                     Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
                     expr1.setName(ControlEvaluator.RETURN);
-                    expr1.addArgument(expr);
+                    expr1.addArgument((StatementWithResultInterface) stmt);
                     functionRecord.statements.add(expr1); // wrapped in a return
-                } else {
-                    functionRecord.statements.add(expr); // already has a return
                 }
             } else {
                 functionRecord.statements.add(stmt); // a statement, not merely an expression

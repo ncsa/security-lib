@@ -1,78 +1,27 @@
 This is scrapbook of things That I would like to consider for QDL that are not fully formed
 but should be captured someplace.
-4/8/2021
-Allow for some expressions on the rhs of assignment operator. This is easy to enable
-in the parser, but the trick is going to be
-  (1) The ExpressionStemNode needs to have a method to only resolve the stem
-      to a multi index.
-  (2) Multiple assignments will have to be supported, so
-      (w.).j(n).j(m) := n += mod(m, 17)
-      which would take an existing variable, n, increment it and then use it in
-      an expression
 
-4/3/2021
-- Improve stems so that functions may be used.
-     ===>
-     This may be a very modification to the parser! The notation and tests, however,
-     should not be affected. Might want to take the effort to redefine lists
-     as first order objects?
-     <===
-E.g.
-  f(x).i(t).j(y+2)
+3/9/2021
+The current parser definitions require that expression stems components be either simple variables,
+functions or ( expression). So
+f(n).3 fails
+f(n).(3) works
+This is because parsing would tokenize
+a.0
+as the simple variable "a" followed by the decimal ".0" and then blow up. The parser tries to match
+in this way automatically. The way to fix this is with
+predicates in the grammar that plays with the input stream and tokens found up to this point. This
+is an entire chapter in the Antlr book, so it needs some serious study.
 
-providing f(x) returns a stem and i returns a stem or index, j returns an index.
-The issue now is with the parser. The way stem variables are defined is as part of
-the variable definition (allows for .). Because of this, defining a new espression
-rule like
-| expression '.' expression
-does not quite work. Stem variables are not allowed as the head (since they end in periods)
-and simple integer indices trigger a parse exception because they cannot be differntiated from
-decimals, so
-  indices(5).3
-triggers a parser error but
-  indices(5).(3)
-does not, since (3) is an expression.
-E.g.
-
-{f(x):g(y),f(f(x-2)):g(x^2+1)}.i(mod(x,5)+1)
-
-should be allowed.
-
-There are a few ways to fix it.
-1. (Deluxe version)
-    - Redefine variables so that . is not allowed.
-    - define DIGITS to be used for indexes
-
-    This would mean that *every* use of stems breaks since they would no longer
-    be automatically processed as variables. Moreover, a.0.2 would end up being some
-    the stem context. This would make that component quite large and complex.
-
-2. Simply define it as is, but require parentheses for anything other than functions.
-  so indices(5).i(x) works as is, but indices(5).(2) would be required.
-  indices(5).j should be ok. accessing a stem might be impossible
-  a.indices(5).(3) will probably fail.
-
-3. Use a different character to denote stems of expressions.
-
-| expression ';' expression
-
-has no issues, but every bit of written QDL code with a stem is busted for good.
-
-Case study: removed . from ID definition, added exp'.'expr to expression grammar
-"workw fine" here means that the parser lets it through sanely. No code to do anything else
-
-a.j f(x).w all work fine (so vars and functions)
-a. := i(4) FAILS. := is not recognized as an assignment operator
-a.0 FAILS .0 still not recognized as an integer, but some sort of decimal.
-a.(0) works fine since 0 is now recognized as a number.
-f(x).(expr).(expr) works fine
+For now, it all works, so the day to parser get rewritten with predicates just means parentheses
+can get dropped.
 
 10/5/2020
 - Workspace Library mangement
     Be able to designate a command to run on load/reload
     Have a run_on_load property in WS that is the name of a command?
     Or have a designated method like on_boot() or init() that is always run? Gives another keyword
-    basically in QDL.
+    basically in QDL. :(
 
 
 
