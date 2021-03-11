@@ -44,6 +44,15 @@ public abstract class JavaModule extends Module {
         this.className = className;
     }
 
+    public String getLoaderClassName() {
+        return loaderClassName;
+    }
+
+    public void setLoaderClassName(String loaderClassName) {
+        this.loaderClassName = loaderClassName;
+    }
+
+    String loaderClassName;
     /**
      * Used by the factory method {@link #newInstance(State)}
      *

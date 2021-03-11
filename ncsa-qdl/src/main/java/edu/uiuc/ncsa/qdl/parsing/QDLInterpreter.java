@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.List;
 
 /**
  * This is a facade for the various components of the parser and lexer.
@@ -58,6 +59,16 @@ public class QDLInterpreter implements Serializable {
         StringReader reader = new StringReader(line);
         execute(reader);
     }
+
+    public void execute(List<String> lines) throws Throwable {
+        StringBuffer stringBuffer = new StringBuffer();
+        for(String line : lines){
+             stringBuffer.append(line + "\n");
+        }
+        StringReader reader = new StringReader(stringBuffer.toString());
+        execute(reader);
+    }
+
 
     public void execute(Reader r) throws Throwable {
         QDLParserDriver driver = new QDLParserDriver(environment, state);

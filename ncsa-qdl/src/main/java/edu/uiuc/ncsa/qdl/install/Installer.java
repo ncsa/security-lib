@@ -17,7 +17,9 @@ import java.util.zip.ZipOutputStream;
 import static java.lang.Integer.MAX_VALUE;
 
 /**
- * Really simple installer.
+ * Really simple installer. This basically just copies stuff that has been set up in the
+ * create_installer.sh script, so chances are excellent if you need to change the installer,
+ * you should be looking there.<br/><br/>
  * This gets copied to your jar and will just copy everything in the jar to
  * a given directory (including sub directories). So make the tree you want, jar it up with this class
  * and run it. This is a completely stand alone class because otherwise you have to manage dependencies

@@ -45,6 +45,9 @@ public interface XMLConstants {
     String COMPRESS_XML = "compress_xml";
     String WS_ID = "ws_id";
     String DESCRIPTION = "description";
+    String EXTERNAL_EDITOR_PATH = "external_editor_path";
+    String USE_EXTERNAL_EDITOR = "use_external_editor";
+    String NANO_SYNTAX_FILE = "nano_syntax_file";
 
 
     String VARIABLE_TAG = "var";

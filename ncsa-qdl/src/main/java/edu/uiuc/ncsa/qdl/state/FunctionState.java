@@ -76,6 +76,9 @@ public abstract class FunctionState extends VariableState {
             arrayList.remove(arrayList.size() - 1); // remove it
 
             Module currentModule = getImportedModules().get(arrayList.get(0));// there is at least one.
+            if(currentModule == null){
+                throw new IllegalArgumentException("No such module. You must import a module before accessing its functions");
+            }
             arrayList.remove(0);
             Module nextModule = null;
             for (String aa : arrayList) {

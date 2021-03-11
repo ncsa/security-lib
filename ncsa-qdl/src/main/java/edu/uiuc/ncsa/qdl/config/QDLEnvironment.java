@@ -42,7 +42,10 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String debugLevel,
                           boolean autosaveOn,
                           long autosaveInterval,
-                          boolean autosaveMessagesOn) {
+                          boolean autosaveMessagesOn,
+                          boolean useExternalEditor,
+                          String externalEditorPath,
+                          String nanoSyntaxFile) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -65,8 +68,38 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.autosaveOn = autosaveOn;
         this.autosaveInterval = autosaveInterval;
         this.autosaveMessagesOn = autosaveMessagesOn;
+        this.externalEditorPath = externalEditorPath;
+        this.useExternalEditor = useExternalEditor;
+        this.nanoSyntaxFile = nanoSyntaxFile;
+    }
+    boolean useExternalEditor;
+
+    public boolean isUseExternalEditor() {
+        return useExternalEditor;
     }
 
+    public void setUseExternalEditor(boolean useExternalEditor) {
+        this.useExternalEditor = useExternalEditor;
+    }
+
+    public String getNanoSyntaxFile() {
+        return nanoSyntaxFile;
+    }
+
+    public void setNanoSyntaxFile(String nanoSyntaxFile) {
+        this.nanoSyntaxFile = nanoSyntaxFile;
+    }
+
+    String nanoSyntaxFile;
+    public String getExternalEditorPath() {
+        return externalEditorPath;
+    }
+
+    public void setExternalEditorPath(String externalEditorPath) {
+        this.externalEditorPath = externalEditorPath;
+    }
+
+    String externalEditorPath;
     public boolean isAutosaveMessagesOn() {
         return autosaveMessagesOn;
     }

@@ -180,7 +180,12 @@ public abstract class VariableState extends NamespaceAwareState {
             isNSQ = true;
             variableName = getFQName(w.name);
             uri = importManager.getByAlias(getAlias(w.name));
-            stem = (StemVariable) getModuleMap().get(uri).getState().getSymbolStack().resolveValue(variableName);
+            Module m = getModuleMap().get(uri);
+            if(m == null){
+                // So they specified a non-existent module. No such value.
+                return null;
+            }
+            stem = (StemVariable) m.getState().getSymbolStack().resolveValue(variableName);
         } else {
             // Local variables. Remove lead # if needed.
             variableName = w.name;
@@ -378,7 +383,11 @@ public abstract class VariableState extends NamespaceAwareState {
     public TreeSet<String> listVariables(boolean useCompactNotation) {
         TreeSet<String> out = getSymbolStack().listVariables();
         for (URI key : getImportManager().keySet()) {
-            TreeSet<String> uqVars = getModuleMap().get(key).getState().listVariables(useCompactNotation);
+            Module m = getModuleMap().get(key);
+            if(m == null){
+                continue; // the user specified a non-existent module.
+            }
+            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation);
             for (String x : uqVars) {
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);

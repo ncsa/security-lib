@@ -1552,7 +1552,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testMultiStatementMultiArgLambda() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "f(x,y,z)->[q:=x; q:= q+y; q:= q+z;return(q);];");
+        addLine(script, "f(x,y,z)->[q:=x; q+= y; q += z; return(q);];");
         addLine(script, "a := f(1,1,1);");
         addLine(script, "b := f(3,2,1);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);

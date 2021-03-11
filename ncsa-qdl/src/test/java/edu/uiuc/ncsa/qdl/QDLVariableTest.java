@@ -152,6 +152,9 @@ public class QDLVariableTest extends AbstractQDLTester {
 
     /**
      * This also checks for deep resolution and then it sets the value and then reads it.
+     * So each variable is set in a different symbol table (emulating having a complex
+     * set of modules and control structures). This test is to show that a single
+     * stem that accesses all of them gets resolved right.
      *
      * @throws Exception
      */

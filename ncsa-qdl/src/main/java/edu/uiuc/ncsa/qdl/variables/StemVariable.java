@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.variables;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.state.VariableState;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -774,6 +775,13 @@ public class StemVariable extends HashMap<String, Object> {
     a.; // show it
     a.~[[mod(random(3),100)],mod(random(4),100)];
      */
+
+    /**
+     * This will return a new stem consisting of this stem and the union of all
+     * the stem arguments.
+     * @param stemVariables
+     * @return
+     */
     public StemVariable union(StemVariable... stemVariables) {
         StemVariable newStem = (StemVariable) clone();
         for (StemVariable stemVariable : stemVariables) {
@@ -934,6 +942,49 @@ public class StemVariable extends HashMap<String, Object> {
                 output = output + ", ";
             }
             output = output + key + STEM_ENTRY_CONNECTOR + get(key);
+        }
+
+        return output + "}";
+
+    }
+
+    public String inputForm() {
+        String list = null;
+        try {
+            if (!getStemList().isEmpty()) {
+                list = getStemList().inputForm();
+                if (isList()) {
+                    if (getDefaultValue() != null) {
+                        list = "{*:" + InputFormUtil.inputForm(getDefaultValue()) + "}~" + list;
+                    }
+                    return list;
+                }
+            }
+        } catch (StemList.seGapException x) {
+            //rock on. Just means the list is sparse so use full notation.
+        }
+
+        String output = "{";
+        boolean isFirst = true;
+
+        if (getDefaultValue() != null) {
+            output = output + "*:" + InputFormUtil.inputForm(getDefaultValue());
+            isFirst = false;
+        }
+        Set<String> keys;
+        if (list == null) {
+            keys = keySet(); // process everything here.
+        } else {
+            keys = super.keySet(); // only process proper stem entries.
+            output = list + "~" + output;
+        }
+        for (String key : keys) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ", ";
+            }
+            output = output  + InputFormUtil.inputForm(key) +   STEM_ENTRY_CONNECTOR + InputFormUtil.inputForm(get(key));
         }
 
         return output + "}";

@@ -19,7 +19,9 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.statements.FR_WithState;
 import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -56,6 +58,7 @@ import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_BINARY;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_TEXT_STRING;
+import static edu.uiuc.ncsa.qdl.util.InputFormUtil.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
 
@@ -848,14 +851,34 @@ public class WorkspaceCommands implements Logable {
 
     }
 
+    public boolean isUseExternalEditor() {
+        return useExternalEditor;
+    }
+
+    public void setUseExternalEditor(boolean useExternalEditor) {
+        this.useExternalEditor = useExternalEditor;
+    }
+
+    public String getExternalEditorPath() {
+        return externalEditorPath;
+    }
+
+    public void setExternalEditorPath(String externalEditorPath) {
+        this.externalEditorPath = externalEditorPath;
+    }
+
+    boolean useExternalEditor = false;
+    String externalEditorPath = "";
+
     List<String> editorClipboard = new LinkedList<>();
 
     private int _doBufferEdit(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("edit (index | name)");
-            sayi("invoke the line editor on the given buffer");
+            sayi("invoke the editor on the given buffer");
             return RC_NO_OP;
         }
+
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("Sorry. No such buffer");
@@ -875,7 +898,15 @@ public class WorkspaceCommands implements Logable {
             br.setContent(content);
         }
         // so no buffer. There are a couple ways to get it.
-
+        if (useExternalEditor) {
+            List<String> result = _doExternalEdit(br.getContent());
+            if (result == null) {
+                return RC_NO_OP;
+            }
+            br.setContent(result);
+            br.edited = true;
+            return RC_CONTINUE;
+        }
         LineEditor lineEditor = new LineEditor(br.getContent());
         lineEditor.setClipboard(editorClipboard);
         lineEditor.setIoInterface(getIoInterface());
@@ -890,6 +921,74 @@ public class WorkspaceCommands implements Logable {
         }
 
         return RC_CONTINUE;
+    }
+
+    private List<String> _doExternalEdit(List<String> content) {
+        File file = null;
+        try {
+            file = File.createTempFile("nano", ".qdl");
+            FileWriter fw = new FileWriter(file);
+            for (String x : content) {
+                fw.write(x + "\n");
+            }
+            fw.flush();
+            fw.close();
+        } catch (IOException iox) {
+            say("could not create the temp file");
+            return null;
+        }
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        // Nano works great. Others may not.
+        String execPath = isTrivial(externalEditorPath) ? "/bin/nano" : externalEditorPath;
+        String syntaxFile = null;
+        if(!isTrivial(getNanoSyntaxFile())){
+               File f = new File(getNanoSyntaxFile());
+               if(f.isAbsolute()){
+                   syntaxFile = getNanoSyntaxFile();
+               }
+               else{
+                   f = resolveAgainstRoot(getNanoSyntaxFile());
+                   syntaxFile = f.getAbsolutePath();
+               }
+        }
+        if(isTrivial(syntaxFile)){
+            processBuilder.command(execPath,
+                    file.getAbsolutePath());
+
+
+        }else{
+            processBuilder.command(execPath,
+                    file.getAbsolutePath()
+                    , "--rcfile=" + syntaxFile);
+
+        }
+/*
+        processBuilder.command(execPath,
+                file.getAbsolutePath());
+*/
+
+        processBuilder.inheritIO();
+        try {
+            Process process = processBuilder.start();
+            if (0 == process.waitFor()) {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                content = new ArrayList<>();
+                String currentLine = br.readLine();
+
+                while (currentLine != null) {
+                    content.add(currentLine);
+                    currentLine = br.readLine();
+                }
+                br.close();
+            } else {
+                say("There seems to have been a problem with the editor");
+            }
+        } catch (Throwable t) {
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+        }
+        return content;
     }
 
     protected BufferManager.BufferRecord getBR(InputLine inputLine) {
@@ -1497,7 +1596,12 @@ public class WorkspaceCommands implements Logable {
 
     private int _modulesList(InputLine inputLine) {
         TreeSet<String> m = new TreeSet<>();
+        if (getState().getModuleMap().keySet() == null || getState().getModuleMap().keySet().isEmpty()) {
+            say("(no imported modules)");
+            return RC_CONTINUE;
+        }
         for (URI key : getState().getModuleMap().keySet()) {
+
             String out = getImportString(key);
             m.add(out);
         }
@@ -1515,8 +1619,7 @@ public class WorkspaceCommands implements Logable {
      * @param key
      * @return
      */
-    private String getImportString
-    (URI key) {
+    private String getImportString(URI key) {
         String out = key.toString();
         if (state.getImportManager().hasImports()) {
             out = out + " " + state.getImportManager().getAlias(key);
@@ -1557,8 +1660,54 @@ public class WorkspaceCommands implements Logable {
                 return _funcsList(inputLine);
             case "system":
                 return _funcsListSystem(inputLine);
+            case "edit":
+                return _doFuncEdit(inputLine);
             default:
                 say("sorry, unrecognized command.");
+        }
+        return RC_CONTINUE;
+    }
+
+    private int _doFuncEdit(InputLine inputLine) {
+        String fName = inputLine.getArg(inputLine.getArgCount() - 1);
+        int argCount = -1;
+        try {
+            argCount = Integer.parseInt(inputLine.getLastArg());
+        } catch (Throwable t) {
+            say("Could not parse argument count of \"" + inputLine.getLastArg() + "\"");
+            return RC_NO_OP;
+        }
+        FR_WithState fr_withState = getState().resolveFunction(fName, argCount);
+        if (fr_withState == null) {
+            say("no such function");
+            return RC_NO_OP;
+        }
+        if (fr_withState.isExternalModule) {
+            say("cannot edir external function");
+            return RC_NO_OP;
+        }
+        String inputForm = InputFormUtil.inputForm(fName, argCount, getState());
+        if (isTrivial(inputForm)) {
+            say("no such function");
+            return RC_NO_OP;
+        }
+        List<String> f = new ArrayList<>();
+
+        f.add(inputForm);
+        f = _doExternalEdit(f);
+        StringBuffer sb = new StringBuffer();
+        for (String line : f) {
+            sb.append(line + "\n");
+        }
+        try {
+            getInterpreter().execute(sb.toString());
+            fr_withState.functionRecord.sourceCode = sb.toString(); // update source in the record.
+        } catch (Throwable t) {
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+
+            say("could not interpret function:" + t.getMessage());
         }
         return RC_CONTINUE;
     }
@@ -1762,9 +1911,38 @@ public class WorkspaceCommands implements Logable {
             case "size":
                 say(state.getStackSize() + " symbols defined.");
                 return RC_CONTINUE;
+            case "edit":
+                return _doVarEdit(inputLine);
             default:
                 say("Unknown variable command.");
 
+        }
+        return RC_CONTINUE;
+    }
+
+    private int _doVarEdit(InputLine inputLine) {
+        String varName = inputLine.getLastArg();
+        String inputForm = InputFormUtil.inputFormVar(varName, getState());
+        List<String> content = new ArrayList<>();
+        content.add(inputForm);
+        content = _doExternalEdit(content);
+
+        String newValue  = varName + ":=";
+        for(String line : content){
+            newValue = newValue + "\n" + line;
+        }
+        newValue = newValue.trim();
+        if(!newValue.endsWith(";")){
+            newValue = newValue + ";";
+        }
+        try {
+            getInterpreter().execute(newValue);
+        } catch (Throwable throwable) {
+            if(DebugUtil.isEnabled()) {
+                throwable.printStackTrace();
+            }
+            say("Sorry, could not update value of \"" + varName + "\"");
+            return RC_NO_OP;
         }
         return RC_CONTINUE;
     }
@@ -2175,7 +2353,7 @@ public class WorkspaceCommands implements Logable {
             regexff = new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                           System.out.println("Foof");
+                    System.out.println("Foof");
                     return true;
                 }
             };
@@ -2367,7 +2545,7 @@ public class WorkspaceCommands implements Logable {
 
     /**
      * Reads a file and tries to figure out how it was serialized, then returns the information needed to
-     * display basic information. Since there may be many files that have nothign to do with QDL, these are just skipped.
+     * display basic information. Since there may be many files that have nothing to do with QDL, these are just skipped.
      *
      * @param currentFile
      * @return
@@ -2385,7 +2563,15 @@ public class WorkspaceCommands implements Logable {
             return null; // just skip it if can't open the file
         }
         wsLibEntry = new WSLibEntry();
-
+        if (currentFile.getAbsolutePath().endsWith(DEFAULT_QDL_DUMP_FILE_EXTENSION)) {
+            wsLibEntry.ts = new Date(currentFile.lastModified());
+            wsLibEntry.lastSaved_ts = wsLibEntry.ts;
+            wsLibEntry.fileFormat = "QDL";
+            wsLibEntry.length = currentFile.length();
+            wsLibEntry.filename = currentFile.getName();
+            wsLibEntry.filepath = currentFile.getParent();
+            return wsLibEntry;
+        }
         try {
             WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
             fis.close();
@@ -2733,6 +2919,7 @@ public class WorkspaceCommands implements Logable {
     String JAVA_FLAG = SAVE_AS_JAVA_FLAG;
     String COMPRESS_FLAG = "-compress";
     String SHOW_FLAG = "-show";
+    String QDL_DUMP_FLAG = "-qdl";
     public static String SILENT_SAVE_FLAG = "-silent";
 
     /*
@@ -2746,11 +2933,13 @@ public class WorkspaceCommands implements Logable {
             sayi("If you have already loaded (or saved) a file, that is remembered in the " + KEEP_WSF + " variable");
             sayi("and you do not need to specify it henceforth.");
             sayi("The file should be either a relative path (resolved against the default save location) or an absolute path.");
+            sayi(QDL_DUMP_FLAG + " = dump the contents of the workspace to a QDL file. You can just reload it using " + ControlEvaluator.LOAD_COMMAND);
             sayi(JAVA_FLAG + " = save using Java serialization format. The default is XML.");
             sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
             sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
             sayi(SILENT_SAVE_FLAG + " = print no messages when saving.");
+            sayi("Note that a dump does not save any of the current workspace state, just the variables, functions and modules.");
             sayi("See the corresponding load command to recover it. It will print error messages, however.");
             say("See also: autosave_on (ws variable)");
             return RC_NO_OP;
@@ -2760,18 +2949,23 @@ public class WorkspaceCommands implements Logable {
         boolean doJava = inputLine.hasArg(SAVE_AS_JAVA_FLAG);
         boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
         boolean silentMode = inputLine.hasArg(SILENT_SAVE_FLAG);
-
+        boolean qdlDump = inputLine.hasArg(QDL_DUMP_FLAG);
         boolean compressionOn = true;
 
         if (inputLine.hasArg(COMPRESS_FLAG)) {
             compressionOn = inputLine.getNextArgFor(COMPRESS_FLAG).equalsIgnoreCase("on");
         }
 
+        if (qdlDump) {
+            doJava = false; // QDL has preference, so if the user provides both, use QDL
+        }
         inputLine.removeSwitch(SHOW_FLAG);
         inputLine.removeSwitch(COMPRESS_FLAG);
         inputLine.removeSwitchAndValue(SAVE_AS_JAVA_FLAG);
         inputLine.removeSwitch(KEEP_WSF);
         inputLine.removeSwitch(SILENT_SAVE_FLAG);
+        inputLine.removeSwitch(QDL_DUMP_FLAG);
+
 
         // Remove switches before looking at positional arguments.
 
@@ -2783,6 +2977,18 @@ public class WorkspaceCommands implements Logable {
             if (!showFile) {
                 if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
                     fName = inputLine.getArg(FIRST_ARG_INDEX);
+                    // Figure out extension.
+                    if (!fName.contains(".")) {
+                        if (qdlDump) {
+                            fName = fName + DEFAULT_QDL_DUMP_FILE_EXTENSION;
+                        } else {
+                            if (doJava) {
+                                fName = fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION;
+                            } else {
+                                fName = fName + DEFAULT_XML_SAVE_FILE_EXTENSION;
+                            }
+                        }
+                    }
                     target = new File(fName);
                 } else {
                     if (currentWorkspace == null) {
@@ -2805,7 +3011,11 @@ public class WorkspaceCommands implements Logable {
                 }
 
             }
-
+            if (qdlDump) {
+                _doQDLDump(target);
+                say("dumped " + target.length() + " bytes to \"" + target.getAbsolutePath() + "\"");
+                return RC_CONTINUE;
+            }
             long uncompressedXMLSize = -1L;
             if (doJava) {
                 _realSave(target);
@@ -2830,6 +3040,58 @@ public class WorkspaceCommands implements Logable {
             say("could not save the workspace:" + t.getMessage());
         }
         return RC_NO_OP;
+    }
+
+    public static final String DEFAULT_QDL_DUMP_FILE_EXTENSION = ".qdl";
+    public static final String DEFAULT_XML_SAVE_FILE_EXTENSION = ".ws";
+    public static final String ALTERNATE_XML_SAVE_FILE_EXTENSION = ".zml"; // for reads
+    public static final String DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION = ".wsj";
+    public static final String ALTERNATE_JAVA_SERIALIZATION_FILE_EXTENSION = ".ser"; // for reads
+
+    private void _doQDLDump(File target) throws Throwable {
+        FileWriter fileWriter = new FileWriter(target);
+        fileWriter.write("// QDL workspace " + (isTrivial(getWSID()) ? "" : getWSID()) + " dump, saved on " + (new Date()) + "\n");
+        for (URI key : getState().getModuleMap().keySet()) {
+            String output = inputFormModule(key, state);
+            if (output.startsWith(JAVA_CLASS_MARKER)) {
+                output = ControlEvaluator.MODULE_LOAD + "('" + output.substring(JAVA_CLASS_MARKER.length())
+                        + "' ,'" + ControlEvaluator.MODULE_TYPE_JAVA + "');";
+            }
+            fileWriter.write(output + "\n");
+
+        }
+        // now do the imports
+        for (URI key : getState().getModuleMap().keySet()) {
+            List<String> aliases = getState().getImportManager().getAlias(key);
+            for (String alias : aliases) {
+                String output = ControlEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
+                fileWriter.write(output + "\n");
+            }
+        }
+
+        for (String varName : state.listVariables(false)) {
+            String output = inputFormVar(varName, state);
+            fileWriter.write(varName + " := " + output + ";\n");
+        }
+        for (String fWithArg : state.listFunctions(false, null)) {
+            // This gives back functions of the form fName(argCount). Since the
+            // logic involves jumping through a lot of hoops (e.g. getting them from
+            // modules, it is vastly easier to simply parse them to get the source code.
+            // The alternative is a slog through every component with a function.
+            int lpIndex = fWithArg.indexOf("(");
+            int rpIndex = fWithArg.indexOf(")");
+            String fName = fWithArg.substring(0, lpIndex);
+            String rawCount = fWithArg.substring(lpIndex + 1, rpIndex);
+
+            String output = inputForm(fName, Integer.parseInt(rawCount), state);
+            if (!output.startsWith(JAVA_CLASS_MARKER)) {
+                // Do not write java functions, since this makes no sense -- the must live in
+                // a module at this point.
+                fileWriter.write(output + "\n");
+            }
+        }
+        fileWriter.flush();
+        fileWriter.close();
     }
 
     private long _xmlSave(File f, boolean compressSerialization, boolean showIt) throws Throwable {
@@ -2987,19 +3249,25 @@ public class WorkspaceCommands implements Logable {
             sayi("Loads a saved workspace. If the name is relative, it will be resolved against " +
                     "the default location or it may be an absolute path.");
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
+            sayi(QDL_DUMP_FLAG + " = the format of the file is QDL. This loads it into the current workspace.");
+            sayi(JAVA_FLAG + " = the format of the file is serialized java. default is XML");
             sayi("If there is no file given, the current workspace is used.");
+            sayi("If you dumped a workspace to QDL, you may simply load it as any other script");
             sayi("See also: save, setting the current workspace.");
             return RC_NO_OP;
         }
 
-        File target;
+        File target = null;
         String fName = null;
         boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
         inputLine.removeSwitch(KEEP_WSF);
+        boolean isQDLDump = inputLine.hasArg(QDL_DUMP_FLAG);
+        inputLine.removeSwitch(QDL_DUMP_FLAG);
+        boolean isJava = inputLine.hasArg(JAVA_FLAG) && !isQDLDump; // QDL has right of way
+        inputLine.removeSwitch(JAVA_FLAG);
 
         if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             fName = inputLine.getArg(FIRST_ARG_INDEX);
-            target = new File(fName);
         } else {
             if (currentWorkspace == null) {
                 say("sorry, no default file set.");
@@ -3009,17 +3277,83 @@ public class WorkspaceCommands implements Logable {
             }
         }
 
+        if (target == null && fName.contains(".")) {
+            // If there is an extension, we are done.
+            target = new File(fName);
+        }
         boolean loadOK = false;
+        if (target == null) {
+            target = new File(fName);
 
-        if (!target.isAbsolute()) {
-
-            if (saveDir == null) {
-                target = new File(rootDir, fName);
-            } else {
-                target = new File(saveDir, fName);
+            // At this point, the fName has no extension. Check for standard extensions
+            File parentDir = null; // null parent is ignored in the File constructor below
+            if (!target.isAbsolute()) {
+                if (saveDir == null) {
+                    parentDir = rootDir;
+                } else {
+                    parentDir = saveDir;
+                }
             }
-            if (!target.isFile()) {
-                say("sorry, but " + target.getAbsolutePath() + " is not a file.");
+            if (isQDLDump) {
+                target = new File(parentDir, fName + DEFAULT_QDL_DUMP_FILE_EXTENSION); // only  possibility
+            } else {
+                if (isJava) {
+                    target = new File(parentDir, fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION);
+                    if (!target.exists()) {
+                        target = new File(fName + ALTERNATE_JAVA_SERIALIZATION_FILE_EXTENSION);
+                    }
+
+                } else {
+                    target = new File(parentDir, fName + DEFAULT_XML_SAVE_FILE_EXTENSION);
+                    if (!target.exists()) {
+                        target = new File(parentDir, fName + ALTERNATE_XML_SAVE_FILE_EXTENSION);
+                    }
+
+                }
+            }
+
+        } else {
+            if (!target.isAbsolute()) {
+
+                if (saveDir == null) {
+                    target = new File(rootDir, fName);
+                } else {
+                    target = new File(saveDir, fName);
+                }
+                if (!target.isFile()) {
+                    say("sorry, but " + target.getAbsolutePath() + " is not a file.");
+                    return RC_NO_OP;
+                }
+            }
+
+        }
+        if (target == null) {
+            say("sorry, could not determine file for \"" + fName + "\"");
+            return RC_NO_OP;
+        }
+        if (!target.exists()) {
+            say("sorry, the target file \"" + target.getAbsolutePath() + "\" does not exist");
+            return RC_NO_OP;
+        }
+        if (!target.isFile()) {
+            say("sorry, the target  \"" + target.getAbsolutePath() + "\" is not a file");
+            return RC_NO_OP;
+        }
+        if (!target.canRead()) {
+            say("sorry, cannot read  \"" + target.getAbsolutePath() + "\"");
+            return RC_NO_OP;
+        }
+        if (isQDLDump) {
+            String command = ControlEvaluator.LOAD_COMMAND + "('" + target.getAbsolutePath() + "');";
+            try {
+                getInterpreter().execute(command);
+                say(target.getAbsolutePath() + " loaded (" + target.length() + " bytes)");
+                return RC_CONTINUE;
+            } catch (Throwable throwable) {
+                if (DebugUtil.isEnabled()) {
+                    throwable.printStackTrace();
+                }
+                say("sorry, could not load QDL \"" + target.getAbsolutePath() + "\": " + throwable.getMessage());
                 return RC_NO_OP;
             }
         }
@@ -3195,6 +3529,15 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean compressXML = true;
+    String nanoSyntaxFile = "etc/qdl.nanorc";
+
+    public String getNanoSyntaxFile() {
+        return nanoSyntaxFile;
+    }
+
+    public void setNanoSyntaxFile(String nanoSyntaxFile) {
+        this.nanoSyntaxFile = nanoSyntaxFile;
+    }
 
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
@@ -3350,6 +3693,9 @@ public class WorkspaceCommands implements Logable {
         setAutosaveOn(qe.isAutosaveOn());
         setAutosaveMessagesOn(qe.isAutosaveMessagesOn());
         setAutosaveInterval(qe.getAutosaveInterval());
+        setExternalEditorPath(qe.getExternalEditorPath());
+        setUseExternalEditor(qe.isUseExternalEditor());
+        setNanoSyntaxFile(qe.getNanoSyntaxFile());
         initAutosave();
     }
 

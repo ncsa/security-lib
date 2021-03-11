@@ -728,7 +728,7 @@ public class QDLListener implements QDLParserListener {
 
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < defineContext.getChildCount(); i++) {
-            stringBuffer.append(defineContext.getChild(i).getText() + "\n");
+            stringBuffer.append((i==0?"":"\n") + defineContext.getChild(i).getText());
         }
         String rawText = stringBuffer.toString();
         functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
@@ -803,7 +803,7 @@ public class QDLListener implements QDLParserListener {
 
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < lambdaContext.getChildCount(); i++) {
-            stringBuffer.append(lambdaContext.getChild(i).getText() + "\n");
+            stringBuffer.append((i==0?"":"\n")+lambdaContext.getChild(i).getText());
         }
         String rawText = stringBuffer.toString();
         functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.

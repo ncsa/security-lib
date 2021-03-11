@@ -260,7 +260,18 @@ A nickname for this function is i().
                  ]]>
         </body>
     </entry>
-
+    <entry id="input_form">
+        <body>
+            <![CDATA[
+   input_form(module) - The argument is a string with the name of the module
+                        or one of its aliases.
+ input_form(variable) - The argument is a variable (not a string)
+input_form(f, arg_ct) - The arguments are a function (not a string) and the
+                        number of arguments.
+See also: execute();
+                 ]]>
+        </body>
+    </entry>
     <entry id="has_value">
         <body>
             <![CDATA[

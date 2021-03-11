@@ -102,6 +102,16 @@ public class QDLWorkspace {
             } else {
                 lastCommand = input;
             }
+            if (input.startsWith("]]")) {
+                ProcessBuilder processBuilder = new ProcessBuilder();
+                processBuilder.command("/bin/nano", "/tmp/x.qdl");
+                processBuilder.inheritIO();
+                Process process = processBuilder.start();
+                int exitCode = process.waitFor();
+                System.out.println("exit code = " + exitCode);
+                workspaceCommands.say("done!");
+                continue;
+            }
             if (input.startsWith(")")) {
                 switch (workspaceCommands.execute(input)) {
                     case RC_EXIT_NOW:
@@ -111,7 +121,7 @@ public class QDLWorkspace {
                     case RC_CONTINUE:
                         continue;
                     case RC_RELOAD:
-                      workspaceCommands.say("not quite ready for prime time. Check back later");
+                        workspaceCommands.say("not quite ready for prime time. Check back later");
                 }
             }
             boolean echoMode = workspaceCommands.isEchoModeOn();

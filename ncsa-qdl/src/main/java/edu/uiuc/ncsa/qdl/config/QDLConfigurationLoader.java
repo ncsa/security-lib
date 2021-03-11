@@ -97,6 +97,29 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return defaultValue;
     }
 
+    protected boolean useWSExternalEditor() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_EDITOR_ENABLE, false);
+    }
+
+    protected String getExternalEditorPath() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        String x =  getFirstAttribute(node, WS_EDITOR_PATH);
+        if(isTrivial(x)){
+            return "";
+        }
+        return x;
+    }
+    protected String getNanoSyntaxFile() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        String x =  getFirstAttribute(node, WS_NANO_SYNTAX);
+        if(isTrivial(x)){
+            return "";
+        }
+        return x;
+    }
+
+
     protected boolean isWSVerboseOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_VERBOSE, false);
@@ -110,6 +133,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isEnabled() {
         return getFirstBooleanValue(cn, CONFG_ATTR_ENABLED, true);
     }
+
 
     protected String getName() {
         String name = getFirstAttribute(cn, CONFG_ATTR_NAME);
@@ -280,7 +304,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getDebugLevel(),
                 isAutosaveOn(),
                 getAutosaveInterval(),
-                isAutosaveMessagesOn());
+                isAutosaveMessagesOn(),
+                useWSExternalEditor(),
+                getExternalEditorPath(),
+                getNanoSyntaxFile());
     }
 
     @Override

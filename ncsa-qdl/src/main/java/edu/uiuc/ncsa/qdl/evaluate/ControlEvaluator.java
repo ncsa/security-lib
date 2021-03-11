@@ -2,8 +2,12 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
+import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
+import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -14,6 +18,9 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
+import edu.uiuc.ncsa.qdl.statements.FR_WithState;
+import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
@@ -78,6 +85,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String CHECK_SYNTAX = "check_syntax";
     public static final String FQ_CHECK_SYNTAX = SYS_FQ + CHECK_SYNTAX;
     public static final int CHECK_SYNTAX_TYPE = 11 + CONTROL_BASE_VALUE;
+
+    public static final String INPUT_FORM = "input_form";
+    public static final String FQ_INPUT_FORM = SYS_FQ + INPUT_FORM;
+    public static final int INPUT_FORM_TYPE = 12 + CONTROL_BASE_VALUE;
 
     // function stuff
     public static final String RETURN = "return";
@@ -161,6 +172,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             BREAK,
             EXECUTE,
             CHECK_SYNTAX,
+            INPUT_FORM,
             FOR_KEYS,
             FOR_NEXT,
             CHECK_AFTER,
@@ -184,6 +196,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             FQ_INTERRUPT,
             FQ_EXECUTE,
             FQ_CHECK_SYNTAX,
+            FQ_INPUT_FORM,
             FQ_BREAK,
             FQ_FOR_KEYS,
             FQ_FOR_NEXT,
@@ -240,6 +253,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case EXECUTE:
             case FQ_EXECUTE:
                 return EXECUTE_TYPE;
+            case INPUT_FORM:
+                return INPUT_FORM_TYPE;
             case CHECK_SYNTAX:
             case FQ_CHECK_SYNTAX:
                 return CHECK_SYNTAX_TYPE;
@@ -373,9 +388,79 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             case FQ_CHECK_SYNTAX:
                 doCheckSyntax(polyad, state);
                 return true;
+            case INPUT_FORM:
+                doInputForm(polyad, state);
+                return true;
         }
         return false;
     }
+
+    private void doInputForm(Polyad polyad, State state) {
+        if (0 == polyad.getArgCount()) {
+            throw new IllegalArgumentException(INPUT_FORM + " requires at least one argument");
+        }
+        if (polyad.getArguments().get(0) instanceof ConstantNode) {
+            Object arg = polyad.evalArg(0, state);
+
+            // Looking for a module, so this must be a string
+            if (!isString(arg)) {
+                throw new IllegalArgumentException(INPUT_FORM + " requires a module name (as a string)");
+            }
+            String out = InputFormUtil.inputFormModule(arg.toString(), state);
+            if (out == null) {
+                out = "";
+            }
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setResult(out);
+            return;
+        }
+        if (!(polyad.getArguments().get(0) instanceof VariableNode)) {
+            throw new IllegalArgumentException(INPUT_FORM + " requires a variable or function name");
+        }
+        String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
+
+        if (polyad.getArgCount() == 1) {
+            // simple variable case
+            String output = InputFormUtil.inputFormVar(argName, state);
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            polyad.setResult(output);
+            return;
+        }
+        if (polyad.getArgCount() != 2) {
+            throw new IllegalArgumentException(INPUT_FORM + " requires the argument count as the second parameter");
+        }
+        Object arg2 = polyad.evalArg(1, state);
+        if (!(arg2 instanceof Long)) {
+            throw new IllegalArgumentException(INPUT_FORM + " requires argument count must be an integer");
+        }
+        int argCount = ((Long) arg2).intValue();
+        FR_WithState fr_withState = state.resolveFunction(argName, argCount);
+        if (fr_withState == null) {
+            // no such critter
+            polyad.setResult("");
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        FunctionRecord fr = fr_withState.functionRecord;
+        String output = "";
+        if (fr != null) {
+            if (fr instanceof QDLFunctionRecord) {
+                QDLFunction qf = ((QDLFunctionRecord) fr).qdlFunction;
+                if (qf != null) {
+                    output = "java:" + qf.getClass().getCanonicalName();
+                }
+            } else {
+                output = fr.sourceCode;
+            }
+        }
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STRING_TYPE);
+        polyad.setEvaluated(true);
+    }
+
 
     private void doCheckSyntax(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
@@ -1093,6 +1178,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     static final int LOAD_FILE = 0;
     static final int LOAD_JAVA = 1;
 
+    public final static String MODULE_TYPE_JAVA = "java";
+
     protected void doLoadModule(Polyad polyad, State state) {
         if (state.isServerMode()) {
             throw new QDLServerModeException("reading files is not supported in server mode");
@@ -1102,10 +1189,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         int loadTarget = LOAD_FILE;
         if (polyad.getArgCount() == 2) {
-            // Then this is probably a Jva module
+            // Then this is probably a Java module
             Object arg2 = polyad.evalArg(1, state);
             if (isString(arg2)) {
-                loadTarget = arg2.toString().equals("java") ? LOAD_JAVA : LOAD_FILE;
+                loadTarget = arg2.toString().equals(MODULE_TYPE_JAVA) ? LOAD_JAVA : LOAD_FILE;
             } else {
                 throw new IllegalArgumentException(MODULE_LOAD + " requires a string as a second argument");
             }
@@ -1121,7 +1208,28 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             // first arg is the class name.
             try {
                 Class klasse = state.getClass().forName(resourceName);
-                QDLLoader qdlLoader = (QDLLoader) klasse.newInstance();
+                Object newThingy = klasse.newInstance();
+                QDLLoader qdlLoader;
+                if (newThingy instanceof JavaModule) {
+                    // For a single instance, just create a barebones loader on the fly.
+                   qdlLoader = new QDLLoader() {
+                       @Override
+                       public List<Module> load() {
+                           List<Module> m = new ArrayList<>();
+                           JavaModule javaModule = (JavaModule)newThingy;
+                           State newState = state.newModuleState();
+                           javaModule = (JavaModule) javaModule.newInstance(newState);
+                           javaModule.init(newState); // set it up
+                           m.add(javaModule);
+                           return m;
+                       }
+                   };
+                } else {
+                    if (!(newThingy instanceof QDLLoader)) {
+                        throw new IllegalArgumentException("Error: \"" + resourceName + "\" is neither a module nor a loader.");
+                    }
+                    qdlLoader = (QDLLoader) newThingy;
+                }
                 QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
@@ -1144,7 +1252,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             }
             throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?", t);
         }
-        if(script == null){
+        if (script == null) {
             throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?");
         }
 /*
@@ -1203,9 +1311,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     /**
      * The general contract for import. You may import everything in a module by using the uri.
      * You may import items using the FQ name (uri + # + name). <br/><br/>
-     * Imported items are added to the current stack only. it is nto possible to un-import items since
+     * Imported items are added to the current stack only. it is not possible to un-import items since
      * it is impossible to track down references to them and it is dangerous to have programs be able
-     * to unload things willy-nilly since that can cause hard to track down failures.
+     * to unload things willy-nilly since that can cause hard to track down failures.<br/><br/>
+     * If you need to unload, your best bet is to clear the workspace.
      *
      * @param polyad
      */
