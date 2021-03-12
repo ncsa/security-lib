@@ -45,7 +45,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean autosaveMessagesOn,
                           boolean useExternalEditor,
                           String externalEditorPath,
-                          String nanoSyntaxFile) {
+                          QDLEditors qdlEditors) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -70,8 +70,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.autosaveMessagesOn = autosaveMessagesOn;
         this.externalEditorPath = externalEditorPath;
         this.useExternalEditor = useExternalEditor;
-        this.nanoSyntaxFile = nanoSyntaxFile;
+        this.qdlEditors = qdlEditors;
     }
+
+    public QDLEditors getQdlEditors() {
+        return qdlEditors;
+    }
+
+    public void setQdlEditors(QDLEditors qdlEditors) {
+        this.qdlEditors = qdlEditors;
+    }
+
+    QDLEditors qdlEditors;
     boolean useExternalEditor;
 
     public boolean isUseExternalEditor() {
@@ -82,15 +92,6 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.useExternalEditor = useExternalEditor;
     }
 
-    public String getNanoSyntaxFile() {
-        return nanoSyntaxFile;
-    }
-
-    public void setNanoSyntaxFile(String nanoSyntaxFile) {
-        this.nanoSyntaxFile = nanoSyntaxFile;
-    }
-
-    String nanoSyntaxFile;
     public String getExternalEditorPath() {
         return externalEditorPath;
     }

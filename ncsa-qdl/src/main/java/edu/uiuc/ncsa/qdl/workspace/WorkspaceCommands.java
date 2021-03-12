@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
-import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
-import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
-import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
+import edu.uiuc.ncsa.qdl.config.*;
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
@@ -576,6 +574,8 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
             case "copy":
                 return _fileCopy(inputLine);
+            case "edit":
+                return _doFileEdit(inputLine);
             case "rm":
             case "delete":
                 return _fileDelete(inputLine);
@@ -592,6 +592,17 @@ public class WorkspaceCommands implements Logable {
                 say("unknown file command");
                 return RC_NO_OP;
         }
+    }
+
+    private int _doFileEdit(InputLine inputLine) {
+        String source = inputLine.getArg(FIRST_ARG_INDEX);
+         File f = new File(source);
+         // don't care if it exists, that's the editor's problem.
+        if(!f.isAbsolute()){
+            f = new File(rootDir, f.getAbsolutePath());
+        }
+        _doExternalEdit(f);
+        return RC_CONTINUE;
     }
 
     BufferManager bufferManager = new BufferManager();
@@ -859,16 +870,16 @@ public class WorkspaceCommands implements Logable {
         this.useExternalEditor = useExternalEditor;
     }
 
-    public String getExternalEditorPath() {
-        return externalEditorPath;
+    public String getExternalEditorName() {
+        return externalEditorName;
     }
 
-    public void setExternalEditorPath(String externalEditorPath) {
-        this.externalEditorPath = externalEditorPath;
+    public void setExternalEditorName(String externalEditorName) {
+        this.externalEditorName = externalEditorName;
     }
 
     boolean useExternalEditor = false;
-    String externalEditorPath = "";
+    String externalEditorName = "";
 
     List<String> editorClipboard = new LinkedList<>();
 
@@ -898,80 +909,71 @@ public class WorkspaceCommands implements Logable {
             br.setContent(content);
         }
         // so no buffer. There are a couple ways to get it.
-        if (useExternalEditor) {
-            List<String> result = _doExternalEdit(br.getContent());
-            if (result == null) {
-                return RC_NO_OP;
-            }
-            br.setContent(result);
-            br.edited = true;
-            return RC_CONTINUE;
+        List<String> result;
+        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+            result = _doExternalEdit(br.getContent());
+        } else {
+            result = _doLineEditor(br.getContent());
         }
-        LineEditor lineEditor = new LineEditor(br.getContent());
+        if (result == null) {
+            return RC_NO_OP;
+        }
+        br.setContent(result);
+        br.edited = true;
+        return RC_CONTINUE;
+    }
+
+    private List<String> _doLineEditor(List<String> content) {
+        LineEditor lineEditor = new LineEditor(content);
         lineEditor.setClipboard(editorClipboard);
         lineEditor.setIoInterface(getIoInterface());
         try {
             lineEditor.execute();
-            br.setContent(lineEditor.getBuffer()); // Just to be sure it is the same.
-            br.edited = true;
+            return lineEditor.getBuffer(); // Just to be sure it is the same.
         } catch (Throwable t) {
             t.printStackTrace();
             say("Sorry, there was an issue editing this buffer.");
             getState().warn("Error editing buffer:" + t.getMessage() + " for exception " + t.getClass().getSimpleName());
         }
-
-        return RC_CONTINUE;
+        return content;
     }
-
-    private List<String> _doExternalEdit(List<String> content) {
-        File file = null;
-        try {
-            file = File.createTempFile("nano", ".qdl");
-            FileWriter fw = new FileWriter(file);
-            for (String x : content) {
-                fw.write(x + "\n");
+    File tempDir = null;
+    protected File getTempDir(){
+        if(tempDir == null){
+            if(rootDir != null){
+               tempDir = new File(rootDir, "temp");
+               if(!tempDir.exists()){
+                   if(!tempDir.mkdir()){
+                               return null;
+                   }
+               }
             }
-            fw.flush();
-            fw.close();
-        } catch (IOException iox) {
-            say("could not create the temp file");
-            return null;
         }
+        return tempDir;
+    }
+    private List<String> _doExternalEdit(File tempFile)  {
+
+        QDLEditor qdlEditor = getQdlEditors().get(getExternalEditorName());
+        List<String> commands = new ArrayList<>();
+        commands.add(qdlEditor.exec);
+        commands.add(tempFile.getAbsolutePath());
+        for (QDLEditorArg arg : qdlEditor.args) {
+            String a = arg.flag;
+            a = a + (arg.hasConnector() ? arg.connector : "");
+            a = a + (arg.hasValue() ? " " + arg.value : "");
+            commands.add(a);
+        }
+
         ProcessBuilder processBuilder = new ProcessBuilder();
-        // Nano works great. Others may not.
-        String execPath = isTrivial(externalEditorPath) ? "/bin/nano" : externalEditorPath;
-        String syntaxFile = null;
-        if(!isTrivial(getNanoSyntaxFile())){
-               File f = new File(getNanoSyntaxFile());
-               if(f.isAbsolute()){
-                   syntaxFile = getNanoSyntaxFile();
-               }
-               else{
-                   f = resolveAgainstRoot(getNanoSyntaxFile());
-                   syntaxFile = f.getAbsolutePath();
-               }
-        }
-        if(isTrivial(syntaxFile)){
-            processBuilder.command(execPath,
-                    file.getAbsolutePath());
-
-
-        }else{
-            processBuilder.command(execPath,
-                    file.getAbsolutePath()
-                    , "--rcfile=" + syntaxFile);
-
-        }
-/*
-        processBuilder.command(execPath,
-                file.getAbsolutePath());
-*/
-
+        processBuilder.command(commands);
         processBuilder.inheritIO();
+        int exitCode = 0;
+        List<String> content = null;
         try {
             Process process = processBuilder.start();
-            if (0 == process.waitFor()) {
-                BufferedReader br = new BufferedReader(new FileReader(file));
+            exitCode = process.waitFor();
+            if (0 == exitCode) {
+                BufferedReader br = new BufferedReader(new FileReader(tempFile));
                 content = new ArrayList<>();
                 String currentLine = br.readLine();
 
@@ -981,14 +983,50 @@ public class WorkspaceCommands implements Logable {
                 }
                 br.close();
             } else {
-                say("There seems to have been a problem with the editor");
             }
         } catch (Throwable t) {
+            if (exitCode == 0) {
+                exitCode = -1; // trigger message below after any screen clear so the user sees it.
+            }
+            error("error with editor", t);
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
+        } finally {
+            if (qdlEditor.clearScreen) {
+                say("\u001b[2J"); // clear screen
+                say("\u001b[0;0H"); // cursor at top
+            }
         }
+        if (exitCode != 0) {
+            say("There seems to have been a problem with the editor. Check the log: " + getLogger().getFileName());
+        }
+
         return content;
+
+    }
+    private List<String> _doExternalEdit(List<String> content) {
+        File tempFile;
+        File tempDir = getTempDir();
+
+        try {
+            if(tempDir == null){
+                tempFile = File.createTempFile("edit", ".qdl" );
+            } else{
+                tempFile = File.createTempFile("edit", ".qdl", tempDir );
+            }
+            tempFile.deleteOnExit();
+            FileWriter fw = new FileWriter(tempFile);
+            for (String x : content) {
+                fw.write(x + "\n");
+            }
+            fw.flush();
+            fw.close();
+        } catch (IOException iox) {
+            say("could not create the temp file");
+            return null;
+        }
+        return _doExternalEdit(tempFile);
     }
 
     protected BufferManager.BufferRecord getBR(InputLine inputLine) {
@@ -1125,11 +1163,13 @@ public class WorkspaceCommands implements Logable {
 
     private int _fileCopy(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("copy source target");
+            say("copy source target [-binary]");
             sayi("Copy a file from the source to the target. Note that the workspace is VFS aware.");
+            sayi("-binary = treat the files as binary.");
             return RC_NO_OP;
         }
         boolean isBinary = inputLine.hasArg("-binary");
+        inputLine.removeSwitch("-binary");
         try {
             String source = inputLine.getArg(FIRST_ARG_INDEX);
             String target = inputLine.getArg(FIRST_ARG_INDEX + 1);
@@ -1694,13 +1734,19 @@ public class WorkspaceCommands implements Logable {
         List<String> f = new ArrayList<>();
 
         f.add(inputForm);
-        f = _doExternalEdit(f);
+        List<String> result;
+        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+            f = _doExternalEdit(f);
+        } else {
+            f = _doLineEditor(f);
+        }
         StringBuffer sb = new StringBuffer();
         for (String line : f) {
             sb.append(line + "\n");
         }
         try {
             getInterpreter().execute(sb.toString());
+            fr_withState = getState().resolveFunction(fName, argCount); // get it again because it was overwritten
             fr_withState.functionRecord.sourceCode = sb.toString(); // update source in the record.
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
@@ -1925,20 +1971,25 @@ public class WorkspaceCommands implements Logable {
         String inputForm = InputFormUtil.inputFormVar(varName, getState());
         List<String> content = new ArrayList<>();
         content.add(inputForm);
+        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+            content = _doExternalEdit(content);
+        } else {
+            content = _doLineEditor(content);
+        }
         content = _doExternalEdit(content);
 
-        String newValue  = varName + ":=";
-        for(String line : content){
+        String newValue = varName + ":=";
+        for (String line : content) {
             newValue = newValue + "\n" + line;
         }
         newValue = newValue.trim();
-        if(!newValue.endsWith(";")){
+        if (!newValue.endsWith(";")) {
             newValue = newValue + ";";
         }
         try {
             getInterpreter().execute(newValue);
         } catch (Throwable throwable) {
-            if(DebugUtil.isEnabled()) {
+            if (DebugUtil.isEnabled()) {
                 throwable.printStackTrace();
             }
             say("Sorry, could not update value of \"" + varName + "\"");
@@ -2227,6 +2278,12 @@ public class WorkspaceCommands implements Logable {
                     say("(not set)");
                 }
                 break;
+            case EXTERNAL_EDITOR:
+                say(getExternalEditorName());
+                break;
+            case USE_EXTERNAL_EDITOR:
+                say(isUseExternalEditor() ? "on" : "off");
+                break;
             case DESCRIPTION:
                 if (isTrivial(getDescription())) {
                     say("(no description set)");
@@ -2295,6 +2352,8 @@ public class WorkspaceCommands implements Logable {
     public static final String AUTOSAVE_ON = "autosave_on";
     public static final String AUTOSAVE_MESSAGES_ON = "autosave_messages_on";
     public static final String AUTOSAVE_INTERVAL = "autosave_interval";
+    public static final String EXTERNAL_EDITOR = "external_editor";
+    public static final String USE_EXTERNAL_EDITOR = "use_external_editor";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -2707,8 +2766,15 @@ public class WorkspaceCommands implements Logable {
             case DEBUG:
                 setDebugOn(isOnOrTrue(value));
                 say("debug " + (debugOn ? "on" : "off"));
-
                 break;
+            case USE_EXTERNAL_EDITOR:
+                setUseExternalEditor(isOnOrTrue(value));
+                say("use external editor " + (isUseExternalEditor()?"on":"off"));
+                break;
+            case EXTERNAL_EDITOR:
+                String oldName = getExternalEditorName();
+                setExternalEditorName(value);
+                say("external editor was " + (isTrivial(oldName)?"(null)":oldName) + " now is '" + getExternalEditorName() + "'");
             case START_TS:
                 try {
                     Long rawDate = Long.parseLong(value);
@@ -2741,7 +2807,7 @@ public class WorkspaceCommands implements Logable {
                 break;
             case WS_ID:
                 setWSID(value);
-                say("workspace id set to " + getWSID());
+                say("workspace id set to '" + getWSID() + "'");
                 break;
             case COMPRESS_XML:
                 setCompressXML(isOnOrTrue(value));
@@ -2823,7 +2889,9 @@ public class WorkspaceCommands implements Logable {
             AUTOSAVE_ON,
             START_TS,
             ROOT_DIR,
-            WS_ID
+            WS_ID,
+            EXTERNAL_EDITOR,
+            USE_EXTERNAL_EDITOR
     };
     String wsID;
 
@@ -3529,14 +3597,14 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean compressXML = true;
-    String nanoSyntaxFile = "etc/qdl.nanorc";
 
-    public String getNanoSyntaxFile() {
-        return nanoSyntaxFile;
+
+    public QDLEditors getQdlEditors() {
+        return qdlEditors;
     }
 
-    public void setNanoSyntaxFile(String nanoSyntaxFile) {
-        this.nanoSyntaxFile = nanoSyntaxFile;
+    public void setQdlEditors(QDLEditors qdlEditors) {
+        this.qdlEditors = qdlEditors;
     }
 
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
@@ -3693,9 +3761,9 @@ public class WorkspaceCommands implements Logable {
         setAutosaveOn(qe.isAutosaveOn());
         setAutosaveMessagesOn(qe.isAutosaveMessagesOn());
         setAutosaveInterval(qe.getAutosaveInterval());
-        setExternalEditorPath(qe.getExternalEditorPath());
+        setExternalEditorName(qe.getExternalEditorPath());
         setUseExternalEditor(qe.isUseExternalEditor());
-        setNanoSyntaxFile(qe.getNanoSyntaxFile());
+        setQdlEditors(qe.getQdlEditors());
         initAutosave();
     }
 
@@ -3790,6 +3858,7 @@ public class WorkspaceCommands implements Logable {
 
     boolean isRunScript = false;
     String runScriptPath = null;
+    QDLEditors qdlEditors;
 
     protected void fromCommandLine(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON);

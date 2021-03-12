@@ -129,7 +129,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             releaseConnection(c);
         } catch (SQLException e) {
             destroyConnection(c);
-            throw new GeneralException("Error updating approval with identifier = \"" + value.getIdentifierString(), e);
+            throw new GeneralException("Error updating object with identifier = \"" + value.getIdentifierString(), e);
         }
     }
 

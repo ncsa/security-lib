@@ -22,7 +22,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  */
 public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingConfigLoader<T> implements QDLConfigurationConstants, ConfigurationLoader<T> {
     public QDLConfigurationLoader(String cfgFile, ConfigurationNode node) {
-        super("qdl.log","qdl", node, null); // This makes it read the logging configuration and create the logger. Logging should just work
+        super("qdl.log", "qdl", node, null); // This makes it read the logging configuration and create the logger. Logging should just work
         configFile = cfgFile;
     }
 
@@ -33,9 +33,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
      * @param node
      * @param logger
      */
-    public QDLConfigurationLoader(String cfgFile,ConfigurationNode node, MyLoggingFacade logger) {
+    public QDLConfigurationLoader(String cfgFile, ConfigurationNode node, MyLoggingFacade logger) {
         // set defaults for the logger if none configured or you get references to NCSA Delegation
-        super("qdl.log","qdl",node, logger);
+        super("qdl.log", "qdl", node, logger);
         configFile = cfgFile;
     }
 
@@ -47,16 +47,19 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     /**
      * This is set to point to the configuration file (that information is not contained inside the file). It is optional.
+     *
      * @param configFile
      */
     public void setConfigFile(String configFile) {
         this.configFile = configFile;
     }
 
-    protected String getConfigFile(){
-           return configFile;
-       }
+    protected String getConfigFile() {
+        return configFile;
+    }
+
     String configFile = null;
+
     protected String getBootScript() {
         return getNodeValue(cn, BOOT_SCRIPT_TAG, "");
     }
@@ -77,19 +80,22 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     }
 
     protected String getScriptPath() {
-          String x =  getFirstAttribute(cn, SCRIPT_PATH_TAG);
-          return x==null?"":x;
-      }
+        String x = getFirstAttribute(cn, SCRIPT_PATH_TAG);
+        return x == null ? "" : x;
+    }
 
     protected String getModulePath() {
-          String x =  getFirstAttribute(cn, MODULE_PATH_TAG);
-          return x==null?"":x;
-      }
+        String x = getFirstAttribute(cn, MODULE_PATH_TAG);
+        return x == null ? "" : x;
+    }
+
     protected boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
         if (node == null) return defaultValue;
         try {
             String x = getFirstAttribute(node, attrib);
-            if(isTrivial(x)){return defaultValue;} //  Null argument returns false.
+            if (isTrivial(x)) {
+                return defaultValue;
+            } //  Null argument returns false.
             return Boolean.parseBoolean(x);
         } catch (Throwable t) {
 
@@ -104,19 +110,55 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     protected String getExternalEditorPath() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
-        String x =  getFirstAttribute(node, WS_EDITOR_PATH);
-        if(isTrivial(x)){
+        String x = getFirstAttribute(node, WS_EDITOR_NAME);
+        if (isTrivial(x)) {
             return "";
         }
         return x;
     }
-    protected String getNanoSyntaxFile() {
-        ConfigurationNode node = getFirstNode(cn, WS_TAG);
-        String x =  getFirstAttribute(node, WS_NANO_SYNTAX);
-        if(isTrivial(x)){
-            return "";
+
+    /*  Example
+       <editors>
+            <editor name="nano"
+                    exec="/bin/nano"
+                    clear_screen="true>
+               <arg flag="--rcfile"
+                    connector="="
+                    value="/path/to/syntaxfile"/>
+               <!-- can have several args -->
+            </editor>
+       </editors>
+
+     */
+    protected QDLEditors getEditors() {
+        QDLEditors qdlEditors = new QDLEditors(); // never null
+        ConfigurationNode node = getFirstNode(cn, EDITORS_TAG);
+        if (node != null) {
+            // Loop through all the editor elements
+            for (ConfigurationNode kid : node.getChildren(EDITOR_TAG)) {
+                String name = getFirstAttribute(kid, EDITOR_NAME_ATTR);
+                if (StringUtils.isTrivial(name)) {
+                    continue; // not a valid node.
+                }
+                QDLEditor qdlEditor = new QDLEditor();
+                qdlEditor.name = name;
+                qdlEditor.exec = getFirstAttribute(kid, EDITOR_EXEC_ATTR);
+                qdlEditor.clearScreen = getFirstBooleanValue(kid, EDITOR_CLEAR_SCREEN_ATTR, false);
+                for (ConfigurationNode arg : kid.getChildren(EDITOR_ARG_TAG)) {
+                    QDLEditorArg qdlEditorArg = new QDLEditorArg();
+                    String flag = getFirstAttribute(arg, EDITOR_ARG_FLAG_ATTR);
+                    if (isTrivial(flag)) {
+                        continue;
+                    }
+                    qdlEditorArg.flag = flag;
+                    qdlEditorArg.connector = getFirstAttribute(arg, EDITOR_ARG_CONNECTOR_ATTR);
+                    qdlEditorArg.value = getFirstAttribute(arg, EDITOR_ARG_VALUE_ATTR);
+                    qdlEditor.args.add(qdlEditorArg);
+                }
+                qdlEditors.put(qdlEditor);
+            }
         }
-        return x;
+        return qdlEditors;
     }
 
 
@@ -150,38 +192,42 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
     protected String getDebugLevel() {
         String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
-        if(level == null){
+        if (level == null) {
             level = DebugUtil.DEBUG_LEVEL_OFF_LABEL;
         }
         return level;
     }
+
     protected boolean isEchoModeOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
     }
+
     protected boolean isPrettyPrint() {
-          ConfigurationNode node = getFirstNode(cn, WS_TAG);
-          return getFirstBooleanValue(node, WS_ATTR_PRETTY_PRINT, false);
-      }
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_ATTR_PRETTY_PRINT, false);
+    }
+
     protected boolean isAutosaveOn() {
-          ConfigurationNode node = getFirstNode(cn, WS_TAG);
-          return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_ON, false);
-      }
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_ON, false);
+    }
 
     protected boolean isAutosaveMessagesOn() {
-          ConfigurationNode node = getFirstNode(cn, WS_TAG);
-          return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_MESSAGES_ON, false);
-      }
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_ATTR_AUTOSAVE_MESSAGES_ON, false);
+    }
 
     protected long getAutosaveInterval() {
-          ConfigurationNode node = getFirstNode(cn, WS_TAG);
-          String rawValue = getFirstAttribute(node, WS_ATTR_AUTOSAVE_INTERVAL);
-          long autosaveInterval = 10*60*1000L; // 10 minutes in milliseconds.
-          if(rawValue != null){
-              autosaveInterval = ConfigUtil.getValueSecsOrMillis(rawValue);
-          }
-          return autosaveInterval;
-      }
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        String rawValue = getFirstAttribute(node, WS_ATTR_AUTOSAVE_INTERVAL);
+        long autosaveInterval = 10 * 60 * 1000L; // 10 minutes in milliseconds.
+        if (rawValue != null) {
+            autosaveInterval = ConfigUtil.getValueSecsOrMillis(rawValue);
+        }
+        return autosaveInterval;
+    }
+
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
         if (isTrivial(raw)) {
@@ -307,7 +353,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 isAutosaveMessagesOn(),
                 useWSExternalEditor(),
                 getExternalEditorPath(),
-                getNanoSyntaxFile());
+                getEditors());
     }
 
     @Override

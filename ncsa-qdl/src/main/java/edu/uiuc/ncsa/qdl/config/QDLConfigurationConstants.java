@@ -49,9 +49,20 @@ public interface QDLConfigurationConstants {
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";
     String WS_COMPRESS_SERIALIZATION_TAG = "compress_xml";
-    String WS_EDITOR_PATH = "editor_path";
+    String WS_EDITOR_NAME = "editor_name";
     String WS_EDITOR_ENABLE = "use_editor";
-    String WS_NANO_SYNTAX = "nano_syntax_file";
     String SCRIPT_PATH_TAG = "script_path";
     String MODULE_PATH_TAG = "module_path";
+
+    // for the editor configuration
+    String EDITORS_TAG = "editors";
+    String EDITOR_TAG = "editor";
+    String EDITOR_ARG_TAG = "arg";
+    String EDITOR_NAME_ATTR = "name";
+    String EDITOR_EXEC_ATTR = "exec";
+    String EDITOR_CLEAR_SCREEN_ATTR = "clear_screen";
+    String EDITOR_ARG_FLAG_ATTR = "flag";
+    String EDITOR_ARG_CONNECTOR_ATTR = "connector";
+    String EDITOR_ARG_VALUE_ATTR = "value";
+
 }

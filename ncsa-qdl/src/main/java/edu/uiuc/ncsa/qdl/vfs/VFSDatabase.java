@@ -205,7 +205,7 @@ public class VFSDatabase extends SQLDatabase {
             releaseConnection(c);
         } catch (SQLException | IOException e) {
             destroyConnection(c);
-            throw new GeneralException("Error updating approval with identifier = \"" + path + VFSPaths.PATH_SEPARATOR + fileName, e);
+            throw new GeneralException("Error updating object with identifier = \"" + path + VFSPaths.PATH_SEPARATOR + fileName, e);
         }
     }
 

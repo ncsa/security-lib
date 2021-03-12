@@ -61,11 +61,8 @@ public class WSXMLSerializer {
         xsw.writeAttribute(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
         xsw.writeAttribute(COMPRESS_XML, Boolean.toString(workspaceCommands.compressXML));
         xsw.writeAttribute(USE_EXTERNAL_EDITOR, Boolean.toString(workspaceCommands.isUseExternalEditor()));
-        if(!isTrivial(workspaceCommands.getExternalEditorPath())) {
-            xsw.writeAttribute(EXTERNAL_EDITOR_PATH, workspaceCommands.getExternalEditorPath());
-        }
-        if(!isTrivial(workspaceCommands.getNanoSyntaxFile())){
-            xsw.writeAttribute(NANO_SYNTAX_FILE, workspaceCommands.getNanoSyntaxFile());
+        if(!isTrivial(workspaceCommands.getExternalEditorName())) {
+            xsw.writeAttribute(EXTERNAL_EDITOR_PATH, workspaceCommands.getExternalEditorName());
         }
         if (!isTrivial(workspaceCommands.getWSID())) {
             // Note that since we want this to be an attribute, we are limited to what characters normally
@@ -421,14 +418,12 @@ public class WSXMLSerializer {
                     testCommands.setWSID(new String(Base64.decodeBase64(v)));
                     break;
                 case EXTERNAL_EDITOR_PATH:
-                    testCommands.setExternalEditorPath(v);
+                    testCommands.setExternalEditorName(v);
                     break;
                 case USE_EXTERNAL_EDITOR:
                     testCommands.setUseExternalEditor(Boolean.parseBoolean(v));
                     break;
-                case NANO_SYNTAX_FILE:
-                    testCommands.setNanoSyntaxFile(v);
-                    break;
+
                 default:
                     // do nothing
                     say("unknown workspace attribute " + a.getName().getLocalPart() + "=" + v);
