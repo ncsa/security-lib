@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -54,7 +53,6 @@ public abstract class AbstractState implements StateInterface, Logable {
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         FunctionTable functionTable,
                          ModuleMap moduleMap,
                          MyLoggingFacade myLoggingFacade) {
         this.importManager = importManager;
@@ -62,19 +60,10 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.moduleMap = moduleMap;
-        this.functionTable = functionTable;
         this.logger = myLoggingFacade;
     }
 
-    public FunctionTable getFunctionTable() {
-        return functionTable;
-    }
 
-    public void setFunctionTable(FunctionTable functionTable) {
-        this.functionTable = functionTable;
-    }
-
-    FunctionTable functionTable;
 
     public ModuleMap getModuleMap() {
         return moduleMap;
@@ -243,19 +232,50 @@ public abstract class AbstractState implements StateInterface, Logable {
         return scriptPaths;
     }
 
+    public boolean isEnableLibrarySupport() {
+        return enableLibrarySupport;
+    }
+
+    public void setEnableLibrarySupport(boolean enableLibrarySupport) {
+        this.enableLibrarySupport = enableLibrarySupport;
+    }
+
+    boolean enableLibrarySupport = true;
+
+    public List<String> getLibPath() {
+        return libPath;
+    }
+
+    public void setLibPath(String rawPath) {
+        libPath = pathToList(rawPath);
+    }
+
+    public void setLibPath(List<String> libPath) {
+        this.libPath = libPath;
+    }
+
+    protected List<String> libPath = new ArrayList<>();
+
     public List<String> getModulePaths() {
         return modulePaths;
     }
+
     public void setModulePaths(List<String> newModulePaths) {
         modulePaths = newModulePaths;
     }
 
-    public void setModulePaths(String rawPath){
+    public void setModulePaths(String rawPath) {
         modulePaths = pathToList(rawPath);
     }
-    
+
     List<String> modulePaths = new ArrayList<>();
 
+    /**
+     * Internally paths are always normalized to end in a "/";
+     *
+     * @param rawPath
+     * @return
+     */
     protected List<String> pathToList(String rawPath) {
         List<String> x = new ArrayList<>();
         StringTokenizer st = new StringTokenizer(rawPath, ":");

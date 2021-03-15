@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -76,15 +77,15 @@ public class StemListNode implements StatementWithResultInterface {
         return result;
     }
 
-    String sourceCode = "";
+    List<String> sourceCode = new ArrayList<>();
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 

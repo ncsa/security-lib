@@ -2,9 +2,9 @@
    sample script that computes the square root of an argument
 */
 if[
-   script_args() == 0
+   script_args() != 1
 ]then[
-  say('Sorry, but no argument');
+  say('Sorry, but this computes a single number');
   return();
 ];
 x := to_number(script_args(0));

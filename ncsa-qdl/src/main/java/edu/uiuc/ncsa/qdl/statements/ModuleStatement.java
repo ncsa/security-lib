@@ -60,15 +60,15 @@ public class ModuleStatement implements Statement {
     }
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 
-    String sourceCode;
+    List<String> sourceCode;
 
 }

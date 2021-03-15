@@ -301,15 +301,15 @@ The following are working:
         return stemLeft.get(multiIndex);
     }
 
-    String sourceCode = "";
+    List<String> sourceCode = new ArrayList<>();
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 

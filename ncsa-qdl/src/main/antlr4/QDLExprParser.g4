@@ -28,8 +28,11 @@ import QDLVariableParser;
               | stemVariable
               | stemList;
 
-     function : FuncStart argList* ')';
-
+     function : FuncStart f_args* ')';
+        f_ref : F_REF;
+        f_arg : (stemValue | f_ref);
+       f_args : f_arg (',' f_arg)* ;
+       
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
 // and checking for regression. Also Antlr 4 interprets the comments in the right hand column and
 // will use these for generating method names in Java. Be careful of actually putting comments there!

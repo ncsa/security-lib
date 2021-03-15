@@ -4,6 +4,9 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Models an entry for a stem variable (that is not a list element). This is needed because these can be
  * expressions for the key and value which can only be determined at runtime, not earlier, hence everything has to be evaluated.
@@ -61,15 +64,15 @@ public class StemEntryNode implements StatementWithResultInterface {
         return null;
     }
 
-    String sourceCode = "";
+    List<String> sourceCode = new ArrayList<>();
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 

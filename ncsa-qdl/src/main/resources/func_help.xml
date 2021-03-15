@@ -1237,7 +1237,33 @@ compress_xml - toggle compression of XML on WS save. Options are (on | true) or 
                 ]]>
             </body>
         </entry>
-
+    <entry id="enable_library_support">
+            <body>
+                <![CDATA[
+(workspace variable)
+enable_library_support - enable on the fly resolution of scripts as if they were functions.
+            You must set the lib_path as well for this to work.
+See also: lib_path
+]]>
+            </body>
+        </entry>
+    <entry id="lib_path">
+            <body>
+                <![CDATA[
+(workspace variable)
+lib_path - the paths that are used in resolving library references. A library is a collection of
+        QDL scripts, each ending with .qdl. If library support is enabled then calls to scripts are
+        resolved dynamically. See the reference manual for full details.
+E.g.
+   if you have a lib_path set and there is a file called sqrt.qdl that accepts a single number
+   and returns it square root, then you could invoke it for the value of x with
+   sqrt(x)
+   Completely the same, you could do this directly as
+   script_run('/path/to/sqrt.qdl', x)
+See also: enable_library_support
+                ]]>
+            </body>
+        </entry>
     <entry id="ws_file">
             <body>
                 <![CDATA[

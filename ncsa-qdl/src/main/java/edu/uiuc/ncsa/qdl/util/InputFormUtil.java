@@ -7,10 +7,11 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.statements.FR_WithState;
-import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -107,7 +108,7 @@ public class InputFormUtil {
             return JAVA_CLASS_MARKER + ((JavaModule) m).getClassname();
         }
         if (m instanceof QDLModule) {
-            return ((QDLModule) m).getSource();
+            return StringUtils.listToString(((QDLModule) m).getSource());
         }
         return null;
     }

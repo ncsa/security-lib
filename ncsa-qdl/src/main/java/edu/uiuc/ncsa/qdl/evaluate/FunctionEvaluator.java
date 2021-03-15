@@ -4,14 +4,17 @@ import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.RecursionException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.statements.FR_WithState;
-import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.util.TreeSet;
 
@@ -99,7 +102,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
         // Direct analog of func(polyad, state):
-        if(qfr == null){
+        if (qfr == null) {
             throw new UndefinedFunctionException("this function is not defined");
         }
         Object result = qfr.qdlFunction.evaluate(argList, state);
@@ -111,8 +114,46 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    protected boolean tryScript(Polyad polyad, State state) {
+        if (!state.isEnableLibrarySupport() || state.getLibPath().isEmpty()) {
+            return false;
+        }
+        String scriptName = polyad.getName() + QDLVersion.DEFAULT_FILE_EXTENSION;
+        Polyad tryScript = new Polyad(ControlEvaluator.RUN_COMMAND);
+        ConstantNode constantNode = new ConstantNode(scriptName, Constant.STRING_TYPE);
+        tryScript.getArguments().add(constantNode);
+        for (int i = 0; i < polyad.getArgCount(); i++) {
+            tryScript.getArguments().add(polyad.getArguments().get(i));
+        }
+        try {
+            ControlEvaluator.runnit(tryScript, state, ControlEvaluator.RUN_COMMAND, state.getLibPath(), true);
+            tryScript.evaluate(state);
+            polyad.setResult(tryScript.getResult());
+            polyad.setResultType(tryScript.getResultType());
+            polyad.setEvaluated(true);
+            return true;
+        } catch (Throwable t) {
+            DebugUtil.trace(this, ".tryScript failed:");
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     protected void figureOutEvaluation(Polyad polyad, State state) {
-        FR_WithState frs = state.resolveFunction(polyad);
+        FR_WithState frs;
+        try {
+            frs = state.resolveFunction(polyad);
+        } catch (UndefinedFunctionException udx) {
+            if (!state.isEnableLibrarySupport()) {
+                throw udx; // don't try to resolve libraries if support is off.
+            }
+            if (!tryScript(polyad, state)) {
+                throw udx;
+            }
+            return; // if it gets here, then the script worked, exit gracefully.
+        }
         if (frs.isExternalModule) {
             doJavaFunction(polyad, state, frs);
         } else {

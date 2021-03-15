@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.statements;
+package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.state.AbstractState;
 

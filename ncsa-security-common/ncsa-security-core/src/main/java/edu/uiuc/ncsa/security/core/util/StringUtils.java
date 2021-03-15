@@ -543,4 +543,37 @@ public class StringUtils {
         return RJustify(key, leftColumWidth) + " : " + truncate(value.replace("\n", "").replace("\r", ""));
     }
 
+    /**
+     * Converts a list of strings to a single string with embedded linefeeds.
+     * @param list
+     * @return
+     */
+ public static String listToString(List<String> list){
+        String x = "";
+        boolean isFirst = true;
+        for(String s : list){
+            if(isFirst){
+                isFirst = false;
+                x = x + s;
+            }else {
+                x = x + "\n" + s;
+            }
+        }
+        return x;
+ }
+
+    /**
+     * Converts a string with embedded linefeeds into a list of strings, one per line.
+     * The line editor needs this.
+     * @param s
+     * @return
+     */
+ public static List<String> stringToList(String s){
+       StringTokenizer stringTokenizer = new StringTokenizer("\n");
+       List<String> output = new ArrayList<>();
+       while(stringTokenizer.hasMoreTokens()){
+           output.add(stringTokenizer.nextToken());
+       }
+       return output;
+ }
 }

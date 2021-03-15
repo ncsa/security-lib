@@ -36,6 +36,7 @@ grammar QDLVariableParser;
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : ':=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=';
   FuncStart : [a-zA-Z_$#][a-zA-Z_$0-9#]* '(';
+      F_REF : '*' FuncStart ')';
   //StemStart : Identifier '.';
   BOOL_TRUE : 'true';
  BOOL_FALSE : 'false';

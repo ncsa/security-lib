@@ -577,6 +577,48 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void enterEveryRule(ParserRuleContext parserRuleContext) {
 
     }
+
+    @Override
+    public void enterF_ref(QDLParserParser.F_refContext ctx) {
+        System.out.println("enter R_REF");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void exitF_ref(QDLParserParser.F_refContext ctx) {
+        System.out.println("exit R_REF");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void enterF_arg(QDLParserParser.F_argContext ctx) {
+        System.out.println("enter f_arg");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void exitF_arg(QDLParserParser.F_argContext ctx) {
+        System.out.println("exit f_arg");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void enterF_args(QDLParserParser.F_argsContext ctx) {
+        System.out.println("enter f_argS");
+        printKids(ctx);
+
+    }
+
+    @Override
+    public void exitF_args(QDLParserParser.F_argsContext ctx) {
+        System.out.println("exit f_argS");
+        printKids(ctx);
+
+    }
 /*
     @Override
     public void enterStem_ref(QDLParserParser.Stem_refContext ctx) {

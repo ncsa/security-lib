@@ -18,8 +18,8 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
-import edu.uiuc.ncsa.qdl.statements.FR_WithState;
-import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -980,7 +980,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      * @param state
      * @return
      */
-    protected QDLScript resolveScript(String name, List<String> paths, State state) throws Throwable {
+    public static QDLScript resolveScript(String name, List<String> paths, State state) throws Throwable {
         /*
                path.1 := 'vfs#/mysql/init2'; path.0 := 'vfs#/mysql'; path.2 := 'vfs#/pt/';script_paths(path.);
                run_script('temp/hw.qdl')
@@ -1018,11 +1018,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             String caput = name.substring(0, name.indexOf(SCHEME_DELIMITER));
             for (String p : paths) {
                 if (p.startsWith(caput)) {
-                    DebugUtil.trace(this, " trying path = " + p + tempName);
+                    DebugUtil.trace(ControlEvaluator.class, " trying path = " + p + tempName);
 
                     QDLScript q = state.getScriptFromVFS(p + tempName);
                     if (q != null) {
-                        DebugUtil.trace(this, " got path = " + p + tempName);
+                        DebugUtil.trace(ControlEvaluator.class, " got path = " + p + tempName);
 
                         return q;
                     }
@@ -1041,7 +1041,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             }
             for (String p : paths) {
                 String resourceName = p + name;
-                DebugUtil.trace(this, " path = " + resourceName);
+                DebugUtil.trace(ControlEvaluator.class, " path = " + resourceName);
                 if (state.isVFSFile(resourceName)) {
                     if (state.isVFSFile(resourceName)) {
                         if (state.hasVFSProviders()) {
@@ -1061,7 +1061,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         return null;
     }
 
-    protected void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
+    public static void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
+                       runnit(polyad, state, commandName, state.getScriptPaths(), hasNewState);
+    }
+
+    public static void runnit(Polyad polyad, State state, String commandName, List<String> paths, boolean hasNewState) {
         if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("The " + commandName + " requires at least a single argument");
         }
@@ -1072,9 +1076,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         Object arg1 = polyad.evalArg(0, state);
         Object[] argList = new Object[0];
-        if (polyad.getArgCount() == 2) {
+        if (2 == polyad.getArgCount() ) {
             Object arg2 = polyad.evalArg(1, state);
-            if (isStem(arg2)) {
+            if (arg2 instanceof StemVariable) {
                 StemList stemList = ((StemVariable) arg2).getStemList();
                 ArrayList<Object> aa = new ArrayList<>();
                 for (int i = 0; i < stemList.size(); i++) {
@@ -1084,13 +1088,21 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     }
                 }
                 argList = aa.toArray(new Object[0]);
+            }else{
+                argList = new Object[]{arg2}; // pass back single non-stem argument
             }
         }
-        // try {
+        if(2 < polyad.getArgCount()){
+            ArrayList<Object> aa = new ArrayList<>();
+            for(int i = 0; i < polyad.getArgCount(); i++){
+              aa.add(polyad.evalArg(i, state));
+            }
+            argList = aa.toArray(new Object[0]);
+        }
         String resourceName = arg1.toString();
-        QDLScript script = null;
+        QDLScript script;
         try {
-            script = resolveScript(resourceName, state.getScriptPaths(), state);
+            script = resolveScript(resourceName, paths, state);
         } catch (Throwable t) {
             state.warn("Could not find script:" + t.getMessage());
             if (t instanceof RuntimeException) {

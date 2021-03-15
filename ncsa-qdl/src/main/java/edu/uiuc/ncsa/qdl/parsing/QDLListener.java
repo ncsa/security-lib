@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
@@ -22,6 +23,8 @@ import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -168,11 +171,13 @@ public class QDLListener implements QDLParserListener {
             String op = assignmentContext.children.get(++i).getText(); // this is the operator
             String nextVar;
             if (currentA.getSourceCode() == null) {
+                List<String> source = new ArrayList<>();
                 if (isVariableCase) {
-                    currentA.setSourceCode(currentVar + op + assignmentContext.children.get(i + 1).getText());
+                    source.add(currentVar + op + assignmentContext.children.get(i + 1).getText());
                 } else {
-                    currentA.setSourceCode(currentA.getExpStatement().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
+                    source.add(currentA.getExpStatement().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
                 }
+                currentA.setSourceCode(source);
             }
 
             nextA = new Assignment();
@@ -327,7 +332,9 @@ public class QDLListener implements QDLParserListener {
 
         // in the context, the operator is the 0th child since it is prefixed.
         monad.setOperatorType(state.getOperatorType(ctx.getChild(0).getText()));
-        monad.setSourceCode(ctx.getText());
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        monad.setSourceCode(source);
         finish(monad, ctx);
     }
 
@@ -404,15 +411,18 @@ public class QDLListener implements QDLParserListener {
     protected void finish(Dyad dyad, ParseTree parseTree) {
         dyad.setLeftArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(0)));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(2)));
-        dyad.setSourceCode(parseTree.getText());
+        List<String> source = new ArrayList<>();
+        source.add(parseTree.getText());
+        dyad.setSourceCode(source);
 
     }
 
     protected void finish(Monad monad, ParseTree parseTree) {
         int index = monad.isPostFix() ? 0 : 1; // post fix means 0th is the arg, prefix means 1 is the arg.
         monad.setArgument((StatementWithResultInterface) resolveChild(parseTree.getChild(index)));
-        monad.setSourceCode(parseTree.getText());
-
+        List<String> source = new ArrayList<>();
+        source.add(parseTree.getText());
+        monad.setSourceCode(source);
     }
 
     @Override
@@ -512,7 +522,9 @@ public class QDLListener implements QDLParserListener {
         //    value =  value.replace("\\t", "\t");
         //    value =  value.replace("\\r", "\r");
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
-        node.setSourceCode(ctx.getText());
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        node.setSourceCode(source);
         stash(ctx, node);
         // that's it. set the value and we're done.
     }
@@ -607,7 +619,9 @@ public class QDLListener implements QDLParserListener {
         ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
         //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
         conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
-        conditionalStatement.setSourceCode(ctx.getText());
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        conditionalStatement.setSourceCode(source);
         boolean addToIf = true;
         try {
             for (int i = 3; i < ctx.getChildCount(); i++) {
@@ -728,7 +742,7 @@ public class QDLListener implements QDLParserListener {
 
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < defineContext.getChildCount(); i++) {
-            stringBuffer.append((i==0?"":"\n") + defineContext.getChild(i).getText());
+            stringBuffer.append((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
         }
         String rawText = stringBuffer.toString();
         functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
@@ -739,7 +753,8 @@ public class QDLListener implements QDLParserListener {
             name = name.substring(0, name.length() - 1);
         }
         functionRecord.name = name;
-        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+//        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+        for (QDLParserParser.F_argsContext argListContext : nameAndArgsNode.f_args()) {
             // this is a comma delimited list of arguments.
             String allArgs = argListContext.getText();
 
@@ -803,7 +818,7 @@ public class QDLListener implements QDLParserListener {
 
         StringBuffer stringBuffer = new StringBuffer();
         for (int i = 0; i < lambdaContext.getChildCount(); i++) {
-            stringBuffer.append((i==0?"":"\n")+lambdaContext.getChild(i).getText());
+            stringBuffer.append((i == 0 ? "" : "\n") + lambdaContext.getChild(i).getText());
         }
         String rawText = stringBuffer.toString();
         functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
@@ -813,7 +828,8 @@ public class QDLListener implements QDLParserListener {
             name = name.substring(0, name.length() - 1);
         }
         functionRecord.name = name;
-        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+        //for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+        for (QDLParserParser.F_argsContext argListContext : nameAndArgsNode.f_args()) {
             // this is a comma delimited list of arguments.
             String allArgs = argListContext.getText();
 
@@ -960,15 +976,18 @@ public class QDLListener implements QDLParserListener {
      * @param ctx
      * @return
      */
-    protected String getSource(ParserRuleContext ctx) {
+    protected List<String> getSource(ParserRuleContext ctx) {
+        List<String> text = new ArrayList<>();
         if (ctx.start == null || ctx.stop == null) {
             // odd ball case
-            return "no source";
+            text.add("no source");
+            return text;
         }
         int a = ctx.start.getStartIndex();
         int b = ctx.stop.getStopIndex();
         if (b < a) {
-            return "no source";
+            text.add("no source");
+            return text;
         }
         Interval interval = new Interval(a, b);
         // Next line actually gets the original source:
@@ -978,7 +997,11 @@ public class QDLListener implements QDLParserListener {
             // this causes re-parsing it to reliably bomb. Add it back as needed.
             txt = txt + (txt.endsWith(";") ? "" : ";");
         }
-        return txt;
+        StringTokenizer stringTokenizer = new StringTokenizer(txt, "\n");
+        while (stringTokenizer.hasMoreTokens()) {
+            text.add(stringTokenizer.nextToken());
+        }
+        return text;
     }
 
     @Override
@@ -1252,4 +1275,40 @@ public class QDLListener implements QDLParserListener {
         System.out.println("exit stem_refs");
     }*/
 
+    @Override
+    public void enterF_ref(QDLParserParser.F_refContext ctx) {
+        System.out.println("enter R_REF");
+        stash(ctx, new Polyad());
+
+    }
+
+    @Override
+    public void exitF_ref(QDLParserParser.F_refContext ctx) {
+        System.out.println("exit R_REF");
+
+    }
+
+    @Override
+    public void enterF_arg(QDLParserParser.F_argContext ctx) {
+        System.out.println("enter f_arg");
+
+    }
+
+    @Override
+    public void exitF_arg(QDLParserParser.F_argContext ctx) {
+        System.out.println("exit f_arg");
+
+    }
+
+    @Override
+    public void enterF_args(QDLParserParser.F_argsContext ctx) {
+        System.out.println("enter f_argS");
+
+    }
+
+    @Override
+    public void exitF_args(QDLParserParser.F_argsContext ctx) {
+        System.out.println("exit f_argS");
+
+    }
 }

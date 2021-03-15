@@ -8,6 +8,8 @@ import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
+import java.util.List;
+
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -182,14 +184,14 @@ public class Assignment implements Statement, HasResultInterface {
     }
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 
-    String sourceCode = null;
+    List<String> sourceCode = null;
 }

@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is used in parsing. It holds the result of a direct creation of a stem or list
@@ -92,15 +93,15 @@ public class StemVariableNode implements StatementWithResultInterface {
         return result;
     }
 
-    String sourceCode;
+    List<String> sourceCode;
 
     @Override
-    public String getSourceCode() {
+    public List<String> getSourceCode() {
         return sourceCode;
     }
 
     @Override
-    public void setSourceCode(String sourceCode) {
+    public void setSourceCode(List<String> sourceCode) {
         this.sourceCode = sourceCode;
     }
 

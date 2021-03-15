@@ -39,13 +39,15 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           List<ModuleConfig> moduleConfigs,
                           String scriptPath,
                           String modulePath,
+                          String libPath,
                           String debugLevel,
                           boolean autosaveOn,
                           long autosaveInterval,
                           boolean autosaveMessagesOn,
                           boolean useExternalEditor,
                           String externalEditorPath,
-                          QDLEditors qdlEditors) {
+                          QDLEditors qdlEditors,
+                          boolean enableLibrarySupport) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -62,6 +64,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.numericDigits = numericDigits;
         this.showBanner = showBanner;
         this.scriptPath = scriptPath;
+        this.libPath = libPath;
         this.debugLevel = debugLevel;
         this.modulePath = modulePath;
         this.compressionOn = compressionOn;
@@ -71,6 +74,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.externalEditorPath = externalEditorPath;
         this.useExternalEditor = useExternalEditor;
         this.qdlEditors = qdlEditors;
+        this.enableLibrarySupport = enableLibrarySupport;
     }
 
     public QDLEditors getQdlEditors() {
@@ -261,4 +265,20 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     public String getModulePath(){
         return modulePath;
     }
+
+    public String getLibPath() {
+        return libPath;
+    }
+
+    String libPath = null;
+
+    public boolean isEnableLibrarySupport() {
+        return enableLibrarySupport;
+    }
+
+    public void setEnableLibrarySupport(boolean enableLibrarySupport) {
+        this.enableLibrarySupport = enableLibrarySupport;
+    }
+
+    boolean enableLibrarySupport = false;
 }

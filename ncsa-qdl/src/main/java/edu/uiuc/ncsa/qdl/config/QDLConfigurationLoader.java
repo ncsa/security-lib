@@ -83,6 +83,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         String x = getFirstAttribute(cn, SCRIPT_PATH_TAG);
         return x == null ? "" : x;
     }
+    protected String getLibPath() {
+           String x = getFirstAttribute(cn, LIB_PATH_TAG);
+           return x == null ? "" : x;
+       }
 
     protected String getModulePath() {
         String x = getFirstAttribute(cn, MODULE_PATH_TAG);
@@ -228,6 +232,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return autosaveInterval;
     }
 
+    protected boolean isEnableLibrarySupport() {
+        return getFirstBooleanValue(cn, ENABLE_LIBRARY_SUPPORT, true);
+    }
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
         if (isTrivial(raw)) {
@@ -347,13 +354,15 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getModuleConfigs(),
                 getScriptPath(),
                 getModulePath(),
+                getLibPath(),
                 getDebugLevel(),
                 isAutosaveOn(),
                 getAutosaveInterval(),
                 isAutosaveMessagesOn(),
                 useWSExternalEditor(),
                 getExternalEditorPath(),
-                getEditors());
+                getEditors(),
+                isEnableLibrarySupport());
     }
 
     @Override

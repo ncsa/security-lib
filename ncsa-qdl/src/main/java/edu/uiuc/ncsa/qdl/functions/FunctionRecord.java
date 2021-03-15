@@ -1,4 +1,6 @@
-package edu.uiuc.ncsa.qdl.statements;
+package edu.uiuc.ncsa.qdl.functions;
+
+import edu.uiuc.ncsa.qdl.statements.Statement;
 
 import java.io.Serializable;
 import java.util.ArrayList;

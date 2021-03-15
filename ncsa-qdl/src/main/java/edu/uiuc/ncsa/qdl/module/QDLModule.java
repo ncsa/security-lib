@@ -32,9 +32,9 @@ public class QDLModule extends Module {
 
     ModuleStatement moduleStatement;
 
-    public String getSource() {
-        if (moduleStatement == null || StringUtils.isTrivial(moduleStatement.getSourceCode())) {
-            return "";
+    public List<String> getSource() {
+        if (moduleStatement == null || moduleStatement.getSourceCode().isEmpty()) {
+            return new ArrayList<>();
         }
         return moduleStatement.getSourceCode();
     }
@@ -57,9 +57,9 @@ public class QDLModule extends Module {
     @Override
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
         super.writeExtraXMLElements(xsw);
-        if (!StringUtils.isTrivial(getSource())) {
+        if (!getSource().isEmpty()) {
             xsw.writeStartElement(MODULE_SOURCE_TAG);
-            xsw.writeCData(getSource());
+            xsw.writeCData(StringUtils.listToString(getSource()));
             xsw.writeEndElement();
         }
     }

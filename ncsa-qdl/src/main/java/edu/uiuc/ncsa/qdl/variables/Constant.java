@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
+
 import java.math.BigDecimal;
 
 /**
@@ -16,6 +18,7 @@ public class Constant {
         if(object instanceof Boolean) return BOOLEAN_TYPE;
         if(object instanceof StemVariable) return STEM_TYPE;
         if(object instanceof BigDecimal) return DECIMAL_TYPE;
+        if(object instanceof FunctionReferenceNode) return FUNCTION_TYPE;
         return UNKNOWN_TYPE;
     }
     public static final int UNKNOWN_TYPE = -1;
@@ -25,6 +28,7 @@ public class Constant {
     public static final int STRING_TYPE = 3;
     public static final int STEM_TYPE = 4; // these are mixed type
     public static final int DECIMAL_TYPE = 5;
+    public static final int FUNCTION_TYPE = 6;
     Object value;
     int type = UNKNOWN_TYPE;
 

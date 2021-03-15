@@ -53,6 +53,8 @@ public interface QDLConfigurationConstants {
     String WS_EDITOR_ENABLE = "use_editor";
     String SCRIPT_PATH_TAG = "script_path";
     String MODULE_PATH_TAG = "module_path";
+    String LIB_PATH_TAG = "lib_path";
+    String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
 
     // for the editor configuration
     String EDITORS_TAG = "editors";

@@ -17,8 +17,8 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.*;
-import edu.uiuc.ncsa.qdl.statements.FR_WithState;
-import edu.uiuc.ncsa.qdl.statements.FunctionTable;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -84,6 +84,7 @@ public class WorkspaceCommands implements Logable {
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
     public static final String SAVE_AS_JAVA_FLAG = SWITCH + "java";
     public static final String KEEP_WSF = SWITCH + "keep_wsf";
+    public static final String LINE_EDITOR_NAME = "line";
 
     public MyLoggingFacade getLogger() {
         return logger;
@@ -593,7 +594,9 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
         }
     }
-
+    protected boolean useExternalEditor(){
+        return !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
+    }
     private int _doFileEdit(InputLine inputLine) {
         String source = inputLine.getArg(FIRST_ARG_INDEX);
          File f = new File(source);
@@ -601,7 +604,22 @@ public class WorkspaceCommands implements Logable {
         if(!f.isAbsolute()){
             f = new File(rootDir, f.getAbsolutePath());
         }
-        _doExternalEdit(f);
+        if(useExternalEditor()) {
+            _doExternalEdit(f);
+        }else{
+
+            try {
+               List<String> content =  _doLineEditor(FileUtil.readFileAsLines(f.getAbsolutePath()));
+               FileWriter fileWriter = new FileWriter(f);
+               for(String line:content){
+                   fileWriter.write(line + "\n");
+               }
+               fileWriter.flush();
+               fileWriter.close();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        }
         return RC_CONTINUE;
     }
 
@@ -910,7 +928,7 @@ public class WorkspaceCommands implements Logable {
         }
         // so no buffer. There are a couple ways to get it.
         List<String> result;
-        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+        if (useExternalEditor()) {
             result = _doExternalEdit(br.getContent());
         } else {
             result = _doLineEditor(br.getContent());
@@ -1735,7 +1753,7 @@ public class WorkspaceCommands implements Logable {
 
         f.add(inputForm);
         List<String> result;
-        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+        if (useExternalEditor()) {
             f = _doExternalEdit(f);
         } else {
             f = _doLineEditor(f);
@@ -1971,7 +1989,7 @@ public class WorkspaceCommands implements Logable {
         String inputForm = InputFormUtil.inputFormVar(varName, getState());
         List<String> content = new ArrayList<>();
         content.add(inputForm);
-        if (useExternalEditor && !getQdlEditors().isEmpty()) {
+        if (useExternalEditor()) {
             content = _doExternalEdit(content);
         } else {
             content = _doLineEditor(content);
@@ -2284,6 +2302,12 @@ public class WorkspaceCommands implements Logable {
             case USE_EXTERNAL_EDITOR:
                 say(isUseExternalEditor() ? "on" : "off");
                 break;
+            case ENABLE_LIBRARY_SUPPORT:
+                say(getState().isEnableLibrarySupport()?"on":"off");
+                break;
+            case LIB_PATH_TAG:
+                say("current " + LIB_PATH_TAG + "=" + getState().getLibPath());
+                break;
             case DESCRIPTION:
                 if (isTrivial(getDescription())) {
                     say("(no description set)");
@@ -2354,6 +2378,7 @@ public class WorkspaceCommands implements Logable {
     public static final String AUTOSAVE_INTERVAL = "autosave_interval";
     public static final String EXTERNAL_EDITOR = "external_editor";
     public static final String USE_EXTERNAL_EDITOR = "use_external_editor";
+    public static final String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -2775,6 +2800,15 @@ public class WorkspaceCommands implements Logable {
                 String oldName = getExternalEditorName();
                 setExternalEditorName(value);
                 say("external editor was " + (isTrivial(oldName)?"(null)":oldName) + " now is '" + getExternalEditorName() + "'");
+                break;
+            case ENABLE_LIBRARY_SUPPORT:
+                getState().setEnableLibrarySupport(isOnOrTrue(value));
+                say( "library support is now " +(getState().isEnableLibrarySupport()?"on":"off"));
+                break;
+            case LIB_PATH_TAG:
+                getState().setLibPath(value);
+                say("library path updated");
+                break;
             case START_TS:
                 try {
                     Long rawDate = Long.parseLong(value);
@@ -2891,7 +2925,9 @@ public class WorkspaceCommands implements Logable {
             ROOT_DIR,
             WS_ID,
             EXTERNAL_EDITOR,
-            USE_EXTERNAL_EDITOR
+            USE_EXTERNAL_EDITOR,
+            ENABLE_LIBRARY_SUPPORT,
+            LIB_PATH_TAG
     };
     String wsID;
 
@@ -3574,6 +3610,7 @@ public class WorkspaceCommands implements Logable {
     public static final String CLA_DEBUG_ON = "-debug";
     public static final String CLA_RUN_SCRIPT_ON = "-run";
     public static final String CLA_SCRIPT_PATH = "-script_path";
+    public static final String CLA_LIB_PATH = "-lib_path";
 
     protected File resolveAgainstRoot(String file) {
         File f = new File(file);
@@ -3754,8 +3791,11 @@ public class WorkspaceCommands implements Logable {
         interpreter.setEchoModeOn(qe.isEchoModeOn());
         interpreter.setPrettyPrint(qe.isPrettyPrint());
         getState().setScriptPaths(qe.getScriptPath());
+        getState().setEnableLibrarySupport(qe.isEnableLibrarySupport());
+        getState().setLibPath(qe.getLibPath());
         getState().setModulePaths(qe.getModulePath());
         defaultInterpreter = interpreter;
+        getState().setEnableLibrarySupport(qe.isEnableLibrarySupport());
         defaultState = state;
         runScript(inputLine); // run any script if that mode is enabled.
         setAutosaveOn(qe.isAutosaveOn());
@@ -3846,7 +3886,7 @@ public class WorkspaceCommands implements Logable {
             fromConfigFile(inputLine);
             return;
         }
-        // Old input line
+        // Old input line  Jan. 2020
         // -ext "edu.uiuc.ncsa.qdl.extensions.QDLLoaderImpl" -qdlroot /home/ncsa/dev/qdl -env etc/qdl.properties -log log/qdl.log -v
         fromCommandLine(inputLine);
 
@@ -3983,6 +4023,10 @@ public class WorkspaceCommands implements Logable {
         }
         if (inputLine.hasArg(CLA_SCRIPT_PATH)) {
             getState().setScriptPaths(inputLine.getNextArgFor(CLA_SCRIPT_PATH));
+        }
+        if(inputLine.hasArg(CLA_LIB_PATH)){
+            getState().setLibPath(inputLine.getNextArgFor(CLA_LIB_PATH));
+
         }
         runScript(inputLine); // If there is a script, run it.
     }

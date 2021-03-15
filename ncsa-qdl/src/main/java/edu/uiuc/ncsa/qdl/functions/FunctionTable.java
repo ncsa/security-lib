@@ -1,6 +1,7 @@
-package edu.uiuc.ncsa.qdl.statements;
+package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.statements.Documentable;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 

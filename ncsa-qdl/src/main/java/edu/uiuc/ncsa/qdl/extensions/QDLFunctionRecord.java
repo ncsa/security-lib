@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.extensions;
 
-import edu.uiuc.ncsa.qdl.statements.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 
 /**
  * This is needed for internal bookkeeping. It will be created for you are needed by the {@link JavaModule},

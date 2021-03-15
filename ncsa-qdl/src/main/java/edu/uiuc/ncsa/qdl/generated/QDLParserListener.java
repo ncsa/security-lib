@@ -128,6 +128,36 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitFunction(QDLParserParser.FunctionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#f_ref}.
+	 * @param ctx the parse tree
+	 */
+	void enterF_ref(QDLParserParser.F_refContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#f_ref}.
+	 * @param ctx the parse tree
+	 */
+	void exitF_ref(QDLParserParser.F_refContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#f_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterF_arg(QDLParserParser.F_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#f_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitF_arg(QDLParserParser.F_argContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#f_args}.
+	 * @param ctx the parse tree
+	 */
+	void enterF_args(QDLParserParser.F_argsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#f_args}.
+	 * @param ctx the parse tree
+	 */
+	void exitF_args(QDLParserParser.F_argsContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code functions}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

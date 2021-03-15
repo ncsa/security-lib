@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.statements;
 import edu.uiuc.ncsa.qdl.state.State;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Top-level interface for all statements.
@@ -11,6 +12,6 @@ import java.io.Serializable;
  */
 public interface Statement extends Serializable {
     public Object evaluate(State state);
-    public String getSourceCode();
-    public void setSourceCode(String sourceCode);
+    public List<String> getSourceCode();
+    public void setSourceCode(List<String> sourceCode);
 }
