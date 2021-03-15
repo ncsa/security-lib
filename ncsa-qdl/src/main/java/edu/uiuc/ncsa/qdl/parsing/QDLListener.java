@@ -776,9 +776,9 @@ public class QDLListener implements QDLParserListener {
         }
         if (isModule) {
             // Functions defined in a module go there.
-            currentModule.getState().getFunctionTable().put(functionRecord);
+            currentModule.getState().getFTStack().put(functionRecord);
         } else {
-            state.getFunctionTable().put(functionRecord);
+            state.getFTStack().put(functionRecord);
         }
         parsingMap.endMark();
         parsingMap.rollback();
@@ -900,9 +900,9 @@ public class QDLListener implements QDLParserListener {
 
         if (isModule) {
             // Functions defined in a module go there.
-            currentModule.getState().getFunctionTable().put(functionRecord);
+            currentModule.getState().getFTStack().put(functionRecord);
         } else {
-            state.getFunctionTable().put(functionRecord);
+            state.getFTStack().put(functionRecord);
         }
         parsingMap.endMark();
         parsingMap.rollback();

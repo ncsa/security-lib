@@ -11,14 +11,14 @@ import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.state.*;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -1778,14 +1778,27 @@ public class WorkspaceCommands implements Logable {
 
     private int _funcsDrop(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("drop fname");
+            say("drop fname [arg_count]");
             sayi("Removes the function from the current workspace. Note this applies to user-defined functions, not imported functions.");
+            sayi("If you supply no arg_count, then *all* definitions of the functions are removed.");
             return RC_NO_OP;
         }
 
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
-        getState().getFunctionTable().remove(fName);
-        if (getState().getFunctionTable().containsKey(fName)) {
+
+        int argCount = -1;
+        if(inputLine.getArgCount() == 3){
+            String rawCount = inputLine.getArg(FIRST_ARG_INDEX + 1);
+            try{
+               argCount = Integer.parseInt(rawCount);
+            }catch(Throwable t){
+                say("sorry, but \"" + rawCount + "\" is not a number. Aborting...");
+                return RC_NO_OP;
+            }
+        }
+
+        getState().getFTStack().remove(fName, argCount);
+        if (getState().getFTStack().getSomeFunction(fName)==null) {
             say(fName + " removed.");
         } else {
             say("Could not remove " + fName);
@@ -3569,7 +3582,7 @@ public class WorkspaceCommands implements Logable {
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
-                    new FunctionTable(),
+                    new FTStack(),
                     new ModuleMap(),
                     logger,
                     false);// workspace is never in server mode

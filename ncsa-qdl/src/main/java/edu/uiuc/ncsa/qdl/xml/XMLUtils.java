@@ -341,7 +341,7 @@ public class XMLUtils implements XMLConstants {
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
-                        state.getFunctionTable().fromXML(xer, qi);
+                        state.getFTStack().fromXML(xer, qi);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

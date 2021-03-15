@@ -5,9 +5,9 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.functions.FunctionTableImpl;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -31,14 +31,12 @@ public abstract class VariableState extends NamespaceAwareState {
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         FunctionTable functionTable,
                          ModuleMap moduleMap,
                          MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                functionTable,
                 moduleMap,
                 myLoggingFacade);
     }

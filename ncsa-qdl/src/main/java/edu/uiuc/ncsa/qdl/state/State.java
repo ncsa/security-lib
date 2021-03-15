@@ -3,11 +3,11 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -71,7 +71,7 @@ public class State extends FunctionState implements QDLConstants {
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
-                 FunctionTable functionTable,
+                 FTStack ftStack,
                  ModuleMap moduleMap,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode) {
@@ -79,7 +79,7 @@ public class State extends FunctionState implements QDLConstants {
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                functionTable,
+                ftStack,
                 moduleMap,
                 myLoggingFacade);
         this.serverMode = isServerMode;
@@ -386,7 +386,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                getFunctionTable(),
+                getFTStack(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode());
@@ -410,7 +410,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                getFunctionTable(),
+                getFTStack(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode());
@@ -469,7 +469,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FunctionTable(),
+                new FTStack(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode());
@@ -497,7 +497,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FunctionTable(),
+                new FTStack(),
                 new ModuleMap(), // so no modules
                 getLogger(),
                 isServerMode());
@@ -547,7 +547,7 @@ public class State extends FunctionState implements QDLConstants {
         // Symbol stack has the variables
         getSymbolStack().toXML(xsw);
         // Function table has the functions
-        getFunctionTable().toXML(xsw);
+        getFTStack().toXML(xsw);
         writeExtraXMLElements(xsw);
         xsw.writeEndElement(); // end state tag
     }

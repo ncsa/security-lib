@@ -2,9 +2,12 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.*;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.SymbolStack;
+import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -30,7 +33,7 @@ public class TestUtils {
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
-                new FunctionTable(),
+                new FTStack(),
                 new ModuleMap(),
                 null,
                 false);
@@ -47,7 +50,7 @@ public class TestUtils {
                    getTestSymbolStack(),
                    new OpEvaluator(),
                    MetaEvaluator.getInstance(),
-                   new FunctionTable(),
+                   new FTStack(),
                    new ModuleMap(),
                    null,
                    false);

@@ -5,11 +5,11 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -30,29 +30,38 @@ public abstract class FunctionState extends VariableState {
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         FunctionTable functionTable,
+                         FTStack ftStack,
                          ModuleMap moduleMap,
                          MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                functionTable,
                 moduleMap,
                 myLoggingFacade);
+        this.ftStack = ftStack;
     }
 
     private static final long serialVersionUID = 0xcafed00d4L;
 
-    public FunctionTable getFunctionTable() {
+    public FTStack getFTStack() {
+        return ftStack;
+    }
+
+    public void setFTStack(FTStack ftStack) {
+        this.ftStack = ftStack;
+    }
+
+    FTStack ftStack = new FTStack();
+/*    public FunctionTableImpl getFTStack() {
         return functionTable;
     }
 
-    public void setFunctionTable(FunctionTable functionTable) {
+    public void setFunctionTable(FunctionTableImpl functionTable) {
         this.functionTable = functionTable;
     }
 
-    FunctionTable functionTable;
+    FunctionTableImpl functionTable;*/
     /**
      * Convenience, just looks up name and arg count
      *
@@ -72,7 +81,7 @@ public abstract class FunctionState extends VariableState {
         if (name.contains(NS_DELIMITER)) {
             if (name.startsWith(NS_DELIMITER)) {
                 // case is that it is directly qualified for the top leve. Check it, return what is there.
-                frs.functionRecord = getFunctionTable().get(name.substring(1), argCount);
+                frs.functionRecord = getFTStack().get(name.substring(1), argCount);
                 frs.state = this;
                 return frs;
             }
@@ -99,9 +108,9 @@ public abstract class FunctionState extends VariableState {
 
 
             if (argCount == -1) {
-                frs.functionRecord = module.getState().getFunctionTable().getSomeFunction(resolvedName);
+                frs.functionRecord = module.getState().getFTStack().getSomeFunction(resolvedName);
             } else {
-                frs.functionRecord = module.getState().getFunctionTable().get(resolvedName, argCount);
+                frs.functionRecord = module.getState().getFTStack().get(resolvedName, argCount);
             }
             frs.state = module.getState();
             frs.isExternalModule = module.isExternal();
@@ -113,25 +122,25 @@ public abstract class FunctionState extends VariableState {
                 // Nothing imported, so nothing to look through.
                 frs.state = this;
                 if (argCount == -1) {
-                    frs.functionRecord = getFunctionTable().getSomeFunction(name);
+                    frs.functionRecord = getFTStack().getSomeFunction(name);
                 } else {
-                    frs.functionRecord = getFunctionTable().get(name, argCount);
+                    frs.functionRecord = getFTStack().get(name, argCount);
                 }
                 return frs;
             }
             // check for unqualified names.
             FR_WithState fr = new FR_WithState();
-            fr.functionRecord = getFunctionTable().get(name, argCount);
+            fr.functionRecord = getFTStack().get(name, argCount);
 
             fr.state = this;
             for (String alias : getImportedModules().keySet()) {
                 if (fr.functionRecord == null) {
-                    FunctionRecord tempFR = getImportedModules().get(alias).getState().getFunctionTable().get(name, argCount);
+                    FunctionRecord tempFR = getImportedModules().get(alias).getState().getFTStack().get(name, argCount);
                     fr.functionRecord = tempFR;
                     fr.state = getImportedModules().get(alias).getState();
                     fr.isExternalModule = getImportedModules().get(alias).isExternal();
                 } else {
-                    FunctionRecord tempFR = importedModules.get(alias).getState().getFunctionTable().get(name, argCount);
+                    FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
                     if (tempFR != null) {
                         throw new ImportException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                     }
@@ -150,7 +159,7 @@ public abstract class FunctionState extends VariableState {
      * @return
      */
     public TreeSet<String> listFunctions(boolean useCompactNotation, String regex) {
-        TreeSet<String> out = getFunctionTable().listFunctions(regex);
+        TreeSet<String> out = getFTStack().listFunctions(regex);
         // no module templates, so no need to snoop through them
         if(getModuleMap().isEmpty()){
             return out;
@@ -171,9 +180,9 @@ public abstract class FunctionState extends VariableState {
     }
 
     public List<String> listAllDocumentation() {
-        List<String> out = getFunctionTable().listAllDocs();
+        List<String> out = getFTStack().listAllDocs();
         for (URI key : getImportManager().keySet()) {
-            List<String> uqVars = getModuleMap().get(key).getState().getFunctionTable().listAllDocs();
+            List<String> uqVars = getModuleMap().get(key).getState().getFTStack().listAllDocs();
             for (String x : uqVars) {
                 List<String> aliases = getImportManager().getAlias(key);
                 if (aliases.size() == 1) {
@@ -212,9 +221,9 @@ public abstract class FunctionState extends VariableState {
             if (alias == null || alias.isEmpty()) {
                 List<String> out;
                 if (argCount == -1) {
-                    out = getFunctionTable().listAllDocs(realName);
+                    out = getFTStack().listAllDocs(realName);
                 } else {
-                    out = getFunctionTable().getDocumentation(realName, argCount);
+                    out = getFTStack().getDocumentation(realName, argCount);
                 }
                 if (out == null) {
                     return new ArrayList<>();
@@ -228,9 +237,9 @@ public abstract class FunctionState extends VariableState {
             URI ns = importManager.getByAlias(alias);
             List<String> docs;
             if (argCount == -1) {
-                docs = getModuleMap().get(ns).getState().getFunctionTable().listAllDocs(realName);
+                docs = getModuleMap().get(ns).getState().getFTStack().listAllDocs(realName);
             } else {
-                docs = getModuleMap().get(ns).getState().getFunctionTable().getDocumentation(realName, argCount);
+                docs = getModuleMap().get(ns).getState().getFTStack().getDocumentation(realName, argCount);
             }
             if (docs == null) {
                 return new ArrayList<>();
@@ -243,9 +252,9 @@ public abstract class FunctionState extends VariableState {
         if (!importManager.hasImports()) {
             List<String> out;
             if (argCount == -1) {
-                out = getFunctionTable().listAllDocs(fname);
+                out = getFTStack().listAllDocs(fname);
             } else {
-                out = getFunctionTable().getDocumentation(fname, argCount);
+                out = getFTStack().getDocumentation(fname, argCount);
             }
             if (out == null) {
                 return new ArrayList<>();
@@ -253,24 +262,24 @@ public abstract class FunctionState extends VariableState {
             return out;
         }
         // Final case, unqualified name and there are imports. Return all that match.
-//        List<String> out = getFunctionTable().getDocumentation(fname, argCount);
+//        List<String> out = getFTStack().getDocumentation(fname, argCount);
         List<String> out;
         if (argCount == -1) {
-            out = getFunctionTable().listAllDocs(fname);
+            out = getFTStack().listAllDocs(fname);
         } else {
-            out = getFunctionTable().getDocumentation(fname, argCount);
+            out = getFTStack().getDocumentation(fname, argCount);
         }
 
         if (out == null) {
             out = new ArrayList<>();
         }
         for (URI key : getImportManager().keySet()) {
-            if (getModuleMap().get(key).getState().getFunctionTable().containsKey(fname, argCount)) {
+            if (getModuleMap().get(key).getState().getFTStack().isDefined(fname, argCount)) {
                 List<String> doxx;
                 if (argCount == -1) {
-                    doxx = getModuleMap().get(key).getState().getFunctionTable().listAllDocs(fname);
+                    doxx = getModuleMap().get(key).getState().getFTStack().listAllDocs(fname);
                 } else {
-                    doxx = getModuleMap().get(key).getState().getFunctionTable().getDocumentation(fname, argCount);
+                    doxx = getModuleMap().get(key).getState().getFTStack().getDocumentation(fname, argCount);
                 }
                 if (doxx == null) {
                     String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname;

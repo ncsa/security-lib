@@ -109,7 +109,7 @@ public abstract class JavaModule extends Module {
                 if (f.getDocumentation(i) != null && !f.getDocumentation(i).isEmpty()) {
                     fr.documentation = f.getDocumentation(i);
                 }
-                state.getFunctionTable().put(fr);
+                state.getFTStack().put(fr);
 
             }
         }

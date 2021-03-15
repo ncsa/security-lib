@@ -113,9 +113,9 @@ public class QDLParserDriver {
             parsingMap = new ParsingMap();
             QDLListener qdlListener = new QDLListener(parsingMap, state);
             // This will spit out the inner workings of the parser so it may be a TON of output.
-            // Only uncomment for really low level debugging!
+            // Only uncomment for really low level debugging! E.g. debugging the actual parser.
  /***** DebugListener *****/
-
+ /*
                 QDLDebugListener debugListener = new QDLDebugListener();
                 parser.addParseListener(debugListener);
                 parser.addErrorListener(new BaseErrorListener() {
@@ -129,7 +129,7 @@ public class QDLParserDriver {
                           }
 
     
-
+   */
              // The default is to have the error listener on and this in turn prints every little thing
             // to the console. Great for debugging, but very annoying for users who type in a boo-boo.
             lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
