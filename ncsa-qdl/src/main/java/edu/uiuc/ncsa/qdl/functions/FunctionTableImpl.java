@@ -188,7 +188,6 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
             return;
         }
         xsw.writeStartElement(XMLConstants.FUNCTIONS_TAG);
-        xsw.writeComment("The functions for this state.");
         for (String key : keySet()) {
             if (StringUtils.isTrivial(get(key).sourceCode)) {
                 // No source code usually means it is from some external function

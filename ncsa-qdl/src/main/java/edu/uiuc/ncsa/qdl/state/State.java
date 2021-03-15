@@ -572,6 +572,9 @@ public class State extends FunctionState implements QDLConstants {
                             setSymbolStack(st);
                             break;
                         case FUNCTIONS_TAG:
+                            XMLUtils.oldDeserializeFunctions(xer, xp, this);
+                            break;
+                        case FUNCTION_TABLE_STACK_TAG:
                             XMLUtils.deserializeFunctions(xer, xp, this);
                             break;
                         case IMPORTED_MODULES:

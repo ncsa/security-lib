@@ -36,4 +36,6 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
     void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 
     void remove(String fName, int argCount);
+
+    boolean isEmpty();
 }

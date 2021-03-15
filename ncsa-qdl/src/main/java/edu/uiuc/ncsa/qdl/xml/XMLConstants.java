@@ -52,6 +52,7 @@ public interface XMLConstants {
 
     String VARIABLE_TAG = "var";
     String VARIABLE_NAME_TAG = "name";
+    String FUNCTION_TABLE_STACK_TAG = "function_stack";
     String FUNCTIONS_TAG = "functions";
     String FUNCTION_TAG = "func";
     String FUNCTION_NAME_TAG = "name";
@@ -66,13 +67,7 @@ public interface XMLConstants {
     String STATE_ID_TAG = "internal_id";
     String IMPORTED_MODULES = "imports";
     String MODULE_TEMPLATE_TAG = "templates";
-    /*
-     String src;
-        String link;
-        boolean edited = false;
-        boolean deleted = false;
-        List<String> content = null;
-     */
+
     String BUFFER_MANAGER = "buffer_manager";
     String BUFFER_RECORDS = "records";
     String BUFFER_RECORD = "record";

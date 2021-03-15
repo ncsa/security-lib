@@ -1,44 +1,57 @@
 package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/21 at  6:22 AM
  */
-public class FTStack implements FunctionTable{
+public class FTStack implements FunctionTable {
     public FTStack() {
         pushNew();
     }
 
+    public boolean isEmpty() {
+        boolean empty = true;
+        for (FunctionTable functionTable : ftables) {
+            empty = empty && functionTable.isEmpty();
+        }
+        return empty;
+    }
+
     /**
      * remove <b>all</b> instances of the function from the local stack
+     *
      * @param name
      * @param argCount
      * @return
      */
-    public void remove(String name, int argCount){
+    public void remove(String name, int argCount) {
         peek().remove(name, argCount);
     }
 
     ArrayList<FunctionTable> ftables = new ArrayList<>();
-    public FunctionTable peek(){
+
+    public FunctionTable peek() {
         return ftables.get(0);
     }
 
-    public void push(FunctionTable ft){
+    public void push(FunctionTable ft) {
         ftables.add(0, ft);
     }
 
-    public void pushNew(){
+    public void pushNew() {
         push(new FunctionTableImpl());
     }
 
@@ -49,9 +62,9 @@ public class FTStack implements FunctionTable{
 
     @Override
     public FunctionRecord get(String key, int argCount) {
-        for(FunctionTable functionTable : ftables){
-            FunctionRecord fr = functionTable.get(key,argCount);
-            if(fr != null){
+        for (FunctionTable functionTable : ftables) {
+            FunctionRecord fr = functionTable.get(key, argCount);
+            if (fr != null) {
                 return fr;
             }
         }
@@ -60,8 +73,8 @@ public class FTStack implements FunctionTable{
 
     @Override
     public boolean isDefined(String var, int argCount) {
-        for(FunctionTable functionTable : ftables){
-            if(functionTable.isDefined(var,argCount)){
+        for (FunctionTable functionTable : ftables) {
+            if (functionTable.isDefined(var, argCount)) {
                 return true;
             }
         }
@@ -71,37 +84,87 @@ public class FTStack implements FunctionTable{
     /**
      * Used in the case there is a single function by this name so we don't have to know ahead
      * of time the arg count (which might not be available).
+     *
      * @param name
      * @return
      */
     @Override
     public FunctionRecord getSomeFunction(String name) {
-        for(FunctionTable functionTable : ftables){
+        for (FunctionTable functionTable : ftables) {
             FunctionRecord fr = functionTable.getSomeFunction(name);
-            if(fr != null){
+            if (fr != null) {
                 return fr;
             }
         }
 
         return null;
     }
-       public List<FunctionRecord> getByAllName(String name){
-           List<FunctionRecord> all = new ArrayList<>();
-           // Note this walks backwards through the stack.
-           for(int i = ftables.size()-1; 0 <= i; i--){
-               all.addAll(ftables.get(i).getByAllName(name));
-           }
-           return all;
-        
-       }
+
+    public List<FunctionRecord> getByAllName(String name) {
+        List<FunctionRecord> all = new ArrayList<>();
+        // Note this walks backwards through the stack.
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            all.addAll(ftables.get(i).getByAllName(name));
+        }
+        return all;
+
+    }
+
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-         throw new NotImplementedException("Implement me!");
+        if (isEmpty()) {
+            return;
+        }
+        xsw.writeStartElement(XMLConstants.FUNCTION_TABLE_STACK_TAG);
+        xsw.writeComment("The functions for this state.");
+        // lay these in in reverse order so we just have to read them in the fromXML method
+        // and push them on the stack
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            ftables.get(i).toXML(xsw);
+        }
+        xsw.writeEndElement(); // end of tables.
     }
 
     @Override
     public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
-        throw new NotImplementedException("Implement me!");
+        // points to stacks tag
+        XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        // no attributes or such with the stacks tag.
+        boolean foundStack = false;
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case XMLConstants.FUNCTION_TABLE_STACK_TAG:
+                            foundStack = true;
+                            FunctionTableImpl functionTable = new FunctionTableImpl();
+                            functionTable.fromXML(xer, qi);
+                            if(!functionTable.isEmpty()) {
+                                this.push(functionTable);
+                            }
+                            break;
+                            // Legacy case -- just a single functions block, not a stack.
+                        case XMLConstants.FUNCTIONS_TAG:
+                            if(foundStack) break; // if a stack is being processed, skip this
+                            FunctionTableImpl functionTable1 = new FunctionTableImpl();
+                            functionTable1.fromXML(xer, qi);
+                            if(!functionTable1.isEmpty()) {
+                                this.push(functionTable1);
+                            }
+                           break;
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTION_TABLE_STACK_TAG)) {
+                        return;
+                    }
+                    break;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG );
+
 
     }
 
@@ -110,7 +173,7 @@ public class FTStack implements FunctionTable{
         TreeSet<String> all = new TreeSet<>();
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
-        for(int i = ftables.size()-1; 0 <= i; i--){
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
             all.addAll(ftables.get(i).listFunctions(regex));
         }
         return all;
@@ -121,7 +184,7 @@ public class FTStack implements FunctionTable{
         List<String> all = new ArrayList<>();
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
-        for(int i = ftables.size()-1; 0 <= i; i--){
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
             all.addAll(ftables.get(i).listAllDocs());
         }
         return all;
@@ -132,7 +195,7 @@ public class FTStack implements FunctionTable{
         List<String> all = new ArrayList<>();
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
-        for(int i = ftables.size()-1; 0 <= i; i--){
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
             all.addAll(ftables.get(i).listAllDocs(functionName));
         }
         return all;
@@ -143,7 +206,7 @@ public class FTStack implements FunctionTable{
         List<String> all = new ArrayList<>();
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
-        for(int i = ftables.size()-1; 0 <= i; i--){
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
             all.addAll(ftables.get(i).getDocumentation(fName, argCount));
         }
         return all;
