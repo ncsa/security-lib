@@ -2,10 +2,14 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -561,6 +565,33 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return null;
     }
 
+    /**
+     * get a polyad or dyad (for the operator) from the {@link FunctionReferenceNode}.
+     * You must still set any arguments, but the type and name should be correctly set.
+     * @param state
+     * @param frNode
+     * @return
+     */
+    protected ExpressionImpl getOperator(State state, FunctionReferenceNode frNode) {
+        ExpressionImpl operator;
+        String operatorName = frNode.getFunctionName();
+        if (state.getOpEvaluator().isMathOperator(operatorName)) {
+            operator = new Dyad(state.getOperatorType(operatorName));
+        } else {
+            if(state.getMetaEvaluator().isBuiltInFunction(operatorName)){
+                operator  = new Polyad(operatorName);
+            }else{
+                FunctionRecord functionRecord = state.getFTStack().get(operatorName, 2); // It's a dyad!
+                if(functionRecord == null){
+                    throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined");
+                }
+                Polyad polyad1 = new Polyad(operatorName);
+                polyad1.setBuiltIn(false); // or it will not execute!
+                operator = polyad1;
+            }
+        }
+        return operator;
+    }
     public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string

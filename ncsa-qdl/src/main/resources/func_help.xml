@@ -331,9 +331,10 @@ list_copy(source., start_index, length, target., target_index) -
  start_index = the index in the source where the copy starts
       length = how many elements to copy
      target. = the target stem of the copy
-target_index = the index in the target that will receive the copy. Note that any elements already
-               in these locations will be replaced. If you need to insert elements,
-               consider using the list_insert_at command.
+target_index = the index in the target that will receive the copy. Note that
+               any elements already in these locations will be replaced. If you
+               need to insert elements, consider using the list_insert_at
+               command.
 See also: list_insert_at
                  ]]>
         </body>
@@ -418,7 +419,8 @@ Note: The default value is not returned in any key operations, so setting the
 size(arg) -  return the size of the argument.
 
 arg is a stem - return the number of elements in the stem
-arg is a string - return the number of characters in the string, i.e., its length
+arg is a string - return the number of characters in the string, i.e., its
+                length
 args is a scalar - zero, since scalars (such as integers) have no size.
             ]]>
         </body>
@@ -427,9 +429,11 @@ args is a scalar - zero, since scalars (such as integers) have no size.
         <body>
             <![CDATA[
                  to_json(stem.) - convert the stem to a JSON string.
-        to_json(stem., convert) - if convert is true, vencode all keys in the JSON for the stem
-to_json(stem., convert, indent) - (requires convert), indent is an integer giving the number of
-                                  spaces to indent the JSON string
+        to_json(stem., convert) - if convert is true, vencode all keys in the
+                                  JSON for the stem
+to_json(stem., convert, indent) - (requires convert), indent is an integer
+                                  giving the number ofspaces to indent the
+                                  JSON string
 See also: from_json
                 ]]>
         </body>
@@ -437,8 +441,8 @@ See also: from_json
     <entry id="to_list">
         <body>
             <![CDATA[
-to_list(arg0, arg1, ...) - takes any set of arguments (including stems) and converts to a list,
-                           whose elements are the arguments.
+to_list(arg0, arg1, ...) - takes any set of arguments (including stems) and
+                  converts to a list, whose elements are the arguments.
 Note: This does not remove the arguments from the symbol table.
                 ]]>
         </body>
@@ -603,10 +607,11 @@ Note: The cfg. contains the configuration and is not trivial to describe.
         <body>
             <![CDATA[
 file_write(file_name, contents) = write the contents to the given file.
-                                  contents can be a string or a list of strings.
+                                  contents can be a string or a list of strings
 file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,
                                   then the contents are decoded to binary
-                                  before writing. The default is that this flag is false.
+                                  before writing. The default is that this
+                                  flag is false.
 See also: file_read, decode_b64, encode_b64
 ]]>
         </body>
@@ -655,7 +660,8 @@ E.g.
 
      In this case, the left argument is [2,5,8,11] and the right argument
      has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
-See also: indices, rename_keys, which lets you rename some of the keys in a stem.
+See also: indices, rename_keys, which lets you rename some of the keys in a
+          stem.
                ]]>
         </body>
     </entry>
@@ -707,7 +713,8 @@ See Also: script_load, script_run, scan, say, print
     <entry id="info">
         <body>
             <![CDATA[
-info() -- a stem of all current information about the session (such as load paths, memory and such).
+info() -- a stem of all current information about the session
+          such as load paths, memory and such.
 info(key) - key is a string. This returns the single value for the given key.
 E.g. info('user.home_dir') prints out the current user's home directory.
 See also: constants()
@@ -719,7 +726,9 @@ See also: constants()
             <![CDATA[
 constants() - all constants associated with the system
 constants(key) - key is a string. This returns the value of a specific key.
-E.g. constants('file_type.binary') returns the integer that can be used in the file_read function.
+E.g.
+     constants('file_type.binary')
+returns the integer that can be used in the file_read function.
 See also: info()
                 ]]>
         </body>
@@ -727,7 +736,8 @@ See also: info()
     <entry id="is_defined">
         <body>
             <![CDATA[
-is_defined(var) - a boolean-valued function that tells you if a given variable has been named.
+is_defined(var) - a boolean-valued function that tells you if a given variable
+                  has been named.
 Note: the argument is not a string, it is the actual variable.
                 ]]>
         </body>
@@ -736,7 +746,8 @@ Note: the argument is not a string, it is the actual variable.
         <body>
             <![CDATA[
 is_function(name) - checks if the value of name (it is a string) is defined.
-is_function(name, arg_count) checks if a function given in name with the number of arguments is defined.
+is_function(name, arg_count) checks if a function given in name with the number
+                    of arguments is defined.
                 ]]>
         </body>
     </entry>
@@ -1166,9 +1177,11 @@ start_ts - The time stamp when this was first created. You *may* change this,
             <body>
                 <![CDATA[
 (workspace variable)
-root_dir - The root directory for all relative file directories. If you attempt to save the workspace and
-           the file name is relative (so does not e.g., start with a /) then it is assumed to reside
-           in this directory. At startup, this is set to the directory where QDL was started by default.
+root_dir - The root directory for all relative file directories. If you attempt
+           to save the workspace and the file name is relative (so does not
+           e.g., start with a /) then it is assumed to reside in this
+           directory. At startup, this is set to the directory where QDL
+           was started by default.
 E.g.
 
 )save ws/var/my_ws.zml
@@ -1182,8 +1195,9 @@ E.g.
             <body>
                 <![CDATA[
 (workspace variable)
-save_dir - The default directory for saving and loading files. This is set at startup automatically
-           This overrides relativizing the path from the root_dir.
+save_dir - The default directory for saving and loading files. This is set
+           at startup automatically This overrides relativizing the path
+           from the root_dir.
                 ]]>
             </body>
         </entry>
@@ -1192,9 +1206,10 @@ save_dir - The default directory for saving and loading files. This is set at st
             <body>
                 <![CDATA[
 (workspace variable)
-autosave_on - Turn on automatically saving workspace. If on then every time the autosave_interval (measured in
-              milliseconds) passes, the current workspace is saved.
-              See also: autosave_messages_on, autosave_interval
+autosave_on - Turn on automatically saving workspace. If on then every time the
+              autosave_interval (measured in milliseconds) passes, the current
+              workspace is saved.
+See also: autosave_messages_on, autosave_interval
 ]]>
             </body>
         </entry>
@@ -1203,9 +1218,10 @@ autosave_on - Turn on automatically saving workspace. If on then every time the 
             <body>
                 <![CDATA[
 (workspace variable)
-autosave_messages_on - Turn on notifications by the autosave system. If on then every time the workspace is
-             automatically saved, the usual messages (size, time) are printed. If false, nothing is printed.
-             See also: autosave_on, autosave_interval
+autosave_messages_on - Turn on notifications by the autosave system. If on then
+             every time the workspace is automatically saved, the usual
+             messages (size, time) are printed. If false, nothing is printed.
+See also: autosave_on, autosave_interval
 ]]>
             </body>
         </entry>
@@ -1214,9 +1230,10 @@ autosave_messages_on - Turn on notifications by the autosave system. If on then 
             <body>
                 <![CDATA[
 (workspace variable)
-autosave_interval - The interval in either seconds or milliseconds that determines how often the workspace is saved.
-             The default is 10 minutes or 600000 ms. You may enter this as milliseconds (default units) or
-             as seconds.
+autosave_interval - The interval in either seconds or milliseconds that
+                    determines how often the workspace is saved. The default
+                    is 10 minutes or 600000 ms. You may enter this as
+                    milliseconds (default units) or as seconds.
 E.g.
    )ws set autosave_interval 900 sec.
 
@@ -1230,9 +1247,10 @@ E.g.
             <body>
                 <![CDATA[
 (workspace variable)
-compress_xml - toggle compression of XML on WS save. Options are (on | true) or (off | false).
-               Note that on loading workspaces, this not used -- the workspace will figure out
-               if it was saved with compression and decompress it, so you don't have to worry about
+compress_xml - toggle compression of XML on WS save. Options are (on | true)
+               or (off | false). Note that on loading workspaces, this not used
+                -- the workspace will figure out if it was saved with
+                compression and decompress it, so you don't have to worry about
                the compression of stored workspaces.
                 ]]>
             </body>
@@ -1241,8 +1259,9 @@ compress_xml - toggle compression of XML on WS save. Options are (on | true) or 
             <body>
                 <![CDATA[
 (workspace variable)
-enable_library_support - enable on the fly resolution of scripts as if they were functions.
-            You must set the lib_path as well for this to work.
+enable_library_support - enable on the fly resolution of scripts as if they
+               were functions. You must set the lib_path as well for
+               this to work.
 See also: lib_path
 ]]>
             </body>
@@ -1251,15 +1270,17 @@ See also: lib_path
             <body>
                 <![CDATA[
 (workspace variable)
-lib_path - the paths that are used in resolving library references. A library is a collection of
-        QDL scripts, each ending with .qdl. If library support is enabled then calls to scripts are
-        resolved dynamically. See the reference manual for full details.
+lib_path - the paths that are used in resolving library references. A library
+           is a collection of QDL scripts, each ending with .qdl. If library
+           support is enabled then calls to scripts are resolved dynamically.
+           See the reference manual for full details.
 E.g.
-   if you have a lib_path set and there is a file called sqrt.qdl that accepts a single number
-   and returns it square root, then you could invoke it for the value of x with
-   sqrt(x)
-   Completely the same, you could do this directly as
-   script_run('/path/to/sqrt.qdl', x)
+   if you have a lib_path set and there is a file called sqrt.qdl that accepts
+    a single number and returns it square root, then you could invoke it for
+    the value of x with
+       sqrt(x)
+   You could do this directly as
+       script_run('/path/to/sqrt.qdl', x)
 See also: enable_library_support
                 ]]>
             </body>
@@ -1275,6 +1296,37 @@ ws_file - the current file to save to/load from by default. If you save or load 
 
           (so no file argument) and the workspace is saved. Note that this is independent of the
           save_dir, which used for resolving all relative path loads and saves.
+                ]]>
+            </body>
+        </entry>
+    <entry id="reduce">
+            <body>
+                <![CDATA[
+reduce(*f(), list.) - Takes a dyadic function f and applied it between
+             successive members of the list. The final result is a scalar.
+E.g.
+Are all elements of a boolean list true?
+   a. := -1 < n(5); // list of boolean true values
+   reduce(*&&, a.)
+true
+This applies && between each element.
+See also: expand()
+                ]]>
+            </body>
+        </entry>
+    <entry id="expand">
+            <body>
+                <![CDATA[
+expand(*f(), list.) = apply the dyadic function f() pairwise and return the
+              intermediate results.
+E.g. To compute the factorial of a number and see the parts:
+   expand(**, 1+n(5))
+[1, 2, 6, 24, 120]
+
+In this case [1, 2, 3, 4, 5] becomes [1, 1*2, 1*2*3, 1*2*3*4, 1*2*3*4*5]
+Note that reduce effectively returns just the final number. Using expand
+lets you use the intermediate results too.
+See also: reduce()
                 ]]>
             </body>
         </entry>

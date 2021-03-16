@@ -2,13 +2,14 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
@@ -18,8 +19,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -34,10 +34,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
@@ -89,6 +86,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final String INPUT_FORM = "input_form";
     public static final String FQ_INPUT_FORM = SYS_FQ + INPUT_FORM;
     public static final int INPUT_FORM_TYPE = 12 + CONTROL_BASE_VALUE;
+
+    public static final String REDUCE = "reduce";
+    public static final String FQ_REDUCE = SYS_FQ + REDUCE;
+    public static final int REDUCE_TYPE = 14 + CONTROL_BASE_VALUE;
+
+    public static final String EXPAND = "expand";
+    public static final String FQ_EXPAND = SYS_FQ + EXPAND;
+    public static final int EXPAND_TYPE = 15 + CONTROL_BASE_VALUE;
 
     // function stuff
     public static final String RETURN = "return";
@@ -160,6 +165,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
 
     public static String FUNC_NAMES[] = new String[]{
+            REDUCE, EXPAND,
             SCRIPT_PATH_COMMAND,
             SCRIPT_ARGS_COMMAND,
             SYS_INFO,
@@ -185,6 +191,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             LOAD_COMMAND};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
+            FQ_REDUCE,  FQ_EXPAND,
             FQ_SCRIPT_PATH_COMMAND,
             FQ_SCRIPT_ARGS_COMMAND,
             FQ_SYS_INFO,
@@ -226,6 +233,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case EXPAND:
+            case FQ_EXPAND:
+                return EXPAND_TYPE;
+            case REDUCE:
+            case FQ_REDUCE:
+                return REDUCE_TYPE;
             case SCRIPT_PATH_COMMAND:
             case FQ_SCRIPT_PATH_COMMAND:
                 return SCRIPT_PATH_COMMAND_TYPE;
@@ -307,6 +320,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         // does is mark them as built in functions.
 
         switch (polyad.getName()) {
+            case EXPAND:
+            case FQ_EXPAND:
+                doReduceOrExpand(polyad, state, false);
+                return true;
+            case REDUCE:
+            case FQ_REDUCE:
+                doReduceOrExpand(polyad, state, true);
+                return true;
             case SCRIPT_PATH_COMMAND:
             case FQ_SCRIPT_PATH_COMMAND:
                 doScriptPaths(polyad, state);
@@ -394,6 +415,94 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         return false;
     }
+             /*
+               times(x,y)->x*y
+  reduce(*times(), 1+n(5))
+
+              */
+    private void doReduceOrExpand(Polyad polyad, State state, boolean doReduce) {
+        StatementWithResultInterface arg0 = polyad.getArguments().get(0);
+        if (!(arg0 instanceof FunctionReferenceNode)) {
+            throw new IllegalArgumentException("error: first argument of " + REDUCE + " must be a function reference");
+        }
+        Object arg1 = polyad.evalArg(1, state);
+        if (!isStem(arg1)) {
+            throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a stem");
+        }
+        StemVariable stemVariable = (StemVariable) arg1;
+        if (!stemVariable.isList()) {
+            throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a list");
+        }
+        if(stemVariable.size() ==0){
+            polyad.setEvaluated(true);
+          if(doReduce){
+              // result is a scalar
+              polyad.setResult(QDLNull.getInstance());
+              polyad.setResultType(Constant.NULL_TYPE);
+          }else{
+              polyad.setResult(new StemVariable());
+              polyad.setResultType(Constant.STEM_TYPE);
+          }
+          // result is an empty stem
+            return;
+        }
+        if(stemVariable.size() == 1){
+            StemEntry stemEntry =  stemVariable.getStemList().iterator().next();
+            polyad.setEvaluated(true);
+
+            if(doReduce){
+                // return scalar of the value
+                polyad.setResult(stemEntry.entry);
+                polyad.setResultType(Constant.getType(stemEntry.entry));
+
+            }else{
+                   StemVariable output= new StemVariable();
+                   output.listAppend(stemEntry.entry);
+                   polyad.setResult(output);
+                   polyad.setResultType(Constant.STEM_TYPE);
+            }
+            return;
+        }
+
+        ExpressionImpl operator = getOperator(state, (FunctionReferenceNode) arg0);
+        boolean isFirst = true;
+        StemVariable output = null;
+        Object reduceOuput = null;
+        // contract is that a single list is returned unaltered.
+        // At this point, we know there are at least 2 entries.
+        Iterator<StemEntry> iterator = stemVariable.getStemList().iterator();
+        Object lastValue = iterator.next().entry;
+
+        if(!doReduce){
+            output = new StemVariable();
+            output.listAppend(lastValue);
+        }
+        while(iterator.hasNext()){
+            Object currentValue = iterator.next().entry;
+            ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
+            argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
+            argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
+            operator.setArguments(argList);
+            operator.evaluate(state);
+            if(doReduce){
+                reduceOuput = operator.getResult();
+            }else{
+                output.listAppend(operator.getResult());
+            }
+            lastValue = operator.getResult();
+        }
+        if(doReduce){
+               polyad.setResult(reduceOuput);
+               polyad.setResultType(Constant.getType(reduceOuput));
+        }else{
+             polyad.setResult(output);
+             polyad.setResultType(Constant.STEM_TYPE);
+        }
+        polyad.setEvaluated(true);
+        return;
+    }
+
+
 
     private void doInputForm(Polyad polyad, State state) {
         if (0 == polyad.getArgCount()) {
@@ -1062,7 +1171,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     }
 
     public static void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
-                       runnit(polyad, state, commandName, state.getScriptPaths(), hasNewState);
+        runnit(polyad, state, commandName, state.getScriptPaths(), hasNewState);
     }
 
     public static void runnit(Polyad polyad, State state, String commandName, List<String> paths, boolean hasNewState) {
@@ -1076,7 +1185,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         Object arg1 = polyad.evalArg(0, state);
         Object[] argList = new Object[0];
-        if (2 == polyad.getArgCount() ) {
+        if (2 == polyad.getArgCount()) {
             Object arg2 = polyad.evalArg(1, state);
             if (arg2 instanceof StemVariable) {
                 StemList stemList = ((StemVariable) arg2).getStemList();
@@ -1088,14 +1197,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     }
                 }
                 argList = aa.toArray(new Object[0]);
-            }else{
+            } else {
                 argList = new Object[]{arg2}; // pass back single non-stem argument
             }
         }
-        if(2 < polyad.getArgCount()){
+        if (2 < polyad.getArgCount()) {
             ArrayList<Object> aa = new ArrayList<>();
-            for(int i = 0; i < polyad.getArgCount(); i++){
-              aa.add(polyad.evalArg(i, state));
+            for (int i = 0; i < polyad.getArgCount(); i++) {
+                aa.add(polyad.evalArg(i, state));
             }
             argList = aa.toArray(new Object[0]);
         }
@@ -1224,18 +1333,18 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 QDLLoader qdlLoader;
                 if (newThingy instanceof JavaModule) {
                     // For a single instance, just create a barebones loader on the fly.
-                   qdlLoader = new QDLLoader() {
-                       @Override
-                       public List<Module> load() {
-                           List<Module> m = new ArrayList<>();
-                           JavaModule javaModule = (JavaModule)newThingy;
-                           State newState = state.newModuleState();
-                           javaModule = (JavaModule) javaModule.newInstance(newState);
-                           javaModule.init(newState); // set it up
-                           m.add(javaModule);
-                           return m;
-                       }
-                   };
+                    qdlLoader = new QDLLoader() {
+                        @Override
+                        public List<Module> load() {
+                            List<Module> m = new ArrayList<>();
+                            JavaModule javaModule = (JavaModule) newThingy;
+                            State newState = state.newModuleState();
+                            javaModule = (JavaModule) javaModule.newInstance(newState);
+                            javaModule.init(newState); // set it up
+                            m.add(javaModule);
+                            return m;
+                        }
+                    };
                 } else {
                     if (!(newThingy instanceof QDLLoader)) {
                         throw new IllegalArgumentException("Error: \"" + resourceName + "\" is neither a module nor a loader.");

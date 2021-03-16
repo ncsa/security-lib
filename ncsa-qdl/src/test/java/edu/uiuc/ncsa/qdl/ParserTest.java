@@ -1646,7 +1646,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
-    public void testBuildInFunctionReference() throws Throwable {
+    public void testBuiltInFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "g(*h(), x, y)->h(x, y);");
@@ -1662,7 +1662,7 @@ public class ParserTest extends AbstractQDLTester {
      * @throws Throwable
      */
     @Test
-    public void testBuildInFunctionReference2() throws Throwable {
+    public void testBuiltInFunctionReference2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "g1(*h(), x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
@@ -1673,7 +1673,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
-    public void testBuildInFunctionReferenceOrder() throws Throwable {
+    public void testBuiltInFunctionReferenceOrder() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y);");
@@ -1700,20 +1700,54 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("d", state) == -1L;
 
     }
-      /*
 
 
+    @Test
+        public void testReduceWithOperator() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := reduce(**, 1+n(5));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 120L;
+    }
+    @Test
+        public void testReduceWithUserFunction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "times(x,y)->x*y;");
+        addLine(script, "x := reduce(*times(), 1+n(5));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 120L;
+    }
 
-  g(*h(), x, y)->h(x+'pqr', y+1) + h(x+'tuv', y)
-  g(*substring(), 'abcd', 2)
+    @Test
+        public void testExpandWithOperator() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [1,3,5,7];");
+        addLine(script, "b. := [1,3,6,7];");
+        addLine(script, "x. := expand(*&&, a. == b.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns [T T F F]
+        assert getBooleanValue("x.0", state);
+        assert getBooleanValue("x.1", state);
+        assert !getBooleanValue("x.2", state);
+        assert !getBooleanValue("x.3", state);
+    }
 
-  g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y)
-  g1(*substring(), 'abcd', 2) // fails on purpose -- shoudl check for right location of f ref in arg list.
-  g1('abcd', 2, *substring())
-
-  op(*h(), x, y) -> h(x,y)
-  op(*+, 2, 3)
-   op(**, 2, 3)
-  op(*^, 2, 3)
-       */
+    @Test
+        public void testReduceWithLogicalOperator() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [1,3,5,7];");
+        addLine(script, "b. := [1,3,6,7];");
+        addLine(script, "x := reduce(*||, a. == b.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        assert getBooleanValue("x", state);
+    }
 }

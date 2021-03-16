@@ -2810,6 +2810,11 @@ public class WorkspaceCommands implements Logable {
                 say("use external editor " + (isUseExternalEditor()?"on":"off"));
                 break;
             case EXTERNAL_EDITOR:
+                QDLEditor x = getQdlEditors().get(value);
+                if(x == null){
+                    say("Sorry, but there is no such editor \"" + value + "\" available. Make sure it is configured.");
+                    break;
+                }
                 String oldName = getExternalEditorName();
                 setExternalEditorName(value);
                 say("external editor was " + (isTrivial(oldName)?"(null)":oldName) + " now is '" + getExternalEditorName() + "'");

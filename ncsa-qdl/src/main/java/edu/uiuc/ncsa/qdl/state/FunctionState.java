@@ -53,15 +53,7 @@ public abstract class FunctionState extends VariableState {
     }
 
     FTStack ftStack = new FTStack();
-/*    public FunctionTableImpl getFTStack() {
-        return functionTable;
-    }
 
-    public void setFunctionTable(FunctionTableImpl functionTable) {
-        this.functionTable = functionTable;
-    }
-
-    FunctionTableImpl functionTable;*/
     /**
      * Convenience, just looks up name and arg count
      *
