@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
@@ -297,7 +298,8 @@ public class QDLListener implements QDLParserListener {
 
                 // add it.
                 //        dyad.setLeftArgument((ExpressionNode) resolveChild(parseTree.getChild(0)));
-                polyad.getArguments().add((StatementWithResultInterface) resolveChild(kid));
+                StatementWithResultInterface swri = (StatementWithResultInterface) resolveChild(kid);
+                polyad.getArguments().add(swri);
             }
         }
     }
@@ -1277,38 +1279,58 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterF_ref(QDLParserParser.F_refContext ctx) {
-        System.out.println("enter R_REF");
-        stash(ctx, new Polyad());
+        //  System.out.println("enter F_REF");
+        stash(ctx, new FunctionReferenceNode());
 
     }
 
     @Override
     public void exitF_ref(QDLParserParser.F_refContext ctx) {
-        System.out.println("exit R_REF");
-
+        //      System.out.println("exit F_REF");
+        FunctionReferenceNode frn = (FunctionReferenceNode) parsingMap.getStatementFromContext(ctx);
+        String name = ctx.getText();
+        name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER.length());
+        int parenIndex  = name.indexOf("(");
+        if(-1 < parenIndex) {
+            // whack off any dangling parenthese
+            name = name.substring(0, name.indexOf("("));
+        }
+        frn.setFunctionName(name);
     }
 
     @Override
     public void enterF_arg(QDLParserParser.F_argContext ctx) {
-        System.out.println("enter f_arg");
+        //  System.out.println("enter f_arg");
 
     }
 
     @Override
     public void exitF_arg(QDLParserParser.F_argContext ctx) {
-        System.out.println("exit f_arg");
+        //  System.out.println("exit f_arg");
 
     }
 
     @Override
     public void enterF_args(QDLParserParser.F_argsContext ctx) {
-        System.out.println("enter f_argS");
+        // System.out.println("enter f_argS");
 
     }
 
     @Override
     public void exitF_args(QDLParserParser.F_argsContext ctx) {
-        System.out.println("exit f_argS");
+        //   System.out.println("exit f_argS");
 
     }
+
+/*    @Override
+    public void enterAllOps(QDLParserParser.AllOpsContext ctx) {
+           System.out.println("enter allops");
+
+    }
+
+    @Override
+    public void exitAllOps(QDLParserParser.AllOpsContext ctx) {
+        System.out.println("exit allops");
+
+    }*/
 }

@@ -29,6 +29,8 @@ public interface QDLConstants {
     String RESERVED_FALSE = "false";
     String RESERVED_NULL = "null";
 
+    String FUNCTION_REFERENCE_MARKER = "*";
+
     static boolean isReservedWord(String x) {
         return RESERVED_TRUE.equals(x) || RESERVED_FALSE.equals(x) || RESERVED_NULL.equals(x);
     }

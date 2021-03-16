@@ -36,13 +36,20 @@ grammar QDLVariableParser;
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : ':=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=';
   FuncStart : [a-zA-Z_$#][a-zA-Z_$0-9#]* '(';
-      F_REF : '*' FuncStart ')';
+//      F_REF :   '*' (AllOps | (FuncStart ')'));
+      F_REF :   '*' (AllOps | (FuncStart ')'));
+      //F_REF :  '*' (AllOps '(' |  FuncStart) ')';
   //StemStart : Identifier '.';
   BOOL_TRUE : 'true';
  BOOL_FALSE : 'false';
        Null : 'null';
      STRING : '\'' (ESC|.)*? '\'';
     Decimal : (Integer '.' Integer) | ('.' Integer);
+    // AllOps must be a fragment or every bloddy operator outside of a function reference will
+    // get flagged as a possible match.
+    fragment 
+    AllOps : Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
+             LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde;
 
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
@@ -65,6 +72,7 @@ grammar QDLVariableParser;
         MoreEquals : '>=';
             Equals : '==';
          NotEquals : '!=';
+    Exponentiation : '^';
                And : '&&';
                 Or : '||';
           Backtick : '`';

@@ -17,4 +17,17 @@ public class QDLFunctionRecord extends FunctionRecord {
     }
 
     public QDLFunction qdlFunction = null;
+
+    @Override
+    public QDLFunctionRecord clone() throws CloneNotSupportedException {
+        QDLFunctionRecord functionRecord = new QDLFunctionRecord();
+        functionRecord.name = name;
+        functionRecord.sourceCode = sourceCode;
+        functionRecord.documentation = documentation;
+        functionRecord.statements = statements;
+        functionRecord.argNames = argNames;
+        functionRecord.argCount = argCount;
+        functionRecord.qdlFunction = qdlFunction;
+        return functionRecord;
+    }
 }

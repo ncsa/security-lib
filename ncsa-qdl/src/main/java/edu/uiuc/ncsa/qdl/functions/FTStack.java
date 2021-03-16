@@ -72,6 +72,17 @@ public class FTStack implements FunctionTable {
     }
 
     @Override
+    public FunctionRecord getFunctionReference(String name) {
+        for (FunctionTable functionTable : ftables) {
+            FunctionRecord fr = functionTable.getFunctionReference(name);
+            if (fr != null) {
+                return fr;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean isDefined(String var, int argCount) {
         for (FunctionTable functionTable : ftables) {
             if (functionTable.isDefined(var, argCount)) {
@@ -210,5 +221,15 @@ public class FTStack implements FunctionTable {
             all.addAll(ftables.get(i).getDocumentation(fName, argCount));
         }
         return all;
+    }
+
+    @Override
+    public FTStack clone()  {
+        FTStack cloned = new FTStack();
+        for(FunctionTable ft : ftables){
+            cloned.push(ft);
+        }
+        return cloned;
+
     }
 }

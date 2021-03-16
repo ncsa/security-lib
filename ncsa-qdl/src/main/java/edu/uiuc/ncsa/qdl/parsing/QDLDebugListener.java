@@ -619,29 +619,16 @@ public class QDLDebugListener extends QDLParserBaseListener {
         printKids(ctx);
 
     }
-/*
-    @Override
-    public void enterStem_ref(QDLParserParser.Stem_refContext ctx) {
-        System.out.println("enter stem-ref");
+/*    @Override
+    public void enterAllOps(QDLParserParser.AllOpsContext ctx) {
+           System.out.println("enter allops");
         printKids(ctx);
+
     }
 
     @Override
-    public void exitStem_ref(QDLParserParser.Stem_refContext ctx) {
-        System.out.println("exit stem-ref");
-        printKids(ctx);
-    }
-
-    @Override
-    public void enterStem_refs(QDLParserParser.Stem_refsContext ctx) {
-        System.out.println("enter stem-refs");
-        printKids(ctx);
-    }
-
-    @Override
-    public void exitStem_refs(QDLParserParser.Stem_refsContext ctx) {
-        System.out.println("exit stem_refs");
-        printKids(ctx);
+    public void exitAllOps(QDLParserParser.AllOpsContext ctx) {
+        System.out.println("exit allops");
+     printKids(ctx);
     }*/
-
 }

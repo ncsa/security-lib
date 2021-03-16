@@ -11,6 +11,15 @@ import java.util.List;
  * on 3/14/21 at  3:26 PM
  */
 public class FunctionReferenceNode implements StatementWithResultInterface {
+    public String getFunctionName() {
+        return functionName;
+    }
+
+    public void setFunctionName(String functionName) {
+        this.functionName = functionName;
+    }
+
+    String functionName;
     Object result;
     @Override
     public Object getResult() {

@@ -63,6 +63,37 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int INTEGER_DIVIDE_VALUE = 212;
     public static final int TILDE_VALUE = 213;
     public static final int DOT_VALUE = 214;
+    /**
+     * All Math operators. These are used in function references.
+     */
+    public static String[] ALL_MATH_OPS = new String[]{
+        POWER,
+        TILDE,
+        TIMES,
+        DIVIDE,
+        INTEGER_DIVIDE,
+        PLUS,
+        MINUS,
+        AND,
+        OR,
+        EQUALS,
+        NOT_EQUAL,
+        LESS_THAN,
+        LESS_THAN_EQUAL,
+        LESS_THAN_EQUAL2,
+        MORE_THAN,
+        MORE_THAN_EQUAL,
+        MORE_THAN_EQUAL2,
+        NOT};
+
+    public boolean isMathOperator(String x){
+        for(String op: ALL_MATH_OPS){
+            if(op.equals(x)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public String[] getFunctionNames() {

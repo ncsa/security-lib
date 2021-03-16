@@ -5,18 +5,24 @@ import edu.uiuc.ncsa.qdl.exceptions.RecursionException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
-import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
+import java.util.List;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -161,21 +167,109 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
     }
 
+    /*
+      r(x)->x^2 + 1;
+  f(*h(), x) -> h(x);
+            f(*r(), 2)
+
+
+  g(*h(), x, y)->h(x+'pqr', y+1) + h(x+'tuv', y)
+  g(*substring(), 'abcd', 2)
+
+  g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y)
+  g1(*substring(), 'abcd', 2) // fails on purpose -- shoudl check for right location of f ref in arg list.
+  g1('abcd', 2, *substring())
+
+  op(*h(), x, y) -> h(x,y)
+  op(*+, 2, 3)
+   op(**, 2, 3)
+  op(*^, 2, 3)
+
+     */
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
         FunctionRecord functionRecord = frs.functionRecord;
+
         if (functionRecord == null) {
-            throw new UndefinedFunctionException(" the function '" + polyad.getName() + "' with "
-                    + polyad.getArgCount() + " arguments was not found.");
+            // see if its a reference instead
+            functionRecord = state.getFTStack().getFunctionReference(polyad.getName());
+            if (functionRecord == null) {
+                throw new UndefinedFunctionException(" the function '" + polyad.getName() + "' with "
+                        + polyad.getArgCount() + " arguments was not found.");
+            }
         }
-        State localState = (State) frs.state.newStateWithImports();
+        State localState = frs.state.newStateWithImports();
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getLocalST();
+        boolean hasLocalFunctionTable = false;
         // now we populate the local state with the variables.
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
             // note that the call evaluates the state in the non-local environment as per contract,
             // but the named result goes in to the localState.
-            symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(state));
+            String localName = functionRecord.argNames.get(i);
+            if (isFunctionReference(localName)) {
+                localName = dereferenceFunctionName(localName);
+                if (!hasLocalFunctionTable) {
+                    localState.getFTStack().pushNew();
+                    hasLocalFunctionTable = true;
+                }
+                // This is the local name of the function.
+                if (!(polyad.getArguments().get(i) instanceof FunctionReferenceNode)) {
+                    throw new IllegalArgumentException("error: The supplied argument was not a function reference");
+                }
+                FunctionReferenceNode frn = (FunctionReferenceNode) polyad.getArguments().get(i);
+                String xname = frn.getFunctionName(); // dereferenced in the parser
+                boolean isBuiltin = state.getMetaEvaluator().isBuiltInFunction(xname) || state.getOpEvaluator().isMathOperator(xname);
+
+                if (isBuiltin) {
+                    FunctionRecord functionRecord1 = new FunctionRecord();
+                    functionRecord1.name = localName;
+                    functionRecord1.fRefName = xname;
+                    functionRecord1.isFuncRef = true;
+                    localState.getFTStack().peek().put(functionRecord1);
+                } else {
+                    List<FunctionRecord> functionRecordList = localState.getFTStack().getByAllName(xname);
+                    for (FunctionRecord functionRecord1 : functionRecordList) {
+                        FunctionRecord clonedFR = null;
+                        try {
+                            clonedFR = functionRecord1.clone();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                            throw new NFWException("Somehow function records are no longer clonable. Check signatures.");
+                        }
+                        clonedFR.name = localName;
+                        localState.getFTStack().peek().put(clonedFR);
+                    }
+                }
+
+                // This had better be a function reference or this should blow up.
+            } else {
+                symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(state));
+            }
+        }
+        if (functionRecord.isFuncRef) {
+            String realName = functionRecord.fRefName;
+            if (state.getOpEvaluator().isMathOperator(realName)) {
+                // Dyads are reserved for math operations and are smart enough
+                // to grab the OpEvaluator and invoke it, so if the user is sending along
+                // a polyad. Note that polyads and dyads are both subclasses of
+                // ExpressionImpl and so we can't cast from one to the other, we
+                // have to copy stuff.
+                Dyad dyad = new Dyad(localState.getOperatorType(realName));
+                dyad.setLeftArgument(polyad.getArguments().get(0));
+                dyad.setRightArgument(polyad.getArguments().get(1));
+                dyad.evaluate(localState);
+                polyad.setResultType(dyad.getResultType());
+                polyad.setEvaluated(true);
+                polyad.setResult(dyad.getResult());
+                polyad.getArguments().set(0, dyad.getLeftArgument());
+                polyad.getArguments().set(1, dyad.getRightArgument());
+                return;
+            } else {
+                polyad.setName(realName);
+                polyad.evaluate(localState);
+                return;
+            }
         }
         for (Statement statement : functionRecord.statements) {
             try {
@@ -202,4 +296,13 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
+    protected boolean isFunctionReference(String name) {
+        return name.startsWith(FUNCTION_REFERENCE_MARKER);
+    }
+
+    protected String dereferenceFunctionName(String name) {
+        String x = name.substring(FUNCTION_REFERENCE_MARKER.length());
+        x = x.substring(0, x.indexOf("(")); // * ... ( are bookends for the reference
+        return x;
+    }
 }

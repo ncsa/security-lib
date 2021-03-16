@@ -22,6 +22,9 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
 
     FunctionRecord getSomeFunction(String name);
 
+ FunctionRecord getFunctionReference(String name);
+
+
     /**
      * Finds every {@link FunctionRecord} in all stacks for a given name. Note that
      *

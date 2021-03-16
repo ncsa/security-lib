@@ -429,6 +429,7 @@ public class ParserTest extends AbstractQDLTester {
      * Tests that short-circuit conditionals work. There are two basic tests for && and ||
      * then a couple of tests that show that it does not simply bail on all subsequent conditionals
      * if one found.
+     *
      * @throws Throwable
      */
     @Test
@@ -488,7 +489,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to interpret single equals without parser error";
-        } catch (IllegalStateException  pcx) {
+        } catch (IllegalStateException pcx) {
             assert true;
         }
     }
@@ -1493,6 +1494,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 9L;
 
     }
+
     @Test
     public void testMultiArgLambda() throws Throwable {
         State state = testUtils.getNewState();
@@ -1509,6 +1511,7 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Since the body of a lambda function can be either a single statement or enclosed in brackets [... ]
      * what happens if the single statement is standard list notation?
+     *
      * @throws Throwable
      */
     @Test
@@ -1524,18 +1527,19 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * Lambda with body of function in brackets.
+     *
      * @throws Throwable
      */
     @Test
-        public void testLambdaInBracket() throws Throwable {
-            State state = testUtils.getNewState();
-            StringBuffer script = new StringBuffer();
-            addLine(script, "h(x)->[n:=2*x;return(1+3*n(n));];");
-            addLine(script, "a := h(3).i(5);");
-            QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            assert getLongValue("a", state) == 16L;
-        }
+    public void testLambdaInBracket() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "h(x)->[n:=2*x;return(1+3*n(n));];");
+        addLine(script, "a := h(3).i(5);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 16L;
+    }
 
     @Test
     public void testMultiStatementLambda() throws Throwable {
@@ -1560,6 +1564,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 3L;
         assert getLongValue("b", state) == 6L;
     }
+
     @Test
     public void testExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
@@ -1580,6 +1585,7 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Check that expressions for stems with multiple indices can be resolved and
      * have the value set. This is a crucial operation in many instances.
+     *
      * @throws Throwable
      */
     @Test
@@ -1613,16 +1619,101 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
-      public void testBadExpressionStem() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "(0).(1);");
-          try {
-              QDLInterpreter interpreter = new QDLInterpreter(null, state);
-              interpreter.execute(script.toString());
-              assert false : "Was able to create a stem from (0).(1)";
-          }catch(IllegalStateException t){
-              assert true;
-          }
-      }
+    public void testBadExpressionStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "(0).(1);");
+        try {
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert false : "Was able to create a stem from (0).(1)";
+        } catch (IllegalStateException t) {
+            assert true;
+        }
+    }
+
+    @Test
+    public void testUserFunctionReference() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "r(x)->x^2 + 1;");
+        addLine(script, "f(*h(), x) -> h(x);");
+        addLine(script, "a := f(*r(), 2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 5L;
+
+    }
+
+    @Test
+    public void testBuildInFunctionReference() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g(*h(), x, y)->h(x, y);");
+        addLine(script, "a := g(*substring(), 'abcd', 2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("a", state).equals("cd");
+    }
+
+    /**
+     * Fancier version
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testBuildInFunctionReference2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g1(*h(), x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1(*substring(), 'abcd', 2 );");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("a", state).equals("dpqrcdtuv");
+    }
+
+    @Test
+    public void testBuildInFunctionReferenceOrder() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1('abcd', 2, *substring());");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("a", state).equals("dpqrcdtuv");
+    }
+
+    @Test
+    public void testOpReference() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "  op(*h(), x, y) -> h(x,y);");
+        addLine(script, "a := op(*+, 2, 3);");
+        addLine(script, "b := op(**, 2, 3);");
+        addLine(script, "c := op(*^, 2, 3);");
+        addLine(script, "d := op(*-, 2, 3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a", state) == 5L;
+        assert getLongValue("b", state) == 6L;
+        assert getLongValue("c", state) == 8L;
+        assert getLongValue("d", state) == -1L;
+
+    }
+      /*
+
+
+
+  g(*h(), x, y)->h(x+'pqr', y+1) + h(x+'tuv', y)
+  g(*substring(), 'abcd', 2)
+
+  g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y)
+  g1(*substring(), 'abcd', 2) // fails on purpose -- shoudl check for right location of f ref in arg list.
+  g1('abcd', 2, *substring())
+
+  op(*h(), x, y) -> h(x,y)
+  op(*+, 2, 3)
+   op(**, 2, 3)
+  op(*^, 2, 3)
+       */
 }

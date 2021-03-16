@@ -23,10 +23,18 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     String munger = "$$$";
 
     public String createKey(String name, int argCount) {
+        if(argCount == FunctionRecord.FREF_ARG_COUNT){
+            return name + munger;
+        }
         return name + munger + argCount;
-
     }
 
+    public FunctionRecord getFunctionReference(String name){
+        if(super.containsKey(name + munger)){
+            return get(name + munger);
+        }
+        return null;
+    }
     public String createKey(FunctionRecord fr) {
         return createKey(fr.name, fr.getArgCount());
     }
@@ -35,6 +43,7 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     public FunctionRecord put(FunctionRecord value) {
         return super.put(createKey(value), value);
     }
+
 
     @Override
     public FunctionRecord get(String key, int argCount) {

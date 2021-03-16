@@ -410,7 +410,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                getFTStack(),
+                getFTStack().clone(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode());

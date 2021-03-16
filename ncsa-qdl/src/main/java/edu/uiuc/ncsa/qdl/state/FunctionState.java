@@ -136,9 +136,11 @@ public abstract class FunctionState extends VariableState {
             for (String alias : getImportedModules().keySet()) {
                 if (fr.functionRecord == null) {
                     FunctionRecord tempFR = getImportedModules().get(alias).getState().getFTStack().get(name, argCount);
-                    fr.functionRecord = tempFR;
-                    fr.state = getImportedModules().get(alias).getState();
-                    fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                    if(tempFR != null) {
+                        fr.functionRecord = tempFR;
+                        fr.state = getImportedModules().get(alias).getState();
+                        fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                    }
                 } else {
                     FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
                     if (tempFR != null) {
@@ -147,7 +149,12 @@ public abstract class FunctionState extends VariableState {
                 }
             }
             if (fr.functionRecord == null) {
-                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
+                // edge case is that it is actually a built-in function reference.
+                fr.functionRecord=getFTStack().getFunctionReference(name);
+                //fr.isExternalModule = false; // just to be sure.
+                if(fr.functionRecord == null) {
+                    throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
+                }
             }
             return fr;
         }
