@@ -742,12 +742,15 @@ public class QDLListener implements QDLParserListener {
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
         // Best we can do with ANTLR...
 
-        StringBuffer stringBuffer = new StringBuffer();
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < defineContext.getChildCount(); i++) {
-            stringBuffer.append((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
+            stringList.add((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
         }
-        String rawText = stringBuffer.toString();
-        functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
+        // ANTLR may strip final terminator. Put it back as needed.
+        if(!stringList.get(stringList.size() -1).endsWith(";")){
+            stringList.set(stringList.size() -1,stringList.get(stringList.size() -1) + ";");
+        }
+        functionRecord.sourceCode = stringList;
 
         QDLParserParser.FunctionContext nameAndArgsNode = defineContext.function();
         String name = nameAndArgsNode.getChild(0).getText();
@@ -818,12 +821,16 @@ public class QDLListener implements QDLParserListener {
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
         // Best we can do with ANTLR...
 
-        StringBuffer stringBuffer = new StringBuffer();
+
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < lambdaContext.getChildCount(); i++) {
-            stringBuffer.append((i == 0 ? "" : "\n") + lambdaContext.getChild(i).getText());
+            stringList.add(lambdaContext.getChild(i).getText());
         }
-        String rawText = stringBuffer.toString();
-        functionRecord.sourceCode = rawText + (rawText.endsWith(";") ? "" : ";"); // ANTLR may strip final terminator. Put it back as needed.
+        // ANTLR may strip final terminator. Put it back as needed.
+        if(!stringList.get(stringList.size() -1).endsWith(";")){
+            stringList.set(stringList.size() -1,stringList.get(stringList.size() -1) + ";");
+        }
+        functionRecord.sourceCode = stringList;
 
         String name = nameAndArgsNode.getChild(0).getText();
         if (name.endsWith("(")) {

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTIONS_TAG;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
 
 /**
@@ -23,18 +25,19 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     String munger = "$$$";
 
     public String createKey(String name, int argCount) {
-        if(argCount == FunctionRecord.FREF_ARG_COUNT){
+        if (argCount == FunctionRecord.FREF_ARG_COUNT) {
             return name + munger;
         }
         return name + munger + argCount;
     }
 
-    public FunctionRecord getFunctionReference(String name){
-        if(super.containsKey(name + munger)){
+    public FunctionRecord getFunctionReference(String name) {
+        if (super.containsKey(name + munger)) {
             return get(name + munger);
         }
         return null;
     }
+
     public String createKey(FunctionRecord fr) {
         return createKey(fr.name, fr.getArgCount());
     }
@@ -52,28 +55,28 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
 
     @Override
     public void remove(String fName, int argCount) {
-          if(argCount == -1){
-              String almostMungedName = fName + munger;
-                    for (String key : keySet()) {
-                        if (key.startsWith(almostMungedName)) {
-                            remove(key);
-                        }
-                    }
+        if (argCount == -1) {
+            String almostMungedName = fName + munger;
+            for (String key : keySet()) {
+                if (key.startsWith(almostMungedName)) {
+                    remove(key);
+                }
+            }
 
-              return;
-          }
-          remove(createKey(fName, argCount));
+            return;
+        }
+        remove(createKey(fName, argCount));
     }
 
     @Override
     public List<FunctionRecord> getByAllName(String name) {
         List<FunctionRecord> fList = new ArrayList<>();
         String almostMungedName = name + munger;
-              for (String key : keySet()) {
-                  if (key.startsWith(almostMungedName)) {
-                      fList.add(get(key));
-                  }
-              }
+        for (String key : keySet()) {
+            if (key.startsWith(almostMungedName)) {
+                fList.add(get(key));
+            }
+        }
         return fList;
     }
 
@@ -170,7 +173,7 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     @Override
     public List<String> getDocumentation(String fName, int argCount) {
         if (get(fName, argCount) == null) {
-            return null;
+            return new ArrayList<>(); // never null
         } else {
             return get(fName, argCount).documentation;
         }
@@ -196,9 +199,9 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
         if (isEmpty()) {
             return;
         }
-        xsw.writeStartElement(XMLConstants.FUNCTIONS_TAG);
+        xsw.writeStartElement(FUNCTIONS_TAG);
         for (String key : keySet()) {
-            if (StringUtils.isTrivial(get(key).sourceCode)) {
+            if (get(key).sourceCode.isEmpty()) {
                 // No source code usually means it is from some external function
                 // and we cannot recreate it.
                 continue;
@@ -209,7 +212,7 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
             xsw.writeAttribute(XMLConstants.FUNCTION_NAME_TAG, name);
             xsw.writeAttribute(XMLConstants.FUNCTION_ARG_COUNT_TAG, Integer.toString(get(key).getArgCount()));
 
-            xsw.writeCData(get(key).sourceCode);
+            xsw.writeCData(StringUtils.listToString(get(key).sourceCode));
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
@@ -223,14 +226,12 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
      * @param qi
      * @throws XMLStreamException
      */
-    @Override
-    public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
+    public void processSingleFunction(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
-
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (xe.asEndElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
@@ -248,8 +249,27 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
             }
             xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TAG);
+        throw new XMLMissingCloseTagException(FUNCTION_TAG);
+    }
 
-
+    @Override
+    public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
+                        processSingleFunction(xer, qi);
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTIONS_TAG)) {
+                        return;
+                    }
+            }
+            xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 }

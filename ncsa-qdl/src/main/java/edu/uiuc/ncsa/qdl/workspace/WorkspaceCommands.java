@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
-import edu.uiuc.ncsa.qdl.config.*;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
+import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
+import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
@@ -32,6 +34,10 @@ import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.*;
 import edu.uiuc.ncsa.security.util.cli.*;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
+import edu.uiuc.ncsa.security.util.cli.editing.Editors;
+import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -50,6 +56,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.zip.GZIPOutputStream;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
@@ -594,28 +601,30 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
         }
     }
-    protected boolean useExternalEditor(){
+
+    protected boolean useExternalEditor() {
         return !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
     }
+
     private int _doFileEdit(InputLine inputLine) {
         String source = inputLine.getArg(FIRST_ARG_INDEX);
-         File f = new File(source);
-         // don't care if it exists, that's the editor's problem.
-        if(!f.isAbsolute()){
+        File f = new File(source);
+        // don't care if it exists, that's the editor's problem.
+        if (!f.isAbsolute()) {
             f = new File(rootDir, f.getAbsolutePath());
         }
-        if(useExternalEditor()) {
+        if (useExternalEditor()) {
             _doExternalEdit(f);
-        }else{
+        } else {
 
             try {
-               List<String> content =  _doLineEditor(FileUtil.readFileAsLines(f.getAbsolutePath()));
-               FileWriter fileWriter = new FileWriter(f);
-               for(String line:content){
-                   fileWriter.write(line + "\n");
-               }
-               fileWriter.flush();
-               fileWriter.close();
+                List<String> content = _doLineEditor(FileUtil.readFileAsLines(f.getAbsolutePath()));
+                FileWriter fileWriter = new FileWriter(f);
+                for (String line : content) {
+                    fileWriter.write(line + "\n");
+                }
+                fileWriter.flush();
+                fileWriter.close();
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
@@ -905,9 +914,72 @@ public class WorkspaceCommands implements Logable {
         if (_doHelp(inputLine)) {
             say("edit (index | name)");
             sayi("invoke the editor on the given buffer");
+            sayi("-list - list available editors");
+            sayi("-add name exec - add a (basic) editor configuration.");
+            sayi("-rm name - remove an editor: note it cannot be the currently active one");
+            sayi("-use name - use this as the default. Implicitly enables using external editors if needed.");
             return RC_NO_OP;
         }
 
+        if (inputLine.hasArg("-add")) {
+            if (inputLine.getArgCount() != 3) {
+                say("Sorry, wrong number of arguments for -add");
+                return RC_NO_OP;
+            }
+            String name = inputLine.getNextArgFor("-use");
+            if(isTrivial(name)){
+                say("no name specified.");
+                return RC_NO_OP;
+            }
+            inputLine.removeSwitchAndValue("-add");
+            String exec = inputLine.getLastArg();
+            if (getQdlEditors().hasEntry(name)) {
+                boolean ok = readline("The editor named \"" + name + "\" already exists. Do you want to over write it (y/n)?").equals("y");
+                if (!ok) {
+                    say("aborted.");
+                    return RC_NO_OP;
+                }
+            }
+            EditorEntry ee = new EditorEntry();
+            ee.name = name;
+            ee.exec = exec;
+            getQdlEditors().put(ee);
+            return RC_CONTINUE;
+        }
+        
+        if(inputLine.hasArg("-use")){
+            String name = inputLine.getNextArgFor("-use");
+            if(isTrivial(name)){
+                say("no name specified.");
+                return RC_NO_OP;
+            }
+            setExternalEditorName(name);
+            setUseExternalEditor(!name.equals(LINE_EDITOR_NAME));
+            return RC_CONTINUE;
+        }
+        if(inputLine.hasArg("-rm")){
+            String name = inputLine.getNextArgFor("-use");
+            if(isTrivial(name)){
+                say("no name specified.");
+                return RC_NO_OP;
+            }
+            if(getQdlEditors().hasEntry(name)){
+                if(getExternalEditorName().equals(name)){
+                    say("removing default editor, reverting to line editor");
+                    setExternalEditorName(LINE_EDITOR_NAME);
+                }
+
+                getQdlEditors().remove(name);
+                say(name + " removed.");
+            }else{
+                say(name + " not found.");
+            }
+             return RC_CONTINUE;
+        }
+        if (inputLine.hasArg("-list")) {
+            listEditors();
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("Sorry. No such buffer");
@@ -933,7 +1005,7 @@ public class WorkspaceCommands implements Logable {
         } else {
             result = _doLineEditor(br.getContent());
         }
-        if (result == null) {
+        if (result == null || result.isEmpty()) {
             return RC_NO_OP;
         }
         br.setContent(result);
@@ -955,44 +1027,32 @@ public class WorkspaceCommands implements Logable {
         }
         return content;
     }
+
     File tempDir = null;
-    protected File getTempDir(){
-        if(tempDir == null){
-            if(rootDir != null){
-               tempDir = new File(rootDir, "temp");
-               if(!tempDir.exists()){
-                   if(!tempDir.mkdir()){
-                               return null;
-                   }
-               }
+
+    protected File getTempDir() {
+        if (tempDir == null) {
+            if (rootDir != null) {
+                tempDir = new File(rootDir, "temp");
+                if (!tempDir.exists()) {
+                    if (!tempDir.mkdir()) {
+                        return null;
+                    }
+                }
             }
         }
         return tempDir;
     }
-    private List<String> _doExternalEdit(File tempFile)  {
 
-        QDLEditor qdlEditor = getQdlEditors().get(getExternalEditorName());
-        List<String> commands = new ArrayList<>();
-        commands.add(qdlEditor.exec);
-        commands.add(tempFile.getAbsolutePath());
-        for (QDLEditorArg arg : qdlEditor.args) {
-            String a = arg.flag;
-            a = a + (arg.hasConnector() ? arg.connector : "");
-            a = a + (arg.hasValue() ? " " + arg.value : "");
-            commands.add(a);
-        }
+    private List<String> _doExternalEdit(File tempFile) {
 
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(commands);
-        processBuilder.inheritIO();
-        int exitCode = 0;
-        List<String> content = null;
-        try {
-            Process process = processBuilder.start();
-            exitCode = process.waitFor();
-            if (0 == exitCode) {
+        EditorEntry qdlEditor = getQdlEditors().get(getExternalEditorName());
+        List<String> content = new ArrayList<>();
+
+        int exitCode = EditorUtils.editFile(qdlEditor, tempFile);
+        if (exitCode == EditorUtils.EDITOR_RC_OK) {
+            try {
                 BufferedReader br = new BufferedReader(new FileReader(tempFile));
-                content = new ArrayList<>();
                 String currentLine = br.readLine();
 
                 while (currentLine != null) {
@@ -1000,38 +1060,27 @@ public class WorkspaceCommands implements Logable {
                     currentLine = br.readLine();
                 }
                 br.close();
-            } else {
-            }
-        } catch (Throwable t) {
-            if (exitCode == 0) {
-                exitCode = -1; // trigger message below after any screen clear so the user sees it.
-            }
-            error("error with editor", t);
-            if (DebugUtil.isEnabled()) {
-                t.printStackTrace();
-            }
-        } finally {
-            if (qdlEditor.clearScreen) {
-                say("\u001b[2J"); // clear screen
-                say("\u001b[0;0H"); // cursor at top
-            }
-        }
-        if (exitCode != 0) {
-            say("There seems to have been a problem with the editor. Check the log: " + getLogger().getFileName());
-        }
 
+            } catch (Throwable e) {
+                if (DebugUtil.isEnabled()) {
+                    e.printStackTrace();
+                }
+                say("There was an error reading the file:" + e.getMessage());
+            }
+        }
         return content;
 
     }
+
     private List<String> _doExternalEdit(List<String> content) {
         File tempFile;
         File tempDir = getTempDir();
 
         try {
-            if(tempDir == null){
-                tempFile = File.createTempFile("edit", ".qdl" );
-            } else{
-                tempFile = File.createTempFile("edit", ".qdl", tempDir );
+            if (tempDir == null) {
+                tempFile = File.createTempFile("edit", ".qdl");
+            } else {
+                tempFile = File.createTempFile("edit", ".qdl", tempDir);
             }
             tempFile.deleteOnExit();
             FileWriter fw = new FileWriter(tempFile);
@@ -1741,7 +1790,7 @@ public class WorkspaceCommands implements Logable {
             return RC_NO_OP;
         }
         if (fr_withState.isExternalModule) {
-            say("cannot edir external function");
+            say("cannot edit external functions.");
             return RC_NO_OP;
         }
         String inputForm = InputFormUtil.inputForm(fName, argCount, getState());
@@ -1749,23 +1798,16 @@ public class WorkspaceCommands implements Logable {
             say("no such function");
             return RC_NO_OP;
         }
-        List<String> f = new ArrayList<>();
-
-        f.add(inputForm);
-        List<String> result;
+        List<String> f = StringUtils.stringToList(inputForm);
         if (useExternalEditor()) {
             f = _doExternalEdit(f);
         } else {
             f = _doLineEditor(f);
         }
-        StringBuffer sb = new StringBuffer();
-        for (String line : f) {
-            sb.append(line + "\n");
-        }
         try {
-            getInterpreter().execute(sb.toString());
+            getInterpreter().execute(f);
             fr_withState = getState().resolveFunction(fName, argCount); // get it again because it was overwritten
-            fr_withState.functionRecord.sourceCode = sb.toString(); // update source in the record.
+            fr_withState.functionRecord.sourceCode = f; // update source in the record.
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
@@ -1787,18 +1829,18 @@ public class WorkspaceCommands implements Logable {
         String fName = inputLine.getArg(FIRST_ARG_INDEX);
 
         int argCount = -1;
-        if(inputLine.getArgCount() == 3){
+        if (inputLine.getArgCount() == 3) {
             String rawCount = inputLine.getArg(FIRST_ARG_INDEX + 1);
-            try{
-               argCount = Integer.parseInt(rawCount);
-            }catch(Throwable t){
+            try {
+                argCount = Integer.parseInt(rawCount);
+            } catch (Throwable t) {
                 say("sorry, but \"" + rawCount + "\" is not a number. Aborting...");
                 return RC_NO_OP;
             }
         }
 
         getState().getFTStack().remove(fName, argCount);
-        if (getState().getFTStack().getSomeFunction(fName)==null) {
+        if (getState().getFTStack().getSomeFunction(fName) == null) {
             say(fName + " removed.");
         } else {
             say("Could not remove " + fName);
@@ -1999,7 +2041,7 @@ public class WorkspaceCommands implements Logable {
 
     private int _doVarEdit(InputLine inputLine) {
         String varName = inputLine.getLastArg();
-        String inputForm = InputFormUtil.inputFormVar(varName, getState());
+        String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
         List<String> content = new ArrayList<>();
         content.add(inputForm);
         if (useExternalEditor()) {
@@ -2316,7 +2358,7 @@ public class WorkspaceCommands implements Logable {
                 say(isUseExternalEditor() ? "on" : "off");
                 break;
             case ENABLE_LIBRARY_SUPPORT:
-                say(getState().isEnableLibrarySupport()?"on":"off");
+                say(getState().isEnableLibrarySupport() ? "on" : "off");
                 break;
             case LIB_PATH_TAG:
                 say("current " + LIB_PATH_TAG + "=" + getState().getLibPath());
@@ -2424,6 +2466,11 @@ public class WorkspaceCommands implements Logable {
             say("(truncation is possible and denoted with an ellipsis), restricting the total width to 80 characters");
             say("Note that if you just ask it to list the directory, every file will be read, so for a very large");
             say("this may take some time");
+            say("E.g.");
+            say(")lib " + REGEX_SWITCH + " .*\\.ws");
+            say("shows all files eding in .ws Since a period is special character in regexes, it must be escaped.");
+            say(".* means match any character, \\.ws means it must in in .ws.");
+
             return RC_CONTINUE;
         }
         String fileName = null;
@@ -2445,7 +2492,13 @@ public class WorkspaceCommands implements Logable {
 
         FilenameFilter regexff = null;
         if (inputLine.hasArg(REGEX_SWITCH)) {
-            pattern = Pattern.compile(inputLine.getNextArgFor(REGEX_SWITCH));
+            String rx = inputLine.getNextArgFor(REGEX_SWITCH);
+            try {
+                pattern = Pattern.compile(inputLine.getNextArgFor(rx));
+            } catch (PatternSyntaxException patternSyntaxException) {
+                say("sorry, there is a problem with your regex: \"" + rx + "\":" + patternSyntaxException.getMessage());
+                return RC_NO_OP;
+            }
 
             regexff = new FilenameFilter() {
                 @Override
@@ -2807,21 +2860,25 @@ public class WorkspaceCommands implements Logable {
                 break;
             case USE_EXTERNAL_EDITOR:
                 setUseExternalEditor(isOnOrTrue(value));
-                say("use external editor " + (isUseExternalEditor()?"on":"off"));
+                say("use external editor " + (isUseExternalEditor() ? "on" : "off"));
                 break;
             case EXTERNAL_EDITOR:
-                QDLEditor x = getQdlEditors().get(value);
-                if(x == null){
-                    say("Sorry, but there is no such editor \"" + value + "\" available. Make sure it is configured.");
-                    break;
+                if (!value.equals(LINE_EDITOR_NAME)) {
+                    EditorEntry x = getQdlEditors().get(value);
+                    if (x == null) {
+                        say("Sorry, but there is no such editor \"" + value + "\" available. Make sure it is configured.");
+                        listEditors();
+                        break;
+                    }
+
                 }
                 String oldName = getExternalEditorName();
                 setExternalEditorName(value);
-                say("external editor was " + (isTrivial(oldName)?"(null)":oldName) + " now is '" + getExternalEditorName() + "'");
+                say("external editor was " + (isTrivial(oldName) ? "(null)" : oldName) + " now is '" + getExternalEditorName() + "'");
                 break;
             case ENABLE_LIBRARY_SUPPORT:
                 getState().setEnableLibrarySupport(isOnOrTrue(value));
-                say( "library support is now " +(getState().isEnableLibrarySupport()?"on":"off"));
+                say("library support is now " + (getState().isEnableLibrarySupport() ? "on" : "off"));
                 break;
             case LIB_PATH_TAG:
                 getState().setLibPath(value);
@@ -2928,6 +2985,13 @@ public class WorkspaceCommands implements Logable {
 
     }
 
+    protected void listEditors() {
+        say("Available editors:");
+        say(LINE_EDITOR_NAME);
+        for (String name : getQdlEditors().listNames()) {
+            say(name + (name.equals(getExternalEditorName()) ? " (active)" : ""));
+        }
+    }
 
     protected String[] ALL_WS_VARS = new String[]{
             COMPRESS_XML,
@@ -3192,7 +3256,7 @@ public class WorkspaceCommands implements Logable {
         }
 
         for (String varName : state.listVariables(false)) {
-            String output = inputFormVar(varName, state);
+            String output = inputFormVar(varName, 2, state);
             fileWriter.write(varName + " := " + output + ";\n");
         }
         for (String fWithArg : state.listFunctions(false, null)) {
@@ -3654,11 +3718,11 @@ public class WorkspaceCommands implements Logable {
     boolean compressXML = true;
 
 
-    public QDLEditors getQdlEditors() {
+    public Editors getQdlEditors() {
         return qdlEditors;
     }
 
-    public void setQdlEditors(QDLEditors qdlEditors) {
+    public void setQdlEditors(Editors qdlEditors) {
         this.qdlEditors = qdlEditors;
     }
 
@@ -3916,7 +3980,7 @@ public class WorkspaceCommands implements Logable {
 
     boolean isRunScript = false;
     String runScriptPath = null;
-    QDLEditors qdlEditors;
+    Editors qdlEditors;
 
     protected void fromCommandLine(InputLine inputLine) throws Throwable {
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON);
@@ -4042,7 +4106,7 @@ public class WorkspaceCommands implements Logable {
         if (inputLine.hasArg(CLA_SCRIPT_PATH)) {
             getState().setScriptPaths(inputLine.getNextArgFor(CLA_SCRIPT_PATH));
         }
-        if(inputLine.hasArg(CLA_LIB_PATH)){
+        if (inputLine.hasArg(CLA_LIB_PATH)) {
             getState().setLibPath(inputLine.getNextArgFor(CLA_LIB_PATH));
 
         }

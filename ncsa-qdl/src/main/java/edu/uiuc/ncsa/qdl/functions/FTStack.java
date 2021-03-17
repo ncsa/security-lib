@@ -147,22 +147,23 @@ public class FTStack implements FunctionTable {
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
-                        case XMLConstants.FUNCTION_TABLE_STACK_TAG:
+            /*            case XMLConstants.FUNCTION_TABLE_STACK_TAG:
                             foundStack = true;
                             FunctionTableImpl functionTable = new FunctionTableImpl();
                             functionTable.fromXML(xer, qi);
                             if(!functionTable.isEmpty()) {
                                 this.push(functionTable);
                             }
-                            break;
+                            break;*/
                             // Legacy case -- just a single functions block, not a stack.
                         case XMLConstants.FUNCTIONS_TAG:
                             if(foundStack) break; // if a stack is being processed, skip this
-                            FunctionTableImpl functionTable1 = new FunctionTableImpl();
+                            //FunctionTableImpl functionTable1 = new FunctionTableImpl();
+                            FunctionTable functionTable1 = qi.getState().getFTStack().peek();
                             functionTable1.fromXML(xer, qi);
-                            if(!functionTable1.isEmpty()) {
+                          /*  if(!functionTable1.isEmpty()) {
                                 this.push(functionTable1);
-                            }
+                            }*/
                            break;
                     }
                     break;

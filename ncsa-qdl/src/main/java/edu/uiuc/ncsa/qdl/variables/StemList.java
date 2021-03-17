@@ -65,6 +65,10 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         add(newEntry);
     }
 
+    public String getInputForm(int indentFactor, String currentIndent) {
+        return null;
+    }
+
     public static class seGapException extends QDLException {
         // If there is a gap in the entries, fall back on stem notation.
         // All this exception needs is to exist.
@@ -140,6 +144,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     public String inputForm(int indent) {
        return inputForm(indent, "");
     }
+
     public String inputForm() {
         String output = "[";
         boolean isFirst = true;

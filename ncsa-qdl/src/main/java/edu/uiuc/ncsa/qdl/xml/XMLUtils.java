@@ -335,26 +335,10 @@ public class XMLUtils implements XMLConstants {
     }
 
     public static void deserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
-        XMLEvent xe = xer.nextEvent();
+        XMLEvent xe = xer.peek();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
-        while (xer.hasNext()) {
-            xe = xer.peek();
-            switch (xe.getEventType()) {
-                case XMLEvent.START_ELEMENT:
-                    if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TABLE_STACK_TAG)) {
-                        state.getFTStack().fromXML(xer, qi);
-                    }
+        state.getFTStack().fromXML(xer, qi);
 
-                    break;
-                case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTION_TABLE_STACK_TAG)) {
-                        return;
-                    }
-
-            }
-            xer.nextEvent();
-        }
-        throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 
 

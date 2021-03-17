@@ -1,4 +1,7 @@
-package edu.uiuc.ncsa.security.util.cli;
+package edu.uiuc.ncsa.security.util.cli.editing;
+
+import edu.uiuc.ncsa.security.util.cli.AbstractEditor;
+import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 
 import java.io.*;
 import java.util.LinkedList;

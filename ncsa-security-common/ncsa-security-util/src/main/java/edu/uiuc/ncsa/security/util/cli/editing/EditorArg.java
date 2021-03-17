@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.config;
+package edu.uiuc.ncsa.security.util.cli.editing;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -6,7 +6,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/21 at  8:12 AM
  */
-public class QDLEditorArg {
+public class EditorArg {
     public String flag;
     public String connector = null;
     public boolean hasConnector(){

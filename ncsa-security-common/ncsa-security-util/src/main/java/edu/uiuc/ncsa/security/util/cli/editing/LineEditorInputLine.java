@@ -1,4 +1,7 @@
-package edu.uiuc.ncsa.security.util.cli;
+package edu.uiuc.ncsa.security.util.cli.editing;
+
+import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
+import edu.uiuc.ncsa.security.util.cli.EditorInputLine;
 
 import java.util.StringTokenizer;
 import java.util.Vector;

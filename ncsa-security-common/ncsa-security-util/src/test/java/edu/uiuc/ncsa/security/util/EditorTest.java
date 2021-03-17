@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.security.util;
 
-import edu.uiuc.ncsa.security.util.cli.LineEditorInputLine;
+import edu.uiuc.ncsa.security.util.cli.editing.LineEditorInputLine;
 import org.junit.Test;
 
 /**

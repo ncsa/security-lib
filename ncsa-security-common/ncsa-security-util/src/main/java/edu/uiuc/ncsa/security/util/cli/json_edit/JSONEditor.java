@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An editor for JSON objects.
+ * An editor for JSON objects. Mostly an experiment to see if this is viable for large JSON objects.
  * <p>Created by Jeff Gaynor<br>
  * on 8/17/20 at  10:26 AM
  */

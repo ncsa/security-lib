@@ -2,7 +2,10 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
-import edu.uiuc.ncsa.qdl.expressions.*;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
@@ -28,6 +31,7 @@ import edu.uiuc.ncsa.qdl.workspace.QDLWorkspace;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import java.io.File;
@@ -191,7 +195,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             LOAD_COMMAND};
 
     public static String FQ_FUNC_NAMES[] = new String[]{
-            FQ_REDUCE,  FQ_EXPAND,
+            FQ_REDUCE, FQ_EXPAND,
             FQ_SCRIPT_PATH_COMMAND,
             FQ_SCRIPT_ARGS_COMMAND,
             FQ_SYS_INFO,
@@ -415,11 +419,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         return false;
     }
-             /*
-               times(x,y)->x*y
-  reduce(*times(), 1+n(5))
 
-              */
+    /*
+      times(x,y)->x*y
+reduce(*times(), 1+n(5))
+
+     */
     private void doReduceOrExpand(Polyad polyad, State state, boolean doReduce) {
         StatementWithResultInterface arg0 = polyad.getArguments().get(0);
         if (!(arg0 instanceof FunctionReferenceNode)) {
@@ -433,33 +438,33 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (!stemVariable.isList()) {
             throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a list");
         }
-        if(stemVariable.size() ==0){
+        if (stemVariable.size() == 0) {
             polyad.setEvaluated(true);
-          if(doReduce){
-              // result is a scalar
-              polyad.setResult(QDLNull.getInstance());
-              polyad.setResultType(Constant.NULL_TYPE);
-          }else{
-              polyad.setResult(new StemVariable());
-              polyad.setResultType(Constant.STEM_TYPE);
-          }
-          // result is an empty stem
+            if (doReduce) {
+                // result is a scalar
+                polyad.setResult(QDLNull.getInstance());
+                polyad.setResultType(Constant.NULL_TYPE);
+            } else {
+                polyad.setResult(new StemVariable());
+                polyad.setResultType(Constant.STEM_TYPE);
+            }
+            // result is an empty stem
             return;
         }
-        if(stemVariable.size() == 1){
-            StemEntry stemEntry =  stemVariable.getStemList().iterator().next();
+        if (stemVariable.size() == 1) {
+            StemEntry stemEntry = stemVariable.getStemList().iterator().next();
             polyad.setEvaluated(true);
 
-            if(doReduce){
+            if (doReduce) {
                 // return scalar of the value
                 polyad.setResult(stemEntry.entry);
                 polyad.setResultType(Constant.getType(stemEntry.entry));
 
-            }else{
-                   StemVariable output= new StemVariable();
-                   output.listAppend(stemEntry.entry);
-                   polyad.setResult(output);
-                   polyad.setResultType(Constant.STEM_TYPE);
+            } else {
+                StemVariable output = new StemVariable();
+                output.listAppend(stemEntry.entry);
+                polyad.setResult(output);
+                polyad.setResultType(Constant.STEM_TYPE);
             }
             return;
         }
@@ -473,35 +478,34 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         Iterator<StemEntry> iterator = stemVariable.getStemList().iterator();
         Object lastValue = iterator.next().entry;
 
-        if(!doReduce){
+        if (!doReduce) {
             output = new StemVariable();
             output.listAppend(lastValue);
         }
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             Object currentValue = iterator.next().entry;
             ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
             argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
             argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
             operator.setArguments(argList);
             operator.evaluate(state);
-            if(doReduce){
+            if (doReduce) {
                 reduceOuput = operator.getResult();
-            }else{
+            } else {
                 output.listAppend(operator.getResult());
             }
             lastValue = operator.getResult();
         }
-        if(doReduce){
-               polyad.setResult(reduceOuput);
-               polyad.setResultType(Constant.getType(reduceOuput));
-        }else{
-             polyad.setResult(output);
-             polyad.setResultType(Constant.STEM_TYPE);
+        if (doReduce) {
+            polyad.setResult(reduceOuput);
+            polyad.setResultType(Constant.getType(reduceOuput));
+        } else {
+            polyad.setResult(output);
+            polyad.setResultType(Constant.STEM_TYPE);
         }
         polyad.setEvaluated(true);
         return;
     }
-
 
 
     private void doInputForm(Polyad polyad, State state) {
@@ -530,21 +534,44 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
 
         if (polyad.getArgCount() == 1) {
-            // simple variable case
+            // simple variable case, no indent
             String output = InputFormUtil.inputFormVar(argName, state);
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
             polyad.setResult(output);
             return;
         }
+
         if (polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException(INPUT_FORM + " requires the argument count as the second parameter");
+            throw new IllegalArgumentException(INPUT_FORM + " requires the argument count or boolean as the second parameter");
         }
         Object arg2 = polyad.evalArg(1, state);
-        if (!(arg2 instanceof Long)) {
-            throw new IllegalArgumentException(INPUT_FORM + " requires argument count must be an integer");
+        boolean doIndent = false;
+        int argCount = -1;
+
+        switch (Constant.getType(arg2)) {
+            case Constant.LONG_TYPE:
+                argCount = ((Long) arg2).intValue();
+                break;
+            case Constant.BOOLEAN_TYPE:
+                doIndent = (Boolean) arg2;
+                break;
+            default:
+                throw new IllegalArgumentException(INPUT_FORM + " requires an argument count for functions of a boolean ");
         }
-        int argCount = ((Long) arg2).intValue();
+        if(polyad.getArgCount() == 2 && isBoolean(arg2)){
+          // process as variable with indent factor
+            String output = InputFormUtil.inputFormVar(argName,2, state);
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            polyad.setResult(output);
+            return;
+        }
+        // case here is that second arg is not a boolean (==> must be arg count) OR there is more than one arg.
+        if(!isLong(arg2)){
+            throw new IllegalArgumentException(INPUT_FORM + " second argument must be an integer");
+        }
+
         FR_WithState fr_withState = state.resolveFunction(argName, argCount);
         if (fr_withState == null) {
             // no such critter
@@ -562,7 +589,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     output = "java:" + qf.getClass().getCanonicalName();
                 }
             } else {
-                output = fr.sourceCode;
+                output = StringUtils.listToString(fr.sourceCode);
             }
         }
         polyad.setResult(output);

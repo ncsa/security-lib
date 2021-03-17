@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.config;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 
 import java.io.Serializable;
 import java.util.List;
@@ -46,7 +47,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean autosaveMessagesOn,
                           boolean useExternalEditor,
                           String externalEditorPath,
-                          QDLEditors qdlEditors,
+                          Editors qdlEditors,
                           boolean enableLibrarySupport) {
         super(myLogger);
         this.cfgFile = cfgFile;
@@ -77,15 +78,15 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.enableLibrarySupport = enableLibrarySupport;
     }
 
-    public QDLEditors getQdlEditors() {
+    public Editors getQdlEditors() {
         return qdlEditors;
     }
 
-    public void setQdlEditors(QDLEditors qdlEditors) {
+    public void setQdlEditors(Editors qdlEditors) {
         this.qdlEditors = qdlEditors;
     }
 
-    QDLEditors qdlEditors;
+    Editors qdlEditors;
     boolean useExternalEditor;
 
     public boolean isUseExternalEditor() {

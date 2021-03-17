@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+
 /**
  * Utility class for getting configurations and things in them. Generally every call is
  * done anew, so anything you want to keep you should store.
@@ -216,6 +218,20 @@ public class Configurations {
         return cn.getValue().toString();
 
     }
+
+    public static boolean getFirstBooleanValue(ConfigurationNode node, String attrib, boolean defaultValue) {
+         if (node == null) return defaultValue;
+         try {
+             String x = getFirstAttribute(node, attrib);
+             if (isTrivial(x)) {
+                 return defaultValue;
+             } //  Null argument returns false.
+             return Boolean.parseBoolean(x);
+         } catch (Throwable t) {
+
+         }
+         return defaultValue;
+     }
 
     /**
      * Return the default value if none is found.

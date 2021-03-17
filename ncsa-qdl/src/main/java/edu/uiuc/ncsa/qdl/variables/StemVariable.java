@@ -43,17 +43,17 @@ public class StemVariable extends HashMap<String, Object> {
         return (Long) get(key);
     }
 
-    public Long getLong(Long key){
+    public Long getLong(Long key) {
         return (Long) get(key);
     }
 
     @Override
     public Object get(Object key) {
-        if(key instanceof Long){
-            return get((Long)key);
+        if (key instanceof Long) {
+            return get((Long) key);
         }
-        if(key instanceof String){
-            return get((String)key);
+        if (key instanceof String) {
+            return get((String) key);
         }
         return super.get(key);
     }
@@ -779,6 +779,7 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * This will return a new stem consisting of this stem and the union of all
      * the stem arguments.
+     *
      * @param stemVariables
      * @return
      */
@@ -852,6 +853,7 @@ public class StemVariable extends HashMap<String, Object> {
         return output + "\n" + currentIndent + "}";
 
     }
+
 
     public static void main(String[] arg) {
         StemVariable s = new StemVariable();
@@ -984,12 +986,68 @@ public class StemVariable extends HashMap<String, Object> {
             } else {
                 output = output + ", ";
             }
-            output = output  + InputFormUtil.inputForm(key) +   STEM_ENTRY_CONNECTOR + InputFormUtil.inputForm(get(key));
+            output = output + InputFormUtil.inputForm(key) + STEM_ENTRY_CONNECTOR + InputFormUtil.inputForm(get(key));
         }
 
         return output + "}";
 
     }
+
+    public String inputForm(int indentFactor) {
+        return inputForm(indentFactor, "");
+    }
+
+    public String inputForm(int indentFactor, String currentIndent) {
+        String list = null;
+        try {
+            if (!getStemList().isEmpty()) {
+                list = getStemList().inputForm(indentFactor, currentIndent);
+                if (isList()) {
+                    if (getDefaultValue() != null) {
+                        list = "{*:" + InputFormUtil.inputForm(getDefaultValue()) + "}~" + list;
+                    }
+                    return list;
+                }
+            }
+        } catch (StemList.seGapException x) {
+            //rock on
+        }
+        //        String blanks = "                                                           ";
+        //      blanks = blanks + blanks + blanks + blanks; // lots of blanks
+        String output = currentIndent + "{\n";
+        boolean isFirst = true;
+        if (getDefaultValue() != null) {
+            isFirst = false;
+            output = output + "*:" + InputFormUtil.inputForm(getDefaultValue());
+        }
+        String newIndent = currentIndent + StringUtils.getBlanks(indentFactor);
+        for (String key : super.keySet()) {
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                output = output + ",\n";
+            }
+            Object o = get(key);
+            output = output + newIndent + InputFormUtil.inputForm(key) + STEM_ENTRY_CONNECTOR + InputFormUtil.inputForm(get(key));
+        }
+        if (list == null) {
+            // now for any list
+            for (StemEntry entry : getStemList()) {
+                if (isFirst) {
+                    isFirst = false;
+                } else {
+                    output = output + ",\n";
+                }
+                output = output + newIndent + InputFormUtil.inputForm(entry.index) + STEM_ENTRY_CONNECTOR + InputFormUtil.inputForm(entry.entry);
+            }
+        } else {
+            output = list + "~" + output;
+
+        }
+        return output + "\n" + currentIndent + "}";
+
+    }
+
 
     protected static class OrderedIndexEntry implements Comparable, Serializable {
         public OrderedIndexEntry(long index, boolean hasStem) {

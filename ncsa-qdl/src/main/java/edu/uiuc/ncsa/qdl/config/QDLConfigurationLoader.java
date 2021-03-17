@@ -4,7 +4,12 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
-import edu.uiuc.ncsa.security.core.util.*;
+import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
+import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
@@ -121,48 +126,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return x;
     }
 
-    /*  Example
-       <editors>
-            <editor name="nano"
-                    exec="/bin/nano"
-                    clear_screen="true>
-               <arg flag="--rcfile"
-                    connector="="
-                    value="/path/to/syntaxfile"/>
-               <!-- can have several args -->
-            </editor>
-       </editors>
 
-     */
-    protected QDLEditors getEditors() {
-        QDLEditors qdlEditors = new QDLEditors(); // never null
-        ConfigurationNode node = getFirstNode(cn, EDITORS_TAG);
-        if (node != null) {
-            // Loop through all the editor elements
-            for (ConfigurationNode kid : node.getChildren(EDITOR_TAG)) {
-                String name = getFirstAttribute(kid, EDITOR_NAME_ATTR);
-                if (StringUtils.isTrivial(name)) {
-                    continue; // not a valid node.
-                }
-                QDLEditor qdlEditor = new QDLEditor();
-                qdlEditor.name = name;
-                qdlEditor.exec = getFirstAttribute(kid, EDITOR_EXEC_ATTR);
-                qdlEditor.clearScreen = getFirstBooleanValue(kid, EDITOR_CLEAR_SCREEN_ATTR, false);
-                for (ConfigurationNode arg : kid.getChildren(EDITOR_ARG_TAG)) {
-                    QDLEditorArg qdlEditorArg = new QDLEditorArg();
-                    String flag = getFirstAttribute(arg, EDITOR_ARG_FLAG_ATTR);
-                    if (isTrivial(flag)) {
-                        continue;
-                    }
-                    qdlEditorArg.flag = flag;
-                    qdlEditorArg.connector = getFirstAttribute(arg, EDITOR_ARG_CONNECTOR_ATTR);
-                    qdlEditorArg.value = getFirstAttribute(arg, EDITOR_ARG_VALUE_ATTR);
-                    qdlEditor.args.add(qdlEditorArg);
-                }
-                qdlEditors.put(qdlEditor);
-            }
-        }
-        return qdlEditors;
+    protected Editors getEditors() {
+        return EditorUtils.getEditors(cn); // never null
     }
 
 

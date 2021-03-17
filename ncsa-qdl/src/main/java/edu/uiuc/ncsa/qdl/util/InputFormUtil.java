@@ -3,12 +3,12 @@ package edu.uiuc.ncsa.qdl.util;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FR_WithState;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -75,7 +75,7 @@ public class InputFormUtil {
                     output = JAVA_CLASS_MARKER + qf.getClass().getCanonicalName();
                 }
             } else {
-                output = fr.sourceCode;
+                output = StringUtils.listToString(fr.sourceCode);
             }
         }
         return output;
@@ -89,10 +89,15 @@ public class InputFormUtil {
         return stemVariable.inputForm();
     }
 
+    public static String inputForm(StemVariable stemVariable, int indentFactor) {
+        return stemVariable.inputForm(indentFactor);
+    }
+
     /**
      * Finds teh input form for a module. Note that the name is either
      * an alias, like acl or acl# (trailing # is optional) or the namespace
      * (like oa4mp:/util/acl)
+     *
      * @param moduleNS
      * @param state
      * @return
@@ -128,20 +133,29 @@ public class InputFormUtil {
                 return null;
             }
         }
-       return inputFormModule(moduleNS, state);
+        return inputFormModule(moduleNS, state);
     }
 
     /**
      * Finds the input form for a variable from the state.
+     *
      * @param varName
      * @param state
      * @return
      */
-    public static String inputFormVar(String varName, State state){
-          Object object = state.getValue(varName);
-          if(object == null) return null;
-          return inputForm(object);
+    public static String inputFormVar(String varName, int indentFactor, State state) {
+        Object object = state.getValue(varName);
+        if (object == null) return null;
+        if (object instanceof StemVariable && 0 <= indentFactor) {
+            return inputForm((StemVariable) object, indentFactor);
+        }
+        return inputForm(object);
     }
+
+    public static String inputFormVar(String varName, State state) {
+        return inputFormVar(varName, -1, state);
+    }
+
     public static void main(String[] args) {
         StemVariable stemVariable = new StemVariable();
         stemVariable.put(0L, "foo0");

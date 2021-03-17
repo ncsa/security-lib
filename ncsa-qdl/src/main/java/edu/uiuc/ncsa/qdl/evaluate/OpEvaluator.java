@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.TreeSet;
 
@@ -67,28 +68,28 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
-        POWER,
-        TILDE,
-        TIMES,
-        DIVIDE,
-        INTEGER_DIVIDE,
-        PLUS,
-        MINUS,
-        AND,
-        OR,
-        EQUALS,
-        NOT_EQUAL,
-        LESS_THAN,
-        LESS_THAN_EQUAL,
-        LESS_THAN_EQUAL2,
-        MORE_THAN,
-        MORE_THAN_EQUAL,
-        MORE_THAN_EQUAL2,
-        NOT};
+            POWER,
+            TILDE,
+            TIMES,
+            DIVIDE,
+            INTEGER_DIVIDE,
+            PLUS,
+            MINUS,
+            AND,
+            OR,
+            EQUALS,
+            NOT_EQUAL,
+            LESS_THAN,
+            LESS_THAN_EQUAL,
+            LESS_THAN_EQUAL2,
+            MORE_THAN,
+            MORE_THAN_EQUAL,
+            MORE_THAN_EQUAL2,
+            NOT};
 
-    public boolean isMathOperator(String x){
-        for(String op: ALL_MATH_OPS){
-            if(op.equals(x)){
+    public boolean isMathOperator(String x) {
+        for (String op : ALL_MATH_OPS) {
+            if (op.equals(x)) {
                 return true;
             }
         }
@@ -100,12 +101,22 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         return new String[0];
     }
 
+    MathContext mathContext;
+
+    public MathContext getMathContext() {
+        if (mathContext == null) {
+            mathContext = new MathContext(getNumericDigits());
+        }
+        return mathContext;
+    }
+
     public int getNumericDigits() {
         return numericDigits;
     }
 
     public void setNumericDigits(int numericDigits) {
         this.numericDigits = numericDigits;
+        mathContext = new MathContext(numericDigits);
     }
 
     public static int numericDigits = 50; // default precision for decimals.
@@ -220,31 +231,31 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     protected void doTilde(Dyad dyad, State state) {
         Object obj0 = dyad.evalArg(0, state);
         Object obj1 = dyad.evalArg(1, state);
-        if((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)){
+        if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
             throw new IllegalArgumentException("Error: cannot do a union a null");
         }
         StemVariable stem0 = null;
         StemVariable stem1 = null;
 
-        if(obj0 instanceof StemVariable){
-            stem0 =  (StemVariable)obj0;
-        }else{
+        if (obj0 instanceof StemVariable) {
+            stem0 = (StemVariable) obj0;
+        } else {
             stem0 = new StemVariable();
             stem0.put(0L, obj0);
         }
 
-        if(obj1 instanceof StemVariable){
-            stem1 =  (StemVariable)obj1;
-        }else{
+        if (obj1 instanceof StemVariable) {
+            stem1 = (StemVariable) obj1;
+        } else {
             stem1 = new StemVariable();
             stem1.put(0L, obj1);
         }
 
         // NOTE this is done so we don't end up shlepping around references to things and modifying them
         // wihout warning.
-  //       stem0 = (StemVariable) stem0.clone();
-  //       stem1 = (StemVariable)stem1.clone();
-        StemVariable newStem =  stem0.union(stem1);
+        //       stem0 = (StemVariable) stem0.clone();
+        //       stem1 = (StemVariable)stem1.clone();
+        StemVariable newStem = stem0.union(stem1);
         dyad.setResult(newStem);
         dyad.setResultType(Constant.STEM_TYPE);
         dyad.setEvaluated(true);
@@ -280,9 +291,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-                if (!isLong(objects[1])) {
+        /*        if (!isLong(objects[1])) {
                     throw new IllegalArgumentException("Exponentiation requires the second argument be an integer");
-                }
+                }*/
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
                         Double dd = Math.pow((Long) objects[0], (Long) objects[1]);
@@ -291,8 +302,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.resultType = Constant.LONG_TYPE;
                     } else {
                         BigDecimal left = toBD(objects[0]);
-                        int n = ((Long) objects[1]).intValue();
-                        r.result = left.pow(n);
+                        BigDecimal result;
+                        if (isLong(objects[1])) {
+                            result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (Long) objects[1], getMathContext());
+                        } else {
+                            result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (BigDecimal) objects[1], getMathContext());
+                        }
+                        r.result = result;
                         r.resultType = Constant.DECIMAL_TYPE;
                     }
                 } else {

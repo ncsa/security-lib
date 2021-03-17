@@ -102,16 +102,7 @@ public class QDLWorkspace {
             } else {
                 lastCommand = input;
             }
-            if (input.startsWith("]]")) {
-                ProcessBuilder processBuilder = new ProcessBuilder();
-                processBuilder.command("/bin/nano", "/tmp/x.qdl");
-                processBuilder.inheritIO();
-                Process process = processBuilder.start();
-                int exitCode = process.waitFor();
-                System.out.println("exit code = " + exitCode);
-                workspaceCommands.say("done!");
-                continue;
-            }
+
             if (input.startsWith(")")) {
                 switch (workspaceCommands.execute(input)) {
                     case RC_EXIT_NOW:

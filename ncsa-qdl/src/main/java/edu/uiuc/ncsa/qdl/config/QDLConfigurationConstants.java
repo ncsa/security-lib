@@ -56,15 +56,6 @@ public interface QDLConfigurationConstants {
     String LIB_PATH_TAG = "lib_path";
     String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
 
-    // for the editor configuration
-    String EDITORS_TAG = "editors";
-    String EDITOR_TAG = "editor";
-    String EDITOR_ARG_TAG = "arg";
-    String EDITOR_NAME_ATTR = "name";
-    String EDITOR_EXEC_ATTR = "exec";
-    String EDITOR_CLEAR_SCREEN_ATTR = "clear_screen";
-    String EDITOR_ARG_FLAG_ATTR = "flag";
-    String EDITOR_ARG_CONNECTOR_ATTR = "connector";
-    String EDITOR_ARG_VALUE_ATTR = "value";
+
 
 }

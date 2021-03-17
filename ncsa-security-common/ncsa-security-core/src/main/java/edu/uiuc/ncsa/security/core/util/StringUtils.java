@@ -569,7 +569,7 @@ public class StringUtils {
      * @return
      */
  public static List<String> stringToList(String s){
-       StringTokenizer stringTokenizer = new StringTokenizer("\n");
+       StringTokenizer stringTokenizer = new StringTokenizer(s, "\n");
        List<String> output = new ArrayList<>();
        while(stringTokenizer.hasMoreTokens()){
            output.add(stringTokenizer.nextToken());

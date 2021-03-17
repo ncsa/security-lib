@@ -13,7 +13,7 @@ import java.util.List;
 public class FunctionRecord implements Serializable, Cloneable {
     public static int FREF_ARG_COUNT = -10;
     public String name;
-    public String sourceCode;
+    public List<String> sourceCode = new ArrayList<>();
     public List<String> documentation = new ArrayList<>();
     public List<Statement> statements = new ArrayList<>();
     public List<String> argNames = new ArrayList<>();
