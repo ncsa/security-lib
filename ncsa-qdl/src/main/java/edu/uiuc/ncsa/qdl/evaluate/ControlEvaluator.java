@@ -134,7 +134,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     public static final int OS_ENV_TYPE = 208 + CONTROL_BASE_VALUE;
 
     // logging
-    public static final String SYSTEM_LOG = "log";
+    public static final String SYSTEM_LOG = "log_entry";
     public static final String FQ_SYSTEM_LOG = SYS_FQ + SYSTEM_LOG;
     public static final int SYSTEM_LOG_TYPE = 209 + CONTROL_BASE_VALUE;
 
@@ -1403,18 +1403,7 @@ reduce(*times(), 1+n(5))
         if (script == null) {
             throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?");
         }
-/*
-        if (state.hasVFSProviders() && resourceName.contains(ImportManager.NS_DELIMITER)) {
-            try {
-                script = state.getScriptFromVFS(resourceName);
-            } catch (Throwable t) {
-                if (t instanceof RuntimeException) {
-                    throw (RuntimeException) t;
-                }
-                throw new QDLException("error reading script from VFS:" + t.getMessage(), t);
-            }
-        }
-        */
+
         File file = null;
 
         if (script == null) {

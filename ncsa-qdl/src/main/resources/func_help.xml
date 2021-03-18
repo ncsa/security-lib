@@ -1330,7 +1330,189 @@ See also: reduce()
                 ]]>
             </body>
         </entry>
+    <entry id="sin">
+             <body>
+                 <![CDATA[
+sin(x) - the sine of x
+x can be any number.
+See also: asin()
+]]>
+             </body>
+         </entry>
+    <entry id="asin">
+             <body>
+                 <![CDATA[
+asin(x) - the arc sine of x. The result in in radians.
+-1 <= x <= 1.
+See also: sin()
+]]>
+             </body>
+         </entry>
+    <entry id="sinh">
+             <body>
+                 <![CDATA[
+sinh(x) - the hyperbolic sine of x
+x can be any number.
+See also: asinh()
+]]>
+             </body>
+         </entry>
+    <entry id="asinh">
+             <body>
+                 <![CDATA[
+asin(x) - the inverse of sinh of x.
+x can be any number
+See also: sinh()
+]]>
+             </body>
+         </entry>
 
+    <entry id="cos">
+             <body>
+                 <![CDATA[
+cos(x) - the cosine of x
+x can be any number.
+See also: acos()
+]]>
+             </body>
+         </entry>
+    <entry id="acos">
+             <body>
+                 <![CDATA[
+acos(x) - the arc cosine of x. The result in in radians.
+-1 <= x <= 1.
+See also: cos()
+]]>
+             </body>
+         </entry>
+    <entry id="cosh">
+             <body>
+                 <![CDATA[
+cosh(x) - the hyperbolic cosine of x
+x can be any number.
+See also: acosh()
+]]>
+             </body>
+         </entry>
+    <entry id="acosh">
+             <body>
+                 <![CDATA[
+acosh(x) - the inverse of cosh of x.
+1 <= x
+See also: cosh()
+]]>
+             </body>
+         </entry>
+
+    <entry id="tan">
+             <body>
+                 <![CDATA[
+tan(x) - the tangent of x
+x can be any number.
+See also: atan()
+]]>
+             </body>
+         </entry>
+    <entry id="atan">
+             <body>
+                 <![CDATA[
+atan(x) - the arc tangent of x. The result in in radians.
+x can be any number.
+See also: tan()
+]]>
+             </body>
+         </entry>
+    <entry id="tanh">
+             <body>
+                 <![CDATA[
+tanh(x) - the hyperbolic tangent of x
+x can be any number
+See also: atanh()
+]]>
+             </body>
+         </entry>
+    <entry id="atanh">
+             <body>
+                 <![CDATA[
+atanh(x) - the inverse of tanh of x.
+-1 < x < 1
+See also: tanh()
+]]>
+             </body>
+         </entry>
+
+    <entry id="pi">
+            <body>
+                <![CDATA[
+The value of the constant pi in the current precision.
+]]>
+            </body>
+        </entry>
+    <entry id="exp">
+            <body>
+                <![CDATA[
+exp(x) - the value of e^x, e is the base of the natural logarithm.
+x can be any number.
+See also: ln(), log()
+]]>
+            </body>
+        </entry>
+    <entry id="ln">
+            <body>
+                <![CDATA[
+ln(x) - the natural logarithm of x
+0 < x
+See also: exp(), log()
+]]>
+            </body>
+        </entry>
+
+    <entry id="log">
+            <body>
+                <![CDATA[
+log(x) - the base 10 logarithm of x
+0 < x
+Note that QDL support arbitrary exponentiation, so unlike ln(x), there is no
+explicit inverse. The inverse is 10^x.
+If you need a different base, divide by the log of the base,
+E.g.
+  To get log base 2 of 8:
+  log(8)/log(2)
+3.00000000001
+See also: ln(), exp()
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="log_entry">
+            <body>
+                <![CDATA[
+log_entry(message) - put a message in the current log. 
+]]>
+            </body>
+        </entry>
+
+    <entry id="nroot">
+            <body>
+                <![CDATA[
+nroot(x,n) - compute the n-th root of x.
+             n is an integer.
+             If n is odd, x may be any number,
+             If n is even, 0 <= 0
+The general case of exponentiation x^y will fail for fractional roots and
+negative numbers. This is because there is no way to check if an exponent
+is an n-th root, due to internal computer representation not being exact,
+so
+    (-5)^(1/3)
+will fail (because 1/3 cannot be represented fully in the computer).
+nroot(x,n) explicitly checks, so
+   nroot(-5,3)
+-1.70997594667670
+works.
+See also: Reference manual on ^
+]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->
@@ -1344,3 +1526,4 @@ See also: reduce()
         </entry>
           -->
 </help>
+

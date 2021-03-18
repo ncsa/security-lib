@@ -30,13 +30,15 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
      */
     public static MetaEvaluator getInstance() {
         if (metaEvaluator == null) {
-            metaEvaluator = new MetaEvaluator();
-            metaEvaluator.addEvaluator(new StringEvaluator());
-            metaEvaluator.addEvaluator(new StemEvaluator());
-            metaEvaluator.addEvaluator(new IOEvaluator());
-            metaEvaluator.addEvaluator(new MathEvaluator());
-            metaEvaluator.addEvaluator(new ControlEvaluator());
-            metaEvaluator.addEvaluator(new FunctionEvaluator());
+            metaEvaluator = new MetaEvaluator();                // NS base value. Must be distinct for new evaluators
+            metaEvaluator.addEvaluator(new StringEvaluator());  // 3000
+            metaEvaluator.addEvaluator(new StemEvaluator());    // 2000
+            metaEvaluator.addEvaluator(new IOEvaluator());      // 4000
+            metaEvaluator.addEvaluator(new ControlEvaluator()); // 5000
+            metaEvaluator.addEvaluator(new MathEvaluator());    // 1000
+            metaEvaluator.addEvaluator(new TMathEvaluator());   // 7000
+            // must be last always to resolve user defined functions.
+            metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000
         }
         return metaEvaluator;
     }
