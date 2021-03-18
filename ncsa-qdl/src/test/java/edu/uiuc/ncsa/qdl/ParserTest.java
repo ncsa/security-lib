@@ -1703,7 +1703,7 @@ public class ParserTest extends AbstractQDLTester {
 
 
     @Test
-        public void testReduceWithOperator() throws Throwable {
+    public void testReduceWithOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "x := reduce(**, 1+n(5));");
@@ -1711,8 +1711,9 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 120L;
     }
+
     @Test
-        public void testReduceWithUserFunction() throws Throwable {
+    public void testReduceWithUserFunction() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "times(x,y)->x*y;");
@@ -1723,7 +1724,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
-        public void testExpandWithOperator() throws Throwable {
+    public void testExpandWithOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
@@ -1739,7 +1740,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
-        public void testReduceWithLogicalOperator() throws Throwable {
+    public void testReduceWithLogicalOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
@@ -1749,5 +1750,28 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         // returns true if any elements are true
         assert getBooleanValue("x", state);
+    }
+
+    /**
+     * In this test, a function named h is defined and *h() is used as a reference in another
+     * function. What <i>should</i> happen is that inside the function, *h resolves to what
+     * was passed in, not the global defintion. If this test breaks, it is a critical bit
+     * of regression.
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionReferenceVisibility() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "h(x)->-x;");
+        addLine(script, "s(x)->x^2;");
+        addLine(script, "f(*h(),x)->ln(h(x));");
+        addLine(script, "y := f(*s(),2);");
+        addLine(script, "z := ln(4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        assert areEqual(getBDValue("y", state), getBDValue("z", state)) : "function reference visibility has changed.";
     }
 }

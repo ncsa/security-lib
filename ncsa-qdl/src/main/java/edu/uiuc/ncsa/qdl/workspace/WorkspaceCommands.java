@@ -3582,6 +3582,7 @@ public class WorkspaceCommands implements Logable {
     @Override
     public void setDebugOn(boolean debugOn) {
         this.debugOn = debugOn;
+        DebugUtil.setIsEnabled(debugOn);
     }
 
     @Override
