@@ -89,6 +89,7 @@ public class WorkspaceCommands implements Logable {
     public static final String COMPACT_ALIAS_SWITCH = SWITCH + "compact";
     public static final String COLUMNS_VIEW_SWITCH = SWITCH + "cols"; // force single column view
     public static final String SHOW_FAILURES = SWITCH + "show_failures"; // for displaying workspaces that don't load
+    public static final String SHOW_ONLY_FAILURES = SWITCH + "only_failures"; // for displaying only workspaces that don't load
     public static final String SAVE_AS_JAVA_FLAG = SWITCH + "java";
     public static final String KEEP_WSF = SWITCH + "keep_wsf";
     public static final String LINE_EDITOR_NAME = "line";
@@ -273,7 +274,8 @@ public class WorkspaceCommands implements Logable {
             case LIB_COMMAND:
                 inline = inline.replace(LIB_COMMAND, WS_COMMAND + " lib ");
                 inputLine = new InputLine(CLT.tokenize(inline));
-                return _wsLibList(inputLine);
+                return doWS(inputLine);
+            //return _wsLibList(inputLine);
             case SAVE_COMMAND:
                 inline = inline.replace(SAVE_COMMAND, WS_COMMAND + " save ");
                 inputLine = new InputLine(CLT.tokenize(inline));
@@ -927,7 +929,7 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
             }
             String name = inputLine.getNextArgFor("-use");
-            if(isTrivial(name)){
+            if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
             }
@@ -946,10 +948,10 @@ public class WorkspaceCommands implements Logable {
             getQdlEditors().put(ee);
             return RC_CONTINUE;
         }
-        
-        if(inputLine.hasArg("-use")){
+
+        if (inputLine.hasArg("-use")) {
             String name = inputLine.getNextArgFor("-use");
-            if(isTrivial(name)){
+            if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
             }
@@ -957,24 +959,24 @@ public class WorkspaceCommands implements Logable {
             setUseExternalEditor(!name.equals(LINE_EDITOR_NAME));
             return RC_CONTINUE;
         }
-        if(inputLine.hasArg("-rm")){
+        if (inputLine.hasArg("-rm")) {
             String name = inputLine.getNextArgFor("-use");
-            if(isTrivial(name)){
+            if (isTrivial(name)) {
                 say("no name specified.");
                 return RC_NO_OP;
             }
-            if(getQdlEditors().hasEntry(name)){
-                if(getExternalEditorName().equals(name)){
+            if (getQdlEditors().hasEntry(name)) {
+                if (getExternalEditorName().equals(name)) {
                     say("removing default editor, reverting to line editor");
                     setExternalEditorName(LINE_EDITOR_NAME);
                 }
 
                 getQdlEditors().remove(name);
                 say(name + " removed.");
-            }else{
+            } else {
                 say(name + " not found.");
             }
-             return RC_CONTINUE;
+            return RC_CONTINUE;
         }
         if (inputLine.hasArg("-list")) {
             listEditors();
@@ -2231,8 +2233,10 @@ public class WorkspaceCommands implements Logable {
                 return _wsGet(inputLine);
             case "set":
                 return _wsSet(inputLine);
-
             case "lib":
+                if (2 < inputLine.getArgCount() && inputLine.getArg(FIRST_ARG_INDEX).equals("drop")) {
+                    return _wsListDrop(inputLine);
+                }
                 return _wsLibList(inputLine);
             case "name":
                 if (currentWorkspace == null) {
@@ -2254,6 +2258,98 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
         }
 
+    }
+
+    private int _wsListDrop(InputLine inputLine) {
+        // Drop a workspace or collection of them
+        if (inputLine.hasArg("--help")) {
+            say(")lib drop file | " + REGEX_SWITCH + " regex [-f]");
+            sayi("Drop, i.e. delete, either a single file or collection of them");
+            sayi("-r means to use the regex to determine the file list for deletion");
+            sayi("-f = force deletion flag. If this is not present, each file will get prompted");
+            sayi("     If present, all files will be deleted.");
+            return RC_CONTINUE;
+        }
+        String regex = null;
+        inputLine.removeSwitch("drop"); // so it is not interpreted as a file name.
+        if (inputLine.hasArg(REGEX_SWITCH)) {
+            regex = inputLine.getNextArgFor(REGEX_SWITCH);
+            inputLine.removeSwitchAndValue(REGEX_SWITCH);
+        }
+        boolean forceDeletes = inputLine.hasArg("-f");
+        inputLine.removeSwitch("-f");
+        File currentFile = _resolveLibFile(inputLine);
+        if (currentFile == null) {
+            say("Sorry, no file specified and no default file.");
+            return RC_NO_OP;
+        }
+        if (currentFile.isFile()) {
+            if (!forceDeletes) {
+                forceDeletes = readline("Are you sure you want to delete the workspace \"" + currentFile.getAbsolutePath() + "\" (y/n)?").equals("y");
+            }
+            if (forceDeletes) {
+                boolean rc = currentFile.delete();
+                if (rc) {
+                    say("deleted: " + currentFile.getAbsolutePath() );
+                } else {
+                    say(currentFile.getAbsolutePath() + " could not be deleted");
+                }
+                return RC_CONTINUE;
+            } else {
+                return RC_NO_OP;
+            }
+        }
+        // it's a directory. Apply any regex.
+        Pattern pattern = null;
+
+        FilenameFilter regexff = null;
+        if (regex != null) {
+            try {
+                pattern = Pattern.compile(regex);
+            } catch (PatternSyntaxException patternSyntaxException) {
+                say("sorry, there is a problem with your regex: \"" + regex + "\":" + patternSyntaxException.getMessage());
+                return RC_NO_OP;
+            }
+            regexff = new RegexFileFilter(pattern);
+        }
+        File[] files;
+        if (regexff == null) {
+            files = currentFile.listFiles();
+        } else {
+            files = currentFile.listFiles(regexff);
+        }
+        TreeSet<String> deletedFiles = new TreeSet<>();
+        if (forceDeletes) {
+            for (File file : files) {
+                if (file.isFile()) { // don't delete directories!
+                    if (file.delete()) {
+                        deletedFiles.add(file.getAbsolutePath());
+                    }
+                }
+            }
+            for (String x : deletedFiles) {
+                say("deleted " + x);
+            }
+            return RC_CONTINUE;
+        }
+        for (File f : files) {
+            if (f.isFile()) {
+                boolean doDelete = readline("Are you sure you want to delete the workspace \"" + f.getAbsolutePath() + "\" (y/n)?").equals("y");
+                if (doDelete) {
+                    if (f.delete()) {
+                        deletedFiles.add(f.getAbsolutePath());
+                    }
+                }
+            }
+        }
+        if (!deletedFiles.isEmpty()) {
+            for (String x : deletedFiles) {
+                say("deleted: " + x);
+            }
+
+        }
+        //currentFile.l
+        return RC_CONTINUE;
     }
 
 
@@ -2458,6 +2554,7 @@ public class WorkspaceCommands implements Logable {
             say(CLA_VERBOSE_ON + " = print out a very long listing");
             say(CLA_LONG_FORMAT_ON + " - print out a listing restricting everything property to a single line");
             say(SHOW_FAILURES + " = show output for files that cannot be deserialized and why.");
+            say(SHOW_ONLY_FAILURES + " = show only output for files that cannot be deserialized and why.");
             say(DISPLAY_WIDTH_SWITCH + " cols = set the printed output to the given number of columns. Default is " + displayWidth);
             say(REGEX_SWITCH + " regex = filter output using the regex.");
             say("E.g.");
@@ -2468,17 +2565,21 @@ public class WorkspaceCommands implements Logable {
             say("this may take some time");
             say("E.g.");
             say(")lib " + REGEX_SWITCH + " .*\\.ws");
-            say("shows all files eding in .ws Since a period is special character in regexes, it must be escaped.");
+            say("shows all files ending in .ws Since a period is special character in regexes, it must be escaped.");
             say(".* means match any character, \\.ws means it must in in .ws.");
 
             return RC_CONTINUE;
         }
         String fileName = null;
         File currentFile = null;
+        boolean showOnlyFailures = inputLine.hasArg(SHOW_ONLY_FAILURES);
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON); // print everything
         boolean isLongFormat = inputLine.hasArg(CLA_LONG_FORMAT_ON); // print long format
         boolean isShortFormat = !(isVerbose || isLongFormat);
         boolean showFailures = inputLine.hasArg(SHOW_FAILURES);
+        if (showOnlyFailures) {
+            showFailures = true;// so it gets ignored later
+        }
         if (inputLine.hasArg(DISPLAY_WIDTH_SWITCH)) {
             displayWidth = inputLine.getNextIntArg(DISPLAY_WIDTH_SWITCH);
         }
@@ -2486,6 +2587,7 @@ public class WorkspaceCommands implements Logable {
         inputLine.removeSwitch(CLA_VERBOSE_ON);
         inputLine.removeSwitch(CLA_LONG_FORMAT_ON);
         inputLine.removeSwitch(SHOW_FAILURES);
+        inputLine.removeSwitch(SHOW_ONLY_FAILURES);
         inputLine.removeSwitchAndValue(DISPLAY_WIDTH_SWITCH);
         Pattern pattern = null;
         String regex = null;
@@ -2494,66 +2596,49 @@ public class WorkspaceCommands implements Logable {
         if (inputLine.hasArg(REGEX_SWITCH)) {
             String rx = inputLine.getNextArgFor(REGEX_SWITCH);
             try {
-                pattern = Pattern.compile(inputLine.getNextArgFor(rx));
+                pattern = Pattern.compile(rx);
             } catch (PatternSyntaxException patternSyntaxException) {
                 say("sorry, there is a problem with your regex: \"" + rx + "\":" + patternSyntaxException.getMessage());
                 return RC_NO_OP;
             }
-
-            regexff = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    System.out.println("Foof");
-                    return true;
-                }
-            };
             regexff = new RegexFileFilter(pattern);
             inputLine.removeSwitchAndValue(REGEX_SWITCH);
         }
-        if (1 < inputLine.getArgCount()) {
-            fileName = inputLine.getArg(2);
-            currentFile = new File(fileName);
-        } else {
-            if (saveDir != null) {
-                currentFile = saveDir;
-
-            } else {
-                currentFile = rootDir;
-            }
-            if (currentFile == null) {
-                say("Sorry no root or save dir specified and no argument. Nothing to show.");
-                return RC_NO_OP;
-            }
-        }
-
-        if (!currentFile.isAbsolute()) {
-            if (saveDir == null) {
-                currentFile = new File(rootDir, fileName);
-            } else {
-                currentFile = new File(saveDir, fileName);
-            }
+        currentFile = _resolveLibFile(inputLine);
+        if (currentFile == null) {
+            say("Sorry no root or save dir specified and no argument. Nothing to show.");
+            return RC_NO_OP;
         }
         // That's been resolved.
         // currentFile is either a single file or a directory.
-
-
+        int failureCount = 0;
+        int successCount = 0;
         if (currentFile.isFile()) {
             say("processing file " + currentFile.getAbsolutePath());
             WSLibEntry w = _getWSLibEntry(currentFile);
             if (w != null) {
+                if(!showOnlyFailures && !w.failed){
+                    return RC_CONTINUE;
+                }
+
                 if (!showFailures && w.failed) {
                     return RC_CONTINUE;
                 }
                 if (isShortFormat) {
                     say(w.shortFormat(displayWidth));
+                    successCount++;
                 } else {
                     List<String> out = formatMap(w.toMap(),
                             null,
                             true, isVerbose, 1, displayWidth);
                     for (String x : out) {
                         say(x);
+                        successCount++;
                     }
                 }
+            }
+            if (successCount == 0 && 0 < failureCount) {
+                say("(there were " + failureCount + " failures. Rerun with " + SHOW_FAILURES + " switch to see them.");
             }
             return RC_CONTINUE;
         }
@@ -2574,10 +2659,17 @@ public class WorkspaceCommands implements Logable {
             File fff = sortedFiles.get(absPath);
             WSLibEntry w = _getWSLibEntry(fff);
             if (w == null) continue;
+            if(showOnlyFailures && !w.failed){
+                failureCount++;
+                continue;
+            }
+
             if (!showFailures && w.failed) {
+                failureCount++;
                 continue;
             }
             if (isShortFormat) {
+                successCount++;
                 say(w.shortFormat(displayWidth));
             } else {
                 if (firstPass) {
@@ -2589,14 +2681,47 @@ public class WorkspaceCommands implements Logable {
                         null,
                         true, isVerbose, 1, displayWidth);
                 for (String x : out) {
+                    successCount++;
                     say(x);
                 }
 
             }
 
         }
+        if(showOnlyFailures){
+            say("found " + successCount + " workspaces" );
 
+        } else {
+            say("found " + successCount + " workspaces" + (0 < failureCount ? (", " + failureCount + " failures") : ""));
+        }
         return RC_CONTINUE;
+    }
+
+    protected File _resolveLibFile(InputLine inputLine) {
+        String fileName = null;
+        File currentFile;
+        if (1 < inputLine.getArgCount()) {
+            fileName = inputLine.getArg(FIRST_ARG_INDEX);
+            currentFile = new File(fileName);
+        } else {
+            if (saveDir != null) {
+                currentFile = saveDir;
+            } else {
+                currentFile = rootDir;
+            }
+            if (currentFile == null) {
+                return null;
+            }
+        }
+        // current file absolute means its been resolved.
+        if (!currentFile.isAbsolute()) {
+            if (saveDir == null) {
+                currentFile = new File(rootDir, fileName);
+            } else {
+                currentFile = new File(saveDir, fileName);
+            }
+        }
+        return currentFile;
     }
 
     public static class RegexFileFilter implements FilenameFilter {

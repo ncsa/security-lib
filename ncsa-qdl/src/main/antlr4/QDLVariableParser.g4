@@ -49,7 +49,7 @@ grammar QDLVariableParser;
     // get flagged as a possible match.
     fragment 
     AllOps : Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
-             LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde;
+             LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot;
 
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
@@ -72,6 +72,7 @@ grammar QDLVariableParser;
         MoreEquals : '>=';
             Equals : '==';
          NotEquals : '!=';
+        LogicalNot : '!';
     Exponentiation : '^';
                And : '&&';
                 Or : '||';

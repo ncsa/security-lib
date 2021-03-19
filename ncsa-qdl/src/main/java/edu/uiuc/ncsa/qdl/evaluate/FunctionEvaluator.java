@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
+import edu.uiuc.ncsa.qdl.expressions.Monad;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
@@ -250,22 +251,35 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         if (functionRecord.isFuncRef) {
             String realName = functionRecord.fRefName;
             if (state.getOpEvaluator().isMathOperator(realName)) {
-                // Dyads are reserved for math operations and are smart enough
+                // Monads and Dyads are reserved for math operations and are smart enough
                 // to grab the OpEvaluator and invoke it, so if the user is sending along
-                // a polyad. Note that polyads and dyads are both subclasses of
+                // a polyad, that requires going through the evaluator.
+                // Note that monads, dyads and polyads are all subclasses of
                 // ExpressionImpl and so we can't cast from one to the other, we
                 // have to copy stuff.
-                Dyad dyad = new Dyad(localState.getOperatorType(realName));
-                dyad.setLeftArgument(polyad.getArguments().get(0));
-                dyad.setRightArgument(polyad.getArguments().get(1));
-                dyad.evaluate(localState);
-                polyad.setResultType(dyad.getResultType());
-                polyad.setEvaluated(true);
-                polyad.setResult(dyad.getResult());
-                polyad.getArguments().set(0, dyad.getLeftArgument());
-                polyad.getArguments().set(1, dyad.getRightArgument());
-                return;
+                if (polyad.getArgCount() == 1) {
+                    Monad monad = new Monad(localState.getOperatorType(realName), false);
+                    monad.setArgument(polyad.getArguments().get(0));
+                    monad.evaluate(localState);
+                    polyad.setResultType(monad.getResultType());
+                    polyad.setEvaluated(true);
+                    polyad.setResult(monad.getResult());
+                    polyad.getArguments().set(0, monad.getArgument());
+                    return;
+                } else {
+                    Dyad dyad = new Dyad(localState.getOperatorType(realName));
+                    dyad.setLeftArgument(polyad.getArguments().get(0));
+                    dyad.setRightArgument(polyad.getArguments().get(1));
+                    dyad.evaluate(localState);
+                    polyad.setResultType(dyad.getResultType());
+                    polyad.setEvaluated(true);
+                    polyad.setResult(dyad.getResult());
+                    polyad.getArguments().set(0, dyad.getLeftArgument());
+                    polyad.getArguments().set(1, dyad.getRightArgument());
+                    return;
+                }
             } else {
+                // Easy case, just run it as a polyad.
                 polyad.setName(realName);
                 polyad.evaluate(localState);
                 return;

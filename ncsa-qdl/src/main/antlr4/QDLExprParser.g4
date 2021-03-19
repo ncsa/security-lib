@@ -44,10 +44,10 @@ expression
  | stemVariable                                                          #stemVar
  | stemList                                                              #stemLi
  | expression '.' expression                                             #dotOp
+ | expression '~' expression                                             #tildeExpression
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
  | '!' expression                                                        #notExpression
- | expression '~' expression                                             #tildeExpression
  | expression '^' expression                                             #powerExpression
  | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression
  | ('+' | '-') expression                                                #unaryMinusExpression

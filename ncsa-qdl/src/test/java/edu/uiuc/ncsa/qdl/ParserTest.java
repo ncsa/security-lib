@@ -1774,4 +1774,57 @@ public class ParserTest extends AbstractQDLTester {
         // returns true if any elements are true
         assert areEqual(getBDValue("y", state), getBDValue("z", state)) : "function reference visibility has changed.";
     }
+
+
+    /**
+     * A fork in the language J is of the form<br/><br/>
+     * <pre>
+     *     (monad1 dyad monad2) arg
+     * </pre>
+     * and is interpreted as<br/><br/>
+     * <pre>
+     *    dyad(monad1(arg), monad2(arg))
+     * </pre>
+     * This actually covers a very large range of applications. This example computes
+     * the average over a list as<br/><br/>
+     * <pre>
+     *    sum(list.)/size(list.)
+     * </pre>
+     * using multiple references and shows passing multiple function references is resolved
+     * correctly.
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionReferenceJFork() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "sum(x.)->reduce(*+,x.);");
+        addLine(script, "fork(*a(),*b(),*c(),x.)->b(a(x.),c(x.));");
+        addLine(script, "y := fork(*sum(), */, *size(), 1+2*n(5));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        assert getLongValue("y", state) == 5L : "passing multiple function references failed.";
+
+    }
+
+    /**
+     * Shows that monadic operators are being resolved correctly
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionReferenceMonad() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "m(*monad(), arg.)->monad(arg.);");
+        addLine(script, "x. := m(*!, [false, true, false]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        StemVariable stem = getStemValue("x.", state);
+        assert stem.getBoolean(0L);
+        assert !stem.getBoolean(1L);
+        assert stem.getBoolean(2L);
+
+    }
 }

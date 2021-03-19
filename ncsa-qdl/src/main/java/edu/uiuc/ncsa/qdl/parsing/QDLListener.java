@@ -1297,6 +1297,7 @@ public class QDLListener implements QDLParserListener {
         FunctionReferenceNode frn = (FunctionReferenceNode) parsingMap.getStatementFromContext(ctx);
         String name = ctx.getText();
         name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER.length());
+        //frn.setFunctionName(name); // if we allow function references to not end in ()
         int parenIndex  = name.indexOf("(");
         if(-1 < parenIndex) {
             // whack off any dangling parenthese

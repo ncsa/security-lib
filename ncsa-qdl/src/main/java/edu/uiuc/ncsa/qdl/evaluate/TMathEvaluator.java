@@ -235,6 +235,9 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                     throw new IllegalArgumentException(N_ROOT + " requires an integer second argument");
                 }
                 if (isLong(arg2)) {
+                    if(0==(Long)arg2){
+                        throw new IllegalArgumentException(N_ROOT + " cannot extract the zero-th root");
+                    }
                     exponent = new BigDecimal((Long) arg2);
                     isExponentEven = (((Long) arg2) % 2) == 0;
                 }
@@ -341,39 +344,58 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private BigDecimal evaluateBD(BigDecimal x, MathContext mathContext, String op) {
+        BigDecimal bd = null;
         switch (op) {
             case COSINE:
-                return ch.obermuhlner.math.big.BigDecimalMath.cos(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.cos(x, mathContext);
+                break;
             case ARC_COSINE:
-                return ch.obermuhlner.math.big.BigDecimalMath.acos(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.acos(x, mathContext);
+                break;
             case SINE:
-                return ch.obermuhlner.math.big.BigDecimalMath.sin(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.sin(x, mathContext);
+                break;
             case ARC_SINE:
-                return ch.obermuhlner.math.big.BigDecimalMath.asin(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.asin(x, mathContext);
+                break;
             case TANGENT:
-                return ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
+                break;
             case ARC_TANGENT:
-                return ch.obermuhlner.math.big.BigDecimalMath.atan(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.atan(x, mathContext);
+                break;
             case LOG_10:
-                return ch.obermuhlner.math.big.BigDecimalMath.log10(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.log10(x, mathContext);
+                break;
             case LOG_E:
-                return ch.obermuhlner.math.big.BigDecimalMath.log(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.log(x, mathContext);
+                break;
             case EXP:
-                return ch.obermuhlner.math.big.BigDecimalMath.exp(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.exp(x, mathContext);
+                break;
             case SINH:
-                return ch.obermuhlner.math.big.BigDecimalMath.sinh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.sinh(x, mathContext);
+                break;
             case ARC_SINH:
-                return ch.obermuhlner.math.big.BigDecimalMath.asinh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.asinh(x, mathContext);
+                break;
             case COSH:
-                return ch.obermuhlner.math.big.BigDecimalMath.cosh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.cosh(x, mathContext);
+                break;
             case ARC_COSH:
-                return ch.obermuhlner.math.big.BigDecimalMath.acosh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.acosh(x, mathContext);
+                break;
             case TANH:
-                return ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
+                break;
             case ARC_TANH:
-                return ch.obermuhlner.math.big.BigDecimalMath.atanh(x, mathContext);
+                bd = ch.obermuhlner.math.big.BigDecimalMath.atanh(x, mathContext);
+                break;
+            default:
+                throw new UndefinedFunctionException("The function " + op + " is undefined");
         }
-        throw new UndefinedFunctionException("The function " + op + " is undefined");
+        // later may want to start setting scale for Big decimals...
+        return bd;
     }
 
     private void doTranscendentalMath(Polyad polyad, String op, State state) {
