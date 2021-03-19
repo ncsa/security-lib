@@ -36,6 +36,7 @@ public interface QDLConfigurationConstants {
     String MODULE_ATTR_TYPE = "type";
     String MODULE_CLASS_NAME_TAG = "class_name";
     String MODULE_TYPE_JAVA = "java";
+    String QDL_MODULE_PATH_TAG = "path";
     String MODULE_TYPE_QDL = "qdl";
     String BOOT_SCRIPT_TAG = "boot_script";
     String WS_TAG = "workspace";

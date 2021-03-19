@@ -41,6 +41,17 @@ public class FTStack implements FunctionTable {
         peek().remove(name, argCount);
     }
 
+    /**
+     * Take the FT stack and add all of the tables in this stack in the correct order.
+     * This is needed when, e.g., creating new local state for function reference resolution
+     * @param ftStack
+     */
+     public void addTables(FTStack ftStack){
+         // add backwards
+         for (int i = ftables.size() - 1; 0 <= i; i--) {
+             ftStack.push(ftables.get(i));
+         }
+     }
     ArrayList<FunctionTable> ftables = new ArrayList<>();
 
     public FunctionTable peek() {

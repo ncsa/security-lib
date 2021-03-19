@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.config;
 
+import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -8,11 +9,16 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
+import java.net.URI;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider.*;
@@ -51,8 +57,8 @@ public class QDLConfigurationLoaderUtils {
                                 VFSPaths.SCHEME_DELIMITER + vfsConfig.getMountPoint());
                         break;
                     case VFS_TYPE_ZIP:
-                        VFSZipFileConfig zc = (VFSZipFileConfig)vfsConfig;
-                        provider = new VFSZipFileProvider(zc.getZipFilePath(), zc.getScheme(),zc.getMountPoint(),
+                        VFSZipFileConfig zc = (VFSZipFileConfig) vfsConfig;
+                        provider = new VFSZipFileProvider(zc.getZipFilePath(), zc.getScheme(), zc.getMountPoint(),
                                 zc.canRead(), zc.canWrite());
                         state.addVFSProvider(provider);
                         config.getMyLogger().info("VFS zip file mount: " + vfsConfig.getScheme() +
@@ -68,57 +74,59 @@ public class QDLConfigurationLoaderUtils {
             }
         }
     }
-     public static VFSDatabase setupMySQLDatabase(MyLoggingFacade logger, Map<String, String> map){
-         int port = 3306; // means use default
-         boolean useSSL = false; // also default
-         if(!map.containsKey(DRIVER)){
-             map.put(DRIVER,"com.mysql.cj.jdbc.Driver" );
-         }
-         if(!map.containsKey(HOST)){
-             map.put(HOST, "localhost");
-         }
-         if(!map.containsKey(DATABASE)){
-             map.put(DATABASE, map.get(SCHEMA));
-         }
-         try{
-             if(map.containsKey(PORT)) {
-                 port = Integer.parseInt(map.get(PORT));
-             }
-         }catch(Throwable t){
-             if(logger != null)
-             logger.warn("VFS mount: Could not determine port from value " + map.get(PORT));
-         }
-         try{
-             if(map.containsKey(USE_SSL)) {
-                 useSSL = Boolean.parseBoolean(map.get(USE_SSL));
-             }
-         }catch(Throwable t){
-             if(logger!=null)
-             logger.warn("VFS mount: Could not determine whether or not to use SSL from value " + map.get(USE_SSL));
-         }
-         MySQLConnectionParameters parameters = new MySQLConnectionParameters(
-             map.get(USERNAME),
-             map.get(PASSWORD),
-             map.get(DATABASE),
-             map.get(SCHEMA),
-             map.get(HOST),
-             port,
-             map.get(DRIVER),
-             useSSL,
-             map.get(PARAMETERS)
-         );
-         MySQLConnectionPool connectionPool = new MySQLConnectionPool(parameters);
 
-         return new VFSDatabase(connectionPool, map.get(StorageConfigurationTags.SQL_TABLENAME));
+    public static VFSDatabase setupMySQLDatabase(MyLoggingFacade logger, Map<String, String> map) {
+        int port = 3306; // means use default
+        boolean useSSL = false; // also default
+        if (!map.containsKey(DRIVER)) {
+            map.put(DRIVER, "com.mysql.cj.jdbc.Driver");
+        }
+        if (!map.containsKey(HOST)) {
+            map.put(HOST, "localhost");
+        }
+        if (!map.containsKey(DATABASE)) {
+            map.put(DATABASE, map.get(SCHEMA));
+        }
+        try {
+            if (map.containsKey(PORT)) {
+                port = Integer.parseInt(map.get(PORT));
+            }
+        } catch (Throwable t) {
+            if (logger != null)
+                logger.warn("VFS mount: Could not determine port from value " + map.get(PORT));
+        }
+        try {
+            if (map.containsKey(USE_SSL)) {
+                useSSL = Boolean.parseBoolean(map.get(USE_SSL));
+            }
+        } catch (Throwable t) {
+            if (logger != null)
+                logger.warn("VFS mount: Could not determine whether or not to use SSL from value " + map.get(USE_SSL));
+        }
+        MySQLConnectionParameters parameters = new MySQLConnectionParameters(
+                map.get(USERNAME),
+                map.get(PASSWORD),
+                map.get(DATABASE),
+                map.get(SCHEMA),
+                map.get(HOST),
+                port,
+                map.get(DRIVER),
+                useSSL,
+                map.get(PARAMETERS)
+        );
+        MySQLConnectionPool connectionPool = new MySQLConnectionPool(parameters);
 
-     }
+        return new VFSDatabase(connectionPool, map.get(StorageConfigurationTags.SQL_TABLENAME));
+
+    }
+
     protected static VFSFileProvider setupMySQLVFS(QDLEnvironment config, VFSSQLConfig myCfg) {
         VFSFileProvider provider;
-        Map<String,String> map = myCfg.getConnectionParameters();
+        Map<String, String> map = myCfg.getConnectionParameters();
 
         VFSDatabase db = setupMySQLDatabase(config.getMyLogger(), map);
         provider = new VFSMySQLProvider(db,
-                myCfg.getScheme(),myCfg.mountPoint, myCfg.canRead(),myCfg.canWrite());
+                myCfg.getScheme(), myCfg.mountPoint, myCfg.canRead(), myCfg.canWrite());
         return provider;
     }
 
@@ -156,7 +164,7 @@ public class QDLConfigurationLoaderUtils {
                             foundClasses = foundClasses + "," + className;
                         }
                     } catch (Throwable t) {
-
+                        DebugUtil.printStackTrace(t);
                         config.getMyLogger().error(
                                 "WARNING: module \"" + className + "\" could not be loaded:" + t.getMessage(),
                                 t);
@@ -165,13 +173,37 @@ public class QDLConfigurationLoaderUtils {
                 if (moduleConfig.getType().equals(MODULE_TYPE_QDL)) {
                     QDLModuleConfig qmc = (QDLModuleConfig) moduleConfig;
                     String module = QDLFileUtil.readFileAsString(qmc.getPath());
-                    interpreter.execute(module);
-                    config.getMyLogger().info("loaded qdl module " + module);
+                    // only (easy) way to tell to compare before and after
+                    Set<URI> oldImports = new HashSet<>();
+                    oldImports.addAll(interpreter.getState().getModuleMap().keySet());
+                    try {
+                        interpreter.execute(module);
+                    } catch (Throwable t) {
+                        DebugUtil.printStackTrace(t);
+                        // a missing module should not crash the load
+                        config.getMyLogger().error(
+                                "WARNING: QDL module \"" + module.substring(0, Math.min(50, module.length())) + "\" could not be loaded:" + t.getMessage(),
+                                t);
+                    }
+                    Set<URI> newImports = interpreter.getState().getModuleMap().keySet();
+                    if (newImports.size() != oldImports.size() + 1) {
+                        throw new NFWException("Error: added multiple modules unexpectedly");
+                    }
+                    for (URI uri : newImports) {
+                        if (!oldImports.contains(uri)) {
+                            if (qmc.isImportOnStart()) {
+                                // also easy is to have QDL do the import rather than doing brain surgery on its state.
+                                interpreter.execute(ControlEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
+                            }
+                            break;
+                        }
+                    }
+                    config.getMyLogger().info("loaded qdl module " + qmc.getPath());
                     if (isFirstQDLModules) {
                         isFirstQDLModules = false;
-                        foundModules = module;
+                        foundModules = qmc.getPath();
                     } else {
-                        foundModules = foundModules + "," + module;
+                        foundModules = foundModules + "," + qmc.getPath();
                     }
                 }
             }// end for loop
@@ -194,7 +226,7 @@ public class QDLConfigurationLoaderUtils {
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
-                ((JavaModule)mm).init(state1);
+                ((JavaModule) mm).init(state1);
                 state.getImportedModules().put(m.getAlias(), mm);
             }
         }

@@ -1,0 +1,73 @@
+module[
+   'qdl:/math/x','mathx'
+]body[
+   >> This module defines several additional functions for mathematics
+   >> These include sec(), sech() etc.
+        sec(x)->1/cos(x);
+        csc(x)->1/sin(x);
+        cot(x)->1/tan(x);
+       asec(x)->cos(1/x);
+       acsc(x)->sin(1/x);
+       acot(x)->tan(1/x);
+       sech(x)->1/cosh(x);
+       csch(x)->1/sinh(x);
+       coth(x)->1/tanh(x);
+      asech(x)->acosh(1/x);
+      acsch(x)->asinh(1/x);
+      acoth(x)->atanh(1/x);
+
+  // Here starts definitions using the full syntax, so we can include some
+  // online help.
+   define[dist(a,b)][
+     >> The distance between two points defined as the
+     >> sqrt(a^2 + b^2);
+     return(sqrt(a^2 + b^2));
+   ];
+
+   define[sqrt(x)][
+     >> The (non-negative) square root of the argument
+     return(nroot(x, 2));
+   ];
+
+   define[nn(k)][
+     >> convenience function for k integers, starting at 1
+     >> This is in contract the the standard indices function
+     >> n(k) that starts at zero.
+     return(1+n(k));
+   ];
+
+   define[logn(x,n)][
+     >> The logarithm, base n for x.
+     >> Note that both may be stems.
+     return(ln(x)/ln(n));
+   ];
+
+   define[ fork(*monad1(),*dyad(),*monad2(),x.)][
+     >> A fork is defined as a taking a dyad and two monads and applying them to an argument
+     >>    dyad(monad1(x.), monad2(x.)
+     >> A surprisingly large number of problems are addressed by this: transform the argument
+     >> then use both results for something else. For instance
+     >> to compute the average of a set of numbers, define
+     >>    sum(x.)->reduce(*+, x.);
+     >> then the average of the first 10 odd numbers is
+     >>    fork(*sum(), */, *size(), 1+2*n(10));
+     >> So "sum divided by size" is how to read this.
+     >> Note the dyad (any algebraic operation like addition is a dyad) is put
+     >> in the middle of the argument list so it looks any other operator.
+     return(dyad(monad1(x.),monad2(x.)));
+   ];
+
+   define[polynomial(coefficients., x)][
+     >> polynomial(coefficients., arg) takes a list of coefficients (0th index) is constant and evaluates it.
+     >> so polynomial([3,5,7,11], x) == 11*x^3 + 7*x^2 + 5*x + 3
+     return(reduce(*+, coefficients.*(x^n(size(coefficients.)))));
+   ];
+
+   define[poly2(coefficients., x)][
+     >> poly2(coefficients., arg) takes a list of coefficients (last index is the constant) and evaluates it.
+     >> so poly2([11,7,5,3], x) == 11*x^3 + 7*x^2 + 5*x + 3
+     >> This is because some people just find it optically easier.
+     return(reduce(*+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
+   ];
+   
+]; // end module

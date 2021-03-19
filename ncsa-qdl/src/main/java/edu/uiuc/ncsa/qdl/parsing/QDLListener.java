@@ -805,12 +805,17 @@ public class QDLListener implements QDLParserListener {
         // up. That means that the system will think f needs to be evaluated asap and you will
         // get errors.
         parsingMap.startMark(false);
+        //stash(ctx, new FunctionD());
+
     }
     //     define[g(x)][z:=x+1;return(x);]
     //     h(x) -> [z:=x+1;return(z);];
 
     @Override
     public void exitLambdaStatement(QDLParserParser.LambdaStatementContext lambdaContext) {
+        createLambdaStatement(lambdaContext);
+    }
+    protected void createLambdaStatement(QDLParserParser.LambdaStatementContext lambdaContext) {
         QDLParserParser.FunctionContext nameAndArgsNode = lambdaContext.function();
         if (nameAndArgsNode == null) {
             return; // do nothing.
@@ -1033,6 +1038,7 @@ public class QDLListener implements QDLParserListener {
             boolean isSkip = false;
             for (int i = 0; i < stmt.getChildCount(); i++) {
                 isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.DefineStatementContext);
+                isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.LambdaStatementContext);
             }
             if (!isSkip) {
                 Statement kid = resolveChild(stmt);

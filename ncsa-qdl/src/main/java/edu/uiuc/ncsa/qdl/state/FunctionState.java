@@ -44,6 +44,7 @@ public abstract class FunctionState extends VariableState {
 
     private static final long serialVersionUID = 0xcafed00d4L;
 
+    @Override
     public FTStack getFTStack() {
         return ftStack;
     }

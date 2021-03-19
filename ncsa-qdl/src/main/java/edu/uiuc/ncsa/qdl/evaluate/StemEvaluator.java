@@ -28,7 +28,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int SIZE_TYPE = 1 + STEM_FUNCTION_BASE_VALUE;
 
 
-
     public static final String MAKE_INDICES = "indices";
     public static final String SHORT_MAKE_INDICES = "n";
     public static final String FQ_MAKE_INDICES = STEM_FQ + MAKE_INDICES;
@@ -143,6 +142,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_LIST_STARTS_WITH = STEM_FQ + LIST_STARTS_WITH;
     public static final int LIST_STARTS_WITH_TYPE = 206 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String LIST_REVERSE = "list_reverse";
+    public static final String FQ_LIST_REVERSE = STEM_FQ + LIST_REVERSE;
+    public static final int LIST_REVERSE_TYPE = 207 + STEM_FUNCTION_BASE_VALUE;
+
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
     public static final String FQ_TO_JSON = STEM_FQ + TO_JSON;
@@ -181,6 +184,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             LIST_INSERT_AT,
             LIST_SUBSET,
             LIST_COPY,
+            LIST_REVERSE,
             LIST_STARTS_WITH,
             IS_LIST,
             TO_LIST,
@@ -211,6 +215,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_LIST_INSERT_AT,
             FQ_LIST_SUBSET,
             FQ_LIST_COPY,
+            FQ_LIST_REVERSE,
             FQ_LIST_STARTS_WITH,
             FQ_IS_LIST,
             FQ_TO_LIST,
@@ -290,6 +295,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_COPY:
             case FQ_LIST_COPY:
                 return LIST_COPY_TYPE;
+            case LIST_REVERSE:
+            case FQ_LIST_REVERSE:
+                return LIST_REVERSE_TYPE;
             case LIST_STARTS_WITH:
             case FQ_LIST_STARTS_WITH:
                 return LIST_STARTS_WITH_TYPE;
@@ -413,6 +421,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_SUBSET:
                 doListSubset(polyad, state);
                 return true;
+            case LIST_REVERSE:
+            case FQ_LIST_REVERSE:
+                doListReverse(polyad, state);
+                return true;
             case LIST_STARTS_WITH:
             case FQ_LIST_STARTS_WITH:
                 doListStartsWith(polyad, state);
@@ -452,6 +464,26 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doListReverse(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("error:" + LIST_REVERSE + " requires a single argument.");
+        }
+        Object arg1 = polyad.evalArg(0, state);
+        if (!isStem(arg1)) {
+            throw new IllegalArgumentException("error:" + LIST_REVERSE + " requires a stem as its argument.");
+        }
+        StemVariable input = (StemVariable) arg1;
+        StemVariable output = new StemVariable();
+        Iterator<StemEntry> iterator = input.getStemList().descendingIterator();
+        while(iterator.hasNext()){
+            StemEntry s = iterator.next();
+            output.listAppend(s.entry);
+        }
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
     }
 
     private void doUniqueValues(Polyad polyad, State state) {
@@ -906,9 +938,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             long i = 0L;
             for (String key : stemVariable.keySet()) {
                 if (returnType == Constant.getType(stemVariable.get(key))) {
-                    if(out.isLongIndex(key)){
+                    if (out.isLongIndex(key)) {
                         out.put(i++, Long.parseLong(key));
-                    }else {
+                    } else {
                         out.put(i++, key);
                     }
                 }
@@ -919,26 +951,26 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             for (String key : stemVariable.keySet()) {
                 switch (returnScope) {
                     case all_keys:
-                        if(out.isLongIndex(key)){
+                        if (out.isLongIndex(key)) {
                             out.put(i++, Long.parseLong(key));
-                        }else {
+                        } else {
                             out.put(i++, key);
                         }
                         break;
                     case only_scalars:
                         if (Constant.getType(stemVariable.get(key)) != Constant.STEM_TYPE) {
-                            if(out.isLongIndex(key)){
+                            if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
-                            }else {
+                            } else {
                                 out.put(i++, key);
                             }
                         }
                         break;
                     case only_stems:
                         if (Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE) {
-                            if(out.isLongIndex(key)){
+                            if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
-                            }else {
+                            } else {
                                 out.put(i++, key);
                             }
                         }
@@ -1037,19 +1069,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * Needed by list_keys and keys so that returned indices that are longs are indeed longs.
      * Otherwise everything returned would be a string (e.g., '0' not 0) which makes subsequent
      * algebraic operations  on them fail.
+     *
      * @param out
      * @param key
      */
-    protected void putLongOrStringKey(StemVariable out, String key){
+    protected void putLongOrStringKey(StemVariable out, String key) {
         Long k = null;
-        if(out.isLongIndex(key)){
+        if (out.isLongIndex(key)) {
             k = Long.parseLong(key);
             out.put(k, k);
-        }else {
+        } else {
             out.put(key, key);
         }
 
     }
+
     /**
      * has_keys(stem. var | keysList.) returns a var or  boolean stem if the key in the list is a key in the stem
      *
@@ -1410,20 +1444,20 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      shuffle(a., b.);
      */
     protected void shuffleKeys(Polyad polyad, State state) {
-        if (0 == polyad.getArgCount() || 2 < polyad.getArgCount() ) {
+        if (0 == polyad.getArgCount() || 2 < polyad.getArgCount()) {
             throw new IllegalArgumentException("the " + SHUFFLE + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArguments().get(0).getResult();
-        if(isLong(arg)){
-           Long argL = (Long)arg ;
-           int argInt = argL.intValue();
-            if(argL < 0L){
+        if (isLong(arg)) {
+            Long argL = (Long) arg;
+            int argInt = argL.intValue();
+            if (argL < 0L) {
                 throw new IllegalArgumentException("the argument to" + SHUFFLE + " must be > 0");
             }
             Long[] array = new Long[argInt];
             long j = 0L;
-            for(int i = 0; i<argInt; i++){
+            for (int i = 0; i < argInt; i++) {
                 array[i] = j++; // fill it with longs
             }
             List<Long> longList = Arrays.asList(array);

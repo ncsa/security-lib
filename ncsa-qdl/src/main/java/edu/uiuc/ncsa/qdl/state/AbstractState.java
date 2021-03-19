@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
@@ -63,7 +64,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.logger = myLoggingFacade;
     }
 
-
+     public abstract FTStack getFTStack();
 
     public ModuleMap getModuleMap() {
         return moduleMap;

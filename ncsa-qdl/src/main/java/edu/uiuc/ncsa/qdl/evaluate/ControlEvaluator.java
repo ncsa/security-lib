@@ -1439,6 +1439,9 @@ reduce(*times(), 1+n(5))
             polyad.setResult(Boolean.TRUE);
             polyad.setEvaluated(true);
         } catch (Throwable t) {
+            if(DebugUtil.isEnabled()){
+                t.printStackTrace();
+            }
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             polyad.setResult(Boolean.FALSE);
             polyad.setEvaluated(true);

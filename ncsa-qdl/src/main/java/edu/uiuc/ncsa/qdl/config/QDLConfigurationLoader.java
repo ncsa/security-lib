@@ -291,7 +291,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
             if (getFirstAttribute(kid, MODULE_ATTR_TYPE).equals(MODULE_TYPE_QDL)) {
                 QDLModuleConfig v = new QDLModuleConfig();
                 v.importOnStart = getFirstBooleanValue(kid, MODULE_ATTR_IMPORT_ON_START, false);
-                v.path = getNodeValue(kid, MODULE_PATH_TAG);
+                v.path = getNodeValue(kid, QDL_MODULE_PATH_TAG);
                 configs.add(v);
             }
         }

@@ -186,7 +186,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
    op(**, 2, 3)
   op(*^, 2, 3)
 
-     */
+            */
+    //  sum(x.)->reduce(*+, x.);
+    //fork(*sum(), */, *size(), [2,5,7])
+
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
         FunctionRecord functionRecord = frs.functionRecord;
 
@@ -198,7 +201,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                         + polyad.getArgCount() + " arguments was not found.");
             }
         }
-        State localState = frs.state.newStateWithImports();
+        State localState = state.newStateWithImports();
+        frs.state.getFTStack().addTables(localState.getFTStack());
+        //localState.getFTStack().push(frs.state.getFTStack().peek());
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getLocalST();

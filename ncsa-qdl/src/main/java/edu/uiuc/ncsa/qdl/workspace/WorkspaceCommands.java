@@ -2617,7 +2617,7 @@ public class WorkspaceCommands implements Logable {
             say("processing file " + currentFile.getAbsolutePath());
             WSLibEntry w = _getWSLibEntry(currentFile);
             if (w != null) {
-                if(!showOnlyFailures && !w.failed){
+                if(showOnlyFailures && !w.failed){
                     return RC_CONTINUE;
                 }
 
@@ -2689,7 +2689,7 @@ public class WorkspaceCommands implements Logable {
 
         }
         if(showOnlyFailures){
-            say("found " + successCount + " workspaces" );
+            say("found " + successCount + " failures" );
 
         } else {
             say("found " + successCount + " workspaces" + (0 < failureCount ? (", " + failureCount + " failures") : ""));
