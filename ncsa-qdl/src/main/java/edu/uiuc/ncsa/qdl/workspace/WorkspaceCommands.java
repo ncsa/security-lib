@@ -1987,7 +1987,9 @@ public class WorkspaceCommands implements Logable {
 
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
         TreeSet<String> funcs = getState().getMetaEvaluator().listFunctions(listFQ);
-        return printList(inputLine, funcs);
+        int rc = printList(inputLine, funcs);
+        say(funcs.size() + " total functions");
+        return rc;
     }
 
     protected int _funcsList(InputLine inputLine) {
@@ -1999,8 +2001,10 @@ public class WorkspaceCommands implements Logable {
         }
 
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
-        TreeSet<String> funs = getState().listFunctions(useCompactNotation, null);
-        return printList(inputLine, funs);
+        TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null);
+        int rc  = printList(inputLine, funcs);
+        say(funcs.size() + " total functions");
+        return rc;
     }
 
     /**

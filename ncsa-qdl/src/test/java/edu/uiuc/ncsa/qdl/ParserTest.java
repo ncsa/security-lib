@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
-import edu.uiuc.ncsa.qdl.exceptions.ImportException;
+import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -554,7 +554,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Was able to access imported functions inside another function without importing it";
-        } catch (ImportException ufx) {
+        } catch (NamespaceException ufx) {
             assert true;
         }
 
@@ -1825,6 +1825,112 @@ public class ParserTest extends AbstractQDLTester {
         assert stem.getBoolean(0L);
         assert !stem.getBoolean(1L);
         assert stem.getBoolean(2L);
+    }
 
+    /**
+     * Tests tjhreee cases for visibility of functions in standard if then clause
+     * Critical simple use case.
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionDefVisibilityInConditional() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := true;");
+        // doesn't exist at all
+        addLine(script, "if[a][q(x)->x^2;];");
+        addLine(script, "x := is_function(q,1);");
+        addLine(script, "q(x,y)->x*y;");
+        // there is one, but with different arg count
+        addLine(script, "if[a][q(x)->x^2;];");
+        addLine(script, "y := is_function(q,1);");
+        addLine(script, "q(x)->x^3;");
+        addLine(script, "if[a][q(x)->x^2;];");
+        addLine(script, "z := is_function(q,1);");
+        addLine(script,"w := q(2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert !getBooleanValue("x",state);
+        assert !getBooleanValue("y",state);
+        assert !getBooleanValue("z",state);
+        assert getLongValue("w",state).equals(4L);
+    }
+
+    /**
+     * Very similar to {@link #testFunctionDefVisibilityInConditional()} , except
+     * else clauses are tested. 
+     * Critical simple use case.
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionDefVisibilityInConditional2() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := false;");
+        // doesn't exist at all
+        addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
+        addLine(script, "x := is_function(q,1);");
+        addLine(script, "q(x,y)->x*y;");
+        addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
+        addLine(script, "y := is_function(q,1);");
+        addLine(script, "q(x)->x^3;");
+        addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
+        addLine(script, "z := is_function(q,1);");
+        addLine(script,"w := q(2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        assert !getBooleanValue("x",state);
+        assert !getBooleanValue("y",state);
+        assert !getBooleanValue("z",state);
+        assert getLongValue("w",state).equals(4L);
+    }
+
+    /*
+    module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];
+    module_import('a:a');
+    y := g(1);
+     */
+
+    /**
+     * Case of a sinple module. The point is that a function f, is defined in the module and that
+     * another module function g calls it. What should happen (assuming no other definitions of these
+     * in the state, which would throw a namespace exception) is that g uses f and that is
+     * that. If the module functions are not being added only to the module state, then there would be errors.
+     * Critical simple use case.
+     * @throws Throwable
+     */
+    public void testModuleFunctionVisibility() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "y := g(1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        StemVariable stem = getStemValue("x.", state);
+        assert getLongValue("y", state).equals(4L);
+    }
+
+    /**
+     * trigger that having competing function names between the workspace and a module
+     * is flagged as an error.
+     * @throws Throwable
+     */
+    public void testBadModuleFunctionVisibility() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x)->x;");
+        addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "y := g(1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "the visibility of module functions is incorrect";
+        }catch(NamespaceException ix){
+            assert true;
+        }
     }
 }

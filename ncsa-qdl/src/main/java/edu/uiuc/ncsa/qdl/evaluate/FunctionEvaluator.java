@@ -4,10 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.RecursionException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.expressions.Monad;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
@@ -66,10 +63,19 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getName()) {
             case IS_FUNCTION:
             case FQ_IS_FUNCTION:
-                if (polyad.getArgCount() != 1) {
+                if (polyad.getArgCount() ==0) {
                     throw new IllegalArgumentException("You must supply at least one argument.");
                 }
+                if(polyad.getArguments().get(0) instanceof VariableNode){
+                    // they either are asking about a variable or it does not exist and by default, the parser thinks
+                    // it was one
+                    polyad.setEvaluated(true);
+                    polyad.setResultType(Constant.BOOLEAN_TYPE);
+                    polyad.setResult(false);
+                    return true;
+                }
                 Object object = polyad.evalArg(0, state);
+
                 if (object == null) {
                     throw new MissingArgumentException(" You must supply an argument for the " + IS_FUNCTION + " command.");
                 }
@@ -190,6 +196,12 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     //  sum(x.)->reduce(*+, x.);
     //fork(*sum(), */, *size(), [2,5,7])
 
+    /*
+       module['a:a', 'a'][f(x)->x+1;g(x)->f(x+2);];
+       module_import('a:a');
+       g(1);
+     */
+
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
         FunctionRecord functionRecord = frs.functionRecord;
 
@@ -202,7 +214,6 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             }
         }
         State localState = state.newStateWithImports();
-        frs.state.getFTStack().addTables(localState.getFTStack());
         //localState.getFTStack().push(frs.state.getFTStack().peek());
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 

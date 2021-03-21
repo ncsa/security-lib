@@ -22,6 +22,13 @@ public class FTStack implements FunctionTable {
         pushNew();
     }
 
+    /**
+     * Add the table to the end of the stack. Let's you control where the tables end up.
+     * @param functionTable
+     */
+    public void append(FunctionTable functionTable){
+        ftables.add(functionTable);
+    }
     public boolean isEmpty() {
         boolean empty = true;
         for (FunctionTable functionTable : ftables) {
@@ -44,14 +51,16 @@ public class FTStack implements FunctionTable {
     /**
      * Take the FT stack and add all of the tables in this stack in the correct order.
      * This is needed when, e.g., creating new local state for function reference resolution
+     *
      * @param ftStack
      */
-     public void addTables(FTStack ftStack){
-         // add backwards
-         for (int i = ftables.size() - 1; 0 <= i; i--) {
-             ftStack.push(ftables.get(i));
-         }
-     }
+    public void addTables(FTStack ftStack) {
+        // add backwards
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            ftStack.push(ftables.get(i));
+        }
+    }
+
     ArrayList<FunctionTable> ftables = new ArrayList<>();
 
     public FunctionTable peek() {
@@ -68,6 +77,13 @@ public class FTStack implements FunctionTable {
 
     @Override
     public FunctionRecord put(FunctionRecord value) {
+        for(FunctionTable functionTable : ftables){
+            if(functionTable.isDefined(value.name, value.getArgCount())){
+                functionTable.put(value);
+                return value;
+            }
+        }
+
         return peek().put(value);
     }
 
@@ -166,16 +182,16 @@ public class FTStack implements FunctionTable {
                                 this.push(functionTable);
                             }
                             break;*/
-                            // Legacy case -- just a single functions block, not a stack.
+                        // Legacy case -- just a single functions block, not a stack.
                         case XMLConstants.FUNCTIONS_TAG:
-                            if(foundStack) break; // if a stack is being processed, skip this
+                            if (foundStack) break; // if a stack is being processed, skip this
                             //FunctionTableImpl functionTable1 = new FunctionTableImpl();
                             FunctionTable functionTable1 = qi.getState().getFTStack().peek();
                             functionTable1.fromXML(xer, qi);
                           /*  if(!functionTable1.isEmpty()) {
                                 this.push(functionTable1);
                             }*/
-                           break;
+                            break;
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -186,7 +202,7 @@ public class FTStack implements FunctionTable {
             }
             xe = xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG );
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG);
 
 
     }
@@ -236,12 +252,42 @@ public class FTStack implements FunctionTable {
     }
 
     @Override
-    public FTStack clone()  {
+    public FTStack clone() {
         FTStack cloned = new FTStack();
-        for(FunctionTable ft : ftables){
-            cloned.push(ft);
+        for (FunctionTable ft : ftables) {
+               cloned.append(ft);
         }
         return cloned;
+    }
 
+    @Override
+    public String toString() {
+        String out = "[" + getClass().getSimpleName();
+        out = out + ", table#=" + ftables.size();
+        int i = 0;
+        int totalSymbols = 0;
+        boolean isFirst = true;
+        out = ", counts=[";
+        for (FunctionTable functionTable : ftables) {
+            if(isFirst){
+                isFirst = false;
+                out = out + functionTable.size();
+            }else {
+                out = out + "," + functionTable.size();
+            }
+            totalSymbols += functionTable.size();
+        }
+        out = out + "], total=" + totalSymbols;
+        out = out + "]";
+        return out;
+    }
+
+    @Override
+    public int size() {
+        int totalSymbols = 0;
+        for (FunctionTable functionTable : ftables) {
+            totalSymbols += functionTable.size();
+        }
+        return totalSymbols;
     }
 }

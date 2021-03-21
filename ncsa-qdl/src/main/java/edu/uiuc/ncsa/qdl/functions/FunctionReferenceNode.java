@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import java.util.List;
 
 /**
+ * Just a pointer to the function. Just has the name.
  * <p>Created by Jeff Gaynor<br>
  * on 3/14/21 at  3:26 PM
  */

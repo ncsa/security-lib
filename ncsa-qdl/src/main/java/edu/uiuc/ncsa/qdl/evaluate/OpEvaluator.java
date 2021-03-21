@@ -120,7 +120,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         TMathEvaluator.setPi(null); // zero it out, force recompute at new precision
     }
 
-    public static int numericDigits = 50; // default precision for decimals.
+    public static int numericDigits = 15; // default precision for decimals.
 
     /**
      * No listing for these yet since they are not the standard func() pattern, e.g. a < b.

@@ -41,4 +41,6 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
     void remove(String fName, int argCount);
 
     boolean isEmpty();
+
+    int size();
 }

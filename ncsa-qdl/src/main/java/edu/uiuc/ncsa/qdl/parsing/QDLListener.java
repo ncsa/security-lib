@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
+import edu.uiuc.ncsa.qdl.functions.FunctionDefinitionStatement;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.generated.QDLParserListener;
@@ -635,6 +636,7 @@ public class QDLListener implements QDLParserListener {
                 if (p.getText().equals(";") || p.getText().equals("]")) {
                     continue;
                 }
+
                 if (addToIf) {
                     Statement s = resolveChild(p);
                     conditionalStatement.getIfArguments().add(s);
@@ -732,11 +734,17 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterDefineStatement(QDLParserParser.DefineStatementContext ctx) {
-        parsingMap.startMark();
+   //     parsingMap.startMark();
+        FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setLambda(false);
+        stash(ctx, fds);
     }
 
     protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
         FunctionRecord functionRecord = new FunctionRecord();
+        FunctionDefinitionStatement fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(defineContext);
+                                                           fds.setFunctionRecord(functionRecord);
+        //FunctionDefinitionStatement fds =
         // not quite the original source... The issue is that this comes parsed and stripped of any original
         // end of line markers, so we cannot tell what was there. Since it may include documentation lines
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
@@ -747,8 +755,8 @@ public class QDLListener implements QDLParserListener {
             stringList.add((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
         }
         // ANTLR may strip final terminator. Put it back as needed.
-        if(!stringList.get(stringList.size() -1).endsWith(";")){
-            stringList.set(stringList.size() -1,stringList.get(stringList.size() -1) + ";");
+        if (!stringList.get(stringList.size() - 1).endsWith(";")) {
+            stringList.set(stringList.size() - 1, stringList.get(stringList.size() - 1) + ";");
         }
         functionRecord.sourceCode = stringList;
 
@@ -758,7 +766,6 @@ public class QDLListener implements QDLParserListener {
             name = name.substring(0, name.length() - 1);
         }
         functionRecord.name = name;
-//        for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
         for (QDLParserParser.F_argsContext argListContext : nameAndArgsNode.f_args()) {
             // this is a comma delimited list of arguments.
             String allArgs = argListContext.getText();
@@ -779,16 +786,6 @@ public class QDLListener implements QDLParserListener {
         for (QDLParserParser.StatementContext sc : defineContext.statement()) {
             functionRecord.statements.add(resolveChild(sc));
         }
-        if (isModule) {
-            // Functions defined in a module go there.
-            currentModule.getState().getFTStack().put(functionRecord);
-        } else {
-            state.getFTStack().put(functionRecord);
-        }
-        parsingMap.endMark();
-        parsingMap.rollback();
-        parsingMap.clearMark();
-
     }
 
 
@@ -804,8 +801,11 @@ public class QDLListener implements QDLParserListener {
         // Special case since f(x) -> ... means f is added before we get here and won't get picked
         // up. That means that the system will think f needs to be evaluated asap and you will
         // get errors.
-        parsingMap.startMark(false);
-        //stash(ctx, new FunctionD());
+     //   parsingMap.startMark(false);
+        FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setLambda(true);
+
+        stash(ctx, fds);
 
     }
     //     define[g(x)][z:=x+1;return(x);]
@@ -815,8 +815,10 @@ public class QDLListener implements QDLParserListener {
     public void exitLambdaStatement(QDLParserParser.LambdaStatementContext lambdaContext) {
         createLambdaStatement(lambdaContext);
     }
+
     protected void createLambdaStatement(QDLParserParser.LambdaStatementContext lambdaContext) {
         QDLParserParser.FunctionContext nameAndArgsNode = lambdaContext.function();
+
         if (nameAndArgsNode == null) {
             return; // do nothing.
         }
@@ -826,14 +828,16 @@ public class QDLListener implements QDLParserListener {
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
         // Best we can do with ANTLR...
 
+        FunctionDefinitionStatement fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(lambdaContext);
+        fds.setFunctionRecord(functionRecord);
 
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < lambdaContext.getChildCount(); i++) {
             stringList.add(lambdaContext.getChild(i).getText());
         }
         // ANTLR may strip final terminator. Put it back as needed.
-        if(!stringList.get(stringList.size() -1).endsWith(";")){
-            stringList.set(stringList.size() -1,stringList.get(stringList.size() -1) + ";");
+        if (!stringList.get(stringList.size() - 1).endsWith(";")) {
+            stringList.set(stringList.size() - 1, stringList.get(stringList.size() - 1) + ";");
         }
         functionRecord.sourceCode = stringList;
 
@@ -876,13 +880,7 @@ public class QDLListener implements QDLParserListener {
                 functionRecord.statements.add(resolveChild(parserTree));
 
             }
-/*
-            for (QDLParserParser.StatementContext sc : lambdaContext.statement()) {
-                System.out.println("lambda:" + sc.getText());
-                functionRecord.statements.add(resolveChild(sc));
-            }
 
-*/
         } else {
             // its a single expression most likely. Check to see if it needs wrapped in
             // a return
@@ -911,16 +909,6 @@ public class QDLListener implements QDLParserListener {
             }
 
         }
-
-        if (isModule) {
-            // Functions defined in a module go there.
-            currentModule.getState().getFTStack().put(functionRecord);
-        } else {
-            state.getFTStack().put(functionRecord);
-        }
-        parsingMap.endMark();
-        parsingMap.rollback();
-        parsingMap.clearMark();
     }
 
 
@@ -1035,6 +1023,7 @@ public class QDLListener implements QDLParserListener {
             // that are in any define contexts. So if this is a define context,
             // skip it. They are handled elsewhere and the definitions are never evaluated
             // just stashed.
+/*
             boolean isSkip = false;
             for (int i = 0; i < stmt.getChildCount(); i++) {
                 isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.DefineStatementContext);
@@ -1044,6 +1033,10 @@ public class QDLListener implements QDLParserListener {
                 Statement kid = resolveChild(stmt);
                 moduleStatement.getStatements().add(kid);
             }
+*/
+            Statement kid = resolveChild(stmt);
+            moduleStatement.getStatements().add(kid);
+
             //}
         }
         //       For fdoc support.  Probably not, but maybe
@@ -1304,8 +1297,8 @@ public class QDLListener implements QDLParserListener {
         String name = ctx.getText();
         name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER.length());
         //frn.setFunctionName(name); // if we allow function references to not end in ()
-        int parenIndex  = name.indexOf("(");
-        if(-1 < parenIndex) {
+        int parenIndex = name.indexOf("(");
+        if (-1 < parenIndex) {
             // whack off any dangling parenthese
             name = name.substring(0, name.indexOf("("));
         }

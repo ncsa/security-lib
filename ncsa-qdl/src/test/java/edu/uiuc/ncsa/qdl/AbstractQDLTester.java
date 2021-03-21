@@ -40,7 +40,7 @@ public class AbstractQDLTester extends TestBase {
         return (StemVariable) state.getValue(variable);
     }
 
-    protected BigDecimal comparisonTolerance = new BigDecimal(".0000000000001");
+    protected BigDecimal comparisonTolerance = new BigDecimal(".000000000001");
 
     /**
      * Compares two {@link BigDecimal}s. Tells if their difference is less than the
