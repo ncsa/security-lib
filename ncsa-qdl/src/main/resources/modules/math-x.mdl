@@ -80,7 +80,7 @@ module[
         >> plot(*sin(), 0, pi()/2, 10)
          x. := start + n(n)*(stop - start)/(n-1);
          y. := f(x.);
-         return(join(x., y., 1));
+         return(x.~|y.);
       ];
 
       define[
@@ -94,7 +94,7 @@ module[
          t. := start + n(n)*(stop - start)/(n-1);
          x. := x(t.);
          y. := y(t.);
-         return(join(x., y., 1));
+         return(x.~|y.);
       ];
 
 ]; // end module
