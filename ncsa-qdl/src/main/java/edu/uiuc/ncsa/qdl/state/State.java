@@ -18,9 +18,11 @@ import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import org.apache.commons.codec.binary.Base32;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -28,6 +30,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -683,4 +686,21 @@ public class State extends FunctionState implements QDLConstants {
     public void readExtraXMLAttributes(StartElement xe) throws XMLStreamException{
 
     }
+    SecureRandom secureRandom = new SecureRandom();
+    Base32 base32 = new Base32('_'); // set trailing char to be an underscore
+
+    /**
+     * Returns an unused variable name.
+     * @return
+     */
+  public String getTempVariableName(){
+      byte[] b = new byte[16];
+      for(int i = 0; i<10; i++){
+          String var = base32.encodeToString(b);
+          if(!isDefined(var)){
+              return var;
+          }
+      }
+      throw new NFWException("Was unable to create a random, unused variable");
+  }
 }

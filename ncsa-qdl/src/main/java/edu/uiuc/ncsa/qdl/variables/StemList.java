@@ -184,4 +184,15 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
 
         return output + "\n]";
     }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    int rank = -1;
+
 }

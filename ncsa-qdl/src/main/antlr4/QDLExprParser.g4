@@ -44,7 +44,7 @@ expression
  | stemVariable                                                          #stemVar
  | stemList                                                              #stemLi
  | expression '.' expression                                             #dotOp
- | expression '~' expression                                             #tildeExpression
+ | expression ('~' | '~|' ) expression                                    #tildeExpression
  | expression postfix=('++' | '--')                                      #postfix
  | prefix=('++'|'--') expression                                         #prefix
  | '!' expression                                                        #notExpression

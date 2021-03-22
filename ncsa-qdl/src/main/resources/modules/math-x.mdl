@@ -6,9 +6,9 @@ module[
         sec(x)->1/cos(x);
         csc(x)->1/sin(x);
         cot(x)->1/tan(x);
-       asec(x)->cos(1/x);
-       acsc(x)->sin(1/x);
-       acot(x)->tan(1/x);
+       asec(x)->acos(1/x);
+       acsc(x)->asin(1/x);
+       acot(x)->atan(1/x);
        sech(x)->1/cosh(x);
        csch(x)->1/sinh(x);
        coth(x)->1/tanh(x);
@@ -18,8 +18,8 @@ module[
 
   // Here starts definitions using the full syntax, so we can include some
   // online help.
-   define[dist(a,b)][
-     >> The distance between two points defined as the
+   define[hypotenuse(a,b)][
+     >> The hypotenuse of a right triangle, given the other two sides.
      >> sqrt(a^2 + b^2);
      return(sqrt(a^2 + b^2));
    ];
@@ -69,5 +69,32 @@ module[
      >> This is because some people just find it optically easier.
      return(reduce(*+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
    ];
-   
+
+      define[
+         plot(*f(), start, stop, n)
+      ][
+        >> A program to generate the plot points a real valued function over an interval
+        >> (start, stop) with n total points.
+        >> The result is a list of (x,y) coordinates.
+        >> Try it out on
+        >> plot(*sin(), 0, pi()/2, 10)
+         x. := start + n(n)*(stop - start)/(n-1);
+         y. := f(x.);
+         return(join(x., y., 1));
+      ];
+
+      define[
+         pplot(*x(), *y() start, stop, n)
+      ][
+        >> A program to generate the parametric plot points of two real valued function over an interval
+        >> (start, stop) with n total points.
+        >> The result is a list of (x,y) coordinates.
+        >> Try it out on
+        >> pplot(*sin(),*cos(),  0, pi()/2, 10)
+         t. := start + n(n)*(stop - start)/(n-1);
+         x. := x(t.);
+         y. := y(t.);
+         return(join(x., y., 1));
+      ];
+
 ]; // end module

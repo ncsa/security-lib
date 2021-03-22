@@ -264,7 +264,6 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
                     return;
                 }
-
             }
             if(polyad.getOperatorType() == OpEvaluator.AND_VALUE){
                 if(!((Boolean)arg1)){
@@ -273,9 +272,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                     polyad.setEvaluated(true);
                     return;
                 }
-
             }
-
         }
         Object arg2 = polyad.evalArg(1, state);
         if (arg2 == null) {
@@ -336,8 +333,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                     objects[i] = polyad.getArguments().get(i).getResult();
                 }
             }
-
-            if (objects[0] instanceof StemVariable) {
+            if (isStem(objects[0]) || isStem(objects[1])) {
                 StemVariable newOut = new StemVariable();
                 processStem2(newOut, toStem(objects[0]), toStem(objects[1]), pointer, polyad, optionalArgs);
                 if (!newOut.isEmpty()) {

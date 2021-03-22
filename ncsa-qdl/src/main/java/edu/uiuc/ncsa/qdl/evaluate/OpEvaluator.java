@@ -23,6 +23,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String ASSIGNMENT = ":=";
     public static final String POWER = "^";
     public static final String TILDE = "~";
+    public static final String TILDE_STILE = "|~";
     public static final String TIMES = "*";
     public static final String DIVIDE = "/";
     public static final String INTEGER_DIVIDE = "%";
@@ -64,12 +65,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int INTEGER_DIVIDE_VALUE = 212;
     public static final int TILDE_VALUE = 213;
     public static final int DOT_VALUE = 214;
+    public static final int TILDE_STILE_VALUE = 215;
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
             POWER,
-            TILDE,
+            TILDE, TILDE_STILE,
             TIMES,
             DIVIDE,
             INTEGER_DIVIDE,
@@ -179,6 +181,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return NOT_VALUE;
             case PLUS_PLUS:
                 return PLUS_PLUS_VALUE;
+            case TILDE_STILE:
+                return TILDE_STILE_VALUE;
             case TILDE:
                 return TILDE_VALUE;
             case DOT:
@@ -204,6 +208,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case PLUS_VALUE:
                 doDyadPlus(dyad, state);
                 return;
+            case TILDE_STILE_VALUE:
+                doJoin(dyad, state);
+                return;
             case TILDE_VALUE:
                 doTilde(dyad, state);
                 return;
@@ -227,6 +234,17 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             default:
                 throw new NotImplementedException("Unknown dyadic operator");
         }
+    }
+
+    private void doJoin(Dyad dyad, State state) {
+        Polyad joinPolyad = new Polyad(StemEvaluator.JOIN);
+        joinPolyad.getArguments().add(dyad.getLeftArgument());
+        joinPolyad.getArguments().add(dyad.getRightArgument());
+        joinPolyad.getArguments().add(new ConstantNode(StemEvaluator.JOIN_LAST_ARGUMENT_VALUE, Constant.LONG_TYPE));
+        state.getMetaEvaluator().evaluate(joinPolyad, state);
+        dyad.setResult(joinPolyad.getResult());
+        dyad.setResultType(joinPolyad.getResultType());
+        dyad.setEvaluated(true);
     }
 
     protected void doTilde(Dyad dyad, State state) {
@@ -557,10 +575,25 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
     }
 
+    /*
+
+      join0(x., y.)->[z.:=null;z.:=x.~y.;return(z.);]
+      join1(x., y.)->[z.:=null;while[for_keys(i0,x.)][z.i0. := x.i0~y.i0;];return(z.);]
+      join2(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][z.i0.i1.:=x.i0.i1~y.i0.i1;];];return(z.);]
+      join3(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][z.i0.i1.i2.:=x.i0.i1.i2~y.i0.i1.i2;];];];return(z.);]
+      join4(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][while[for_keys(i3, x.i0.i1)][z.i0.i1.i2.i3.:=x.i0.i1.i2.i3~y.i0.i1.i2.i3;];];];];return(z.);]
+
+    */
+    /**
+     * Fo dyadic plus.
+     * @param dyad
+     * @param state
+     */
     protected void doDyadPlus(Dyad dyad, State state) {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
+                // At this point, only scalars should ever get passed here as arguments.
                 fpResult r = new fpResult();
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
@@ -572,11 +605,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.result = left.add(right);
                         r.resultType = Constant.DECIMAL_TYPE;
                     }
-                } else {
+                    return r;
+                }
+
+                if(!isStem(objects[1] )){
                     r.result = objects[0].toString() + objects[1].toString();
                     r.resultType = Constant.STRING_TYPE;
+                    return r;
                 }
-                return r;
+               // This is a stem
+                throw new IllegalArgumentException("error: stem encountered in scalar operation");
             }
         };
         process2(dyad, pointer, PLUS, state);

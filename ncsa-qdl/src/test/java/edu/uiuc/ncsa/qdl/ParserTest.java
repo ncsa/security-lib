@@ -1918,6 +1918,7 @@ public class ParserTest extends AbstractQDLTester {
      * is flagged as an error.
      * @throws Throwable
      */
+    @Test
     public void testBadModuleFunctionVisibility() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1932,5 +1933,27 @@ public class ParserTest extends AbstractQDLTester {
         }catch(NamespaceException ix){
             assert true;
         }
+    }
+
+    /**
+    * Devious test for this. Run it with the join command and check that
+    * every value of the result is true as a string. This saves me from having
+     * to do a low-level slog looking for any failures.
+     */
+    @Test
+    public void testJoinOnLastAxis() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "q. := [[n(4), 4+n(4)],[8+n(4),12+n(4)], [16+n(5),21+n(5)]];");
+        addLine(script, "w. := 100 + q.;");
+        addLine(script, "a. := join(q., w., 3);");
+        addLine(script, "b. := q.~|w.;");
+        addLine(script, "out := to_string(b. == a.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("out", state).indexOf("false") <0;
+        // returns true if any elements are true
+        StemVariable stem = getStemValue("x.", state);
+
     }
 }

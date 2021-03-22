@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -112,6 +113,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int UNIQUE_VALUES_TYPE = 109 + STEM_FUNCTION_BASE_VALUE;
 
 
+    public static final String JOIN = "join";
+    public static final String FQ_JOIN = STEM_FQ + JOIN;
+    public static final int JOIN_TYPE = 110 + STEM_FUNCTION_BASE_VALUE;
+
+
     // list functions
 
     public static final String LIST_APPEND = "list_append";
@@ -161,6 +167,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
     public static String FUNC_NAMES[] = new String[]{
             SIZE,
+            JOIN,
             MAKE_INDICES,
             SHORT_MAKE_INDICES,
             HAS_VALUE,
@@ -193,6 +200,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FROM_JSON};
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_SIZE,
+            FQ_JOIN,
             FQ_MAKE_INDICES,
             FQ_HAS_VALUE,
             FQ_REMOVE,
@@ -241,6 +249,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case JOIN:
+            case FQ_JOIN:
+                return JOIN_TYPE;
             case SIZE:
             case FQ_SIZE:
                 return SIZE_TYPE;
@@ -340,7 +351,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
-
+            case JOIN:
+            case FQ_JOIN:
+                doJoin(polyad, state);
+                return true;
             case VAR_TYPE:
             case FQ_VAR_TYPE:
                 doVarType(polyad, state);
@@ -477,7 +491,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable input = (StemVariable) arg1;
         StemVariable output = new StemVariable();
         Iterator<StemEntry> iterator = input.getStemList().descendingIterator();
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             StemEntry s = iterator.next();
             output.listAppend(s.entry);
         }
@@ -873,7 +887,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + SIZE + " function requires 1 argument");
         }
         polyad.evalArg(0, state);
-        ;
         Object arg = polyad.getArguments().get(0).getResult();
         long size = 0;
         if (isStem(arg)) {
@@ -1616,6 +1629,184 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(result);
         polyad.setEvaluated(true);
 
+    }
+
+    /*
+    Long block of QDL here to show how the Java should work. It is easy to do cases of this in QDL, but this
+    ought to be a built in function.
+    q. has different length of things
+    q. := [[n(4), 4+n(4)],[8+n(4),12+n(4)], [16+n(5),21+n(5)]]
+    w. := 100 + q.
+     join(q., w., 1)
+     join(q., w., 2)
+     join(q., w., 3)
+    q.
+[
+ [[0,1,2,3],[4,5,6,7]],
+ [[8,9,10,11],[12,13,14,15]],
+ [[16,17,18,19,20],[21,22,23,24,25]]
+]
+    w.
+[
+ [[100,101,102,103],[104,105,106,107]],
+ [[108,109,110,111],[112,113,114,115]],
+ [[116,117,118,119,120],[121,122,123,124,125]]
+]
+  // QDL to do the first few cases of this directly
+  join0(x., y.)->[z.:=null;z.:=x.~y.;return(z.);]
+  join1(x., y.)->[z.:=null;while[for_keys(i0,x.)][z.i0. := x.i0~y.i0;];return(z.);]
+  join2(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][z.i0.i1.:=x.i0.i1~y.i0.i1;];];return(z.);]
+  join3(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][z.i0.i1.i2.:=x.i0.i1.i2~y.i0.i1.i2;];];];return(z.);]
+  join4(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][while[for_keys(i3, x.i0.i1)][z.i0.i1.i2.i3.:=x.i0.i1.i2.i3~y.i0.i1.i2.i3;];];];];return(z.);]
+
+  // also q.~w.
+  z. := join0(q.,w.)
+  //  *   <--- You are here
+  //  z.i.j.k
+          join0(q.,w.)
+[
+ [[0,1,2,3],[4,5,6,7]],
+ [[8,9,10,11],[12,13,14,15]],
+ [[16,17,18,19,20],[21,22,23,24,25]],
+ [[100,101,102,103],[104,105,106,107]],
+ [[108,109,110,111],[112,113,114,115]],
+ [[116,117,118,119,120],[121,122,123,124,125]]
+]
+// result is list of combined lengths size(z.) == size(q.) + size(w.)
+
+ z. :=  join1(q., w.)
+  //   *  <--- You are here
+  // z.i.j.k
+[
+ [[0,1,2,3],[4,5,6,7],[100,101,102,103],[104,105,106,107]],
+ [[8,9,10,11],[12,13,14,15],[108,109,110,111],[112,113,114,115]],
+ [[16,17,18,19,20],[21,22,23,24,25],[116,117,118,119,120],[121,122,123,124,125]]
+]
+// z. has same shape, but z.k == q.k ~ w.k
+
+
+       z. := join2(q.,w.)
+  //     *  <--- You are here
+  // z.i.j.k
+[
+ [[0,1,2,3,100,101,102,103],[4,5,6,7,104,105,106,107]],
+ [[8,9,10,11,108,109,110,111],[12,13,14,15,112,113,114,115]],
+ [[16,17,18,19,20,116,117,118,119,120],[21,22,23,24,25,121,122,123,124,125]]
+]
+// z. now has size(z.k) == size(q.k) + size(w.k)
+
+z. :=  join3(q.,w.)
+  //       * <--- You are here
+  // z.i.j.k
+[
+ [[[0,100],[1,101],[2,102],[3,103]],[[4,104],[5,105],[6,106],[7,107]]],
+ [[[8,108],[9,109],[10,110],[11,111]],[[12,112],[13,113],[14,114],[15,115]]],
+ [[[16,116],[17,117],[18,118],[19,119],[20,120]],[[21,121],[22,122],[23,123],[24,124],[25,125]]]
+]
+
+  // Since this is the last index this joins each element into new elements, increasing the
+  // rank of the stem by 1
+     */
+      public static final Long JOIN_LAST_ARGUMENT_VALUE = new Long(-0xcafed00d);
+
+    protected void doJoin(Polyad polyad, State state) {
+        Object[] args = new Object[polyad.getArgCount()];
+        int argCount = polyad.getArgCount();
+        for (int i = 0; i < argCount; i++) {
+            args[i] = polyad.evalArg(i, state);
+        }
+        int depth = ((Long) args[2]).intValue();
+        StemVariable leftStem;
+        if(isStem(args[0])) {
+            leftStem = (StemVariable) args[0];
+        }else{
+            leftStem = new StemVariable();
+            leftStem.put(0L, args[0]);
+        }
+        StemVariable rightStem;
+        if(isStem(args[1])){
+            rightStem = (StemVariable) args[1];
+        }else{
+            rightStem = new StemVariable();
+            rightStem.put(0L, args[1]);
+        }
+        boolean doJoinOnLastAxis = false;
+        if(depth == JOIN_LAST_ARGUMENT_VALUE){
+            doJoinOnLastAxis = true;
+        }
+        if (depth == 0) {
+            StemVariable outStem = leftStem.union(rightStem);
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResult(outStem);
+            return;
+        }
+        StemVariable outStem = new StemVariable();
+
+        if (leftStem.isEmpty() || rightStem.isEmpty()) {
+            // edge case -- they sent an empty argument, so don't blow up, just return nothing
+            polyad.setResult(outStem);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        if(doJoinOnLastAxis){
+            joinRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis);
+        }else{
+            joinRecursion(outStem, leftStem, rightStem, depth - 1, doJoinOnLastAxis);
+        }
+        polyad.setResult(outStem);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+    }
+
+    protected void joinRecursion(StemVariable out0,
+                                 StemVariable left0,
+                                 StemVariable right0,
+                                 int depth,
+                                 boolean maxDepth) {
+        StemVariable commonKeys = left0.commonKeys(right0);
+        for (String key0 : commonKeys.keySet()) {
+            Object leftObj = left0.get(key0);
+            Object rightObj = right0.get(key0);
+
+            StemVariable left1 = null;
+            if (isStem(leftObj)) {
+                left1 = (StemVariable) leftObj;
+            } else {
+                if (rightObj == null) {
+                    throw new RankException("There are no more elements in the left argument.");
+                }
+
+                left1 = new StemVariable();
+                left1.put(0L, leftObj);
+            }
+            StemVariable right1 = null;
+            if (isStem(rightObj)) {
+                right1 = (StemVariable) right0.get(key0);
+            } else {
+                if (rightObj == null) {
+                    throw new RankException("There are no more elements in the right argument.");
+                }
+                right1 = new StemVariable();
+                right1.put(0L, rightObj);
+            }
+            boolean bottomedOut = areNoneStems(leftObj, rightObj) && maxDepth && 0 < depth;
+            if (bottomedOut) {
+                out0.put(key0, left1.union(right1));
+            } else {
+                if (0 < depth) {
+                    if (areNoneStems(leftObj, rightObj)) {
+                        throw new RankException("rank error");
+                    }
+                    StemVariable out1 = new StemVariable();
+                    out0.put(key0, out1);
+                    joinRecursion(out1, left1, right1, depth - 1, maxDepth);
+                } else {
+                    out0.put(key0, left1.union(right1));
+                }
+            }
+        }
     }
 
 

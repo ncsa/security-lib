@@ -741,20 +741,14 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public Object put(String key, Object value) {
-       /* if (!isVar(key)) {
-            throw new IllegalArgumentException("Error: " + key + " is neither a legal variable name nor number.");
-        }*/
+
         if (key.endsWith(STEM_INDEX_MARKER)) {
             key = key.substring(0, key.length() - 1);
         }
         if (StringUtils.isTrivial(key)) {
             throw new IllegalArgumentException("error: Cannot have a trivial stem key");
         }
-/*
-        if (!key.endsWith(STEM_INDEX_MARKER) && isIntVar(key)) {
-            return put(Long.parseLong(key), value);
-        }
-*/
+
         if (isIntVar(key)) {
             return put(Long.parseLong(key), value);
         }
@@ -1338,4 +1332,15 @@ public class StemVariable extends HashMap<String, Object> {
         output.setStemList(getStemList().unique());
         return output;
     }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
+    }
+
+    int rank = -1; // unset
+
 }

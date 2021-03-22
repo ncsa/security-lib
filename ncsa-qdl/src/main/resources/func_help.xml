@@ -1513,6 +1513,16 @@ See also: Reference manual on ^
 ]]>
             </body>
         </entry>
+    <entry id="join">
+            <body>
+                <![CDATA[
+join(x., y., axis) - join two stems together along a given axis.
+See also: union or the ~ operator. Those are special cases of
+join(x., y., 0 ) == x.~y.
+                ]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->

@@ -1188,7 +1188,14 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitTildeExpression(QDLParserParser.TildeExpressionContext ctx) {
-        Dyad dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+        String x = ctx.getChild(1).getText();
+        Dyad dyad;
+        if(x.equals("~|")) {
+            dyad = new Dyad(OpEvaluator.TILDE_STILE_VALUE);
+        }else{
+            dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+
+        }
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
