@@ -103,21 +103,21 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         return new String[0];
     }
 
-    MathContext mathContext;
+    static MathContext mathContext;
 
-    public MathContext getMathContext() {
+    public static MathContext getMathContext() {
         if (mathContext == null) {
-            mathContext = new MathContext(getNumericDigits());
+            mathContext = new MathContext(getNumericDigits(), RoundingMode.HALF_EVEN);
         }
         return mathContext;
     }
 
-    public int getNumericDigits() {
+    public static int getNumericDigits() {
         return numericDigits;
     }
 
-    public void setNumericDigits(int numericDigits) {
-        this.numericDigits = numericDigits;
+    public static void setNumericDigits(int newNumericDigits) {
+        numericDigits = newNumericDigits;
         mathContext = new MathContext(numericDigits);
         TMathEvaluator.setPi(null); // zero it out, force recompute at new precision
     }
@@ -549,7 +549,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                                     BigDecimal out = left.divide(right, getNumericDigits(), RoundingMode.DOWN);
                                     r.result = out;
                                     r.resultType = Constant.DECIMAL_TYPE;
-
+                                  return r;
                                 } catch (ArithmeticException x) {
 
                                 }

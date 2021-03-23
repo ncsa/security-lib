@@ -165,7 +165,8 @@ public abstract class FunctionState extends VariableState {
             return out;
         }
         for (URI key : getImportManager().keySet()) {
-            TreeSet<String> uqVars = getModuleMap().get(key).getState().listFunctions(useCompactNotation, regex);
+            Module mm = getModuleMap().get(key);
+            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex);
             for (String x : uqVars) {
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);

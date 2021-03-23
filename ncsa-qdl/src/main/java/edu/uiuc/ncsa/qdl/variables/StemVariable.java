@@ -921,7 +921,11 @@ public class StemVariable extends HashMap<String, Object> {
         boolean isFirst = true;
 
         if (getDefaultValue() != null) {
-            output = output + "*:" + getDefaultValue();
+            if(getDefaultValue() instanceof BigDecimal){
+                output = output + "*:" + InputFormUtil.inputForm((BigDecimal)getDefaultValue());
+            }else {
+                output = output + "*:" + getDefaultValue();
+            }
             isFirst = false;
         }
         Set<String> keys;
@@ -937,7 +941,14 @@ public class StemVariable extends HashMap<String, Object> {
             } else {
                 output = output + ", ";
             }
-            output = output + key + STEM_ENTRY_CONNECTOR + get(key);
+            Object vv = get(key);
+            String ss;
+            if(vv instanceof BigDecimal){
+                         ss = InputFormUtil.inputForm((BigDecimal)vv);
+            }else{
+                ss = vv.toString();
+            }
+            output = output + key + STEM_ENTRY_CONNECTOR + ss;
         }
 
         return output + "}";

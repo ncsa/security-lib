@@ -2002,7 +2002,7 @@ public class WorkspaceCommands implements Logable {
 
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null);
-        int rc  = printList(inputLine, funcs);
+        int rc = printList(inputLine, funcs);
         say(funcs.size() + " total functions");
         return rc;
     }
@@ -2294,7 +2294,7 @@ public class WorkspaceCommands implements Logable {
             if (forceDeletes) {
                 boolean rc = currentFile.delete();
                 if (rc) {
-                    say("deleted: " + currentFile.getAbsolutePath() );
+                    say("deleted: " + currentFile.getAbsolutePath());
                 } else {
                     say(currentFile.getAbsolutePath() + " could not be deleted");
                 }
@@ -2621,7 +2621,7 @@ public class WorkspaceCommands implements Logable {
             say("processing file " + currentFile.getAbsolutePath());
             WSLibEntry w = _getWSLibEntry(currentFile);
             if (w != null) {
-                if(showOnlyFailures && !w.failed){
+                if (showOnlyFailures && !w.failed) {
                     return RC_CONTINUE;
                 }
 
@@ -2663,7 +2663,7 @@ public class WorkspaceCommands implements Logable {
             File fff = sortedFiles.get(absPath);
             WSLibEntry w = _getWSLibEntry(fff);
             if (w == null) continue;
-            if(showOnlyFailures && !w.failed){
+            if (showOnlyFailures && !w.failed) {
                 failureCount++;
                 continue;
             }
@@ -2692,8 +2692,8 @@ public class WorkspaceCommands implements Logable {
             }
 
         }
-        if(showOnlyFailures){
-            say("found " + successCount + " failures" );
+        if (showOnlyFailures) {
+            say("found " + successCount + " failures");
 
         } else {
             say("found " + successCount + " workspaces" + (0 < failureCount ? (", " + failureCount + " failures") : ""));
@@ -2977,10 +2977,12 @@ public class WorkspaceCommands implements Logable {
             case PRETTY_PRINT:
             case PRETTY_PRINT_SHORT:
                 setPrettyPrint(isOnOrTrue(value));
+                getInterpreter().setPrettyPrint(isPrettyPrint());
                 say("pretty print " + (prettyPrint ? "on" : "off"));
                 break;
             case ECHO:
                 setEchoModeOn(isOnOrTrue(value));
+                getInterpreter().setEchoModeOn(isEchoModeOn());
                 say("echo mode " + (echoModeOn ? "on" : "off"));
                 break;
             case DEBUG:
@@ -3204,7 +3206,7 @@ public class WorkspaceCommands implements Logable {
         if (_doHelp(inputLine)) {
             say("clear [" + RELOAD_FLAG + "]");
             sayi("Clear the state *completely*. This includes all virtual file systems and buffers.");
-            sayi(RELOAD_FLAG + " = relaod the current workspace from the configuration. Nothing current will be saved.");
+            sayi(RELOAD_FLAG + " = reload the current workspace from the configuration. Nothing current will be saved.");
             return RC_NO_OP;
         }
         if (inputLine.hasArg(RELOAD_FLAG)) {
@@ -3213,22 +3215,27 @@ public class WorkspaceCommands implements Logable {
                 return RC_RELOAD;
             }
         }
-        boolean clearIt = readline("Are you sure you want to clear the worskapce state? (Y/n)[n]").equals("Y");
+        boolean clearIt = readline("Are you sure you want to clear the workspace state? (Y/n)[n]").equals("Y");
         if (!clearIt) {
             say("WS clear aborted.");
             return RC_NO_OP;
         }
+        clearWS();
+        say("workspace cleared");
+        return RC_CONTINUE;
+    }
+
+    private void clearWS() {
         State oldState = state;
         // Get rid of everything.
         state = null;
+        ImportManager.setResolver(null); // zero this out or we have bogus entries.
         state = getState();
 
         state.createSystemConstants();
         state.setSystemInfo(oldState.getSystemInfo());
 
         interpreter = new QDLInterpreter(state);
-        say("workspace cleared");
-        return RC_CONTINUE;
     }
 
     String JAVA_FLAG = SAVE_AS_JAVA_FLAG;
@@ -3326,7 +3333,7 @@ public class WorkspaceCommands implements Logable {
                 }
 
             }
-            if (qdlDump) {
+            if (qdlDump || target.getAbsolutePath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)) {
                 _doQDLDump(target);
                 say("dumped " + target.length() + " bytes to \"" + target.getAbsolutePath() + "\"");
                 return RC_CONTINUE;
@@ -3366,6 +3373,8 @@ public class WorkspaceCommands implements Logable {
     private void _doQDLDump(File target) throws Throwable {
         FileWriter fileWriter = new FileWriter(target);
         fileWriter.write("// QDL workspace " + (isTrivial(getWSID()) ? "" : getWSID()) + " dump, saved on " + (new Date()) + "\n");
+        fileWriter.write("\n/* ** module definitions ** */\n");
+
         for (URI key : getState().getModuleMap().keySet()) {
             String output = inputFormModule(key, state);
             if (output.startsWith(JAVA_CLASS_MARKER)) {
@@ -3376,6 +3385,8 @@ public class WorkspaceCommands implements Logable {
 
         }
         // now do the imports
+        fileWriter.write("\n/* ** module imports ** */\n");
+
         for (URI key : getState().getModuleMap().keySet()) {
             List<String> aliases = getState().getImportManager().getAlias(key);
             for (String alias : aliases) {
@@ -3384,15 +3395,24 @@ public class WorkspaceCommands implements Logable {
             }
         }
 
-        for (String varName : state.listVariables(false)) {
+        /**
+         * Have to be careful in listing only what is in the actual state, not
+         * stuff in modules too since that is saved elsewhere and both bloats
+         * the output and can make for NS conflicts on reload.
+         */
+        fileWriter.write("\n/* ** user defined variables ** */\n");
+        for (String varName : state.getSymbolStack().listVariables()) {
             String output = inputFormVar(varName, 2, state);
             fileWriter.write(varName + " := " + output + ";\n");
         }
-        for (String fWithArg : state.listFunctions(false, null)) {
+
+        fileWriter.write("\n/* ** user defined functions ** */\n");
+        for (String fWithArg : state.getFTStack().listFunctions(null)) {
             // This gives back functions of the form fName(argCount). Since the
             // logic involves jumping through a lot of hoops (e.g. getting them from
             // modules, it is vastly easier to simply parse them to get the source code.
             // The alternative is a slog through every component with a function.
+
             int lpIndex = fWithArg.indexOf("(");
             int rpIndex = fWithArg.indexOf(")");
             String fName = fWithArg.substring(0, lpIndex);
@@ -3568,6 +3588,9 @@ public class WorkspaceCommands implements Logable {
             sayi(JAVA_FLAG + " = the format of the file is serialized java. default is XML");
             sayi("If there is no file given, the current workspace is used.");
             sayi("If you dumped a workspace to QDL, you may simply load it as any other script");
+            sayi("e.g.");
+            say(")load my_ws -qdl");
+            sayi("would load a file named my_ws.qdl ");
             sayi("See also: save, setting the current workspace.");
             return RC_NO_OP;
         }
@@ -3610,7 +3633,11 @@ public class WorkspaceCommands implements Logable {
                 }
             }
             if (isQDLDump) {
-                target = new File(parentDir, fName + DEFAULT_QDL_DUMP_FILE_EXTENSION); // only  possibility
+                target = new File(parentDir, fName); // try it raw
+                if (!target.exists() || !target.isFile()) {
+                    target = new File(parentDir, fName + DEFAULT_QDL_DUMP_FILE_EXTENSION); // only  possible extension
+                }
+
             } else {
                 if (isJava) {
                     target = new File(parentDir, fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION);
@@ -3641,7 +3668,8 @@ public class WorkspaceCommands implements Logable {
                 }
             }
 
-        }
+        }         //     file_write('/tmp/data.csv',  to_cvs([['x','y']]~y.))
+
         if (target == null) {
             say("sorry, could not determine file for \"" + fName + "\"");
             return RC_NO_OP;
@@ -3658,10 +3686,24 @@ public class WorkspaceCommands implements Logable {
             say("sorry, cannot read  \"" + target.getAbsolutePath() + "\"");
             return RC_NO_OP;
         }
-        if (isQDLDump) {
+        if (isQDLDump || target.getAbsolutePath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)) {
+            // Other load methods clear the workspace first. We do that here:
+            // User experience is that if it was in echo mode and pretty print before the car
+            // it should remain so, since QDL does not save WS state.
+            boolean echo = isEchoModeOn();
+            boolean pp = isPrettyPrint();
+            clearWS();
             String command = ControlEvaluator.LOAD_COMMAND + "('" + target.getAbsolutePath() + "');";
             try {
+                // Don't barf out everything to the command line when it loads.
+                getInterpreter().setPrettyPrint(false);
+                getInterpreter().setEchoModeOn(false);
                 getInterpreter().execute(command);
+                setPrettyPrint(pp);
+                setEchoModeOn(echo);
+                getInterpreter().setEchoModeOn(echo);
+                getInterpreter().setPrettyPrint(pp);
+
                 say(target.getAbsolutePath() + " loaded (" + target.length() + " bytes)");
                 return RC_CONTINUE;
             } catch (Throwable throwable) {
@@ -3773,7 +3815,6 @@ public class WorkspaceCommands implements Logable {
 
     protected State getState() {
         if (state == null) {
-            ImportManager namespaceResolver = ImportManager.getResolver();
             SymbolTableImpl symbolTable = new SymbolTableImpl();
             SymbolStack stack = new SymbolStack();
             stack.addParent(symbolTable);
@@ -3991,6 +4032,16 @@ public class WorkspaceCommands implements Logable {
             }
 
             env.put("qdl_modules", foundModules[QDL_MODULE_INDEX]);
+        }
+        if (foundModules[MODULE_FAILURES_INDEX] != null && !foundModules[MODULE_FAILURES_INDEX].isEmpty()) {
+            if (!isRunScript && isVerbose) {
+                say("failed to load modules:");
+                StringTokenizer t = new StringTokenizer(foundModules[MODULE_FAILURES_INDEX], ",");
+                while (t.hasMoreTokens()) {
+                    sayi(t.nextToken().trim());
+                }
+            }
+            say("Check the log " + getLogger().getFileName() + " for more information");
         }
         String bf = QDLConfigurationLoaderUtils.runBootScript(qe, getState());
         if (bf != null) {

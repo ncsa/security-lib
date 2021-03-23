@@ -42,7 +42,15 @@ public class InputFormUtil {
     }
 
     public static String inputForm(BigDecimal d) {
-        return d.toString();
+        String s = d.toPlainString();
+
+/*      This fails. Must take into account large integers first as well as sign.
+        Just plain string works fine, so this is mostly cosmetic.
+        int dIndex = s.indexOf(".");
+        if(OpEvaluator.getNumericDigits() < s.length()-dIndex){
+            s =  s.substring(dIndex, 1+dIndex + OpEvaluator.getNumericDigits());
+        }*/
+        return s; // Or it spits out scientific noation like .123E-15 which bombs in the parser
     }
 
     public static String inputForm(String s) {

@@ -1637,8 +1637,8 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "r(x)->x^2 + 1;");
-        addLine(script, "f(*h(), x) -> h(x);");
-        addLine(script, "a := f(*r(), 2);");
+        addLine(script, "f(@h(), x) -> h(x);");
+        addLine(script, "a := f(@r(), 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
@@ -1649,8 +1649,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g(*h(), x, y)->h(x, y);");
-        addLine(script, "a := g(*substring(), 'abcd', 2);");
+        addLine(script, "g(@h(), x, y)->h(x, y);");
+        addLine(script, "a := g(@substring(), 'abcd', 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("cd");
@@ -1665,8 +1665,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReference2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g1(*h(), x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
-        addLine(script, "a := g1(*substring(), 'abcd', 2 );");
+        addLine(script, "g1(@h(), x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1(@substring(), 'abcd', 2 );");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("dpqrcdtuv");
@@ -1676,8 +1676,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReferenceOrder() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y);");
-        addLine(script, "a := g1('abcd', 2, *substring());");
+        addLine(script, "g1(x,y,@h())->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1('abcd', 2, @substring());");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("dpqrcdtuv");
@@ -1687,11 +1687,11 @@ public class ParserTest extends AbstractQDLTester {
     public void testOpReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "  op(*h(), x, y) -> h(x,y);");
-        addLine(script, "a := op(*+, 2, 3);");
-        addLine(script, "b := op(**, 2, 3);");
-        addLine(script, "c := op(*^, 2, 3);");
-        addLine(script, "d := op(*-, 2, 3);");
+        addLine(script, "  op(@h(), x, y) -> h(x,y);");
+        addLine(script, "a := op(@+, 2, 3);");
+        addLine(script, "b := op(@*, 2, 3);");
+        addLine(script, "c := op(@^, 2, 3);");
+        addLine(script, "d := op(@-, 2, 3);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
@@ -1706,7 +1706,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testReduceWithOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "x := reduce(**, 1+n(5));");
+        addLine(script, "x := reduce(@*, 1+n(5));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 120L;
@@ -1717,7 +1717,7 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "times(x,y)->x*y;");
-        addLine(script, "x := reduce(*times(), 1+n(5));");
+        addLine(script, "x := reduce(@times(), 1+n(5));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 120L;
@@ -1729,7 +1729,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
         addLine(script, "b. := [1,3,6,7];");
-        addLine(script, "x. := expand(*&&, a. == b.);");
+        addLine(script, "x. := expand(@&&, a. == b.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns [T T F F]
@@ -1745,7 +1745,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
         addLine(script, "b. := [1,3,6,7];");
-        addLine(script, "x := reduce(*||, a. == b.);");
+        addLine(script, "x := reduce(@||, a. == b.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
@@ -1766,8 +1766,8 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "h(x)->-x;");
         addLine(script, "s(x)->x^2;");
-        addLine(script, "f(*h(),x)->ln(h(x));");
-        addLine(script, "y := f(*s(),2);");
+        addLine(script, "f(@h(),x)->ln(h(x));");
+        addLine(script, "y := f(@s(),2);");
         addLine(script, "z := ln(4);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1798,9 +1798,9 @@ public class ParserTest extends AbstractQDLTester {
     public void testFunctionReferenceJFork() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "sum(x.)->reduce(*+,x.);");
-        addLine(script, "fork(*a(),*b(),*c(),x.)->b(a(x.),c(x.));");
-        addLine(script, "y := fork(*sum(), */, *size(), 1+2*n(5));");
+        addLine(script, "sum(x.)->reduce(@+,x.);");
+        addLine(script, "fork(@a(),@b(),@c(),x.)->b(a(x.),c(x.));");
+        addLine(script, "y := fork(@sum(), @/, @size(), 1+2*n(5));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
@@ -1816,8 +1816,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testFunctionReferenceMonad() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "m(*monad(), arg.)->monad(arg.);");
-        addLine(script, "x. := m(*!, [false, true, false]);");
+        addLine(script, "m(@monad(), arg.)->monad(arg.);");
+        addLine(script, "x. := m(@!, [false, true, false]);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true

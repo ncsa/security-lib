@@ -42,15 +42,15 @@ module[
      return(ln(x)/ln(n));
    ];
 
-   define[ fork(*monad1(),*dyad(),*monad2(),x.)][
+   define[ fork(@monad1(),@dyad(),@monad2(),x.)][
      >> A fork is defined as a taking a dyad and two monads and applying them to an argument
      >>    dyad(monad1(x.), monad2(x.)
      >> A surprisingly large number of problems are addressed by this: transform the argument
      >> then use both results for something else. For instance
      >> to compute the average of a set of numbers, define
-     >>    sum(x.)->reduce(*+, x.);
+     >>    sum(x.)->reduce(@+, x.);
      >> then the average of the first 10 odd numbers is
-     >>    fork(*sum(), */, *size(), 1+2*n(10));
+     >>    fork(@sum(), @/, @size(), 1+2*n(10));
      >> So "sum divided by size" is how to read this.
      >> Note the dyad (any algebraic operation like addition is a dyad) is put
      >> in the middle of the argument list so it looks any other operator.
@@ -60,41 +60,76 @@ module[
    define[polynomial(coefficients., x)][
      >> polynomial(coefficients., arg) takes a list of coefficients (0th index) is constant and evaluates it.
      >> so polynomial([3,5,7,11], x) == 11*x^3 + 7*x^2 + 5*x + 3
-     return(reduce(*+, coefficients.*(x^n(size(coefficients.)))));
+     return(reduce(@+, coefficients.*(x^n(size(coefficients.)))));
    ];
 
    define[poly2(coefficients., x)][
      >> poly2(coefficients., arg) takes a list of coefficients (last index is the constant) and evaluates it.
      >> so poly2([11,7,5,3], x) == 11*x^3 + 7*x^2 + 5*x + 3
      >> This is because some people just find it optically easier.
-     return(reduce(*+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
+     return(reduce(@+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
    ];
 
       define[
-         plot(*f(), start, stop, n)
+         plot(@f(), start, stop, $_n)
       ][
         >> A program to generate the plot points a real valued function over an interval
         >> (start, stop) with n total points.
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
-        >> plot(*sin(), 0, pi()/2, 10)
-         x. := start + n(n)*(stop - start)/(n-1);
+        >> plot(@sin(), 0, pi()/2, 10)
+
+         x. := start + n($_n)*(stop - start)/($_n-1);
+         say(to_string(x.)) ;
          y. := f(x.);
          return(x.~|y.);
       ];
 
       define[
-         pplot(*x(), *y() start, stop, n)
+         pplot(@_x(), @_y(), start, stop, _n)
       ][
         >> A program to generate the parametric plot points of two real valued function over an interval
         >> (start, stop) with n total points.
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
-        >> pplot(*sin(),*cos(),  0, pi()/2, 10)
-         t. := start + n(n)*(stop - start)/(n-1);
-         x. := x(t.);
-         y. := y(t.);
-         return(x.~|y.);
+        >> pplot(@sin(),@cos(),  0, pi()/2, 10)
+        if[_n < 2][say('sorry, you need at least 2 points');return();];
+         __t. := start + n(_n)*(stop - start)/(_n-1);
+         __x. := _x(__t.);
+         __y. := _y(__t.);
+         return(__x.~|__y.);
       ];
+ 
+      define[
+         for_each(@f(),a.)
+      ][
+         >> Apply a function to each element of a list. Some functions,
+         >> such as to_string, operate on lists rather than element-wise
+         >> This will apply the function to each enry of a stem.
+         >> For instance, if you are doing an export of a stem to some file forma
+         >> like CVS, you would need to turn each line into a string to process it
+         >> with a command like
+         >> for_each(@to_string(), my_stem.)
+         z. := null;
+         while[for_keys(k,a.)][z.k := f(a.k);];
+         return(z.);
+     ];  // end for_each
 
+     define[
+        to_csv(a.)
+     ][
+        >> convert a stem., a., to csv (comma separated values) format.
+        >> a. stem to be converted. Each element is a list and will be a line
+        >> in the output.
+        >> typical use is
+        >> file_write(my_file, to_cvs(data.));
+        >> E.g. here is the start of one
+        >> a.0 := ['t', 'x', 'y']; // header
+        >> a.1 := [0, .5, .345723445]; // first line of data
+        >> tip:  [['x','y']]~a. would stick in the headers.
+        z. := for_each(@to_string(), a.) - ']' - '[';
+        return(z.);
+     ]; //end to_cvs
+
+     // file_write('/tmp/data.csv',  to_csv([['x','y']]~y.))
 ]; // end module

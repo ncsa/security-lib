@@ -132,13 +132,17 @@ public class QDLConfigurationLoaderUtils {
 
     public static int JAVA_MODULE_INDEX = 0;
     public static int QDL_MODULE_INDEX = 1;
+    public static int MODULE_FAILURES_INDEX = 2;
+    public static int MODULE_LOAD_MESSAGES_SIZE = 3;
+
 
     public static String[] setupModules(QDLEnvironment config, State state) throws Throwable {
-        String[] x = new String[2];
+        String[] x = new String[MODULE_LOAD_MESSAGES_SIZE];
 
         if (!config.getModuleConfigs().isEmpty()) {
             String foundClasses = "";
             String foundModules = "";
+            String failedModules = "";
             boolean isFirstJavaModules = true;
             boolean isFirstQDLModules = true;
             QDLInterpreter interpreter = new QDLInterpreter(state);
@@ -184,6 +188,8 @@ public class QDLConfigurationLoaderUtils {
                         config.getMyLogger().error(
                                 "WARNING: QDL module \"" + module.substring(0, Math.min(50, module.length())) + "\" could not be loaded:" + t.getMessage(),
                                 t);
+                        failedModules = failedModules + (failedModules.length()==0?"":",") + qmc.getPath();
+                        continue;
                     }
                     Set<URI> newImports = interpreter.getState().getModuleMap().keySet();
                     if (newImports.size() != oldImports.size() + 1) {
@@ -192,8 +198,12 @@ public class QDLConfigurationLoaderUtils {
                     for (URI uri : newImports) {
                         if (!oldImports.contains(uri)) {
                             if (qmc.isImportOnStart()) {
-                                // also easy is to have QDL do the import rather than doing brain surgery on its state.
-                                interpreter.execute(ControlEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
+//                                try {
+                                    // also easy is to have QDL do the import rather than doing brain surgery on its state.
+                                    interpreter.execute(ControlEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
+  //                              }catch (Throwable t){
+    //                                  failedModules = failedModules + (failedModules.length()==0?"":",") + uri.toString();
+      //                          }
                             }
                             break;
                         }
@@ -212,7 +222,9 @@ public class QDLConfigurationLoaderUtils {
             }
             if (!foundModules.isEmpty()) {
                 x[QDL_MODULE_INDEX] = foundModules;
-
+            }
+            if(!failedModules.isEmpty()){
+                x[MODULE_FAILURES_INDEX] = failedModules;
             }
         } // end if loop
         return x;

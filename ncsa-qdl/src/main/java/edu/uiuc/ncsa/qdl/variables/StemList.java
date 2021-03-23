@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -113,7 +114,13 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
             if (obj == null) {
                 throw new seGapException();
             }
-            output = output + obj;
+            String vv;
+            if(obj instanceof BigDecimal){
+                vv = InputFormUtil.inputForm((BigDecimal) obj);
+            }else{
+                vv = obj.toString();
+            }
+            output = output + vv;
         }
 
         return output + "]";

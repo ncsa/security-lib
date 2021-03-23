@@ -138,8 +138,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     protected BigDecimal toBD(Object obj) {
         if (!isNumber(obj)) throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
         if (obj instanceof BigDecimal) return (BigDecimal) obj;
-        if (obj instanceof Long) return new BigDecimal((Long) obj);
-        if (obj instanceof Integer) return new BigDecimal((Integer) obj);
+        if (obj instanceof Long) return new BigDecimal((Long) obj, OpEvaluator.getMathContext());
+        if (obj instanceof Integer) return new BigDecimal((Integer) obj, OpEvaluator.getMathContext());
         throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
     }
 
