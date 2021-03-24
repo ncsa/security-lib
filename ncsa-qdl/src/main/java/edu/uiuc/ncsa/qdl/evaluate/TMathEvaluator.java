@@ -188,7 +188,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case EXP:
             case FQ_EXP:
-                doTranscendentalMath(polyad, EXP, state);
+                doTranscendentalMath(polyad, EXP, true, state);
                 return true;
             case PI:
             case FQ_PI:
@@ -213,7 +213,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 if (isBoolean(arg1) || isString(arg1) || arg1 == QDLNull.getInstance()) {
                     throw new IllegalArgumentException(N_ROOT + " requires a numeric argument as its base");
                 }
-                if (isBoolean(arg2) || isString(arg2) || arg2 == QDLNull.getInstance()){
+                if (isBoolean(arg2) || isString(arg2) || arg2 == QDLNull.getInstance()) {
                     throw new IllegalArgumentException(N_ROOT + " requires a numeric argument as its exponent");
                 }
 
@@ -223,7 +223,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 boolean isBaseNonNegative = false;
                 if (isBigDecimal(arg1)) {
                     base = (BigDecimal) arg1;
-                    isBaseNonNegative =0 <= base.signum();
+                    isBaseNonNegative = 0 <= base.signum();
                 }
                 if (isLong(arg1)) {
                     base = new BigDecimal((Long) arg1);
@@ -235,7 +235,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                     throw new IllegalArgumentException(N_ROOT + " requires an integer second argument");
                 }
                 if (isLong(arg2)) {
-                    if(0==(Long)arg2){
+                    if (0 == (Long) arg2) {
                         throw new IllegalArgumentException(N_ROOT + " cannot extract the zero-th root");
                     }
                     exponent = new BigDecimal((Long) arg2);
@@ -257,7 +257,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 if (!isBaseNonNegative) {
                     result = result.negate(mathContext);
                 }
-                 r.result =result;
+                r.result = result;
                 r.resultType = Constant.DECIMAL_TYPE;
                 return r;
             }
@@ -269,10 +269,30 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void computePi(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 0) {
-            throw new IllegalArgumentException(PI + " does not take any arguments");
+        if (1 < polyad.getArgCount()) {
+            throw new IllegalArgumentException(PI + " takes at most one argument");
         }
-        polyad.setResult(getPi(state.getOpEvaluator().getMathContext()));
+        Object exponent;
+        if (polyad.getArgCount() == 0) {
+            // implicit assumption that the exponent is 1.
+            polyad.setResult(getPi(state.getOpEvaluator().getMathContext()));
+        } else {
+            exponent = polyad.evalArg(0, state);
+
+            MathContext mathContext = OpEvaluator.getMathContext();
+            BigDecimal rr = null;
+            if (isLong(exponent)) {
+                rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (Long) exponent, mathContext);
+            }
+            if (isBigDecimal(exponent)) {
+                rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
+            }
+            if (rr == null) {
+                throw new IllegalArgumentException("Error: argument must be a number");
+            }
+            polyad.setResult(rr);
+
+        }
         polyad.setResultType(Constant.DECIMAL_TYPE);
         polyad.setEvaluated(true);
     }
@@ -344,6 +364,10 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private BigDecimal evaluateBD(BigDecimal x, MathContext mathContext, String op) {
+        return evaluateBD(x, mathContext, false, op);
+    }
+
+    private BigDecimal evaluateBD(BigDecimal x, MathContext mathContext, boolean doPowers, String op) {
         BigDecimal bd = null;
         switch (op) {
             case COSINE:
@@ -399,7 +423,24 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doTranscendentalMath(Polyad polyad, String op, State state) {
-        Object ob = polyad.evalArg(0, state);
+        doTranscendentalMath(polyad, op, false, state);
+    }
+
+    private void doTranscendentalMath(Polyad polyad, String op, boolean doPowers, State state) {
+        Object ob = null;
+        if (doPowers) {
+            if (polyad.getArgCount() == 0) {
+                ob = 1L; // so exp() returns e, pi() returns pi
+            }else{
+                ob = polyad.evalArg(0, state);
+            }
+        } else {
+            if (polyad.getArgCount() == 0) {
+                throw new IllegalArgumentException(op + " requires an argument");
+            }
+            ob = polyad.evalArg(0, state);
+        }
+
         MathContext mc = state.getOpEvaluator().getMathContext();
         if (ob instanceof Long) {
             BigDecimal x = new BigDecimal((Long) ob);
@@ -433,7 +474,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 if (x == null) {
                     throw new IllegalArgumentException("error \"" + x + "\" is not a number");
                 }
-                BigDecimal result = evaluateBD(x0, mc, op);
+                BigDecimal result = evaluateBD(x0, mc, doPowers, op);
                 outStem.put(key, result);
 
             }

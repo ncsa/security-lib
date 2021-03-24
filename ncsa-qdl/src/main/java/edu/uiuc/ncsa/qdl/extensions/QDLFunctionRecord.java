@@ -30,4 +30,6 @@ public class QDLFunctionRecord extends FunctionRecord {
         functionRecord.qdlFunction = qdlFunction;
         return functionRecord;
     }
+
+
 }

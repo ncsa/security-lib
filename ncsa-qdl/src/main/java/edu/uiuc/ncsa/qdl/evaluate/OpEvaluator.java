@@ -310,26 +310,27 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-        /*        if (!isLong(objects[1])) {
-                    throw new IllegalArgumentException("Exponentiation requires the second argument be an integer");
-                }*/
+
                 if (areAllNumbers(objects)) {
-                    if (areAllLongs(objects)) {
-                        Double dd = Math.pow((Long) objects[0], (Long) objects[1]);
-                        // wee bit of conversion since this only returns doubles, not longs
-                        r.result = dd.longValue();
-                        r.resultType = Constant.LONG_TYPE;
+                    boolean doBigD = isBigDecimal(objects[0]) || isBigDecimal(objects[1]);
+                    BigDecimal left = toBD(objects[0]);
+                    BigDecimal result;
+                    if (isLong(objects[1])) {
+                        result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (Long) objects[1], getMathContext());
                     } else {
-                        BigDecimal left = toBD(objects[0]);
-                        BigDecimal result;
-                        if (isLong(objects[1])) {
-                            result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (Long) objects[1], getMathContext());
-                        } else {
-                            result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (BigDecimal) objects[1], getMathContext());
-                        }
-                        r.result = result;
-                        r.resultType = Constant.DECIMAL_TYPE;
+                        result = ch.obermuhlner.math.big.BigDecimalMath.pow(left, (BigDecimal) objects[1], getMathContext());
                     }
+                    if (!doBigD) {
+                        try {
+                            r.result = result.longValueExact();
+                            r.resultType = Constant.LONG_TYPE;
+                            return r;
+                        } catch (ArithmeticException ax) {
+                        }
+                    }
+                    r.result = result;
+                    r.resultType = Constant.DECIMAL_TYPE;
+
                 } else {
                     throw new IllegalArgumentException("Exponentiation requires a int or decimal be raised to an int power");
                 }
@@ -497,14 +498,19 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 fpResult r = new fpResult();
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
-                        r.result = (Long) objects[0] - (Long) objects[1];
-                        r.resultType = Constant.LONG_TYPE;
-                    } else {
-                        BigDecimal left = toBD(objects[0]);
-                        BigDecimal right = toBD(objects[1]);
-                        r.result = left.subtract(right);
-                        r.resultType = Constant.DECIMAL_TYPE;
+                        try {
+                            r.result = Math.subtractExact((Long) objects[0], (Long) objects[1]);
+                            r.resultType = Constant.LONG_TYPE;
+                            return r;
+                        } catch (ArithmeticException arithmeticException) {
+                            // fall through to big decimal case
+                        }
                     }
+
+                    BigDecimal left = toBD(objects[0]);
+                    BigDecimal right = toBD(objects[1]);
+                    r.result = left.subtract(right);
+                    r.resultType = Constant.DECIMAL_TYPE;
                 } else {
                     if (!areAllStrings(objects)) {
                         throw new IllegalArgumentException("cannot perform " + MINUS + " on mixed argument types.");
@@ -531,9 +537,49 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAllNumbers(objects)) {
+                    if (doTimes) {
+                        if (areAllLongs(objects)) {
+                            try {
+                                r.result = Math.multiplyExact((Long) objects[0], (Long) objects[1]);
+                                r.resultType = Constant.LONG_TYPE;
+                                return r;
+                            } catch (ArithmeticException arithmeticException) {
+                                // fall through to BD case
+                            }
+                        }
+                        BigDecimal left = toBD(objects[0]);
+                        BigDecimal right = toBD(objects[1]);
+                        BigDecimal rr = left.multiply(right);
+                        try {
+                            r.result = rr.longValueExact();
+                            r.resultType = Constant.LONG_TYPE;
+
+                        } catch (ArithmeticException arithmeticException) {
+                            r.result = rr;
+                            r.resultType = Constant.DECIMAL_TYPE;
+                        }
+                        return r;
+                    } else {
+                        BigDecimal left = toBD(objects[0]);
+                        BigDecimal right = toBD(objects[1]);
+                        r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
+                    }
+
+                    r.resultType = Constant.DECIMAL_TYPE;
+                    return r;
+                     /*
                     if (areAllLongs(objects)) {
                         if (doTimes) {
-                            r.result = (Long) objects[0] * (Long) objects[1];
+                            try {
+                                r.result = Math.multiplyExact((Long) objects[0], (Long) objects[1]);
+                            } catch (ArithmeticException arithmeticException) {
+                                // ok, so over flow
+                                BigDecimal left = toBD(objects[0]);
+                                BigDecimal right = toBD(objects[1]);
+                                r.result = left.multiply(right);
+                                r.resultType = Constant.DECIMAL_TYPE;
+                                return r;
+                            }
                         } else {
                             // So dividing a long by a long might result in
                             // a decimal. This checks that and if so, return it,
@@ -549,7 +595,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                                     BigDecimal out = left.divide(right, getNumericDigits(), RoundingMode.DOWN);
                                     r.result = out;
                                     r.resultType = Constant.DECIMAL_TYPE;
-                                  return r;
+                                    return r;
                                 } catch (ArithmeticException x) {
 
                                 }
@@ -559,17 +605,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     } else {
                         BigDecimal left = toBD(objects[0]);
                         BigDecimal right = toBD(objects[1]);
-                        if (doTimes) {
-                            r.result = left.multiply(right);
-                        } else {
-                            r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
-                        }
+                        r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
                         r.resultType = Constant.DECIMAL_TYPE;
-                    }
+                    }*/
                 } else {
                     throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
-                return r;
             }
         };
         process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
@@ -584,8 +625,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
       join4(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][while[for_keys(i3, x.i0.i1)][z.i0.i1.i2.i3.:=x.i0.i1.i2.i3~y.i0.i1.i2.i3;];];];];return(z.);]
 
     */
+
+    // maximum long value is 9223372036854775807
+    // almost max is 9223372036854775806
+
     /**
-     * Fo dyadic plus.
+     * For dyadic plus.
+     *
      * @param dyad
      * @param state
      */
@@ -597,23 +643,28 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 fpResult r = new fpResult();
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
-                        r.result = (Long) objects[0] + (Long) objects[1];
-                        r.resultType = Constant.LONG_TYPE;
-                    } else {
-                        BigDecimal left = toBD(objects[0]);
-                        BigDecimal right = toBD(objects[1]);
-                        r.result = left.add(right);
-                        r.resultType = Constant.DECIMAL_TYPE;
+                        try {
+                            r.result = Math.addExact((Long) objects[0], (Long) objects[1]);
+                            r.resultType = Constant.LONG_TYPE;
+                            return r;
+                        } catch (ArithmeticException arithmeticException) {
+                            // fall through
+                        }
                     }
+
+                    BigDecimal left = toBD(objects[0]);
+                    BigDecimal right = toBD(objects[1]);
+                    r.result = left.add(right);
+                    r.resultType = Constant.DECIMAL_TYPE;
                     return r;
                 }
 
-                if(!isStem(objects[1] )){
+                if (!isStem(objects[1])) {
                     r.result = objects[0].toString() + objects[1].toString();
                     r.resultType = Constant.STRING_TYPE;
                     return r;
                 }
-               // This is a stem
+                // This is a stem
                 throw new IllegalArgumentException("error: stem encountered in scalar operation");
             }
         };

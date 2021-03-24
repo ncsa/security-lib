@@ -6,7 +6,7 @@
 grammar QDLVariableParser;
  // stem_ref : StemStart  ((Identifier | integer) '.')*;
   variable : Identifier;
-    number : Decimal | Integer;
+    number : Decimal | Integer | SCIENTIFIC_NUMBER;
    integer : Integer;
       fdoc : FDOC;
 
@@ -48,6 +48,16 @@ grammar QDLVariableParser;
     AllOps : Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
              LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot;
 
+SCIENTIFIC_NUMBER
+   : Decimal (E SIGN? Integer)?
+   ;
+fragment E
+   : 'E' | 'e'
+   ;
+
+fragment SIGN
+   : ('+' | '-')
+   ;
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
   Note: we have a single equals sign here as a lexical unit so the parser can later flag it as an error

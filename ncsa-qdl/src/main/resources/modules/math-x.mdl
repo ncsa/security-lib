@@ -80,7 +80,6 @@ module[
         >> plot(@sin(), 0, pi()/2, 10)
 
          x. := start + n($_n)*(stop - start)/($_n-1);
-         say(to_string(x.)) ;
          y. := f(x.);
          return(x.~|y.);
       ];
@@ -130,6 +129,26 @@ module[
         z. := for_each(@to_string(), a.) - ']' - '[';
         return(z.);
      ]; //end to_cvs
+     /*
+        To use this with gnuplot, go to a work directory (here I am using /tmp
+        but you should create your own),  and create
+        the file cfg.gnuplot containing the lines
 
+        set datafile separator ','
+        plot '/tmp/data.csv' using 1:2 with lines, '' using 1:3 with lines
+
+        Then to export QDL, try this in QDL
+
+        file := '/tmp/data.csv';
+        y. := pplot(@cos(),@sin(),-pi(),pi(),500);
+        file_write(file, to_csv([['x','y']]~y.));
+
+        At the command line, you can see the plot by running gnuplot like this:
+
+        gnuplot -p cfg.gnuplot
+
+        you should see a circle of radius 1.
+
+     */
      // file_write('/tmp/data.csv',  to_csv([['x','y']]~y.))
 ]; // end module

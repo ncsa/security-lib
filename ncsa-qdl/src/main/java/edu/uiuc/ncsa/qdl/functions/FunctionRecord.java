@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.functions;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 
 import java.io.Serializable;
@@ -19,8 +22,9 @@ public class FunctionRecord implements Serializable, Cloneable {
     public List<String> argNames = new ArrayList<>();
     public boolean isFuncRef = false;
     public String fRefName = null;
-    public int getArgCount(){
-        if(isFuncRef) return FREF_ARG_COUNT;
+
+    public int getArgCount() {
+        if (isFuncRef) return FREF_ARG_COUNT;
         return argNames.size();
     }
 
@@ -33,7 +37,7 @@ public class FunctionRecord implements Serializable, Cloneable {
                 ", argNames=" + argNames +
                 ", arg count = " + getArgCount() +
                 ", f_ref? = " + isFuncRef +
-                (fRefName==null?"":", ref_name = \"" + fRefName + "\"") +
+                (fRefName == null ? "" : ", ref_name = \"" + fRefName + "\"") +
                 '}';
     }
 
@@ -46,5 +50,14 @@ public class FunctionRecord implements Serializable, Cloneable {
         functionRecord.statements = statements;
         functionRecord.argNames = argNames;
         return functionRecord;
+    }
+
+    public FunctionRecord newInstance() throws Throwable {
+        State state = StateUtils.newInstance();
+        // Since the
+        QDLInterpreter interpreter = new QDLInterpreter(state);
+        interpreter.execute(sourceCode);
+        List<FunctionRecord> frs = state.getFTStack().peek().getAll();
+        return frs.get(0);
     }
 }

@@ -77,6 +77,11 @@ public class DebugUtil implements DebugConstants{
         return getInstance().isEnabled();
     }
 
+    public static void printStackTrace(Throwable t){
+        if(isEnabled()){
+            t.printStackTrace();
+        }
+    }
     public static void setIsEnabled(boolean isEnabled) {
         getInstance().setIsEnabled(isEnabled);
     }

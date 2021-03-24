@@ -66,6 +66,14 @@ public class FTStack implements FunctionTable {
     public FunctionTable peek() {
         return ftables.get(0);
     }
+    public List<FunctionRecord> getAll(){
+        List<FunctionRecord> all = new ArrayList<>();
+        for(FunctionTable ft : ftables){
+
+            all.addAll(ft.getAll());
+        }
+        return all;
+    }
 
     public void push(FunctionTable ft) {
         ftables.add(0, ft);

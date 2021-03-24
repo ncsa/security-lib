@@ -264,7 +264,16 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert areEqual(getStemValue("d.",state), arrayToStem(new int[] {-9, -4, -1, 0, -1, -4}));
         assert areEqual(getStemValue("e.",state), arrayToStem(new int[] {27, 8, 1, 0, -1, -8}));
         assert areEqual(getStemValue("f.",state), arrayToStem(new int[] {9, 6, 3, 0, -3, -6}));
-        assert areEqual(getStemValue("g.",state), arrayToStem(new double[] {.9, .6, .3, 0.0, -.3, -.6}));
+        StemVariable gStem = new StemVariable();
+        // Caveat: Bigdecimal from double always induces rounding, so use string constructor for exact tests.
+        gStem.listAppend(new BigDecimal(".9"));
+        gStem.listAppend(new BigDecimal(".6"));
+        gStem.listAppend(new BigDecimal(".3"));
+        gStem.listAppend(new Long(0L));
+        gStem.listAppend(new BigDecimal("-0.3"));
+        gStem.listAppend(new BigDecimal("-0.6"));
+        assert areEqual(getStemValue("g.",state), gStem);
+        //assert areEqual(getStemValue("g.",state), arrayToStem(new double[] {.9, .6, .3, 0, -.3, -.6}));
         assert areEqual(getStemValue("h.",state), arrayToStem(new double[] {-3.3, -2.3, -1.3, -0.3, .7, 1.7}));
         assert areEqual(getStemValue("i.",state), arrayToStem(new double[] {2.7, 1.7, .7, -.3, -1.3, -2.3}));
 

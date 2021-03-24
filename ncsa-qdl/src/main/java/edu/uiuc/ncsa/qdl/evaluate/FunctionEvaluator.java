@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
-import edu.uiuc.ncsa.qdl.exceptions.RecursionException;
-import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
@@ -99,7 +96,15 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         if (!polyad.isBuiltIn()) {
-            figureOutEvaluation(polyad, state);
+            try {
+                figureOutEvaluation(polyad, state);
+            }catch(Throwable t){
+                if(t instanceof RuntimeException){
+                    throw (RuntimeException)t;
+                }
+                QDLException q = new QDLException("error evaluating function", t);
+                throw q;
+            }
             return true;
         }
         return false;
@@ -154,7 +159,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
-    protected void figureOutEvaluation(Polyad polyad, State state) {
+    protected void figureOutEvaluation(Polyad polyad, State state) throws Throwable{
         FR_WithState frs;
         try {
             frs = state.resolveFunction(polyad);
@@ -170,7 +175,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         if (frs.isExternalModule) {
             doJavaFunction(polyad, state, frs);
         } else {
-            doFunctionEvaluation(polyad, state, frs);
+            doFunctionEvaluation(polyad, state, frs.functionRecord);
         }
     }
 
@@ -200,10 +205,23 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
        module['a:a', 'a'][f(x)->x+1;g(x)->f(x+2);];
        module_import('a:a');
        g(1);
+
+       y. := pplot(@cos(),@sin(),-pi(),pi(),50);
+       y. := pplot(@sin(),@cos(),-1,1,100);
+         lissy(x)->sin(x)*cosh(x)
+  y. := pplot(@lissx(), @lissy(), -pi(), pi(), 500
+
+  search >home_url  -out [home_url, email] -r  .*ncifcrf\.gov
+
      */
 
-    protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) {
-        FunctionRecord functionRecord = frs.functionRecord;
+    protected void doFunctionEvaluation(Polyad polyad, State state, FunctionRecord functionRecord) throws Throwable{
+        //FunctionRecord functionRecord ;
+  //      if(frs.functionRecord.isFuncRef){
+         //   functionRecord = frs.functionRecord;
+/*        } else{
+             functionRecord = frs.functionRecord.newInstance();
+        }*/
 
         if (functionRecord == null) {
             // see if its a reference instead
@@ -212,6 +230,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 throw new UndefinedFunctionException(" the function '" + polyad.getName() + "' with "
                         + polyad.getArgCount() + " arguments was not found.");
             }
+        }
+        if(!functionRecord.isFuncRef) {
+            functionRecord = functionRecord.newInstance();
         }
         State localState = state.newStateWithImports();
         //localState.getFTStack().push(frs.state.getFTStack().peek());
@@ -303,7 +324,12 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         for (Statement statement : functionRecord.statements) {
             try {
-                statement.evaluate(localState);
+                /*if(statement instanceof StatementWithResultInterface){
+                    StatementWithResultInterface swri = ((StatementWithResultInterface)statement).makeCopy();
+                    swri.evaluate(state);
+                }else {*/
+                    statement.evaluate(localState);
+                //}
             } catch (ReturnException rx) {
                 polyad.setResult(rx.result);
                 polyad.setResultType(rx.resultType);

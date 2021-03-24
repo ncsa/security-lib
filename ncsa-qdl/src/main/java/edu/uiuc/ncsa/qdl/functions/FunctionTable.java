@@ -32,6 +32,7 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
      * @return
      */
     List<FunctionRecord> getByAllName(String name);
+    List<FunctionRecord> getAll();
 
 
     void toXML(XMLStreamWriter xsw) throws XMLStreamException;

@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -401,7 +402,13 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         result = temp.toString();
                     }
                 } else {
-                    result = temp.toString();
+                    if(temp instanceof BigDecimal){
+                        result = InputFormUtil.inputForm((BigDecimal) temp);
+
+                    } else{
+
+                        result = temp.toString();
+                    }
                 }
             }
         }

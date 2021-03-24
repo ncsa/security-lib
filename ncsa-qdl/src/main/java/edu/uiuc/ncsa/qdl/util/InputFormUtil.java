@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
@@ -42,8 +43,18 @@ public class InputFormUtil {
     }
 
     public static String inputForm(BigDecimal d) {
-        String s = d.toPlainString();
-
+        d = d.stripTrailingZeros();
+        String s = d.toString();
+        if(OpEvaluator.getNumericDigits() < s.length()){
+            s = d.toEngineeringString();
+        }
+/*
+        String s = d.toString();
+        if(s.indexOf("E")!=-1){
+            s = s.replace("E", "*10^(");
+            s = s + ")";
+        }
+*/
 /*      This fails. Must take into account large integers first as well as sign.
         Just plain string works fine, so this is mostly cosmetic.
         int dIndex = s.indexOf(".");

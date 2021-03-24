@@ -81,6 +81,15 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     }
 
     @Override
+    public List<FunctionRecord> getAll() {
+        List<FunctionRecord> fList = new ArrayList<>();
+        for (String key : keySet()) {
+            fList.add(get(key));
+        }
+        return fList;
+    }
+
+    @Override
     public boolean isDefined(String var, int argCount) {
         if (argCount == -1) {
             for (String k : keySet()) {

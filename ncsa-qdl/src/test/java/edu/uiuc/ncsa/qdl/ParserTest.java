@@ -868,7 +868,8 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a.0", state) == 3L;
         assert getLongValue("a.1", state) == -2L;
         assert getLongValue("a.2", state) == 6L;
-        assert getLongValue("a.3", state) == 1L;
+    assert    areEqual(getBDValue("a.3", state), new BigDecimal("1.0"));
+       // assert getLongValue("a.3", state) == 1L;
         assert getLongValue("a.4", state) == 1L;
         assert getLongValue("a.5", state) == 125L;
     }
@@ -1804,8 +1805,33 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        assert getLongValue("y", state) == 5L : "passing multiple function references failed.";
+        assert areEqual(getBDValue("y", state), new BigDecimal("5.0")) : "passing multiple function references failed.";
 
+    }
+
+    /**
+     * THis tests that defining a function with a reference and repeatedly calling
+     * it with different arguments does indeed do the evaluation (and not get the state
+     * confused).
+     * @throws Throwable
+     */
+    @Test
+    public void testFunctionReferenceMultipleEvaluations() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "line(x)->x;");
+        addLine(script, "square(x)->x^2;");
+        addLine(script, "cube(x)->x^3;");
+        addLine(script, "f(@z(), x)->z(x);");
+        addLine(script, "x := f(@line(), 3);");
+        addLine(script, "y := f(@square(),3);");
+        addLine(script, "z := f(@cube(),3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        assert getLongValue("x", state).equals(3L);
+        assert getLongValue("y", state).equals(9L);
+        assert getLongValue("z", state).equals(27L);
     }
 
     /**
@@ -1954,6 +1980,36 @@ public class ParserTest extends AbstractQDLTester {
         assert getStringValue("out", state).indexOf("false") <0;
         // returns true if any elements are true
         StemVariable stem = getStemValue("x.", state);
+    }
+    @Test
+      public void testOverflowAdd() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "numeric_digits(25);");
+        addLine(script, "x := 9223372036854775806 + 6;"); // This is almost the largest value a long in Java can hold
+        addLine(script, "y := -9223372036854775805 - 6;"); // This is almost the smallest value a long in Java can hold
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert areEqual(getBDValue("x", state), new BigDecimal("9223372036854775812"));
+        assert areEqual(getBDValue("y", state), new BigDecimal("-9223372036854775811"));
+    }
+    @Test
+    public void testEngineeringNotation() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "numeric_digits(25);");
+        addLine(script, "x := 1.2E3+2.3E-2;");
+        addLine(script, "y := 1.2E3-2.3E-2;");
+        addLine(script, "z := 1.2E3*2.3E-2;");
+        addLine(script, "w := 1.2E3/2.3E-2;");
+        addLine(script, "t := 1.2E3^2.3E-2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert areEqual(getBDValue("x", state), new BigDecimal("1200.023"));
+        assert areEqual(getBDValue("y", state), new BigDecimal("1199.977"));
+        assert areEqual(getBDValue("z", state), new BigDecimal("27.6"));
+        assert areEqual(getBDValue("w", state), new BigDecimal("52173.913043478260869"));
+        assert areEqual(getBDValue("t", state), new BigDecimal("1.17712116537414"));
 
     }
 }
