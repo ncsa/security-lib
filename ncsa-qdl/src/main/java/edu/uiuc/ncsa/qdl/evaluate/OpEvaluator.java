@@ -120,6 +120,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         numericDigits = newNumericDigits;
         mathContext = new MathContext(numericDigits);
         TMathEvaluator.setPi(null); // zero it out, force recompute at new precision
+        TMathEvaluator.setNaturalLogBase(null);
     }
 
     public static int numericDigits = 15; // default precision for decimals.

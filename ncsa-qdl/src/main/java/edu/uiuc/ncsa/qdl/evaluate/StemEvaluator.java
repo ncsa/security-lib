@@ -1283,12 +1283,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 state,
                 LIST_APPEND + " requires stem as its first argument");
         Object arg2 = polyad.evalArg(1, state);
+        StemVariable outStem = new StemVariable();
+        outStem = (StemVariable) stem1.clone();
+        //outStem.(stem1);
         if (arg2 instanceof StemVariable) {
-            stem1.listAppend((StemVariable) arg2);
+            outStem.listAppend((StemVariable) arg2);
         } else {
-            stem1.listAppend(arg2);
+            outStem.listAppend(arg2);
         }
-        polyad.setResult(stem1);
+        polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
@@ -1707,7 +1710,7 @@ z. :=  join3(q.,w.)
   // Since this is the last index this joins each element into new elements, increasing the
   // rank of the stem by 1
      */
-      public static final Long JOIN_LAST_ARGUMENT_VALUE = new Long(-0xcafed00d);
+    public static final Long JOIN_LAST_ARGUMENT_VALUE = new Long(-0xcafed00d);
 
     protected void doJoin(Polyad polyad, State state) {
         Object[] args = new Object[polyad.getArgCount()];
@@ -1717,21 +1720,21 @@ z. :=  join3(q.,w.)
         }
         int depth = ((Long) args[2]).intValue();
         StemVariable leftStem;
-        if(isStem(args[0])) {
+        if (isStem(args[0])) {
             leftStem = (StemVariable) args[0];
-        }else{
+        } else {
             leftStem = new StemVariable();
             leftStem.put(0L, args[0]);
         }
         StemVariable rightStem;
-        if(isStem(args[1])){
+        if (isStem(args[1])) {
             rightStem = (StemVariable) args[1];
-        }else{
+        } else {
             rightStem = new StemVariable();
             rightStem.put(0L, args[1]);
         }
         boolean doJoinOnLastAxis = false;
-        if(depth == JOIN_LAST_ARGUMENT_VALUE){
+        if (depth == JOIN_LAST_ARGUMENT_VALUE) {
             doJoinOnLastAxis = true;
         }
         if (depth == 0) {
@@ -1750,21 +1753,33 @@ z. :=  join3(q.,w.)
             polyad.setEvaluated(true);
             return;
         }
-        if(doJoinOnLastAxis){
-            joinRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis);
-        }else{
-            joinRecursion(outStem, leftStem, rightStem, depth - 1, doJoinOnLastAxis);
+        StemUtility.AxisAction  joinAction = new StemUtility.AxisAction() {
+            @Override
+            public void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem) {
+                out.put(key, leftStem.union(rightStem));
+
+            }
+        };
+        if (doJoinOnLastAxis) {
+            StemUtility.axisRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis, joinAction);
+        } else {
+            StemUtility.axisRecursion(outStem, leftStem, rightStem, depth - 1, doJoinOnLastAxis, joinAction);
         }
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
-    protected void joinRecursion(StemVariable out0,
+    public interface AxisAction {
+        void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem);
+    }
+
+    protected void axisRecursion(StemVariable out0,
                                  StemVariable left0,
                                  StemVariable right0,
                                  int depth,
-                                 boolean maxDepth) {
+                                 boolean maxDepth,
+                                 AxisAction axisAction) {
         StemVariable commonKeys = left0.commonKeys(right0);
         for (String key0 : commonKeys.keySet()) {
             Object leftObj = left0.get(key0);
@@ -1793,7 +1808,7 @@ z. :=  join3(q.,w.)
             }
             boolean bottomedOut = areNoneStems(leftObj, rightObj) && maxDepth && 0 < depth;
             if (bottomedOut) {
-                out0.put(key0, left1.union(right1));
+                axisAction.action(out0, key0, left1, right1);
             } else {
                 if (0 < depth) {
                     if (areNoneStems(leftObj, rightObj)) {
@@ -1801,7 +1816,7 @@ z. :=  join3(q.,w.)
                     }
                     StemVariable out1 = new StemVariable();
                     out0.put(key0, out1);
-                    joinRecursion(out1, left1, right1, depth - 1, maxDepth);
+                    axisRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
                 } else {
                     out0.put(key0, left1.union(right1));
                 }

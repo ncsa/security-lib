@@ -1145,17 +1145,27 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         String phrase = "This is my stem " + getRandomString();
         addLine(script, "my_stem.help := '" + phrase + "';");
-        addLine(script, "list_append(my_stem., 10 + indices(5));");
+        addLine(script, "b. := 10 + indices(5);");
+        addLine(script, "b.foo := 'bar';");
+        addLine(script, "x. := list_append(my_stem., b.);");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
+        // original unchanged
         StemVariable stem = getStemValue("my_stem.", state);
-        assert stem.getLong("0") == 10L;
-        assert stem.getLong("1") == 11L;
-        assert stem.getLong("2") == 12L;
-        assert stem.getLong("3") == 13L;
-        assert stem.getLong("4") == 14L;
+        assert stem.size() == 1;
         assert stem.getString("help").equals(phrase);
+
+        // result has elements
+        StemVariable xstem = getStemValue("x.", state);
+        assert xstem.getLong("0") == 10L;
+        assert xstem.getLong("1") == 11L;
+        assert xstem.getLong("2") == 12L;
+        assert xstem.getLong("3") == 13L;
+        assert xstem.getLong("4") == 14L;
+
+        assert xstem.containsKey("help");
+        assert !xstem.containsKey("foo");
     }
 
     @Test

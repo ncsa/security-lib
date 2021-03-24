@@ -127,6 +127,19 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     static BigDecimal pi;
 
+    public static BigDecimal getNaturalLogBase(MathContext mathContext) {
+        if (naturalLogBase == null) {
+            naturalLogBase = ch.obermuhlner.math.big.BigDecimalMath.exp(BigDecimal.ONE, mathContext);
+        }
+        return naturalLogBase;
+    }
+
+    public static void setNaturalLogBase(BigDecimal naturalLogBase) {
+        TMathEvaluator.naturalLogBase = naturalLogBase;
+    }
+
+    static BigDecimal naturalLogBase;
+
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
@@ -430,7 +443,10 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
         Object ob = null;
         if (doPowers) {
             if (polyad.getArgCount() == 0) {
-                ob = 1L; // so exp() returns e, pi() returns pi
+                polyad.setResult(getNaturalLogBase(OpEvaluator.getMathContext()));
+                polyad.setResultType(Constant.DECIMAL_TYPE);
+                polyad.setEvaluated(true);
+                return;
             }else{
                 ob = polyad.evalArg(0, state);
             }

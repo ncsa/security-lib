@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 
@@ -47,7 +48,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     public abstract boolean evaluate(Polyad polyad, State state);
 
     protected boolean isStem(Object obj) {
-        return obj instanceof StemVariable;
+        return StemUtility.isStem(obj);
     }
 
     protected boolean isStemList(Object obj) {
@@ -70,18 +71,11 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     protected boolean areAllStems(Object... objects) {
-        for (Object arg : objects) {
-            if (!isStem(arg)) return false;
-        }
-        return true;
+      return StemUtility.areAllStems(objects);
     }
 
     protected boolean areNoneStems(Object... objects) {
-        for (Object arg : objects) {
-            if (isStem(arg)) return false;
-        }
-        return true;
-    }
+return StemUtility.areNoneStems(objects);    }
 
     protected boolean isString(Object obj) {
         return obj instanceof String;
