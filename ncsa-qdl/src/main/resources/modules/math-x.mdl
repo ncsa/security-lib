@@ -105,7 +105,7 @@ module[
          >> Apply a function to each element of a list. Some functions,
          >> such as to_string, operate on lists rather than element-wise
          >> This will apply the function to each enry of a stem.
-         >> For instance, if you are doing an export of a stem to some file forma
+         >> For instance, if you are doing an export of a stem to some file format
          >> like CVS, you would need to turn each line into a string to process it
          >> with a command like
          >> for_each(@to_string(), my_stem.)
@@ -125,7 +125,7 @@ module[
         >> E.g. here is the start of one
         >> a.0 := ['t', 'x', 'y']; // header
         >> a.1 := [0, .5, .345723445]; // first line of data
-        >> tip:  [['x','y']]~a. would stick in the headers.
+        >> tip:  [['t', 'x','y']]~a. would stick in the headers.
         z. := for_each(@to_string(), a.) - ']' - '[';
         return(z.);
      ]; //end to_cvs

@@ -687,7 +687,7 @@ public class State extends FunctionState implements QDLConstants {
 
     }
     SecureRandom secureRandom = new SecureRandom();
-    Base32 base32 = new Base32('_'); // set trailing char to be an underscore
+   transient  Base32 base32 = new Base32('_'); // set trailing char to be an underscore
 
     /**
      * Returns an unused variable name.

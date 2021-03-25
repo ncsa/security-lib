@@ -70,10 +70,8 @@ public abstract class StoreCommands extends CommonCommands {
 
 
     protected void showUpdateHelp() {
-        say("Updates an entry, that is to say, allows you to edit the values stored for an entry");
-        say("Syntax:\n");
         say("update index");
-
+        sayi("Use: Updates an entry, that is to say, allows you to edit the values stored for an entry");
     }
 
 
@@ -227,12 +225,11 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected void showCreateHelp() {
-        say("Create a new entry in the currently active store.");
-        say("Syntax is\n");
         say("create [id]\n");
-        say("where the id is a unique uri which will identify the object. (Note that there is not a lead slash! ");
-        say("Just enter the identifier if you want to set it. Be sure it is a valid uri.) If you do not specify an");
-        say("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
+        sayi("Usage: Create a new entry in the currently active store.");
+        sayi("where the id is a unique uri which will identify the object. (Note that there is not a lead slash! ");
+        sayi("Just enter the identifier if you want to set it. Be sure it is a valid uri.) If you do not specify an");
+        sayi("identifier, you will be prompted for one. You may also elect to have a new, random one created and assigned.");
     }
 
 
@@ -321,16 +318,15 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     protected void showRMHelp() {
-        say("Remove an item from the store. ");
-        say("Syntax:\n");
-        say("rm [index|uid]\n");
-        say("where index is the index number from the list (ls) command or the unique identifier for the item, preceeded");
-        say("by a forward slash\n");
+        say("rm [index|uid]");
+        sayi("Usage: Remove an item from the store. ");
+        sayi("where index is the index number from the list (ls) command or the unique identifier for the item, preceeded");
+        sayi("by a forward slash\n");
         say("Examples\n");
-        say("rm 12\n");
-        say("This removes item 12 on the list\n");
-        say("rm /http://cilogon.org/serverT/uid/123\n");
-        say("This removes the item with the given unique identifier from the current store, regardless of its position in the list command");
+        sayi("rm 12\n");
+        sayi("This removes item 12 on the list\n");
+        sayi("rm /http://cilogon.org/serverT/uid/123\n");
+        sayi("This removes the item with the given unique identifier from the current store, regardless of its position in the list command");
     }
 
     Identifier id = null;
@@ -344,9 +340,9 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     private void showClearIDHelp() {
-        say("clear_id - (no argument) clears the current defualt identifier.");
+        say("clear_id");
+        sayi("Usage: Clears the current defualt identifier.");
         say("See also: set_id, get_id");
-
     }
 
     public void set_id(InputLine inputLine) throws Throwable {
@@ -411,9 +407,9 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     private void showGetIDHelp() {
-        say("get_id - (no argument) show the current id if any.");
-        say("See also: clear_id, set_id");
-
+        say("get_id");
+        sayi("Usage: Show the current id if any.");
+        sayi("See also: clear_id, set_id");
     }
 
     /**
@@ -487,20 +483,21 @@ public abstract class StoreCommands extends CommonCommands {
 
     protected void showLSHelp() {
         say("ls [flags] [number]");
-        say("flags are");
-        say(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
-        say(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
-        say(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
-        say("If you have listed all objects you may use the index number as the argument. Or you can supply");
-        say("the identifier escaped with a /");
+        sayi("Usage: Show information about an object or objects.");
+        sayi("flags are");
+        sayi(StringUtils.RJustify(LINE_LIST_COMMAND, 4) + " = " + "line list of an object or all objects. Longer entries will be truncated.");
+        sayi(StringUtils.RJustify(ALL_LIST_COMMAND, 4) + " = " + " list of **every** entry in the store. You have been warned.");
+        sayi(StringUtils.RJustify(VERBOSE_COMMAND, 4) + " = " + "verbose list. All entries will be shown in their entirety.");
+        sayi("If you have listed all objects you may use the index number as the argument. Or you can supply");
+        sayi("the identifier escaped with a /");
         say("E.g.");
-        say("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
-        say("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
-        say("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
-        say("ls " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the ls -a command");
-        say("ls " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
-        say("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
-        say("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
+        sayi("ls " + LINE_LIST_COMMAND + " " + ALL_LIST_COMMAND + " = line listing of entire store. This may be huge.");
+        sayi("ls " + LINE_LIST_COMMAND + " = line list of the currently active object.");
+        sayi("ls " + ALL_LIST_COMMAND + "  = short list of the entire store.");
+        sayi("ls " + LINE_LIST_COMMAND + " 4 = line list of the 4th item from the ls -a command");
+        sayi("ls " + LINE_LIST_COMMAND + " /foo:bar = line list of the object with identifier foo:bar");
+        sayi("ls " + LINE_LIST_COMMAND + " foo:bar = line list of the object with identifier foo:bar");
+        sayi("ls " + VERBOSE_COMMAND + " foo:bar = verbose list of the object with identifier foo:bar");
     }
 
     protected final String LINE_LIST_COMMAND = "-l";
@@ -583,7 +580,8 @@ public abstract class StoreCommands extends CommonCommands {
     protected static String SIZE_ALL_FLAG = "-all";
     protected static String SIZE_VERSIONS_FLAG = "-versions";
     protected void showSizeHelp() {
-        say("size [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "] - prints out the number of  entries in the store ");
+        say("size [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "]");
+        sayi("Usage: Prints out the number of  entries in the store ");
         sayi("This by default does not count versions.");
         sayi(SIZE_ALL_FLAG + " = include a count of everything, including versions");
         sayi(SIZE_VERSIONS_FLAG + " = include a count of only versions.");
