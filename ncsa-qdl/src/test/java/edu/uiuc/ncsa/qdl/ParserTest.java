@@ -1972,6 +1972,22 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * Tests that functions defined in functions are resolved correctly.
+     * Here this computes (x+1)^2 as a composition of two functions, t and s.
+     * @throws Throwable
+     */
+    @Test
+          public void testNestedFunction() throws Throwable {
+            State state = testUtils.getNewState();
+            StringBuffer script = new StringBuffer();
+            addLine(script, "define[f(x)][t(x)->x+1;s(x)->x^2;return(s(t(x)));];");
+            addLine(script, "x := f(2);"); // This is almost the largest value a long in Java can hold
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert getLongValue("x",state).equals(9L);
+        }
+
+    /**
     * Devious test for this. Run it with the join command and check that
     * every value of the result is true as a string. This saves me from having
      * to do a low-level slog looking for any failures.

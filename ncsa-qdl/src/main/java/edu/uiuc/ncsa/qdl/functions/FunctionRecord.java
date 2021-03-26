@@ -53,6 +53,8 @@ public class FunctionRecord implements Serializable, Cloneable {
     }
 
    transient byte[] template = null;
+//    long startTime = 0L;
+  //  int loopCount = 0;
     /**
      * Create a new , clean copy of this function record for use. It will be
      * modified as part of being the local state during execution so a
@@ -62,15 +64,49 @@ public class FunctionRecord implements Serializable, Cloneable {
      * @return
      * @throws Throwable
      */
+    /*
+    Timings for
+
+      f(x)->x*sin(x)*exp(-x); while[for_next(j,5001)][f(j);];
+      1616711126720  start
+      1616711126721  1 ms to serialize functions
+      1             ms  to do  one deserialzation
+      253 [252]          total [elapsed] time for 1000 reps
+      440 [187]  "  " 2000
+      621 [181]  "   " 3000
+      801 [180] "   " 4000
+      982 [181] "  " 5000
+       5000.982 = 5.09 deserializations + executions per second. slow, but this also uses the big decimals
+
+      Much simpler function:
+      f(x)->x; while[for_next(j,5001)][f(j);];
+      1616711414417
+      1616711414417
+      0
+      72
+      137
+      199
+      264
+      327
+      gives 15.29 deserializations per second.
+
+     */
     public FunctionRecord newInstance() throws Throwable {
         if (template == null) {
+    //        startTime = System.currentTimeMillis();
+      //      System.out.println(startTime);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(this);
             oos.flush();
             oos.close();
             template = baos.toByteArray();
+      //      System.out.println(System.currentTimeMillis());
+
         }
+        //  if((loopCount++)%1000 == 0 ){
+          //    System.out.println(System.currentTimeMillis() - startTime);
+          //}
         ByteArrayInputStream bais = new ByteArrayInputStream(template);
         ObjectInputStream ois = new ObjectInputStream(bais);
         FunctionRecord fr = (FunctionRecord) ois.readObject();

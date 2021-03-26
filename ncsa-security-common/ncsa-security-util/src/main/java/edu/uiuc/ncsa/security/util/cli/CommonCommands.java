@@ -401,8 +401,8 @@ public abstract class CommonCommands implements Commands {
         String envFile = curentEnvFile;
         if (inputLine.hasArg(CL_OUTPUT_FILE_FLAG)) {
             envFile = inputLine.getNextArgFor(CL_OUTPUT_FILE_FLAG);
-            return;
         }
+
         if (!getDriver().hasEnv()) {
             // nix to do
             return;
@@ -430,6 +430,7 @@ public abstract class CommonCommands implements Commands {
             fos.flush();
             fos.close();
         }
+        say("stored env file to \"" + f.getAbsolutePath()+"\"");
     }
 
     protected void printEnvHelp() {

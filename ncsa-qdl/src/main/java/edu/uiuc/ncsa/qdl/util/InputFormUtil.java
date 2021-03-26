@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.util;
 
+import ch.obermuhlner.math.big.BigDecimalMath;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
@@ -15,7 +16,10 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -42,26 +46,67 @@ public class InputFormUtil {
         return myLong.toString();
     }
 
+    /*
+      f(x)->x*cos(x)*exp(-x);
+  g(x)->x^2*sin(x)*exp(1-x)
+    y. := pplot(@f(),@g(), -2,2,1000)
+    list_subset(y., 5, 10)
+
+     */
     public static String inputForm(BigDecimal d) {
+        return formatBD2(d);
+    }
+
+    protected static String formatBD(BigDecimal d) {
         d = d.stripTrailingZeros();
+        //  int newScale =   d.scale() - d.precision();
+        //  d.setScale(OpEvaluator.getNumericDigits(), RoundingMode.HALF_DOWN);
+        //d.setScale(OpEvaluator.getNumericDigits(), RoundingMode.HALF_DOWN);
+        BigDecimal frac = BigDecimalMath.fractionalPart(d);
+
         String s = d.toString();
-        if(OpEvaluator.getNumericDigits() < s.length()){
-            s = d.toEngineeringString();
+        int p = s.indexOf(".");
+        if (s.toUpperCase().indexOf("E") != -1) {
+            return s;
+        }
+        if (0 <= p) {
+            if (s.length() - p - 1 <= OpEvaluator.getNumericDigits()) {
+                // nix
+            } else {
+                s = s.substring(0, p + 1 + OpEvaluator.getNumericDigits());
+            }
+        }
+        return s; // Or it spits out scientific noation like .123E-15 which bombs in the parser
+    }
+
+    public static BigDecimal top = new BigDecimal("1000000000");
+    public static BigDecimal bottom = new BigDecimal("-1000000000");
+    protected static boolean isDBInRange(BigDecimal d){
+        int bb = bottom.compareTo(d);
+        int tt = d.compareTo(top);
+        return (bb <= 0 ) && (  tt <= 0);
+    }
+    protected static String formatBD2(BigDecimal d) {
+        try{
+            return Long.toString(d.longValueExact());
+        }catch(ArithmeticException arithmeticException) {
+            // rock on
         }
 /*
-        String s = d.toString();
-        if(s.indexOf("E")!=-1){
-            s = s.replace("E", "*10^(");
-            s = s + ")";
-        }
+            NumberFormat formatter = new DecimalFormat("#####.########");
+            formatter.setRoundingMode(RoundingMode.HALF_UP);
+            formatter.setMinimumFractionDigits(1);
+            formatter.setMaximumFractionDigits(OpEvaluator.getNumericDigits());
+            return formatter.format(d);
 */
-/*      This fails. Must take into account large integers first as well as sign.
-        Just plain string works fine, so this is mostly cosmetic.
-        int dIndex = s.indexOf(".");
-        if(OpEvaluator.getNumericDigits() < s.length()-dIndex){
-            s =  s.substring(dIndex, 1+dIndex + OpEvaluator.getNumericDigits());
-        }*/
-        return s; // Or it spits out scientific noation like .123E-15 which bombs in the parser
+
+        NumberFormat formatter = new DecimalFormat("0.0E0");
+        formatter.setRoundingMode(RoundingMode.HALF_UP);
+        //formatter.setMinimumFractionDigits((d.scale() > 0) ? d.precision() : d.scale());
+        formatter.setMinimumFractionDigits(1);
+        formatter.setMaximumFractionDigits(OpEvaluator.getNumericDigits());
+        return formatter.format(d);
+
     }
 
     public static String inputForm(String s) {
@@ -187,4 +232,37 @@ public class InputFormUtil {
         stemVariable.put("null", QDLNull.getInstance());
         System.out.println(stemVariable.inputForm());
     }
+    /*
+      y. := [n(4), n(4)+4, 8+n(4)]
+      yy. := [y., 100+y.]
+      yyy.:=[yy., 200 + yy., 400 + yy.]
+      yyy_reduce0. := reduce(@+, yyy.)
+      yyy_reduce1.0. :=  yyy.0.0 + yyy.0.1
+      yyy_reduce1.1. :=  yyy.1.0 + yyy.1.1
+      yyy_reduce1.2. :=  yyy.2.0 + yyy.2.1
+      yyy_reduce2.0. := yyy.0.0.0 + yyy.0.0.1 + yyy.0.0.2
+      yyy_reduce2.1. := yyy.0.1.0 + yyy.0.1.1 + yyy.0.1.2
+         yyy.
+      [
+       [[[0,1,2,3],[4,5,6,7],[8,9,10,11]],[[100,101,102,103],[104,105,106,107],[108,109,110,111]]],
+       [[[200,201,202,203],[204,205,206,207],[208,209,210,211]],[[300,301,302,303],[304,305,306,307],[308,309,310,311]]],
+       [[[400,401,402,403],[404,405,406,407],[408,409,410,411]],[[500,501,502,503],[504,505,506,507],[508,509,510,511]]]
+      ]
+         yyy_reduce0.
+      [
+       [[600,603,606,609],[612,615,618,621],[624,627,630,633]],
+       [[900,903,906,909],[912,915,918,921],[924,927,930,933]]
+      ]
+         yyy_reduce1.
+     [
+      [[100,102,104,106],[108,110,112,114],[116,118,120,122]],
+      [[500,502,504,506],[508,510,512,514],[516,518,520,522]],
+      [[900,902,904,906],[908,910,912,914],[916,918,920,922]]
+     ]
+        yyy.reduce2.
+     [
+      [12,15,18,21],
+      [312,315,318,321]
+     ]
+     */
 }

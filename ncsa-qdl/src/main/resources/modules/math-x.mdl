@@ -70,35 +70,79 @@ module[
      return(reduce(@+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
    ];
 
+   define[
+     interval(x.)
+     ][
+     >> creates a stem from [start, stop, count] that are count elements evenly distributed.
+     >> This is used in the plotting programs
+     >> E.g.
+     >> interval([-2,3,10])
+     >> [-2,-1.445,-0.889,-0.3333,0.222,0.777,1.333,1.888,2.444,3]
+     >> (with numeric digits set to 3 so it's a tidy example.)
+        return(n(x.2)/(x.2-1)*(x.1 - x.0) + x.0);
+     ]; //end interval
+
       define[
-         plot(@f(), start, stop, $_n)
+         plot(@f(), arg.)
       ][
         >> A program to generate the plot points a real valued function over an interval
-        >> (start, stop) with n total points.
+        >> [start, stop, n].
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
-        >> plot(@sin(), 0, pi()/2, 10)
+        >> plot(@sin(), [0, pi()/2, 10])
 
-         x. := start + n($_n)*(stop - start)/($_n-1);
+         x. := interval(arg.);
          y. := f(x.);
          return(x.~|y.);
       ];
 
       define[
-         pplot(@_x(), @_y(), start, stop, _n)
+         pplot(@x(), @y(), arg.)
       ][
         >> A program to generate the parametric plot points of two real valued function over an interval
-        >> (start, stop) with n total points.
+        >> [start, stop, n]
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
-        >> pplot(@sin(),@cos(),  0, pi()/2, 10)
-        if[_n < 2][say('sorry, you need at least 2 points');return();];
-         __t. := start + n(_n)*(stop - start)/(_n-1);
-         __x. := _x(__t.);
-         __y. := _y(__t.);
-         return(__x.~|__y.);
+        >> pplot(@sin(),@cos(),  [0, pi()/2, 10])
+        if[arg.2 < 2][say('sorry, you need at least 2 points');return();];
+         t. := interval(arg.);
+         x. := x(t.);
+         y. := y(t.);
+         return(x.~|y.);
       ];
- 
+       define[
+          splot(@x(), @y(), @z(), t_arg., s_arg.)
+       ][
+         >> A program to generate the parametric surface plot points of three real valued functions
+         >> over the intervals [start0, stop0,  n0] and [start1, stop1,  n1].
+         >> The result is a list of (x,y,z) coordinates.
+         >> E.g.
+         >> x(t,s)->sin(t)*cosh(s)
+         >> y(t,s)->cos(t)*sinh(s)
+         >> z(t,s)->sin(2*t)*cos(3*s)
+         >> t. :=[-1,1,10]
+         >> s. :=[0,1,10]
+         >> splot(@x(), @y(), @z(), t., s.)
+
+          if[t_arg.2 < 2 || s_arg.2 < 2][say('sorry, you need at least 2 points');return();];
+          t. := interval(t_arg.);
+          s. := interval(s_arg.);
+          x. := x(t., s.);
+          y. := y(t., s.);
+          z. := z(t., s.);
+          // In the next bit, x.~|y. creates the two columns, then we just need
+          // to add z. to it.
+          return(join(x.~|y., z., 1));
+       ];
+       /*
+         x(t,s)->sin(t)*cosh(s)
+         y(t,s)->cos(t)*sinh(s)
+         z(t,s)->sin(2*t)*cos(3*s)
+         t. :=[-1,1,10]
+         s. :=[0,1,10]
+         splot(@x(), @y(), @z(), t., s.)
+       */
+
       define[
          for_each(@f(),a.)
       ][
