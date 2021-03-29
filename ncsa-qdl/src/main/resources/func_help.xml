@@ -1522,7 +1522,22 @@ join(x., y., 0 ) == x.~y.
                 ]]>
             </body>
         </entry>
-
+    <entry id="list_reverse">
+            <body>
+                <![CDATA[
+list_reverse(list.) - reverse the elements of a list
+E.g.
+  list_reverse(n(5))
+[4,3,2,1,0]
+Another example on a list of lists
+  p. := [n(3),n(2)]
+  p.
+[[0,1,2], [0,1]]
+  list_reverse(p.)
+[[0,1],[0,1,2]]
+]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->
