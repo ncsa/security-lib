@@ -150,8 +150,11 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Object remove(Long key) {
+        getStemList().remove(key);
+/*
         StemEntry stemEntry = new StemEntry(key);
         getStemList().remove(stemEntry);
+*/
         return null;
     }
 
@@ -163,14 +166,11 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Object get(Long key) {
-        StemEntry index = new StemEntry(key);
-        if (!getStemList().contains(index) && defaultValue != null) {
+        Object rc = getStemList().get(key);
+        if(rc == null && defaultValue != null){
             return defaultValue;
         }
-        if (getStemList().contains(index)) {
-            return getStemList().floor(index).entry;
-        }
-        return null;
+        return rc;
     }
 
     /**
@@ -715,7 +715,7 @@ public class StemVariable extends HashMap<String, Object> {
         return this;
     }
 
-    String int_regex = "[1-9][0-9]*";
+    String int_regex = "[+-]?[1-9][0-9]*";
 
     public boolean isLongIndex(String key) {
         // special case of index being zero!! Otherwise, no such index can start with zero,

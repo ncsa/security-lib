@@ -63,15 +63,25 @@ public class QDLVariableTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
 
         state.setValue("i", 0L);
+        state.setValue("j", 1L);
+        state.setValue("k", -1L); // relative index
         // first test, i = 0, so foo.i should resolve to foo.0
         String stem = "foo.i";
         String value = "abc";
-        state.setValue(stem, value);
+        state.setValue("foo.i", value);
+        state.setValue("foo.j", value);
+
+
         assert state.isDefined(stem);
         state.remove(stem);
         assert !state.isDefined(stem);
+        state.setValue("foo.i", value);
+        state.remove("foo.k"); // removes last one
+        assert !state.isDefined("foo.j");
+
         state.remove("i");
         assert !state.isDefined("i");
+
     }
 
     /**

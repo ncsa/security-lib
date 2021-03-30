@@ -1130,10 +1130,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doMakeIndex(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("the " + MAKE_INDICES + " function requires 1 argument");
+        if (0 == polyad.getArgCount()) {
+            throw new IllegalArgumentException("the " + MAKE_INDICES + " function requires at least 1 argument");
         }
         polyad.evalArg(0, state);
+
         Object arg = polyad.getArguments().get(0).getResult();
         if (!(arg instanceof Long)) {
             polyad.setResult(new StemVariable()); // just an empty stem
@@ -1141,12 +1142,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        long size = (Long) arg;
+        Object[] fill = null;
+        if (polyad.getArgCount() != 1) {
+            Object lastArg = polyad.evalArg(polyad.getArgCount() - 1, state);
+            if (!isStem(lastArg)) {
+                // fine, no fill.
+            } else {
+                StemVariable fillStem = (StemVariable) lastArg;
+                if(!fillStem.isList()){
+                    throw new IllegalArgumentException("error: fill argument must be a list of scalars");
+                }
+                StemList stemList = fillStem.getStemList();
+                fill = stemList.toArray(true, false);
+            }
+        }
 
+        long size = (Long) arg;
+        StemList stemList;
+        if (fill == null || fill.length == 0) {
+            stemList = new StemList(size);
+        } else {
+            stemList = new StemList(size, fill);
+        }
         StemVariable out = new StemVariable();
+        out.setStemList(stemList);
+/*
         for (int i = 0; i < size; i++) {
             out.put(Integer.toString(i), new Long(i));
         }
+*/
         polyad.setResult(out);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
@@ -1753,7 +1777,7 @@ z. :=  join3(q.,w.)
             polyad.setEvaluated(true);
             return;
         }
-        StemUtility.AxisAction  joinAction = new StemUtility.AxisAction() {
+        StemUtility.AxisAction joinAction = new StemUtility.AxisAction() {
             @Override
             public void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem) {
                 out.put(key, leftStem.union(rightStem));

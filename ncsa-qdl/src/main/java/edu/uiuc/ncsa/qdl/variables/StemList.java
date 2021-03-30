@@ -17,6 +17,26 @@ import java.util.TreeSet;
  * on 2/20/20 at  8:39 AM
  */
 public class StemList<V extends StemEntry> extends TreeSet<V> {
+    public StemList() {
+        super();
+    }
+
+    public StemList(long size) {
+        for (long i = 0L; i < size; i++) {
+            StemEntry stemEntry = new StemEntry(i, i);
+            add((V) stemEntry);
+        }
+    }
+
+    public StemList(long size, Object[] fill) {
+        int fillSize = fill.length;
+        for (long i = 0L; i < size; i++) {
+
+            StemEntry stemEntry = new StemEntry(i, fill[(int) i % fillSize]);
+            add((V) stemEntry);
+        }
+    }
+
     /**
      * Runs over <i>every</i> enetry in the stem list (including danglers).
      * result is a standard list (starts at 0, no gaps) of unique elements.
@@ -37,9 +57,20 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
 
     public Object get(long index) {
+        if (index < 0L) {
+            index = size() + index;
+        }
         V stemEntry = (V) new StemEntry(index);
         if (!contains(stemEntry)) return null;
         return floor(stemEntry).entry;
+    }
+
+    public boolean remove(Long index) {
+        if (index < 0L) {
+            index = size() + index;
+        }
+        V stemEntry = (V) new StemEntry(index);
+        return super.remove(stemEntry);
     }
 
     /**
@@ -115,9 +146,9 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
                 throw new seGapException();
             }
             String vv;
-            if(obj instanceof BigDecimal){
+            if (obj instanceof BigDecimal) {
                 vv = InputFormUtil.inputForm((BigDecimal) obj);
-            }else{
+            } else {
                 vv = obj.toString();
             }
             output = output + vv;
@@ -149,7 +180,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
 
     public String inputForm(int indent) {
-       return inputForm(indent, "");
+        return inputForm(indent, "");
     }
 
     public String inputForm() {
@@ -201,5 +232,31 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
 
     int rank = -1;
+
+    /**
+     * Convert this to an array of objects. Note that there may be gaps
+     * filled in with null values if this is sparse.
+     *
+     * @param noGaps  - if true, truncates array at first encountered gap
+     * @param allowStems - if true, hitting a stem throws an exception.
+     * @return
+     */
+    public Object[] toArray(boolean noGaps, boolean allowStems) {
+        Object[] r = new Object[size()];
+
+        for (long i = 0L; i < size(); i++) {
+            Object o = get(i);
+            if (!allowStems && (o instanceof StemVariable)) {
+                throw new IllegalArgumentException("error: a stem is not allowed in this list");
+            }
+            if (o == null && noGaps) {
+                Object[] r2 = new Object[(int) i];
+                System.arraycopy(r, 0, r2, 0, (int) i);
+                return r2;
+            }
+            r[(int) i] = o;
+        }
+        return r;
+    }
 
 }
