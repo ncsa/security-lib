@@ -29,10 +29,19 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
 
     public StemList(long size, Object[] fill) {
-        int fillSize = fill.length;
-        for (long i = 0L; i < size; i++) {
 
-            StemEntry stemEntry = new StemEntry(i, fill[(int) i % fillSize]);
+        int fillSize = -1;
+        if (fill != null && fill.length!=0) {
+            fillSize = fill.length;
+        }
+        StemEntry stemEntry;
+        for (long i = 0L; i < size; i++) {
+            if (fill == null) {
+                stemEntry = new StemEntry(i, i);
+            } else {
+
+                stemEntry = new StemEntry(i, fill[(int) i % fillSize]);
+            }
             add((V) stemEntry);
         }
     }
@@ -107,24 +116,37 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
 
     public String toString(int indentFactor, String currentIndent) {
-        String output = currentIndent + "[\n";
+        String output = currentIndent + "[";
         String newIndent = currentIndent + StringUtils.getBlanks(indentFactor);
-
+        boolean needsCRWithClosingBrace = true;
         boolean isFirst = true;
         for (long i = 0; i < size(); i++) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                output = output + ",\n";
-            }
+
             Object obj = get(i);
             if (obj == null) {
                 throw new seGapException();
             }
-            output = output + newIndent + StemConverter.convert(obj);
+            if(obj instanceof StemVariable){
+                if (isFirst) {
+                    isFirst = false;
+                    output = output + "\n";
+                } else {
+                    output = output + ",\n";
+                }
+                output = output + newIndent +   ((StemVariable) obj).toString(indentFactor, newIndent);
+            }else{
+                needsCRWithClosingBrace = false;
+                if(isFirst){
+                    isFirst = false;
+                    output = output  + StemConverter.convert(obj);
+                }   else{
+
+                    output = output + "," + StemConverter.convert(obj);
+                }
+            }
         }
 
-        return output + "\n]";
+        return output + (needsCRWithClosingBrace?"\n"+newIndent + "]":"]") ;
     }
 
     public String toString(int indentFactor) {
@@ -237,7 +259,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
      * Convert this to an array of objects. Note that there may be gaps
      * filled in with null values if this is sparse.
      *
-     * @param noGaps  - if true, truncates array at first encountered gap
+     * @param noGaps     - if true, truncates array at first encountered gap
      * @param allowStems - if true, hitting a stem throws an exception.
      * @return
      */

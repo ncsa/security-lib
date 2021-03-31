@@ -139,6 +139,8 @@ public class TokenUtils {
         q = host + token + "/" + uid + "/" + now.getTime() + "?version=" + version + "&lifetime=" + lifetime;
         uriQ = URI.create(q);
         print(uriQ);
+
+        System.out.println(b32DecodeToken("NB2HI4DTHIXS65DFON2C4Y3JNRXWO33OFZXXEZZPN5QXK5DIGIXTMNZXMY3GKZJRMIZTKYZWG44WKMZXG5RTKMZXMJRGENRRGNRTCOJ7OR4XAZJ5OJSWM4TFONUFI33LMVXCM5DTHUYTMMJXGIYTINBZG4YTKMRGOZSXE43JN5XD25RSFYYCM3DJMZSXI2LNMU6TSMBQGAYDA"));
     }
 
     static void print(URI uriQ) {

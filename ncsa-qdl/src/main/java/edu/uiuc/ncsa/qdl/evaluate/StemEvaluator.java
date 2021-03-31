@@ -1143,37 +1143,72 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         Object[] fill = null;
+        boolean hasFill = true;
         if (polyad.getArgCount() != 1) {
             Object lastArg = polyad.evalArg(polyad.getArgCount() - 1, state);
             if (!isStem(lastArg)) {
                 // fine, no fill.
+                hasFill = false;
             } else {
                 StemVariable fillStem = (StemVariable) lastArg;
-                if(!fillStem.isList()){
+                if (!fillStem.isList()) {
                     throw new IllegalArgumentException("error: fill argument must be a list of scalars");
                 }
                 StemList stemList = fillStem.getStemList();
                 fill = stemList.toArray(true, false);
+                hasFill = true;
             }
         }
+        // Special case is a simple list. n(3) should yield [0,1,2] rather than a 1x3
+        // array (recursion automatically boxes it into at least a 2 rank array).
+        if(polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill)){
+            long size = (Long) arg;
+                StemList stemList;
+                if (fill == null || fill.length == 0) {
+                    stemList = new StemList(size);
+                } else {
+                    stemList = new StemList(size, fill);
+                }
+                StemVariable out = new StemVariable();
+                out.setStemList(stemList);
 
-        long size = (Long) arg;
-        StemList stemList;
-        if (fill == null || fill.length == 0) {
-            stemList = new StemList(size);
-        } else {
-            stemList = new StemList(size, fill);
+
+                polyad.setResult(out);
+                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setEvaluated(true);
+                return;
+        }
+
+        int lastArgIndex = polyad.getArgCount() - 1;
+        if (fill != null && fill.length != 0) {
+            lastArgIndex--; // last arg is the fill pattern
+        }
+        int[] lengths = new int[lastArgIndex + 1];
+        for (int i = 0; i < lastArgIndex + 1; i++) {
+            lengths[i] = ((Long) polyad.evalArg(i, state)).intValue();
         }
         StemVariable out = new StemVariable();
-        out.setStemList(stemList);
-/*
-        for (int i = 0; i < size; i++) {
-            out.put(Integer.toString(i), new Long(i));
-        }
-*/
+        indexRecursion(out, lengths, 0,  fill);
         polyad.setResult(out);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+        return;
+}
+
+  
+    protected void indexRecursion(StemVariable out, int[] lengths, int index,  Object[] fill) {
+        for (int i = 0; i < lengths[index]; i++) {
+            if (lengths.length == index + 2) {
+                // end of recursion
+                StemVariable out1 = new StemVariable((long) lengths[lengths.length-1], fill);
+                out.put((long) i, out1);
+
+            } else {
+                StemVariable out1 = new StemVariable();
+                indexRecursion(out1, lengths, index + 1, fill);
+                out.put((long) i, out1);
+            }
+        }
 
     }
 

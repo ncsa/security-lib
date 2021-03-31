@@ -158,6 +158,14 @@ public class StemVariable extends HashMap<String, Object> {
         return null;
     }
 
+    public StemVariable() {
+    }
+
+    public StemVariable(Long count, Object[] fillList) {
+        StemList s = new StemList(count,fillList);
+        setStemList(s);
+    }
+
     public Object remove(String key) {
         if (isLongIndex(key)) {
             return remove(Long.parseLong(key.toString()));
