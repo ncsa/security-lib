@@ -79,7 +79,11 @@ module[
      >> interval([-2,3,10])
      >> [-2,-1.445,-0.889,-0.3333,0.222,0.777,1.333,1.888,2.444,3]
      >> (with numeric digits set to 3 so it's a tidy example.)
-        if[x.2 <= 1][raise_error('interval: the number of divisions must be greater than 1', 1);];
+
+        if[var_type(x.) != 4][raise_error('interval: argument must be a list',1);];
+        if[size(x.) != 3][raise_error('interval: list must have 3 elements',1);];
+        if[var_type(x.2) != 2][raise_error('interval: the number of divisions must be an integer.', 1);];
+        if[x.2 <= 1][raise_error('interval: you need at least 2 divisions for an interval', 1);];
         return(n(x.2)/(x.2-1)*(x.1 - x.0) + x.0);
      ]; //end interval
 
@@ -105,7 +109,6 @@ module[
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
         >> pplot(@sin(),@cos(),  [0, pi()/2, 10])
-        if[arg.2 < 2][say('sorry, you need at least 2 points');return();];
          t. := interval(arg.);
          x. := x(t.);
          y. := y(t.);
@@ -171,6 +174,7 @@ module[
         >> a.0 := ['t', 'x', 'y']; // header
         >> a.1 := [0, .5, .345723445]; // first line of data
         >> tip:  [['t', 'x','y']]~a. would stick in the headers.
+        // convert each entry and remove the [] so its just numbers
         z. := for_each(@to_string(), a.) - ']' - '[';
         return(z.);
      ]; //end to_cvs

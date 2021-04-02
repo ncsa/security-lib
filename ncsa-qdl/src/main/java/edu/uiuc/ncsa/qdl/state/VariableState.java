@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.functions.FunctionTableImpl;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -196,7 +195,11 @@ public abstract class VariableState extends NamespaceAwareState {
             if (object instanceof QDLNull) {
                 isQDLNull = true;
             } else {
-                stem = (StemVariable) st.resolveValue(getFQName(variableName));
+                Object oooo = st.resolveValue(getFQName(variableName));
+                if(oooo!=null && !(oooo instanceof StemVariable)){
+                    throw new IllegalArgumentException("error: a stem was expected");
+                }
+                stem = (StemVariable) oooo;
             }
             // most likely place for it was in the main symbol table. But since there is
             // no name clash, look for it in the modules.

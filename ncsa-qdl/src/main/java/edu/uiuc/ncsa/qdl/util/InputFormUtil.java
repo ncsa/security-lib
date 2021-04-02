@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -79,30 +78,35 @@ public class InputFormUtil {
         return s; // Or it spits out scientific noation like .123E-15 which bombs in the parser
     }
 
-    public static BigDecimal top = new BigDecimal("1000000000");
-    public static BigDecimal bottom = new BigDecimal("-1000000000");
+    public static BigDecimal top = new BigDecimal("1000000000"); // 1 billion
+    public static BigDecimal bottom = new BigDecimal("-1000000000"); // -1 billion
+    protected static DecimalFormat Dformatter = new DecimalFormat("0.0");
+    protected static DecimalFormat Eformatter = new DecimalFormat("0.0E0");
+
     protected static boolean isDBInRange(BigDecimal d){
-        int bb = bottom.compareTo(d);
-        int tt = d.compareTo(top);
-        return (bb <= 0 ) && (  tt <= 0);
+        int exp= BigDecimalMath.exponent(d);
+        return -9 < exp && exp < 9;
+        //return (0 <= d.compareTo(bottom)  ) && (  d.compareTo(top) <= 0);
     }
     protected static String formatBD2(BigDecimal d) {
-        try{
-            return Long.toString(d.longValueExact());
-        }catch(ArithmeticException arithmeticException) {
-            // rock on
-        }
-/*
-            NumberFormat formatter = new DecimalFormat("#####.########");
-            formatter.setRoundingMode(RoundingMode.HALF_UP);
-            formatter.setMinimumFractionDigits(1);
-            formatter.setMaximumFractionDigits(OpEvaluator.getNumericDigits());
-            return formatter.format(d);
-*/
+        DecimalFormat formatter;
+        if(isDBInRange(d)) {
 
-        NumberFormat formatter = new DecimalFormat("0.0E0");
+            try {
+                return Long.toString(d.longValueExact());
+            } catch (ArithmeticException arithmeticException) {
+                // rock on
+                formatter = Dformatter;
+
+            }
+        }else{
+            formatter = Eformatter;
+
+        }
+
+        // If the number is in a small range, just output the number. Otherwise, use
+        // scientific notation.
         formatter.setRoundingMode(RoundingMode.HALF_UP);
-        //formatter.setMinimumFractionDigits((d.scale() > 0) ? d.precision() : d.scale());
         formatter.setMinimumFractionDigits(1);
         formatter.setMaximumFractionDigits(OpEvaluator.getNumericDigits());
         return formatter.format(d);

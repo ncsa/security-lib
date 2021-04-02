@@ -1139,7 +1139,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         Object arg = polyad.getArguments().get(0).getResult();
         // First argument always has to be an integer.
         if (!(arg instanceof Long)) {
-            throw new IndexError("error: only non-negative integer arguments are allowed");
+            throw new IndexError("error: only non-negative integer arguments are allowed in " + SHORT_MAKE_INDICES + " or " + MAKE_INDICES);
         }
         Object[] fill = null;
         CyclicArgList cyclicArgList = null;
