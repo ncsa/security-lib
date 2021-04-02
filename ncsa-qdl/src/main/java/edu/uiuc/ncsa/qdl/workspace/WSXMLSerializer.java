@@ -117,6 +117,15 @@ public class WSXMLSerializer {
             workspaceCommands.bufferManager.toXML(xsw);
         }
 
+        List<String> ch = workspaceCommands.commandHistory;
+        if(ch!=null && !ch.isEmpty()){
+            xsw.writeStartElement(COMMAND_HISTORY);
+            StemVariable stemVariable = new StemVariable();
+            stemVariable.addList(ch);
+            XMLUtils.write(xsw, stemVariable);
+            xsw.writeEndElement();
+        }
+
         List<String> s = workspaceCommands.getState().getScriptPaths();
         if (s != null && !s.isEmpty()) {
             xsw.writeStartElement(SCRIPT_PATH);
@@ -168,7 +177,10 @@ public class WSXMLSerializer {
         return fromXML(xer, false);
 
     }
-
+    /*
+       sin(n(2,3,4,interval([0,pi()/2, 24])))^2 + cos(n(2,3,4,interval([0,pi()/2, 24])))^2
+       nroot(n(4,3,2,interval([-1,1,24])), 3)
+     */
     public WorkspaceCommands fromXML(XMLEventReader xer, boolean workspaceAttributesOnly) throws XMLStreamException {
         if (!xer.hasNext()) {
             say("Error! no XML found to deserialize");
@@ -205,6 +217,9 @@ public class WSXMLSerializer {
                                 break;
                             case SCRIPT_PATH:
                                 testCommands.state.setScriptPaths(getStemAsListFromXML(SCRIPT_PATH, xer));
+                                break;
+                            case COMMAND_HISTORY:
+                                testCommands.commandHistory = getStemAsListFromXML(COMMAND_HISTORY, xer);
                                 break;
                             case MODULE_PATH:
                                 testCommands.state.setModulePaths(getStemAsListFromXML(MODULE_PATH, xer));

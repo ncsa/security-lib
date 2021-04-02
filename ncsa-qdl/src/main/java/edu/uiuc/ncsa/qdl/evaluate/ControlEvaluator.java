@@ -1295,7 +1295,9 @@ reduce(*times(), 1+n(5))
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
-        throw new RaiseErrorException(polyad);
+        // set the message in the exception to the message from the error, so if it happens in the course of execution
+        // they get a message
+        throw new RaiseErrorException(polyad, arg1.toString());
     }
 
     protected void doReturn(Polyad polyad, State state) {

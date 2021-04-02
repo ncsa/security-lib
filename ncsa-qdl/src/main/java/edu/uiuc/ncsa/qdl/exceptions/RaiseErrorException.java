@@ -20,4 +20,9 @@ public class RaiseErrorException extends QDLException {
     public RaiseErrorException(Polyad polyad) {
         this.polyad = polyad;
     }
+    public RaiseErrorException(Polyad polyad, String message) {
+        super(message);
+        this.polyad = polyad;
+
+    }
 }

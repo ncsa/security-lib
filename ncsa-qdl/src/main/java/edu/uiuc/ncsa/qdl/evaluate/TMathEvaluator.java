@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -440,66 +439,36 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doTranscendentalMath(Polyad polyad, String op, boolean doPowers, State state) {
-        Object ob = null;
-        if (doPowers) {
-            if (polyad.getArgCount() == 0) {
-                polyad.setResult(getNaturalLogBase(OpEvaluator.getMathContext()));
-                polyad.setResultType(Constant.DECIMAL_TYPE);
-                polyad.setEvaluated(true);
-                return;
-            }else{
-                ob = polyad.evalArg(0, state);
-            }
-        } else {
-            if (polyad.getArgCount() == 0) {
-                throw new IllegalArgumentException(op + " requires an argument");
-            }
-            ob = polyad.evalArg(0, state);
-        }
-
-        MathContext mc = state.getOpEvaluator().getMathContext();
-        if (ob instanceof Long) {
-            BigDecimal x = new BigDecimal((Long) ob);
-            BigDecimal result = evaluateBD(x, mc, op);
-            polyad.setEvaluated(true);
-            polyad.setResult(result);
+        if (doPowers && polyad.getArgCount() == 0) {
+            // do  exp() as if exp(1)
+            polyad.setResult(getNaturalLogBase(OpEvaluator.getMathContext()));
             polyad.setResultType(Constant.DECIMAL_TYPE);
-            return;
-        }
-        if (ob instanceof BigDecimal) {
-            BigDecimal bd = (BigDecimal) polyad.evalArg(0, state);
-            BigDecimal result = evaluateBD(bd, mc, op);
             polyad.setEvaluated(true);
-            polyad.setResult(result);
-            polyad.setResultType(Constant.DECIMAL_TYPE);
             return;
         }
 
-        if (ob instanceof StemVariable) {
-            StemVariable outStem = new StemVariable();
-            StemVariable stemVariable = (StemVariable) ob;
-            for (String key : stemVariable.keySet()) {
-                Object x = stemVariable.get(key);
-                BigDecimal x0 = null;
-                if (x instanceof Long) {
-                    x0 = new BigDecimal((Long) x);
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                BigDecimal bd = null;
+                Object ob = objects[0];
+                if (ob instanceof Long) {
+                    bd = new BigDecimal((Long) ob);
                 }
-                if (x instanceof BigDecimal) {
-                    x0 = (BigDecimal) x;
+                if (ob instanceof BigDecimal) {
+                    bd = (BigDecimal) ob;
                 }
-                if (x == null) {
-                    throw new IllegalArgumentException("error \"" + x + "\" is not a number");
-                }
-                BigDecimal result = evaluateBD(x0, mc, doPowers, op);
-                outStem.put(key, result);
 
+                if (bd == null) {
+                    throw new IllegalArgumentException("error, " + op + "() got '"+ ob + "', requires a number");
+                }
+
+                r.result = evaluateBD(bd, OpEvaluator.getMathContext(), op);
+                r.resultType = Constant.DECIMAL_TYPE;
+                return r;
             }
-            polyad.setEvaluated(true);
-            polyad.setResult(outStem);
-            polyad.setResultType(Constant.STEM_TYPE);
-            return;
-        }
-        throw new IllegalArgumentException("Error: Unknown type.");
+        };
+        process1(polyad, pointer, op, state);
     }
-
 }

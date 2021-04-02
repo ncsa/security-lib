@@ -75,7 +75,7 @@ public class TokenUtils {
     }
 
     public static String b64DecodeToken(String b64EncodedToken) {
-        String out = new String(decodeBase64(b64EncodedToken.toUpperCase()));
+        String out = new String(decodeBase64(b64EncodedToken));
         return out;
     }
 

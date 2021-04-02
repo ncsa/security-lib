@@ -79,6 +79,7 @@ module[
      >> interval([-2,3,10])
      >> [-2,-1.445,-0.889,-0.3333,0.222,0.777,1.333,1.888,2.444,3]
      >> (with numeric digits set to 3 so it's a tidy example.)
+        if[x.2 <= 1][raise_error('interval: the number of divisions must be greater than 1', 1);];
         return(n(x.2)/(x.2-1)*(x.1 - x.0) + x.0);
      ]; //end interval
 

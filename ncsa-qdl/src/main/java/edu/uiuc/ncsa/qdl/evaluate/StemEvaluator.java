@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -1136,14 +1137,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.evalArg(0, state);
 
         Object arg = polyad.getArguments().get(0).getResult();
+        // First argument always has to be an integer.
         if (!(arg instanceof Long)) {
-            polyad.setResult(new StemVariable()); // just an empty stem
-            polyad.setResultType(Constant.STEM_TYPE);
-            polyad.setEvaluated(true);
-            return;
+            throw new IndexError("error: only non-negative integer arguments are allowed");
         }
         Object[] fill = null;
-        boolean hasFill = true;
+        CyclicArgList cyclicArgList = null;
+        boolean hasFill = false;
         if (polyad.getArgCount() != 1) {
             Object lastArg = polyad.evalArg(polyad.getArgCount() - 1, state);
             if (!isStem(lastArg)) {
@@ -1156,27 +1156,38 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 }
                 StemList stemList = fillStem.getStemList();
                 fill = stemList.toArray(true, false);
+                cyclicArgList = new CyclicArgList(fill);
+
                 hasFill = true;
             }
         }
         // Special case is a simple list. n(3) should yield [0,1,2] rather than a 1x3
         // array (recursion automatically boxes it into at least a 2 rank array).
-        if(polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill)){
+        if (polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill)) {
             long size = (Long) arg;
-                StemList stemList;
-                if (fill == null || fill.length == 0) {
-                    stemList = new StemList(size);
-                } else {
-                    stemList = new StemList(size, fill);
-                }
-                StemVariable out = new StemVariable();
-                out.setStemList(stemList);
-
-
-                polyad.setResult(out);
+            if(size == 0){
+                polyad.setResult(new StemVariable());
                 polyad.setResultType(Constant.STEM_TYPE);
                 polyad.setEvaluated(true);
                 return;
+            }
+            if(size < 0L){
+                throw new IndexError("error: negative index encountered");
+            }
+            StemList stemList;
+            if (hasFill) {
+                stemList = new StemList(size, cyclicArgList.next((int) size));
+            } else {
+                stemList = new StemList(size);
+            }
+            StemVariable out = new StemVariable();
+            out.setStemList(stemList);
+
+
+            polyad.setResult(out);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
         }
 
         int lastArgIndex = polyad.getArgCount() - 1;
@@ -1185,27 +1196,83 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         int[] lengths = new int[lastArgIndex + 1];
         for (int i = 0; i < lastArgIndex + 1; i++) {
-            lengths[i] = ((Long) polyad.evalArg(i, state)).intValue();
+            Object obj = polyad.evalArg(i, state);
+            if (!isLong(obj)) {
+                throw new IndexError("error: argument " + i + " is not an integer. All dimensions must be positive integers.");
+            }
+            lengths[i] = ((Long) obj).intValue();
+            // Any dimension of 0 returns an empty list
+            if (lengths[i] == 0) {
+                polyad.setResult(new StemVariable());
+                polyad.setResult(Constant.STEM_TYPE);
+                polyad.setEvaluated(true);
+                return;
+            }
+            if (lengths[i] < 0L) {
+                throw new IndexError("error: argument " + i + " is negative. All dimensions must be positive integers.");
+            }
         }
         StemVariable out = new StemVariable();
-        indexRecursion(out, lengths, 0,  fill);
+        indexRecursion(out, lengths, 0, cyclicArgList);
         polyad.setResult(out);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
         return;
-}
+    }
 
-  
-    protected void indexRecursion(StemVariable out, int[] lengths, int index,  Object[] fill) {
+    /**
+     * This makes an infinite arg list for creating new stems.
+     * <pre>
+     *       Object[] myArgs = new Object[]{"a","b",0L};
+     *       CyclicArgClist cal = new CyclicArgList(myArgs);
+     *       cal.next(17);
+     * </pre>
+     * would return the array
+     * <pre>
+     *     ["a","b",),"a","b",...]
+     * </pre>
+     * with 17 elements
+     */
+    public static class CyclicArgList {
+        public CyclicArgList(Object[] args) {
+            this.args = args;
+        }
+
+        Object[] args;
+
+        /**
+         * Cylically get the next n elements
+         *
+         * @param n
+         * @return
+         */
+        public Object[] next(int n) {
+            Object[] out = new Object[n];
+            for (int i = 0; i < n; i++) {
+                out[i] = args[((currentIndex++) % args.length)];
+            }
+            return out;
+        }
+
+        int currentIndex = 0;
+    }
+
+    protected void indexRecursion(StemVariable out, int[] lengths, int index, CyclicArgList cyclicArgList) {
         for (int i = 0; i < lengths[index]; i++) {
             if (lengths.length == index + 2) {
                 // end of recursion
-                StemVariable out1 = new StemVariable((long) lengths[lengths.length-1], fill);
+                StemVariable out1;
+                if (cyclicArgList == null) {
+                    out1 = new StemVariable((long) lengths[lengths.length - 1], null);
+                } else {
+
+                    out1 = new StemVariable((long) lengths[lengths.length - 1], cyclicArgList.next(lengths[lengths.length - 1]));
+                }
                 out.put((long) i, out1);
 
             } else {
                 StemVariable out1 = new StemVariable();
-                indexRecursion(out1, lengths, index + 1, fill);
+                indexRecursion(out1, lengths, index + 1, cyclicArgList);
                 out.put((long) i, out1);
             }
         }

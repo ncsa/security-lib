@@ -129,6 +129,8 @@ public class WorkspaceCommands implements Logable {
     protected static final String LIB_COMMAND = ")lib";
     protected static final String EDIT_COMMAND = ")edit";
     protected static final String FILE_COMMAND = ")file";
+    protected static final String HISTORY_COMMAND = ")h";
+    protected static final String REPEAT_COMMAND = ")r";
     protected static final String STATE_INDICATOR_COMMAND = ")si";
 
     public static final int RC_NO_OP = -1;
@@ -225,7 +227,15 @@ public class WorkspaceCommands implements Logable {
         return inputLine;
     }
 
+    /**
+     * The workspace commands are here so they can be serialized with the rest of the workspace.
+     * However, since the mechanism has to intercept every command before it gets forwarded
+     * to {@link #execute(String)}, the logic for managing this list is in {@link QDLWorkspace}.
+     */
+    public List<String> commandHistory = new LinkedList<>();
+
     public int execute(String inline) {
+
         inline = TemplateUtil.replaceAll(inline, env); // allow replacements in commands too...
         InputLine inputLine = new InputLine(CLT.tokenize(inline));
         inputLine = variableLookup(inputLine);
@@ -288,6 +298,7 @@ public class WorkspaceCommands implements Logable {
         say("Unknown command.");
         return RC_NO_OP;
     }
+
 
     protected void shutdown() {
         if (autosaveThread != null) {
@@ -3234,7 +3245,7 @@ public class WorkspaceCommands implements Logable {
 
         state.createSystemConstants();
         state.setSystemInfo(oldState.getSystemInfo());
-
+        commandHistory = new ArrayList<>();
         interpreter = new QDLInterpreter(state);
     }
 
@@ -4417,6 +4428,7 @@ public class WorkspaceCommands implements Logable {
             currentWorkspace = newCommands.currentWorkspace;
             rootDir = newCommands.rootDir;
             saveDir = newCommands.saveDir;
+            commandHistory = newCommands.commandHistory;
             autosaveInterval = newCommands.getAutosaveInterval();
             autosaveMessagesOn = newCommands.isAutosaveMessagesOn();
             autosaveOn = newCommands.isAutosaveOn();

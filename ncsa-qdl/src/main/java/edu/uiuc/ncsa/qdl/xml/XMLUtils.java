@@ -79,7 +79,7 @@ public class XMLUtils implements XMLConstants {
 
     public static void write(XMLStreamWriter xsw, String ll) throws XMLStreamException {
         xsw.writeStartElement(STRING_TAG);
-        xsw.writeCharacters(ll.toString());
+        xsw.writeCData(ll);
         xsw.writeEndElement();
     }
 

@@ -2038,4 +2038,22 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(getBDValue("t", state), new BigDecimal("1.17712116537414"));
 
     }
+
+    /**
+     * Tests that executing a couple of transcendental math functions on a 3 rank array
+     * actually processes all the elements. Uses sin<sup>2</sup>(x) + cos<sup>2</sup>(x) ==1.
+     * @throws Exception
+     */
+    @Test
+    public void testTMathOnArray() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script,"interval(x.)->n(x.2)/(x.2-1)*(x.1 - x.0) + x.0;");
+        addLine(script, "x. := sin(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2 + cos(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2;");
+        addLine(script, "y := reduce(@+, reduce(@+, reduce(@+, x.)));");  // add em all up
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert areEqual(getBDValue("y", state), new BigDecimal("24.0000000"));
+
+    }
 }
