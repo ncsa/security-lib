@@ -1,3 +1,4 @@
+#! /usr/bin/env -S qdl-run
 /*
   The expected Hello World program.  
   Jeff Gaynor

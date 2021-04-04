@@ -1,0 +1,19 @@
+#! /usr/bin/env -S qdl-run
+/*
+  The expected Hello World program.  
+  Jeff Gaynor
+  1/26/2020
+*/
+say('you entered the following arguments:');
+if[
+   script_args() == 0
+  ][
+   say('(no args)');
+   return();
+ ];
+
+while[
+    for_next(i, script_args())
+  ][
+    say('# ' + to_string(i) + ':' + script_args(i));
+];

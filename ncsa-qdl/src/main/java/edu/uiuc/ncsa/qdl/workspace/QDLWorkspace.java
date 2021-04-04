@@ -215,19 +215,23 @@ public class QDLWorkspace {
         ISO6429IO iso6429IO = null; // only make one of these if you need it because jLine takes over all IO!
         if (argLine.hasArg("-ansi")) {
             iso6429IO = new ISO6429IO();
-            System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
             workspaceCommands = new WorkspaceCommands(iso6429IO);
             isoTerminal = true;
-
         } else {
-            System.out.println("using generic terminal");
             workspaceCommands = new WorkspaceCommands(new BasicIO());
-
         }
         workspaceCommands.init(argLine);
+
         if (workspaceCommands.isRunScript()) {
             return;
         }
+        if(isoTerminal){
+            System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
+
+        }else{
+            System.out.println("using generic terminal");
+        }
+
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
         ArrayList<String> functions = new ArrayList<>();
         functions.addAll(qc.workspaceCommands.getState().getMetaEvaluator().listFunctions(false));

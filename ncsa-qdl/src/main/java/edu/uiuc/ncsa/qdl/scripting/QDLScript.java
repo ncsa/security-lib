@@ -101,7 +101,7 @@ public class QDLScript extends FileEntry implements ScriptInterface {
             }
         }
         try {
-            parser.execute(getText());
+            parser.execute(getText(SHEBANG_REGEX));
         } catch (Throwable t) {
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;

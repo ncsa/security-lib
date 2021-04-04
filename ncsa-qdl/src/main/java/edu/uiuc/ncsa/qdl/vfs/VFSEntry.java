@@ -11,6 +11,8 @@ import java.util.List;
  * on 2/19/20 at  5:58 AM
  */
 public interface VFSEntry extends Serializable {
+    String SHEBANG_REGEX = "^#!";
+    public String getText(String regexFilter);
     public String getText();
     public List<String> getLines();
     public XProperties getProperties();

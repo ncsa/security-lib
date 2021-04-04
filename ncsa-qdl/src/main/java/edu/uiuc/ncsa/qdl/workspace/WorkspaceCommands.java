@@ -27,6 +27,7 @@ import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.Logable;
@@ -4336,7 +4337,15 @@ public class WorkspaceCommands implements Logable {
             String[] args = argList.toArray(new String[0]);
             getState().setScriptArgs(args);
             try {
-                String runScript = QDLFileUtil.readFileAsString(runScriptPath);
+                List<String> lines = QDLFileUtil.readFileAsLines(runScriptPath);
+                StringBuffer stringBuffer = new StringBuffer();
+                for (String line : lines) {
+                    if (!line.matches(VFSEntry.SHEBANG_REGEX)) {
+                        stringBuffer.append(line + "\n");
+                    }
+                }
+                //String runScript = QDLFileUtil.readFileAsString(runScriptPath);
+                String runScript = stringBuffer.toString();
                 if (runScript != null && !runScript.isEmpty()) {
                     interpreter.execute(runScript);
                     System.exit(0); // make sure to use this so external programs (like shell scripts) know all is ok

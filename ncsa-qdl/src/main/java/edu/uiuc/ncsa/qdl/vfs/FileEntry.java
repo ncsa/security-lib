@@ -57,6 +57,25 @@ public class FileEntry implements VFSEntry {
         return Base64.decodeBase64(getText());
     }
 
+
+    /**
+     * Filters lines. If a line matches the regex, then it is omitted.
+     * @param regexFilter
+     * @return
+     */
+    @Override
+    public String getText(String regexFilter) {
+        if (text == null) {
+            text = "";
+            for (String line : lines) {
+                if(!line.matches(regexFilter)) {
+                    text = text + line + "\n";
+                }
+            }
+        }
+        return text;
+    }
+
     @Override
     public String getText() {
         if (text == null) {
