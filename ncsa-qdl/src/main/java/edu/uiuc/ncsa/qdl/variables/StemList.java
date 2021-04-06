@@ -245,15 +245,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         return output + "\n]";
     }
 
-    public int getRank() {
-        return rank;
-    }
 
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    int rank = -1;
 
     /**
      * Convert this to an array of objects. Note that there may be gaps
@@ -280,5 +272,32 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         }
         return r;
     }
-
+   public StemList getSize(){
+        StemList s = new StemList();
+        if(isEmpty()){
+            return s;
+        }
+        long index = 0L;
+        StemEntry stemEntry = new StemEntry(index++,new Long(size()));
+        s.add(stemEntry);
+        StemEntry currentEntry = first();
+        while(currentEntry != null){
+                 Object obj = currentEntry.entry;
+                 if(obj instanceof StemVariable){
+                     StemVariable s1 = (StemVariable) currentEntry.entry;
+                     if(s1.getStemList().size() == 0){
+                         break;
+                     }
+                     stemEntry = new StemEntry(index++,new Long(s1.getStemList().size()));
+                     s.add(stemEntry);
+                     currentEntry = s1.getStemList().first();
+                 }else{
+                     break;
+                 }
+        }
+        return s;
+   }
+   public Long getRank(){
+        return new Long(getSize().size());
+   }
 }

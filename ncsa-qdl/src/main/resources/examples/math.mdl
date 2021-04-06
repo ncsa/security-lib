@@ -1,3 +1,7 @@
+/*
+   Example of how to write some math functions in QDL, putting them in a module.
+*/
+
 module[
   'qdl:/math','mm'
   ]body[

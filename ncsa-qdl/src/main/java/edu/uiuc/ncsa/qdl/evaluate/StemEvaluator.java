@@ -23,7 +23,9 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  */
 public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String STEM_NAMESPACE = "stem";
+    public static final String LIST_NAMESPACE = "list";
     public static final String STEM_FQ = STEM_NAMESPACE + ImportManager.NS_DELIMITER;
+    public static final String LIST_FQ = LIST_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int STEM_FUNCTION_BASE_VALUE = 2000;
     public static final String SIZE = "size";
     public static final String FQ_SIZE = STEM_FQ + SIZE;
@@ -69,6 +71,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_HAS_VALUE = STEM_FQ + HAS_VALUE;
     public static final int HAS_VALUE_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String DIMENSION = "dim";
+    public static final String FQ_DIMENSION = STEM_FQ + DIMENSION;
+    public static final int DIMENSION_TYPE = 14 + STEM_FUNCTION_BASE_VALUE;
+
+    public static final String RANK = "rank";
+    public static final String FQ_RANK = STEM_FQ + RANK;
+    public static final int RANK_TYPE = 15 + STEM_FUNCTION_BASE_VALUE;
 
     // Key functions
     public static final String COMMON_KEYS = "common_keys";
@@ -120,21 +129,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
     // list functions
+    // older ones are prepended wit a list_. These still work but won't show up
+    // in lists of functions.
 
-    public static final String LIST_APPEND = "list_append";
-    public static final String FQ_LIST_APPEND = STEM_FQ + LIST_APPEND;
+    public static final String LIST_APPEND = "append";
+    public static final String LIST_APPEND2 = "list_append";
+    public static final String FQ_LIST_APPEND = LIST_FQ + LIST_APPEND;
     public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String LIST_INSERT_AT = "list_insert_at";
-    public static final String FQ_LIST_INSERT_AT = STEM_FQ + LIST_INSERT_AT;
+    public static final String LIST_INSERT_AT = "insert_at";
+    public static final String LIST_INSERT_AT2 = "list_insert_at";
+    public static final String FQ_LIST_INSERT_AT = LIST_FQ + LIST_INSERT_AT;
     public static final int LIST_INSERT_AT_TYPE = 201 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String LIST_SUBSET = "list_subset";
-    public static final String FQ_LIST_SUBSET = STEM_FQ + LIST_SUBSET;
+    public static final String LIST_SUBSET = "subset";
+    public static final String LIST_SUBSET2 = "list_subset";
+    public static final String FQ_LIST_SUBSET = LIST_FQ + LIST_SUBSET;
     public static final int LIST_SUBSET_TYPE = 202 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String LIST_COPY = "list_copy";
-    public static final String FQ_LIST_COPY = STEM_FQ + LIST_COPY;
+    public static final String LIST_COPY2 = "copy";
+    public static final String FQ_LIST_COPY = LIST_FQ + LIST_COPY;
     public static final int LIST_COPY_TYPE = 203 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String IS_LIST = "is_list";
@@ -145,12 +160,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_TO_LIST = STEM_FQ + TO_LIST;
     public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String LIST_STARTS_WITH = "list_starts_with";
-    public static final String FQ_LIST_STARTS_WITH = STEM_FQ + LIST_STARTS_WITH;
+    public static final String LIST_STARTS_WITH = "starts_with";
+    public static final String LIST_STARTS_WITH2 = "list_starts_with";
+    public static final String FQ_LIST_STARTS_WITH = LIST_FQ + LIST_STARTS_WITH;
     public static final int LIST_STARTS_WITH_TYPE = 206 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String LIST_REVERSE = "list_reverse";
-    public static final String FQ_LIST_REVERSE = STEM_FQ + LIST_REVERSE;
+    public static final String LIST_REVERSE = "reverse";
+    public static final String LIST_REVERSE2 = "list_reverse";
+    public static final String FQ_LIST_REVERSE = LIST_FQ + LIST_REVERSE;
     public static final int LIST_REVERSE_TYPE = 207 + STEM_FUNCTION_BASE_VALUE;
 
     // Conversions to/from JSON.
@@ -167,6 +184,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * by the developer since it is used to determine if a function is built in or a user-defined function.
      */
     public static String FUNC_NAMES[] = new String[]{
+            DIMENSION, RANK,
             SIZE,
             JOIN,
             MAKE_INDICES,
@@ -200,6 +218,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             TO_JSON,
             FROM_JSON};
     public static String FQ_FUNC_NAMES[] = new String[]{
+            FQ_DIMENSION, FQ_RANK,
             FQ_SIZE,
             FQ_JOIN,
             FQ_MAKE_INDICES,
@@ -250,6 +269,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case DIMENSION:
+            case FQ_DIMENSION:
+                return DIMENSION_TYPE;
+            case RANK:
+            case FQ_RANK:
+                return RANK_TYPE;
             case JOIN:
             case FQ_JOIN:
                 return JOIN_TYPE;
@@ -302,21 +327,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_TO_LIST:
                 return TO_LIST_TYPE;
             case LIST_APPEND:
+            case LIST_APPEND2:
             case FQ_LIST_APPEND:
                 return LIST_APPEND_TYPE;
             case LIST_COPY:
+            case LIST_COPY2:
             case FQ_LIST_COPY:
                 return LIST_COPY_TYPE;
             case LIST_REVERSE:
+            case LIST_REVERSE2:
             case FQ_LIST_REVERSE:
                 return LIST_REVERSE_TYPE;
             case LIST_STARTS_WITH:
+            case LIST_STARTS_WITH2:
             case FQ_LIST_STARTS_WITH:
                 return LIST_STARTS_WITH_TYPE;
             case LIST_INSERT_AT:
+            case LIST_INSERT_AT2:
             case FQ_LIST_INSERT_AT:
                 return LIST_INSERT_AT_TYPE;
             case LIST_SUBSET:
+            case LIST_SUBSET2:
             case FQ_LIST_SUBSET:
                 return LIST_SUBSET_TYPE;
             case MAKE_INDICES:
@@ -352,6 +383,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case DIMENSION:
+            case FQ_DIMENSION:
+                doDimension(polyad, state);
+                return true;
+            case RANK:
+            case FQ_RANK:
+                 doRank(polyad,state);
+                return true;
             case JOIN:
             case FQ_JOIN:
                 doJoin(polyad, state);
@@ -421,26 +460,32 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 doToList(polyad, state);
                 return true;
             case LIST_APPEND:
+            case LIST_APPEND2:
             case FQ_LIST_APPEND:
                 doListAppend(polyad, state);
                 return true;
             case LIST_COPY:
+            case LIST_COPY2:
             case FQ_LIST_COPY:
                 doListCopyOrInsert(polyad, state, false);
                 return true;
             case LIST_INSERT_AT:
+            case LIST_INSERT_AT2:
             case FQ_LIST_INSERT_AT:
                 doListCopyOrInsert(polyad, state, true);
                 return true;
             case LIST_SUBSET:
+            case LIST_SUBSET2:
             case FQ_LIST_SUBSET:
                 doListSubset(polyad, state);
                 return true;
             case LIST_REVERSE:
+            case LIST_REVERSE2:
             case FQ_LIST_REVERSE:
                 doListReverse(polyad, state);
                 return true;
             case LIST_STARTS_WITH:
+            case LIST_STARTS_WITH2:
             case FQ_LIST_STARTS_WITH:
                 doListStartsWith(polyad, state);
                 return true;
@@ -479,6 +524,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doRank(Polyad polyad, State state) {
+        if (polyad.getArgCount() == 0 || !isStem(polyad.evalArg(0, state))) {
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setResult(0L);
+            return;
+        }
+        polyad.setEvaluated(true);
+        StemVariable s = (StemVariable) polyad.getArguments().get(0).getResult();
+        polyad.setResult(s.getRank());
+        polyad.setResultType(Constant.LONG_TYPE);
+
+    }
+
+    private void doDimension(Polyad polyad, State state) {
+        if (polyad.getArgCount() == 0 || !isStem(polyad.evalArg(0, state))) {
+            polyad.setEvaluated(true);
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setResult(0L);
+            return;
+        }
+        // so its a stem
+        polyad.setEvaluated(true);
+        StemVariable s = (StemVariable) polyad.getArguments().get(0).getResult();
+        polyad.setResult(s.dim());
+        polyad.setResultType(Constant.STEM_TYPE);
+
     }
 
     protected void doListReverse(Polyad polyad, State state) {
@@ -1165,13 +1239,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // array (recursion automatically boxes it into at least a 2 rank array).
         if (polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill)) {
             long size = (Long) arg;
-            if(size == 0){
+            if (size == 0) {
                 polyad.setResult(new StemVariable());
                 polyad.setResultType(Constant.STEM_TYPE);
                 polyad.setEvaluated(true);
                 return;
             }
-            if(size < 0L){
+            if (size < 0L) {
                 throw new IndexError("error: negative index encountered");
             }
             StemList stemList;

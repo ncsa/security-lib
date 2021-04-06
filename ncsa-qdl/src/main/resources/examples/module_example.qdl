@@ -1,6 +1,8 @@
 /*
   This script (and you should invoke script_run) tests modules and how they are to work at a basic level.
   It creates a couple of modules imports them multiple times and runs some stuff.
+  Nota Bene: It is not a module itself, but ahs several. trying to load it as a module will
+             therefore causes errors.
   Jeff Gaynor
   1/26/2020
 */

@@ -34,10 +34,10 @@ public interface QDLConfigurationConstants {
     // imported and how.
     String MODULE_ATTR_IMPORT_ON_START = "import_on_start";
     String MODULE_ATTR_TYPE = "type";
-    String MODULE_CLASS_NAME_TAG = "class_name";
     String MODULE_TYPE_JAVA = "java";
-    String QDL_MODULE_PATH_TAG = "path";
     String MODULE_TYPE_QDL = "qdl";
+    String MODULE_CLASS_NAME_TAG = "class_name";
+    String QDL_MODULE_PATH_TAG = "path";
     String BOOT_SCRIPT_TAG = "boot_script";
     String WS_TAG = "workspace";
     String WS_ATTR_VERBOSE = "verbose";

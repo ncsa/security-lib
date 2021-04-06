@@ -1,0 +1,27 @@
+/*
+  Module for complex numbers.
+*/
+
+module[
+   'qdl:/math/complex','complex'
+]body[
+    >> Complex number operations on simple numbers as lists.
+    >> These do not work iteratively since the plan is to introduce
+    >> actual complex number support at some point into QDL. these allow for some
+    >> quick calculations
+    c_plus(a.,b.)->a.+b.;
+    c_minus(a.,b.)->a.-b.;
+    c_times(a.,b.)->[a.0*b.0 - a.1*b.1, a.0*b.1+b.0*a.1];
+    c_mod2(z.)->reduce(@+,z.^2);
+    c_mod(z.)->sqrt(mod2(z.));
+    c_conj(z.)->[z.0,-z.1];
+    c_div(a.,b.)->c_times(a., conj(b.))/mod2(b.);
+    c_real(z.)->z.0;
+    c_im(z.)->z.1;
+    c_exp(z.)->exp(z.0)*[cos(z.1), sin(z.1)];
+    c_ln(z.)->[ln(mod(z.), atan(z.1/z.0)]; // principal value only.
+]; //end module
+/*
+          module_load('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/complex.mdl')
+
+*/

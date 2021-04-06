@@ -95,7 +95,17 @@ public class QDLWorkspace {
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
-            String input = workspaceCommands.readline(INDENT).trim();
+
+            String input = workspaceCommands.readline(INDENT);
+            if(input == null){
+                // about the only way to get a null here is if the user is piping in
+                // something via std in and it hits the end of the stream.
+                if(workspaceCommands.isDebugOn()){
+                    workspaceCommands.say("exiting");
+                }
+                return;
+            }
+            input = input.trim();
             boolean storeLine = true;
             String out = null;
             if(input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")){

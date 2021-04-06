@@ -311,20 +311,20 @@ See also: list_keys(), rename_keys(), var_type(), constants('var_type')
                  ]]>
         </body>
     </entry>
-    <entry id="list_append">
+    <entry id="append">
         <body>
             <![CDATA[
-list_append(list0., arg) - append arg to list0., adjusting the indices as
+append(list0., arg) - append arg to list0., adjusting the indices as
                            needed.
 Note: If arg is a scalar, the single value is appended. If arg is a list,
       then the entire list is appended.
                  ]]>
         </body>
     </entry>
-    <entry id="list_copy">
+    <entry id="copy">
         <body>
             <![CDATA[
-list_copy(source., start_index, length, target., target_index) -
+copy(source., start_index, length, target., target_index) -
                copy one list into another, overwriting old elements.
 
      source. = the stem that is the source of the copy.
@@ -333,16 +333,16 @@ list_copy(source., start_index, length, target., target_index) -
      target. = the target stem of the copy
 target_index = the index in the target that will receive the copy. Note that
                any elements already in these locations will be replaced. If you
-               need to insert elements, consider using the list_insert_at
+               need to insert elements, consider using the insert_at
                command.
-See also: list_insert_at
+See also: insert_at
                  ]]>
         </body>
     </entry>
-    <entry id="list_insert_at">
+    <entry id="insert_at">
         <body>
             <![CDATA[
-list_insert_at(source., start_index, length, target., target_index) -
+insert_at(source., start_index, length, target., target_index) -
                insert one list in another, moving the old elements.
 
      source. = the stem that is the source of the copy.
@@ -352,17 +352,17 @@ list_insert_at(source., start_index, length, target., target_index) -
 target_index = the index in the target that will receive the copy. Note that
                any elements already in these locations will be moved. If you
                intend to replace a section of this list, consider using the
-               list_copy command.
-            See also: list_copy
+               copy command.
+            See also: copy
 ]]>
         </body>
     </entry>
-    <entry id="list_subset">
+    <entry id="subset">
         <body>
             <![CDATA[
-list_subset(source_list., start_index) -
+subset(source_list., start_index) -
           return a subset of the source_list starting at the given index.
-list_subset(source_list., start_index, n) -
+subset(source_list., start_index, n) -
           return a subset of the source_list starting at the given index,
           but only return n elements.
 Note: If n is omiited, then the rest of the list is returned from the start
@@ -616,21 +616,21 @@ See also: file_read, decode_b64, encode_b64
 ]]>
         </body>
     </entry>
-    <entry id="list_starts_with">
+    <entry id="starts_with">
         <body>
             <![CDATA[
-list_starts_with(x., y.) - returns a left conformable list that has the
+starts_with(x., y.) - returns a left conformable list that has the
                            indices of the right argument.  If there
                            is no such element, an index of -1 is returned.
 E.g.
-  list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
+  starts_with(['a','qrs','pqr'],['a','p','s','t'])
 {0=0, 1=-1, 2=1}
 How to read this: left element 0 starts with right element 0
                    "     "     1  does not start with any
                    "     "     2 starts with right element 1
 
 To get a list of these, use mask, e.g.
-     mask(['a','qrs','pqr'], -1 <list_starts_with(
+     mask(['a','qrs','pqr'], -1 <starts_with(
                                  ['a','qrs','pqr'],
                                  ['a','p','s','t']));
 {0=a, 2=pqr}
@@ -1522,22 +1522,53 @@ join(x., y., 0 ) == x.~y.
                 ]]>
             </body>
         </entry>
-    <entry id="list_reverse">
+    <entry id="reverse">
             <body>
                 <![CDATA[
-list_reverse(list.) - reverse the elements of a list
+reverse(list.) - reverse the elements of a list
 E.g.
-  list_reverse(n(5))
+  reverse(n(5))
 [4,3,2,1,0]
 Another example on a list of lists
   p. := [n(3),n(2)]
   p.
 [[0,1,2], [0,1]]
-  list_reverse(p.)
+  reverse(p.)
 [[0,1],[0,1,2]]
 ]]>
             </body>
         </entry>
+    <entry id="dim">
+            <body>
+                <![CDATA[
+dim(list.) - The dimension of a list. This returns a list of the size of each
+             zeroth component. In the case of non-ragged lists, this is
+             precisely the number of elements per entry.
+E.g.
+    dim(n(5))
+[5]
+Because this has a single index and it is 5 elements long.
+     dim(n(3,4,5))
+[3,4,5]
+This is a list of the indices (three) with the counts in them.
+Note: This is only a partial result with ragged arrays, since there is no
+      good way to get a single canonical size.
+]]>
+            </body>
+        </entry>
+    <entry id="rank">
+            <body>
+                <![CDATA[
+rank(list.) - returns the number (a scalar) of independent indices,
+              i.e. size(dim(list.))
+E.g.
+   rank(n(3,4,5))
+3
+This means there are three separate indices.
+]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->

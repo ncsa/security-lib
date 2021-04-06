@@ -1,5 +1,5 @@
 /*
-   sample script that computes the square root of an argument
+   sample script that computes the square root of an argument using the Newton-Raphson method
 */
 if[
    script_args() != 1

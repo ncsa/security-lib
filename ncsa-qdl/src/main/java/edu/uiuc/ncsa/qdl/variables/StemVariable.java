@@ -1352,14 +1352,13 @@ public class StemVariable extends HashMap<String, Object> {
         return output;
     }
 
-    public int getRank() {
-        return rank;
+
+    public StemVariable dim(){
+        StemVariable dim = new StemVariable();
+        dim.setStemList(getStemList().getSize());
+        return dim;
     }
-
-    public void setRank(int rank) {
-        this.rank = rank;
+    public Long getRank(){
+      return getStemList().getRank();
     }
-
-    int rank = -1; // unset
-
 }

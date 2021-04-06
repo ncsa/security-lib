@@ -102,6 +102,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 if(t instanceof RuntimeException){
                     throw (RuntimeException)t;
                 }
+                if(t instanceof StackOverflowError){
+                    throw new QDLException("stack overflow", t);
+                }
                 QDLException q = new QDLException("error evaluating function", t);
                 throw q;
             }

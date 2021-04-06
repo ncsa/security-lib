@@ -65,8 +65,10 @@ import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.*;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_BINARY;
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_TEXT_STRING;
 import static edu.uiuc.ncsa.qdl.util.InputFormUtil.*;
+import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.*;
 import static edu.uiuc.ncsa.security.util.cli.CLIDriver.EXIT_COMMAND;
+import static edu.uiuc.ncsa.security.util.cli.CLIDriver.HELP_SWITCH;
 
 /**
  * This is the helper class to the {@link QDLWorkspace} that does the grunt work of the ) commands.
@@ -1631,23 +1633,19 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doModulesCommand(InputLine inputLine) {
-        if (_doHelp(inputLine)) {
+        if (inputLine.hasArg(HELP_SWITCH)) {
             say("Modules commands:");
-            sayi("list - list all loaded modules and their aliases.");
-            sayi("(uri | alias)+ - list all full information for that module, including any documentation.");
+            sayi("[list] - list all loaded modules and their aliases. Default is to list modules.");
+            sayi("(uri | alias) [-help] - list all full information for that module, including any documentation.");
+            sayi("      If the module has been loaded, you can use any of the aliases, otherwise you need the uri");
             return RC_NO_OP;
         }
-
-        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
-            return _modulesList(inputLine);
+        if (inputLine.hasArg("-help")) {
+            inputLine.removeSwitch("-help");
+            _moduleHelp(inputLine);
+            return RC_CONTINUE;
         }
-        switch (inputLine.getArg(ACTION_INDEX)) {
-            case "list":
-                return _modulesList(inputLine);
-            default:
-                _moduleHelp(inputLine);
-        }
-        return RC_CONTINUE;
+        return _modulesList(inputLine);
     }
 
     /**
@@ -1689,10 +1687,10 @@ public class WorkspaceCommands implements Logable {
                 for (String x : docs) {
                     say(x);
                 }
+                if (1 < inputLine.getArgCount()) {
+                    say("");
+                } // spacer
             }
-            if (1 < inputLine.getArgCount()) {
-                say("");
-            } // spacer
         }
     }
 
@@ -2011,10 +2009,26 @@ public class WorkspaceCommands implements Logable {
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
         }
+        boolean listFQ = inputLine.hasArg(FQ_SWITCH);
 
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null);
-        int rc = printList(inputLine, funcs);
+        // These are fully qualified.
+        int rc = -1;
+        if (listFQ) {
+            rc = printList(inputLine, funcs);
+        } else {
+            TreeSet<String> funcs2 = new TreeSet<>();
+            for (String x : funcs) {
+                int indexOf = x.lastIndexOf(SCHEME_DELIMITER);
+                if (0 < indexOf) {
+                    funcs2.add(x.substring(indexOf + 1));
+                } else {
+                    funcs2.add(x);
+                }
+            }
+            rc = printList(inputLine, funcs2);
+        }
         say(funcs.size() + " total functions");
         return rc;
     }

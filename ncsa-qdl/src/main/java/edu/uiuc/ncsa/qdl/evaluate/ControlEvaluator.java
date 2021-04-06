@@ -1497,10 +1497,8 @@ reduce(*times(), 1+n(5))
             alias = arg2.toString();
         } else {
             // no new alias supplied, so use the default in the module definition.
-
             alias = m.getAlias();
         }
-
         ImportManager resolver = state.getImportManager();
         resolver.addImport(moduleNS, alias);
         state.getImportedModules().put(alias, newInstance);

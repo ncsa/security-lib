@@ -279,4 +279,35 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
     }
 
+    /**
+     * Define a recursive function and invoke it. This will compute the Fibonacci numbers
+     * 1,1,2,3,5,8,13,21,34,55,... It tests a single value.<br/><br/>
+     * Mostly to do recursive functions like this requires a great deal of state management internally
+     * so that the state of the various calls do not run together. This test will fail if somehow the
+     * state management for functions changes, hence it is a required regression test.
+     * Also, this test gets the 20th Fibonacci number which will take a bit. Again this is seeing
+     * that the state gets managed for a stack of 20 calls then unravelled correctly. Since each call
+     * calls up two more instances of this function, there is exponential growth in the number of calls
+     * pending as it runs. Yes this could be optimized not to do that, and QDL could easily have
+     * a few simple expression to compute the numbers efficiently, but that is not the point of this test.
+     * The point of the test is to have thousands of pending calls, each with their own state, that the system
+     * has to keep straight or the result is wrong.
+     * @throws Throwable
+     */
+    @Test
+    public void testRecursion() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[");
+        addLine(script, "    fib(n)");
+        addLine(script, " ]body[");
+        addLine(script, "    if[ n <= 2 ]then[ return(1);];");
+        addLine(script, "    return( fib(n - 1) + fib(n - 2));");
+        addLine(script, "];");
+        addLine(script, "x := fib(20);"); // should return 6765
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 6765L;
+    }
+
 }
