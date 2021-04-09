@@ -310,4 +310,16 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 6765L;
     }
 
+    @Test
+     public void testSignedIndex() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "y := n(10).(-1);"); // should return last one, 9
+         addLine(script, "z := n(9).(-4);"); // should return 5
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getLongValue("y", state) == 9L;
+         assert getLongValue("z", state) == 5L;
+     }
+
 }

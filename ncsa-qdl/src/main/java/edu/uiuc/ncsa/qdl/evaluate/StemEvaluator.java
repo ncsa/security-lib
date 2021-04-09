@@ -15,6 +15,7 @@ import net.sf.json.JSONObject;
 
 import java.util.*;
 
+import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -1278,7 +1279,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             // Any dimension of 0 returns an empty list
             if (lengths[i] == 0) {
                 polyad.setResult(new StemVariable());
-                polyad.setResult(Constant.STEM_TYPE);
+                polyad.setResultType(Constant.STEM_TYPE);
                 polyad.setEvaluated(true);
                 return;
             }
@@ -1405,10 +1406,20 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         Long length = (Long) arg3;
 
+        // need to handle case that the target does not exist.
+        StemVariable targetStem;
+        if (polyad.getArguments().get(3) instanceof VariableNode){
+            targetStem = getOrCreateStem(polyad.getArguments().get(3),
+                    state, LIST_COPY + " requires a stem as its fourth argument"
+            );
+        }else{
+              Object obj = polyad.evalArg(3,state);
+              if(!isStem(obj)){
+                  throw new IllegalArgumentException(LIST_COPY + " requires an integer as its fifth argument");
 
-        StemVariable targetStem = getOrCreateStem(polyad.getArguments().get(3),
-                state, LIST_COPY + " requires a stem as its fourth argument"
-        );
+              }
+              targetStem = (StemVariable) obj;
+        }
 
         Object arg5 = polyad.evalArg(4, state);
         if (!isLong(arg5)) {
@@ -1910,7 +1921,6 @@ z. :=  join3(q.,w.)
   // Since this is the last index this joins each element into new elements, increasing the
   // rank of the stem by 1
      */
-    public static final Long JOIN_LAST_ARGUMENT_VALUE = new Long(-0xcafed00d);
 
     protected void doJoin(Polyad polyad, State state) {
         Object[] args = new Object[polyad.getArgCount()];
@@ -1918,7 +1928,7 @@ z. :=  join3(q.,w.)
         for (int i = 0; i < argCount; i++) {
             args[i] = polyad.evalArg(i, state);
         }
-        int depth = ((Long) args[2]).intValue();
+        int axis = ((Long) args[2]).intValue();
         StemVariable leftStem;
         if (isStem(args[0])) {
             leftStem = (StemVariable) args[0];
@@ -1934,10 +1944,10 @@ z. :=  join3(q.,w.)
             rightStem.put(0L, args[1]);
         }
         boolean doJoinOnLastAxis = false;
-        if (depth == JOIN_LAST_ARGUMENT_VALUE) {
+        if (axis == LAST_AXIS_ARGUMENT_VALUE) {
             doJoinOnLastAxis = true;
         }
-        if (depth == 0) {
+        if (axis == 0) {
             StemVariable outStem = leftStem.union(rightStem);
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
@@ -1953,18 +1963,21 @@ z. :=  join3(q.,w.)
             polyad.setEvaluated(true);
             return;
         }
-        StemUtility.AxisAction joinAction = new StemUtility.AxisAction() {
+        StemUtility.DyadAxisAction joinAction = new StemUtility.DyadAxisAction() {
             @Override
             public void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem) {
                 out.put(key, leftStem.union(rightStem));
 
             }
         };
+        StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis?1000000:-1, doJoinOnLastAxis, joinAction);
+/*
         if (doJoinOnLastAxis) {
-            StemUtility.axisRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis, joinAction);
+            StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis, joinAction);
         } else {
-            StemUtility.axisRecursion(outStem, leftStem, rightStem, depth - 1, doJoinOnLastAxis, joinAction);
+            StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, axis - 1, doJoinOnLastAxis, joinAction);
         }
+*/
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);

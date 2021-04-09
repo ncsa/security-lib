@@ -1288,7 +1288,11 @@ public class StemVariable extends HashMap<String, Object> {
         }
         StemList<StemEntry> sSL = getStemList();
         for (long i = startIndex; i < startIndex + length; i++) {
-            outSL.append(sSL.get(i));
+            Object obj = sSL.get(i);
+            if(obj == null){
+                throw new IndexError("error: argument out of bounds for index " + i + ", object has size " + sSL.size());
+            }
+            outSL.append(obj);
         }
         for (long i = insertIndex; i < tSL.size(); i++) {
             outSL.append(tSL.get(i));

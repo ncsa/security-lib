@@ -7,7 +7,23 @@ import edu.uiuc.ncsa.qdl.exceptions.RankException;
  * on 3/24/21 at  12:38 PM
  */
 public class StemUtility {
-    public interface AxisAction {
+    public static final Long LAST_AXIS_ARGUMENT_VALUE = new Long(-0xcafed00d);
+
+
+    public interface MonadAxisAction{
+        void action(StemVariable out, String key, StemVariable arg);
+    }
+    /**
+     * Action to be applied at a given axis.
+     */
+    public interface DyadAxisAction {
+        /**
+         * Action to be applied
+         * @param out -  the result
+         * @param key - current key
+         * @param leftStem - The left hand stem's argument at this axis
+         * @param rightStem - the right hand stem's argument at this axis.
+         */
           void action(StemVariable out, String key, StemVariable leftStem, StemVariable rightStem);
       }
 
@@ -29,7 +45,7 @@ public class StemUtility {
     }
 
     /**
-     * Apply some action along an axis.
+     * Apply some action along an axis. This will recurse to a given axis and apply an action there
      * @param out0
      * @param left0
      * @param right0
@@ -37,12 +53,12 @@ public class StemUtility {
      * @param maxDepth
      * @param axisAction
      */
-      public static void axisRecursion(StemVariable out0,
-                                   StemVariable left0,
-                                   StemVariable right0,
-                                   int depth,
-                                   boolean maxDepth,
-                                   AxisAction axisAction) {
+      public static void axisDayadRecursion(StemVariable out0,
+                                            StemVariable left0,
+                                            StemVariable right0,
+                                            int depth,
+                                            boolean maxDepth,
+                                            DyadAxisAction axisAction) {
           StemVariable commonKeys = left0.commonKeys(right0);
           for (String key0 : commonKeys.keySet()) {
               Object leftObj = left0.get(key0);
@@ -79,12 +95,46 @@ public class StemUtility {
                       }
                       StemVariable out1 = new StemVariable();
                       out0.put(key0, out1);
-                      axisRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
+                      axisDayadRecursion(out1, left1, right1, depth - 1, maxDepth, axisAction);
                   } else {
                       out0.put(key0, left1.union(right1));
                   }
               }
           }
       }
+
+    public static void axisMonadRecursion(StemVariable out0,
+                                                StemVariable arg,
+                                                int depth,
+                                                boolean maxDepth,
+                                                MonadAxisAction axisAction) {
+              for (String key0 : arg.keySet()) {
+                  Object argObj = arg.get(key0);
+
+                  StemVariable arg1 = null;
+                  if (isStem(argObj)) {
+                      arg1 = (StemVariable) argObj;
+                  } else {
+                      arg1 = new StemVariable();
+                      arg1.put(0L, argObj);
+                  }
+
+                  boolean bottomedOut = !isStem(argObj) && maxDepth && 0 < depth;
+                  if (bottomedOut) {
+                      axisAction.action(out0, key0, arg1);
+                  } else {
+                      if (0 < depth) {
+                          if (!isStem(argObj)) {
+                              throw new RankException("rank error");
+                          }
+                          StemVariable out1 = new StemVariable();
+                          out0.put(key0, out1);
+                          axisMonadRecursion(out1, arg1,  depth - 1, maxDepth, axisAction);
+                      } else {
+                          out0.put(key0, arg1);
+                      }
+                  }
+              }
+          }
 
 }

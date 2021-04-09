@@ -41,6 +41,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 
+import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
 
@@ -438,6 +439,14 @@ reduce(*times(), 1+n(5))
         if (!stemVariable.isList()) {
             throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a list");
         }
+        int axis = 0; // default
+        if(polyad.getArgCount() == 3){
+            Object axisObj = polyad.evalArg(2, state);
+            if(!isLong(axisObj)){
+                throw new IllegalArgumentException("error: third argument of " + REDUCE + ", the axis, must be an integer");
+            }
+            axis = ((Long)axisObj).intValue();
+        }
         if (stemVariable.size() == 0) {
             polyad.setEvaluated(true);
             if (doReduce) {
@@ -469,7 +478,30 @@ reduce(*times(), 1+n(5))
             return;
         }
 
-        ExpressionImpl operator = getOperator(state, (FunctionReferenceNode) arg0);
+        newReduceOrExpand(polyad, state, doReduce, axis, (FunctionReferenceNode) arg0, stemVariable);
+        oldreduceOrExpand(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
+    }
+
+    private void newReduceOrExpand(Polyad polyad, State state, boolean doReduce, int axis, FunctionReferenceNode arg0, StemVariable stemVariable) {
+        StemUtility.MonadAxisAction action = new StemUtility.MonadAxisAction() {
+            @Override
+            public void action(StemVariable out, String key, StemVariable arg) {
+                 System.out.println(key);
+            }
+        };
+        ExpressionImpl operator = getOperator(state, arg0);
+        StemVariable out= new StemVariable();
+        boolean doOnLastAxis = false;
+        if (axis == LAST_AXIS_ARGUMENT_VALUE) {
+            doOnLastAxis = true;
+        }
+
+        //StemUtility.axisMonadRecursion(out, stemVariable,-1, );
+        StemUtility.axisMonadRecursion(out, stemVariable,  doOnLastAxis?1000000:-1, doOnLastAxis, action);
+
+    }
+    private void oldreduceOrExpand(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable) {
+        ExpressionImpl operator = getOperator(state, arg0);
         boolean isFirst = true;
         StemVariable output = null;
         Object reduceOuput = null;

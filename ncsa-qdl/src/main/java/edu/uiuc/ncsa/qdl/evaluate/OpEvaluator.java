@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
@@ -241,7 +242,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         Polyad joinPolyad = new Polyad(StemEvaluator.JOIN);
         joinPolyad.getArguments().add(dyad.getLeftArgument());
         joinPolyad.getArguments().add(dyad.getRightArgument());
-        joinPolyad.getArguments().add(new ConstantNode(StemEvaluator.JOIN_LAST_ARGUMENT_VALUE, Constant.LONG_TYPE));
+        joinPolyad.getArguments().add(new ConstantNode(StemUtility.LAST_AXIS_ARGUMENT_VALUE, Constant.LONG_TYPE));
         state.getMetaEvaluator().evaluate(joinPolyad, state);
         dyad.setResult(joinPolyad.getResult());
         dyad.setResultType(joinPolyad.getResultType());
