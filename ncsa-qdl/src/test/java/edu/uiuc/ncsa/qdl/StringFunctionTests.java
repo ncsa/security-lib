@@ -627,5 +627,21 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getStringValue("t2", state).equals("0:1:2:3:4");
         assert getStringValue("t3", state).equals("0k=1k=2k=3k=4");
     }
-
+    @Test
+    public void testSubstring() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := substring('abcd', 2);"); // rest of string starting at 2
+        addLine(script, "b := substring('abcd', 1,2);"); // two chars, starting at 1
+        addLine(script, "c := substring('abcd', 1, 10,'.');"); // 5 chars starting at 1 + padding
+        addLine(script, "d := substring('abcd', 1, 1000);"); // rest of string starting at 1 since 1000 > length
+        addLine(script, "f := substring('abcdefg', 3, 11,'pqr');"); // cyclical extension
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("a", state).equals("cd");
+        assert getStringValue("b", state).equals("bc");
+        assert getStringValue("c", state).equals("bcd.......");
+        assert getStringValue("d", state).equals("bcd");
+        assert getStringValue("f", state).equals("defgpqrpqrp");
+    }
 }

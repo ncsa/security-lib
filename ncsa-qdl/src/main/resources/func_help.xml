@@ -453,8 +453,21 @@ Note: This does not remove the arguments from the symbol table.
 unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element
                              by (non-integer) key into a variable.
                              safeModeOn (default is true) will NOT overwrite
-                             any variables in the current workspace, turning
-                             safeModeOn to false will.
+                             any variables in the current workspace, AND it will
+                             vencode any keys needed. Turning
+                             safeModeOn to false will fail if a variable exists or
+                             if unboxing would result in an illegal varaible name.
+E.g.
+   a :='f(x)';
+   x.a := 2; // perfectly legal
+   x.
+{f(x):2}
+   unbox(x.)
+   )vars
+f$28x$29
+
+because 'f(x)' cannot be a legal variable name so it was vencoded.
+See also: box, vencode, vdecode
                 ]]>
         </body>
     </entry>
@@ -1000,10 +1013,22 @@ substring(arg, n) - take a substring of the arg starting at the given index, n,
                     and going to the rest of the string. This will also be
                     done on each element if arg is a stem.
 substring(arg, n,length) - start the substring at index n and continue for
-                    length characters.
+                    length characters. If no n + length > size(arg) and
+                    no padding, just return the rest of the string
 substring(arg, n ,length ,padding) - start at the index, retrieve length
                     characters and if there are not enough, cyclically pad the
                     result with the string padding.
+E.g.
+   substring('abcdefg',3)
+defg
+   substring('abcdefg',3,2)
+de
+   substring('abcdefg',3,10); // asking for more characters than available
+defg
+  substring('abcdefg',3,11,'pqr'); // padding with string cyclically
+defgpqrpqrp
+  substring(['abc','pqr'],1,5,'tuv'); // works on lists and stems
+[bctuv,qrtuv]
                 ]]>
         </body>
     </entry>

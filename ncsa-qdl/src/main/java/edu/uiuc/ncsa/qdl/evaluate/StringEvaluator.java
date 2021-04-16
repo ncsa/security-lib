@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
@@ -26,66 +27,67 @@ This is driven by Java because it is better to have small classes that specializ
 functions rather than a massive single class. So the inheritence is just encapsulating the logic of this.
  */
 public class StringEvaluator extends AbstractFunctionEvaluator {
-
+    public static final String STRING_NAMESPACE = "string";
+    public static final String STRING_FQ = STRING_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int STRING_FUNCTION_BASE_VALUE = 3000;
     public static final String CONTAINS = "contains";
-    public static final String SYS_CONTAINS = SYS_FQ + CONTAINS;
+    public static final String SYS_CONTAINS = STRING_FQ + CONTAINS;
     public static final int CONTAINS_TYPE = 1 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_LOWER = "to_lower";
-    public static final String SYS_TO_LOWER = SYS_FQ + TO_LOWER;
+    public static final String SYS_TO_LOWER = STRING_FQ + TO_LOWER;
     public static final int TO_LOWER_TYPE = 2 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_UPPER = "to_upper";
-    public static final String SYS_TO_UPPER = SYS_FQ + TO_UPPER;
+    public static final String SYS_TO_UPPER = STRING_FQ + TO_UPPER;
     public static final int TO_UPPER_TYPE = 3 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TRIM = "trim";
-    public static final String SYS_TRIM = SYS_FQ + TRIM;
+    public static final String SYS_TRIM = STRING_FQ + TRIM;
     public static final int TRIM_TYPE = 4 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INSERT = "insert";
-    public static final String SYS_INSERT = SYS_FQ + INSERT;
+    public static final String SYS_INSERT = STRING_FQ + INSERT;
     public static final int INSERT_TYPE = 5 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String SUBSTRING = "substring";
-    public static final String SYS_SUBSTRING = SYS_FQ + SUBSTRING;
+    public static final String SYS_SUBSTRING = STRING_FQ + SUBSTRING;
     public static final int SUBSTRING_TYPE = 6 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String REPLACE = "replace";
-    public static final String SYS_REPLACE = SYS_FQ + REPLACE;
+    public static final String SYS_REPLACE = STRING_FQ + REPLACE;
     public static final int REPLACE_TYPE = 7 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INDEX_OF = "index_of";
-    public static final String SYS_INDEX_OF = SYS_FQ + INDEX_OF;
+    public static final String SYS_INDEX_OF = STRING_FQ + INDEX_OF;
     public static final int INDEX_OF_TYPE = 8 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TOKENIZE = "tokenize";
-    public static final String SYS_TOKENIZE = SYS_FQ + TOKENIZE;
+    public static final String SYS_TOKENIZE = STRING_FQ + TOKENIZE;
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String ENCODE = "vencode";
-    public static final String SYS_ENCODE = SYS_FQ + ENCODE;
+    public static final String SYS_ENCODE = STRING_FQ + ENCODE;
     public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DECODE = "vdecode";
-    public static final String SYS_DECODE = SYS_FQ + DECODE;
+    public static final String SYS_DECODE = STRING_FQ + DECODE;
     public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DETOKENIZE = "detokenize";
-    public static final String SYS_DETOKENIZE = SYS_FQ + DETOKENIZE;
+    public static final String SYS_DETOKENIZE = STRING_FQ + DETOKENIZE;
     public static final int DETOKENIZE_TYPE = 12 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_URI = "to_uri";
-    public static final String SYS_TO_URI = SYS_FQ + TO_URI;
+    public static final String SYS_TO_URI = STRING_FQ + TO_URI;
     public static final int TO_URI_TYPE = 13 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String FROM_URI = "from_uri";
-    public static final String SYS_FROM_URI = SYS_FQ + FROM_URI;
+    public static final String SYS_FROM_URI = STRING_FQ + FROM_URI;
     public static final int FROM_URI_TYPE = 14 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String CAPUT = "head";
-    public static final String SYS_CAPUT = SYS_FQ + CAPUT;
+    public static final String SYS_CAPUT = STRING_FQ + CAPUT;
     public static final int CAPUT_TYPE = 15 + STRING_FUNCTION_BASE_VALUE;
 
     public static String FUNC_NAMES[] = new String[]{
@@ -256,39 +258,39 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     protected void doCaput(Polyad polyad, State state) {
         fPointer pointer = new fPointer() {
-              @Override
-              public fpResult process(Object... objects) {
-                  fpResult r = new fpResult();
-                  int pos = -1;
-                  boolean caseSensitive = true;
-                  if (objects.length == 3) {
-                      if (!(objects[2] instanceof Boolean)) {
-                          throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
-                      }
-                      caseSensitive = (Boolean) objects[2];
-                  }
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                int pos = -1;
+                boolean caseSensitive = true;
+                if (objects.length == 3) {
+                    if (!(objects[2] instanceof Boolean)) {
+                        throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
+                    }
+                    caseSensitive = (Boolean) objects[2];
+                }
 
-                  if (areAllStrings(objects[0], objects[1])) {
-                      String s0 = (String)objects[0];
-                      String s1 = (String) objects[1];
-                      if (caseSensitive) {
-                          pos = s0.indexOf(s1);
-                      } else {
-                          pos = s0.toLowerCase().indexOf(s1.toLowerCase());
-                      }
-                      if(pos < 0 ){
-                          // not found
-                          r.result = "";
-                      }else{
-                          r.result = s0.substring(0, pos);
-                      }
+                if (areAllStrings(objects[0], objects[1])) {
+                    String s0 = (String) objects[0];
+                    String s1 = (String) objects[1];
+                    if (caseSensitive) {
+                        pos = s0.indexOf(s1);
+                    } else {
+                        pos = s0.toLowerCase().indexOf(s1.toLowerCase());
+                    }
+                    if (pos < 0) {
+                        // not found
+                        r.result = "";
+                    } else {
+                        r.result = s0.substring(0, pos);
+                    }
 
-                  }
-                  r.resultType = Constant.STRING_TYPE;
-                  return r;
-              }
-          };
-          process2(polyad, pointer, CAPUT, state, true);
+                }
+                r.resultType = Constant.STRING_TYPE;
+                return r;
+            }
+        };
+        process2(polyad, pointer, CAPUT, state, true);
 
     }
 
@@ -525,7 +527,8 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-    protected void doSubstring(Polyad polyad, State state) {
+    protected void
+    doSubstring(Polyad polyad, State state) {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
@@ -552,14 +555,21 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     }
                     padding = objects[3].toString();
                 }
-                String r = arg.substring(n, Math.min(length, arg.length())); // the Java way
-                if (arg.length() < length && padding != null) {
-                    StringBuffer stringBuffer = new StringBuffer();
-                    for (int i = 0; i < 1 + (length - arg.length()) / padding.length(); i++) {
-                        stringBuffer.append(padding);
+                String r;
+                if (padding == null) {
+                    r = arg.substring(n, Math.min(n + length, arg.length())); // the Java way looks for end index, not length
+                } else {
+                    r = arg.substring(n, Math.min(length, arg.length())); // the Java way
+                    if (r.length() < length) {
+                        StringBuffer stringBuffer = new StringBuffer();
+                        for (int i = 0; i < 1+(length - r.length()) / padding.length(); i++) {
+                            stringBuffer.append(padding);// This appends the padding so later we can extend it cyclically
+                        }
+                        // If the padding is long, then there will be too much, only take what the user requests
+                        r = r + stringBuffer.toString().substring(0, length - r.length());
                     }
-                    r = r + stringBuffer.toString().substring(0, 1 + length - arg.length());
                 }
+
                 result.result = r;
                 result.resultType = Constant.STRING_TYPE;
 

@@ -868,8 +868,8 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a.0", state) == 3L;
         assert getLongValue("a.1", state) == -2L;
         assert getLongValue("a.2", state) == 6L;
-    assert    areEqual(getBDValue("a.3", state), new BigDecimal("1.0"));
-       // assert getLongValue("a.3", state) == 1L;
+        assert areEqual(getBDValue("a.3", state), new BigDecimal("1.0"));
+        // assert getLongValue("a.3", state) == 1L;
         assert getLongValue("a.4", state) == 1L;
         assert getLongValue("a.5", state) == 125L;
     }
@@ -1169,6 +1169,45 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
+    public void testSafeUnboxWithBadVariable() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // This creates a stem with an illegal variable name as its key, 'f(x)'
+        // then tries to unbox it. It should fail
+        addLine(script, "a := 'f(x)';"); // Create existing entry in symbol table
+        addLine(script, "x.a := 2;"); // Create existing entry in symbol table
+        addLine(script, "unbox(x.);"); // try to overwrite it in safe mode -- should encode variable
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert true;
+        } catch (IllegalArgumentException ix) {
+            assert false : "Was not able to unbox a variable with a bad name in safe mode.";
+        }
+    }
+
+
+    @Test
+    public void testUNSafeUnboxWithBadVariable() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // This creates a stem with an illegal variable name as its key, 'f(x)'
+        // then tries to unbox it. It should fail
+        addLine(script, "a := 'f(x)';"); // Create existing entry in symbol table
+        addLine(script, "x.a := 2;"); // Create existing entry in symbol table
+        addLine(script, "unbox(x., false);"); // try to overwrite without safe mode -- refuse
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Was able to unbox a variable with a name clash in safe mode.";
+        } catch (IllegalArgumentException ix) {
+            assert true;
+        }
+    }
+
+    @Test
     public void testSafeUnbox() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1182,7 +1221,6 @@ public class ParserTest extends AbstractQDLTester {
         } catch (IllegalArgumentException ix) {
             assert true;
         }
-
     }
 
     @Test
@@ -1196,6 +1234,20 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("b") :
                 "Failed to overwrite in unbox. Expected \"b\", got \"" + getStringValue("a", state) + "\"";
+    }
+
+    @Test
+    public void testUnboxWithBadVariableAndFlag() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 'f(x)';"); // Create existing entry in symbol table
+        addLine(script, "x.a := 2;"); // Create existing entry in symbol table
+        addLine(script, "unbox(x., true);"); // Variable should be v encoded in safe mode
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("f$28x$29", state) == 2L :
+                "Failed to vencode in unbox. Expected  variable \"f$28x$29\" not found.";
     }
 
     /**
@@ -1803,6 +1855,7 @@ public class ParserTest extends AbstractQDLTester {
      * </pre>
      * using multiple references and shows passing multiple function references is resolved
      * correctly.
+     *
      * @throws Throwable
      */
     @Test
@@ -1823,6 +1876,7 @@ public class ParserTest extends AbstractQDLTester {
      * THis tests that defining a function with a reference and repeatedly calling
      * it with different arguments does indeed do the evaluation (and not get the state
      * confused).
+     *
      * @throws Throwable
      */
     @Test
@@ -1846,10 +1900,11 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * Shows that monadic operators are being resolved correctly
+     *
      * @throws Throwable
      */
     @Test
-    public void testFunctionReferenceMonad() throws Throwable{
+    public void testFunctionReferenceMonad() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "m(@monad(), arg.)->monad(arg.);");
@@ -1866,10 +1921,11 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Tests tjhreee cases for visibility of functions in standard if then clause
      * Critical simple use case.
+     *
      * @throws Throwable
      */
     @Test
-    public void testFunctionDefVisibilityInConditional() throws Throwable{
+    public void testFunctionDefVisibilityInConditional() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a := true;");
@@ -1883,23 +1939,24 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "q(x)->x^3;");
         addLine(script, "if[a][q(x)->x^2;];");
         addLine(script, "z := is_function(q,1);");
-        addLine(script,"w := q(2);");
+        addLine(script, "w := q(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert !getBooleanValue("x",state);
-        assert !getBooleanValue("y",state);
-        assert !getBooleanValue("z",state);
-        assert getLongValue("w",state).equals(4L);
+        assert !getBooleanValue("x", state);
+        assert !getBooleanValue("y", state);
+        assert !getBooleanValue("z", state);
+        assert getLongValue("w", state).equals(4L);
     }
 
     /**
      * Very similar to {@link #testFunctionDefVisibilityInConditional()} , except
-     * else clauses are tested. 
+     * else clauses are tested.
      * Critical simple use case.
+     *
      * @throws Throwable
      */
     @Test
-    public void testFunctionDefVisibilityInConditional2() throws Throwable{
+    public void testFunctionDefVisibilityInConditional2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a := false;");
@@ -1912,14 +1969,14 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "q(x)->x^3;");
         addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
         addLine(script, "z := is_function(q,1);");
-        addLine(script,"w := q(2);");
+        addLine(script, "w := q(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        assert !getBooleanValue("x",state);
-        assert !getBooleanValue("y",state);
-        assert !getBooleanValue("z",state);
-        assert getLongValue("w",state).equals(4L);
+        assert !getBooleanValue("x", state);
+        assert !getBooleanValue("y", state);
+        assert !getBooleanValue("z", state);
+        assert getLongValue("w", state).equals(4L);
     }
 
     /*
@@ -1934,6 +1991,7 @@ public class ParserTest extends AbstractQDLTester {
      * in the state, which would throw a namespace exception) is that g uses f and that is
      * that. If the module functions are not being added only to the module state, then there would be errors.
      * Critical simple use case.
+     *
      * @throws Throwable
      */
     public void testModuleFunctionVisibility() throws Throwable {
@@ -1952,6 +2010,7 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * trigger that having competing function names between the workspace and a module
      * is flagged as an error.
+     *
      * @throws Throwable
      */
     @Test
@@ -1966,7 +2025,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "the visibility of module functions is incorrect";
-        }catch(NamespaceException ix){
+        } catch (NamespaceException ix) {
             assert true;
         }
     }
@@ -1974,26 +2033,27 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Tests that functions defined in functions are resolved correctly.
      * Here this computes (x+1)^2 as a composition of two functions, t and s.
+     *
      * @throws Throwable
      */
     @Test
-          public void testNestedFunction() throws Throwable {
-            State state = testUtils.getNewState();
-            StringBuffer script = new StringBuffer();
-            addLine(script, "define[f(x)][t(x)->x+1;s(x)->x^2;return(s(t(x)));];");
-            addLine(script, "x := f(2);"); // This is almost the largest value a long in Java can hold
-            QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            assert getLongValue("x",state).equals(9L);
-        }
+    public void testNestedFunction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[f(x)][t(x)->x+1;s(x)->x^2;return(s(t(x)));];");
+        addLine(script, "x := f(2);"); // This is almost the largest value a long in Java can hold
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state).equals(9L);
+    }
 
     /**
-    * Devious test for this. Run it with the join command and check that
-    * every value of the result is true as a string. This saves me from having
+     * Devious test for this. Run it with the join command and check that
+     * every value of the result is true as a string. This saves me from having
      * to do a low-level slog looking for any failures.
      */
     @Test
-    public void testJoinOnLastAxis() throws Throwable{
+    public void testJoinOnLastAxis() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "q. := [[n(4), 4+n(4)],[8+n(4),12+n(4)], [16+n(5),21+n(5)]];");
@@ -2003,12 +2063,13 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "out := to_string(b. == a.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getStringValue("out", state).indexOf("false") <0;
+        assert getStringValue("out", state).indexOf("false") < 0;
         // returns true if any elements are true
         StemVariable stem = getStemValue("x.", state);
     }
+
     @Test
-      public void testOverflowAdd() throws Throwable {
+    public void testOverflowAdd() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "numeric_digits(25);");
@@ -2019,8 +2080,9 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(getBDValue("x", state), new BigDecimal("9223372036854775812"));
         assert areEqual(getBDValue("y", state), new BigDecimal("-9223372036854775811"));
     }
+
     @Test
-    public void testEngineeringNotation() throws Throwable{
+    public void testEngineeringNotation() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "numeric_digits(25);");
@@ -2042,13 +2104,14 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Tests that executing a couple of transcendental math functions on a 3 rank array
      * actually processes all the elements. Uses sin<sup>2</sup>(x) + cos<sup>2</sup>(x) ==1.
+     *
      * @throws Exception
      */
     @Test
-    public void testTMathOnArray() throws Throwable{
+    public void testTMathOnArray() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script,"interval(x.)->n(x.2)/(x.2-1)*(x.1 - x.0) + x.0;");
+        addLine(script, "interval(x.)->n(x.2)/(x.2-1)*(x.1 - x.0) + x.0;");
         addLine(script, "x. := sin(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2 + cos(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2;");
         addLine(script, "y := reduce(@+, reduce(@+, reduce(@+, x.)));");  // add em all up
         QDLInterpreter interpreter = new QDLInterpreter(null, state);

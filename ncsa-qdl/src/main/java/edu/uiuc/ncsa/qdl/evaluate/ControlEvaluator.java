@@ -41,7 +41,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
 
-import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
+import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
 
@@ -423,7 +423,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     /*
       times(x,y)->x*y
-reduce(*times(), 1+n(5))
+      reduce(@times(), 1+n(5))
 
      */
     private void doReduceOrExpand(Polyad polyad, State state, boolean doReduce) {
@@ -440,12 +440,12 @@ reduce(*times(), 1+n(5))
             throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a list");
         }
         int axis = 0; // default
-        if(polyad.getArgCount() == 3){
+        if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
-            if(!isLong(axisObj)){
+            if (!isLong(axisObj)) {
                 throw new IllegalArgumentException("error: third argument of " + REDUCE + ", the axis, must be an integer");
             }
-            axis = ((Long)axisObj).intValue();
+            axis = ((Long) axisObj).intValue();
         }
         if (stemVariable.size() == 0) {
             polyad.setEvaluated(true);
@@ -478,29 +478,46 @@ reduce(*times(), 1+n(5))
             return;
         }
 
-        newReduceOrExpand(polyad, state, doReduce, axis, (FunctionReferenceNode) arg0, stemVariable);
-        oldreduceOrExpand(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
+        // newReduceOrExpand(polyad, state, doReduce, axis, (FunctionReferenceNode) arg0, stemVariable);
+        // oldReduceOrExpand(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
+        // oldReduceOrExpand2(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
+        StemUtility.StemAxisWalkerAction1 axisWalker;
+        if(doReduce){
+            axisWalker = this.new AxisReduce(getOperator(state, (FunctionReferenceNode) arg0), state);
+        }else{
+            axisWalker = this.new AxisExpand(getOperator(state, (FunctionReferenceNode) arg0), state);
+        }
+        Object result = axisWalker(stemVariable, axis, axisWalker);
+        polyad.setResult(result);
+        polyad.setResultType(Constant.getType(result));
+        polyad.setEvaluated(true);
     }
 
+/*
     private void newReduceOrExpand(Polyad polyad, State state, boolean doReduce, int axis, FunctionReferenceNode arg0, StemVariable stemVariable) {
+        ExpressionImpl operator = getOperator(state, arg0);
         StemUtility.MonadAxisAction action = new StemUtility.MonadAxisAction() {
             @Override
             public void action(StemVariable out, String key, StemVariable arg) {
-                 System.out.println(key);
+                System.out.println(key);
             }
         };
-        ExpressionImpl operator = getOperator(state, arg0);
-        StemVariable out= new StemVariable();
+        StemVariable out = new StemVariable();
         boolean doOnLastAxis = false;
         if (axis == LAST_AXIS_ARGUMENT_VALUE) {
             doOnLastAxis = true;
         }
 
         //StemUtility.axisMonadRecursion(out, stemVariable,-1, );
-        StemUtility.axisMonadRecursion(out, stemVariable,  doOnLastAxis?1000000:-1, doOnLastAxis, action);
-
+        StemUtility.axisMonadRecursion(out, stemVariable, doOnLastAxis ? 1000000 : (axis - 1), doOnLastAxis, action);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResult(out);
+        polyad.setEvaluated(true);
     }
-    private void oldreduceOrExpand(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable) {
+*/
+
+ /*  Original that works only along axis. Can be re-enabled and used for testing newer versions
+    private void oldReduceOrExpand(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable) {
         ExpressionImpl operator = getOperator(state, arg0);
         boolean isFirst = true;
         StemVariable output = null;
@@ -537,6 +554,121 @@ reduce(*times(), 1+n(5))
         }
         polyad.setEvaluated(true);
         return;
+    }
+*/
+/*    private void oldReduceOrExpand2(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable1) {
+        ExpressionImpl operator = getOperator(state, arg0);
+        StemVariable output = new StemVariable();
+        // contract is that a single list is returned unaltered.
+        // At this point, we know there are at least 2 entries.
+        for (String key1 : stemVariable1.keySet()) {
+            Object obj = stemVariable1.get(key1);
+            if (!isStem(obj)) {
+                continue;
+            }
+            StemVariable stemVariable = (StemVariable) obj;
+            Set<String> keySet = stemVariable.keySet();
+            Iterator<String> iterator = keySet.iterator();
+            StemVariable output1 = null;
+            Object reduceOuput = null;
+
+            Object lastValue = stemVariable.get(iterator.next()); // grab one before loop starts
+            if (!doReduce) {
+                output1 = new StemVariable();
+                output1.listAppend(lastValue);
+            }
+
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Object currentValue = stemVariable.get(key);
+                ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
+                argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
+                argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
+                operator.setArguments(argList);
+                operator.evaluate(state);
+                if (doReduce) {
+                    reduceOuput = operator.getResult();
+                } else {
+                    output1.put(key, operator.getResult());
+                }
+                lastValue = operator.getResult();
+            }
+            if (doReduce) {
+
+                output.put(key1, reduceOuput);
+            } else {
+                output.put(key1, output1);
+            }
+        }
+
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+        return;
+    }*/
+
+    public class AxisReduce implements StemUtility.StemAxisWalkerAction1 {
+        ExpressionImpl operator;
+        State state;
+
+        public AxisReduce(ExpressionImpl operator, State state) {
+            this.operator = operator;
+            this.state = state;
+        }
+
+        @Override
+        public Object action(StemVariable inStem) {
+            Object reduceOuput = null;
+            // contract is that a single list is returned unaltered.
+            // At this point, we know there are at least 2 entries.
+            Iterator<StemEntry> iterator = inStem.getStemList().iterator();
+            Object lastValue = iterator.next().entry;
+
+            while (iterator.hasNext()) {
+                Object currentValue = iterator.next().entry;
+                ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
+                argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
+                argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
+                operator.setArguments(argList);
+                operator.evaluate(state);
+                reduceOuput = operator.getResult();
+                lastValue = operator.getResult();
+            }
+            return reduceOuput;
+        }
+    }
+
+    public class AxisExpand implements StemUtility.StemAxisWalkerAction1 {
+        ExpressionImpl operator;
+        State state;
+
+        public AxisExpand(ExpressionImpl operator, State state) {
+            this.operator = operator;
+            this.state = state;
+        }
+
+        @Override
+        public Object action(StemVariable inStem) {
+            StemVariable output = new StemVariable();
+            Set<String> keySet = inStem.keySet();
+            Iterator<String> iterator = keySet.iterator();
+
+            Object lastValue = inStem.get(iterator.next()); // grab one before loop starts
+            output.listAppend(lastValue);
+
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                Object currentValue = inStem.get(key);
+                ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
+                argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
+                argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
+                operator.setArguments(argList);
+                operator.evaluate(state);
+                output.put(key, operator.getResult());
+                lastValue = operator.getResult();
+            }
+            return output;
+        }
     }
 
 
@@ -591,16 +723,16 @@ reduce(*times(), 1+n(5))
             default:
                 throw new IllegalArgumentException(INPUT_FORM + " requires an argument count for functions of a boolean ");
         }
-        if(polyad.getArgCount() == 2 && isBoolean(arg2)){
-          // process as variable with indent factor
-            String output = InputFormUtil.inputFormVar(argName,2, state);
+        if (polyad.getArgCount() == 2 && isBoolean(arg2)) {
+            // process as variable with indent factor
+            String output = InputFormUtil.inputFormVar(argName, 2, state);
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
             polyad.setResult(output);
             return;
         }
         // case here is that second arg is not a boolean (==> must be arg count) OR there is more than one arg.
-        if(!isLong(arg2)){
+        if (!isLong(arg2)) {
             throw new IllegalArgumentException(INPUT_FORM + " second argument must be an integer");
         }
 
@@ -1473,7 +1605,7 @@ reduce(*times(), 1+n(5))
             polyad.setResult(Boolean.TRUE);
             polyad.setEvaluated(true);
         } catch (Throwable t) {
-            if(DebugUtil.isEnabled()){
+            if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
             polyad.setResultType(Constant.BOOLEAN_TYPE);

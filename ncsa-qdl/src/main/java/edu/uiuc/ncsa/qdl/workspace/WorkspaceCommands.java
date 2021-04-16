@@ -270,6 +270,11 @@ public class WorkspaceCommands implements Logable {
             case STATE_INDICATOR_COMMAND:
                 return doSICommand(inputLine);
             case OFF_COMMAND:
+                if(inputLine.hasArg(HELP_SWITCH)){
+                    say(OFF_COMMAND + " [y||n] - exit the system. If you do not supply an argument, you will be prompted.");
+                    sayi("y = exit immediately without saving");
+                    return RC_NO_OP;
+                }
                 if (inputLine.hasArg("y")) {
                     shutdown();
                     return RC_EXIT_NOW;

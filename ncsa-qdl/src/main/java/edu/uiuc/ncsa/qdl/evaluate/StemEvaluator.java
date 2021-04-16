@@ -14,8 +14,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
+import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
+import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -390,7 +393,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case RANK:
             case FQ_RANK:
-                 doRank(polyad,state);
+                doRank(polyad, state);
                 return true;
             case JOIN:
             case FQ_JOIN:
@@ -557,14 +560,30 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doListReverse(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("error:" + LIST_REVERSE + " requires a single argument.");
-        }
         Object arg1 = polyad.evalArg(0, state);
         if (!isStem(arg1)) {
             throw new IllegalArgumentException("error:" + LIST_REVERSE + " requires a stem as its argument.");
         }
+        int axis = 0;
+        if (polyad.getArgCount() == 2) {
+            Object arg2 = polyad.evalArg(1, state);
+            if (!isLong(arg2)) {
+                throw new IllegalArgumentException("error:" + LIST_REVERSE + " an integer as its axis.");
+            }
+            axis = ((Long) arg2).intValue();
+        }
+
         StemVariable input = (StemVariable) arg1;
+
+        DoReverse reverse = this.new DoReverse();
+
+        Object result = axisWalker(input, axis, reverse);
+        polyad.setResult(result);
+        polyad.setResultType(Constant.getType(result));
+        polyad.setEvaluated(true);
+
+
+/*
         StemVariable output = new StemVariable();
         Iterator<StemEntry> iterator = input.getStemList().descendingIterator();
         while (iterator.hasNext()) {
@@ -574,6 +593,20 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(output);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+*/
+    }
+
+    protected class DoReverse implements StemUtility.StemAxisWalkerAction1 {
+        @Override
+        public Object action(StemVariable inStem) {
+            StemVariable output = new StemVariable();
+            Iterator<StemEntry> iterator = inStem.getStemList().descendingIterator();
+            while (iterator.hasNext()) {
+                StemEntry s = iterator.next();
+                output.listAppend(s.entry);
+            }
+            return output;
+        }
     }
 
     private void doUniqueValues(Polyad polyad, State state) {
@@ -902,18 +935,29 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // Make a safe copy of the state to unpack this in case something bombs
         List<String> keys = new ArrayList<>();
         State localState = state.newModuleState();
+        QDLCodec codec = new QDLCodec();
+
         for (String key : stem.keySet()) {
             Object ob = stem.get(key);
             key = key + (isStem(ob) ? STEM_INDEX_MARKER : "");
             if (safeMode) {
+                if (!pattern.matcher(key).matches()) {
+                    key = codec.encode(key);
+                }
                 if (state.isDefined(key)) {
                     throw new IllegalArgumentException("Error: name clash in safe mode for \"" + key + "\"");
+                }
+
+
+            } else {
+                if (!pattern.matcher(key).matches()) {
+                    throw new IllegalArgumentException("Error: The variable name \"" + key + "\" is not a legal variable name.");
                 }
             }
             keys.add(key);
             localState.setValue(key, ob);
         }
-        // once all is said and done and none of this bombed copy it. That way we don't leave the actual state in disaary
+        // once all is said and done and none of this bombed copy it. That way we don't leave the actual state in disarray
         for (String key : keys) {
             state.setValue(key, localState.getValue(key));
         }
@@ -926,6 +970,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
+    Pattern pattern = Pattern.compile(var_regex);
 
     /**
      * Take a collection of variables and stem them up, removing them from the symbole table.
@@ -1408,17 +1453,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         // need to handle case that the target does not exist.
         StemVariable targetStem;
-        if (polyad.getArguments().get(3) instanceof VariableNode){
+        if (polyad.getArguments().get(3) instanceof VariableNode) {
             targetStem = getOrCreateStem(polyad.getArguments().get(3),
                     state, LIST_COPY + " requires a stem as its fourth argument"
             );
-        }else{
-              Object obj = polyad.evalArg(3,state);
-              if(!isStem(obj)){
-                  throw new IllegalArgumentException(LIST_COPY + " requires an integer as its fifth argument");
+        } else {
+            Object obj = polyad.evalArg(3, state);
+            if (!isStem(obj)) {
+                throw new IllegalArgumentException(LIST_COPY + " requires an integer as its fifth argument");
 
-              }
-              targetStem = (StemVariable) obj;
+            }
+            targetStem = (StemVariable) obj;
         }
 
         Object arg5 = polyad.evalArg(4, state);
@@ -1586,7 +1631,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
         Object arg2 = polyad.getArguments().get(1).getResult();
-
+     /*   StemUtility.StemAxisWalkerAction1 walker = new StemUtility.StemAxisWalkerAction1() {
+            @Override
+            public Object action(StemVariable inStem) {
+                
+            }
+        }*/
         if (!isStem(arg2)) {
             StemVariable result = new StemVariable();
             if (target.containsKey(arg2.toString())) {
@@ -1701,10 +1751,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("The " + SHUFFLE + " command requires a stem as its first argument.");
         }
 
-        polyad.evalArg(1, state);
+        Object arg2 = polyad.evalArg(1, state);
 
-        Object arg2 = polyad.getArguments().get(1).getResult();
-        polyad.evalArg(1, state);
+        // polyad.getArguments().get(1).getResult();
+        //  polyad.evalArg(1, state);
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + SHUFFLE + " command requires a stem as its second argument.");
         }
@@ -1970,7 +2020,7 @@ z. :=  join3(q.,w.)
 
             }
         };
-        StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis?1000000:-1, doJoinOnLastAxis, joinAction);
+        StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis ? 1000000 : (axis - 1), doJoinOnLastAxis, joinAction);
 /*
         if (doJoinOnLastAxis) {
             StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis, joinAction);

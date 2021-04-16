@@ -42,26 +42,28 @@ but should be captured someplace.
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║   "   ║ join         ║ left., right.[, axis]    ║  -   ║ catenate the elements of left. and right. along the axis.    ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
-║   "   ║ keys         ║ arg.                     ║      ║ returns stem {key0:key0,key1:key1,...}                       ║
+║   "   ║ keys         ║ arg.[,filter]            ║      ║ returns stem {key0:key0,key1:key1,...}                       ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
-║   "   ║ list_keys    ║ arg.                     ║      ║ returns list [key0,key1,...]                                 ║
+║   "   ║ list_keys    ║ arg.[,filter]            ║      ║ returns list [key0,key1,...]                                 ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
-║   "   ║ mask         ║ left., right.            ║      ║                                                              ║
+║   "   ║ mask         ║ left., right.            ║  L   ║                                                              ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║   "   ║ rank         ║ arg.                     ║      ║                                                              ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║   "   ║ remove       ║ var_name                 ║      ║ deletes var_name from symbol table                           ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
-║   "   ║ rename_keys  ║ arg., stem.              ║      ║ renames the keys in arg. as per stem.                        ║
+║   "   ║ rename_keys  ║ arg., stem.              ║  L   ║ renames the keys in arg. as per stem.                        ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║  "    ║ set_default  ║ arg., scalar             ║   -  ║ returns arg.~{*:scalar}                                      ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
-║  "    ║ shuffle      ║ arg.[,list.]             ║      ║ randomly shuffles elements of arg. or reorders them          ║
+║  "    ║ shuffle      ║ int | arg.[,list.]       ║      ║ randomly shuffles elements of arg. or reorders them          ║
 ║       ║              ║                          ║      ║ as per list.                                                 ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║  "    ║ size         ║   arg.                   ║      ║ number of elements                                           ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║  "    ║ to_list      ║  arg0,arg1,...           ║   -  ║ returns [arg0,arg1,...]                                      ║
+╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
+║  "    ║ trim         ║   arg.                   ║      ║ trims a stem of strings on 0th axis                          ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
 ║  "    ║ unbox        ║   arg.                   ║      ║ turns stem into a set of variables.                          ║
 ╠═══════╬══════════════╬══════════════════════════╬══════╬══════════════════════════════════════════════════════════════╣
@@ -70,6 +72,18 @@ but should be captured someplace.
 ║  "    ║ unique       ║  list.                   ║      ║ returns the unique elements in a list.                       ║
 ╚═══════╩══════════════╩══════════════════════════╩══════╩══════════════════════════════════════════════════════════════╝
  This is the master list of things to do with stems and lists (aside from to/from JSON).
+
+ * Deprecation list
+ append
+ set_default
+ to_list
+ union
+ Maybe vencode encode_b64, to_hex, to_json  replace with
+ encode(type, arg)
+ decode(type, arg)
+ Support: hex, base 64, base 32 (new), json, variable
+ Could get rid of 10 functions and make it more extensible.
+
 
 3/9/2021
 The current parser definitions require that expression stems components be either simple variables,

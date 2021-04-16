@@ -1,4 +1,5 @@
-QDL is an outgrowth of some of the seminal ideas in K. Iverson's work. It is a list aka array processing language.
+QDL is an outgrowth of some of the seminal ideas in K. Iverson's work. It is a list (aka array)
+processing language.
 Merits of such languages are
 
 * loop free, recursion free
