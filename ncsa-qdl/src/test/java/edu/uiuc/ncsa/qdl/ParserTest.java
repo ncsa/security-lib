@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
+import static edu.uiuc.ncsa.qdl.evaluate.OpEvaluator.*;
+
 /**
  * A class for testing the parser. Write little scripts, test that the state is what is should be.
  * This is to let us know if, for instance, changing the lexer blows up.
@@ -43,7 +45,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "define[");
         addLine(script, "f(x,y)");
         addLine(script, "]body[");
-        addLine(script, "v := (x^3 + x*y^2 - 3*x*y + 1)/(x^4 + y^2 +2);");
+        addLine(script, "v := (x^3 + x×y^2 - 3×x×y + 1)÷(x^4 + y^2 +2);");
         addLine(script, "return(v);");
         addLine(script, "];");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -441,15 +443,15 @@ public class ParserTest extends AbstractQDLTester {
         // if the evaluation is attempted.
         addLine(script, "b := 0 < a ||  d.2 == 5;"); // true
         addLine(script, "c := a < 1 &&  d.2 == 5;"); // false
-        addLine(script, "d := 2 < 3 && (0 < a || d.2 == 5);"); //true
-        addLine(script, "e := 3 < 2 || (a < 1 && d.2 == 5);"); //false
+        addLine(script, "d := 2 < 3 && (0 < a ⋁ d.2 == 5);"); //true
+        addLine(script, "e := 3 < 2 ⋁ (a < 1 ⋀ d.2 ≡ 5);"); //false
         addLine(script, "f := 2 < 3 &&  1 < 3 && 4 < 3;"); //false
         addLine(script, "g := 2 < 3 &&  4 < 3 && 1 < 3;"); //false
-        addLine(script, "h := 4 < 3 &&  1 < 3 && 1 < 3;"); //false
-        addLine(script, "i := 0 < 3 &&  1 < 3 && 2 < 3;"); //true
+        addLine(script, "h := 4 < 3 ⋀  1 < 3 && 1 < 3;"); //false
+        addLine(script, "i := 0 < 3 ⋀  1 < 3 && 2 < 3;"); //true
         addLine(script, "j := false ||  true || d.5 == 5;"); //true
         addLine(script, "k := true ||  false || d.5 == 5;"); //true
-        addLine(script, "l := is_defined(d.) && d.3 <= 5 ;"); //false -- d. undefined
+        addLine(script, "l := is_defined(d.) && d.3 ≤ 5 ;"); //false -- d. undefined
         // before implementing this, the last test would have failed since
         // the system would still check d.3, which is undefined.
         State state = testUtils.getNewState();
@@ -855,12 +857,14 @@ public class ParserTest extends AbstractQDLTester {
     public void testAssignments() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := indices(6);");
+        addLine(script, "a. := indices(25);");
         addLine(script, "b := 3;");
         addLine(script, "a.0+=b;"); // 0 + 3 = 3
         addLine(script, "a.1-=b;"); // 1 - 3 = -2
-        addLine(script, "a.2*=b;"); // 2 * 6 =  6
+        addLine(script, "a.2*=b;"); // 2 * 3 =  6
+        addLine(script, "a.12" + TIMES2 + "=b;"); // 12 * 3 =  36
         addLine(script, "a.3/=b;"); //   3/3 =  1
+        addLine(script, "a.15" + DIVIDE2 + "=b;"); //   15/3 =  5
         addLine(script, "a.4%=b;"); //   4%3 =  1
         addLine(script, "a.5^=b;"); //   5^3 =  125
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -868,8 +872,11 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a.0", state) == 3L;
         assert getLongValue("a.1", state) == -2L;
         assert getLongValue("a.2", state) == 6L;
+        assert getLongValue("a.12", state) == 36L;
         assert areEqual(getBDValue("a.3", state), new BigDecimal("1.0"));
-        // assert getLongValue("a.3", state) == 1L;
+        assert areEqual(getBDValue("a.15", state), new BigDecimal("5.0"));
+
+//        assert getLongValue("a.15", state) == 5L;
         assert getLongValue("a.4", state) == 1L;
         assert getLongValue("a.5", state) == 125L;
     }
@@ -911,25 +918,37 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.0 := a<b;"); //F
         addLine(script, "a.1 := a>b;"); // T
         addLine(script, "a.2 := a==b;"); //F
+        addLine(script, "a.12 := a" + EQUALS2 + "b;"); //F
         addLine(script, "a.3 := a!=b;"); // T
+        addLine(script, "a.13 := a"+ NOT_EQUAL2 +"b;"); // T
         addLine(script, "a.4 := a<=a;"); //T
+        addLine(script, "a.14 := a" + LESS_THAN_EQUAL3 + "a;"); //T
         addLine(script, "a.5 := a=<a;"); //T
         addLine(script, "a.6 := b>=b;"); //T
+        addLine(script, "a.16 := b" + MORE_THAN_EQUAL3 + "b;"); //T
         addLine(script, "a.7 := b=>b;"); //T
         addLine(script, "a.8 := a==a;"); //T
+        addLine(script, "a.18 := a" + EQUALS2 + "a;"); //T
         addLine(script, "a.9 := a!=a;"); //F
+        addLine(script, "a.19 := a" + NOT_EQUAL2 + "a;"); //F
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("a.1", state);
         assert getBooleanValue("a.3", state);
+        assert getBooleanValue("a.13", state);
         assert getBooleanValue("a.4", state);
+        assert getBooleanValue("a.14", state);
         assert getBooleanValue("a.5", state);
         assert getBooleanValue("a.6", state);
+        assert getBooleanValue("a.16", state);
         assert getBooleanValue("a.7", state);
         assert getBooleanValue("a.8", state);
+        assert getBooleanValue("a.18", state);
         assert !getBooleanValue("a.0", state);
         assert !getBooleanValue("a.2", state);
+        assert !getBooleanValue("a.12", state);
         assert !getBooleanValue("a.9", state);
+        assert !getBooleanValue("a.19", state);
     }
 
 
@@ -941,7 +960,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "b:=10;");
         addLine(script, "c:=-5;");
         addLine(script, "d:=a<b&&c<a;");
-        addLine(script, "e:=!(a<b&&c<a);");
+        addLine(script, "e:=!(a<b"+ AND2 + "c<a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
@@ -1808,7 +1827,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
         addLine(script, "b. := [1,3,6,7];");
-        addLine(script, "x := reduce(@||, a. == b.);");
+        addLine(script, "x := reduce(@⋁, a. == b.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
@@ -1883,10 +1902,10 @@ public class ParserTest extends AbstractQDLTester {
     public void testFunctionReferenceMultipleEvaluations() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "line(x)->x;");
+        addLine(script, "line(x) → x;");
         addLine(script, "square(x)->x^2;");
         addLine(script, "cube(x)->x^3;");
-        addLine(script, "f(@z(), x)->z(x);");
+        addLine(script, "f(@z(), x) → z(x);");
         addLine(script, "x := f(@line(), 3);");
         addLine(script, "y := f(@square(),3);");
         addLine(script, "z := f(@cube(),3);");
@@ -1918,6 +1937,25 @@ public class ParserTest extends AbstractQDLTester {
         assert stem.getBoolean(2L);
     }
 
+    /**
+     * Same as previous, with ¬ tested explicitly
+     * @throws Throwable
+     */
+
+    @Test
+     public void testFunctionReferenceMonad2() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "m(@monad(), arg.)->monad(arg.);");
+         addLine(script, "x. := m(@¬, [false, true, false]);");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         // returns true if any elements are true
+         StemVariable stem = getStemValue("x.", state);
+         assert stem.getBoolean(0L);
+         assert !stem.getBoolean(1L);
+         assert stem.getBoolean(2L);
+     }
     /**
      * Tests tjhreee cases for visibility of functions in standard if then clause
      * Critical simple use case.
@@ -1986,7 +2024,7 @@ public class ParserTest extends AbstractQDLTester {
      */
 
     /**
-     * Case of a sinple module. The point is that a function f, is defined in the module and that
+     * Case of a simple module. The point is that a function f, is defined in the module and that
      * another module function g calls it. What should happen (assuming no other definitions of these
      * in the state, which would throw a namespace exception) is that g uses f and that is
      * that. If the module functions are not being added only to the module state, then there would be errors.

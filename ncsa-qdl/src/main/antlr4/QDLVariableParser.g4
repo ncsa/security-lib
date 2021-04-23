@@ -34,7 +34,7 @@ grammar QDLVariableParser;
  Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
-     ASSIGN : ':=' | '+=' | '-=' | '*=' | '/=' | '%=' | '^=';
+     ASSIGN : ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;
   FuncStart : [a-zA-Z_$#][a-zA-Z_$0-9#]* '(';
       F_REF : '@' (AllOps | (FuncStart ')'));
   BOOL_TRUE : 'true';
@@ -65,24 +65,24 @@ fragment SIGN
   statement is simply ignored.  Since this is the most common error for beginners (using the wrong
   assignment operator), this just must get flagged as a syntax error in parsing.
 */
-   LambdaConnector : '->';
-             Times : '*';
-            Divide : '/';
+   LambdaConnector : '->' | '→'; // unicode 2192
+             Times : '*' | '×';
+            Divide : '/' | '÷';
           PlusPlus : '++';
               Plus : '+';
         MinusMinus : '--';
              Minus : '-';
           LessThan : '<';
        GreaterThan : '>';
-       SingleEqual : '=';
-        LessEquals : '<=';
-        MoreEquals : '>=';
-            Equals : '==';
-         NotEquals : '!=';
-        LogicalNot : '!';
+       SingleEqual : '='; 
+        LessEquals : '<=' | '≤' | '=<';
+        MoreEquals : '>=' | '≥' | '=>';
+            Equals : '==' | '≡';
+         NotEquals : '!=' | '≠';
+        LogicalNot : '!'  | '¬';
     Exponentiation : '^';
-               And : '&&';
-                Or : '||';
+               And : '&&' | '⋀';
+                Or : '||' | '⋁';
           Backtick : '`';
            Percent : '%';
              Tilde : '~';

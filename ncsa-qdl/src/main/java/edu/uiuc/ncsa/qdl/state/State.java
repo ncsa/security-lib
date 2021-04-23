@@ -161,6 +161,19 @@ public class State extends FunctionState implements QDLConstants {
         // Start off with the actual constants that the system must have
         systemConstants = new StemVariable();
 
+        StemVariable characters = new StemVariable();
+        characters.put("22c0", OpEvaluator.AND2);
+        characters.put("f7", OpEvaluator.DIVIDE2);
+        characters.put("2261", OpEvaluator.EQUALS2);
+        characters.put("2264", OpEvaluator.LESS_THAN_EQUAL3);
+        characters.put("2265", OpEvaluator.MORE_THAN_EQUAL3);
+        characters.put("ac", OpEvaluator.NOT2);
+        characters.put("2260", OpEvaluator.NOT_EQUAL2);
+        characters.put("22c1", OpEvaluator.OR2);
+        characters.put("d7", OpEvaluator.TIMES2);
+        characters.put("2192", "→");
+
+        systemConstants.put(SYS_VAR_TYPE_CHARACTERS, characters);
         StemVariable varTypes = new StemVariable();
         varTypes.put(SYS_VAR_TYPE_STRING, new Long(Constant.STRING_TYPE));
         varTypes.put(SYS_VAR_TYPE_STEM, new Long(Constant.STEM_TYPE));

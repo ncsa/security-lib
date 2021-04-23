@@ -57,6 +57,7 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
                     checkValue(PARAMETERS,"")
             );
             pool = new MariaDBConnectionPool(x);
+            pool.setMaxSize(getMaxConnections());
         }
         return pool;
     }

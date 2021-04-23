@@ -50,6 +50,7 @@ public interface QDLConstants {
     String SYS_VAR_TYPE_NULL = RESERVED_NULL;
     String SYS_VAR_TYPE_UNDEFINED = "undefined";
     String SYS_VAR_TYPE_STRING = "string";
+    String SYS_VAR_TYPE_CHARACTERS = "characters";
 
     String SYS_ERROR_CODES = "error_codes.";
     String SYS_ERROR_CODE_SYSTEM_ERROR = "system_error";

@@ -248,8 +248,10 @@ public class QDLListener implements QDLParserListener {
                 return OpEvaluator.PLUS_VALUE;
             case "-=":
                 return OpEvaluator.MINUS_VALUE;
+            case "×=":
             case "*=":
                 return OpEvaluator.TIMES_VALUE;
+            case "÷=":
             case "/=":
                 return OpEvaluator.DIVIDE_VALUE;
             case "%=":

@@ -40,32 +40,32 @@ import QDLVariableParser;
 
 expression
  :
-   function                                                              #functions
- | stemVariable                                                          #stemVar
- | stemList                                                              #stemLi
- | expression '.' expression                                             #dotOp
- | expression ('~' | '~|' ) expression                                   #tildeExpression
- | expression postfix=('++' | '--')                                      #postfix
- | prefix=('++'|'--') expression                                         #prefix
- //| prefix='*' expression                                                 #f_ref
- | '!' expression                                                        #notExpression
- | expression '^' expression                                             #powerExpression
- | expression op=('*' | '/' | '%' ) expression                           #multiplyExpression
- | ('+' | '-') expression                                                #unaryMinusExpression
- | expression op=('+' | '-' ) expression                                 #addExpression
- | expression op=('<' | '>' | '<=' | '>=' | '=<' | '=>' ) expression     #compExpression
- | expression op=('==' | '!=') expression                                #eqExpression
- | expression '&&' expression                                            #andExpression
- | expression '||' expression                                            #orExpression
- | '(' expression ')'                                                    #association
- | LeftBracket                                                           #leftBracket
- | integer                                                               #integers
- | number                                                                #numbers
- | variable                                                              #variables
- | Bool                                                                  #logical
- | Null                                                                  #null
- | STRING                                                                #strings
- | ';'                                                                   #semi_for_empty_expressions
+   function                                                                    #functions
+ | stemVariable                                                                #stemVar
+ | stemList                                                                    #stemLi
+ | expression '.' expression                                                   #dotOp
+ | expression ('~' | '~|' ) expression                                         #tildeExpression
+ | expression postfix=('++' | '--')                                            #postfix
+ | prefix=('++'|'--') expression                                               #prefix
+ //| prefix='*' expression                                                       #f_ref
+ | LogicalNot expression                                                       #notExpression
+ | expression '^' expression                                                   #powerExpression
+ | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
+ | ('+' | '-') expression                                                      #unaryMinusExpression
+ | expression op=('+' | '-' ) expression                                       #addExpression
+ | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
+ | expression op=(Equals | NotEquals) expression                               #eqExpression
+ | expression And expression                                                   #andExpression
+ | expression Or expression                                                    #orExpression
+ | '(' expression ')'                                                          #association
+ | LeftBracket                                                                 #leftBracket
+ | integer                                                                     #integers
+ | number                                                                      #numbers
+ | variable                                                                    #variables
+ | Bool                                                                        #logical
+ | Null                                                                        #null
+ | STRING                                                                      #strings
+ | ';'                                                                         #semi_for_empty_expressions
  ;
 // This *could* be added but does not work quite as expected because variables are allowed to have . to show they
 // are stems. A (probably quite substantial) rewrite of the parser would be in order to change this

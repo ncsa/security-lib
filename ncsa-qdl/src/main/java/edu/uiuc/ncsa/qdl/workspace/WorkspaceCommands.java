@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
@@ -624,7 +625,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected boolean useExternalEditor() {
-        return !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
+        return getQdlEditors()!=null && !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
     }
 
     private int _doFileEdit(InputLine inputLine) {
@@ -1801,19 +1802,37 @@ public class WorkspaceCommands implements Logable {
             say("Could not parse argument count of \"" + inputLine.getLastArg() + "\"");
             return RC_NO_OP;
         }
-        FR_WithState fr_withState = getState().resolveFunction(fName, argCount);
-        if (fr_withState == null) {
-            say("no such function");
-            return RC_NO_OP;
+        FR_WithState fr_withState = null;
+        try {
+             fr_withState = getState().resolveFunction(fName, argCount);
+            if (fr_withState.isExternalModule) {
+                say("cannot edit external functions.");
+                return RC_NO_OP;
+            }
+
+        }catch(UndefinedFunctionException ufx){
+            // ok, they are defining it now
         }
-        if (fr_withState.isExternalModule) {
-            say("cannot edit external functions.");
-            return RC_NO_OP;
-        }
-        String inputForm = InputFormUtil.inputForm(fName, argCount, getState());
+
+
+        String inputForm = fr_withState== null?"":InputFormUtil.inputForm(fName, argCount, getState());
+
         if (isTrivial(inputForm)) {
-            say("no such function");
-            return RC_NO_OP;
+            say("new function '" + fName + "'");
+            StringBuilder argList = new StringBuilder();
+            argList.append("(");
+            boolean isFirst = true;
+            for(int i =0; i < argCount; i++){
+                if(isFirst){
+                    isFirst = false;
+                    argList.append("x").append(i);
+                }else{
+                    argList.append(", x").append(i);
+                }
+            }
+            argList.append(")");
+            inputForm = fName + argList + "->null;";
+//            return RC_NO_OP;
         }
         List<String> f = StringUtils.stringToList(inputForm);
         if (useExternalEditor()) {

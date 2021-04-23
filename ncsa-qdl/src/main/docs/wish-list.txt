@@ -1,6 +1,164 @@
 This is scrapbook of things That I would like to consider for QDL that are not fully formed
 but should be captured someplace.
 
+4/20/2021
+
+- signed axes 0,1,2, (like indices). axis of -1 is last axis which makes sense since dimension is a list
+
+Two new operators
+ - m_apply, d_apply
+
+ m_apply(@monad, arg., axis) = apply the given monad to each element on the axis
+ d_appy(left.[, left_axis], @dyad, @right.[,right_axis])
+
+ E.g.
+   d_apply(left., -1, @*, right.)
+
+   multiplies the left. last axis with the right 0th axis == in matrixes, this part of matrix multiplication.
+   Full matrix multiplication then is
+
+    reduce(@+, some_axis, d_apply(left., -1, @*, right.))
+
+    where some_axis is the new resulting axis inside the product. so if left. is 2x3x4 and right is 4x5x6
+    the d_apply result has shape 2x3x4x5x6 (2nd axis, 4 elements, has been applied) so reduction is on the
+    2nd axis.
+
+    ===>>> Implies strongly some form of axis math needs to happen, or tracking so when an operator is
+           applied to an axis, we know what the new, "hot" axis is (?)
+                                             *
+           Axis math: 2x3x4 OP 4x5x6 --> 2x3x4x5x6  hot axis has the * over it.
+
+    It is pretty regular so that 2x3x4, -1 OPERATOR 4x5x6,0 certainly has enbough information to figure this out.
+    Just question is how to transmit it faithfully?
+    Alternate way of doing this is to have some notation for an axis and be able to query it? <a,b,c> is
+    an axis list? Maybe write axis[2,3,4] instead i.e.,  add an axis directive?
+    This introduces a new data type into QDL which is a very big step. Could also have some
+    form of function to do it? axis(arg.). Or a connector 2!3!4 vs. 2! ?
+
+    Compare APL expression for the inner product. Chop up A on its last axis, apply g to that along B's
+    first axis, reduce with f (along it's zero-th action, A and B are matrices).
+    A f.g B   ←→   f/¨ (⊂[¯1+⍴⍴A]A) ∘.g ⊂[0]B
+
+-- Perhaps an axis or slice operator? slice(arg., axis) returns the list on axis.
+  arg. := n(3,4,n(12))
+[
+  [0,1,2,3],
+  [4,5,6,7],
+  [8,9,10,11]
+ ]
+
+   slice(arg., 0) returns the list above. slice(arg.,1) returns the 4 list
+[
+    [0,4,8],
+    [1,5,9],
+    [2,6,10],
+    [3,7,11]
+]
+ == [
+     [arg.0.0, arg.1.0, arg.2.0],
+     [arg.0.1,.arg.1.1, arg.2.1],
+     [arg.0.2,.arg.1.2, arg.2.2],
+     [arg.0.3,.arg.1.3, arg.2.3]
+     ]
+so slice(arg., 1) == takes a 3x4 stem and returns a 4x3 stem. slice(n(3,4,5),2) returns 5x4x3
+E.g. arg2. := n(3,4,5,n(60))
+            [
+              [
+                [0,1,2,3,4],
+                [5,6,7,8,9],
+                [10,11,12,13,14],
+                [15,16,17,18,19]
+              ],
+              [
+                [20,21,22,23,24],
+                [25,26,27,28,29],
+                [30,31,32,33,34],
+                [35,36,37,38,39]
+              ],
+              [
+                [40,41,42,43,44],
+                [45,46,47,48,49],
+                [50,51,52,53,54],
+                [55,56,57,58,59]
+              ]
+             ]
+
+slice(arg2., 0) -> 3x4x5 == arg2. == [arg2.0, arg2.1, arg2.2]
+slice(arg., 1) -> 4x3x5  == [[arg2.0.0, arg2.1.0, arg2.2.0], [arg2.0.1, arg2.1.1, arg2.2.1],...
+           [
+             [
+                [0,1,2,3,4],
+                [20,21,22,23,24],
+                [40,41,42,43,44],
+             ]
+             [
+                [5,6,7,8,9],
+                [25,26,27,28,29],
+                [45,46,47,48,49],
+             ]
+             [
+                [10,11,12,13,14],
+                [30,31,32,33,34],
+                [50,51,52,53,54],
+             ]
+             [
+                [15,16,17,18,19]
+                [35,36,37,38,39]
+                [55,56,57,58,59]
+             ]
+           ]
+
+                          n(3,4,[arg.0.0.0, arg.0.1.0, arg.0.2.0, arg.0.3.0,
+                                 arg.1.0.0, arg.1.1.0, arg.1.2.0,arg.1.3.0,
+                                 arg.2.0.0,arg.2.1.0,arg.2.2.0, arg.2.3.0],
+
+slice(arg2., 2) -> 5x3x4
+          [
+                [
+                  [0,5,10,15],
+                  [20,25,30,35],
+                  [40,45,50,55]
+                ]
+                   [1,6,11,16],
+                   [21,26,31,36],
+                   [41,46,51,56]
+               ]
+               etc.
+           ]
+
+
+         while[
+           for_next(i,3)][
+           while[
+              for_next(j,4)][
+              say(arg2.i.j);
+           ]; //inner
+         ]; //outer
+
+       // elements for arg2. on last axis, n is index of entry
+      define[slice(n) ][  while[for_next(i,3)][while[for_next(j,4)][say(arg2.i.j.n);];];]
+      // print out the indices
+      define[islice(n) ][  while[for_next(i,3)][while[for_next(j,4)][say(i+'.'+j+'.'+n);];];]
+
+ // doodle to do in qdl:
+slice(arg., 1) -> 4x3x5  == [[arg2.0.0, arg2.1.0, arg2.2.0], [arg2.0.1, arg2.1.1, arg2.2.1],...
+
+            define[slice0(arg.)][return(arg.);]
+            define[slice1(arg.)][
+              out0.:={};
+              while[
+                for_keys(i,arg.)
+               ][
+                 out1.:={};
+                 while[
+                  for_next(j,arg.i)
+                 ][
+                   out1.j := arg.i.];
+                 ];// end inner while
+                 out0.i := out1.j;
+              ]; //end outer while
+            ]; //end definition
+
 4/8/2021
  ┌──┬──┐  ╔══╦══╗ ╒══╤══╕ ╓──╥──╖
  │  │  │  ║  ║  ║ │  │  │ ║  ║  ║

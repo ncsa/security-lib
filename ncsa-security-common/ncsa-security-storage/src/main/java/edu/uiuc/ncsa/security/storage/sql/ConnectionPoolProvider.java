@@ -26,6 +26,9 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     public static final String DATABASE = "database";
     public static final String PARAMETERS = "parameters";
     public static final String SCHEMA = SQLStoreProvider.SCHEMA; // since this is shared, really.
+    public static final String CONNECTION_MAX = "maxConnections";
+    public static final String CONNECTION_IDLE_TIMEOUT = "idleTimeout";
+    public static final String CONNECTION_IDLE_CLEANUP_INTERVAL = "idleCleanup";
 
 
     protected ConnectionPoolProvider(String database, String schema, String host, int port, String driver, boolean useSSL) {
@@ -36,7 +39,39 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         this.schema = schema;
         this.useSSL = useSSL;
     }
+    int maxConnections = 10;
 
+    public static String getConnectionIdleCleanupInterval() {
+        return CONNECTION_IDLE_CLEANUP_INTERVAL;
+    }
+
+    public int getMaxConnections() {
+        return maxConnections;
+    }
+
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
+    public long getIdleTimeout() {
+        return idleTimeout;
+    }
+
+    public void setIdleTimeout(long idleTimeout) {
+        this.idleTimeout = idleTimeout;
+    }
+
+    public long getIdleCleanup() {
+        return idleCleanup;
+    }
+
+    public void setIdleCleanup(long idleCleanup) {
+        this.idleCleanup = idleCleanup;
+    }
+
+    long idleTimeout = 10*60*1000L; // idle timeout in ms.
+    long idleCleanup = 60*1000L; // cleanup thread sleep interval
+    
     protected ConnectionPoolProvider(String database, String schema) {
         this.database = database;
         this.schema = schema;
@@ -67,7 +102,7 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         throw new MyConfigurationException("Error: no value specified for " + key);
     }
 
-     protected boolean checkValue(String key, boolean defaultValue) {
+    protected boolean checkValue(String key, boolean defaultValue) {
         String x = getAttribute(key);
         if (x != null) return Boolean.parseBoolean(x);
         return defaultValue;

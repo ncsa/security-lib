@@ -20,29 +20,38 @@ import java.util.TreeSet;
  * on 1/13/20 at  3:20 PM
  */
 public class OpEvaluator extends AbstractFunctionEvaluator {
-
+   // reference for unicode and other characters: https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
+    public static final String AND = "&&";
+    public static final String AND2 = "⋀"; // unicode 22c0
     public static final String ASSIGNMENT = ":=";
+    public static final String DIVIDE = "/";
+    public static final String DIVIDE2 = "÷"; // unicode f7
+    public static final String EQUALS = "==";
+    public static final String EQUALS2 = "≡";  // unicode 2261
+    public static final String INTEGER_DIVIDE = "%";
+    public static final String LESS_THAN = "<";
+    public static final String LESS_THAN_EQUAL = "<=";
+    public static final String LESS_THAN_EQUAL2 = "=<";
+    public static final String LESS_THAN_EQUAL3 = "≤"; // unicode 2264
+    public static final String MINUS = "-";
+    public static final String MINUS_MINUS = "--";
+    public static final String MORE_THAN = ">";
+    public static final String MORE_THAN_EQUAL = ">=";
+    public static final String MORE_THAN_EQUAL2 = "=>";
+    public static final String MORE_THAN_EQUAL3 = "≥"; // unicode 2265
+    public static final String NOT = "!";
+    public static final String NOT2 = "¬"; // unicode ac
+    public static final String NOT_EQUAL = "!=";
+    public static final String NOT_EQUAL2 = "≠"; // unicode 2260
+    public static final String OR = "||";
+    public static final String OR2 = "⋁"; // unicode 22c1
+    public static final String PLUS = "+";
+    public static final String PLUS_PLUS = "++";
     public static final String POWER = "^";
     public static final String TILDE = "~";
     public static final String TILDE_STILE = "|~";
     public static final String TIMES = "*";
-    public static final String DIVIDE = "/";
-    public static final String INTEGER_DIVIDE = "%";
-    public static final String PLUS = "+";
-    public static final String MINUS = "-";
-    public static final String PLUS_PLUS = "++";
-    public static final String MINUS_MINUS = "--";
-    public static final String AND = "&&";
-    public static final String OR = "||";
-    public static final String EQUALS = "==";
-    public static final String NOT_EQUAL = "!=";
-    public static final String LESS_THAN = "<";
-    public static final String LESS_THAN_EQUAL = "<=";
-    public static final String LESS_THAN_EQUAL2 = "=<";
-    public static final String MORE_THAN = ">";
-    public static final String MORE_THAN_EQUAL = ">=";
-    public static final String MORE_THAN_EQUAL2 = "=>";
-    public static final String NOT = "!";
+    public static final String TIMES2 = "×"; // unicode d7
     public static final String DOT = ".";
 
 
@@ -74,21 +83,27 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             POWER,
             TILDE, TILDE_STILE,
             TIMES,
+            TIMES2,
             DIVIDE,
+            DIVIDE2,
             INTEGER_DIVIDE,
             PLUS,
             MINUS,
-            AND,
+            AND, AND2,
             OR,
+            OR2,
             EQUALS,
+            EQUALS2,
             NOT_EQUAL,
+            NOT_EQUAL2,
             LESS_THAN,
             LESS_THAN_EQUAL,
             LESS_THAN_EQUAL2,
             MORE_THAN,
             MORE_THAN_EQUAL,
             MORE_THAN_EQUAL2,
-            NOT};
+            MORE_THAN_EQUAL3,
+            NOT,NOT2};
 
     public boolean isMathOperator(String x) {
         for (String op : ALL_MATH_OPS) {
@@ -148,13 +163,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case ASSIGNMENT:
                 return ASSIGNMENT_VALUE;
             case AND:
+            case AND2:
                 return AND_VALUE;
             case EQUALS:
+            case EQUALS2:
                 return EQUALS_VALUE;
             case LESS_THAN:
                 return LESS_THAN_VALUE;
             case LESS_THAN_EQUAL:
             case LESS_THAN_EQUAL2:
+            case LESS_THAN_EQUAL3:
                 return LESS_THAN_EQUAL_VALUE;
             case MINUS:
                 return MINUS_VALUE;
@@ -162,24 +180,30 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return MORE_THAN_VALUE;
             case MORE_THAN_EQUAL:
             case MORE_THAN_EQUAL2:
+            case MORE_THAN_EQUAL3:
                 return MORE_THAN_EQUAL_VALUE;
             case NOT_EQUAL:
+            case NOT_EQUAL2:
                 return NOT_EQUAL_VALUE;
             case OR:
+            case OR2:
                 return OR_VALUE;
             case PLUS:
                 return PLUS_VALUE;
             case POWER:
                 return POWER_VALUE;
             case TIMES:
+            case TIMES2:
                 return TIMES_VALUE;
             case DIVIDE:
+            case DIVIDE2:
                 return DIVIDE_VALUE;
             case INTEGER_DIVIDE:
                 return INTEGER_DIVIDE_VALUE;
             case MINUS_MINUS:
                 return MINUS_MINUS_VALUE;
             case NOT:
+            case NOT2:
                 return NOT_VALUE;
             case PLUS_PLUS:
                 return PLUS_PLUS_VALUE;
@@ -234,7 +258,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 doDyadComparisonOperator(dyad, state);
                 return;
             default:
-                throw new NotImplementedException("Unknown dyadic operator");
+                throw new NotImplementedException("Unknown dyadic operator " + dyad.getOperatorType());
         }
     }
 

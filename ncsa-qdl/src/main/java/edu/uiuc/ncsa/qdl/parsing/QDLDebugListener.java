@@ -350,7 +350,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     @Override
     public void exitOrExpression(QDLParserParser.OrExpressionContext ctx) {
         String id = xit("or");
-        fakeStack.put(id, ctx.Or().toString());
+        fakeStack.put(id, ctx.getText());
         sayi("exit OR Expression:" + id, ctx);
 
     }
@@ -391,7 +391,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void exitAndExpression(QDLParserParser.AndExpressionContext ctx) {
         String id = xit("and");
         sayi("exit AndExpression:" + id, ctx);
-        fakeStack.put(id, ctx.And().toString());
+        fakeStack.put(id, ctx.getText());
     }
 
     @Override
