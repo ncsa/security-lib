@@ -32,6 +32,19 @@ public class TokenImpl implements NewToken {
     }
 
     /**
+     * If this is a JWT, then this returns the JTI. If not, it just returns the token.
+     * @return
+     */
+    public URI getJti() {
+        return jti;
+    }
+
+    public void setJti(URI jti) {
+        this.jti = jti;
+    }
+
+    URI jti;
+    /**
      * Checks if the version is null, effectively meaning it was created before versions existed.
      *
      * @return
@@ -52,12 +65,14 @@ public class TokenImpl implements NewToken {
 
     public TokenImpl(String sciToken, URI jti) {
         this.token = URI.create(sciToken);
+        this.jti = jti;
         isJWT = true; // only place we can determine this
         init(jti);
     }
 
     public TokenImpl(URI token) {
         this.token = token;
+        this.jti = token;
         init(token);
     }
 
@@ -125,6 +140,7 @@ public class TokenImpl implements NewToken {
         stringBuilder.append(", " + TIMESTAMP_TAG + "=" + getIssuedAt());
         stringBuilder.append(", " + LIFETIME_TAG + "=" + getLifetime());
         stringBuilder.append(", " + VERSION_TAG + "=" + getVersion());
+        stringBuilder.append(", " + "jti" + "=" + getJti());
         return stringBuilder;
 
     }

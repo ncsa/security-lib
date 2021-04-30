@@ -51,7 +51,7 @@ public class QDLParserParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'{'", "','", "'}'", "':'", "')'", "'.'", "'('", "';'", null, null, 
-			null, null, null, null, "'true'", "'false'", "'null'", null, null, null, 
+			null, null, null, null, "'true'", "'false'", null, null, null, null, 
 			null, null, null, "'++'", "'+'", "'--'", "'-'", "'<'", "'>'", "'='", 
 			null, null, null, null, null, "'^'", null, null, "'`'", "'%'", "'~'", 
 			"'~|'", "']'", "'['", "'if['", "']then['", "']else['", "'while['", "']do['", 
@@ -1481,21 +1481,10 @@ public class QDLParserParser extends Parser {
 				break;
 			case 5:
 				{
-				_localctx = new NotExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(158);
-				match(LogicalNot);
-				setState(159);
-				expression(18);
-				}
-				break;
-			case 6:
-				{
 				_localctx = new UnaryMinusExpressionContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(160);
+				setState(158);
 				_la = _input.LA(1);
 				if ( !(_la==Plus || _la==Minus) ) {
 				_errHandler.recoverInline(this);
@@ -1505,8 +1494,19 @@ public class QDLParserParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
+				setState(159);
+				expression(16);
+				}
+				break;
+			case 6:
+				{
+				_localctx = new NotExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(160);
+				match(LogicalNot);
 				setState(161);
-				expression(15);
+				expression(10);
 				}
 				break;
 			case 7:
@@ -1644,11 +1644,11 @@ public class QDLParserParser extends Parser {
 						_localctx = new PowerExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(182);
-						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
+						if (!(precpred(_ctx, 18))) throw new FailedPredicateException(this, "precpred(_ctx, 18)");
 						setState(183);
 						match(Exponentiation);
 						setState(184);
-						expression(18);
+						expression(19);
 						}
 						break;
 					case 4:
@@ -1656,7 +1656,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new MultiplyExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(185);
-						if (!(precpred(_ctx, 16))) throw new FailedPredicateException(this, "precpred(_ctx, 16)");
+						if (!(precpred(_ctx, 17))) throw new FailedPredicateException(this, "precpred(_ctx, 17)");
 						setState(186);
 						((MultiplyExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1669,7 +1669,7 @@ public class QDLParserParser extends Parser {
 							consume();
 						}
 						setState(187);
-						expression(17);
+						expression(18);
 						}
 						break;
 					case 5:
@@ -1677,7 +1677,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new AddExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(188);
-						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
+						if (!(precpred(_ctx, 15))) throw new FailedPredicateException(this, "precpred(_ctx, 15)");
 						setState(189);
 						((AddExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1690,7 +1690,7 @@ public class QDLParserParser extends Parser {
 							consume();
 						}
 						setState(190);
-						expression(15);
+						expression(16);
 						}
 						break;
 					case 6:
@@ -1698,7 +1698,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new CompExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(191);
-						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
+						if (!(precpred(_ctx, 14))) throw new FailedPredicateException(this, "precpred(_ctx, 14)");
 						setState(192);
 						((CompExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1711,7 +1711,7 @@ public class QDLParserParser extends Parser {
 							consume();
 						}
 						setState(193);
-						expression(14);
+						expression(15);
 						}
 						break;
 					case 7:
@@ -1719,7 +1719,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new EqExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(194);
-						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
+						if (!(precpred(_ctx, 13))) throw new FailedPredicateException(this, "precpred(_ctx, 13)");
 						setState(195);
 						((EqExpressionContext)_localctx).op = _input.LT(1);
 						_la = _input.LA(1);
@@ -1732,7 +1732,7 @@ public class QDLParserParser extends Parser {
 							consume();
 						}
 						setState(196);
-						expression(13);
+						expression(14);
 						}
 						break;
 					case 8:
@@ -1740,11 +1740,11 @@ public class QDLParserParser extends Parser {
 						_localctx = new AndExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(197);
-						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
+						if (!(precpred(_ctx, 12))) throw new FailedPredicateException(this, "precpred(_ctx, 12)");
 						setState(198);
 						match(And);
 						setState(199);
-						expression(12);
+						expression(13);
 						}
 						break;
 					case 9:
@@ -1752,11 +1752,11 @@ public class QDLParserParser extends Parser {
 						_localctx = new OrExpressionContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(200);
-						if (!(precpred(_ctx, 10))) throw new FailedPredicateException(this, "precpred(_ctx, 10)");
+						if (!(precpred(_ctx, 11))) throw new FailedPredicateException(this, "precpred(_ctx, 11)");
 						setState(201);
 						match(Or);
 						setState(202);
-						expression(11);
+						expression(12);
 						}
 						break;
 					case 10:
@@ -2825,19 +2825,19 @@ public class QDLParserParser extends Parser {
 		case 1:
 			return precpred(_ctx, 21);
 		case 2:
-			return precpred(_ctx, 17);
+			return precpred(_ctx, 18);
 		case 3:
-			return precpred(_ctx, 16);
+			return precpred(_ctx, 17);
 		case 4:
-			return precpred(_ctx, 14);
+			return precpred(_ctx, 15);
 		case 5:
-			return precpred(_ctx, 13);
+			return precpred(_ctx, 14);
 		case 6:
-			return precpred(_ctx, 12);
+			return precpred(_ctx, 13);
 		case 7:
-			return precpred(_ctx, 11);
+			return precpred(_ctx, 12);
 		case 8:
-			return precpred(_ctx, 10);
+			return precpred(_ctx, 11);
 		case 9:
 			return precpred(_ctx, 20);
 		}
@@ -2905,8 +2905,8 @@ public class QDLParserParser extends Parser {
 		"\2\u0094\u0097\3\2\2\2\u0095\u0093\3\2\2\2\u0095\u0096\3\2\2\2\u0096\35"+
 		"\3\2\2\2\u0097\u0095\3\2\2\2\u0098\u0099\7\20\2\2\u0099\37\3\2\2\2\u009a"+
 		"\u009b\b\21\1\2\u009b\u00b1\5\30\r\2\u009c\u00b1\5\16\b\2\u009d\u00b1"+
-		"\5\22\n\2\u009e\u009f\t\3\2\2\u009f\u00b1\5 \21\25\u00a0\u00a1\7%\2\2"+
-		"\u00a1\u00b1\5 \21\24\u00a2\u00a3\t\4\2\2\u00a3\u00b1\5 \21\21\u00a4\u00a5"+
+		"\5\22\n\2\u009e\u009f\t\3\2\2\u009f\u00b1\5 \21\25\u00a0\u00a1\t\4\2\2"+
+		"\u00a1\u00b1\5 \21\22\u00a2\u00a3\7%\2\2\u00a3\u00b1\5 \21\f\u00a4\u00a5"+
 		"\7\t\2\2\u00a5\u00a6\5 \21\2\u00a6\u00a7\7\7\2\2\u00a7\u00b1\3\2\2\2\u00a8"+
 		"\u00b1\7-\2\2\u00a9\u00b1\5\b\5\2\u00aa\u00b1\5\6\4\2\u00ab\u00b1\5\4"+
 		"\3\2\u00ac\u00b1\7\r\2\2\u00ad\u00b1\7\23\2\2\u00ae\u00b1\7\24\2\2\u00af"+
@@ -2916,13 +2916,13 @@ public class QDLParserParser extends Parser {
 		"\2\2\u00b0\u00ab\3\2\2\2\u00b0\u00ac\3\2\2\2\u00b0\u00ad\3\2\2\2\u00b0"+
 		"\u00ae\3\2\2\2\u00b0\u00af\3\2\2\2\u00b1\u00d1\3\2\2\2\u00b2\u00b3\f\30"+
 		"\2\2\u00b3\u00b4\7\b\2\2\u00b4\u00d0\5 \21\31\u00b5\u00b6\f\27\2\2\u00b6"+
-		"\u00b7\t\5\2\2\u00b7\u00d0\5 \21\30\u00b8\u00b9\f\23\2\2\u00b9\u00ba\7"+
-		"&\2\2\u00ba\u00d0\5 \21\24\u00bb\u00bc\f\22\2\2\u00bc\u00bd\t\6\2\2\u00bd"+
-		"\u00d0\5 \21\23\u00be\u00bf\f\20\2\2\u00bf\u00c0\t\4\2\2\u00c0\u00d0\5"+
-		" \21\21\u00c1\u00c2\f\17\2\2\u00c2\u00c3\t\7\2\2\u00c3\u00d0\5 \21\20"+
-		"\u00c4\u00c5\f\16\2\2\u00c5\u00c6\t\b\2\2\u00c6\u00d0\5 \21\17\u00c7\u00c8"+
-		"\f\r\2\2\u00c8\u00c9\7\'\2\2\u00c9\u00d0\5 \21\16\u00ca\u00cb\f\f\2\2"+
-		"\u00cb\u00cc\7(\2\2\u00cc\u00d0\5 \21\r\u00cd\u00ce\f\26\2\2\u00ce\u00d0"+
+		"\u00b7\t\5\2\2\u00b7\u00d0\5 \21\30\u00b8\u00b9\f\24\2\2\u00b9\u00ba\7"+
+		"&\2\2\u00ba\u00d0\5 \21\25\u00bb\u00bc\f\23\2\2\u00bc\u00bd\t\6\2\2\u00bd"+
+		"\u00d0\5 \21\24\u00be\u00bf\f\21\2\2\u00bf\u00c0\t\4\2\2\u00c0\u00d0\5"+
+		" \21\22\u00c1\u00c2\f\20\2\2\u00c2\u00c3\t\7\2\2\u00c3\u00d0\5 \21\21"+
+		"\u00c4\u00c5\f\17\2\2\u00c5\u00c6\t\b\2\2\u00c6\u00d0\5 \21\20\u00c7\u00c8"+
+		"\f\16\2\2\u00c8\u00c9\7\'\2\2\u00c9\u00d0\5 \21\17\u00ca\u00cb\f\r\2\2"+
+		"\u00cb\u00cc\7(\2\2\u00cc\u00d0\5 \21\16\u00cd\u00ce\f\26\2\2\u00ce\u00d0"+
 		"\t\3\2\2\u00cf\u00b2\3\2\2\2\u00cf\u00b5\3\2\2\2\u00cf\u00b8\3\2\2\2\u00cf"+
 		"\u00bb\3\2\2\2\u00cf\u00be\3\2\2\2\u00cf\u00c1\3\2\2\2\u00cf\u00c4\3\2"+
 		"\2\2\u00cf\u00c7\3\2\2\2\u00cf\u00ca\3\2\2\2\u00cf\u00cd\3\2\2\2\u00d0"+

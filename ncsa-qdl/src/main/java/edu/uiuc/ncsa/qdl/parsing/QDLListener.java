@@ -87,7 +87,7 @@ public class QDLListener implements QDLParserListener {
             cnode.setSourceCode(getSource(ctx));
             return;
         }
-        if (ctx.getText().equals(QDLConstants.RESERVED_NULL)) {
+        if (ctx.getText().equals(QDLConstants.RESERVED_NULL) || ctx.getText().equals(QDLConstants.RESERVED_NULL2)) {
             p.statement = QDLNull.getInstance();
             return;
         }
@@ -205,7 +205,7 @@ public class QDLListener implements QDLParserListener {
             //          nextA.setVariableReference(nextVar);
             // Special cases. := means assignment, if not then, then it is one
             // of +=, *=,..., so create the appropriate dyad
-            if (op.equals(":=")) {
+            if (op.equals(":=") || op.equals("≔")) {   // Allows unicode 2254 as assignment too.
                 if (i + 1 == exprIndex) {
                     Statement arg = resolveChild(assignmentContext.children.get(i + 1));
                     currentA.setArgument(arg);
@@ -504,6 +504,8 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitNull(QDLParserParser.NullContext ctx) {
+        ConstantNode constantNode = new ConstantNode(QDLNull.getInstance(), Constant.NULL_TYPE);
+           stash(ctx, constantNode);
     }
 
     @Override

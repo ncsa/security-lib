@@ -48,8 +48,7 @@ expression
  | expression postfix=('++' | '--')                                            #postfix
  | prefix=('++'|'--') expression                                               #prefix
  //| prefix='*' expression                                                       #f_ref
- | LogicalNot expression                                                       #notExpression
- | expression '^' expression                                                   #powerExpression
+ | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
  | ('+' | '-') expression                                                      #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
@@ -57,6 +56,7 @@ expression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
  | expression And expression                                                   #andExpression
  | expression Or expression                                                    #orExpression
+ | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
  | LeftBracket                                                                 #leftBracket
  | integer                                                                     #integers

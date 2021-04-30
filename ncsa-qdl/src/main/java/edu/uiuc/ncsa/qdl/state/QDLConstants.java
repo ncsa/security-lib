@@ -28,6 +28,7 @@ public interface QDLConstants {
     String RESERVED_TRUE = "true";
     String RESERVED_FALSE = "false";
     String RESERVED_NULL = "null";
+    String RESERVED_NULL2 = "∅";
 
     String FUNCTION_REFERENCE_MARKER = "@";
 

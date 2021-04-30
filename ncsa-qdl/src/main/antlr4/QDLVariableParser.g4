@@ -34,15 +34,15 @@ grammar QDLVariableParser;
  Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
-     ASSIGN : ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;
+     ASSIGN : '≔' | ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;
   FuncStart : [a-zA-Z_$#][a-zA-Z_$0-9#]* '(';
       F_REF : '@' (AllOps | (FuncStart ')'));
   BOOL_TRUE : 'true';
  BOOL_FALSE : 'false';
-       Null : 'null';
+       Null : 'null' | '∅';
      STRING : '\'' (ESC|.)*? '\'';
     Decimal : (Integer '.' Integer) | ('.' Integer);
-    // AllOps must be a fragment or every bloddy operator outside of a function reference will
+    // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.
     fragment 
     AllOps : Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
@@ -66,8 +66,8 @@ fragment SIGN
   assignment operator), this just must get flagged as a syntax error in parsing.
 */
    LambdaConnector : '->' | '→'; // unicode 2192
-             Times : '*' | '×';
-            Divide : '/' | '÷';
+             Times : '*'  | '×';  // unicode d7
+            Divide : '/'  | '÷';  // unicode f7
           PlusPlus : '++';
               Plus : '+';
         MinusMinus : '--';
@@ -75,14 +75,14 @@ fragment SIGN
           LessThan : '<';
        GreaterThan : '>';
        SingleEqual : '='; 
-        LessEquals : '<=' | '≤' | '=<';
-        MoreEquals : '>=' | '≥' | '=>';
-            Equals : '==' | '≡';
-         NotEquals : '!=' | '≠';
-        LogicalNot : '!'  | '¬';
+        LessEquals : '<=' | '≤' | '=<';  // unicode 2264
+        MoreEquals : '>=' | '≥' | '=>';  // unicode 2265
+            Equals : '==' | '≡';  // unicode 2261
+         NotEquals : '!=' | '≠';  // unicode 2260
+        LogicalNot : '!'  | '¬';  // unicode ac
     Exponentiation : '^';
-               And : '&&' | '⋀';
-                Or : '||' | '⋁';
+               And : '&&' | '⋀' | '∧'; // unicode 22c0, 2227
+                Or : '||' | '⋁' | '∨'; // unicode 22c2, 2228
           Backtick : '`';
            Percent : '%';
              Tilde : '~';
