@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.InvalidAlgorithmException;
+import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
+import edu.uiuc.ncsa.security.core.exceptions.UnsupportedJWTTypeException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -183,9 +186,9 @@ public class JWTUtil2 {
 
     /**
      * This returns header, payload and signature as the three elements of an array.
-     *
      * @param idToken
      * @return
+     * @throws IllegalArgumentException if this is not parsable as a token of the form A.B[.C]
      */
     public static String[] decat(String idToken) {
         StringTokenizer st = new StringTokenizer(idToken, ".");
@@ -195,7 +198,7 @@ public class JWTUtil2 {
         switch (st.countTokens()) {
             case 0:
             case 1:
-                return null;
+                throw new IllegalArgumentException("Error: No JWT components foound.");
             case 2:
                 output[HEADER_INDEX] = st.nextToken();
                 output[PAYLOAD_INDEX] = st.nextToken();
@@ -221,13 +224,12 @@ public class JWTUtil2 {
     /**
      * This will only peel off the header and payload. No verification of any sort is done!!
      *
+     *
      * @param jwt
      * @return
+     * @throws IllegalArgumentException if this is not JWT or the argument is null
      */
     public static JSONObject[] readJWT(String jwt) {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new GeneralException("Error: missing or empty token");
-        }
         String[] x = decat(jwt);
         JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
@@ -237,20 +239,26 @@ public class JWTUtil2 {
         return rc;
     }
 
+    /**
+     * Verify and read a JWT. Note that this returns any of several exceptions which you should
+     * check for as needed. An {@link IllegalArgumentException} means that this is not in fact
+     * a JWT, all other exceptions relate to whether the internal structure passes muster.
+     * @param jwt
+     * @param webKeys
+     * @return
+     * @throws IllegalArgumentException if this is not a JWT or the argument is null
+     * @throws InvalidAlgorithmException if there is no algorithm or the algorith is not supported
+     * @throws InvalidSignatureException if the signature fails to verify
+     * @throws UnsupportedJWTTypeException if the internal type of the token is not supported
+     */
     public static JSONObject verifyAndReadJWT(String jwt, JSONWebKeys webKeys) {
-        if (jwt == null || jwt.isEmpty()) {
-            throw new GeneralException("Error: missing or empty token");
-        }
         String[] x = decat(jwt);
-        if (x == null) {
-            throw new IllegalArgumentException("Error: not a JWT");
-        }
         JSONObject h = JSONObject.fromObject(new String(Base64.decodeBase64(x[HEADER_INDEX])));
         JSONObject p = JSONObject.fromObject(new String(Base64.decodeBase64(x[PAYLOAD_INDEX])));
         DebugUtil.trace(JWTUtil.class, "header=" + h);
         DebugUtil.trace(JWTUtil.class, "payload=" + p);
         if (h.get(ALGORITHM) == null) {
-            throw new IllegalArgumentException("Error: no algorithm.");
+            throw new InvalidAlgorithmException("Error: no algorithm.");
         } else {
             if (h.get(ALGORITHM).equals(NONE_JWT)) {
                 DebugUtil.trace(JWTUtil.class, "unsigned id token. Returning payload");
@@ -258,21 +266,21 @@ public class JWTUtil2 {
                 return p;
             }
         }
-        if (!h.get(TYPE).equals("JWT")) throw new GeneralException("Unsupported token type.");
+        if (!h.get(TYPE).equals("JWT")) throw new UnsupportedJWTTypeException("Unsupported token type.");
         Object keyID = h.get(KEY_ID);
         DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
 
         if (keyID == null || !(keyID instanceof String)) {
-            throw new IllegalArgumentException("Error: Unknown algorithm");
+            throw new InvalidAlgorithmException("Error: Unknown algorithm");
         }
         boolean isOK = false;
         try {
             isOK = verify(h, p, x[SIGNATURE_INDEX], webKeys.get(h.getString(KEY_ID)));
         } catch (Throwable t) {
-            throw new IllegalStateException("Error: could not verify signature", t);
+            throw new InvalidSignatureException("Error: could not verify signature", t);
         }
         if (!isOK) {
-            throw new IllegalStateException("Error: could not verify signature");
+            throw new InvalidSignatureException("Error: could not verify signature");
         }
         return p;
     }

@@ -3,14 +3,16 @@ processing language.
 Merits of such languages are
 
 * loop free, recursion free
-* extending operations over lists effectively embeds control structures in the data
+* extending operations over lists effectively embeds most common control structures
+  in the data --  stems are therefore objects
 * partial answer to the "von Neumann bottleneck".
 * polymorphism on rank of objects.
 
 There are a couple of different ways to approach this topic. APL had strict conformity on arrays.
 J has the ability to box and unbox them, i.e. treat arrays as if they were scalars. Other languages
 like Haskell also have some structures. The real issue in all of them is ragged arrays, meaning arrays
-of objects that are not uniform. Some reject ragged arrays, some have a lot of work arounds
+of objects that are not uniform. Some reject ragged arrays, some have a lot of work arounds. The
+model in QDL is lists of lists and no further structure is assumed.
 
 QDL uses stem variables, which allow ragged arrays, non-integer keys and employs subsetting,
 that is to say, operations only apply to common keys between lists. So if a stem is

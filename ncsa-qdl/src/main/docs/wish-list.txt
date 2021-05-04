@@ -40,6 +40,17 @@ Two new operators
     A f.g B   ←→   f/¨ (⊂[¯1+⍴⍴A]A) ∘.g ⊂[0]B
 
 -- Perhaps an axis or slice operator? slice(arg., axis) returns the list on axis.
+
+(This is an example of an operator that simply swaps a pair of dimensions, could even have
+ a generic version where by all the dimensions can be swapped,
+ so
+    δ(arg.) == [3,5,4]
+    α(arg., [2,0,1])
+ returns a 4x3x5 array.
+    α(arg., scalar)
+ returns a scalar x i x j x ... (puts the scalar axis first).
+ )
+    
   arg. := n(3,4,n(12))
 [
   [0,1,2,3],
