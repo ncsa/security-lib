@@ -180,5 +180,14 @@ public abstract class IDTokenResponse extends IResponse2 {
         osw.close();
     }
 
-
+    @Override
+    public String toString() {
+        return "IDTokenResponse{" +
+                "accessToken=" + accessToken +
+                ", refreshToken=" + refreshToken +
+                ", signToken=" + signToken +
+                ", claims=" + claims +
+                ", supportedScopes=" + supportedScopes +
+                '}';
+    }
 }
