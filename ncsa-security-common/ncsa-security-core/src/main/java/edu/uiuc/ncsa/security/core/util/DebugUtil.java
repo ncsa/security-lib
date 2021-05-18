@@ -173,7 +173,26 @@ public class DebugUtil implements DebugConstants{
     public static void trace(Object obj, String message) {
         getInstance().trace(obj, message);
     }
+    /*
+    do local means to only print out the debug message if there is a local flag for a component. This allows
+    you to turn on or off component wise debugging.
+     */
+    public static void trace(boolean doLocal, Object obj, String message, Throwable t) {
+        if(doLocal){getInstance().trace(obj, message, t);}
+    }
 
+    public static void trace(boolean doLocal, Class callingClass, String message, Throwable t) {
+        if(doLocal){getInstance().trace(callingClass, message, t);}
+    }
+
+    public static void trace(boolean doLocal, Class callingClass, String message)
+    {
+        if(doLocal){getInstance().trace(callingClass, message);}
+    }
+
+    public static void trace(boolean doLocal, Object obj, String message) {
+        if(doLocal){getInstance().trace(obj, message);}
+    }
     /**
      * This will print out a message from a class that includes the class name and current timestamp.
      *

@@ -30,11 +30,11 @@ public class PGConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
         return null;
     }
 
-    ConnectionPool cp;
+    ConnectionPool pool;
 
     @Override
     public ConnectionPool get() {
-        if (cp == null) {
+        if (pool == null) {
             PostgresConnectionParameters x = new PostgresConnectionParameters(
                     checkValue(USERNAME),
                     checkValue(PASSWORD),
@@ -45,8 +45,10 @@ public class PGConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
                     checkValue(DRIVER, driver),
                     checkValue(USE_SSL, useSSL),
                     checkValue(PARAMETERS,""));
-            cp = new ConnectionPool(x);
+            pool = new ConnectionPool(x);
+            setPoolParameters(pool
+            );
         }
-        return cp;
+        return pool;
     }
 }

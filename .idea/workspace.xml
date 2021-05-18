@@ -5,15 +5,41 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="parser tweak, state management improvement">
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionRecord.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/StackMap.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLVariableParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLVariableParser.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/VFSDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/vfs/VFSDatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/DebugUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/DebugUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/Pool.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/Pool.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/DBInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/DBInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLDatabase.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/TableInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/TableInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionPoolProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/DBInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/DBInitializer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLDatabase.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLDatabase.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/TableInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/TableInitializer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mariadb/MariaDBConnectionPoolProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLIDriver.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLITool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CLITool.class" afterDir="false" />
@@ -29,7 +55,11 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/servlet/DBConfigLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/servlet/DBConfigLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/SQLBaseTransactionStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/SQLBaseTransactionStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/servlet/DBConfigLoader.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/servlet/DBConfigLoader.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/servlet/TransactionState.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/servlet/TransactionState.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/SQLBaseTransactionStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/SQLBaseTransactionStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" afterDir="false" />
@@ -39,8 +69,6 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/server/IDTokenResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/server/IDTokenResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" afterDir="false" />
@@ -170,7 +198,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="Application.QDL default">
+  <component name="RunManager" selected="JUnit.QDL Test Suite">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -253,34 +281,6 @@
       <option name="PATTERN" value="" />
       <option name="USE_PATTERN" value="false" />
       <method />
-    </configuration>
-    <configuration name="InputFormUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.util.InputFormUtil" />
-      <module name="ncsa-qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.qdl.util.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="JSONEditor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.cli.json_edit.JSONEditor" />
-      <module name="ncsa-security-util" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.cli.json_edit.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
     </configuration>
     <configuration name="NFor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.util.NFor" />
@@ -383,6 +383,22 @@
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <method v="2" />
     </configuration>
+    <configuration name="MultipleInheritanceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ncsa-security-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.core.configuration" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="QDL Test Suite" type="JUnit" factoryName="JUnit">
       <module name="ncsa-qdl" />
       <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.qdl" />
@@ -416,6 +432,13 @@
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Scratch" type="Java Scratch" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="Scratch" />
+      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -554,19 +577,19 @@
       <item itemvalue="Application.QDL default" />
       <item itemvalue="Application.QDL GUI" />
       <item itemvalue="Application.TokenUtils" />
-      <item itemvalue="Application.InputFormUtil" />
-      <item itemvalue="Application.JSONEditor" />
       <item itemvalue="Application.NFor" />
+      <item itemvalue="Java Scratch.Scratch" />
       <item itemvalue="JUnit.QDL Test Suite" />
       <item itemvalue="JUnit.StemFunctionsTest.testSFEmbeddedStem" />
+      <item itemvalue="JUnit.MultipleInheritanceTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.MultipleInheritanceTest" />
+        <item itemvalue="Java Scratch.Scratch" />
         <item itemvalue="Application.TokenUtils" />
         <item itemvalue="Application.NFor" />
         <item itemvalue="JUnit.StemFunctionsTest.testSFEmbeddedStem" />
-        <item itemvalue="Application.JSONEditor" />
-        <item itemvalue="Application.InputFormUtil" />
       </list>
     </recent_temporary>
   </component>
@@ -638,14 +661,10 @@
       <workItem from="1617740452280" duration="30138000" />
       <workItem from="1618832574087" duration="40178000" />
       <workItem from="1619206634597" duration="43586000" />
-      <workItem from="1620040564017" duration="21492000" />
-    </task>
-    <task id="LOCAL-00040" summary="More tests. Added an exception. renamed a class">
-      <created>1612368811989</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1612368811989</updated>
+      <workItem from="1620040564017" duration="21724000" />
+      <workItem from="1620647392843" duration="38118000" />
+      <workItem from="1621251767820" duration="4067000" />
+      <workItem from="1621262351560" duration="3630000" />
     </task>
     <task id="LOCAL-00041" summary="Final checkin before cutting release. Just added some tests.">
       <created>1612384097017</created>
@@ -983,7 +1002,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620140056533</updated>
     </task>
-    <option name="localTasksCounter" value="89" />
+    <task id="LOCAL-00089" summary="Updated a toString method.">
+      <created>1620417041691</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1620417041691</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -993,7 +1019,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="QDL: Refactor of functions (moved stuff to its own package finally), documentation. Changed one property from being a string to being a list of them." />
     <MESSAGE value="QDL: Finished refactor of function support. No actual changes, just making the class layout and usage sane with some interfaces. Loooong overdue." />
     <MESSAGE value="One edge case with serialization to XML." />
     <MESSAGE value="QDL: support for function pointers. Tests." />
@@ -1018,7 +1043,8 @@
     <MESSAGE value="parser tweak, tests" />
     <MESSAGE value="Fixes for FNAL CIL-971" />
     <MESSAGE value="CIL-974 fixes: more exception types for various JWT verification failures so understandable error messages can be generated and logged." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-974 fixes: more exception types for various JWT verification failures so understandable error messages can be generated and logged." />
+    <MESSAGE value="Updated a toString method." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated a toString method." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
  */
 public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaDBConnectionPool> {
 
-
     /**
      * Sets the defaults for this connection.
      * @param database
@@ -37,7 +36,6 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
 
     @Override
     public Object componentFound(CfgEvent configurationEvent) {
-
         return null;
     }
 
@@ -56,8 +54,10 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
                     checkValue(USE_SSL, useSSL),
                     checkValue(PARAMETERS,"")
             );
+
             pool = new MariaDBConnectionPool(x);
-            pool.setMaxSize(getMaxConnections());
+            setPoolParameters(pool);
+            System.err.println( this.getClass().getSimpleName() + ": created connection pool with id " + pool.getUuid());
         }
         return pool;
     }

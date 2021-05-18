@@ -103,14 +103,16 @@ public abstract class DBInitializer extends SQLDatabase implements Initializable
      * @throws SQLException
      */
     protected void init2() throws SQLException {
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         Statement s = c.createStatement();
         createSchema(s);
         createTables(s);
         setPermissions(s);
         s.close();
         c.close();
-        releaseConnection(c);
+        releaseConnection(cr);
     }
 
     public boolean init() {
@@ -128,13 +130,15 @@ public abstract class DBInitializer extends SQLDatabase implements Initializable
      * @throws SQLException
      */
     protected void destroy2() throws SQLException {
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         Statement s = c.createStatement();
         dropTables(s);
         dropSchema(s);
         s.close();
         c.close();
-        releaseConnection(c);
+        releaseConnection(cr);
 
     }
 

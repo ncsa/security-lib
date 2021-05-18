@@ -64,7 +64,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      */
     public List<V> getAll() {
         LinkedList<V> allEntries = new LinkedList<>();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         V t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createSelectAllStatement());
@@ -80,9 +82,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting all entries.", e);
         }
         return allEntries;
@@ -100,7 +102,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             throw new UnregisteredObjectException("Error: cannot update non-existent entry for\"" +
                     value.getIdentifierString() + "\". Register it first or call save.");
         }
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
 
             PreparedStatement stmt = c.prepareStatement(getTable().createUpdateStatement());
@@ -126,9 +130,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.setString(i++, value.getIdentifierString());
             stmt.executeUpdate();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error updating object with identifier = \"" + value.getIdentifierString(), e);
         }
     }
@@ -172,7 +176,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public void register(V value) {
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createInsertStatement());
             Map<String, Object> map = depopulate(value);
@@ -190,9 +196,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error: could not register object with id \"" + value.getIdentifierString() + "\"", e);
         } finally {
         }
@@ -220,7 +226,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             throw new NFWException("Error casting object of type \"" + o.getClass().getName() + "\" to an Identifier.\nThis is an implementation error", c);
         }
 
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         V t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createSelectStatement());
@@ -231,7 +239,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
-                releaseConnection(c);
+                releaseConnection(cr);
                 return null;   // returning a null fulfills contract for this being a map.
             }
 
@@ -240,9 +248,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             stmt.close();
             t = create();
             populate(map, t);
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
         }
         return t;
@@ -251,17 +259,19 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         String attributes = null;
-        if(attr == null || attr.isEmpty()){
+        if (attr == null || attr.isEmpty()) {
             attributes = "*";
-        }else{
+        } else {
             attributes = "";
-            for(String a : attr){
+            for (String a : attr) {
                 attributes = attributes + a + " ";
             }
         }
-        String searchString = "select "+ attributes + " from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
+        String searchString = "select " + attributes + " from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
         List<V> values = new ArrayList<>();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         V t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(searchString);
@@ -278,14 +288,15 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
         }
         return values;
 
     }
+
     public List<V> search(String key, String condition, boolean isRegEx) {
         return search(key, condition, isRegEx, null);
     }
@@ -327,7 +338,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 query = "SELECT COUNT(*)  from " + tablename;
             }
         }
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         int rowCount = 0; // default size
 
         try {
@@ -339,9 +352,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting the size.", e);
         }
         return rowCount;
@@ -359,7 +372,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         } catch (ClassCastException c) {
             throw new NFWException("Error casting object of type \"" + key.getClass().getName() + "\" to an Identifier.\nThis is an implementation error", c);
         }
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         boolean rc = false;
         try {
             PreparedStatement stmt = c.prepareStatement(getTable().createSelectStatement());
@@ -369,9 +384,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             rc = rs.next();
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             e.printStackTrace();
         }
         return rc;
@@ -406,15 +421,17 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             // fine. Return null. All we care about is whether the next operations work.
         }
         String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + "=?";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setString(1, key.toString());
             stmt.execute();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting identity providers", e);
         }
         return oldObject;
@@ -435,14 +452,16 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public void clear() {
         String query = "DELETE FROM " + getTable().getFQTablename();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting identity providers", e);
         }
     }
@@ -452,7 +471,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         HashSet<Identifier> keys = new HashSet<Identifier>();
 
         String query = "Select " + getTable().getPrimaryKeyColumnName() + " from " + getTable().getFQTablename();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
@@ -463,10 +484,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
 
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting the user ids", e);
         }
         return keys;
@@ -481,7 +502,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      */
     public Collection<V> values() {
         Collection<V> allOfThem = new ArrayList<V>();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement("select * from " + getTable().getFQTablename());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
@@ -495,9 +518,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error: could not get database object", e);
         }
         return allOfThem;
@@ -505,7 +528,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
     public Set<Entry<Identifier, V>> entrySet() {
         Set<Entry<Identifier, V>> entries = new HashSet<Entry<Identifier, V>>();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement("select * from " + getTable().getFQTablename());
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content per JDBC spec.
@@ -519,9 +544,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error: could not get database object", e);
         }
         return entries;
@@ -540,8 +565,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
      */
     public void checkColumns() throws SQLException {
         ColumnDescriptors cds = getTable().getColumnDescriptor();
-        Connection connection = getConnection();
-        Statement stmt = connection.createStatement();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        Statement stmt = c.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT * from " + getTable().getFQTablename());
         ResultSetMetaData metaData = rs.getMetaData();
         Hashtable<String, Integer> foundCols = new Hashtable<String, Integer>();
@@ -590,12 +617,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         rs.close();
         stmt.close();
-        releaseConnection(connection);
+        releaseConnection(cr);
     }
 
     public void checkTable() {
-        Connection c = getConnection();
-
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
         try {
             DatabaseMetaData md = c.getMetaData();
             ResultSet tables = md.getTables(null, getTable().getSchema(), getTable().getTablename(), new String[]{"TABLE"});
@@ -614,7 +641,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 }
 
             }
-            releaseConnection(c);
+            releaseConnection(cr);
 
         } catch (SQLException x) {
             System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
@@ -625,7 +652,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         return converter;
     }
 
-       public MapConverter getMapConverter() {
-           return converter;
-       }
+    public MapConverter getMapConverter() {
+        return converter;
+    }
 }

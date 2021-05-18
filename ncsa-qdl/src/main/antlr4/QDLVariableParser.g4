@@ -35,7 +35,7 @@ grammar QDLVariableParser;
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
      ASSIGN : '≔' | ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;
-  FuncStart : [a-zA-Z_$#][a-zA-Z_$0-9#]* '(';
+  FuncStart : [a-zA-Z_$#\u03b1-\u03c9][a-zA-Z_$0-9#\u03b1-\u03c9]* '(';
       F_REF : '@' (AllOps | (FuncStart ')'));
   BOOL_TRUE : 'true';
  BOOL_FALSE : 'false';
@@ -51,6 +51,9 @@ grammar QDLVariableParser;
 SCIENTIFIC_NUMBER
    : Decimal (E SIGN? Integer)?
    ;
+
+ //  GREEK: 'αβγδεζηθικλμνξοπρςστυφχψω';
+
 fragment E
    : 'E' | 'e'
    ;

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLDatabase;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import net.sf.json.JSONArray;
@@ -50,7 +51,9 @@ public class VFSDatabase extends SQLDatabase {
     public List<String> selectByPath(String path) {
         ArrayList<String> paths = new ArrayList<>();
         String statement = " select " + FILE_NAME + " from " + fqTablename + " where " + PATH_NAME + " =?";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         FileEntry t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(statement);
@@ -63,7 +66,7 @@ public class VFSDatabase extends SQLDatabase {
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
-                releaseConnection(c);
+                releaseConnection(cr);
                 return paths;
             }else{
                 // If there is exactly one row in the result, add it.
@@ -75,9 +78,9 @@ public class VFSDatabase extends SQLDatabase {
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
         }
         return paths;
@@ -86,7 +89,9 @@ public class VFSDatabase extends SQLDatabase {
     public List<String> getDistinctPaths() {
         String statement = " select DISTINCT(" + PATH_NAME + ") from " + fqTablename;
         ArrayList<String> paths = new ArrayList<>();
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         FileEntry t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(statement);
@@ -97,7 +102,7 @@ public class VFSDatabase extends SQLDatabase {
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
-                releaseConnection(c);
+                releaseConnection(cr);
                 return paths;
             }
             while (rs.next()) {
@@ -105,9 +110,9 @@ public class VFSDatabase extends SQLDatabase {
             }
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new QDLIOException("Error getting paths from store table" + fqTablename, e);
         }
         return paths;
@@ -116,8 +121,9 @@ public class VFSDatabase extends SQLDatabase {
     public FileEntry get(String[] key) {
         String path = key[VFSMySQLProvider.PATH_INDEX];
         String filename = key[VFSMySQLProvider.FILENAME_INDEX];
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
 
-        Connection c = getConnection();
         FileEntry t = null;
         try {
             String statement = "select * from " + fqTablename + " where " + PATH_NAME + " = ? AND " + FILE_NAME + " = ?";
@@ -130,7 +136,7 @@ public class VFSDatabase extends SQLDatabase {
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
-                releaseConnection(c);
+                releaseConnection(cr);
                 return null;   // returning a null fulfills contract for this.
             }
 
@@ -147,9 +153,9 @@ public class VFSDatabase extends SQLDatabase {
                 array.add(map.getString(CONTENT));
             }
             t = new FileEntry(array, eas);
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting file for \"" + path + "\" named \"" + filename + "\".", e);
         }
         return t;
@@ -160,7 +166,9 @@ public class VFSDatabase extends SQLDatabase {
         String fileName = key[VFSMySQLProvider.FILENAME_INDEX];
         String statment = "Select * from " + fqTablename +
                 " where " + PATH_NAME + " = ? AND " + FILE_NAME + " = ?";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         boolean rc = false;
         try {
             PreparedStatement stmt = c.prepareStatement(statment);
@@ -171,9 +179,9 @@ public class VFSDatabase extends SQLDatabase {
             rc = rs.next();
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             e.printStackTrace();
         }
         return rc;
@@ -188,7 +196,9 @@ public class VFSDatabase extends SQLDatabase {
                 " set " + EA + " = ?, " +
                 CONTENT + " = ? " +
                 "where " + PATH_NAME + " = ? AND " + FILE_NAME + " = ?";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
 
             PreparedStatement stmt = c.prepareStatement(updateStatement);
@@ -202,9 +212,9 @@ public class VFSDatabase extends SQLDatabase {
             stmt.setString(4, fileName);
             stmt.executeUpdate();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException | IOException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error updating object with identifier = \"" + path + VFSPaths.PATH_SEPARATOR + fileName, e);
         }
     }
@@ -212,8 +222,9 @@ public class VFSDatabase extends SQLDatabase {
     public void put(String[] key, VFSEntry fileEntry) {
         String path = key[VFSMySQLProvider.PATH_INDEX];
         String fileName = key[VFSMySQLProvider.FILENAME_INDEX];
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
 
-        Connection c = getConnection();
         try {
             String statement = "insert into " + fqTablename + " (" +
                     PATH_NAME + "," +
@@ -232,9 +243,9 @@ public class VFSDatabase extends SQLDatabase {
 
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException | IOException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error saving file", e);
         }
     }
@@ -255,7 +266,9 @@ public class VFSDatabase extends SQLDatabase {
         path = (path.startsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR)
                 + path
                 + (path.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR); // make SURE it starts and ends with /
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             String statement = "insert into " + fqTablename + " (" +
                     PATH_NAME + "," +
@@ -270,9 +283,9 @@ public class VFSDatabase extends SQLDatabase {
 
             stmt.execute();// just execute() since executeQuery(x) would throw an exception regardless of content of x as per JDBC spec.
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error creating directory", e);
         }
         return true;
@@ -289,16 +302,18 @@ public class VFSDatabase extends SQLDatabase {
             // fine. Return null. All we care about is whether the next operations work.
         }
         String query = "DELETE FROM " + fqTablename + " WHERE " + PATH_NAME + "=? AND " + FILE_NAME + " =?";
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.setString(1, path);
             stmt.setString(2, fileName);
             stmt.execute();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting identity providers", e);
         }
         return oldEntry;
@@ -311,14 +326,16 @@ public class VFSDatabase extends SQLDatabase {
      */
     public void clear() {
         String query = "DELETE FROM " + fqTablename;
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         try {
             PreparedStatement stmt = c.prepareStatement(query);
             stmt.execute();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
         } catch (SQLException e) {
-            destroyConnection(c);
+            destroyConnection(cr);
             throw new GeneralException("Error getting identity providers", e);
         }
     }

@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
 import edu.uiuc.ncsa.security.delegation.token.*;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionRecord;
 import edu.uiuc.ncsa.security.storage.sql.SQLStore;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 import edu.uiuc.ncsa.security.storage.sql.internals.Table;
@@ -50,7 +51,9 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
         if (identifier == null) {
             throw new IllegalStateException("Error: a null identifier was supplied");
         }
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
         V t = null;
         try {
             PreparedStatement stmt = c.prepareStatement(statement);
@@ -60,14 +63,14 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
             if (!rs.next()) {
                 rs.close();
                 stmt.close();
-                releaseConnection(c);
+                releaseConnection(cr);
                 throw new TransactionNotFoundException("No transaction found for identifier \"" + identifier + "\"");
             }
 
             ColumnMap map = rsToMap(rs);
             rs.close();
             stmt.close();
-            releaseConnection(c);
+            releaseConnection(cr);
             t = create();
             populate(map, t);
         } catch (SQLException e) {

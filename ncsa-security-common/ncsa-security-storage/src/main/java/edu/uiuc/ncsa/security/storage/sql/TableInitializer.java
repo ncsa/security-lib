@@ -22,7 +22,8 @@ public class TableInitializer extends SQLDatabase implements Initializable {
     @Override
     public boolean createNew() {
         isNew = false;
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
         try {
             ConnectionParameters cp = getConnectionPool().getConnectionParameters();
             String username = cp.getUsername();
@@ -39,9 +40,9 @@ public class TableInitializer extends SQLDatabase implements Initializable {
             isInit = true;
             isDestroyed = false;
         } catch (Exception x) {
-            destroyConnection(c);
+            destroyConnection(cr);
         }finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return isNew;
     }
@@ -49,7 +50,8 @@ public class TableInitializer extends SQLDatabase implements Initializable {
     @Override
     public boolean destroy() {
         isDestroyed = false;
-        Connection c = getConnection();
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
         try {
             java.sql.Statement stmt = c.createStatement();
             String x = "Drop Table " + table.getFQTablename(); // blow it all away.
@@ -59,9 +61,9 @@ public class TableInitializer extends SQLDatabase implements Initializable {
             isNew = false;
             isInit = false;
         } catch (Exception x) {
-            destroyConnection(c);
+            destroyConnection(cr);
         }finally {
-            releaseConnection(c);
+            releaseConnection(cr);
         }
         return isDestroyed;
     }

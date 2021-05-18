@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.configuration.provider.HierarchicalConfigProvider;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 
 /**
  * Creates a {@link ConnectionPool} from a configuration.
@@ -28,7 +29,11 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     public static final String SCHEMA = SQLStoreProvider.SCHEMA; // since this is shared, really.
     public static final String CONNECTION_MAX = "maxConnections";
     public static final String CONNECTION_IDLE_TIMEOUT = "idleTimeout";
-    public static final String CONNECTION_IDLE_CLEANUP_INTERVAL = "idleCleanup";
+    public static final String CONNECTION_CLEANUP_INTERVAL = "cleanupInterval";
+    public static final String CONNECTION_CLEANUP_ENABLE = "cleanupEnable";
+    public static final String CONNECTION_ENABLE_QUEUE = "queueEnable";
+    public static final String CONNECTION_QUEUE_INTERVAL = "queueInterval";
+
 
 
     protected ConnectionPoolProvider(String database, String schema, String host, int port, String driver, boolean useSSL) {
@@ -39,44 +44,34 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         this.schema = schema;
         this.useSSL = useSSL;
     }
-    int maxConnections = 10;
 
-    public static String getConnectionIdleCleanupInterval() {
-        return CONNECTION_IDLE_CLEANUP_INTERVAL;
-    }
+    public static int DEFAULT_MAX_CONNECTIONS = 10;  // Default max connections == 0 <==> no max
+    public static long DEFAULT_IDLE_TIMEOUT = 10 * 60 * 1000L; // default idle timeout in ms.
+    public static long DEFAULT_CLEANUP_INTERVAL = 60 * 1000L; // default cleanup thread sleep interval
+    public static boolean DEFAULT_CLEANUP_ENABLE = true; // enable cleanup?
+    public static long DEFAULT_QUEUE_INTERVAL =  1000L; // default queue thread sleep interval
 
-    public int getMaxConnections() {
-        return maxConnections;
-    }
-
-    public void setMaxConnections(int maxConnections) {
-        this.maxConnections = maxConnections;
-    }
-
-    public long getIdleTimeout() {
-        return idleTimeout;
-    }
-
-    public void setIdleTimeout(long idleTimeout) {
-        this.idleTimeout = idleTimeout;
-    }
-
-    public long getIdleCleanup() {
-        return idleCleanup;
-    }
-
-    public void setIdleCleanup(long idleCleanup) {
-        this.idleCleanup = idleCleanup;
-    }
-
-    long idleTimeout = 10*60*1000L; // idle timeout in ms.
-    long idleCleanup = 60*1000L; // cleanup thread sleep interval
-    
     protected ConnectionPoolProvider(String database, String schema) {
         this.database = database;
         this.schema = schema;
     }
 
+    /**
+     * Called exactly once during {@link #get()} per (new) pool to set the parameters (max size etc.).
+     *
+     * @param pool
+     */
+    protected void setPoolParameters(ConnectionPool pool) {
+        pool.setCleanupEnabled(checkValue(CONNECTION_CLEANUP_ENABLE, DEFAULT_CLEANUP_ENABLE));
+        pool.setCleanupInterval(checkTime(CONNECTION_CLEANUP_INTERVAL, DEFAULT_CLEANUP_INTERVAL));
+        pool.setIdelLifetime(checkTime(CONNECTION_IDLE_TIMEOUT, DEFAULT_IDLE_TIMEOUT));
+        pool.setMaxSize(checkValue(CONNECTION_MAX, DEFAULT_MAX_CONNECTIONS));
+        pool.setEnableQueue(checkValue(CONNECTION_ENABLE_QUEUE, false));
+        pool.setQueueInterval(checkValue(CONNECTION_QUEUE_INTERVAL, DEFAULT_QUEUE_INTERVAL));
+        if(0<pool.getMaxSize()){
+            pool.setStackMap(new StackMap<>(pool.getMaxSize()));
+        }
+    }
 
     /**
      * Check that the value associated with the key is not null. If it is, use the default value.
@@ -99,7 +94,29 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
         if (x != null) return Integer.parseInt(x);
         if (defaultValue != -1) return defaultValue;
 
-        throw new MyConfigurationException("Error: no value specified for " + key);
+        throw new MyConfigurationException("Error: no int value specified for " + key);
+    }
+
+    /**
+     * Checks long value assuming it is time. No units means it is passed back, but look at
+     * the documentation in {@link ConfigUtil#getValueSecsOrMillis(String)}. IOf you just need
+     * a long value, use {@link #checkValue(String, long)}.
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    protected long checkTime(String key, long defaultValue) {
+        String x = getAttribute(key);
+        if(x!= null) return ConfigUtil.getValueSecsOrMillis(x);
+        if (defaultValue != -1) return defaultValue;
+        throw new MyConfigurationException("Error: no long value specified for " + key);
+    }
+
+    protected long checkValue(String key, long defaultValue) {
+        String x = getAttribute(key);
+        if (x != null) return Long.parseLong(x);
+        if (defaultValue != -1) return defaultValue;
+        throw new MyConfigurationException("Error: no long value specified for " + key);
     }
 
     protected boolean checkValue(String key, boolean defaultValue) {

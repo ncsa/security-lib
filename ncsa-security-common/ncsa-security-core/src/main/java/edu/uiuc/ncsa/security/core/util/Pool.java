@@ -1,9 +1,8 @@
 package edu.uiuc.ncsa.security.core.util;
 
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 
 /**
  * A pool of items, that is to say, a managed list that keeps valid items
@@ -16,17 +15,32 @@ import java.util.NoSuchElementException;
 public abstract class Pool<T> {
     public static final int INFINITE = -1;
     int maxSize = INFINITE;
-    protected  int inUse = 0;
-    List<T> stack = new LinkedList<T>();
+    protected int inUse = 0;
+    /**
+     * Set true ifyou want to see a ton of low level debugging for this.
+     */
+    protected boolean DEEP_DEBUG = true;
+
+    protected void trace(String x) {
+        DebugUtil.trace(DEEP_DEBUG, this, x);
+    }
+
+    public Queue<T> getStack() {
+        return stack;
+    }
+
+    protected Queue<T> stack = new LinkedList<T>();
 
     /**
      * Create a new, ready-to-use object for the pool
+     *
      * @return the object
      */
     public abstract T create() throws PoolException;
 
     /**
      * Destroy an object that is no longer needed.
+     *
      * @param object the object
      */
     public abstract void destroy(T object) throws PoolException;
@@ -36,59 +50,69 @@ public abstract class Pool<T> {
      * pool so a new one can be created. Default is to return true.
      */
     public boolean isValid(T object) throws PoolException {
-	return true;
+        return true;
     }
 
     /**
-     * Pop an object off the stack if ther eis one, otherwise, create one.
+     * Pop an object off the stack if there is one, otherwise, create one.
+     *
      * @return the object
      */
     public synchronized T pop() throws PoolException {
         try {
-            T item = stack.remove(0);
-            if(!isValid(item)){
+
+            T item = getStack().poll();
+            if (item == null || !isValid(item)) {
+                trace("pop: creating new item");
                 return doCreate();
             }
             inUse++;
+            trace("pop: in use = " + inUse);
             return item;
-        } catch(IndexOutOfBoundsException x) { // pool is empty
+        } catch (IndexOutOfBoundsException x) { // pool is empty
             return doCreate();
-        } catch(NoSuchElementException x) { // pool is empty
+        } catch (NoSuchElementException x) { // pool is empty
             return doCreate();
         }
     }
 
     public synchronized T doCreate() throws PoolException {
-	// this is only called if stack.size()==0
-	if(maxSize == INFINITE || inUse < maxSize) {
-	    T item = create();
-	    inUse++;
-	    return item;
-	} else {
-	    throw new PoolException("pool at capacity: "+inUse+" item(s) checked out. " + stack.size() + " items in stack.");
-	}
+        // this is only called if getStack().size()==0
+        if (maxSize == INFINITE || inUse < maxSize) {
+            T item = create();
+            inUse++;
+            return item;
+        } else {
+            throw new PoolException("pool at capacity: " + inUse + " item(s) checked out. " + getStack().size() + " items in getStack().");
+        }
     }
 
     /**
      * Destroying an item reduces the number of in-use items.
      * Do not call this on an item that hasn't been checked out.
+     *
      * @param item the item
      * @throws PoolException
      */
     public synchronized void doDestroy(T item) throws PoolException {
-	destroy(item);
-	inUse--;
+        destroy(item);
+        inUse--;
+        trace("doDestroy, in use=" + inUse);
     }
+
 
     /**
      * Set the maximum number of items.
+     *
      * @param c
      */
     public void setMaxSize(int c) {
         maxSize = c;
     }
+
     /**
      * Get the maximum number of items
+     *
      * @return capacity
      */
     public int getMaxSize() {
@@ -98,31 +122,29 @@ public abstract class Pool<T> {
     /**
      * Check an object into the pool. If the pool is at capacity,
      * destroy the object.
+     *
      * @param object the object
      */
     public synchronized void push(T object) throws PoolException {
-        if((maxSize != INFINITE && stack.size() >= maxSize) || !isValid(object)) {
+        trace("push: ");
+        if ((getMaxSize() != INFINITE && getStack().size() >= getMaxSize()) || !isValid(object)) {
             doDestroy(object);
-        } else if(stack.contains(object)) {
+        } else if (getStack().contains(object)) {
             throw new PoolException("can't check in object more than once: " + object);
         } else {
-            stack.add(0, object);
+            getStack().add(object);
             inUse--;
         }
     }
 
-    public synchronized boolean destroyAll() {
-        boolean success = true;
-        Iterator<T> it = stack.iterator();
-        while(it.hasNext()) {
-            try {
-                doDestroy(it.next());
-            } catch(PoolException x) {
-                success = false;
-            }
-            it.remove();
-        }
-        return success;
+    @Override
+    public String toString() {
+        return "Pool{" +
+                "maxSize=" + maxSize +
+                ", inUse=" + inUse +
+                ", size=" + getStack().size() +
+                ", stack=" + stack +
+                '}';
     }
 }
 

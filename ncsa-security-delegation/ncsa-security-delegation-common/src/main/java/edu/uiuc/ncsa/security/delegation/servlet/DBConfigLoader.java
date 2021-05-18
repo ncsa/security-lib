@@ -64,16 +64,28 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
     }
 
     public MySQLConnectionPoolProvider getMySQLConnectionPoolProvider(String databaseName, String schema) {
-        return new MySQLConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        if (mySQLConnectionPoolProvider == null) {
+
+            mySQLConnectionPoolProvider = new MySQLConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        }
+        return mySQLConnectionPoolProvider;
     }
 
     public MariaDBConnectionPoolProvider getMariaDBConnectionPoolProvider(String databaseName, String schema) {
-        return new MariaDBConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        if (mariaDBConnectionPoolProvider == null) {
+            mariaDBConnectionPoolProvider = new MariaDBConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        }
+        return mariaDBConnectionPoolProvider;
     }
 
 
+    PGConnectionPoolProvider pgConnectionPoolProvider = null;
+
     public PGConnectionPoolProvider getPgConnectionPoolProvider(String databaseName, String schema) {
-        return new PGConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        if (pgConnectionPoolProvider == null) {
+            pgConnectionPoolProvider = new PGConnectionPoolProvider(databaseName, schema);  // database, schema are set to default
+        }
+        return pgConnectionPoolProvider;
 
     }
 

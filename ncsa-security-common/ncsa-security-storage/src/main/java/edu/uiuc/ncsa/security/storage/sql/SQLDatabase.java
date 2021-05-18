@@ -1,9 +1,9 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.PoolException;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -24,7 +24,7 @@ public class SQLDatabase {
     public SQLDatabase() {
     }
 
-    public Connection getConnection() {
+    public ConnectionRecord getConnection() {
         return getConnectionPool().pop();
     }
 
@@ -34,14 +34,17 @@ public class SQLDatabase {
      *
      * @param c
      */
-    public void releaseConnection(Connection c) {
+    public void releaseConnection(ConnectionRecord c) {
+        DebugUtil.trace(this, " before releaseConnection for " + c + ", " + getConnectionPool());
+        c.lastAccessed = System.currentTimeMillis();
         getConnectionPool().push(c);
     }
 
 
-    protected void destroyConnection(Connection c)  {
+    protected void destroyConnection(ConnectionRecord c)  {
         try {
             connectionPool.doDestroy(c);
+            DebugUtil.trace(this, "after destroyConnection for " + c + ", " + getConnectionPool());
         } catch(PoolException x) {
             throw new PoolException("pool failed to destroy connection",x);
         }
