@@ -10,5 +10,5 @@ import edu.uiuc.ncsa.security.delegation.services.DoubleDispatchServer;
  * on 6/3/13 at  10:45 AM
  */
 public interface ATServer extends DoubleDispatchServer {
-    public abstract ATResponse processATRequest(ATRequest atRequest);
+     ATResponse processATRequest(ATRequest atRequest);
 }

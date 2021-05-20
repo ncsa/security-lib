@@ -10,9 +10,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -83,7 +87,7 @@ public class ServiceClient {
         @Override
         public HttpClient create() {
             try {
-               // return getF().getClient(host.toString());
+                // return getF().getClient(host.toString());
                 return getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
             } catch (IOException e) {
                 throw new GeneralException("Error getting https-aware client");
@@ -99,7 +103,7 @@ public class ServiceClient {
     public static String ENCODING = "UTF-8";
 
     public static String encode(String x) throws UnsupportedEncodingException {
-        if(x == null) return "";
+        if (x == null) return "";
         String xx = URLEncoder.encode(x, ENCODING);
         return xx;
     }
@@ -116,30 +120,30 @@ public class ServiceClient {
         for (Object o : m.keySet()) {
             Object v = m.get(o);
             if (v != null) {
-                if(v instanceof List){
+                if (v instanceof List) {
                     // If its a list, repeatedly add it with the same key
                     List<String> list = (List<String>) v;
-                    for(String xx : list){
+                    for (String xx : list) {
                         keyList.add(o.toString());
                         valueList.add(xx);
                         //strings[i][0] = o.toString();
                         //strings[i++][1] = xx;
                     }
-                }else {
+                } else {
                     keyList.add(o.toString());
                     valueList.add(v.toString());
 
 //                    strings[i][0] = o.toString();
-  //                  strings[i++][1] = v.toString();
+                    //                  strings[i++][1] = v.toString();
                 }
             }
         }
         int size = keyList.size();
 
         String[][] strings = new String[size][2];
-        for(int j = 0; j < size; j++){
-               strings[j][0] = keyList.get(j);
-               strings[j][1] = valueList.get(j);
+        for (int j = 0; j < size; j++) {
+            strings[j][0] = keyList.get(j);
+            strings[j][1] = valueList.get(j);
         }
 
         return convertToStringRequest(host, strings);
@@ -148,7 +152,7 @@ public class ServiceClient {
     public String getRawResponse(Map m, String id, String secret) {
         return getRawResponse(convertToStringRequest(host().toString(), m), id, secret);
     }
-    
+
     public String getRawResponse(Map m) {
         return getRawResponse(convertToStringRequest(host().toString(), m));
     }
@@ -179,88 +183,157 @@ public class ServiceClient {
     }
 
     /**
-     * Do a POST to the service using the parameters. This is automatically encoded as JSON and the assumption is that
-     * the response is JSON as well.
+     * Do amn HTTP POST to the endpoint sending along basic authorization and any parameters.
+     * This returns a string, so do process the result.
+     * @param parameters
+     * @param id
+     * @param secret
+     * @return
      */
-/*    public JSONObject doPost(String address, JSONObject json){
-       HttpPost post = new HttpPost(address);
-       // now to add the parameters to the body of the post.
-        //post.getEntity().()
-        StringEntity stringEntity = new StringEntity("", "application/json");
-        UrlEncodedFormEntity xxx = new UrlEncodedFormEntity(null);
-        xxx.
-    }*/
+    public String doPost(Map<String, Object> parameters, String id, String secret) {
+        HttpPost post = new HttpPost(host().toString());
+        List<NameValuePair> params = getNameValuePairs(parameters);
+
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+        } catch (UnsupportedEncodingException e) {
+            throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
+        }
+
+        return doRequest(post, id, secret);
+    }
+
+    /**
+     * Do post using a bearer token
+     * @param parameters
+     * @param bearerToken
+     * @return
+     */
+    public String doPost(Map<String, Object> parameters, String bearerToken) {
+         HttpPost post = new HttpPost(host().toString());
+         List<NameValuePair> params = getNameValuePairs(parameters);
+
+         try {
+             post.setEntity(new UrlEncodedFormEntity(params));
+         } catch (UnsupportedEncodingException e) {
+             throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
+         }
+
+         return doBearerRequest(post, bearerToken);
+     }
+    private List<NameValuePair> getNameValuePairs(Map<String, Object> parameters) {
+        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        for (String key : parameters.keySet()) {
+            if (parameters.get(key) != null) {
+                params.add(new BasicNameValuePair(key, parameters.get(key).toString()));
+            }
+        }
+        return params;
+    }
+
 
     /**
      * This will set the basic authorization in the headers for the request.
+     *
      * @param httpRequestBase
      * @param id
      * @param secret
      * @return
      */
-    protected String doRequest(HttpRequestBase httpRequestBase, String id, String secret){
+    protected String doRequest(HttpRequestBase httpRequestBase, String id, String secret) {
         String creds = id + ":" + secret;
         creds = Base64.encodeBase64String(creds.getBytes());
-        while(creds.endsWith("=")){
+        while (creds.endsWith("=")) {
             // shave off any trailing = from the encoding. 
-            creds = creds.substring(0,creds.length() - 1);
+            creds = creds.substring(0, creds.length() - 1);
         }
         DebugUtil.trace(this, "Doing request with basic authz " + creds);
         httpRequestBase.setHeader("Authorization", "Basic " + creds);
         return doRequest(httpRequestBase);
     }
 
-    protected String doRequest(HttpRequestBase httpRequestBase){
+    /**
+     * If the token is not already base 64 or 32 encoded, option flag to do so.
+     * @param httpRequestBase
+     * @param token
+     * @param base64Encode
+     * @return
+     */
+    protected String doBearerRequest(HttpRequestBase httpRequestBase, String token, boolean base64Encode) {
+        if(base64Encode) {
+           String creds = Base64.encodeBase64String(token.getBytes());
+            while (creds.endsWith("=")) {
+                // shave off any trailing = from the encoding.
+                creds = creds.substring(0, creds.length() - 1);
+            }
+           token = creds; // replace token, rock on
+        }
+        DebugUtil.trace(this, "Doing request with bearer token " + token);
+        httpRequestBase.setHeader("Authorization", "Bearer " + token);
+        return doRequest(httpRequestBase);
+    }
+
+    /**
+     * Process the request, but use a bearer token (the access token which should eb suitably encoded)
+     * @param httpRequestBase
+     * @param token
+     * @return
+     */
+    protected String doBearerRequest(HttpRequestBase httpRequestBase, String token) {
+        return doBearerRequest(httpRequestBase, token, false);
+    }
+    protected String doRequest(HttpRequestBase httpRequestBase) {
         HttpClient client = clientPool.pop();
-           HttpResponse response = null;
-           try{
-               response = client.execute(httpRequestBase);
-           }catch(Throwable t){
-               ServletDebugUtil.trace(this, "Error  invoking execute for client", t);
-               if(ServletDebugUtil.isEnabled()){
-                   t.printStackTrace();
-               }
-               throw new GeneralException("Error invoking client:" + t.getMessage(), t);
-           }
-           try {
+        HttpResponse response = null;
+        try {
+            response = client.execute(httpRequestBase);
+        } catch (Throwable t) {
+            ServletDebugUtil.trace(this, "Error  invoking execute for client", t);
+            if (ServletDebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+            throw new GeneralException("Error invoking client:" + t.getMessage(), t);
+        }
+        try {
 
-               if(response.getEntity() != null && response.getEntity().getContentType()!=null) {
-                   ServletDebugUtil.trace(this, "Raw response, content type:" + response.getEntity().getContentType());
-               }else{
-                   ServletDebugUtil.trace(this, "No response entity or no content type.");
+            if (response.getEntity() != null && response.getEntity().getContentType() != null) {
+                ServletDebugUtil.trace(this, "Raw response, content type:" + response.getEntity().getContentType());
+            } else {
+                ServletDebugUtil.trace(this, "No response entity or no content type.");
 
-               }
-               if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT){
-                   clientPool.push(client);
-                   return "";
-               }
+            }
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_NO_CONTENT) {
+                clientPool.push(client);
+                return "";
+            }
 
-               HttpEntity entity1 = response.getEntity();
-               String x = EntityUtils.toString(entity1, StandardCharsets.UTF_8);
-               if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                   // If there was a proper error thrown on the server then we should be able to parse the contents of the
-                   // response.
+            HttpEntity entity1 = response.getEntity();
+            String x = EntityUtils.toString(entity1, StandardCharsets.UTF_8);
+            if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                // If there was a proper error thrown on the server then we should be able to parse the contents of the
+                // response.
 
-                   ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " +
-                           response.getStatusLine().getStatusCode() + ":\n" + URLDecoder.decode(x, "UTF-8"));
-                   xx.setContent(x);
-                   xx.setStatus(response.getStatusLine().getStatusCode());
-                   clientPool.destroy(client);
-                   throw xx;
-               }
-               clientPool.push(client);
-               return x;
-           } catch (IOException e) {
-               throw new GeneralException("Error invoking http client", e);
-           }
+                ServiceClientHTTPException xx = new ServiceClientHTTPException("Error contacting server with code of  " +
+                        response.getStatusLine().getStatusCode() + ":\n" + URLDecoder.decode(x, "UTF-8"));
+                xx.setContent(x);
+                xx.setStatus(response.getStatusLine().getStatusCode());
+                clientPool.destroy(client);
+                throw xx;
+            }
+            clientPool.push(client);
+            return x;
+        } catch (IOException e) {
+            throw new GeneralException("Error invoking http client", e);
+        }
 
 
     }
+
     public String getRawResponse(String requestString, String id, String secret) {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet, id, secret);
     }
-    
+
     public String getRawResponse(String requestString) {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet);

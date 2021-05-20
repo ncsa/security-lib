@@ -35,7 +35,6 @@ public class SQLDatabase {
      * @param c
      */
     public void releaseConnection(ConnectionRecord c) {
-        DebugUtil.trace(this, " before releaseConnection for " + c + ", " + getConnectionPool());
         c.lastAccessed = System.currentTimeMillis();
         getConnectionPool().push(c);
     }

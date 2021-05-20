@@ -1,9 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.client;
 
 import edu.uiuc.ncsa.security.delegation.client.request.*;
-import edu.uiuc.ncsa.security.delegation.client.server.AGServer;
-import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
-import edu.uiuc.ncsa.security.delegation.client.server.PAServer;
+import edu.uiuc.ncsa.security.delegation.client.server.*;
 import edu.uiuc.ncsa.security.delegation.services.Request;
 import edu.uiuc.ncsa.security.delegation.services.Response;
 import edu.uiuc.ncsa.security.delegation.services.Server;
@@ -157,4 +155,6 @@ public abstract class DelegationService implements Server {
 
     AGServer agServer;
     PAServer paServer;
+
+
 }

@@ -19,7 +19,7 @@ public abstract class Pool<T> {
     /**
      * Set true ifyou want to see a ton of low level debugging for this.
      */
-    protected boolean DEEP_DEBUG = true;
+    protected boolean DEEP_DEBUG = false;
 
     protected void trace(String x) {
         DebugUtil.trace(DEEP_DEBUG, this, x);

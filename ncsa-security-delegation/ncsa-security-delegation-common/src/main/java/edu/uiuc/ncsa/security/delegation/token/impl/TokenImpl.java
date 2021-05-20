@@ -132,15 +132,15 @@ public class TokenImpl implements NewToken {
     protected StringBuilder createString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(getClass().getSimpleName() + "[");
+        stringBuilder.append("jti" + "=" + getJti());
         if (getToken() == null) {
-            stringBuilder.append("token=(null)");
+            stringBuilder.append(", token=(null)");
         } else {
-            stringBuilder.append("token=" + getToken());
+            stringBuilder.append(", token=" + getToken());
         }
         stringBuilder.append(", " + TIMESTAMP_TAG + "=" + getIssuedAt());
         stringBuilder.append(", " + LIFETIME_TAG + "=" + getLifetime());
         stringBuilder.append(", " + VERSION_TAG + "=" + getVersion());
-        stringBuilder.append(", " + "jti" + "=" + getJti());
         return stringBuilder;
 
     }

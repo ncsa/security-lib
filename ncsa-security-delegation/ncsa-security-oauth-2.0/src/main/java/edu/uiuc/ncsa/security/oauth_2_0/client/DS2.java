@@ -2,10 +2,7 @@ package edu.uiuc.ncsa.security.oauth_2_0.client;
 
 import edu.uiuc.ncsa.security.delegation.client.DelegationService;
 import edu.uiuc.ncsa.security.delegation.client.request.*;
-import edu.uiuc.ncsa.security.delegation.client.server.AGServer;
-import edu.uiuc.ncsa.security.delegation.client.server.ATServer;
-import edu.uiuc.ncsa.security.delegation.client.server.PAServer;
-import edu.uiuc.ncsa.security.delegation.client.server.RTServer;
+import edu.uiuc.ncsa.security.delegation.client.server.*;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.oauth_2_0.OA2Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
@@ -29,10 +26,18 @@ public class DS2 extends DelegationService {
      * @param paServer Protected asset (cert) request handler for client
      * @param uiServer UserInfo handler for client
      */
-    public DS2(AGServer agServer, ATServer atServer, PAServer paServer, UIServer2 uiServer, RTServer rtServer) {
+    public DS2(AGServer agServer,
+               ATServer atServer,
+               PAServer paServer,
+               UIServer2 uiServer,
+               RTServer rtServer,
+               RFC7009Server rfc7009Server,
+               RFC7662Server rfc7662Server) {
         super(agServer, atServer, paServer);
         this.uiServer = uiServer;
         this.rtServer = rtServer;
+        this.rfc7009Server = rfc7009Server;
+        this.rfc7662Server = rfc7662Server;
     }
 
     RTServer rtServer;
@@ -69,6 +74,14 @@ public class DS2 extends DelegationService {
         return (RTResponse) getRtServer().process(refreshTokenRequest);
     }
 
+    public RFC7009Response rfc7009(RFC7009Request request) {
+        return  getRfc7009Server().processRFC7009Request(request);
+    }
+
+    public RFC7662Response rfc7662(RFC7662Request request) {
+        return getRfc7662Server().processRFC7662Request(request);
+    }
+
     @Override
     public DelegationResponse processDelegationRequest(DelegationRequest delegationRequest) {
         DelegationResponse delResp = new DelegationResponse(null);
@@ -101,5 +114,16 @@ public class DS2 extends DelegationService {
         }
         return URI.create(rc);
     }
+    public RFC7662Server getRfc7662Server() {
+        return rfc7662Server;
+    }
 
+
+    RFC7662Server rfc7662Server;
+
+    public RFC7009Server getRfc7009Server() {
+        return rfc7009Server;
+    }
+
+    RFC7009Server rfc7009Server;
 }

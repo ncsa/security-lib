@@ -81,7 +81,7 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
 
     public V get(AuthorizationGrant tempCred) {
         try {
-            V t = getTransaction(tempCred.getToken(), getTransactionTable().getByTempCredStatement());
+            V t = getTransaction(tempCred.getJti().toString(), getTransactionTable().getByTempCredStatement());
             return t;
         } catch (TransactionNotFoundException x) {
             return null;
@@ -90,7 +90,7 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
 
     public V get(AccessToken accessToken) {
         try {
-            V t = getTransaction(accessToken.getToken(), getTransactionTable().getByAccessTokenStatement());
+            V t = getTransaction(accessToken.getJti().toString(), getTransactionTable().getByAccessTokenStatement());
             return t;
         } catch (TransactionNotFoundException x) {
             return null;
@@ -106,9 +106,8 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
         }
     }
 
-
+/*
     protected String getToken(Token at) throws SQLException {
         return at == null ? null : at.getToken();
-    }
-
+    }*/
 }

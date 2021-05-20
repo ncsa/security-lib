@@ -122,4 +122,7 @@ public interface OA2Constants {
     String TOKEN_ENDPOINT_AUTH_POST = "client_secret_post";
     String TOKEN_ENDPOINT_AUTH_BASIC = "client_secret_basic";
     String TOKEN_ENDPOINT_AUTH_NONE = "none";
+
+
+
 }

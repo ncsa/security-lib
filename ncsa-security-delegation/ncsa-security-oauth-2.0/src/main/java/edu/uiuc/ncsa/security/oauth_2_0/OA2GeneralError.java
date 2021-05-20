@@ -100,4 +100,14 @@ public class OA2GeneralError extends GeneralException {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public String toString() {
+        return "OA2GeneralError{" +
+                "httpStatus=" + httpStatus +
+                ", error='" + error + '\'' +
+                ", description='" + description + '\'' +
+                ", state='" + state + '\'' +
+                '}';
+    }
 }
