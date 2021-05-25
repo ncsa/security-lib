@@ -1282,6 +1282,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Test heavily parenthesized tail.
+     *
      * @throws Throwable
      */
     @Test
@@ -1296,5 +1297,44 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("x", state);
         assert getBooleanValue("y", state);
+    }
+
+    /**
+     * Test that a list of indices like ['a.b.c'] can be used to access stems. This permits passing around
+     * indices
+     *
+     * @throws Throwable
+     */
+    @Test
+    public void testEmbeddedIndex() throws Throwable {
+        /*
+               x. := ['store.bicycle.price','store.book.0.price','store.book.1.price','store.book.2.price','store.book.3.price']
+  test.:={'comment':'This is taken from the JSON Path spec https://tools.ietf.org/id/draft-goessner-dispatch-jsonpath-00.html for testing', 'store':{'bicycle':{'color':'red', 'price':19.95}, 'book':[{'author':'Nigel Rees', 'price':8.95, 'category':'reference', 'title':'Sayings of the Century'},{'author':'Evelyn Waugh', 'price':12.99, 'category':'fiction', 'title':'Sword of Honour'},{'author':'Herman Melville', 'price':8.99, 'isbn':'0-553-21311-3', 'category':'fiction', 'title':'Moby Dick'},{'author':'J. R. R. Tolkien', 'price':22.99, 'isbn':'0-395-19395-8', 'category':'fiction', 'title':'The Lord of the Rings'}]}, 'expensive':10}
+  test.x.0
+19.95
+  test.x.1
+8.95
+         */
+        StringBuffer script = new StringBuffer();
+        addLine(script, "test.:={'comment':'This is taken from the JSON Path spec https://tools.ietf.org/id/draft-goessner-dispatch-jsonpath-00.html for testing', " +
+                "'store':{'bicycle':{'color':'red', 'price':19.95}, " +
+                "'book':[" +
+                "{'author':'Nigel Rees', 'price':8.95, 'category':'reference', 'title':'Sayings of the Century'}," +
+                "{'author':'Evelyn Waugh', 'price':12.99, 'category':'fiction', 'title':'Sword of Honour'}," +
+                "{'author':'Herman Melville', 'price':8.99, 'isbn':'0-553-21311-3', 'category':'fiction', 'title':'Moby Dick'}," +
+                "{'author':'J. R. R. Tolkien', 'price':22.99, 'isbn':'0-395-19395-8', 'category':'fiction', 'title':'The Lord of the Rings'}" +
+                "]}, " +
+                "'expensive':10};");
+        addLine(script, " x. := ['store.bicycle.price','store.book.0.price','store.book.1.price','store.book.2.price','store.book.3.price'];");
+        addLine(script, "a := test.x.0;"); // resolves to test.store.bicycle.price
+        addLine(script, "b := test.x.1;"); // resolves to test.store.book.0.price
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert areEqual(getBDValue("a", state), new BigDecimal("19.95"));
+        assert areEqual(getBDValue("b", state), new BigDecimal("8.95"));
+
+
     }
 }

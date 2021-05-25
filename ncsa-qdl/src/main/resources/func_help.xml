@@ -1593,6 +1593,46 @@ This means there are three separate indices.
 ]]>
             </body>
         </entry>
+    <entry id="query">
+            <body>
+                <![CDATA[
+query(arg., query_string [, return_indices]) -- do a query on a stem using
+            JSON Path syntax.
+          arg. - the stem to search
+  query_string - a valid JSON Path query string as per
+     https://tools.ietf.org/id/draft-goessner-dispatch-jsonpath-00.html
+return_indices - (optional) return the indices of the result, not the result.
+
+
+  In section 2 of the above specification is a JSON object. If you import
+  this into the workspace as the stem variable my_json., then here are
+  a few examples:
+
+E.g. 1: getting a result set
+   query(test., '$..book[?(@.isbn)]'); // get books with an isbn number
+[
+  {
+  author:Herman Melville,
+  price:8.99,
+  isbn:0-553-21311-3,...
+
+E.g. 2: Getting the indices
+  ndx. := query(test., '$..book[?(@.isbn)]', true); // Just get the indices
+  ndx.
+[store.book.2,store.book.3]
+
+E.g. 3: Using the indices
+   my_json.ndx.0
+{
+  author:Herman Melville,
+  price:8.99,
+  isbn:0-553-21311-3,...
+
+
+                ]]>
+            </body>
+        </entry>
+
 
     <!--
         entry template

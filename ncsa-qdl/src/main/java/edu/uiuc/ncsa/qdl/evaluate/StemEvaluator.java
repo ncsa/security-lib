@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
@@ -11,6 +14,7 @@ import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 import java.util.*;
@@ -183,6 +187,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_FROM_JSON = STEM_FQ + FROM_JSON;
     public static final int FROM_JSON_TYPE = 301 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String JSON_PATH_QUERY = "query";
+       public static final String FQ_JSON_PATH_QUERY = STEM_FQ + JSON_PATH_QUERY;
+       public static final int JSON_PATH_QUERY_TYPE = 302 + STEM_FUNCTION_BASE_VALUE;
+
     /**
      * A list of the names that this Evaluator knows about. NOTE that this must be kept in sync
      * by the developer since it is used to determine if a function is built in or a user-defined function.
@@ -220,7 +228,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             TO_LIST,
             UNIQUE_VALUES,
             TO_JSON,
-            FROM_JSON};
+            FROM_JSON, JSON_PATH_QUERY};
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_DIMENSION, FQ_RANK,
             FQ_SIZE,
@@ -253,7 +261,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_TO_LIST,
             FQ_UNIQUE_VALUES,
             FQ_TO_JSON,
-            FQ_FROM_JSON};
+            FQ_FROM_JSON, FQ_JSON_PATH_QUERY};
 
 
     @Override
@@ -379,6 +387,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FROM_JSON:
             case FQ_FROM_JSON:
                 return FROM_JSON_TYPE;
+            case JSON_PATH_QUERY:
+            case FQ_JSON_PATH_QUERY:
+                return JSON_PATH_QUERY_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -526,8 +537,92 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_FROM_JSON:
                 doFromJSON(polyad, state);
                 return true;
+            case JSON_PATH_QUERY:
+            case FQ_JSON_PATH_QUERY:
+                doJPathQuery(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    protected void doJPathQuery(Polyad polyad, State state) {
+        Object arg0 = polyad.evalArg(0,state);
+        if(!isStem(arg0)){
+            throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a stem as its first argument");
+        }
+        StemVariable stemVariable = (StemVariable) arg0;
+        Object arg1 = polyad.evalArg(1, state);
+        if(!isString(arg1)){
+            throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a string as its second argument");
+        }
+
+        String query = (String) arg1;
+              Configuration conf = null;
+              boolean returnAsPaths = false;
+              if (polyad.getArgCount() == 3) {
+                  Object arg2 = polyad.evalArg(2, state);
+                  if(!isBoolean(arg2)){
+                      throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a boolean as its third argument");
+                  }
+                  returnAsPaths = (Boolean) arg2;
+                  conf = Configuration.builder()
+                          .options(Option.AS_PATH_LIST).build();
+              }
+              String output;
+              if (returnAsPaths) {
+                  output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+                  output = crappyConverter(output);
+              } else {
+                  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
+              }
+              StemVariable outStem = new StemVariable();
+              try {
+                  JSONArray array = JSONArray.fromObject(output);
+                  outStem.fromJSON(array);
+              } catch (JSONException x) {
+                  JSONObject jo = JSONObject.fromObject(output);
+                  outStem.fromJSON(jo);
+              }
+              polyad.setResult(outStem);
+              polyad.setResultType(Constant.STEM_TYPE);
+              polyad.setEvaluated(true);
+    }
+
+    /**
+     * This converts a list of JSON Path indices to stem indices. It is very simple
+     * minded.
+     * @param indexList
+     * @return
+     */
+    protected String crappyConverter(String indexList) {
+        JSONArray arrayIn = JSONArray.fromObject(indexList);
+        JSONArray arrayOut = new JSONArray();
+        for (int i = 0; i < arrayIn.size(); i++) {
+            String x = arrayIn.getString(i);
+            x = x.substring(2); // All JSON paths start with a $.
+            StringTokenizer tokenizer = new StringTokenizer(x, "[");
+            boolean isFirst = true;
+            String r = "";
+            while (tokenizer.hasMoreTokens()) {
+                String nextOne = tokenizer.nextToken();
+                if (nextOne.startsWith("'")) {
+                    nextOne = nextOne.substring(1);
+                }
+                nextOne = nextOne.substring(0, nextOne.length() - 1);
+                if (nextOne.endsWith("'")) {
+                    nextOne = nextOne.substring(0, nextOne.length() - 1);
+                }
+                if (isFirst) {
+                    isFirst = false;
+                    r = r + nextOne;
+                } else {
+                    r = r + StemVariable.STEM_INDEX_MARKER + nextOne;
+                }
+            }
+            arrayOut.add(r);
+
+        }
+        return arrayOut.toString();
     }
 
     private void doRank(Polyad polyad, State state) {

@@ -1395,10 +1395,13 @@ public class ParserTest extends AbstractQDLTester {
      */
     @Test
     public void testJSONInvariance() throws Throwable {
-        String rawJSON = "{\n" +
-                " \"sub\": \"jeff\",\n" +
-                " \"aud\": \"ashigaru:command.line2\",\n" +
-                " \"Jäger-Groß\": \"test value\",\n" +
+     /*  Used tot est with this but it fails now that string support has improved.
+         probably because of embedded control characters. QDL strings do nto allow
+         for embedded control characters (at least at this point).
+         String rawJSON = "{" +
+                "\"sub\": \"jeff\"," +
+                "\"aud\": \"ashigaru:command.line2\"," +
+                "\"Jäger-Groß\": \"test value\",\n" +
                 " \"你浣\": \"test value2\",\n" +
                 " \"uid\": \"jgaynor\",\n" +
                 " \"uidNumber\": \"25939\",\n" +
@@ -1412,14 +1415,32 @@ public class ParserTest extends AbstractQDLTester {
                 "   \"id\": 1898\n" +
                 "  }\n" +
                 " ]\n" +
-                "}\n";
-
+                "}\n";*/
+        String rawJSON = "{" +
+                 "\"sub\": \"jeff\"," +
+                 "\"aud\": \"ashigaru:command.line2\"," +
+                 "\"Jäger-Groß\": \"test value\"," +
+                 " \"你浣\": \"test value2\"," +
+                 " \"uid\": \"jgaynor\"," +
+                 " \"uidNumber\": \"25939\"," +
+                 " \"isMemberOf\":  [" +
+                 "    {" +
+                 "   \"name\": \"org_ici\"," +
+                 "   \"id\": 1282" +
+                 "  }," +
+                 "    {" +
+                 "   \"name\": \"list_apcs\"," +
+                 "   \"id\": 1898" +
+                 "  }" +
+                 " ]" +
+                 "}";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "j := '" + rawJSON + "';");
         addLine(script, "claims. := from_json(j);");
         addLine(script, "j2 := to_json(from_json(to_json(from_json(to_json(from_json(j))))));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        System.out.println(script.toString());
         interpreter.execute(script.toString());
 
         assert state.getValue("j2") != null;

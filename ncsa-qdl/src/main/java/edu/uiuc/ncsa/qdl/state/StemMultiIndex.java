@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -15,10 +18,14 @@ public class StemMultiIndex {
      * @param newNameIndex
      */
     public StemMultiIndex(StemMultiIndex w, int newNameIndex) {
-        name = w.components[newNameIndex] + STEM_INDEX_MARKER; // make sure it has the period
-        components = new String[w.getRealLength() - newNameIndex - 1]; // starts at name of stem
-        System.arraycopy(w.components, newNameIndex+1 , components, 0, components.length);
-        realLength = components.length;
+        name = w.components.get(newNameIndex) + STEM_INDEX_MARKER; // make sure it has the period
+        components = new ArrayList<>();
+        //components = new String[w.getRealLength() - newNameIndex - 1]; // starts at name of stem
+        for(int i =0; i < w.getRealLength() - newNameIndex - 1; i++){
+            components.add(i, w.components.get(newNameIndex+1+i));
+        }
+        //System.arraycopy(w.components, newNameIndex+1 , components, 0, components.length);
+        realLength = components.size();
     }
 
     /**
@@ -26,7 +33,7 @@ public class StemMultiIndex {
      * @return
      */
       public boolean isEmpty(){
-         return getRealLength() == 0 || (getRealLength() == 1 && (getComponents()[0].isEmpty()));
+         return getRealLength() == 0 || (getRealLength() == 1 && (getComponents().get(0).isEmpty()));
       }
 
     /**
@@ -44,8 +51,12 @@ public class StemMultiIndex {
             isStem = true;
         }
 
-        this.components = variable.substring(first_index + 1).split("\\" + STEM_INDEX_MARKER);
-        realLength = components.length;
+        List<String> ccc = new ArrayList<>();
+        for(String x: variable.substring(first_index + 1).split("\\" + STEM_INDEX_MARKER)){
+            ccc.add(x);
+        }
+        this.components = ccc;
+        realLength = components.size();
     }
 
     public int getRealLength() {
@@ -58,11 +69,11 @@ public class StemMultiIndex {
 
     int realLength = -1; // As stems resolve, the length of this changes. This sets the actual length
 
-    public String[] getComponents() {
+    public List<String> getComponents() {
         return components;
     }
     public String getLastComponent(){
-        return components[components.length - 1];
+        return components.get(components.size() - 1);
     }
     public String getName() {
         return name;
@@ -72,7 +83,7 @@ public class StemMultiIndex {
         return isStem;
     }
 
-    String[] components;
+    List<String> components;
     String name;
     boolean isStem = false;
 
@@ -84,11 +95,15 @@ public class StemMultiIndex {
      * @return
      */
     public StemMultiIndex truncate(){
-        if(realLength == components.length) return this;
+        if(realLength == components.size()) return this;
         StemMultiIndex stemMultiIndex = new StemMultiIndex();
         stemMultiIndex.isStem = isStem(); // don't lose if it's a stem!
-        stemMultiIndex.components = new String[realLength];
-        System.arraycopy(components, 0, stemMultiIndex.components, 0, this.realLength);
+        //stemMultiIndex.components = new String[realLength];
+        stemMultiIndex.components = new ArrayList<>();
+        for(int i = 0; i < realLength; i++){
+            stemMultiIndex.components.add(i, components.get(i));
+        }
+        //System.arraycopy(components, 0, stemMultiIndex.components, 0, this.realLength);
         stemMultiIndex.name = name;
         stemMultiIndex.realLength = this.realLength;
         return stemMultiIndex;

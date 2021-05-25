@@ -31,16 +31,17 @@ grammar QDLVariableParser;
 */
 //   Stem_ref : Identifier '.';
     Integer : [0-9]+;
- Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#.]*;   // Implicit definition of stem variables here!
+ Identifier : [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
        Bool : BOOL_TRUE | BOOL_FALSE;
-     ASSIGN : '≔' | ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;
-  FuncStart : [a-zA-Z_$#\u03b1-\u03c9][a-zA-Z_$0-9#\u03b1-\u03c9]* '(';
+     ASSIGN : '≔' | ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254
+  FuncStart : [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]* '(';
       F_REF : '@' (AllOps | (FuncStart ')'));
   BOOL_TRUE : 'true';
  BOOL_FALSE : 'false';
-       Null : 'null' | '∅';
-     STRING : '\'' (ESC|.)*? '\'';
+       Null : 'null' | '∅';  // unicode 2205
+//     STRING : '\'' (ESC|.)*? '\'';
+   STRING   : '\'' (ESC | SAFECODEPOINT)*? '\'';
     Decimal : (Integer '.' Integer) | ('.' Integer);
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.
@@ -89,6 +90,8 @@ fragment SIGN
           Backtick : '`';
            Percent : '%';
              Tilde : '~';
+         Backslash : '\\';
+             Stile : '|';
         TildeRight : '~|';
  //              Dot : '.';
 
@@ -111,7 +114,16 @@ fragment SIGN
    CatchStatement  : ']catch[';
 StatementConnector : '][';
 
-fragment ESC : '\\\'';
+/*
+  Next bit is for string support. Allow unicode, line feed etc. Disallow control characters.
+*/
+fragment ESC : '\\' (['\\/bfnrt] | UNICODE);
+
+fragment UNICODE : 'u' HEX HEX HEX HEX;
+
+fragment HEX : [0-9a-fA-F];
+
+fragment SAFECODEPOINT: ~ ['\\\u0000-\u001F];
 
 // C-style comments ok.
 COMMENT :   '/*' .*? '*/' -> skip;

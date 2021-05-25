@@ -162,7 +162,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable(Long count, Object[] fillList) {
-        StemList s = new StemList(count,fillList);
+        StemList s = new StemList(count, fillList);
         setStemList(s);
     }
 
@@ -175,7 +175,7 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Object get(Long key) {
         Object rc = getStemList().get(key);
-        if(rc == null && defaultValue != null){
+        if (rc == null && defaultValue != null) {
             return defaultValue;
         }
         return rc;
@@ -206,8 +206,8 @@ public class StemVariable extends HashMap<String, Object> {
         /**
          * Drill down, checking everything exists.
          */
-        for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
+        for (int i = 0; i < w.getComponents().size() - 1; i++) {
+            String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
                 throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
@@ -228,9 +228,9 @@ public class StemVariable extends HashMap<String, Object> {
          * Drill down to next. If this is a completely new variable, may have to make all
          * the ones in between.
          */
-        for (int i = 0; i < w.getComponents().length - 1; i++) {
+        for (int i = 0; i < w.getComponents().size() - 1; i++) {
             //   String name = w.getComponents()[i] + STEM_INDEX_MARKER;
-            String name = w.getComponents()[i];
+            String name = w.getComponents().get(i);
             Object object = currentStem.get(name);
             StemVariable nextStem = null;
             if (object instanceof StemVariable) {
@@ -255,8 +255,8 @@ public class StemVariable extends HashMap<String, Object> {
         /**
          * Drill down, checking everything exists.
          */
-        for (int i = 0; i < w.getComponents().length - 1; i++) {
-            String name = w.getComponents()[i] + STEM_INDEX_MARKER;
+        for (int i = 0; i < w.getComponents().size() - 1; i++) {
+            String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
                 throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
@@ -665,6 +665,8 @@ public class StemVariable extends HashMap<String, Object> {
                             put(key, ((Integer) v).longValue());
                         } else if (v instanceof Float) {
                             put(key, new BigDecimal(Float.toString((Float) v)));
+                        } else if (v instanceof Double) {
+                            put(key, new BigDecimal(Double.toString((Double) v)));
                         } else {
                             put(key, v);
                         }
@@ -693,7 +695,15 @@ public class StemVariable extends HashMap<String, Object> {
                     put((long) i, x.fromJSON((JSONArray) v));
                 } else {
                     //   sl.add(new StemEntry(i, v));
-                    put((long) i, v);
+                    if (v instanceof Integer) {
+                        put((long) i, ((Integer) v).longValue());
+                    } else if (v instanceof Float) {
+                        put((long) i, new BigDecimal(Float.toString((Float) v)));
+                    } else if (v instanceof Double) {
+                        put((long) i, new BigDecimal(Double.toString((Double) v)));
+                    } else {
+                        put((long) i, v);
+                    }
                 }
             }
         }
@@ -929,9 +939,9 @@ public class StemVariable extends HashMap<String, Object> {
         boolean isFirst = true;
 
         if (getDefaultValue() != null) {
-            if(getDefaultValue() instanceof BigDecimal){
-                output = output + "*:" + InputFormUtil.inputForm((BigDecimal)getDefaultValue());
-            }else {
+            if (getDefaultValue() instanceof BigDecimal) {
+                output = output + "*:" + InputFormUtil.inputForm((BigDecimal) getDefaultValue());
+            } else {
                 output = output + "*:" + getDefaultValue();
             }
             isFirst = false;
@@ -951,9 +961,9 @@ public class StemVariable extends HashMap<String, Object> {
             }
             Object vv = get(key);
             String ss;
-            if(vv instanceof BigDecimal){
-                         ss = InputFormUtil.inputForm((BigDecimal)vv);
-            }else{
+            if (vv instanceof BigDecimal) {
+                ss = InputFormUtil.inputForm((BigDecimal) vv);
+            } else {
                 ss = vv.toString();
             }
             output = output + key + STEM_ENTRY_CONNECTOR + ss;
@@ -1289,7 +1299,7 @@ public class StemVariable extends HashMap<String, Object> {
         StemList<StemEntry> sSL = getStemList();
         for (long i = startIndex; i < startIndex + length; i++) {
             Object obj = sSL.get(i);
-            if(obj == null){
+            if (obj == null) {
                 throw new IndexError("error: argument out of bounds for index " + i + ", object has size " + sSL.size());
             }
             outSL.append(obj);
@@ -1357,12 +1367,13 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
 
-    public StemVariable dim(){
+    public StemVariable dim() {
         StemVariable dim = new StemVariable();
         dim.setStemList(getStemList().getSize());
         return dim;
     }
-    public Long getRank(){
-      return getStemList().getRank();
+
+    public Long getRank() {
+        return getStemList().getRank();
     }
 }

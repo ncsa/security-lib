@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -41,7 +42,6 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     private static final long serialVersionUID = 0xcafed00d7L;
-
 
 
     /**
@@ -126,7 +126,7 @@ public abstract class VariableState extends NamespaceAwareState {
     private StemMultiIndex resolveStemIndices(StemMultiIndex w) {
         int startinglength = w.getRealLength() - 1; // first pass require some special handling
         for (int i = w.getRealLength() - 1; -1 < i; i--) {
-            String x = w.getComponents()[i];
+            String x = w.getComponents().get(i);
             if (x == null || x.isEmpty()) {
                 // skip missing stem elements. so a...b == a.b;
                 continue;
@@ -135,7 +135,7 @@ public abstract class VariableState extends NamespaceAwareState {
 
             if (i == startinglength) {
                 // No stem resolution should be attempted on the first pass.r
-                w.getComponents()[i] = newIndex;
+                w.getComponents().set(i, newIndex);
                 continue;
             }
             // Check if current index is a stem and feed what's to the right to it as a multi-index
@@ -145,10 +145,25 @@ public abstract class VariableState extends NamespaceAwareState {
                 if (v == null) {
                     throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value");
                 }
-                w.getComponents()[i] = v.toString();
-                w.setRealLength(i + 1);
+                StringTokenizer st = new StringTokenizer(v.toString(), ".");
+                ArrayList<String> newIndices = new ArrayList<>();
+                while (st.hasMoreTokens()) {
+                    String nt = st.nextToken();
+/*
+                    if(isFirst){
+                        isFirst = false;
+                        w.getComponents().set(i, nt);
+                    }else{
+                        w.getComponents().add(i++, nt);
+                    }
+*/                newIndices.add(nt);
+                }
+                w.getComponents().remove(i); // replace the element at i with whatever was found.
+                w.getComponents().addAll(i, newIndices);
+
+                w.setRealLength(i + newIndices.size());
             } else {
-                w.getComponents()[i] = newIndex;
+                w.getComponents().set(i, newIndex);
             }
         }
         return w.truncate();
@@ -178,7 +193,7 @@ public abstract class VariableState extends NamespaceAwareState {
             variableName = getFQName(w.name);
             uri = importManager.getByAlias(getAlias(w.name));
             Module m = getModuleMap().get(uri);
-            if(m == null){
+            if (m == null) {
                 // So they specified a non-existent module. No such value.
                 return null;
             }
@@ -196,7 +211,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 isQDLNull = true;
             } else {
                 Object oooo = st.resolveValue(getFQName(variableName));
-                if(oooo!=null && !(oooo instanceof StemVariable)){
+                if (oooo != null && !(oooo instanceof StemVariable)) {
                     throw new IllegalArgumentException("error: a stem was expected");
                 }
                 stem = (StemVariable) oooo;
@@ -284,12 +299,12 @@ public abstract class VariableState extends NamespaceAwareState {
 
     protected Object gsrNSScalarOp(String variableName, int op, Object value) {
         // if(!pattern.matcher(v.getName()).matches()){
-        if(variableName.equals("0") || intPattern.matcher(variableName).matches()){
+        if (variableName.equals("0") || intPattern.matcher(variableName).matches()) {
             // so its an actual index, like 0, 1, ...
             // Short circuit all the machinery because it will never resolve
             // and there is no need to jump through all of this.
-               return null;
-           }
+            return null;
+        }
         checkNSClash(variableName); // just check first since its quick
         if (isNSQname(variableName)) {
             // get the module, hand back the value.
@@ -365,7 +380,7 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     protected String resolveStemIndex(String index, ResolveState resolveState) {
-   
+
         Object obj = getValue(index);
         if (obj == null) {
             return index; // null value means does not resolve to anything
@@ -385,7 +400,7 @@ public abstract class VariableState extends NamespaceAwareState {
         TreeSet<String> out = getSymbolStack().listVariables();
         for (URI key : getImportManager().keySet()) {
             Module m = getModuleMap().get(key);
-            if(m == null){
+            if (m == null) {
                 continue; // the user specified a non-existent module.
             }
             TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation);

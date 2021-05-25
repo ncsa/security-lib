@@ -22,6 +22,7 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.antlr.v4.runtime.tree.TerminalNodeImpl;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -505,7 +506,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitNull(QDLParserParser.NullContext ctx) {
         ConstantNode constantNode = new ConstantNode(QDLNull.getInstance(), Constant.NULL_TYPE);
-           stash(ctx, constantNode);
+        stash(ctx, constantNode);
     }
 
     @Override
@@ -523,11 +524,15 @@ public class QDLListener implements QDLParserListener {
         if (value.endsWith("'")) {
             value = value.substring(0, value.length() - 1);
         }
-
         value = value.replace("\\'", "'");
-        //    value =  value.replace("\\n", "\n");
-        //    value =  value.replace("\\t", "\t");
-        //    value =  value.replace("\\r", "\r");
+        value = StringEscapeUtils.unescapeJava(value);
+/*
+        value = value.replace("\\n", "\n");
+        value = value.replace("\\t", "\t");
+        value = value.replace("\\r", "\r");
+        value = value.replace("\\b", "\b");
+        value = value.replace("\\\\", "\\");
+*/
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
@@ -738,7 +743,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterDefineStatement(QDLParserParser.DefineStatementContext ctx) {
-   //     parsingMap.startMark();
+        //     parsingMap.startMark();
         FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
         fds.setLambda(false);
         stash(ctx, fds);
@@ -747,7 +752,7 @@ public class QDLListener implements QDLParserListener {
     protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
         FunctionRecord functionRecord = new FunctionRecord();
         FunctionDefinitionStatement fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(defineContext);
-                                                           fds.setFunctionRecord(functionRecord);
+        fds.setFunctionRecord(functionRecord);
         //FunctionDefinitionStatement fds =
         // not quite the original source... The issue is that this comes parsed and stripped of any original
         // end of line markers, so we cannot tell what was there. Since it may include documentation lines
@@ -805,7 +810,7 @@ public class QDLListener implements QDLParserListener {
         // Special case since f(x) -> ... means f is added before we get here and won't get picked
         // up. That means that the system will think f needs to be evaluated asap and you will
         // get errors.
-     //   parsingMap.startMark(false);
+        //   parsingMap.startMark(false);
         FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
         fds.setLambda(true);
 
@@ -1194,9 +1199,9 @@ public class QDLListener implements QDLParserListener {
     public void exitTildeExpression(QDLParserParser.TildeExpressionContext ctx) {
         String x = ctx.getChild(1).getText();
         Dyad dyad;
-        if(x.equals("~|")) {
+        if (x.equals("~|")) {
             dyad = new Dyad(OpEvaluator.TILDE_STILE_VALUE);
-        }else{
+        } else {
             dyad = new Dyad(OpEvaluator.TILDE_VALUE);
 
         }
@@ -1304,7 +1309,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitF_ref(QDLParserParser.F_refContext ctx) {
         //      System.out.println("exit F_REF");
-       // FunctionReferenceNode frn = new FunctionReferenceNode();
+        // FunctionReferenceNode frn = new FunctionReferenceNode();
         FunctionReferenceNode frn = (FunctionReferenceNode) parsingMap.getStatementFromContext(ctx);
         String name = ctx.getText();
         name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER.length());

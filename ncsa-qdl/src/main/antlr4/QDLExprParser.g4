@@ -41,6 +41,7 @@ import QDLVariableParser;
 expression
  :
    function                                                                    #functions
+ | STRING                                                                      #strings
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | expression '.' expression                                                   #dotOp
@@ -64,7 +65,6 @@ expression
  | variable                                                                    #variables
  | Bool                                                                        #logical
  | Null                                                                        #null
- | STRING                                                                      #strings
  | ';'                                                                         #semi_for_empty_expressions
  ;
 // This *could* be added but does not work quite as expected because variables are allowed to have . to show they

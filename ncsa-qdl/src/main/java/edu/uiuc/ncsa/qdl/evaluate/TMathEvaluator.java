@@ -21,7 +21,9 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     public static final int TMATH_FUNCTION_BASE_VALUE = 7000;
 
     public static final String PI = "pi";
+    public static final String PI2 = "π";
     public static final String FQ_PI = MATH_FQ + PI;
+    public static final String FQ_PI2 = MATH_FQ + PI2;
     public static final int PI_TYPE = 1 + TMATH_FUNCTION_BASE_VALUE;
 
 
@@ -92,13 +94,13 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     public static String FUNC_NAMES[] = new String[]{
             COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
-            ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI,
+            ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
             N_ROOT
     };
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_COSINE, FQ_SINE, FQ_TANGENT, FQ_LOG_10, FQ_LOG_E, FQ_EXP,
             FQ_SINH, FQ_COSH, FQ_TANH,
-            FQ_ARC_COSINE, FQ_ARC_SINE, FQ_ARC_TANGENT, FQ_ARC_COSH, FQ_ARC_SINH, FQ_ARC_TANH, FQ_PI,
+            FQ_ARC_COSINE, FQ_ARC_SINE, FQ_ARC_TANGENT, FQ_ARC_COSH, FQ_ARC_SINH, FQ_ARC_TANH, FQ_PI, FQ_PI2,
             FQ_N_ROOT
     };
 
@@ -203,7 +205,9 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 doTranscendentalMath(polyad, EXP, true, state);
                 return true;
             case PI:
+            case PI2:
             case FQ_PI:
+            case FQ_PI2:
                 computePi(polyad, state);
                 return true;
             case N_ROOT:

@@ -17,4 +17,5 @@ public interface RFC7662Constants {
 
     String ACTIVE = "active";
     String TOKEN_TYPE = "token_type";
+    String USERNAME = "username";
 }
