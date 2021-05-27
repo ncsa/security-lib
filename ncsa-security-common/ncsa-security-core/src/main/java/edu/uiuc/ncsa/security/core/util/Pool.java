@@ -15,9 +15,11 @@ import java.util.Queue;
 public abstract class Pool<T> {
     public static final int INFINITE = -1;
     int maxSize = INFINITE;
+    protected int totalCreated = 0;
+    protected int totalDestroyed = 0;
     protected int inUse = 0;
     /**
-     * Set true ifyou want to see a ton of low level debugging for this.
+     * Set true if you want to see a ton of low level debugging for this.
      */
     protected boolean DEEP_DEBUG = false;
 
@@ -142,6 +144,8 @@ public abstract class Pool<T> {
         return "Pool{" +
                 "maxSize=" + maxSize +
                 ", inUse=" + inUse +
+                ", total created=" + totalCreated +
+                ", total destroyed=" + totalDestroyed +
                 ", size=" + getStack().size() +
                 ", stack=" + stack +
                 '}';

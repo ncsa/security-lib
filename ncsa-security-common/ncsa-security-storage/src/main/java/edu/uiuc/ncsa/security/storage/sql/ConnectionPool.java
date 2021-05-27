@@ -45,6 +45,7 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
         try {
             Connection con = DriverManager.getConnection(getConnectionParameters().getJdbcUrl());
             T connectionRecord = (T) new ConnectionRecord(con);
+            totalCreated++;
             return connectionRecord;
         } catch (Exception x) {
             DebugUtil.trace(this, "Connection failure, JDBC URL=" + getConnectionParameters().getJdbcUrl());
@@ -61,6 +62,7 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
                 c.close();
             }
             cc.isClosed = true;
+            totalDestroyed++;
         } catch (SQLException x) {
             throw new PoolException(x);
         }

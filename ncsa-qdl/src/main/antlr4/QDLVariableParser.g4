@@ -33,35 +33,31 @@ grammar QDLVariableParser;
     Integer : [0-9]+;
  Identifier : [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
-       Bool : BOOL_TRUE | BOOL_FALSE;
-     ASSIGN : '≔' | ':=' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254
-  FuncStart : [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]* '(';
-      F_REF : '@' (AllOps | (FuncStart ')'));
-  BOOL_TRUE : 'true';
- BOOL_FALSE : 'false';
-       Null : 'null' | '∅';  // unicode 2205
-//     STRING : '\'' (ESC|.)*? '\'';
-   STRING   : '\'' (ESC | SAFECODEPOINT)*? '\'';
-    Decimal : (Integer '.' Integer) | ('.' Integer);
+         Bool : BOOL_TRUE | BOOL_FALSE;
+       ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254
+    FuncStart :  FUNCTION_NAME '(';
+        F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
+    BOOL_TRUE : 'true';
+   BOOL_FALSE : 'false';
+         Null : 'null' | '∅';  // unicode 2205
+     STRING   : '\'' (ESC | SAFECODEPOINT)*? '\'';
+      Decimal : (Integer '.' Integer) | ('.' Integer);
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.
-    fragment 
-    AllOps : Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
-             LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot;
 
-SCIENTIFIC_NUMBER
-   : Decimal (E SIGN? Integer)?
-   ;
+fragment AllOps :
+     Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
+     LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot;
 
- //  GREEK: 'αβγδεζηθικλμνξοπρςστυφχψω';
+fragment FUNCTION_NAME :
+     [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;
 
-fragment E
-   : 'E' | 'e'
-   ;
+SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 
-fragment SIGN
-   : ('+' | '-')
-   ;
+fragment E : 'E' | 'e';
+
+fragment SIGN : ('+' | '-');
+
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
   Note: we have a single equals sign here as a lexical unit so the parser can later flag it as an error
@@ -69,7 +65,13 @@ fragment SIGN
   statement is simply ignored.  Since this is the most common error for beginners (using the wrong
   assignment operator), this just must get flagged as a syntax error in parsing.
 */
-   LambdaConnector : '->' | '→'; // unicode 2192
+
+ // Note that the extra characgers for && and || are there because certain unicode aware keyboards
+ // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
+
+// The left bracket, as the end of a control statement, has to be found in the lexer.
+
+   LambdaConnector : '->' | '→';  // unicode 2192
              Times : '*'  | '×';  // unicode d7
             Divide : '/'  | '÷';  // unicode f7
           PlusPlus : '++';
@@ -83,6 +85,7 @@ fragment SIGN
         MoreEquals : '>=' | '≥' | '=>';  // unicode 2265
             Equals : '==' | '≡';  // unicode 2261
          NotEquals : '!=' | '≠';  // unicode 2260
+      RegexMatches : '=~' | '≈';  // unicode 2248
         LogicalNot : '!'  | '¬';  // unicode ac
     Exponentiation : '^';
                And : '&&' | '⋀' | '∧'; // unicode 22c0, 2227
@@ -93,14 +96,12 @@ fragment SIGN
          Backslash : '\\';
              Stile : '|';
         TildeRight : '~|';
- //              Dot : '.';
+       LeftBracket : ']';
+      RightBracket : '[';
 
-// The left bracket, as the end of a control statement, has to be found in the lexer.
-   LeftBracket: ']';
-   RightBracket: '[';
+ //            Dot : '.';
 
 // Control structures.
-
          LogicalIf : 'if[';
        LogicalThen : ']then[';
        LogicalElse : ']else[';
@@ -117,16 +118,14 @@ StatementConnector : '][';
 /*
   Next bit is for string support. Allow unicode, line feed etc. Disallow control characters.
 */
-fragment ESC : '\\' (['\\/bfnrt] | UNICODE);
-
-fragment UNICODE : 'u' HEX HEX HEX HEX;
-
-fragment HEX : [0-9a-fA-F];
-
+      fragment ESC : '\\' (['\\/bfnrt] | UNICODE);
+  fragment UNICODE : 'u' HEX HEX HEX HEX;
+      fragment HEX : [0-9a-fA-F];
+// Omit control characters -- used escaped \n etc. instead
 fragment SAFECODEPOINT: ~ ['\\\u0000-\u001F];
 
 // C-style comments ok.
-COMMENT :   '/*' .*? '*/' -> skip;
+COMMENT : '/*' .*? '*/' -> skip;
 
 // C++ style comments ok.
 LINE_COMMENT:   '//' ~[\r\n]* -> skip;

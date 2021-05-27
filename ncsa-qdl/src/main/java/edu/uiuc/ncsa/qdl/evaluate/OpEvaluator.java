@@ -20,7 +20,7 @@ import java.util.TreeSet;
  * on 1/13/20 at  3:20 PM
  */
 public class OpEvaluator extends AbstractFunctionEvaluator {
-   // reference for unicode and other characters: https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
+    // reference for unicode and other characters: https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
     public static final String AND = "&&";
     public static final String AND2 = "⋀"; // unicode 22c0
     public static final String AND3 = "∧"; // unicode 2227
@@ -55,6 +55,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String TIMES = "*";
     public static final String TIMES2 = "×"; // unicode d7
     public static final String DOT = ".";
+    public static final String REGEX_MATCH = "=~";
+    public static final String REGEX_MATCH2 = "≈";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -78,6 +80,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int TILDE_VALUE = 213;
     public static final int DOT_VALUE = 214;
     public static final int TILDE_STILE_VALUE = 215;
+    public static final int REGEX_MATCH_VALUE = 216;
     /**
      * All Math operators. These are used in function references.
      */
@@ -105,7 +108,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             MORE_THAN_EQUAL,
             MORE_THAN_EQUAL2,
             MORE_THAN_EQUAL3,
-            NOT,NOT2};
+            NOT, NOT2,
+            REGEX_MATCH, REGEX_MATCH2};
+
 
     public boolean isMathOperator(String x) {
         for (String op : ALL_MATH_OPS) {
@@ -217,6 +222,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return TILDE_VALUE;
             case DOT:
                 return DOT_VALUE;
+            case REGEX_MATCH:
+            case REGEX_MATCH2:
+                return REGEX_MATCH_VALUE;
         }
         return UNKNOWN_VALUE;
     }
@@ -261,9 +269,37 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case MORE_THAN_EQUAL_VALUE:
                 doDyadComparisonOperator(dyad, state);
                 return;
+            case REGEX_MATCH_VALUE:
+                doRegexMatch(dyad, state);
+                return;
             default:
                 throw new NotImplementedException("Unknown dyadic operator " + dyad.getOperatorType());
         }
+    }
+    // '[a-zA-Z]{3}' =~ 'aBc'
+
+    /**
+     * Contract is expression regex ≈ expression returns true if it matches expression as a string.
+     *
+     * @param dyad
+     * @param state
+     */
+    protected void doRegexMatch(Dyad dyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (!isString(objects[0])) {
+                    throw new IllegalArgumentException(REGEX_MATCH + " requires a regular expression as its left argument");
+                }
+                String regex = objects[0].toString();
+                String ob = objects[1].toString();
+                r.result = new Boolean(ob.matches(regex));
+                r.resultType = Constant.BOOLEAN_TYPE;
+                return r;
+            }
+        };
+        process2(dyad, pointer, REGEX_MATCH, state);
     }
 
     private void doJoin(Dyad dyad, State state) {

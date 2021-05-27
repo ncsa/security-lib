@@ -127,6 +127,8 @@ public class QDLWorkspace {
                }else{
                 input = out; // repeat the command
             }
+            input = input.split("//")[0]; // if there is a line comment, strip it.
+
 /*            if (input.equals("%")) {
                 input = lastCommand;
             } else {

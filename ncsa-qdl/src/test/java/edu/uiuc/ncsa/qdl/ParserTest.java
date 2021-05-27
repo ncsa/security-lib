@@ -1722,6 +1722,24 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     @Test
+    public void testReverseAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "99 =: q; indices(5) ≕ a. ;j(n)->n;f()->a.;");
+        addLine(script, "q =: f().j(2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        // check that exactly the value was updated
+        assert getLongValue("q", state) == 99L;
+        assert stemVariable.getLong(0L) == 0L;
+        assert stemVariable.getLong(1L) == 1L;
+        assert stemVariable.getLong(2L) == 99L;
+        assert stemVariable.getLong(3L) == 3L;
+        assert stemVariable.getLong(4L) == 4L;
+    }
+
+    @Test
     public void testBadExpressionStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1740,8 +1758,8 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "r(x)->x^2 + 1;");
-        addLine(script, "f(@h(), x) -> h(x);");
-        addLine(script, "a := f(@r(), 2);");
+        addLine(script, "f(@h, x) -> h(x);");
+        addLine(script, "a := f(@r, 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
@@ -1752,8 +1770,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g(@h(), x, y)->h(x, y);");
-        addLine(script, "a := g(@substring(), 'abcd', 2);");
+        addLine(script, "g(@h, x, y)->h(x, y);");
+        addLine(script, "a := g(@substring, 'abcd', 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("cd");
@@ -1768,8 +1786,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReference2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g1(@h(), x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
-        addLine(script, "a := g1(@substring(), 'abcd', 2 );");
+        addLine(script, "g1(@h, x,y)->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1(@substring, 'abcd', 2 );");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("dpqrcdtuv");
@@ -1779,8 +1797,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReferenceOrder() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g1(x,y,@h())->h(x+'pqr', y+1) + h(x+'tuv', y);");
-        addLine(script, "a := g1('abcd', 2, @substring());");
+        addLine(script, "g1(x,y,@h)->h(x+'pqr', y+1) + h(x+'tuv', y);");
+        addLine(script, "a := g1('abcd', 2, @substring);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("dpqrcdtuv");

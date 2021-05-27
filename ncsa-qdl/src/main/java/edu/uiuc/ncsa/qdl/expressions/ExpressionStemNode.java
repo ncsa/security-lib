@@ -176,19 +176,19 @@ The following are working:
                     s.put((Long) getRightArg().getResult(), newValue);
                 } else {
                     String targetKey = null;
-                    if(getRightArg().getResult() == null){
-                        if(getRightArg() instanceof VariableNode){
+                    if (getRightArg().getResult() == null) {
+                        if (getRightArg() instanceof VariableNode) {
                             VariableNode v = (VariableNode) getRightArg();
-                            if(v.getResult() == null){
+                            if (v.getResult() == null) {
                                 targetKey = v.getVariableReference();
-                            }else{
+                            } else {
                                 targetKey = v.getResult().toString();
                             }
-                        }else{
+                        } else {
                             throw new IllegalArgumentException("error: could not determine key for stem");
                         }
 
-                    }else{
+                    } else {
                         targetKey = getRightArg().getResult().toString();
                     }
                     s.put(targetKey, newValue);
@@ -236,8 +236,14 @@ The following are working:
         if (setValue) {
             r1 = stemVariable.put(r.toString(), newValue);
         } else {
-            r1 = stemVariable.get(r);
-        }
+    /*        if (r.toString().contains(STEM_INDEX_MARKER)
+            ) {*/
+                StemMultiIndex stemMultiIndex = new StemMultiIndex("$" + STEM_INDEX_MARKER + r);
+                r1 = stemVariable.get(stemMultiIndex);
+      /*      } else {
+                r1 = stemVariable.get(r);
+            }
+      */  }
 
         setResult(r1);
         setEvaluated(true);
@@ -245,7 +251,8 @@ The following are working:
         return r1;
 
     }
-
+      // a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}}
+    //  (a.).query(a., '$..m',true).(0)
     protected Object doLeftSVCase(StatementWithResultInterface leftArg, StatementWithResultInterface rightArg, State state) {
         List<StatementWithResultInterface> x = new ArrayList<>();
         x.add(rightArg);

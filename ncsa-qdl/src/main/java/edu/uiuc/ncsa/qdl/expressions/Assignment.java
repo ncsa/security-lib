@@ -19,6 +19,15 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 1/13/20 at  5:08 PM
  */
 public class Assignment implements Statement, HasResultInterface {
+    public boolean isFlippedAssignment() {
+        return flippedAssignment;
+    }
+
+    public void setFlippedAssignment(boolean flippedAssignment) {
+        this.flippedAssignment = flippedAssignment;
+    }
+
+    boolean flippedAssignment = false;
     Object result;
 
     public Object getResult() {
@@ -98,7 +107,36 @@ public class Assignment implements Statement, HasResultInterface {
         if (QDLConstants.isReservedWord(variableReference)) {
             throw new IllegalArgumentException("Error: Cannnot use reserved word \"" + variableReference + "\" as a variable.");
         }
+        if (flippedAssignment) {
+            Statement origArg = argument;
+            if ((argument instanceof ExpressionStemNode) && expStatement == null) {
+                // edge case of ESN. This is resolved to a variable reference so it has to
+                // be turned into a variable node to get the current value from the state
+                // at the right time.
+                argument = new VariableNode(variableReference);
+            } else {
+                argument = expStatement;
+            }
+
+            if (origArg instanceof VariableNode) {
+                variableReference = ((VariableNode) origArg).getVariableReference();
+                expStatement = null;
+            } else {
+                // If this is chained with other assignments it can get close to impossible
+                // to determine what should be assigned to what with our simple-minded
+                // flipping scheme a =: b --> b := a
+                // Consider 5 =: a := 7  or a ^= b =: c += 7
+                // Parentheses would help, but this is getting out of hand.
+                if (origArg instanceof Assignment) {
+                    throw new IllegalArgumentException("error: cannot chain =: with any assignments");
+                }
+                if (origArg instanceof StatementWithResultInterface) {
+                    expStatement = (StatementWithResultInterface) origArg;
+                }
+            }
+        }
         result = argument.evaluate(state);
+
         getHRI().setEvaluated(true);
         setResult(getHRI().getResult());
         evaluated = true;
@@ -108,10 +146,11 @@ public class Assignment implements Statement, HasResultInterface {
         }
         return setVariableValue(state, resultType, result);
     }
-     /*
-       j(n)->n;a.:=i(5);(a.).j(2) :=100;
 
-      */
+    /*
+      j(n)->n;a.:=i(5);(a.).j(2) :=100;
+
+     */
     protected Object setExpValue(State state, int resultType, Object result) {
         if (getExpStatement() instanceof ExpressionStemNode) {
             ExpressionStemNode esn = (ExpressionStemNode) getExpStatement();

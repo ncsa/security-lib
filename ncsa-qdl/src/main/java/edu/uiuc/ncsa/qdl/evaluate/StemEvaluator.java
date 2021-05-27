@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
@@ -188,8 +189,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int FROM_JSON_TYPE = 301 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String JSON_PATH_QUERY = "query";
-       public static final String FQ_JSON_PATH_QUERY = STEM_FQ + JSON_PATH_QUERY;
-       public static final int JSON_PATH_QUERY_TYPE = 302 + STEM_FUNCTION_BASE_VALUE;
+    public static final String FQ_JSON_PATH_QUERY = STEM_FQ + JSON_PATH_QUERY;
+    public static final int JSON_PATH_QUERY_TYPE = 302 + STEM_FUNCTION_BASE_VALUE;
 
     /**
      * A list of the names that this Evaluator knows about. NOTE that this must be kept in sync
@@ -546,51 +547,66 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doJPathQuery(Polyad polyad, State state) {
-        Object arg0 = polyad.evalArg(0,state);
-        if(!isStem(arg0)){
+        Object arg0 = polyad.evalArg(0, state);
+        if (!isStem(arg0)) {
             throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a stem as its first argument");
         }
         StemVariable stemVariable = (StemVariable) arg0;
         Object arg1 = polyad.evalArg(1, state);
-        if(!isString(arg1)){
+        if (!isString(arg1)) {
             throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a string as its second argument");
         }
 
         String query = (String) arg1;
-              Configuration conf = null;
-              boolean returnAsPaths = false;
-              if (polyad.getArgCount() == 3) {
-                  Object arg2 = polyad.evalArg(2, state);
-                  if(!isBoolean(arg2)){
-                      throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a boolean as its third argument");
-                  }
-                  returnAsPaths = (Boolean) arg2;
-                  conf = Configuration.builder()
-                          .options(Option.AS_PATH_LIST).build();
-              }
-              String output;
-              if (returnAsPaths) {
-                  output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
-                  output = crappyConverter(output);
-              } else {
-                  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
-              }
-              StemVariable outStem = new StemVariable();
-              try {
-                  JSONArray array = JSONArray.fromObject(output);
-                  outStem.fromJSON(array);
-              } catch (JSONException x) {
-                  JSONObject jo = JSONObject.fromObject(output);
-                  outStem.fromJSON(jo);
-              }
-              polyad.setResult(outStem);
-              polyad.setResultType(Constant.STEM_TYPE);
-              polyad.setEvaluated(true);
+        Configuration conf = null;
+        boolean returnAsPaths = false;
+        if (polyad.getArgCount() == 3) {
+            Object arg2 = polyad.evalArg(2, state);
+            if (!isBoolean(arg2)) {
+                throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a boolean as its third argument");
+            }
+            returnAsPaths = (Boolean) arg2;
+            conf = Configuration.builder()
+                    .options(Option.AS_PATH_LIST).build();
+        }
+        String output;
+        if (returnAsPaths) {
+            try {
+                output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+            } catch (JsonPathException jpe) {
+                throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+            }
+
+            output = crappyConverter(output);
+        } else {
+            try {
+                conf = Configuration.builder()
+                        .options(Option.ALWAYS_RETURN_LIST).build();
+
+              //  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
+                output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+
+            } catch (JsonPathException jpe) {
+                throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+            }
+        }
+        StemVariable outStem = new StemVariable();
+        try {
+            JSONArray array = JSONArray.fromObject(output);
+            outStem.fromJSON(array);
+        } catch (JSONException x) {
+            JSONObject jo = JSONObject.fromObject(output);
+            outStem.fromJSON(jo);
+        }
+        polyad.setResult(outStem);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
     }
 
     /**
      * This converts a list of JSON Path indices to stem indices. It is very simple
      * minded.
+     *
      * @param indexList
      * @return
      */

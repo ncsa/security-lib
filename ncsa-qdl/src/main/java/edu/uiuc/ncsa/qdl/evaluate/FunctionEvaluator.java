@@ -60,10 +60,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         switch (polyad.getName()) {
             case IS_FUNCTION:
             case FQ_IS_FUNCTION:
-                if (polyad.getArgCount() ==0) {
+                if (polyad.getArgCount() == 0) {
                     throw new IllegalArgumentException("You must supply at least one argument.");
                 }
-                if(polyad.getArguments().get(0) instanceof VariableNode){
+                if (polyad.getArguments().get(0) instanceof VariableNode) {
                     // they either are asking about a variable or it does not exist and by default, the parser thinks
                     // it was one
                     polyad.setEvaluated(true);
@@ -98,11 +98,11 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         if (!polyad.isBuiltIn()) {
             try {
                 figureOutEvaluation(polyad, state);
-            }catch(Throwable t){
-                if(t instanceof RuntimeException){
-                    throw (RuntimeException)t;
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
                 }
-                if(t instanceof StackOverflowError){
+                if (t instanceof StackOverflowError) {
                     throw new QDLException("stack overflow", t);
                 }
                 QDLException q = new QDLException("error evaluating function", t);
@@ -162,7 +162,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
-    protected void figureOutEvaluation(Polyad polyad, State state) throws Throwable{
+    protected void figureOutEvaluation(Polyad polyad, State state) throws Throwable {
         FR_WithState frs;
         try {
             frs = state.resolveFunction(polyad);
@@ -218,10 +218,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
      */
 
-    protected void doFunctionEvaluation(Polyad polyad, State state, FunctionRecord functionRecord) throws Throwable{
+    protected void doFunctionEvaluation(Polyad polyad, State state, FunctionRecord functionRecord) throws Throwable {
         //FunctionRecord functionRecord ;
-  //      if(frs.functionRecord.isFuncRef){
-         //   functionRecord = frs.functionRecord;
+        //      if(frs.functionRecord.isFuncRef){
+        //   functionRecord = frs.functionRecord;
 /*        } else{
              functionRecord = frs.functionRecord.newInstance();
         }*/
@@ -234,7 +234,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                         + polyad.getArgCount() + " arguments was not found.");
             }
         }
-        if(!functionRecord.isFuncRef) {
+        if (!functionRecord.isFuncRef) {
             functionRecord = functionRecord.newInstance();
         }
         State localState = state.newStateWithImports();
@@ -331,7 +331,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     StatementWithResultInterface swri = ((StatementWithResultInterface)statement).makeCopy();
                     swri.evaluate(state);
                 }else {*/
-                    statement.evaluate(localState);
+                statement.evaluate(localState);
                 //}
             } catch (ReturnException rx) {
                 polyad.setResult(rx.result);
@@ -361,7 +361,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
     protected String dereferenceFunctionName(String name) {
         String x = name.substring(FUNCTION_REFERENCE_MARKER.length());
-        x = x.substring(0, x.indexOf("(")); // * ... ( are bookends for the reference
+        if (x.endsWith("()")) {
+            x = x.substring(0, x.length() - 2); // * ... ( are bookends for the reference
+        }
         return x;
     }
 }

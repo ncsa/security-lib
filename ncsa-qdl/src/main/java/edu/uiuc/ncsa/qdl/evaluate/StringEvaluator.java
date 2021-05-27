@@ -562,7 +562,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r = arg.substring(n, Math.min(length, arg.length())); // the Java way
                     if (r.length() < length) {
                         StringBuffer stringBuffer = new StringBuffer();
-                        for (int i = 0; i < 1+(length - r.length()) / padding.length(); i++) {
+                        for (int i = 0; i < 1 + (length - r.length()) / padding.length(); i++) {
                             stringBuffer.append(padding);// This appends the padding so later we can extend it cyclically
                         }
                         // If the padding is long, then there will be too much, only take what the user requests
@@ -730,11 +730,25 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAllStrings(objects[0], objects[1])) {
-                    StringTokenizer st = new StringTokenizer(objects[0].toString(), objects[1].toString());
+                    boolean doRegex = false;
+                    if (objects.length == 3) {
+                        if (isBoolean(objects[2])) {
+                            doRegex = (Boolean) objects[2];
+                        }
+                    }
                     StemVariable outStem = new StemVariable();
-                    int i = 0;
-                    while (st.hasMoreTokens()) {
-                        outStem.put(Integer.toString(i++), st.nextToken());
+                    if (doRegex) {
+                        String[] tokens = objects[0].toString().split(objects[1].toString());
+                        for (int i = 0; i < tokens.length; i++) {
+                            outStem.put(Integer.toString(i), tokens[i]);
+                        }
+                    } else {
+                        StringTokenizer st = new StringTokenizer(objects[0].toString(), objects[1].toString());
+                        int i = 0;
+                        while (st.hasMoreTokens()) {
+                            outStem.put(Integer.toString(i++), st.nextToken());
+                        }
+
                     }
                     r.result = outStem;
                     r.resultType = Constant.STEM_TYPE;
@@ -745,6 +759,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process2(polyad, pointer, INSERT, state);
+        process2(polyad, pointer, TOKENIZE, state,true);
     }
 }
+/*
+a := 'a d, m, i.n'
+r := '\\s+|,\\s*|\\.\\s*'
+tokenize(a,r,true)
+*/

@@ -338,6 +338,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitStemLi(QDLParserParser.StemLiContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code regexMatches}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterRegexMatches(QDLParserParser.RegexMatchesContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code regexMatches}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitRegexMatches(QDLParserParser.RegexMatchesContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code logical}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

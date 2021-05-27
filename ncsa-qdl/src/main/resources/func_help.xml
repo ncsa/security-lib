@@ -1054,11 +1054,27 @@ See also: to_upper
     <entry id="tokenize">
         <body>
             <![CDATA[
-tokenize(arg, delimiter) - tokenize a string or stem of strings using the
+      tokenize(arg, delimiter) - tokenize a string or stem of strings using the
                            given delimeter.
+       arg - the string to tokenize
+       delimiter - either the delimiter or if the last argument is true,
+tokenize(target, arg[, use_regex]) - tokenize a string or stem of strings using the
+                           given regex
+    target - the string to tokenize
+       arg - either the delimiter (use_regex == false) or a regular expression
+             (use_regex == true)
+     use_regex - flag to use regex.
 E.g.
    tokenize('abd:def:123', ':');
 [abd,def,123]
+
+E.g.
+   Tokenize a string with various delimters using a regular expression
+
+   a := 'a d, m, i.n';
+   r := '\\s+|,\\s*|\\.\\s*';
+   tokenize(a,r,true);
+[a,d,m,i,n]
                 ]]>
         </body>
     </entry>
@@ -1602,8 +1618,10 @@ query(arg., query_string [, return_indices]) -- do a query on a stem using
   query_string - a valid JSON Path query string as per
      https://tools.ietf.org/id/draft-goessner-dispatch-jsonpath-00.html
 return_indices - (optional) return the indices of the result, not the result.
+Returns a list.
 
-
+This allows you to query stems using the standard query language in JSON.
+You supply a stem and a query. Note that the query is a string since 
   In section 2 of the above specification is a JSON object. If you import
   this into the workspace as the stem variable my_json., then here are
   a few examples:
@@ -1615,6 +1633,8 @@ E.g. 1: getting a result set
   author:Herman Melville,
   price:8.99,
   isbn:0-553-21311-3,...
+
+  Note well that results are returned as stem lists.
 
 E.g. 2: Getting the indices
   ndx. := query(test., '$..book[?(@.isbn)]', true); // Just get the indices
@@ -1628,6 +1648,9 @@ E.g. 3: Using the indices
   price:8.99,
   isbn:0-553-21311-3,...
 
+Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/my_json.json
+       and issue
+       my_json. := from_json(file_read('/my/path/my_json.json'));
 
                 ]]>
             </body>

@@ -5,17 +5,7 @@ grammar QDLExprParser;
 
 import QDLVariableParser;
 
-/*
-  Uncomment the next line to allow the parser to recognize expressions, e.g.
-     f().j(4) := 42;
- You can enable it now, but actually turning the left hand into something reasonable
- is going to be quite tricky. Now the solution is to just use variables, so
-     a. := f(); n := j(4);
-     a. n := 42;
-*/
    assignment : (expression  op=ASSIGN)+  expression;
-
-//   assignment : (variable  op=ASSIGN)+  expression;
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';
@@ -48,13 +38,13 @@ expression
  | expression ('~' | '~|' ) expression                                         #tildeExpression
  | expression postfix=('++' | '--')                                            #postfix
  | prefix=('++'|'--') expression                                               #prefix
- //| prefix='*' expression                                                       #f_ref
  | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
  | ('+' | '-') expression                                                      #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
+ | expression op=RegexMatches expression                                       #regexMatches
  | expression And expression                                                   #andExpression
  | expression Or expression                                                    #orExpression
  | LogicalNot expression                                                       #notExpression

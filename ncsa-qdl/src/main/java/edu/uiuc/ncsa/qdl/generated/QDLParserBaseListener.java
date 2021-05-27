@@ -376,6 +376,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRegexMatches(QDLParserParser.RegexMatchesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRegexMatches(QDLParserParser.RegexMatchesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLogical(QDLParserParser.LogicalContext ctx) { }
 	/**
 	 * {@inheritDoc}

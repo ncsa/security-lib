@@ -206,7 +206,12 @@ public class QDLListener implements QDLParserListener {
             //          nextA.setVariableReference(nextVar);
             // Special cases. := means assignment, if not then, then it is one
             // of +=, *=,..., so create the appropriate dyad
-            if (op.equals(":=") || op.equals("≔")) {   // Allows unicode 2254 as assignment too.
+            if (op.equals(":=") || op.equals("≔") | op.equals("=:") | op.equals("≕")) {   // Allows unicode 2254, 2255 as assignment too.
+                if(op.equals("=:") | op.equals("≕")){
+                    // This is the only place for sure we know what the operator is.
+                    currentA.setFlippedAssignment(true);
+                }
+
                 if (i + 1 == exprIndex) {
                     Statement arg = resolveChild(assignmentContext.children.get(i + 1));
                     currentA.setArgument(arg);
@@ -1346,7 +1351,19 @@ public class QDLListener implements QDLParserListener {
 
     }
 
-/*    @Override
+    @Override
+    public void enterRegexMatches(QDLParserParser.RegexMatchesContext ctx) {
+        stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
+
+    }
+
+    @Override
+    public void exitRegexMatches(QDLParserParser.RegexMatchesContext ctx) {
+        Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
+         dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
+         finish(dyad, ctx);
+    }
+    /*    @Override
     public void enterAllOps(QDLParserParser.AllOpsContext ctx) {
            System.out.println("enter allops");
 
