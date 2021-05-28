@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="4" failures="0" name="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" time="0.031" errors="0" skipped="0">
+<testsuite tests="4" failures="0" name="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" time="0.029" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/java/jdk1.8.0_231/jre/lib/amd64"/>
@@ -32,7 +32,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="52.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="5.4.0-58-generic"/>
+    <property name="os.version" value="5.4.0-73-generic"/>
     <property name="library.jansi.path" value="/usr/share/maven/lib/jansi-native"/>
     <property name="user.home" value="/home/ncsa"/>
     <property name="user.timezone" value="America/Chicago"/>
@@ -62,8 +62,8 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testCleanup" time="0.02"/>
+  <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testCleanup" time="0.019"/>
   <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testInitializable" time="0.001"/>
-  <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testMap" time="0.009"/>
+  <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testMap" time="0.008"/>
   <testcase classname="edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest" name="testStore" time="0.001"/>
 </testsuite>

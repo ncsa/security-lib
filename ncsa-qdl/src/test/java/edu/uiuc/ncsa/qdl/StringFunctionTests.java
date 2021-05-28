@@ -610,6 +610,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.size() == 1;
         assert result.getString("bind").startsWith(expectedResult);
     }
+
     @Test
     public void testDetokenize() throws Throwable {
         StringBuffer script = new StringBuffer();
@@ -627,6 +628,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getStringValue("t2", state).equals("0:1:2:3:4");
         assert getStringValue("t3", state).equals("0k=1k=2k=3k=4");
     }
+
     @Test
     public void testSubstring() throws Throwable {
         State state = testUtils.getNewState();
@@ -647,10 +649,11 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     /**
      * Tests that using a regex to tokenize a string with multiple types of delimiters works.
+     *
      * @throws Throwable
      */
     @Test
-    public void testRegexTokenize() throws Throwable{
+    public void testRegexTokenize() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         // delimiters are space , .
@@ -658,31 +661,43 @@ public class StringFunctionTests extends AbstractQDLTester {
         addLine(script, "y := reduce(@⋀, x. == ['a','d','m','i','n']);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("y",state);
+        assert getBooleanValue("y", state);
 
     }
 
     @Test
-    public void testRegexMatches() throws Throwable{
+    public void testRegexMatches() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
- addLine(script, "x ≔ '[a-zA-Z]{3}' =~ 'aBc';"); // Check that rhs has 3 letters
- addLine(script, "y ≔ '[Yy][Ee][Ss]' =~ 'yEs';"); // checks rhs is case insensitive 'yes'
- addLine(script, "z ≔ '[0-9]{5}' =~ 23456;"); // checks rhs integer is treated as string, then checked for 5 digit.
-           /*
-              '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
-true
-    '[Yy][Ee][Ss]' =~ 'yEs'; //Checks that the argument is case insensitive ‘yes’
-true
-  '[0-9]{5}' =~ 23456; // Check if this is a 5 digit number
-true
+        addLine(script, "x ≔ '[a-zA-Z]{3}' =~ 'aBc';"); // Check that rhs has 3 letters
+        addLine(script, "y ≔ '[Yy][Ee][Ss]' =~ 'yEs';"); // checks rhs is case insensitive 'yes'
+        addLine(script, "z ≔ '[0-9]{5}' =~ 23456;"); // checks rhs integer is treated as string, then checked for 5 digit.
 
-            */
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("x",state);
-        assert getBooleanValue("y",state);
-        assert getBooleanValue("z",state);
+        assert getBooleanValue("x", state);
+        assert getBooleanValue("y", state);
+        assert getBooleanValue("z", state);
+    }
+
+    /**
+     * Checks a few random unicode escapes mostly as regression if we break it.
+     * @throws Throwable
+     */
+    @Test
+    public void testUnicodeEscapes() throws Throwable{
+        // π
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x ≔ '\u03c0' == 'π';");
+        addLine(script, "y ≔ '≔' == '\u2254';");
+        addLine(script, "z ≔ '∧' == '\u2227';");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("x", state);
+        assert getBooleanValue("y", state);
+        assert getBooleanValue("z", state);
 
     }
 }

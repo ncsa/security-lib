@@ -34,29 +34,29 @@ grammar QDLVariableParser;
  Identifier : [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
  //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
          Bool : BOOL_TRUE | BOOL_FALSE;
-       ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254
+       ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
     BOOL_TRUE : 'true';
    BOOL_FALSE : 'false';
          Null : 'null' | '∅';  // unicode 2205
-     STRING   : '\'' (ESC | SAFECODEPOINT)*? '\'';
+        STRING : '\'' StringCharacters? '\'';
+
       Decimal : (Integer '.' Integer) | ('.' Integer);
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.
 
 fragment AllOps :
      Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
-     LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot;
+     LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot |
+     RegexMatches;
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;
 
 SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
-
-fragment E : 'E' | 'e';
-
-fragment SIGN : ('+' | '-');
+       fragment E : 'E' | 'e';
+    fragment SIGN : ('+' | '-');
 
 /*
   Constants. These are here so they are lexical units and the parser can access them as such.
@@ -66,7 +66,7 @@ fragment SIGN : ('+' | '-');
   assignment operator), this just must get flagged as a syntax error in parsing.
 */
 
- // Note that the extra characgers for && and || are there because certain unicode aware keyboards
+ // Note that the extra characters for && and || are there because certain unicode aware keyboards
  // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
 
 // The left bracket, as the end of a control statement, has to be found in the lexer.
@@ -118,18 +118,16 @@ StatementConnector : '][';
 /*
   Next bit is for string support. Allow unicode, line feed etc. Disallow control characters.
 */
-      fragment ESC : '\\' (['\\/bfnrt] | UNICODE);
-  fragment UNICODE : 'u' HEX HEX HEX HEX;
-      fragment HEX : [0-9a-fA-F];
-// Omit control characters -- used escaped \n etc. instead
-fragment SAFECODEPOINT: ~ ['\\\u0000-\u001F];
+               fragment ESC : '\\' [btnfr'\\] | UnicodeEscape;
+     fragment UnicodeEscape :  '\\' 'u'+  HexDigit HexDigit HexDigit HexDigit;
+          fragment HexDigit : [0-9a-fA-F];
+  fragment StringCharacters : StringCharacter+;
+   fragment StringCharacter : ~['\\\r\n] | ESC;
 
-// C-style comments ok.
-COMMENT : '/*' .*? '*/' -> skip;
-
-// C++ style comments ok.
-LINE_COMMENT:   '//' ~[\r\n]* -> skip;
-
-WS2 : [ \t\r\n]+ ->skip;
-
-FDOC :  '>>' ~[\r\n]*;
+/*
+   Comments and white space
+*/
+           FDOC :  '>>' ~[\r\n]*;
+             WS : [ \t\r\n\u000C]+ -> skip;
+        COMMENT : '/*' .*? '*/' -> skip;
+   LINE_COMMENT : '//' ~[\r\n]* -> skip;

@@ -69,7 +69,7 @@ public abstract class Pool<T> {
                 return doCreate();
             }
             inUse++;
-            trace("pop: in use = " + inUse);
+            trace("pop: in use = " + inUse + ", created = " + totalCreated);
             return item;
         } catch (IndexOutOfBoundsException x) { // pool is empty
             return doCreate();
@@ -99,7 +99,7 @@ public abstract class Pool<T> {
     public synchronized void doDestroy(T item) throws PoolException {
         destroy(item);
         inUse--;
-        trace("doDestroy, in use=" + inUse);
+        trace("doDestroy, in use=" + inUse + ", destroyed = " + totalDestroyed);
     }
 
 

@@ -688,8 +688,19 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-                if (areAllStrings(objects)) {
-                    r.result = objects[0].toString().replace(objects[1].toString(), objects[2].toString());
+                boolean doregex = false;
+                if (objects.length == 4) {
+                    if (!isBoolean(objects[3])) {
+                        throw new IllegalArgumentException("error. replace requires a boolean as its 4th argument");
+                    }
+                    doregex = (Boolean) objects[3];
+                }
+                if (areAllStrings(objects[0],objects[1],objects[2])) {
+                    if (doregex) {
+                        r.result = objects[0].toString().replaceAll(objects[1].toString(), objects[2].toString());
+                    } else {
+                        r.result = objects[0].toString().replace(objects[1].toString(), objects[2].toString());
+                    }
                     r.resultType = Constant.STRING_TYPE;
                 } else {
                     r.result = objects[0];
@@ -698,7 +709,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process3(polyad, pointer, REPLACE, state);
+        process3(polyad, pointer, REPLACE, state, true);
     }
 
     protected void doInsert(Polyad polyad, State state) {
@@ -719,7 +730,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process3(polyad, pointer, INSERT, state);
+        process3(polyad, pointer, INSERT, state, false);
     }
 
     protected void doTokenize(Polyad polyad, State state) {
@@ -759,7 +770,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process2(polyad, pointer, TOKENIZE, state,true);
+        process2(polyad, pointer, TOKENIZE, state, true);
     }
 }
 /*

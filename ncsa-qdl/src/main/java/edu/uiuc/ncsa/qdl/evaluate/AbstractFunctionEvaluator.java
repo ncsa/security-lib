@@ -344,9 +344,10 @@ return StemUtility.areNoneStems(objects);    }
     protected void process3(ExpressionImpl polyad,
                             fPointer pointer,
                             String name,
-                            State state) {
-        if (polyad.getArgCount() != 3) {
-            throw new IllegalArgumentException("Error: the " + name + " function requires 3 arguments");
+                            State state,
+                            boolean optionalArguments) {
+        if (!optionalArguments && polyad.getArgCount() != 3) {
+            throw new IllegalArgumentException("Error: the " + name + " function requires at least 3  arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
         if(arg1 == null){
@@ -374,8 +375,18 @@ return StemUtility.areNoneStems(objects);    }
         if (arg1 == null || arg2 == null || arg3 == null) {
             throw new UnknownSymbolException("Error: Unknown symbol");
         }
-        if (areNoneStems(arg1, arg2, arg3)) {
-            fpResult result = pointer.process(arg1, arg2, arg3);
+        Object[] argList = new Object[polyad.getArgCount()];
+        argList[0] = arg1;
+        argList[1] = arg2;
+        argList[2] = arg3;
+        if (optionalArguments) {
+            for (int i = 2; i < polyad.getArgCount(); i++) {
+                argList[i] = polyad.getArguments().get(i).evaluate(state);
+            }
+        }
+        if (areNoneStems(argList)) {
+
+            fpResult result = pointer.process(argList);
             finishExpr(polyad, result);
             return;
         }

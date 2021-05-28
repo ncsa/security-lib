@@ -127,7 +127,9 @@ public class QDLWorkspace {
                }else{
                 input = out; // repeat the command
             }
-            input = input.split("//")[0]; // if there is a line comment, strip it.
+            // Good idea to strip off comments in parser, but the regex here needs to be
+            // quite clever to match ' and // within them (e.g. any url fails at the command line).
+        //    input = input.split("//")[0]; // if there is a line comment, strip it.
 
 /*            if (input.equals("%")) {
                 input = lastCommand;

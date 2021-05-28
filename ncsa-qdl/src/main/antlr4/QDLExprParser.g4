@@ -24,6 +24,7 @@ import QDLVariableParser;
        f_args : f_arg (',' f_arg)* ;
         f_ref : F_REF;
 
+
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
 // and checking for regression. Also Antlr 4 interprets the comments in the right hand column and
 // will use these for generating method names in Java. Be careful of actually putting comments there!
@@ -49,6 +50,7 @@ expression
  | expression Or expression                                                    #orExpression
  | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
+ | expression '?' expression ':' expression                                    #altIFExpression
  | LeftBracket                                                                 #leftBracket
  | integer                                                                     #integers
  | number                                                                      #numbers

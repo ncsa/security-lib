@@ -362,6 +362,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitLogical(QDLParserParser.LogicalContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code altIFExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterAltIFExpression(QDLParserParser.AltIFExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code altIFExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitAltIFExpression(QDLParserParser.AltIFExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code orExpression}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

@@ -70,7 +70,7 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
 
     @Override
     public synchronized void push(T object) throws PoolException {
-        trace("push id:" + getUuid() + ", connections: " + getStackMap().map.keySet());
+        trace("push id:" + getUuid() + ", connections: " + getStackMap().map.keySet() + ", total created:" + totalCreated);
         super.push(object);
         if(!object.isClosed){
             object.lastAccessed = System.currentTimeMillis();

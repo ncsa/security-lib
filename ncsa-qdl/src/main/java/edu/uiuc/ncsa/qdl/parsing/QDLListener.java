@@ -182,7 +182,6 @@ public class QDLListener implements QDLParserListener {
                 }
                 currentA.setSourceCode(source);
             }
-
             nextA = new Assignment();
             if (assignmentContext.children.size() == i + 1) {
                 // no next element, implies the user sent something like a :=; so no rhs, OR the
@@ -1363,6 +1362,25 @@ public class QDLListener implements QDLParserListener {
          dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
          finish(dyad, ctx);
     }
+
+    @Override
+    public void enterAltIFExpression(QDLParserParser.AltIFExpressionContext ctx) {
+        stash(ctx, new AltIfExpressionNode());
+
+    }
+
+    @Override
+    public void exitAltIFExpression(QDLParserParser.AltIFExpressionContext ctx) {
+        AltIfExpressionNode altIfExpressionNode = (AltIfExpressionNode) parsingMap.getStatementFromContext(ctx);
+        //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
+        altIfExpressionNode.setIF((ExpressionNode) resolveChild(ctx.getChild(0)));
+        altIfExpressionNode.setTHEN((ExpressionNode) resolveChild(ctx.getChild(2)));
+        altIfExpressionNode.setELSE((ExpressionNode) resolveChild(ctx.getChild(4)));
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        altIfExpressionNode.setSourceCode(source);
+    }
+
     /*    @Override
     public void enterAllOps(QDLParserParser.AllOpsContext ctx) {
            System.out.println("enter allops");

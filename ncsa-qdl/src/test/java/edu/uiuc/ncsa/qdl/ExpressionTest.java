@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.*;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -59,8 +60,8 @@ public class ExpressionTest extends AbstractQDLTester {
         VariableNode bNode = new VariableNode("b");
         // so to make these, ou start at the bottom and assemble as you rise up.
         Dyad aPlus2 = new Dyad(OpEvaluator.PLUS_VALUE, aNode, twoNode);
-        Dyad bMinus3 = new Dyad( OpEvaluator.MINUS_VALUE, bNode, threeNode);
-        Dyad lessThanNode = new Dyad( OpEvaluator.LESS_THAN_VALUE, aPlus2, bMinus3);
+        Dyad bMinus3 = new Dyad(OpEvaluator.MINUS_VALUE, bNode, threeNode);
+        Dyad lessThanNode = new Dyad(OpEvaluator.LESS_THAN_VALUE, aPlus2, bMinus3);
         // top node
         Monad notNode = new Monad(OpEvaluator.NOT_VALUE, lessThanNode);
         notNode.evaluate(state);
@@ -75,5 +76,37 @@ public class ExpressionTest extends AbstractQDLTester {
         notNode2.evaluate(state2);
         assert !(Boolean) notNode2.getResult();
 
+    }
+
+    /**
+     * Test to check that inline conditionals of the form
+     *
+     * <pre>
+     *     <i>boolean</i> <b>?</b> <i>expression0</i> <b>:</b> <i>expression1</i>
+     *  </pre>
+     *
+     *  work as advertised. This checks that operations inside the expressions work,
+     *  precedence is followed and that parentheses are interpreted correctly.
+     *  <p>And FYI</p>
+     *  <pre>
+     *    π()^exp()
+     * 22.4591577183611
+     *   exp()^π()
+     * 23.1406926327793
+     *  </pre>
+     * @throws Throwable
+     */
+    @Test
+    public void testInlineConditional() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := π()^exp() ≤ exp()^π() ? 'left i'+'s bigger' : 'right' + ' is' + ' bigger';");
+        addLine(script, "y := 3 < 2 ? 4>3 ?'a':'b':'c';"); // shows that precedence is followed for nesting too.
+        addLine(script, "z := (3 < 2) ? ((4 ≥ 3 )?'a':'b'):'c';"); // shows that parentheses are interpreted correctly
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("x", state).equals("left is bigger");
+        assert getStringValue("y", state).equals("c");
+        assert getStringValue("z", state).equals("c");
     }
 }
