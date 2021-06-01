@@ -182,7 +182,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
         }
     }
 
-
+/*
     @Override
     public void enterArgList(QDLParserParser.ArgListContext ctx) {
         say("enter arg list:" + enter("argList"));
@@ -194,7 +194,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void exitArgList(QDLParserParser.ArgListContext ctx) {
         sayi("exit arg list:" + xit("argList"), ctx);
         printKids(ctx);
-    }
+    }*/
 
     @Override
     public void enterFunction(QDLParserParser.FunctionContext ctx) {
@@ -302,7 +302,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
 
     }
 
-    @Override
+/*    @Override
     public void enterLeftBracket(QDLParserParser.LeftBracketContext ctx) {
         say("enter left bracket");
     }
@@ -311,7 +311,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     public void exitLeftBracket(QDLParserParser.LeftBracketContext ctx) {
         sayi("exit left bracket ", ctx);
 
-    }
+    }*/
 
     @Override
     public void enterVariable(QDLParserParser.VariableContext ctx) {
@@ -631,4 +631,122 @@ public class QDLDebugListener extends QDLParserBaseListener {
         System.out.println("exit allops");
      printKids(ctx);
     }*/
+/*@Override
+  public void enterExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
+    System.out.println("enter enterExpressionBlock");
+    printKids(ctx);
+  }
+
+  @Override
+  public void exitExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
+      System.out.println("exit enterExpressionBlock");
+      printKids(ctx);
+
+  }
+
+  @Override
+  public void enterConditionalBlock(QDLParserParser.ConditionalBlockContext ctx) {
+      System.out.println("enter enterConditionalBlock");
+      printKids(ctx);
+  }
+
+  @Override
+  public void exitConditionalBlock(QDLParserParser.ConditionalBlockContext ctx) {
+      System.out.println("exit enterConditionalBlock");
+      printKids(ctx);
+
+  }*/
+
+
+
+  @Override
+  public void enterRealInterval(QDLParserParser.RealIntervalContext ctx) {
+      System.out.println("enter enterRealInterval");
+      printKids(ctx);
+  }
+
+  @Override
+  public void exitRealInterval(QDLParserParser.RealIntervalContext ctx) {
+      System.out.println("exit enterRealInterval");
+      printKids(ctx);
+
+  }
+
+  @Override
+  public void enterIntInterval(QDLParserParser.IntIntervalContext ctx) {
+      System.out.println("enter enterIntInterval");
+      printKids(ctx);
+  }
+
+  @Override
+  public void exitIntInterval(QDLParserParser.IntIntervalContext ctx) {
+      System.out.println("exit enterIntInterval");
+      printKids(ctx);
+
+  }
+
+/*  @Override
+  public void enterStatementBlock(QDLParserParser.StatementBlockContext ctx) {
+      System.out.println("enter enterStatementBlock");
+      printKids(ctx);
+  }
+
+  @Override
+  public void exitStatementBlock(QDLParserParser.StatementBlockContext ctx) {
+      System.out.println("exit enterStatementBlock");
+      printKids(ctx);
+
+  }
+
+  @Override
+  public void enterDocStatementBlock(QDLParserParser.DocStatementBlockContext ctx) {
+      System.out.println("enter enterDocStatementBlock");
+      printKids(ctx);
+  }
+
+  @Override
+  public void exitDocStatementBlock(QDLParserParser.DocStatementBlockContext ctx) {
+      System.out.println("exit enterDocStatementBlock");
+      printKids(ctx);
+
+  }*/
+
+    @Override
+    public void enterIInterval(QDLParserParser.IIntervalContext ctx) {
+        System.out.println("enter enterIInterval");
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitIInterval(QDLParserParser.IIntervalContext ctx) {
+        System.out.println("exit exitIInterval");
+
+        printKids(ctx);
+
+
+    }
+
+    @Override
+    public void enterRInterval(QDLParserParser.RIntervalContext ctx) {
+        System.out.println("enter enterRInterval");
+        printKids(ctx);
+    }
+
+    @Override
+    public void exitRInterval(QDLParserParser.RIntervalContext ctx) {
+        System.out.println("exit exitRInterval");
+        printKids(ctx);
+    }
+
+    @Override
+    public void enterStemList(QDLParserParser.StemListContext ctx) {
+        System.out.println("enter enterStemList");
+         printKids(ctx);
+    }
+
+    @Override
+    public void exitStemList(QDLParserParser.StemListContext ctx) {
+        System.out.println("exit exitStemList");
+          printKids(ctx);
+    }
 }

@@ -13,6 +13,26 @@ grammar QDLVariableParser;
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.
 
+
+// Keywords
+         ASSERT : 'assert' | '⊨'; // unicode 22a8
+     BOOL_FALSE : 'false'  | '⊥'; // unicode 22a5
+      BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
+           BODY : 'body';
+          CATCH : 'catch';
+         DEFINE : 'define';
+             DO : 'do';
+           ELSE : 'else';
+             IF : 'if';
+         MODULE : 'module';
+           Null : 'null'   | '∅';  // unicode 2205
+          SWITCH: 'switch';
+           THEN : 'then';
+            TRY : 'try';
+          WHILE : 'while';
+ LDoubleBracket : '[`' |'⟦'; // unicode 27e6
+ RDoubleBracket : '`]' |'⟧'; // unicode 27e7
+
 // Lexer stuff
 // NOTE: ORDER MATTERS!! You can easily break the parser if you change the order of these
 // so if you add a rule, you must re-run the tests and look for regression and be prepared
@@ -37,9 +57,6 @@ grammar QDLVariableParser;
        ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
-    BOOL_TRUE : 'true';
-   BOOL_FALSE : 'false';
-         Null : 'null' | '∅';  // unicode 2205
         STRING : '\'' StringCharacters? '\'';
 
       Decimal : (Integer '.' Integer) | ('.' Integer);
@@ -96,24 +113,31 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
          Backslash : '\\';
              Stile : '|';
         TildeRight : '~|';
-       LeftBracket : ']';
-      RightBracket : '[';
+       LeftBracket : '[';
+      RightBracket : ']';
+             Comma : ',';
+             Colon : ':';
+
+
+ //    EmptyBlock : LeftBracket RightBracket;
+
+
 
  //            Dot : '.';
 
 // Control structures.
-         LogicalIf : 'if[';
-       LogicalThen : ']then[';
-       LogicalElse : ']else[';
-         WhileLoop : 'while[';
-           WhileDo : ']do[';
-   SwitchStatement : 'switch[';
-   DefineStatement : 'define[';
-     BodyStatement : ']body[';
-   ModuleStatement : 'module[';
-     TryStatement  : 'try[';
-   CatchStatement  : ']catch[';
-StatementConnector : '][';
+//         LogicalIf : 'if[';
+//       LogicalThen : ']then[';
+//       LogicalElse : ']else[';
+//         WhileLoop : 'while[';
+//           WhileDo : ']do[';
+//   SwitchStatement : 'switch[';
+//   DefineStatement : 'define[';
+//     BodyStatement : ']body[';
+//   ModuleStatement : 'module[';
+//     TryStatement  : 'try[';
+//   CatchStatement  : ']catch[';
+//StatementConnector : '][';
 
 /*
   Next bit is for string support. Allow unicode, line feed etc. Disallow control characters.

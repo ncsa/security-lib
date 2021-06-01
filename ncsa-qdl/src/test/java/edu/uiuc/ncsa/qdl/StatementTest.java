@@ -108,7 +108,7 @@ public class StatementTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_TRUE + " a value";
-        } catch (IllegalArgumentException iax) {
+        } catch (IllegalStateException | IllegalArgumentException iax) {
             assert true;
         }
 
@@ -119,7 +119,7 @@ public class StatementTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
-        } catch (IllegalArgumentException iax) {
+        } catch (IllegalStateException |  IllegalArgumentException iax) {
             assert true;
         }
 

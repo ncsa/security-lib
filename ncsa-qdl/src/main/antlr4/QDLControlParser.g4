@@ -4,7 +4,7 @@
 */
 grammar QDLControlParser;
 
-import QDLVariableParser,QDLExprParser;
+import QDLVariableParser2,QDLExprParser;
 
 element : (statement ';' ) | (moduleStatement ';') ;
 
@@ -13,41 +13,57 @@ statement :
           | conditionalStatement
           | loopStatement
           | switchStatement
+          | expression
           | assignment
           | tryCatchStatement
-          | stemVariable
-          | stemList
-          | expression
           | lambdaStatement
           ;
 
+ assignment : (expression  op=ASSIGN)+  expression;
+
+ conditionalStatement : ifStatement | ifElseStatement;
+ 
+ifStatement  :
+//		LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* RightBracket;
+     IF conditionalBlock THEN? statementBlock;
+//     IF '[' expression ']' THEN? (EmptyBlock | '[' (statement ';')+ ']');
+
+ifElseStatement :
+	//	LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* LogicalElse (statement ';')* RightBracket;
+	  IF conditionalBlock THEN? statementBlock ELSE statementBlock;
+    //  IF '[' expression ']' THEN? (EmptyBlock | '[' (statement ';')+ ']') ELSE '[' (statement ';')* ']';
 
 
-ifStatement
-	:	LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* LeftBracket;
-
-
-ifElseStatement
-	:	LogicalIf expression (LogicalThen | StatementConnector) (statement ';')* LogicalElse (statement ';')* LeftBracket;
-
-conditionalStatement : ( ifElseStatement | ifStatement);
 
 loopStatement:
-     WhileLoop expression (WhileDo | StatementConnector) (statement ';')* LeftBracket;
+     //WhileLoop expression (WhileDo | StatementConnector) (statement ';')* RightBracket;
+     WHILE conditionalBlock DO? statementBlock ;
 
 switchStatement:
-    SwitchStatement (ifStatement ';')* LeftBracket;
+    SWITCH '['  (ifStatement ';')* ']';
 
 defineStatement:
-     DefineStatement function (BodyStatement | StatementConnector) fdoc* (statement ';')+ LeftBracket;
+     //DefineStatement function (BodyStatement | StatementConnector) fdoc* (statement ';')+ RightBracket;
+     DEFINE '[' function ']' BODY? docStatementBlock;
 
 lambdaStatement:
-    function LambdaConnector  (statement) | (RightBracket  (statement ';')+ LeftBracket)  ;
+    //function LambdaConnector  (statement) | (LeftBracket  (statement ';')+ RightBracket)  ;
+    function LambdaConnector  (statement) | statementBlock  ;
 
 moduleStatement:
-     ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) fdoc* (statement ';')* LeftBracket;
+     //ModuleStatement STRING (',' STRING)? (BodyStatement | StatementConnector) fdoc* (statement ';')* RightBracket;
+     MODULE LeftBracket STRING (',' STRING)? RightBracket BODY? docStatementBlock;
 
 tryCatchStatement:
-     TryStatement (statement ';')* CatchStatement (statement ';')* LeftBracket;
+     //TryStatement (statement ';')* CatchStatement (statement ';')* RightBracket;
+     TRY statementBlock CATCH statementBlock;
+
+
+    statementBlock : LeftBracket (statement ';')* RightBracket;
+ docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
+   expressionBlock : LeftBracket expression (',' expression)+ RightBracket;
+  conditionalBlock : LeftBracket expression RightBracket;
+  //moduleBlock : LeftBracket STRING (',' STRING)? RightBracket;
+   fdoc : FDOC;
 
 

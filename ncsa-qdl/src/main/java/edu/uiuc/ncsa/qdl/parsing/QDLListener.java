@@ -80,7 +80,10 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitVariable(QDLParserParser.VariableContext ctx) {
         StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
-        if (ctx.getText().equals(QDLConstants.RESERVED_TRUE) || ctx.getText().equals(QDLConstants.RESERVED_FALSE)) {
+        if (ctx.getText().equals(QDLConstants.RESERVED_TRUE) ||
+                ctx.getText().equals(QDLConstants.RESERVED_TRUE2) ||
+                ctx.getText().equals(QDLConstants.RESERVED_FALSE) ||
+                ctx.getText().equals(QDLConstants.RESERVED_FALSE2)) {
             // SPECIAL CASE. The parse recognizes true and false, but does not know what to do with them.
             // We are here because it lumps them together with the variable values.
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals(QDLConstants.RESERVED_TRUE)), Constant.BOOLEAN_TYPE);
@@ -152,6 +155,10 @@ public class QDLListener implements QDLParserListener {
         for (int i = 0; i < exprIndex; i++) {
             boolean isVariableCase = true;
             String currentVar = null;
+            if (assignmentContext.children.get(i) instanceof QDLParserParser.KeywordsContext) {
+                throw new IllegalArgumentException("error: cannot assign constant a value");
+
+            }
             if (assignmentContext.children.get(i) instanceof QDLParserParser.VariablesContext) {
                 currentVar = assignmentContext.children.get(i).getText();
                 currentA.setVariableReference(currentVar);
@@ -206,7 +213,7 @@ public class QDLListener implements QDLParserListener {
             // Special cases. := means assignment, if not then, then it is one
             // of +=, *=,..., so create the appropriate dyad
             if (op.equals(":=") || op.equals("≔") | op.equals("=:") | op.equals("≕")) {   // Allows unicode 2254, 2255 as assignment too.
-                if(op.equals("=:") | op.equals("≕")){
+                if (op.equals("=:") | op.equals("≕")) {
                     // This is the only place for sure we know what the operator is.
                     currentA.setFlippedAssignment(true);
                 }
@@ -267,15 +274,15 @@ public class QDLListener implements QDLParserListener {
         return OpEvaluator.UNKNOWN_VALUE;
     }
 
-    @Override
-    public void enterArgList(QDLParserParser.ArgListContext ctx) {
+/*    @Override
+    public void enterArgList(QDLParserParser*//**//*.ArgListContext ctx) {
 
     }
 
     @Override
     public void exitArgList(QDLParserParser.ArgListContext ctx) {
 
-    }
+    }*/
 
     @Override
     public void enterFunction(QDLParserParser.FunctionContext ctx) {
@@ -391,7 +398,7 @@ public class QDLListener implements QDLParserListener {
         Monad monad = (Monad) parsingMap.getStatementFromContext(ctx);
         finish(monad, ctx);
     }
-
+/*
     @Override
     public void enterLeftBracket(QDLParserParser.LeftBracketContext ctx) {
 
@@ -400,7 +407,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitLeftBracket(QDLParserParser.LeftBracketContext ctx) {
 
-    }
+    }*/
 
 
     @Override
@@ -589,6 +596,7 @@ public class QDLListener implements QDLParserListener {
         finish(monad, ctx);
     }
 
+
     @Override
     public void enterSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
 
@@ -596,6 +604,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
+
 
     }
 
@@ -632,6 +641,34 @@ public class QDLListener implements QDLParserListener {
     }
 
     protected ConditionalStatement doConditional(ParseTree ctx) {
+        ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
+        //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
+        //conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1))); // first child is always conditional
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        conditionalStatement.setSourceCode(source);
+        boolean addToIf = true;
+
+        ParseExpressionBlock parseExpressionBlock = (ParseExpressionBlock) parsingMap.getStatementFromContext(ctx.getChild(1));
+        conditionalStatement.setConditional(parseExpressionBlock.getExpressionNodes().get(0));
+        for (int i = 2; i < ctx.getChildCount(); i++) {
+            ParseTree p = ctx.getChild(i);
+            if (p instanceof TerminalNodeImpl) {
+                continue; // skip tokens like [, then, else
+            }
+            ParseStatementBlock parseStatementBlock = (ParseStatementBlock) parsingMap.getStatementFromContext(p);
+
+            if (addToIf) {
+                conditionalStatement.setIfArguments(parseStatementBlock.getStatements());
+                addToIf = false;
+            } else {
+                conditionalStatement.setElseArguments(parseStatementBlock.getStatements());
+            }
+        }
+        return conditionalStatement;
+    }
+
+    protected ConditionalStatement doConditionalOLD(ParseTree ctx) {
         ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
         //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
         conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
@@ -706,9 +743,11 @@ public class QDLListener implements QDLParserListener {
         //a:=3; while[ a < 6 ]do[ q:= 6; say(q+a); ++a;]; // prints 9 10 11
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q+a); a--;]; // prints 14 13
         //a:=8; while[ a > 6 ]do[ q:= 6; say(q + --a); ]; // prints 13 12
+        QDLParserParser.ConditionalBlockContext conditionalBlockContext = ctx.conditionalBlock();
+        QDLParserParser.StatementBlockContext statementBlockContext = ctx.statementBlock();
         WhileLoop whileLoop = (WhileLoop) parsingMap.getStatementFromContext(ctx);
-        whileLoop.setConditional((ExpressionNode) resolveChild(ctx.expression()));
-        for (QDLParserParser.StatementContext stmt : ctx.statement()) {
+        whileLoop.setConditional((ExpressionNode) resolveChild(conditionalBlockContext.expression()));
+        for (QDLParserParser.StatementContext stmt : statementBlockContext.statement()) {
             whileLoop.getStatements().add(resolveChild(stmt));
         }
         whileLoop.setSourceCode(getSource(ctx));
@@ -788,7 +827,8 @@ public class QDLListener implements QDLParserListener {
                 functionRecord.argNames.add(st.nextToken());
             }
         }
-        for (QDLParserParser.FdocContext fd : defineContext.fdoc()) {
+        QDLParserParser.DocStatementBlockContext docStatementBlockContext = defineContext.docStatementBlock();
+        for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
             String doc = fd.getText();
             // strip off function comment marker
             if (doc.startsWith(">>")) {
@@ -796,7 +836,7 @@ public class QDLListener implements QDLParserListener {
             }
             functionRecord.documentation.add(doc);
         }
-        for (QDLParserParser.StatementContext sc : defineContext.statement()) {
+        for (QDLParserParser.StatementContext sc : docStatementBlockContext.statement()) {
             functionRecord.statements.add(resolveChild(sc));
         }
     }
@@ -879,9 +919,17 @@ public class QDLListener implements QDLParserListener {
 //           }
 //           functionRecord.documentation.add(doc);
 //       }
-        ParseTree p = lambdaContext.statement().get(0).getChild(0);
+        boolean hasSingleArg = true;
+        ParseTree p;
+        if (lambdaContext.getChild(2).getChild(0) instanceof QDLParserParser.LambdaStatementContext) {
+            p = lambdaContext.getChild(2).getChild(0).getChild(0);
+            hasSingleArg = false;
+        } else {
+            p = lambdaContext.getChild(2).getChild(0);
+        }
         String x = p.getChild(0).getText();
-        if ((!(p instanceof QDLParserParser.StemListContext)) && x.equals("[")) {
+
+        if (!hasSingleArg) {
             // its a set of statements
             for (int i = 0; i < p.getChildCount(); i++) {
                 ParseTree parserTree = p.getChild(i);
@@ -897,8 +945,13 @@ public class QDLListener implements QDLParserListener {
         } else {
             // its a single expression most likely. Check to see if it needs wrapped in
             // a return
-            QDLParserParser.StatementContext sc = lambdaContext.statement().get(0);
-            Statement stmt = resolveChild(sc);
+/*
+            if(lambdaContext.statementBlock()!=null){
+
+                p = lambdaContext.statementBlock().statement().get(0);
+            }
+*/
+            Statement stmt = resolveChild(p);
             // Contract: Wrap simple expressions in a return.
             if (stmt instanceof StatementWithResultInterface) {
                 if (stmt instanceof ExpressionImpl) {
@@ -1031,7 +1084,8 @@ public class QDLListener implements QDLParserListener {
         currentModule.setAlias(alias);
         moduleStatement.setSourceCode(getSource(moduleContext));
         state.getModuleMap().put(namespace, currentModule);
-        for (QDLParserParser.StatementContext stmt : moduleContext.statement()) {
+        QDLParserParser.DocStatementBlockContext docStatementBlockContext = moduleContext.docStatementBlock();
+        for (QDLParserParser.StatementContext stmt : docStatementBlockContext.statement()) {
             // Issue is that resolving children as we do gets the function definitions.
             // that are in any define contexts. So if this is a define context,
             // skip it. They are handled elsewhere and the definitions are never evaluated
@@ -1053,7 +1107,7 @@ public class QDLListener implements QDLParserListener {
             //}
         }
         //       For fdoc support.  Probably not, but maybe
-        for (QDLParserParser.FdocContext fd : moduleContext.fdoc()) {
+        for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
             String doc = fd.getText();
             // strip off function comment marker
             if (doc.startsWith(">>")) {
@@ -1177,7 +1231,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterStemLi(QDLParserParser.StemLiContext ctx) {
-
+        System.out.println("entering stemli");
     }
 
     @Override
@@ -1359,8 +1413,8 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitRegexMatches(QDLParserParser.RegexMatchesContext ctx) {
         Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
-         dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
-         finish(dyad, ctx);
+        dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
+        finish(dyad, ctx);
     }
 
     @Override
@@ -1381,15 +1435,257 @@ public class QDLListener implements QDLParserListener {
         altIfExpressionNode.setSourceCode(source);
     }
 
-    /*    @Override
-    public void enterAllOps(QDLParserParser.AllOpsContext ctx) {
-           System.out.println("enter allops");
+    /*
+    @Override
+
+    public void enterLambdaDef(QDLParserParser.LambdaDefContext ctx) {
+     //   FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+     //   fds.setLambda(true);
+
+     //   stash(ctx, fds);
+    }
+    */
+
+    /*
+    5/29/2021
+    Almost works, but FunctionDefinitionStatement has to become a StatementWithResultInterface
+    and return a function reference -- which means a new type in Constant, e.g. and dealing
+    with it throughout the code.
+    Straightforward but tedious and probably quite time consuming
+
+    @Override
+    public void exitLambdaDef(QDLParserParser.LambdaDefContext ctx) {
+        System.out.println(ctx.function());
+        System.out.println(ctx.expression());
+        FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setLambda(true);
+
+        stash(ctx, fds);
+        QDLParserParser.FunctionContext nameAndArgsNode = ctx.function();
+
+        if (nameAndArgsNode == null) {
+            return; // do nothing.
+        }
+        FunctionRecord functionRecord = new FunctionRecord();
+        // not quite the original source... The issue is that this comes parsed and stripped of any original
+        // end of line markers, so we cannot tell what was there. Since it may include documentation lines
+        // we have to add back in EOLs at the end of every statement so the comments don't get lost.
+        // Best we can do with ANTLR...
+
+         fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(ctx);
+        fds.setFunctionRecord(functionRecord);
+
+        List<String> stringList = new ArrayList<>();
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            stringList.add(ctx.getChild(i).getText());
+        }
+        // ANTLR may strip final terminator. Put it back as needed.
+        if (!stringList.get(stringList.size() - 1).endsWith(";")) {
+            stringList.set(stringList.size() - 1, stringList.get(stringList.size() - 1) + ";");
+        }
+        functionRecord.sourceCode = stringList;
+
+        String name = nameAndArgsNode.getChild(0).getText();
+        if (name.endsWith("(")) {
+            name = name.substring(0, name.length() - 1);
+        }
+        functionRecord.name = name;
+        //for (QDLParserParser.ArgListContext argListContext : nameAndArgsNode.argList()) {
+        for (QDLParserParser.F_argsContext argListContext : nameAndArgsNode.f_args()) {
+            // this is a comma delimited list of arguments.
+            String allArgs = argListContext.getText();
+
+            StringTokenizer st = new StringTokenizer(allArgs, ",");
+            while (st.hasMoreElements()) {
+                functionRecord.argNames.add(st.nextToken());
+            }
+        }
+
+        ParseTree p = ctx.expression();
+        String x = p.getChild(0).getText();
+        QDLParserParser.ExpressionContext sc = ctx.expression();
+        Statement stmt = resolveChild(sc);
+        // Contract: Wrap simple expressions in a return.
+            if (stmt instanceof ExpressionImpl) {
+                ExpressionImpl expr = (ExpressionImpl) stmt;
+                if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
+                    Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
+                    expr1.setName(ControlEvaluator.RETURN);
+                    expr1.addArgument(expr);
+                    functionRecord.statements.add(expr1); // wrapped in a return
+                } else {
+                    functionRecord.statements.add(expr); // already has a return
+                }
+            } else {
+                Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
+                expr1.setName(ControlEvaluator.RETURN);
+                expr1.addArgument((StatementWithResultInterface) stmt);
+                functionRecord.statements.add(expr1); // wrapped in a return
+            }
+
+
+    }
+      */
+
+    @Override
+    public void enterExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
+        stash(ctx, new ParseExpressionBlock());
 
     }
 
     @Override
-    public void exitAllOps(QDLParserParser.AllOpsContext ctx) {
-        System.out.println("exit allops");
+    public void exitExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
+        System.out.println("exiting expression bl");
+        ParseExpressionBlock parseExpressionBlock = (ParseExpressionBlock) parsingMap.getStatementFromContext(ctx);
+        // Now we fill it up with expressions
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            ParseTree expr = ctx.getChild(i);
+            parseExpressionBlock.getExpressionNodes().add((ExpressionNode) parsingMap.getStatementFromContext(expr));
+        }
+    }
 
-    }*/
+    @Override
+    public void enterConditionalBlock(QDLParserParser.ConditionalBlockContext ctx) {
+        stash(ctx, new ParseExpressionBlock());
+
+    }
+
+    @Override
+    public void exitConditionalBlock(QDLParserParser.ConditionalBlockContext ctx) {
+        ParseExpressionBlock parseExpressionBlock = (ParseExpressionBlock) parsingMap.getStatementFromContext(ctx);
+        ParseTree expr = ctx.getChild(1); // only one
+        parseExpressionBlock.getExpressionNodes().add((ExpressionNode) resolveChild(expr));
+
+    }
+
+
+    @Override
+    public void enterRealInterval(QDLParserParser.RealIntervalContext ctx) {
+
+    }
+
+    @Override
+    public void exitRealInterval(QDLParserParser.RealIntervalContext ctx) {
+
+    }
+
+    @Override
+    public void enterIntInterval(QDLParserParser.IntIntervalContext ctx) {
+
+    }
+
+    @Override
+    public void exitIntInterval(QDLParserParser.IntIntervalContext ctx) {
+
+    }
+
+    @Override
+    public void enterStatementBlock(QDLParserParser.StatementBlockContext ctx) {
+        stash(ctx, new ParseStatementBlock());
+    }
+
+    @Override
+    public void exitStatementBlock(QDLParserParser.StatementBlockContext ctx) {
+        ParseStatementBlock parseStatementBlock = (ParseStatementBlock) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                // typically these are just parse tokens like [, ;, ], comma
+                continue;
+            }
+            // Typically this is populated with statment contexts that hold exactly what we want.
+            ParseTree expr = ctx.getChild(i).getChild(0);
+            parseStatementBlock.getStatements().add(resolveChild(expr));
+
+        }
+    }
+
+    @Override
+    public void enterDocStatementBlock(QDLParserParser.DocStatementBlockContext ctx) {
+
+    }
+
+    @Override
+    public void exitDocStatementBlock(QDLParserParser.DocStatementBlockContext ctx) {
+
+    }
+
+    @Override
+    public void enterIInterval(QDLParserParser.IIntervalContext ctx) {
+        stash(ctx, new SliceNode());
+    }
+
+    @Override
+    public void exitIInterval(QDLParserParser.IIntervalContext ctx) {
+        SliceNode sliceNode = (SliceNode) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            sliceNode.getArguments().add((StatementWithResultInterface) resolveChild(ctx.getChild(i)));
+        }
+    }
+
+    @Override
+    public void enterRInterval(QDLParserParser.RIntervalContext ctx) {
+        stash(ctx, new RealIntervalNode());
+    }
+
+    @Override
+    public void exitRInterval(QDLParserParser.RIntervalContext ctx) {
+        RealIntervalNode realIntervalNode = (RealIntervalNode) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            realIntervalNode.getArguments().add((StatementWithResultInterface) resolveChild(ctx.getChild(i)));
+        }
+    }
+
+    @Override
+    public void enterKeywords(QDLParserParser.KeywordsContext ctx) {
+        System.out.println("entering keywordS:" + ctx.getText());
+    }
+
+    @Override
+    public void exitKeywords(QDLParserParser.KeywordsContext ctx) {
+
+    }
+
+    @Override
+    public void enterKeyword(QDLParserParser.KeywordContext ctx) {
+        ConstantNode constantNode = new ConstantNode(null, Constant.STRING_TYPE);
+        stash(ctx, constantNode);
+
+    }
+
+    @Override
+    public void exitKeyword(QDLParserParser.KeywordContext ctx) {
+        StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
+        ConstantNode constantNode = (ConstantNode) p.statement;
+        switch (ctx.getText()) {
+            case QDLConstants.RESERVED_FALSE:
+            case QDLConstants.RESERVED_FALSE2:
+                constantNode.setResult(Boolean.FALSE);
+                constantNode.setResultType(Constant.BOOLEAN_TYPE);
+                break;
+            case QDLConstants.RESERVED_TRUE:
+            case QDLConstants.RESERVED_TRUE2:
+                constantNode.setResult(Boolean.TRUE);
+                constantNode.setResultType(Constant.BOOLEAN_TYPE);
+                break;
+            case QDLConstants.RESERVED_NULL:
+            case QDLConstants.RESERVED_NULL2:
+                constantNode.setResult(QDLNull.getInstance());
+                constantNode.setResultType(Constant.NULL_TYPE);
+                break;
+            default:
+                throw new IllegalArgumentException("error: unknown reserved keyword constant");
+        }
+
+    }
 }
+
+

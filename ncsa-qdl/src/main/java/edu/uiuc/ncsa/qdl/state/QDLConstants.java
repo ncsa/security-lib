@@ -26,7 +26,9 @@ public interface QDLConstants {
     // Only three reserved words in QDL. Used in the parser.
 
     String RESERVED_TRUE = "true";
+    String RESERVED_TRUE2 = "⊤";
     String RESERVED_FALSE = "false";
+    String RESERVED_FALSE2 = "⊥";
     String RESERVED_NULL = "null";
     String RESERVED_NULL2 = "∅";
 

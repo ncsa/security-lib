@@ -1270,7 +1270,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testTailResolution2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, " b. := [[-n(4)^2,2+n(5)],[10 - 3*n(6),4+5*n(7)]];");
+        addLine(script, " b. := [[ -n(4)^2,2+n(5)],[10 - 3*n(6),4+5*n(7)]];");
         addLine(script, " x := (b.).(0).i(1).(3);");
         addLine(script, " y := b.0.1.3 == (b.).(0).i(1).(3);");
 

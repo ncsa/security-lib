@@ -1000,9 +1000,23 @@ See also: continue, break
 replace(source, old, new) - replaces all occurences of old with new in the
                             source. These may be various combinations of stems
                             and strings.
+
+replace(source, regex, new, is_regex) - when is_regex == true,
+                            replaces all matching occurences with
+                            the regex with new in the source. These may be
+                            various combinations of stems and strings.
+If is_regex is false, then no regular expressions are used and matching is
+as simple strings.
+
 E.g
    replace('abcde', 'cd', '23');
 ab23e
+
+E.g. with a regex - replace all blanks with a single period.
+  replace('a b c  d e fgh', '\\s+', '.', true)
+a.b.c.d.e.fgh
+
+See also: =~, tokenize
                 ]]>
         </body>
     </entry>
@@ -1054,12 +1068,13 @@ See also: to_upper
     <entry id="tokenize">
         <body>
             <![CDATA[
-      tokenize(arg, delimiter) - tokenize a string or stem of strings using the
-                           given delimeter.
+tokenize(arg, delimiter) - tokenize a string or stem of strings using
+                           the given delimeter.
        arg - the string to tokenize
        delimiter - either the delimiter or if the last argument is true,
-tokenize(target, arg[, use_regex]) - tokenize a string or stem of strings using the
-                           given regex
+
+tokenize(target, arg[, use_regex]) - tokenize a string or stem of strings
+                           using the given regex
     target - the string to tokenize
        arg - either the delimiter (use_regex == false) or a regular expression
              (use_regex == true)
@@ -1343,12 +1358,12 @@ ws_file - the current file to save to/load from by default. If you save or load 
     <entry id="reduce">
             <body>
                 <![CDATA[
-reduce(*f(), list.) - Takes a dyadic function f and applied it between
+reduce(@f(), list.) - Takes a dyadic function f and applied it between
              successive members of the list. The final result is a scalar.
 E.g.
 Are all elements of a boolean list true?
    a. := -1 < n(5); // list of boolean true values
-   reduce(*&&, a.)
+   reduce(@&&, a.)
 true
 This applies && between each element.
 See also: expand()
@@ -1358,14 +1373,14 @@ See also: expand()
     <entry id="expand">
             <body>
                 <![CDATA[
-expand(*f(), list.) = apply the dyadic function f() pairwise and return the
+expand(@f, list.) = apply the dyadic function f() pairwise and return the
               intermediate results.
 E.g. To compute the factorial of a number and see the parts:
-   expand(**, 1+n(5))
+   expand(@*, 1+n(5))
 [1, 2, 6, 24, 120]
 
 In this case [1, 2, 3, 4, 5] becomes [1, 1*2, 1*2*3, 1*2*3*4, 1*2*3*4*5]
-Note that reduce effectively returns just the final number. Using expand
+Note that reduce() effectively returns just the final number. Using expand
 lets you use the intermediate results too.
 See also: reduce()
                 ]]>
@@ -1652,6 +1667,23 @@ Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/m
        and issue
        my_json. := from_json(file_read('/my/path/my_json.json'));
 
+                ]]>
+            </body>
+        </entry>
+    <entry id="=~">
+            <body>
+                <![CDATA[
+regex =~ expression
+Apply the given regex (which is a string) to match the string representation
+of the expression.
+Result is always a boolean.
+
+E.g.
+   '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
+true
+
+Note: ≈ (unicode 2248) is also used for this.
+See also: tokenize, replace.
                 ]]>
             </body>
         </entry>

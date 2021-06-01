@@ -115,6 +115,76 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * Same as above with spaces and such added to the define statement
+     * @throws Throwable
+     */
+    @Test
+       public void testRational2Spaces() throws Throwable {
+           BigDecimal[] results = {
+                   new BigDecimal("1.38912043468865"),
+                   new BigDecimal("1.55731202901014"),
+                   new BigDecimal("-7.10526315789474"),
+                   new BigDecimal("3.48158672751801")
+           };
+           State state = testUtils.getNewState();
+           StringBuffer script = new StringBuffer();
+           addLine(script, "define  \n[");
+           addLine(script, "f(x,y,z)");
+           addLine(script, "]  body   [");
+           addLine(script, "v := (x*y^2*z^3 - x/y^2 + z^4)/(1-(x*y*(1-z))^2);");
+           addLine(script, "return(v);");
+           addLine(script, "];");
+           QDLInterpreter interpreter = new QDLInterpreter(null, state);
+           interpreter.execute(script.toString());
+
+           for (int i = 1; i < 1 + results.length; i++) {
+               script = new StringBuffer();
+               addLine(script, "a:=-5/" + i + ";");
+               addLine(script, "b := 3/" + i + ";");
+               addLine(script, "c := 5/" + i + ";");
+               addLine(script, "d := f(a,b,c);");
+               interpreter.execute(script.toString());
+               BigDecimal bd = results[i - 1];
+               BigDecimal d = (BigDecimal) state.getValue("d");
+               assert areEqual(d, bd);
+           }
+       }
+
+      /**
+        *  Same as previous, no <b>body</b> keyword.
+       */
+    @Test
+       public void testRational2Spaces2() throws Throwable {
+           BigDecimal[] results = {
+                   new BigDecimal("1.38912043468865"),
+                   new BigDecimal("1.55731202901014"),
+                   new BigDecimal("-7.10526315789474"),
+                   new BigDecimal("3.48158672751801")
+           };
+           State state = testUtils.getNewState();
+           StringBuffer script = new StringBuffer();
+           addLine(script, "define  \n[");
+           addLine(script, "f(x,y,z)");
+           addLine(script, "]  \n\n   [");
+           addLine(script, "v := (x*y^2*z^3 - x/y^2 + z^4)/(1-(x*y*(1-z))^2);");
+           addLine(script, "return(v);");
+           addLine(script, "];");
+           QDLInterpreter interpreter = new QDLInterpreter(null, state);
+           interpreter.execute(script.toString());
+
+           for (int i = 1; i < 1 + results.length; i++) {
+               script = new StringBuffer();
+               addLine(script, "a:=-5/" + i + ";");
+               addLine(script, "b := 3/" + i + ";");
+               addLine(script, "c := 5/" + i + ";");
+               addLine(script, "d := f(a,b,c);");
+               interpreter.execute(script.toString());
+               BigDecimal bd = results[i - 1];
+               BigDecimal d = (BigDecimal) state.getValue("d");
+               assert areEqual(d, bd);
+           }
+       }
+    /**
      * Here is what we are testing to see if it parses right:
      * f(x,y) = 1/(2*x+3*y/(4*x+5*y/(6*x+7*y/(8*x+9*y/(x^2+y^2+1)))))
      * <pre>
@@ -408,6 +478,34 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "while[");
         addLine(script, "    for_next(j,10)");
         addLine(script, "]do[");
+        addLine(script, "   if[");
+        addLine(script, "      mod(j,2) == 0");
+        addLine(script, "   ]then[");
+        addLine(script, "     a.j := random_string();");
+        addLine(script, "   ]else[");
+        addLine(script, "     a.j. := random(3);");
+        addLine(script, "   ]; // end if");
+        addLine(script, "]; // end while");
+        addLine(script, "");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        assert stemVariable.size() == 10; // Fingers and toes test.
+        assert stemVariable.containsKey("1"); // odds are stems
+        assert stemVariable.containsKey("0"); // evens are scalars
+    }
+
+    @Test
+    public void testListScopeSpaces() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := null;");
+        addLine(script, "while");
+        addLine(script, "     [");
+        addLine(script, "    for_next(j,10)");
+        addLine(script, "]\n");
+        addLine(script, "[");
         addLine(script, "   if[");
         addLine(script, "      mod(j,2) == 0");
         addLine(script, "   ]then[");
@@ -1372,6 +1470,43 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
+     * Same as above, testing that spaces in the conditional do not alter it.
+     * No <b>then</b> keyword
+     * @throws Throwable
+     */
+    @Test
+    public void testVariableScopeSpaces1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := null;");
+        addLine(script, "if\n\n[2 < 3\n]\n\n[\n\na :=2;\n\n];");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("a") != null;
+        assert getLongValue("a", state) == 2L;
+    }
+
+    /**
+     * Same as above, testing that spaces in the conditional do not alter it.
+     * With <b>then</b> keyword
+     * @throws Throwable
+     */
+    @Test
+    public void testVariableScopeSpaces2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := null;");
+        addLine(script, "if\n\n[2 < 3\n]\nthen\n[\n\na :=2;\n\n];");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+
+        assert state.getValue("a") != null;
+        assert getLongValue("a", state) == 2L;
+    }
+    /**
      * Tests that to_ and from_ json are inverses for suitably
      * well-behaved JSON. "Well-behaved" = no integers used as keys.
      * Or there is a conflict with deserializing stems since a stem
@@ -1996,7 +2131,7 @@ public class ParserTest extends AbstractQDLTester {
          assert stem.getBoolean(2L);
      }
     /**
-     * Tests tjhreee cases for visibility of functions in standard if then clause
+     * Tests three cases for visibility of functions in standard if then clause
      * Critical simple use case.
      *
      * @throws Throwable
@@ -2038,7 +2173,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a := false;");
         // doesn't exist at all
-        addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
+        addLine(script, "if  [a]\n\n  [q(x)->x^3;]else[q(x)->x^2;];");
         addLine(script, "x := is_function(q,1);");
         addLine(script, "q(x,y)->x*y;");
         addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
@@ -2075,6 +2210,23 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "y := g(1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        StemVariable stem = getStemValue("x.", state);
+        assert getLongValue("y", state).equals(4L);
+    }
+
+    /**
+     * Same as above, with spaces.
+     * @throws Throwable
+     */
+    public void testModuleFunctionVisibilitySpaces() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " module   \n[\n'a:a',\n'a'\n]   \n\n[\n  f(x)->x^2;g(x)->f(x+1);  \n]   \n\n;");
         addLine(script, "module_import('a:a');");
         addLine(script, "y := g(1);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -2196,4 +2348,20 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(getBDValue("y", state), new BigDecimal("24.0000000"));
 
     }
+
+    /**
+     * basic regression test for the slice notation
+     * @throws Throwable
+     */
+    public void testSlices() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := reduce(@∧, [-1;11;2]==[-1,1,3,5,7,9,11]);");
+        addLine(script, "y := reduce(@∧, [| -1;2;6 |]== [-1,-0.4,0.2,0.8,1.4,2]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("x",state);
+        assert getBooleanValue("y",state);
+    }
+
 }
