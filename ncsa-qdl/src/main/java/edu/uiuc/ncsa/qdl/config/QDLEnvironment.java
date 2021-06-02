@@ -48,7 +48,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean useExternalEditor,
                           String externalEditorPath,
                           Editors qdlEditors,
-                          boolean enableLibrarySupport) {
+                          boolean enableLibrarySupport,
+                          boolean assertionsOn) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -76,7 +77,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.useExternalEditor = useExternalEditor;
         this.qdlEditors = qdlEditors;
         this.enableLibrarySupport = enableLibrarySupport;
+        this.assertionsOn = assertionsOn;
     }
+
+    public boolean isAssertionsOn() {
+        return assertionsOn;
+    }
+
+    public void setAssertionsOn(boolean assertionsOn) {
+        this.assertionsOn = assertionsOn;
+    }
+
+    boolean assertionsOn = true;
 
     public Editors getQdlEditors() {
         return qdlEditors;

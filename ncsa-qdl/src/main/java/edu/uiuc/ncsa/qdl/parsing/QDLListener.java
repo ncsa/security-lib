@@ -1090,21 +1090,9 @@ public class QDLListener implements QDLParserListener {
             // that are in any define contexts. So if this is a define context,
             // skip it. They are handled elsewhere and the definitions are never evaluated
             // just stashed.
-/*
-            boolean isSkip = false;
-            for (int i = 0; i < stmt.getChildCount(); i++) {
-                isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.DefineStatementContext);
-                isSkip = isSkip || (stmt.getChild(i) instanceof QDLParserParser.LambdaStatementContext);
-            }
-            if (!isSkip) {
-                Statement kid = resolveChild(stmt);
-                moduleStatement.getStatements().add(kid);
-            }
-*/
+
             Statement kid = resolveChild(stmt);
             moduleStatement.getStatements().add(kid);
-
-            //}
         }
         //       For fdoc support.  Probably not, but maybe
         for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
@@ -1435,7 +1423,8 @@ public class QDLListener implements QDLParserListener {
         altIfExpressionNode.setSourceCode(source);
     }
 
-    /*
+/*
+
     @Override
 
     public void enterLambdaDef(QDLParserParser.LambdaDefContext ctx) {
@@ -1444,7 +1433,8 @@ public class QDLListener implements QDLParserListener {
 
      //   stash(ctx, fds);
     }
-    */
+*/
+
 
     /*
     5/29/2021
@@ -1452,8 +1442,8 @@ public class QDLListener implements QDLParserListener {
     and return a function reference -- which means a new type in Constant, e.g. and dealing
     with it throughout the code.
     Straightforward but tedious and probably quite time consuming
-
-    @Override
+     */
+  /*  @Override
     public void exitLambdaDef(QDLParserParser.LambdaDefContext ctx) {
         System.out.println(ctx.function());
         System.out.println(ctx.expression());
@@ -1525,8 +1515,8 @@ public class QDLListener implements QDLParserListener {
 
 
     }
-      */
-
+      
+*/
     @Override
     public void enterExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
         stash(ctx, new ParseExpressionBlock());
@@ -1685,6 +1675,29 @@ public class QDLListener implements QDLParserListener {
                 throw new IllegalArgumentException("error: unknown reserved keyword constant");
         }
 
+    }
+
+    @Override
+    public void enterAssertStatement(QDLParserParser.AssertStatementContext ctx) {
+           stash(ctx, new AssertStatement());
+    }
+
+    @Override
+    public void exitAssertStatement(QDLParserParser.AssertStatementContext ctx) {
+        AssertStatement assertStatement = (AssertStatement) parsingMap.getStatementFromContext(ctx);
+        boolean isFirst = true;
+        for(int i =0;i< ctx.getChildCount(); i++){
+            if(ctx.getChild(i) instanceof TerminalNodeImpl){
+                continue;
+            }
+            if(isFirst){
+                assertStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(i)));
+                isFirst = false;
+            }else{
+                assertStatement.setMesssge((ExpressionNode) resolveChild(ctx.getChild(i)));
+
+            }
+        }
     }
 }
 

@@ -91,13 +91,13 @@ public class SliceNode extends ExpressionImpl {
         long stop = (Long) args[1];
         long step = (Long) args[2];
         Long result = start;
-        Long i = 1L;
+        Long i = 0L;
 
         StemVariable out = new StemVariable();
-        out.put(0L, start);
+       // out.put(0L, start);
         while (result < stop) {
-            result = result + step;
             out.put(i++, result);
+            result = result + step;
         }
         return out;
     }

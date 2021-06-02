@@ -61,6 +61,7 @@ public class WSXMLSerializer {
         xsw.writeAttribute(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
         xsw.writeAttribute(COMPRESS_XML, Boolean.toString(workspaceCommands.compressXML));
         xsw.writeAttribute(USE_EXTERNAL_EDITOR, Boolean.toString(workspaceCommands.isUseExternalEditor()));
+        xsw.writeAttribute(ASSERTIONS_ON, Boolean.toString(workspaceCommands.isAssertionsOn()));
         if(!isTrivial(workspaceCommands.getExternalEditorName())) {
             xsw.writeAttribute(EXTERNAL_EDITOR_PATH, workspaceCommands.getExternalEditorName());
         }
@@ -392,6 +393,9 @@ public class WSXMLSerializer {
                     if(v!= null) {
                         testCommands.setAutosaveInterval(Long.parseLong(v));
                     }
+                    break;
+                case ASSERTIONS_ON:
+                    testCommands.setAssertionsOn(Boolean.parseBoolean(v));
                     break;
                 case AUTOSAVE_MESSAGES_ON:
                     testCommands.setAutosaveMessagesOn(Boolean.parseBoolean(v));

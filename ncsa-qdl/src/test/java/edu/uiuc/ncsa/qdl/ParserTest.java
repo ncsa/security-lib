@@ -454,7 +454,8 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "   for_keys(j,a.)");
         addLine(script, "]do[");
         addLine(script, "// say(j);");
-        addLine(script, "say('j==' + j + ', type=' + var_type(a.j));");
+        // we don't really need these, just test that it runs
+        addLine(script, "y:= 'j==' + j + ', type=' + var_type(a.j);");
         addLine(script, "]; // end while");
 
         State state = testUtils.getNewState();
@@ -1575,7 +1576,6 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "claims. := from_json(j);");
         addLine(script, "j2 := to_json(from_json(to_json(from_json(to_json(from_json(j))))));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        System.out.println(script.toString());
         interpreter.execute(script.toString());
 
         assert state.getValue("j2") != null;

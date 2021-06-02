@@ -160,6 +160,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
     }
 
+    protected boolean areAssertionsEnabled() {
+          return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
+      }
     protected String getDebugLevel() {
         String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
         if (level == null) {
@@ -328,7 +331,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 useWSExternalEditor(),
                 getExternalEditorPath(),
                 getEditors(),
-                isEnableLibrarySupport());
+                isEnableLibrarySupport(),
+                areAssertionsEnabled());
     }
 
     @Override

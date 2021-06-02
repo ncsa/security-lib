@@ -379,9 +379,6 @@ public class VFSTest extends AbstractQDLTester {
         if (System.getProperty("username") == null || System.getProperty("password") == null) {
             System.out.println("No user name and password supplied, cannot do VFS MySQL tests.");
             return;
-        }else{
-            System.out.println("Starting VFS MySQL tests.");
-
         }
         MySQLConnectionParameters params = new MySQLConnectionParameters(
                 System.getProperty("username"),

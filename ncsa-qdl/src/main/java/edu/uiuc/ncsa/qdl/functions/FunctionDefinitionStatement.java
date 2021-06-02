@@ -33,8 +33,10 @@ public class FunctionDefinitionStatement implements Statement {
     @Override
     public Object evaluate(State state) {
         state.getFTStack().put(functionRecord);
-   /*     FunctionReferenceNode functionReferenceNode = new FunctionReferenceNode();
-        functionReferenceNode.setFunctionName("");*/
+/*
+        FunctionReferenceNode functionReferenceNode = new FunctionReferenceNode();
+        functionReferenceNode.setFunctionName("");
+*/
         return QDLNull.getInstance(); // for now
     }
 

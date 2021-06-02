@@ -138,6 +138,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#assertStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssertStatement(QDLParserParser.AssertStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#assertStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssertStatement(QDLParserParser.AssertStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#statementBlock}.
 	 * @param ctx the parse tree
 	 */

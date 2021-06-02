@@ -24,4 +24,14 @@ public class ScriptRuntimeException extends GeneralException {
     public ScriptRuntimeException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public String getRequestedType() {
+        return requestedType;
+    }
+
+    public void setRequestedType(String requestedType) {
+        this.requestedType = requestedType;
+    }
+
+    String requestedType;
 }

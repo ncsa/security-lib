@@ -158,7 +158,8 @@ public abstract class StateUtils {
                             new FTStack(),
                             new ModuleMap(),
                             new MyLoggingFacade("foo"),
-                            false);
+                            false,
+                            true);
                 }
             };
         }

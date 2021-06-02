@@ -18,7 +18,17 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  5:08 PM
  */
-public class Assignment implements Statement, HasResultInterface {
+public class Assignment implements StatementWithResultInterface {
+    @Override
+    public StatementWithResultInterface makeCopy() {
+        Assignment assignment = new Assignment();
+        assignment.flippedAssignment = flippedAssignment;
+        assignment.argument = argument;
+        assignment.expStatement = expStatement.makeCopy();
+        assignment.variableReference = variableReference;
+        return assignment;
+    }
+
     public boolean isFlippedAssignment() {
         return flippedAssignment;
     }

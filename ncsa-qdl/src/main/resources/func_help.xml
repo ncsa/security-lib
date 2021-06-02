@@ -1688,11 +1688,186 @@ See also: tokenize, replace.
             </body>
         </entry>
 
+    <entry id="⟦">
+            <body>
+                <![CDATA[
+Closed slice notation.
+Equivalent to: [|
+You may use ⟦ (\u27e6) or [| ,  ⟧ (\u27e7) or |].
+⟦ start;stop;count ⟧
+will create the list with count elements evenly distributed between start and stop,
+inclusive.
+                ]]>
+            </body>
+        </entry>
+    <entry id="⟧">
+            <body>
+                <![CDATA[
+Unicode \u27e7. Part of a closed slice.
+Equivalent to: |]
+Please see help for ⟦
+                ]]>
+            </body>
+        </entry>
+    <entry id="→">
+            <body>
+                <![CDATA[
+Unicode \u2192 which is a left arrow used in defining lambdas.
+Equivalent to: ->
+                ]]>
+            </body>
+        </entry>
+    <entry id="¬">
+            <body>
+                <![CDATA[
+Unicode logical not \u00ac.
+Equivalent to: !
+                ]]>
+            </body>
+        </entry>
+    <entry id="×">
+            <body>
+                <![CDATA[
+Unicode multiplication \u00d7
+Equivalent to: *
+                ]]>
+            </body>
+        </entry>
+    <entry id="÷">
+            <body>
+                <![CDATA[
+Unicode division \u00f7
+Equivalent to: /
+                ]]>
+            </body>
+        </entry>
+    <entry id="≔">
+            <body>
+                <![CDATA[
+Unicode assign left \u2254
+Equivalent to: :=
+                ]]>
+            </body>
+        </entry>
+    <entry id="≕">
+            <body>
+                <![CDATA[
+Unicode assign right \u2255
+Equivalent to: =:
+                ]]>
+            </body>
+        </entry>
+    <entry id="∧">
+            <body>
+                <![CDATA[
+Unicode logical and \u2227
+Equivalent to: &&
+                ]]>
+            </body>
+        </entry>
+    <entry id="∨">
+            <body>
+                <![CDATA[
+Unicode logical or \u2228
+Equivalent to: ||
+                ]]>
+            </body>
+        </entry>
+    <entry id="∅">
+            <body>
+                <![CDATA[
+Unicode null \u2205
+Equivalent to: null
+                ]]>
+            </body>
+        </entry>
+    <entry id="≤">
+            <body>
+                <![CDATA[
+Unicode less than or equal to \u2264
+Equivalent to: <= or =<
+                ]]>
+            </body>
+        </entry>
+    <entry id="≥">
+            <body>
+                <![CDATA[
+Unicode greater than or equal to \u2265
+Equivalent to: >= or =>
+                ]]>
+            </body>
+        </entry>
+    <entry id="≡">
+            <body>
+                <![CDATA[
+Unicode logical equality \u2261
+Equivalent to: ==
+                ]]>
+            </body>
+        </entry>
+    <entry id="≠">
+            <body>
+                <![CDATA[
+Unicode not equal to \u2260
+Equivalent to: !=
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="≈">
+            <body>
+                <![CDATA[
+Unicode equivalent to \u2248
+Equivalent to: =~
+Used for regular expression matches
+See also: =~
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="unicode">
+            <body>
+                <![CDATA[
+Unicode characters may be put in strings if they are escaped.
+QDL also supports several directly as operators. Typing them is, however
+dependant on your keyboard layout. Generally every unicode character has
+an ASCII version (usually a digraph).
+
+Here is a table of supported unicode characters in QDL:
+
+Standard    Unicode    escape code       What is it
+!              ¬          \u00ac         logical not
+*              ×          \u00d7         multiplication
+/              ÷          \u00f7         division
+->             →          \u2192         lambda function
+null           ∅          \u2205         null
+&&             ∧          \u2227         logical and
+||             ∨          \u2228         logical or
+:=             ≔          \u2254         left assignment
+=:             ≕          \u2255         right assignment
+=~             ≈          \u2248         regex matches
+!=             ≠          \u2260         not equal to
+==             ≡          \u2261         logical equality
+<=             ≤          \u2264         less than or equals
+=>             ≥          \u2265         greater than or equals
+true           ⊤          \u22a4         logical true
+false          ⊥          \u22a5         logical false
+[|             ⟦          \u27e6         left closed slice bracket
+|]             ⟧          \u27e7         right closed slice bracket
+
+You can request help on any QDL symbol by typing
+    )help symbol
+E.g.
+    )help ∅
+    
+would print the entry for null.
+                ]]>
+            </body>
+        </entry>
 
     <!--
         entry template
     -->
-
     <!--
     <entry id="">
             <body>

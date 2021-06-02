@@ -36,7 +36,8 @@ public class TestUtils {
                 new FTStack(),
                 new ModuleMap(),
                 null,
-                false);
+                false,
+                true);
         return state;
     }
 
@@ -53,7 +54,8 @@ public class TestUtils {
                    new FTStack(),
                    new ModuleMap(),
                    null,
-                   false);
+                   false,
+                   true);
            return state;
        }
 

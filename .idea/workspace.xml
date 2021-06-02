@@ -5,39 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="parser tweak, state management improvement">
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.g4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser2.g4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/RealIntervalNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/SliceNode.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/ParseExpressionBlock.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/ParseStatementBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/exceptions/AssertionException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/statements/AssertStatement.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLControlParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLControlParser.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLExprParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLExprParser.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLControlParser.g4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLExprParser.g4" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLVariableParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLVariableParser.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/show.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/show.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser2.g4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLVariableParser.g4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_configuration.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_server_scripts.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_server_scripts.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLEnvironment.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLEnvironment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/SliceNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/SliceNode.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FunctionDefinitionStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FunctionDefinitionStatement.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.tokens" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.tokens" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ArgListContext.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssignmentContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssignmentContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementsContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FdocContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FdocContext.class" afterDir="false" />
@@ -45,7 +41,6 @@
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LeftBracketContext.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" afterDir="false" />
@@ -68,13 +63,17 @@
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLDebugListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLDebugListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/QDLConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/QDLConstants.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/State.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/StateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/StateUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WSXMLSerializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WSXMLSerializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLConstants.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StatementTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StatementTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/TestUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/TestUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/VFSTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/VFSTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" afterDir="false" />
@@ -110,12 +109,14 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/ScriptRuntimeException.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/jwt/ScriptRuntimeException.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2TokenForge$2.class" afterDir="false" />
@@ -193,6 +194,9 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="1" />
+  </component>
   <component name="ProjectId" id="1iL68yczXC5b1nt09nUevEhal73" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -212,7 +216,7 @@
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="JAVA" />
     <property name="extract.method.default.visibility" value="protected" />
     <property name="jdk.selected.JAVA_MODULE" value="11.0.8" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/test.qdl" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -247,7 +251,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="Application.QDL basic">
+  <component name="RunManager" selected="Application.QDL default">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -713,14 +717,7 @@
       <workItem from="1620040564017" duration="21724000" />
       <workItem from="1620647392843" duration="38118000" />
       <workItem from="1621251767820" duration="4067000" />
-      <workItem from="1621262351560" duration="168094000" />
-    </task>
-    <task id="LOCAL-00046" summary="More tests. Added an exception. renamed a class">
-      <created>1612818615432</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1612818615432</updated>
+      <workItem from="1621262351560" duration="189947000" />
     </task>
     <task id="LOCAL-00047" summary="IDE upgrade caused some oddness in version numbers, so I am committing this now. Also, first cut of RFC 8628 impl.">
       <created>1613086268862</created>
@@ -1058,7 +1055,14 @@
       <option name="project" value="LOCAL" />
       <updated>1622227069185</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Parser refactoring. Issue was that Antlr grammar's rules are very sensitive to ordering. QDL's grammar was split cleanly into several small files (normally good design) BUT when being assembled, there was no guarantee that the ordering would be consistent. This caused occasional strange parsing errors that were not consistent between builds and ^$#@ close to impossible to reproduce or track down. A recent build allowed this to be identified and reproduced, hence solved. Solution was to simply put it all in a single large grammar. Added some regression tests to make sure this is monitored. QDL's parsing must be rock solid at all times.">
+      <created>1622565414135</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1622565414135</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1068,7 +1072,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Part of documentation did not get committed last time. Added a test. Updated nano configurations." />
     <MESSAGE value="QDL: Added unit test -- have 200 now! -- updated documentation. Changed order of operations slightly after finding edge case. Updated to use monads. Better library management" />
     <MESSAGE value="Some utilities.Updated documentation. Found a typo. More stuff is included with a default install." />
     <MESSAGE value="QDL: Documentation. Ended up adding some more test cases. Improved help output for CLI" />
@@ -1093,7 +1096,8 @@
     <MESSAGE value="A few tweaks, added a test, updated lagging documents. Added support for JSON Path queries in QDL." />
     <MESSAGE value="Cleaned up parser and added a few tests." />
     <MESSAGE value="More parser cleanup and housekeeping. Updated documentation. More regression tests." />
-    <option name="LAST_COMMIT_MESSAGE" value="More parser cleanup and housekeeping. Updated documentation. More regression tests." />
+    <MESSAGE value="Parser refactoring. Issue was that Antlr grammar's rules are very sensitive to ordering. QDL's grammar was split cleanly into several small files (normally good design) BUT when being assembled, there was no guarantee that the ordering would be consistent. This caused occasional strange parsing errors that were not consistent between builds and ^$#@ close to impossible to reproduce or track down. A recent build allowed this to be identified and reproduced, hence solved. Solution was to simply put it all in a single large grammar. Added some regression tests to make sure this is monitored. QDL's parsing must be rock solid at all times." />
+    <option name="LAST_COMMIT_MESSAGE" value="Parser refactoring. Issue was that Antlr grammar's rules are very sensitive to ordering. QDL's grammar was split cleanly into several small files (normally good design) BUT when being assembled, there was no guarantee that the ordering would be consistent. This caused occasional strange parsing errors that were not consistent between builds and ^$#@ close to impossible to reproduce or track down. A recent build allowed this to be identified and reproduced, hence solved. Solution was to simply put it all in a single large grammar. Added some regression tests to make sure this is monitored. QDL's parsing must be rock solid at all times." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1160,7 +1164,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3152</line>
+          <line>3161</line>
           <option name="timeStamp" value="218" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1170,7 +1174,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3134</line>
+          <line>3143</line>
           <option name="timeStamp" value="223" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1200,22 +1204,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1356</line>
+          <line>1344</line>
           <option name="timeStamp" value="331" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1351</line>
+          <line>1339</line>
           <option name="timeStamp" value="332" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1344</line>
+          <line>1332</line>
           <option name="timeStamp" value="333" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1337</line>
+          <line>1325</line>
           <option name="timeStamp" value="334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1255,12 +1259,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1369</line>
+          <line>1357</line>
           <option name="timeStamp" value="511" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3410</line>
+          <line>3419</line>
           <option name="timeStamp" value="559" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1325,7 +1329,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1233</line>
+          <line>1221</line>
           <option name="timeStamp" value="704" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1350,22 +1354,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>649</line>
-          <option name="timeStamp" value="731" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1591</line>
-          <option name="timeStamp" value="732" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1557</line>
-          <option name="timeStamp" value="733" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1537</line>
+          <line>1527</line>
           <option name="timeStamp" value="734" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1382,6 +1371,21 @@
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/RealIntervalNode.java</url>
           <line>32</line>
           <option name="timeStamp" value="738" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/statements/AssertStatement.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="739" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/Assignment.java</url>
+          <line>147</line>
+          <option name="timeStamp" value="741" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
+          <line>147</line>
+          <option name="timeStamp" value="742" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

@@ -1,16 +1,15 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
-import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
-import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
 
@@ -68,6 +67,11 @@ public class QDLWorkspace {
             workspaceCommands.say("illegal argument:" + t.getMessage());
             return;
         }
+        if (t instanceof AssertionException) {
+            workspaceCommands.say("assertion failed: " + t.getMessage());
+            return;
+        }
+
         if (t instanceof QDLException) {
             workspaceCommands.say(t.getMessage());
             return;
@@ -97,10 +101,10 @@ public class QDLWorkspace {
         while (!isExit) {
 
             String input = workspaceCommands.readline(INDENT);
-            if(input == null){
+            if (input == null) {
                 // about the only way to get a null here is if the user is piping in
                 // something via std in and it hits the end of the stream.
-                if(workspaceCommands.isDebugOn()){
+                if (workspaceCommands.isDebugOn()) {
                     workspaceCommands.say("exiting");
                 }
                 return;
@@ -108,28 +112,28 @@ public class QDLWorkspace {
             input = input.trim();
             boolean storeLine = true;
             String out = null;
-            if(input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")){
-                 out = doHistory(input);
-                 if(out == null){
-                     // nothing in the buffer
-                     continue;
-                 }
-                 storeLine = false;
+            if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
+                out = doHistory(input);
+                if (out == null) {
+                    // nothing in the buffer
+                    continue;
+                }
+                storeLine = false;
             }
-            if(input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")){
-                 out = doRepeatCommand(input);
+            if (input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")) {
+                out = doRepeatCommand(input);
                 storeLine = out == null;
             }
 
             if (storeLine) {
-                   // Store it if it was not retrieved from the command history.
+                // Store it if it was not retrieved from the command history.
                 workspaceCommands.commandHistory.add(0, input);
-               }else{
+            } else {
                 input = out; // repeat the command
             }
             // Good idea to strip off comments in parser, but the regex here needs to be
             // quite clever to match ' and // within them (e.g. any url fails at the command line).
-        //    input = input.split("//")[0]; // if there is a line comment, strip it.
+            //    input = input.split("//")[0]; // if there is a line comment, strip it.
 
 /*            if (input.equals("%")) {
                 input = lastCommand;
@@ -175,46 +179,48 @@ public class QDLWorkspace {
 
 
     protected String doRepeatCommand(String cmdLine) {
-           if (cmdLine.contains("--help")) {
-               workspaceCommands.say(REPEAT_COMMAND + " = repeat the last command. Identical to " + HISTORY_COMMAND + " 0");
-               return null;
-           }
-           if (0 < workspaceCommands.commandHistory.size()) {
-               return workspaceCommands.commandHistory.get(0);
-           }
+        if (cmdLine.contains("--help")) {
+            workspaceCommands.say(REPEAT_COMMAND + " = repeat the last command. Identical to " + HISTORY_COMMAND + " 0");
+            return null;
+        }
+        if (0 < workspaceCommands.commandHistory.size()) {
+            return workspaceCommands.commandHistory.get(0);
+        }
         workspaceCommands.say("no commands found");
-           return null;
-       }
-       protected String doHistory(String cmdLine) {
-           if (cmdLine.contains("--help")) {
-               workspaceCommands.say(HISTORY_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
-               workspaceCommands.say("See also:" + REPEAT_COMMAND);
-               return null; // do nothing
-           }
-           // Either of the following work:             getNamedConfig(
-           // /h == print history with line numbers
-           // /h int = execute line # int, or print history if that fails
-           StringTokenizer st = new StringTokenizer(cmdLine, " ");
-           st.nextToken(); // This is the "/h" which we already know about
-           boolean printIt = true;
-           if (st.hasMoreTokens()) {
-               try {
-                   int lineNo = Integer.parseInt(st.nextToken());
-                   if (0 <= lineNo && lineNo < workspaceCommands.commandHistory.size()) {
-                       return workspaceCommands.commandHistory.get(lineNo);
-                   }
-               } catch (Throwable t) {
-                   // do nothing, just print out the history.
-               }
-           }
-           if (printIt) {
-               for (int i = 0; i < workspaceCommands.commandHistory.size(); i++) {
-                   // an iterator actually prints these in reverse order. Print them in order.
-                   workspaceCommands.say(i + ": " + workspaceCommands.commandHistory.get(i));
-               }
-           }
-           return null;
-       }
+        return null;
+    }
+
+    protected String doHistory(String cmdLine) {
+        if (cmdLine.contains("--help")) {
+            workspaceCommands.say(HISTORY_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
+            workspaceCommands.say("See also:" + REPEAT_COMMAND);
+            return null; // do nothing
+        }
+        // Either of the following work:             getNamedConfig(
+        // /h == print history with line numbers
+        // /h int = execute line # int, or print history if that fails
+        StringTokenizer st = new StringTokenizer(cmdLine, " ");
+        st.nextToken(); // This is the "/h" which we already know about
+        boolean printIt = true;
+        if (st.hasMoreTokens()) {
+            try {
+                int lineNo = Integer.parseInt(st.nextToken());
+                if (0 <= lineNo && lineNo < workspaceCommands.commandHistory.size()) {
+                    return workspaceCommands.commandHistory.get(lineNo);
+                }
+            } catch (Throwable t) {
+                // do nothing, just print out the history.
+            }
+        }
+        if (printIt) {
+            for (int i = 0; i < workspaceCommands.commandHistory.size(); i++) {
+                // an iterator actually prints these in reverse order. Print them in order.
+                workspaceCommands.say(i + ": " + workspaceCommands.commandHistory.get(i));
+            }
+        }
+        return null;
+    }
+
     //  {'x':{'a':'b'},'c':'d'} ~ {'y':{'p':'q'},'r':'s'}
     public static void main(String[] args) throws Throwable {
         Vector<String> vector = new Vector<>();
@@ -239,13 +245,9 @@ public class QDLWorkspace {
         if (workspaceCommands.isRunScript()) {
             return;
         }
-        if(isoTerminal){
+        if (isoTerminal) {
             System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
-
-        }else{
-            System.out.println("using generic terminal");
         }
-
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
         ArrayList<String> functions = new ArrayList<>();
         functions.addAll(qc.workspaceCommands.getState().getMetaEvaluator().listFunctions(false));

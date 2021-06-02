@@ -18,6 +18,7 @@ statement :
           | assignment
           | tryCatchStatement
           | lambdaStatement
+          | assertStatement
           ;
 
  assignment : (expression  op=ASSIGN)+  expression;
@@ -40,7 +41,7 @@ defineStatement:
      DEFINE '[' function ']' BODY? docStatementBlock;
 
 lambdaStatement:
-    function LambdaConnector  (statement) | statementBlock  ;
+    function LambdaConnector  (statement) | statementBlock;
 
 moduleStatement:
      MODULE LeftBracket STRING (',' STRING)? RightBracket BODY? docStatementBlock;
@@ -48,10 +49,12 @@ moduleStatement:
 tryCatchStatement:
      TRY statementBlock CATCH statementBlock;
 
+assertStatement :
+     ASSERT LeftBracket expression RightBracket LeftBracket expression RightBracket;
 
     statementBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
-   expressionBlock : LeftBracket expression (',' expression)+ RightBracket;
+   expressionBlock : LeftBracket expression (';' expression)+ RightBracket;
   conditionalBlock : LeftBracket expression RightBracket;
    fdoc : FDOC;
 
@@ -81,8 +84,8 @@ tryCatchStatement:
 expression
  :
    function                                                                    #functions
- //| function LambdaConnector expression                                         #lambdaDef
-  | STRING                                                                      #strings
+// | function LambdaConnector expression                                         #lambdaDef
+ | STRING                                                                      #strings
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval
@@ -103,6 +106,7 @@ expression
  | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
+// | expression  op=ASSIGN  expression                                           #assignment
  | integer                                                                     #integers
  | number                                                                      #numbers
  | variable                                                                    #variables

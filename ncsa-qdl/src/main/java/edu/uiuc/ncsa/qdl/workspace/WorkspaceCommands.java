@@ -2494,6 +2494,9 @@ public class WorkspaceCommands implements Logable {
             case DEBUG:
                 say(onOrOff(isDebugOn()));
                 break;
+            case ASSERTIONS_ON:
+                say(onOrOff(isAssertionsOn()));
+                break;
             case START_TS:
                 if (startTimeStamp != null) {
                     say("startup time at " + Iso8601.date2String(startTimeStamp));
@@ -2584,6 +2587,7 @@ public class WorkspaceCommands implements Logable {
     public static final String EXTERNAL_EDITOR = "external_editor";
     public static final String USE_EXTERNAL_EDITOR = "use_external_editor";
     public static final String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
+    public static final String ASSERTIONS_ON = "assertions_on";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -3061,6 +3065,11 @@ public class WorkspaceCommands implements Logable {
                 getState().setEnableLibrarySupport(isOnOrTrue(value));
                 say("library support is now " + (getState().isEnableLibrarySupport() ? "on" : "off"));
                 break;
+            case ASSERTIONS_ON:
+                getState().setAssertionsOn(isOnOrTrue(value));
+                say("assertions are now " + (getState().isAssertionsOn() ? "on" : "off"));
+                break;
+
             case LIB_PATH_TAG:
                 getState().setLibPath(value);
                 say("library path updated");
@@ -3875,7 +3884,9 @@ public class WorkspaceCommands implements Logable {
                     new FTStack(),
                     new ModuleMap(),
                     logger,
-                    false);// workspace is never in server mode
+                    false,
+                    isAssertionsOn()
+                    );// workspace is never in server mode
             state.setPID(0);
             /*SIEntry sys = new SIEntry();
             sys.state = state;
@@ -3993,7 +4004,8 @@ public class WorkspaceCommands implements Logable {
         setEchoModeOn(qe.isEchoModeOn());
         setPrettyPrint(qe.isPrettyPrint());
         isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
-
+         state.setAssertionsOn(qe.isAssertionsOn());
+         assertionsOn = qe.isAssertionsOn();
         if (isRunScript) {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
 
@@ -4535,4 +4547,14 @@ public class WorkspaceCommands implements Logable {
         this.autosaveMessagesOn = autosaveMessagesOn;
     }
 
+    public boolean isAssertionsOn() {
+        return assertionsOn;
+    }
+
+    public void setAssertionsOn(boolean assertionsOn) {
+        this.assertionsOn = assertionsOn;
+        getState().setAssertionsOn(assertionsOn);
+    }
+
+    boolean assertionsOn;
 }

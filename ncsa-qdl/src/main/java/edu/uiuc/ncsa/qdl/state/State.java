@@ -77,7 +77,8 @@ public class State extends FunctionState implements QDLConstants {
                  FTStack ftStack,
                  ModuleMap moduleMap,
                  MyLoggingFacade myLoggingFacade,
-                 boolean isServerMode) {
+                 boolean isServerMode,
+                 boolean assertionsOn) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
@@ -86,6 +87,7 @@ public class State extends FunctionState implements QDLConstants {
                 moduleMap,
                 myLoggingFacade);
         this.serverMode = isServerMode;
+        this.assertionsOn = assertionsOn;
     }
 
     public StemVariable getSystemConstants() {
@@ -409,7 +411,8 @@ public class State extends FunctionState implements QDLConstants {
                 getFTStack(),
                 getModuleMap(),
                 getLogger(),
-                isServerMode());
+                isServerMode(),
+                isAssertionsOn());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
@@ -433,7 +436,8 @@ public class State extends FunctionState implements QDLConstants {
                 getFTStack().clone(),
                 getModuleMap(),
                 getLogger(),
-                isServerMode());
+                isServerMode(),
+                isAssertionsOn());
         newState.setImportedModules(getImportedModules());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
@@ -492,7 +496,8 @@ public class State extends FunctionState implements QDLConstants {
                 new FTStack(),
                 getModuleMap(),
                 getLogger(),
-                isServerMode());
+                isServerMode(),
+                isAssertionsOn());
         // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
@@ -520,7 +525,8 @@ public class State extends FunctionState implements QDLConstants {
                 new FTStack(),
                 new ModuleMap(), // so no modules
                 getLogger(),
-                isServerMode());
+                isServerMode(),
+                isAssertionsOn());
         // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
@@ -720,4 +726,14 @@ public class State extends FunctionState implements QDLConstants {
       }
       throw new NFWException("Was unable to create a random, unused variable");
   }
+
+    public boolean isAssertionsOn() {
+        return assertionsOn;
+    }
+
+    public void setAssertionsOn(boolean assertionsOn) {
+        this.assertionsOn = assertionsOn;
+    }
+
+    boolean assertionsOn = true;
 }
