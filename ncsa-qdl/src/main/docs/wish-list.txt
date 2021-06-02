@@ -1,6 +1,19 @@
 This is scrapbook of things That I would like to consider for QDL that are not fully formed
 but should be captured someplace.
 
+6/2/2021
+Updates.
+Would be nice to make assignments dyad operators. This works immediately for simple assignments.
+The problem is that chained assignments have to have some tree walking, e.g.
+   A := B := C += 'qwe';
+Cannot be resolved from left to right since the right hand expression is far away. This implies
+having a tree and walking it at evaluation time, plus making sure the right stuff gets stored,
+so A has the assignment for B as it argument which has C.
+
+Lambda expressions
+These are also almost working. Some low level work needed to get them to return references
+but not enough time before the 5.1.3 release.
+
 4/20/2021
 
 - signed axes 0,1,2, (like indices). axis of -1 is last axis which makes sense since dimension is a list
