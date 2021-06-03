@@ -15,13 +15,10 @@ statement :
           | loopStatement
           | switchStatement
           | expression
-          | assignment
           | tryCatchStatement
           | lambdaStatement
           | assertStatement
           ;
-
- assignment : (expression  op=ASSIGN)+  expression;
 
  conditionalStatement : ifStatement | ifElseStatement;
 
@@ -84,7 +81,7 @@ assertStatement :
 expression
  :
    function                                                                    #functions
-// | function LambdaConnector expression                                         #lambdaDef
+ //| function LambdaConnector expression                                         #lambdaDef
  | STRING                                                                      #strings
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
@@ -106,7 +103,7 @@ expression
  | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
-// | expression  op=ASSIGN  expression                                           #assignment
+ | expression  op=ASSIGN  expression                                           #assignment
  | integer                                                                     #integers
  | number                                                                      #numbers
  | variable                                                                    #variables

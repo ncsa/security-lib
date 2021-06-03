@@ -2,10 +2,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Element;
@@ -110,7 +107,7 @@ public class QDLRunner implements Serializable {
                 } else {
                     if (isEchoModeOn()) {
                         // used by the workspace to print each statement's result to the console.
-                        if ((stmt instanceof ExpressionImpl)) {
+                        if (((stmt instanceof ExpressionImpl)&& !(stmt instanceof ANode2))) {
                             ExpressionImpl expression = (ExpressionImpl) stmt;
                             if (expression instanceof Polyad) {
                                 // so if this is already a print statement, don't wrap it in one

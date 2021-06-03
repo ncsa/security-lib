@@ -34,4 +34,14 @@ public class ScriptRuntimeException extends GeneralException {
     }
 
     String requestedType;
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    int status;
 }

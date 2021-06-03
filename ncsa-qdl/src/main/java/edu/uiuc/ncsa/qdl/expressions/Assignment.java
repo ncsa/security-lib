@@ -23,8 +23,8 @@ public class Assignment implements StatementWithResultInterface {
     public StatementWithResultInterface makeCopy() {
         Assignment assignment = new Assignment();
         assignment.flippedAssignment = flippedAssignment;
-        assignment.argument = argument;
-        assignment.expStatement = expStatement.makeCopy();
+        assignment.rightArg = rightArg;
+        assignment.leftArg = leftArg.makeCopy();
         assignment.variableReference = variableReference;
         return assignment;
     }
@@ -47,18 +47,18 @@ public class Assignment implements StatementWithResultInterface {
         return result;
     }
 
-    public StatementWithResultInterface getExpStatement() {
-        return expStatement;
+    public StatementWithResultInterface getLeftArg() {
+        return leftArg;
     }
 
-    public void setExpStatement(StatementWithResultInterface expStatement) {
-        this.expStatement = expStatement;
+    public void setLeftArg(StatementWithResultInterface leftArg) {
+        this.leftArg = leftArg;
     }
 
-    StatementWithResultInterface expStatement = null;
+    StatementWithResultInterface leftArg = null;
 
     public boolean hasExpStatement() {
-        return expStatement != null;
+        return leftArg != null;
     }
 
     public int getResultType() {
@@ -97,20 +97,20 @@ public class Assignment implements StatementWithResultInterface {
         this.variableReference = variableReference;
     }
 
-    public Statement getArgument() {
-        return argument;
+    public Statement getRightArg() {
+        return rightArg;
     }
 
-    public void setArgument(Statement argument) {
-        this.argument = argument;
+    public void setRightArg(Statement rightArg) {
+        this.rightArg = rightArg;
     }
 
     String variableReference;
-    Statement argument;
+    Statement rightArg;
 
     // just a case
     protected HasResultInterface getHRI() {
-        return (HasResultInterface) argument;
+        return (HasResultInterface) rightArg;
     }
 
     public Object evaluate(State state) {
@@ -118,19 +118,19 @@ public class Assignment implements StatementWithResultInterface {
             throw new IllegalArgumentException("Error: Cannnot use reserved word \"" + variableReference + "\" as a variable.");
         }
         if (flippedAssignment) {
-            Statement origArg = argument;
-            if ((argument instanceof ExpressionStemNode) && expStatement == null) {
+            Statement origArg = rightArg;
+            if ((rightArg instanceof ExpressionStemNode) && leftArg == null) {
                 // edge case of ESN. This is resolved to a variable reference so it has to
                 // be turned into a variable node to get the current value from the state
                 // at the right time.
-                argument = new VariableNode(variableReference);
+                rightArg = new VariableNode(variableReference);
             } else {
-                argument = expStatement;
+                rightArg = leftArg;
             }
 
             if (origArg instanceof VariableNode) {
                 variableReference = ((VariableNode) origArg).getVariableReference();
-                expStatement = null;
+                leftArg = null;
             } else {
                 // If this is chained with other assignments it can get close to impossible
                 // to determine what should be assigned to what with our simple-minded
@@ -141,11 +141,11 @@ public class Assignment implements StatementWithResultInterface {
                     throw new IllegalArgumentException("error: cannot chain =: with any assignments");
                 }
                 if (origArg instanceof StatementWithResultInterface) {
-                    expStatement = (StatementWithResultInterface) origArg;
+                    leftArg = (StatementWithResultInterface) origArg;
                 }
             }
         }
-        result = argument.evaluate(state);
+        result = rightArg.evaluate(state);
 
         getHRI().setEvaluated(true);
         setResult(getHRI().getResult());
@@ -162,13 +162,29 @@ public class Assignment implements StatementWithResultInterface {
 
      */
     protected Object setExpValue(State state, int resultType, Object result) {
-        if (getExpStatement() instanceof ExpressionStemNode) {
-            ExpressionStemNode esn = (ExpressionStemNode) getExpStatement();
+        if (getLeftArg() instanceof Assignment) {
+            Assignment assignment = (Assignment) getLeftArg();
+            if(assignment.getRightArg() instanceof VariableNode){
+                VariableNode variableNode = (VariableNode) assignment.getRightArg();
+                variableReference = variableNode.getVariableReference();
+                setVariableValue(state, resultType, result);
+                assignment.setRightArg(new ConstantNode(result, resultType));
+                assignment.evaluate(state);
+
+            }
+            if(assignment.getRightArg() instanceof Dyad){
+                assignment.getRightArg().evaluate(state);
+            }
+            // here is where the daisy chaining happens.
+            return result;
+        }
+        if (getLeftArg() instanceof ExpressionStemNode) {
+            ExpressionStemNode esn = (ExpressionStemNode) getLeftArg();
             return esn.setValue(state, result);
         }
-        Object target = getExpStatement().evaluate(state);
-        getExpStatement().setEvaluated(true);
-        getExpStatement().setResultType(Constant.getType(target));
+        Object target = getLeftArg().evaluate(state);
+        getLeftArg().setEvaluated(true);
+        getLeftArg().setResultType(Constant.getType(target));
 
         switch (resultType) {
             case STEM_TYPE:
@@ -229,7 +245,7 @@ public class Assignment implements StatementWithResultInterface {
 
     public Assignment(String variableReference, ExpressionNode node) {
         this.variableReference = variableReference;
-        argument = node;
+        rightArg = node;
     }
 
     @Override

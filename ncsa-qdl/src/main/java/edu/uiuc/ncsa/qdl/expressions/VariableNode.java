@@ -41,4 +41,11 @@ public class VariableNode extends ExpressionImpl {
         VariableNode variableNode = new VariableNode(variableReference);
         return variableNode;
     }
+
+    @Override
+    public String toString() {
+        return "VariableNode{" +
+                "variableReference='" + variableReference + '\'' +
+                '}';
+    }
 }

@@ -109,10 +109,7 @@ public class QDLListener implements QDLParserListener {
         parsingMap.put(pr);
     }
 
-    @Override
-    public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
-        stash(ctx, new Assignment());
-    }
+
 
     protected Statement resolveChild(ParseTree currentChild, boolean removeChild) {
         // the most common pattern is that a child node or one of its children is
@@ -143,8 +140,8 @@ public class QDLListener implements QDLParserListener {
         return resolveChild(currentChild, false);
     }
 
-    @Override
-    public void exitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
+
+    public void OLDexitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
         Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
         Assignment topNode = currentA;
         topNode.setSourceCode(getSource(assignmentContext));
@@ -167,7 +164,7 @@ public class QDLListener implements QDLParserListener {
                 if (!(s instanceof StatementWithResultInterface)) {
                     throw new IllegalArgumentException("error: illegal assignment expression ");
                 }
-                currentA.setExpStatement((StatementWithResultInterface) s);
+                currentA.setLeftArg((StatementWithResultInterface) s);
                 isVariableCase = false;
             }
             // The general pattern (i.e.  the children of assignmentContext) is
@@ -185,7 +182,7 @@ public class QDLListener implements QDLParserListener {
                 if (isVariableCase) {
                     source.add(currentVar + op + assignmentContext.children.get(i + 1).getText());
                 } else {
-                    source.add(currentA.getExpStatement().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
+                    source.add(currentA.getLeftArg().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
                 }
                 currentA.setSourceCode(source);
             }
@@ -205,7 +202,7 @@ public class QDLListener implements QDLParserListener {
                 if (!(s instanceof StatementWithResultInterface)) {
                     throw new IllegalArgumentException("error: illegal assignment expression ");
                 }
-                nextA.setExpStatement((StatementWithResultInterface) s);
+                nextA.setLeftArg((StatementWithResultInterface) s);
                 // isVariableCase = false;
             }
 //            nextVar = assignmentContext.children.get(i + 1).getText();
@@ -220,18 +217,18 @@ public class QDLListener implements QDLParserListener {
 
                 if (i + 1 == exprIndex) {
                     Statement arg = resolveChild(assignmentContext.children.get(i + 1));
-                    currentA.setArgument(arg);
+                    currentA.setRightArg(arg);
                     return;
                     // test for this. q and A should have the value 'abc', B == 'bc'
                     //  A := 'a'; B := 'b';
                     // q := A += B += 'c';
                 }
-                currentA.setArgument(nextA);
+                currentA.setRightArg(nextA);
             } else {
                 Dyad d = new Dyad(getAssignmentType(op));
                 d.setLeftArgument(new VariableNode(currentVar));
                 d.setRightArgument(new AssignmentNode(nextA));
-                currentA.setArgument(d);
+                currentA.setRightArg(d);
             }
             if (i + 1 == exprIndex) {
                 Statement arg = resolveChild(assignmentContext.children.get(i + 1));
@@ -240,9 +237,9 @@ public class QDLListener implements QDLParserListener {
                 if (isVariableCase) {
                     nextA.setVariableReference(currentA.getVariableReference());
                 } else {
-                    nextA.setExpStatement(currentA.getExpStatement());
+                    nextA.setLeftArg(currentA.getLeftArg());
                 }
-                nextA.setArgument(arg);
+                nextA.setRightArg(arg);
                 return;
                 //  A := 'a'; B := 'b';
                 // q := A += B += 'c';
@@ -252,6 +249,105 @@ public class QDLListener implements QDLParserListener {
             currentA = nextA;
             //          i = nextIndex - 1; // back up cursor so on increment in loop it points to right place
         } //end for
+    }
+
+    boolean useOldA = false;
+
+    @Override
+    public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
+        if (useOldA) {
+
+            stash(ctx, new Assignment());
+        } else {
+            stash(ctx, new ANode2());
+        }
+    }
+
+    @Override
+    public void exitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
+        if (useOldA) {
+            exitAssignment2(assignmentContext);
+        } else {
+            exitAssignmentANode(assignmentContext);
+        }
+    }
+
+    public void exitAssignmentANode(QDLParserParser.AssignmentContext assignmentContext) {
+        ANode2 currentA = (ANode2) parsingMap.getStatementFromContext(assignmentContext);
+        currentA.setSourceCode(getSource(assignmentContext));
+        currentA.setOp(assignmentContext.ASSIGN().getText());
+        StatementWithResultInterface leftArg;
+        StatementWithResultInterface rightArg;
+        // swap them if it is a right assignment
+        if(currentA.getAssignmentType() == ANode2.rightAssignmentType){
+            leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
+             rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
+
+        }else{
+             leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
+             rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
+
+        }
+
+        if (leftArg instanceof ConstantNode) {
+            throw new IllegalArgumentException("error: cannot assign constant a value");
+        }
+        currentA.setLeftArg(leftArg);
+        currentA.setRightArg(rightArg);
+    }
+
+    public void exitAssignment2(QDLParserParser.AssignmentContext assignmentContext) {
+        Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
+        currentA.setSourceCode(getSource(assignmentContext));
+        StatementWithResultInterface leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
+        if (leftArg instanceof QDLParserParser.KeywordsContext) {
+            throw new IllegalArgumentException("error: cannot assign constant a value");
+
+        }
+        if (leftArg instanceof ConstantNode) {
+            throw new IllegalArgumentException("error: cannot assign constant a value");
+
+        }
+        String op = assignmentContext.ASSIGN().getText();
+        StatementWithResultInterface rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
+        if (op.equals("=:") | op.equals("≕")) {
+            // This is the only place for sure we know what the operator is.
+            currentA.setFlippedAssignment(true);
+            StatementWithResultInterface x = leftArg;
+            leftArg = rightArg;
+            rightArg = x;
+        }
+        if (leftArg instanceof VariableNode) {
+            currentA.setVariableReference(((VariableNode) leftArg).getVariableReference());
+        } else {
+            currentA.setLeftArg(leftArg);
+        }
+        if (op.equals(":=") || op.equals("≔") | op.equals("=:") | op.equals("≕")) {   // Allows unicode 2254, 2255 as assignment too.
+            currentA.setRightArg(rightArg);
+        } else {
+
+            Dyad d = new Dyad(getAssignmentType(op));
+            if (leftArg instanceof Assignment) {
+                Assignment assignment = (Assignment) leftArg;
+                if (assignment.getRightArg() instanceof VariableNode) {
+                    VariableNode variableNode = (VariableNode) assignment.getRightArg();
+                    d.setLeftArgument(new VariableNode(variableNode.getVariableReference()));
+
+                } else {
+                    if (assignment.getRightArg() instanceof Dyad) {
+                        Dyad dyad = (Dyad) assignment.getRightArg();
+                        d.setLeftArgument(dyad.getRightArgument());
+                    } else {
+                        System.out.println("oops");
+                    }
+                }
+
+            } else {
+                d.setLeftArgument(new VariableNode(currentA.getVariableReference()));
+            }
+            d.setRightArgument(rightArg);
+            currentA.setRightArg(d);
+        }
     }
 
     protected int getAssignmentType(String op) {
@@ -1423,15 +1519,14 @@ public class QDLListener implements QDLParserListener {
         altIfExpressionNode.setSourceCode(source);
     }
 
+
 /*
 
     @Override
 
     public void enterLambdaDef(QDLParserParser.LambdaDefContext ctx) {
-     //   FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
-     //   fds.setLambda(true);
+ //       stash(ctx, new LambdaDefinitionNode());
 
-     //   stash(ctx, fds);
     }
 */
 
@@ -1443,14 +1538,13 @@ public class QDLListener implements QDLParserListener {
     with it throughout the code.
     Straightforward but tedious and probably quite time consuming
      */
-  /*  @Override
+ /*
+    @Override
     public void exitLambdaDef(QDLParserParser.LambdaDefContext ctx) {
-        System.out.println(ctx.function());
-        System.out.println(ctx.expression());
-        FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        stash(ctx, new LambdaDefinitionNode());
+        LambdaDefinitionNode fds = (LambdaDefinitionNode) parsingMap.getStatementFromContext(ctx);
         fds.setLambda(true);
 
-        stash(ctx, fds);
         QDLParserParser.FunctionContext nameAndArgsNode = ctx.function();
 
         if (nameAndArgsNode == null) {
@@ -1462,9 +1556,8 @@ public class QDLListener implements QDLParserListener {
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
         // Best we can do with ANTLR...
 
-         fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(ctx);
         fds.setFunctionRecord(functionRecord);
-
+        
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < ctx.getChildCount(); i++) {
             stringList.add(ctx.getChild(i).getText());
@@ -1515,8 +1608,7 @@ public class QDLListener implements QDLParserListener {
 
 
     }
-      
-*/
+ */
     @Override
     public void enterExpressionBlock(QDLParserParser.ExpressionBlockContext ctx) {
         stash(ctx, new ParseExpressionBlock());
@@ -1679,21 +1771,21 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAssertStatement(QDLParserParser.AssertStatementContext ctx) {
-           stash(ctx, new AssertStatement());
+        stash(ctx, new AssertStatement());
     }
 
     @Override
     public void exitAssertStatement(QDLParserParser.AssertStatementContext ctx) {
         AssertStatement assertStatement = (AssertStatement) parsingMap.getStatementFromContext(ctx);
         boolean isFirst = true;
-        for(int i =0;i< ctx.getChildCount(); i++){
-            if(ctx.getChild(i) instanceof TerminalNodeImpl){
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
                 continue;
             }
-            if(isFirst){
+            if (isFirst) {
                 assertStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(i)));
                 isFirst = false;
-            }else{
+            } else {
                 assertStatement.setMesssge((ExpressionNode) resolveChild(ctx.getChild(i)));
 
             }

@@ -48,11 +48,12 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
   fragment StringCharacters : StringCharacter+;
    fragment StringCharacter : ~['\\\r\n] | ESC;
 
-// § 6 Separators
+// § 6 Separators and brackets
        LeftBracket : '[';
       RightBracket : ']';
              Comma : ',';
              Colon : ':';
+         SemiColon : ';';
     LDoubleBracket : '[|' |'⟦'; // unicode 27e6
     RDoubleBracket : '|]' |'⟧'; // unicode 27e7
 
@@ -92,8 +93,6 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
         TildeRight : '~|';
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
-
- // stem_ref : StemStart  ((Identifier | integer) '.')*;
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.
@@ -135,20 +134,12 @@ fragment AllOps :
 fragment FUNCTION_NAME :
      [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;
 
-
-
-
  // Note that the extra characters for && and || are there because certain unicode aware keyboards
  // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
 
-// The left bracket, as the end of a control statement, has to be found in the lexer.
-
-
-
-
 
 /*
-   Comments and white space
+   § 9 Comments and white space
 */
            FDOC :  '>>' ~[\r\n]*;
              WS : [ \t\r\n\u000C]+ -> skip;

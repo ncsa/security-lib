@@ -38,16 +38,6 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitStatement(QDLParserParser.StatementContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link QDLParserParser#assignment}.
-	 * @param ctx the parse tree
-	 */
-	void enterAssignment(QDLParserParser.AssignmentContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link QDLParserParser#assignment}.
-	 * @param ctx the parse tree
-	 */
-	void exitAssignment(QDLParserParser.AssignmentContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#conditionalStatement}.
 	 * @param ctx the parse tree
 	 */
@@ -477,6 +467,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitVariables(QDLParserParser.VariablesContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code assignment}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssignment(QDLParserParser.AssignmentContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code assignment}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssignment(QDLParserParser.AssignmentContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code stemLi}
 	 * labeled alternative in {@link QDLParserParser#expression}.

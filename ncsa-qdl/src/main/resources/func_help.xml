@@ -1865,6 +1865,26 @@ would print the entry for null.
             </body>
         </entry>
 
+    <entry id="assert">
+            <body>
+                <![CDATA[
+assert[boolean][expression]
+is a directive that tells the system to fail if the boolean is false. The
+result will be an error returned with the expression evaluated (if possible)
+and turned into a string.
+E.g.
+assert[ script_args() == 2 ]['You must supply both a username and password.'];
+
+This stops further processing and essentially allows you to introduce and
+unrecoverable error if needed.
+
+Assertions may be globally turned off and on with the assertions_on variable
+in the workspace, or as a configuration option. One common use is to have
+them on for development and off in production.
+]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->
