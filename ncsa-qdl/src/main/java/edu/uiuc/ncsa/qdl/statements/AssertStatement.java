@@ -11,13 +11,13 @@ import java.util.List;
  * on 6/1/21 at  12:53 PM
  */
 public class AssertStatement implements Statement{
-    ExpressionNode conditional;
+    StatementWithResultInterface conditional;
 
-    public ExpressionNode getConditional() {
+    public StatementWithResultInterface getConditional() {
         return conditional;
     }
 
-    public void setConditional(ExpressionNode conditional) {
+    public void setConditional(StatementWithResultInterface conditional) {
         this.conditional = conditional;
     }
 

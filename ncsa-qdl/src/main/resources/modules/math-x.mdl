@@ -24,6 +24,17 @@ module[
      return(sqrt(a^2 + b^2));
    ];
 
+    define[clone(arg)][
+        >> clone(arg.)
+        >> Returns a completely new copy of the stem. Since generally
+        >> to stems are used, something like
+        >> a. := b.
+        >> a.0 := 42
+        >> sets element 42 in b. as well. To have them independent, use this
+        assert[var_type(arg) == constants('var_type').stem][' clone requires a stem as its argument'];
+        return(from_json(to_json(arg)));
+      ];
+
    define[sqrt(x)][
      >> The (non-negative) square root of the argument
      return(nroot(x, 2));

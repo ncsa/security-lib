@@ -271,7 +271,7 @@ public class WorkspaceCommands implements Logable {
             case STATE_INDICATOR_COMMAND:
                 return doSICommand(inputLine);
             case OFF_COMMAND:
-                if(inputLine.hasArg(HELP_SWITCH)){
+                if (inputLine.hasArg(HELP_SWITCH)) {
                     say(OFF_COMMAND + " [y||n] - exit the system. If you do not supply an argument, you will be prompted.");
                     sayi("y = exit immediately without saving");
                     return RC_NO_OP;
@@ -625,7 +625,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected boolean useExternalEditor() {
-        return getQdlEditors()!=null && !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
+        return getQdlEditors() != null && !getQdlEditors().isEmpty() && isUseExternalEditor() && !getExternalEditorName().equals(LINE_EDITOR_NAME);
     }
 
     private int _doFileEdit(InputLine inputLine) {
@@ -1804,29 +1804,29 @@ public class WorkspaceCommands implements Logable {
         }
         FR_WithState fr_withState = null;
         try {
-             fr_withState = getState().resolveFunction(fName, argCount);
+            fr_withState = getState().resolveFunction(fName, argCount);
             if (fr_withState.isExternalModule) {
                 say("cannot edit external functions.");
                 return RC_NO_OP;
             }
 
-        }catch(UndefinedFunctionException ufx){
+        } catch (UndefinedFunctionException ufx) {
             // ok, they are defining it now
         }
 
 
-        String inputForm = fr_withState== null?"":InputFormUtil.inputForm(fName, argCount, getState());
+        String inputForm = fr_withState == null ? "" : InputFormUtil.inputForm(fName, argCount, getState());
 
         if (isTrivial(inputForm)) {
             say("new function '" + fName + "'");
             StringBuilder argList = new StringBuilder();
             argList.append("(");
             boolean isFirst = true;
-            for(int i =0; i < argCount; i++){
-                if(isFirst){
+            for (int i = 0; i < argCount; i++) {
+                if (isFirst) {
                     isFirst = false;
                     argList.append("x").append(i);
-                }else{
+                } else {
                     argList.append(", x").append(i);
                 }
             }
@@ -2072,10 +2072,14 @@ public class WorkspaceCommands implements Logable {
             case "help":
             case "--help":
                 say("Variable commands");
-                say("   drop - remove a variable from the system");
-                say("   list - list all user defined variables");
-                say("   size - try to guestimate the size of all the symbols used.");
-                sayi("system - list all system variables.");
+                say("     drop - remove a variable from the system");
+                say("     list - list all user defined variables");
+                say("     size - try to guestimate the size of all the symbols used.");
+                sayi("  system - list all system variables.");
+                sayi("edit [" + EDIT_TEXT_FLAG + "]- edit the given variable. Adding the " + EDIT_TEXT_FLAG);
+                sayi("          will treat the contents as text and set the variable to that.");
+                sayi("          Note that you won't need quotes around the string if you edit it with " + EDIT_TEXT_FLAG + ".");
+                sayi("          and you can enter linefeeds etc. which will be converted.");
                 return RC_NO_OP;
             case "system":
                 return _varsSystem(inputLine);
@@ -2095,34 +2099,52 @@ public class WorkspaceCommands implements Logable {
         return RC_CONTINUE;
     }
 
+    public static final String EDIT_TEXT_FLAG = "-x";
+
     private int _doVarEdit(InputLine inputLine) {
+        // process flags first
+        boolean isText = inputLine.hasArg(EDIT_TEXT_FLAG);
+        inputLine.removeSwitch(EDIT_TEXT_FLAG);
         String varName = inputLine.getLastArg();
-        String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
         List<String> content = new ArrayList<>();
-        content.add(inputForm);
+        boolean isDefined = getState().isDefined(varName);
+          //  isString = isDefined && (getState().getValue(varName) instanceof String);
+            if(isDefined){
+                if(isText){
+                    String v = getState().getValue(varName).toString();
+                    v.replace("\n","\\n");
+                    content = StringUtils.stringToList(v);
+
+                }else{
+                    String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
+                    content.add(inputForm);
+                }
+            }
+
         if (useExternalEditor()) {
             content = _doExternalEdit(content);
         } else {
             content = _doLineEditor(content);
         }
-        content = _doExternalEdit(content);
-
-        String newValue = varName + ":=";
-        for (String line : content) {
-            newValue = newValue + "\n" + line;
-        }
-        newValue = newValue.trim();
-        if (!newValue.endsWith(";")) {
-            newValue = newValue + ";";
-        }
-        try {
-            getInterpreter().execute(newValue);
-        } catch (Throwable throwable) {
-            if (DebugUtil.isEnabled()) {
-                throwable.printStackTrace();
+        String newValue = StringUtils.listToString(content);
+        if (isText) {
+            getState().setValue(varName, newValue);
+        } else {
+            newValue = newValue.trim();
+            if (!newValue.endsWith(";")) {
+                newValue = newValue + ";";
             }
-            say("Sorry, could not update value of \"" + varName + "\"");
-            return RC_NO_OP;
+
+            try {
+                getInterpreter().execute(varName + " := " + newValue);
+            } catch (Throwable throwable) {
+                if (DebugUtil.isEnabled()) {
+                    throwable.printStackTrace();
+                }
+                say("Sorry, could not update value of \"" + varName + "\"");
+                return RC_NO_OP;
+            }
+
         }
         return RC_CONTINUE;
     }
@@ -3886,7 +3908,7 @@ public class WorkspaceCommands implements Logable {
                     logger,
                     false,
                     isAssertionsOn()
-                    );// workspace is never in server mode
+            );// workspace is never in server mode
             state.setPID(0);
             /*SIEntry sys = new SIEntry();
             sys.state = state;
@@ -4004,8 +4026,8 @@ public class WorkspaceCommands implements Logable {
         setEchoModeOn(qe.isEchoModeOn());
         setPrettyPrint(qe.isPrettyPrint());
         isRunScript = inputLine.hasArg(CLA_RUN_SCRIPT_ON);
-         state.setAssertionsOn(qe.isAssertionsOn());
-         assertionsOn = qe.isAssertionsOn();
+        state.setAssertionsOn(qe.isAssertionsOn());
+        assertionsOn = qe.isAssertionsOn();
         if (isRunScript) {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
 

@@ -1374,6 +1374,6 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Long getRank() {
-        return getStemList().getRank();
+        return Math.max(getStemList().getRank(), size()) ;
     }
 }

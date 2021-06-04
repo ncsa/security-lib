@@ -3,11 +3,13 @@ package edu.uiuc.ncsa.qdl.config;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
+import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.security.core.configuration.StorageConfigurationTags;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.util.cli.editing.EditorEntry;
 import edu.uiuc.ncsa.security.util.cli.editing.EditorUtils;
 import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
@@ -88,10 +90,11 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         String x = getFirstAttribute(cn, SCRIPT_PATH_TAG);
         return x == null ? "" : x;
     }
+
     protected String getLibPath() {
-           String x = getFirstAttribute(cn, LIB_PATH_TAG);
-           return x == null ? "" : x;
-       }
+        String x = getFirstAttribute(cn, LIB_PATH_TAG);
+        return x == null ? "" : x;
+    }
 
     protected String getModulePath() {
         String x = getFirstAttribute(cn, MODULE_PATH_TAG);
@@ -128,7 +131,18 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
 
 
     protected Editors getEditors() {
-        return EditorUtils.getEditors(cn); // never null
+        Editors editors = EditorUtils.getEditors(cn); // never null
+        if (!editors.hasEntry(WorkspaceCommands.LINE_EDITOR_NAME)) {
+            /*
+               Create the line editor so there is always something available.
+             */
+            EditorEntry qdlEditor = new EditorEntry();
+            qdlEditor.name = WorkspaceCommands.LINE_EDITOR_NAME;
+            //qdlEditor.exec = null;
+            //qdlEditor.clearScreen = false;
+            editors.put(qdlEditor);
+        }
+        return editors;
     }
 
 
@@ -161,8 +175,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     }
 
     protected boolean areAssertionsEnabled() {
-          return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
-      }
+        return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
+    }
+
     protected String getDebugLevel() {
         String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
         if (level == null) {
@@ -204,6 +219,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isEnableLibrarySupport() {
         return getFirstBooleanValue(cn, ENABLE_LIBRARY_SUPPORT, true);
     }
+
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
         if (isTrivial(raw)) {

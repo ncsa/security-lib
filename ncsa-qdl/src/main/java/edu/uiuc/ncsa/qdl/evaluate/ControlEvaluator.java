@@ -429,11 +429,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     private void doReduceOrExpand(Polyad polyad, State state, boolean doReduce) {
         StatementWithResultInterface arg0 = polyad.getArguments().get(0);
         if (!(arg0 instanceof FunctionReferenceNode)) {
-            throw new IllegalArgumentException("error: first argument of " + REDUCE + " must be a function reference");
+            throw new IllegalArgumentException("error: first argument of " + (doReduce?REDUCE:EXPAND) + " must be a function reference");
         }
         Object arg1 = polyad.evalArg(1, state);
         if (!isStem(arg1)) {
-            throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a stem");
+            throw new IllegalArgumentException("error: second argument of " + (doReduce?REDUCE:EXPAND) + " must be a stem");
         }
         StemVariable stemVariable = (StemVariable) arg1;
         if (!stemVariable.isList()) {
@@ -443,7 +443,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
             if (!isLong(axisObj)) {
-                throw new IllegalArgumentException("error: third argument of " + REDUCE + ", the axis, must be an integer");
+                throw new IllegalArgumentException("error: third argument of " + (doReduce?REDUCE:EXPAND) + ", the axis, must be an integer");
             }
             axis = ((Long) axisObj).intValue();
         }

@@ -110,7 +110,6 @@ public class QDLListener implements QDLParserListener {
     }
 
 
-
     protected Statement resolveChild(ParseTree currentChild, boolean removeChild) {
         // the most common pattern is that a child node or one of its children is
         // the actual node we need. This checks if the argument is a child in the table
@@ -279,13 +278,13 @@ public class QDLListener implements QDLParserListener {
         StatementWithResultInterface leftArg;
         StatementWithResultInterface rightArg;
         // swap them if it is a right assignment
-        if(currentA.getAssignmentType() == ANode2.rightAssignmentType){
+        if (currentA.getAssignmentType() == ANode2.rightAssignmentType) {
             leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
-             rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
+            rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
 
-        }else{
-             leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
-             rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
+        } else {
+            leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
+            rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
 
         }
 
@@ -1783,7 +1782,7 @@ public class QDLListener implements QDLParserListener {
                 continue;
             }
             if (isFirst) {
-                assertStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(i)));
+                assertStatement.setConditional((StatementWithResultInterface) resolveChild(ctx.getChild(i)));
                 isFirst = false;
             } else {
                 assertStatement.setMesssge((ExpressionNode) resolveChild(ctx.getChild(i)));
@@ -1791,6 +1790,16 @@ public class QDLListener implements QDLParserListener {
             }
         }
     }
+
+/*    @Override
+    public void enterDotOp2(QDLParserParser.DotOp2Context ctx) {
+
+    }
+
+    @Override
+    public void exitDotOp2(QDLParserParser.DotOp2Context ctx) {
+        throw new NotImplementedException();
+    }*/
 }
 
 

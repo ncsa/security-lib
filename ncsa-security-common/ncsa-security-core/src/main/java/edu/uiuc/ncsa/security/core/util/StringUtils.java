@@ -401,7 +401,7 @@ public class StringUtils {
     }
 
     public static String pad2(String s, boolean isTruncate, int commandBufferMaxWidth) {
-        if(isTrivial(s)){
+        if (isTrivial(s)) {
             return getBlanks(commandBufferMaxWidth);
         }
         if (commandBufferMaxWidth <= s.length()) {
@@ -458,7 +458,7 @@ public class StringUtils {
         for (String key : tMap.keySet()) {
             //String v = map.getString(key);
             Object rawValue = map.get(key);
-            if(rawValue==null){
+            if (rawValue == null) {
                 continue;
             }
 
@@ -545,35 +545,40 @@ public class StringUtils {
 
     /**
      * Converts a list of strings to a single string with embedded linefeeds.
+     *
      * @param list
      * @return
      */
- public static String listToString(List<String> list){
+    public static String listToString(List<String> list) {
         String x = "";
         boolean isFirst = true;
-        for(String s : list){
-            if(isFirst){
+        for (String s : list) {
+            if (s == null) {
+                continue;
+            }
+            if (isFirst) {
                 isFirst = false;
                 x = x + s;
-            }else {
+            } else {
                 x = x + "\n" + s;
             }
         }
         return x;
- }
+    }
 
     /**
      * Converts a string with embedded linefeeds into a list of strings, one per line.
      * The line editor needs this.
+     *
      * @param s
      * @return
      */
- public static List<String> stringToList(String s){
-       StringTokenizer stringTokenizer = new StringTokenizer(s, "\n");
-       List<String> output = new ArrayList<>();
-       while(stringTokenizer.hasMoreTokens()){
-           output.add(stringTokenizer.nextToken());
-       }
-       return output;
- }
+    public static List<String> stringToList(String s) {
+        StringTokenizer stringTokenizer = new StringTokenizer(s, "\n");
+        List<String> output = new ArrayList<>();
+        while (stringTokenizer.hasMoreTokens()) {
+            output.add(stringTokenizer.nextToken());
+        }
+        return output;
+    }
 }

@@ -117,11 +117,9 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 
 // § 8 Identifiers
  Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
- //Identifier : [a-zA-Z_$#][a-zA-Z_$0-9#]*;   // No implicit definition of stem variables here!
+// Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;   // no .!
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
-
- //    EmptyBlock : LeftBracket RightBracket;
 
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.

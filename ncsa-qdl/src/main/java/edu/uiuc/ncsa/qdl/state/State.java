@@ -91,6 +91,9 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public StemVariable getSystemConstants() {
+        if(systemConstants == null){
+            createSystemConstants();
+        }
         return systemConstants;
     }
 
