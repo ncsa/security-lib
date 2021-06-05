@@ -91,6 +91,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
          Backslash : '\\';
              Stile : '|';
         TildeRight : '~|';
+           StemDot : '.' | '·';
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
 

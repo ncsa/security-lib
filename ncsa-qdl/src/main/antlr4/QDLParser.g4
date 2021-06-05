@@ -102,19 +102,19 @@ expression
  | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
- | expression '.'+ expression                                                   #dotOp
+ | expression StemDot+ expression                                              #dotOp
  | expression ':'+ expression                                                  #restriction
 // | expression '`'+ expression                                                  #backtick
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
- | expression  op=ASSIGN  expression                                           #assignment
  | integer                                                                     #integers
  | number                                                                      #numbers
  | variable                                                                    #variables
  | keyword                                                                     #keywords
  | Bool                                                                        #logical
  | Null                                                                        #null
-| ';'                                                                         #semi_for_empty_expressions
+ | expression  op=ASSIGN  expression                                           #assignment
+ | ';'                                                                         #semi_for_empty_expressions
  ;
 // This *could* be added but does not work quite as expected because variables are allowed to have . to show they
 // are stems. A (probably quite substantial) rewrite of the parser would be in order to change this
