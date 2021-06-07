@@ -1,0 +1,95 @@
+module[
+   'qdl:/extensions','ext'
+]body[
+   >> This module defines several additional functions for mathematics
+   >> These include sec(), sech() etc.
+   >>    clone(arg.) - make a complete copy of a stem
+   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
+   >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
+   >>    to_cvs(arg.)- export a stem to comma separated format.
+
+    define[clone(arg)][
+        >> clone(arg.)
+        >> Returns a completely new copy of the stem. Since generally
+        >> to stems are used, something like
+        >> a. := b.
+        >> a.0 := 42
+        >> sets element 42 in b. as well. To have them independent, use this
+        assert[var_type(arg) == constants('var_type').stem][' clone requires a stem as its argument'];
+        return(from_json(to_json(arg)));
+      ];
+
+
+
+   define[ fork(@monad1(),@dyad(),@monad2(),x.)][
+     >> A fork is defined as a taking a dyad and two monads and applying them to an argument
+     >>    dyad(monad1(x.), monad2(x.)
+     >> A surprisingly large number of problems are addressed by this: transform the argument
+     >> then use both results for something else. For instance
+     >> to compute the average of a set of numbers, define
+     >>    sum(x.)->reduce(@+, x.);
+     >> then the average of the first 10 odd numbers is
+     >>    fork(@sum(), @/, @size(), 1+2*n(10));
+     >> So "sum divided by size" is how to read this.
+     >> Note the dyad (any algebraic operation like addition is a dyad) is put
+     >> in the middle of the argument list so it looks any other operator.
+     return(dyad(monad1(x.),monad2(x.)));
+   ];
+
+
+
+
+      define[
+         for_each(@f(),a.)
+      ][
+         >> Apply a function to each element of a list. Some functions,
+         >> such as to_string, operate on lists rather than element-wise
+         >> This will apply the function to each enry of a stem.
+         >> For instance, if you are doing an export of a stem to some file format
+         >> like CVS, you would need to turn each line into a string to process it
+         >> with a command like
+         >> for_each(@to_string(), my_stem.)
+         z. := null;
+         while[for_keys(k,a.)][z.k := f(a.k);];
+         return(z.);
+     ];  // end for_each
+
+     define[
+        to_csv(a.)
+     ][
+        >> convert a stem., a., to csv (comma separated values) format.
+        >> a. stem to be converted. Each element is a list and will be a line
+        >> in the output.
+        >> typical use is
+        >> file_write(my_file, to_cvs(data.));
+        >> E.g. here is the start of one
+        >> a.0 := ['t', 'x', 'y']; // header
+        >> a.1 := [0, .5, .345723445]; // first line of data
+        >> tip:  [['t', 'x','y']]~a. would stick in the headers.
+        // convert each entry and remove the [] so its just numbers
+        z. := for_each(@to_string(), a.) - ']' - '[';
+        return(z.);
+     ]; //end to_cvs
+     /*
+        To use this with gnuplot, go to a work directory (here I am using /tmp
+        but you should create your own),  and create
+        the file cfg.gnuplot containing the lines
+
+        set datafile separator ','
+        plot '/tmp/data.csv' using 1:2 with lines, '' using 1:3 with lines
+
+        Then to export QDL, try this in QDL
+
+        file := '/tmp/data.csv';
+        y. := pplot(@cos(),@sin(),-pi(),pi(),500);
+        file_write(file, to_csv([['x','y']]~y.));
+
+        At the command line, you can see the plot by running gnuplot like this:
+
+        gnuplot -p cfg.gnuplot
+
+        you should see a circle of radius 1.
+
+     */
+     // file_write('/tmp/data.csv',  to_csv([['x','y']]~y.))
+]; // end module

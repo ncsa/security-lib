@@ -17,6 +17,15 @@ import java.util.List;
  * on 9/28/20 at  10:57 AM
  */
 public class StemVariableNode implements StatementWithResultInterface {
+    public String getVariableReference() {
+        return variableReference;
+    }
+
+    public void setVariableReference(String variableReference) {
+        this.variableReference = variableReference;
+    }
+
+    String variableReference;
     StemVariable result = new StemVariable();
 
     public ArrayList<StemEntryNode> getStatements() {

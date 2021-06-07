@@ -49,6 +49,7 @@ cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/min-cfg.xml 
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/qdl.nanorc etc/qdl.nanorc
 mkdir "etc/modules"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/math-x.mdl etc/modules
+cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/ext.mdl etc/modules
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/readme.txt etc/modules
 mkdir "examples"
 cp /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/examples/*.qdl examples/

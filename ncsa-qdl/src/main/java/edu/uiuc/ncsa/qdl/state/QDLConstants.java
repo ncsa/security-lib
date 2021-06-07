@@ -113,4 +113,7 @@ public interface QDLConstants {
     String SYS_LOG_WARN = "warn";
     String SYS_LOG_ERROR = "error";
     String SYS_LOG_SEVERE = "severe";
+
+    String STEM_PATH_MARKER = "`";
+    String STEM_PATH_MARKER2 = "·";
 }

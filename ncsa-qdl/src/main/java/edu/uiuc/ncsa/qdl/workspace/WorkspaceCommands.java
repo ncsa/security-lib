@@ -2025,18 +2025,20 @@ public class WorkspaceCommands implements Logable {
         say(funcs.size() + " total functions");
         return rc;
     }
-
+        public static final String LIST_MODULES_SWITCH = "-m";
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("list [" + COMPACT_ALIAS_SWITCH + "]");
+            say("list [" + COMPACT_ALIAS_SWITCH + "|" + LIST_MODULES_SWITCH + "]");
             sayi("List all user defined functions.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
+            sayi(LIST_MODULES_SWITCH + " List modules as well. Default is just what you've defined.");
             return RC_NO_OP;
         }
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
-
+        boolean includeModules = inputLine.hasArg(LIST_MODULES_SWITCH);
+        inputLine.removeSwitch(LIST_MODULES_SWITCH);
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
-        TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null);
+        TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null, includeModules);
         // These are fully qualified.
         int rc = -1;
         if (listFQ) {
@@ -2073,7 +2075,8 @@ public class WorkspaceCommands implements Logable {
             case "--help":
                 say("Variable commands");
                 say("     drop - remove a variable from the system");
-                say("     list - list all user defined variables");
+                say("     list - list all user defined variables. If you include the -m flag, module");
+                say("            variables are shown too");
                 say("     size - try to guestimate the size of all the symbols used.");
                 sayi("  system - list all system variables.");
                 sayi("edit [" + EDIT_TEXT_FLAG + "]- edit the given variable. Adding the " + EDIT_TEXT_FLAG);
@@ -2178,9 +2181,11 @@ public class WorkspaceCommands implements Logable {
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             return RC_NO_OP;
         }
-
+        boolean includeModules = inputLine.hasArg(LIST_MODULES_SWITCH);
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
-        return printList(inputLine, getState().listVariables(useCompactNotation));
+        inputLine.removeSwitch(LIST_MODULES_SWITCH);
+        inputLine.removeSwitch(COMPACT_ALIAS_SWITCH);
+        return printList(inputLine, getState().listVariables(useCompactNotation, includeModules));
     }
 
     /**

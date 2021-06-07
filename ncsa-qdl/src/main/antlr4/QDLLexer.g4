@@ -7,7 +7,8 @@ lexer grammar QDLLexer;
 // § 1 Keywords
   ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null;
 
-         ASSERT : 'assert' | '⊨'; // unicode 22a8
+         ASSERT : 'assert'; 
+         ASSERT2 : '⊨'; // unicode 22a8 
      BOOL_FALSE : 'false'  | '⊥'; // unicode 22a5
       BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
            BODY : 'body';
@@ -27,7 +28,8 @@ lexer grammar QDLLexer;
       Integer : [0-9]+;
 
 // § 3 Decimals, scientific notations
-      Decimal : (Integer '.' Integer) | ('.' Integer);
+//      Decimal : (Integer '.' Integer) | ('.' Integer);
+      Decimal : Integer '.' Integer;
 
 SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
        fragment E : 'E' | 'e';
@@ -91,9 +93,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
          Backslash : '\\';
              Stile : '|';
         TildeRight : '~|';
-           StemDot : '.' | '·';
+           StemDot : '.' ;
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
-
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.

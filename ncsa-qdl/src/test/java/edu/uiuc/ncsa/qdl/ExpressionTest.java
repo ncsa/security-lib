@@ -109,4 +109,69 @@ public class ExpressionTest extends AbstractQDLTester {
         assert getStringValue("y", state).equals("c");
         assert getStringValue("z", state).equals("c");
     }
+    /**
+     * Test that assignments which are now fully treated like any other dyadic operator
+     * and can be grouped and pass back their value reliably. Simple regression test.
+     *
+     * @throws Throwable
+     */
+    public void testAssignmentExpression() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "d:= (false =: c) || true;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("d", state);
+        assert !getBooleanValue("c", state);
+    }
+
+    /**
+     * Update of 1/6/2021 changed assignments from a statement to an expression. This was long
+     * overdue and makes the code vastly easier. This is a set of regression tests to make
+     * sure that functionality with stems (which involves looking up information in the
+     * stem) works.
+     * @throws Throwable
+     */
+    public void testStemAssignments() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [1,2];");
+        addLine(script, "z. := [1,2];");
+        addLine(script, "az_ok :=reduce(@∧, a. == z.);");
+        addLine(script, "b.c := 2;");
+        addLine(script, "bc_ok := b.c == 2;"); // precedence test so it's not bc == b.c
+        addLine(script, "d.e.f := 3;");
+        addLine(script, "def_ok := d.e.f == 3;");
+        addLine(script, "g.h.i.j := 4;");
+        addLine(script, "ghij_ok := g.h.i.j == 4;");
+        addLine(script, "x := 'h.i.j';");
+        addLine(script, "x1 := 'h.i.j.';");
+
+        addLine(script, "x_not_ok := is_defined(g.x);"); //false
+        addLine(script, "w.x := 5;");
+        addLine(script, "w.x1 := 10;");
+        addLine(script, "wx1_ok := w.x1 == (w.).'h.i.j.';"); // test that keys with .'s can be used
+        addLine(script, "wx_not_ok := is_defined(w.h.i.j);"); // false
+        addLine(script, "wx_ok := w.x == (w.).'h.i.j';"); // test that keys with .'s can be used
+        addLine(script, "w.h.i.j := 100;");
+        addLine(script, "w2_ok := w.h.i.j == 100;");
+        addLine(script, "wx2_ok := w.x == (w.).'h.i.j';"); // test that keys with .'s can be used
+        addLine(script, "(b.).(q:= 'c');");
+        addLine(script, "q_ok := q == 'c';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("az_ok", state);
+        assert getBooleanValue("def_ok", state);
+        assert getBooleanValue("ghij_ok", state);
+        assert !getBooleanValue("x_not_ok", state);
+        assert !getBooleanValue("wx_not_ok", state);
+        assert getBooleanValue("wx_ok", state);
+        assert getBooleanValue("wx1_ok", state);
+        assert getBooleanValue("w2_ok", state);
+        assert getBooleanValue("wx2_ok", state);
+        assert getBooleanValue("bc_ok", state);
+        assert getBooleanValue("q_ok", state);
+
+    }
+
 }

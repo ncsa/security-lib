@@ -1861,6 +1861,48 @@ public class ParserTest extends AbstractQDLTester {
         assert stemVariable.getLong(4L) == 4L;
     }
 
+    /**
+     * Assignment was changed to an operator and moved in the order of
+     * operations hierarchy. This means we have to guard against regression like
+     * <pre>
+     *     a.b.c := d.e.f
+     * </pre>
+     * being parsed as
+     * <pre>
+     *     a.b. (c := d) .e.f
+     * </pre>
+     * Then either failing or giving squirrely but silent results
+     * If this test breaks, then probably assignments
+     * @throws Throwable
+     */
+    public void testChainExpAssignment2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.b.c := 2; d.e.f :=5;");
+        addLine(script, "a.b.c := d.e.f;");
+        addLine(script, "rc := a.b.c == 5;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // check that exactly the value was updated
+        assert getBooleanValue("rc", state);
+    }
+    public void testChainExpAssignment3() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "q := 99; a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "f().2 := p := q += 1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable stemVariable = getStemValue("a.", state);
+        // check that exactly the value was updated
+        assert getLongValue("p", state) == 100L;
+        assert getLongValue("q", state) == 100L;
+        assert stemVariable.getLong(0L) == 0L;
+        assert stemVariable.getLong(1L) == 1L;
+        assert stemVariable.getLong(2L) == 100L;
+        assert stemVariable.getLong(3L) == 3L;
+        assert stemVariable.getLong(4L) == 4L;
+    }
     @Test
     public void testReverseAssignment() throws Throwable {
         State state = testUtils.getNewState();
@@ -2373,19 +2415,5 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("y", state);
     }
 
-    /**
-     * Test that assignments which are now fully treated like any other dyadic operator
-     * and can be grouped and pass back their value reliably. Simple regression test.
-     *
-     * @throws Throwable
-     */
-    public void testAssignmentExpression() throws Throwable {
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "d:= (false =: c) || true;");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getBooleanValue("d", state);
-        assert !getBooleanValue("c", state);
-    }
+
 }

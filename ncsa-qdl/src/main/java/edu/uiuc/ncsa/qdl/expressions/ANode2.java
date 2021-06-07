@@ -106,6 +106,10 @@ public class ANode2 extends ExpressionImpl {
         } else {
             // cannot evaluate the variable node at this point since if it does not exist,
             // it raises an exception.
+            if (getLeftArg() instanceof ExpressionStemNode) {
+                   setExpValue(state, (ExpressionStemNode) getLeftArg(), getResultType(), getResult());
+                   wasSet = true;
+               }
             if(!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
                 getLeftArg().evaluate(state); // this chains to the next.
             }
@@ -114,10 +118,7 @@ public class ANode2 extends ExpressionImpl {
                 setVariableValue(state, ((VariableNode) getLeftArg()).getVariableReference(), getResultType(), getResult());
                 wasSet = true;
             }
-            if (getLeftArg() instanceof ExpressionStemNode) {
-                setExpValue(state, (ExpressionStemNode) getLeftArg(), getResultType(), getResult());
-                wasSet = true;
-            }
+
         }
         if (!wasSet) {
             throw new IllegalArgumentException("error: could not determine node type to assign value");

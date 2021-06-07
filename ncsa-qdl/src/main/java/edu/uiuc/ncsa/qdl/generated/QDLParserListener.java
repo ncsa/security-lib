@@ -138,6 +138,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitAssertStatement(QDLParserParser.AssertStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#assertStatement2}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssertStatement2(QDLParserParser.AssertStatement2Context ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#assertStatement2}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssertStatement2(QDLParserParser.AssertStatement2Context ctx);
+	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#statementBlock}.
 	 * @param ctx the parse tree
 	 */
@@ -611,6 +621,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAddExpression(QDLParserParser.AddExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code restriction}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterRestriction(QDLParserParser.RestrictionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code restriction}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitRestriction(QDLParserParser.RestrictionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code semi_for_empty_expressions}
 	 * labeled alternative in {@link QDLParserParser#expression}.

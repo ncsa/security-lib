@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.qdl.expressions.Assignment;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
@@ -119,7 +120,7 @@ public class StatementTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
-        } catch (IllegalStateException |  IllegalArgumentException iax) {
+        } catch (IllegalStateException | IllegalArgumentException iax) {
             assert true;
         }
 
@@ -135,4 +136,41 @@ public class StatementTest extends AbstractQDLTester {
         }
 
     }
+
+    public void testAssert() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "assert[2<3]['test 1'];");
+        addLine(script, "⊨ 2<3 : 'test 1';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // should work without incident since both assert statements pass
+    }
+
+    public void testBadAssert1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "assert[3<2]['test 1'];");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "failed assertion not asserted";
+        } catch (AssertionException assertionException) {
+            assert assertionException.getMessage().equals("test 1");
+        }
+    }
+
+    public void testBadAssert2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "⊨ 3<2 : 'test 1';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "failed assertion not asserted";
+        } catch (AssertionException assertionException) {
+            assert assertionException.getMessage().equals("test 1");
+        }
+    }
+
 }

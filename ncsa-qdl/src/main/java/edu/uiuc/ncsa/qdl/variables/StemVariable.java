@@ -740,10 +740,6 @@ public class StemVariable extends HashMap<String, Object> {
         // so a key of "01" is a string, not the number 1. Sorry, best we can do.
         //     try {
         return key.equals("0") || key.matches(int_regex);
- /*       } catch (StackOverflowError sto) {
-
-            throw new IllegalStateException("Error: This stem references itself and access to it cannot be resolved.");
-        }*/
     }
 
     Pattern var_pattern = Pattern.compile(var_regex);
@@ -1375,5 +1371,26 @@ public class StemVariable extends HashMap<String, Object> {
 
     public Long getRank() {
         return Math.max(getStemList().getRank(), size()) ;
+    }
+    public Object get(StemPath<StemPathEntry> stemPath){
+        if(stemPath.isEmpty()){
+            return null;
+        }
+        QDLCodec codec = new QDLCodec();
+        Object currentObj = QDLNull.getInstance();
+        StemVariable lastStem = this;
+        for(StemPathEntry spe : stemPath){
+             currentObj = lastStem.get(spe.isString()?codec.decode(spe.getKey()):spe.getIndex());
+             if(currentObj == null){
+                 return QDLNull.getInstance();
+             }
+             if(currentObj instanceof StemVariable){
+                 lastStem = (StemVariable) currentObj;
+             }else{
+                 lastStem = null;
+             }
+        }
+
+        return currentObj;
     }
 }

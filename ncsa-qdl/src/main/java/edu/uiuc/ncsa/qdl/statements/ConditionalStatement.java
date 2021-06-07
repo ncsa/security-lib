@@ -49,7 +49,7 @@ public class ConditionalStatement implements Statement {
         Boolean result = false;
         getConditional().evaluate(newState);
         if (!(getConditional().getResult() instanceof Boolean)) {
-            throw new IllegalStateException("Error: You must have a boolean value for your conditional");
+            throw new IllegalStateException("Error: You must have a boolean value for your conditional not \"" +getConditional().getResult() + "\"." );
         }
         if ((Boolean) getConditional().getResult()) {
             result = true;

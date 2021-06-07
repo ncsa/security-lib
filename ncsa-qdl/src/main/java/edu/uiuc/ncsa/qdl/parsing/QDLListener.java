@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.*;
 import edu.uiuc.ncsa.qdl.variables.*;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
@@ -1416,29 +1417,6 @@ public class QDLListener implements QDLParserListener {
 
     }
 
-/*    @Override
-    public void enterStem_ref(QDLParserParser.Stem_refContext ctx) {
-        System.out.println("enter stem-ref");
-        stash(ctx, new VariableNode(null));
-
-    }
-
-    @Override
-    public void exitStem_ref(QDLParserParser.Stem_refContext ctx) {
-        System.out.println("exit stem-ref");
-        StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
-        ((VariableNode) parsingMap.getStatementFromContext(ctx)).setVariableReference(ctx.getText());
-    }
-
-    @Override
-    public void enterStem_refs(QDLParserParser.Stem_refsContext ctx) {
-        System.out.println("enter stem-refs");
-    }
-
-    @Override
-    public void exitStem_refs(QDLParserParser.Stem_refsContext ctx) {
-        System.out.println("exit stem_refs");
-    }*/
 
     @Override
     public void enterF_ref(QDLParserParser.F_refContext ctx) {
@@ -1791,15 +1769,72 @@ public class QDLListener implements QDLParserListener {
         }
     }
 
+    @Override
+    public void enterAssertStatement2(QDLParserParser.AssertStatement2Context ctx) {
+        stash(ctx, new AssertStatement());
+
+    }
+
+    @Override
+    public void exitAssertStatement2(QDLParserParser.AssertStatement2Context ctx) {
+        AssertStatement assertStatement = (AssertStatement) parsingMap.getStatementFromContext(ctx);
+        boolean isFirst = true;
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            if (isFirst) {
+                assertStatement.setConditional((StatementWithResultInterface) resolveChild(ctx.getChild(i)));
+                isFirst = false;
+            } else {
+                assertStatement.setMesssge((ExpressionNode) resolveChild(ctx.getChild(i)));
+
+            }
+        }
+
+    }
+
+    @Override
+    public void enterRestriction(QDLParserParser.RestrictionContext ctx) {
+
+    }
+
+    @Override
+    public void exitRestriction(QDLParserParser.RestrictionContext ctx) {
+        throw new NotImplementedException("restrictions not implemented");
+    }
+
 /*    @Override
+    public void enterIndex(QDLParserParser.IndexContext ctx) {
+
+    }
+
+    @Override
+    public void exitIndex(QDLParserParser.IndexContext ctx) {
+    throw new NotImplementedException("index sets not implemented");
+    }*/
+
+    /*    @Override
     public void enterDotOp2(QDLParserParser.DotOp2Context ctx) {
+        ExpressionStemNode esn = new ExpressionStemNode();
+        stash(ctx, esn);
 
     }
 
     @Override
     public void exitDotOp2(QDLParserParser.DotOp2Context ctx) {
-        throw new NotImplementedException();
+        ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(ctx);
+        expressionStemNode.setSourceCode(getSource(ctx));
+
+         for (int i = 0; i < ctx.getChildCount(); i++) {
+             ParseTree p = ctx.getChild(i);
+             // If it is a termminal node (a node consisting of just be the stem marker) skip it
+             if (!(p instanceof TerminalNodeImpl)) {
+                 expressionStemNode.getStatements().add((StatementWithResultInterface) resolveChild(p));
+             }
+         }
     }*/
+
 }
 
 

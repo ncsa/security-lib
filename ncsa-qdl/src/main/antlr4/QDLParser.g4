@@ -18,6 +18,7 @@ statement :
           | tryCatchStatement
           | lambdaStatement
           | assertStatement
+          | assertStatement2
           ;
 
  conditionalStatement : ifStatement | ifElseStatement;
@@ -46,8 +47,11 @@ moduleStatement:
 tryCatchStatement:
      TRY statementBlock CATCH statementBlock;
 
-assertStatement :
-     ASSERT LeftBracket expression RightBracket LeftBracket expression RightBracket;
+  assertStatement :
+       ASSERT LeftBracket expression RightBracket LeftBracket expression RightBracket;
+
+assertStatement2:
+  ASSERT2 expression (':' expression)?;
 
     statementBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
@@ -78,11 +82,11 @@ assertStatement :
 // and checking for regression. Also Antlr 4 interprets the comments in the right hand column and
 // will use these for generating method names in Java. Be careful of actually putting comments there!
 
+
 expression
  :
    function                                                                    #functions
  //| function LambdaConnector expression                                         #lambdaDef
- | STRING                                                                      #strings
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval
@@ -103,10 +107,12 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression StemDot+ expression                                              #dotOp
- | expression ':'+ expression                                                  #restriction
-// | expression '`'+ expression                                                  #backtick
+// | expression postfix=StemDot                                                  #dotOp2
+ | expression Backslash + expression                                           #restriction
+// | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
+ | STRING                                                                      #strings
  | integer                                                                     #integers
  | number                                                                      #numbers
  | variable                                                                    #variables
@@ -119,10 +125,10 @@ expression
 // This *could* be added but does not work quite as expected because variables are allowed to have . to show they
 // are stems. A (probably quite substantial) rewrite of the parser would be in order to change this
 
+       variable : Identifier ;
+         number : Decimal |  SCIENTIFIC_NUMBER;
+        integer : Integer;
 
-  variable : Identifier ;
-    number : Decimal | Integer | SCIENTIFIC_NUMBER;
-   integer : Integer;
 
    keyword : ConstantKeywords;
 

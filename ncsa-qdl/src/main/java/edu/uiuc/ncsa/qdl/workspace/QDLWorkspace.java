@@ -251,7 +251,7 @@ public class QDLWorkspace {
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
         ArrayList<String> functions = new ArrayList<>();
         functions.addAll(qc.workspaceCommands.getState().getMetaEvaluator().listFunctions(false));
-        functions.addAll(qc.workspaceCommands.getState().listFunctions(true, null));
+        functions.addAll(qc.workspaceCommands.getState().listFunctions(true, null, true));
         if (isoTerminal) {
             // set up command completion
             iso6429IO.setCommandCompletion(functions);

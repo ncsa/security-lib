@@ -158,15 +158,15 @@ public abstract class FunctionState extends VariableState {
      * @param regex
      * @return
      */
-    public TreeSet<String> listFunctions(boolean useCompactNotation, String regex) {
+    public TreeSet<String> listFunctions(boolean useCompactNotation, String regex, boolean includeModules) {
         TreeSet<String> out = getFTStack().listFunctions(regex);
         // no module templates, so no need to snoop through them
-        if(getModuleMap().isEmpty()){
+        if((!includeModules) || getModuleMap().isEmpty()){
             return out;
         }
         for (URI key : getImportManager().keySet()) {
             Module mm = getModuleMap().get(key);
-            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex);
+            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true);
             for (String x : uqVars) {
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);

@@ -169,9 +169,25 @@ The following are working:
         }
 
         // Simplest case.
-        if (getLeftArg().getResultType() == STEM_TYPE) {
+        if (getLeftArg().getResultType() == STEM_TYPE || (getLeftArg() instanceof VariableNode)) {
+            StemVariable s = null;
+            if(getLeftArg() instanceof VariableNode){
+                VariableNode vNode = (VariableNode)getLeftArg();
+                if(!state.isStem(vNode.getVariableReference())){
+                    throw new IllegalArgumentException("Cannot assign stem value to non-stem variable \"" + vNode.getVariableReference() + "\"");
+                }
+                Object obj = state.getValue(vNode.getVariableReference());
+                if(obj == null && setValue){
+                    s = new StemVariable();
+                    // add it to the symbol table
+                    state.setValue(vNode.getVariableReference(), s);
+                }else{
+                    s = (StemVariable)  obj;
+                }
+            }else{
+                 s = (StemVariable) getLeftArg().getResult();
+            }
             if (setValue) {
-                StemVariable s = (StemVariable) getLeftArg().getResult();
                 if (getRightArg().getResult() instanceof Long) {
                     s.put((Long) getRightArg().getResult(), newValue);
                 } else {
@@ -202,13 +218,15 @@ The following are working:
             return result;
         }
         // other case is that the left hand argumement is this class.
+
         if (!(getLeftArg() instanceof ExpressionStemNode)) {
+
             // This means the user passed in something as the left most argument that
             // cannot be a stem, e.g. (1).(2).
             throw new IllegalStateException("Error: left hand argument not a valid stem.");
         }
-
         StatementWithResultInterface swri = getLeftArg();
+
         StatementWithResultInterface lastSWRI = getRightArg();
         Object r = null;
         ExpressionStemNode esn = null;
@@ -238,12 +256,12 @@ The following are working:
         } else {
     /*        if (r.toString().contains(STEM_INDEX_MARKER)
             ) {*/
-                StemMultiIndex stemMultiIndex = new StemMultiIndex("$" + STEM_INDEX_MARKER + r);
-                r1 = stemVariable.get(stemMultiIndex);
-      /*      } else {
-                r1 = stemVariable.get(r);
-            }
-      */  }
+            //           StemMultiIndex stemMultiIndex = new StemMultiIndex("$" + STEM_INDEX_MARKER + r);
+            //         r1 = stemVariable.get(stemMultiIndex);
+            /*      } else { */
+            r1 = stemVariable.get(r);
+        }
+
 
         setResult(r1);
         setEvaluated(true);
@@ -251,7 +269,8 @@ The following are working:
         return r1;
 
     }
-      // a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}}
+
+    // a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}}
     //  (a.).query(a., '$..m',true).(0)
     protected Object doLeftSVCase(StatementWithResultInterface leftArg, StatementWithResultInterface rightArg, State state) {
         List<StatementWithResultInterface> x = new ArrayList<>();
@@ -289,6 +308,16 @@ The following are working:
                         }
                     }
                     gotOne = true;
+                }
+            }
+            if (!gotOne && (rightArg instanceof ConstantNode)) {
+                switch (rightArg.getResultType()) {
+                    case LONG_TYPE:
+                        return stemLeft.get((Long) rightArg.getResult());
+                    case STRING_TYPE:
+                        return stemLeft.get((String) rightArg.getResult());
+                    default:
+                        new IllegalArgumentException("unknown stem index type ");
                 }
             }
             if (!gotOne && (rightArg.getResultType() == STRING_TYPE || rightArg.getResultType() == LONG_TYPE)) {

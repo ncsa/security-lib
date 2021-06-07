@@ -196,7 +196,8 @@ public class MathFunctionsTest extends AbstractQDLTester {
      * There was a bug in the parser that leading minus signs were not handled correctly.
      * This is because tutorials on writing parsers gave some bad advice (having unary minus
      * outrank other operators rather than being in their normal place in the hierarchy). This test
-     * shows that is fixed.
+     * shows that is fixed. Note that decimals are tested here too in that 0.3 (leading zero mandatory)
+     * and such are used.
      *
      * @throws Exception
      */
@@ -207,30 +208,30 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "a.0 := -1;");
         addLine(script, "a.1 := -2^2;");
         addLine(script, "a.2 := -2^3;");
-        addLine(script, "a.30 := -.1;");
-        addLine(script, "a.3 := -.1^2;");
-        addLine(script, "a.4 := -.1^3;");
+        addLine(script, "a.30 := -0.1;");
+        addLine(script, "a.3 := -0.1^2;");
+        addLine(script, "a.4 := -0.1^3;");
         addLine(script, "a.5 := -3*4;");
         addLine(script, "a.6 := -3*(-4);");
         addLine(script, "a.7 := 3*(-4);");
         addLine(script, "a.8 := (3)*(4);");
-        addLine(script, "a.9 := -.3*(-4);");
-        addLine(script, "a.10 := 0-.3*(-4);");
-        addLine(script, "a.11 := .3*(4);");
-        addLine(script, "a.12 := -3*(-.4);");
-        addLine(script, "a.13 := 0-3*(-.4);");
-        addLine(script, "a.14 := 3*(-.4);");
-        addLine(script, "a.15 := -.3*(-.4);");
-        addLine(script, "a.16 := .3*(-.4);");
-        addLine(script, "a.17 := 0-.3*(-.4);");
+        addLine(script, "a.9 := -0.3*(-4);");
+        addLine(script, "a.10 := 0-0.3*(-4);");
+        addLine(script, "a.11 := 0.3*(4);");
+        addLine(script, "a.12 := -3*(-0.4);");
+        addLine(script, "a.13 := 0-3*(-0.4);");
+        addLine(script, "a.14 := 3*(-0.4);");
+        addLine(script, "a.15 := -0.3*(-0.4);");
+        addLine(script, "a.16 := 0.3*(-0.4);");
+        addLine(script, "a.17 := 0-0.3*(-0.4);");
         addLine(script, "b. := -3 + indices(6);"); // {-3, -2, -1, 0, 1, 2}
         addLine(script, "c. := -b.;"); // {3, 2, 1, 0, -1, -2}
         addLine(script, "d. := -b.^2;"); // {-9, -4, -1, 0, -1, -4}
         addLine(script, "e. := -b.^3;"); // {27, 8, 1, 0, -1, -8}
         addLine(script, "f. := -3*b.;"); // {9, 6, 3, 0, -3, -6}
-        addLine(script, "g. := -.3*b.;"); // {.9, .6, .3, 0.0, -.3, -.6}
-        addLine(script, "h. := -.3 + b.;"); // {-3.3, -2.3, -1.3, -0.3, .7, 1.7}
-        addLine(script, "i. := -.3 - b.;"); // {2.7, 1.7, .7, -.3, -1.3, -2.3}
+        addLine(script, "g. := -0.3*b.;"); // {.9, .6, .3, 0.0, -.3, -.6}
+        addLine(script, "h. := -0.3 + b.;"); // {-3.3, -2.3, -1.3, -0.3, .7, 1.7}
+        addLine(script, "i. := -0.3 - b.;"); // {2.7, 1.7, .7, -.3, -1.3, -2.3}
 
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);

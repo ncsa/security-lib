@@ -53,7 +53,7 @@ public abstract class VariableState extends NamespaceAwareState {
     public boolean isDefined(String symbol) {
         try {
             return getValue(symbol) != null;
-        } catch (UnknownSymbolException u) {
+        } catch (IndexError | UnknownSymbolException u) {
             // Can happen if the request is for a stem that eventually does not resolve.
             return false;
         }
@@ -396,14 +396,17 @@ public abstract class VariableState extends NamespaceAwareState {
         return resolveStemIndex(index, resolveState);
     }
 
-    public TreeSet<String> listVariables(boolean useCompactNotation) {
+    public TreeSet<String> listVariables(boolean useCompactNotation, boolean includeModules) {
         TreeSet<String> out = getSymbolStack().listVariables();
+        if(!includeModules){
+            return out;
+        }
         for (URI key : getImportManager().keySet()) {
             Module m = getModuleMap().get(key);
             if (m == null) {
                 continue; // the user specified a non-existent module.
             }
-            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation);
+            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation, true);
             for (String x : uqVars) {
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);

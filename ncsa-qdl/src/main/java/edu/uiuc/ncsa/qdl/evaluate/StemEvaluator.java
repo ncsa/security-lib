@@ -6,6 +6,7 @@ import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -1488,6 +1489,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         int currentIndex = 0;
     }
 
+    /**
+     * Fills in the elements for the n(x,y,z,...) function.adv74008
+     *
+     * @param out
+     * @param lengths
+     * @param index
+     * @param cyclicArgList
+     */
     protected void indexRecursion(StemVariable out, int[] lengths, int index, CyclicArgList cyclicArgList) {
         for (int i = 0; i < lengths[index]; i++) {
             if (lengths.length == index + 2) {
@@ -1703,7 +1712,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + IS_DEFINED + " function requires 1 argument");
         }
         boolean isDef = false;
-        polyad.evalArg(0, state);
+        try {
+            polyad.evalArg(0, state);
+        }catch(IndexError | UnknownSymbolException exception){
+            polyad.setResult(isDef);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setEvaluated(true);
+return;
+        }
         if (polyad.getArguments().get(0) instanceof VariableNode) {
             VariableNode variableNode = (VariableNode) polyad.getArguments().get(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check

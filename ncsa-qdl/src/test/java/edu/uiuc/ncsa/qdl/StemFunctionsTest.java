@@ -1360,4 +1360,23 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert ndx.size() == 1;
         assert ndx.getString("0").equals("t.m");
     }
+
+    /**
+     * Critical regression test that tests that {@link edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode}s
+     * resolve constants on the LHS, so
+     * <pre>
+     * (a.).(0) := 1 <=> a.0 := 1
+     * </pre>
+     *
+     * @throws Throwable
+     */
+    public void testBasicExpressionStemNodeAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "(a.).(0) := 1;");
+        addLine(script, "x := a.0 == 1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("x", state);
+    }
 }
