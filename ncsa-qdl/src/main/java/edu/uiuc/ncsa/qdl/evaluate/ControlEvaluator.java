@@ -483,9 +483,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         // oldReduceOrExpand2(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
         StemUtility.StemAxisWalkerAction1 axisWalker;
         if(doReduce){
-            axisWalker = this.new AxisReduce(getOperator(state, (FunctionReferenceNode) arg0), state);
+            axisWalker = this.new AxisReduce(getOperator(state, (FunctionReferenceNode) arg0,2), state);
         }else{
-            axisWalker = this.new AxisExpand(getOperator(state, (FunctionReferenceNode) arg0), state);
+            axisWalker = this.new AxisExpand(getOperator(state, (FunctionReferenceNode) arg0,2), state);
         }
         Object result = axisWalker(stemVariable, axis, axisWalker);
         polyad.setResult(result);
@@ -493,119 +493,6 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-/*
-    private void newReduceOrExpand(Polyad polyad, State state, boolean doReduce, int axis, FunctionReferenceNode arg0, StemVariable stemVariable) {
-        ExpressionImpl operator = getOperator(state, arg0);
-        StemUtility.MonadAxisAction action = new StemUtility.MonadAxisAction() {
-            @Override
-            public void action(StemVariable out, String key, StemVariable arg) {
-                System.out.println(key);
-            }
-        };
-        StemVariable out = new StemVariable();
-        boolean doOnLastAxis = false;
-        if (axis == LAST_AXIS_ARGUMENT_VALUE) {
-            doOnLastAxis = true;
-        }
-
-        //StemUtility.axisMonadRecursion(out, stemVariable,-1, );
-        StemUtility.axisMonadRecursion(out, stemVariable, doOnLastAxis ? 1000000 : (axis - 1), doOnLastAxis, action);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setResult(out);
-        polyad.setEvaluated(true);
-    }
-*/
-
- /*  Original that works only along axis. Can be re-enabled and used for testing newer versions
-    private void oldReduceOrExpand(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable) {
-        ExpressionImpl operator = getOperator(state, arg0);
-        boolean isFirst = true;
-        StemVariable output = null;
-        Object reduceOuput = null;
-        // contract is that a single list is returned unaltered.
-        // At this point, we know there are at least 2 entries.
-        Iterator<StemEntry> iterator = stemVariable.getStemList().iterator();
-        Object lastValue = iterator.next().entry;
-
-        if (!doReduce) {
-            output = new StemVariable();
-            output.listAppend(lastValue);
-        }
-        while (iterator.hasNext()) {
-            Object currentValue = iterator.next().entry;
-            ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
-            argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
-            argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
-            operator.setArguments(argList);
-            operator.evaluate(state);
-            if (doReduce) {
-                reduceOuput = operator.getResult();
-            } else {
-                output.listAppend(operator.getResult());
-            }
-            lastValue = operator.getResult();
-        }
-        if (doReduce) {
-            polyad.setResult(reduceOuput);
-            polyad.setResultType(Constant.getType(reduceOuput));
-        } else {
-            polyad.setResult(output);
-            polyad.setResultType(Constant.STEM_TYPE);
-        }
-        polyad.setEvaluated(true);
-        return;
-    }
-*/
-/*    private void oldReduceOrExpand2(Polyad polyad, State state, boolean doReduce, FunctionReferenceNode arg0, StemVariable stemVariable1) {
-        ExpressionImpl operator = getOperator(state, arg0);
-        StemVariable output = new StemVariable();
-        // contract is that a single list is returned unaltered.
-        // At this point, we know there are at least 2 entries.
-        for (String key1 : stemVariable1.keySet()) {
-            Object obj = stemVariable1.get(key1);
-            if (!isStem(obj)) {
-                continue;
-            }
-            StemVariable stemVariable = (StemVariable) obj;
-            Set<String> keySet = stemVariable.keySet();
-            Iterator<String> iterator = keySet.iterator();
-            StemVariable output1 = null;
-            Object reduceOuput = null;
-
-            Object lastValue = stemVariable.get(iterator.next()); // grab one before loop starts
-            if (!doReduce) {
-                output1 = new StemVariable();
-                output1.listAppend(lastValue);
-            }
-
-            while (iterator.hasNext()) {
-                String key = iterator.next();
-                Object currentValue = stemVariable.get(key);
-                ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
-                argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
-                argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
-                operator.setArguments(argList);
-                operator.evaluate(state);
-                if (doReduce) {
-                    reduceOuput = operator.getResult();
-                } else {
-                    output1.put(key, operator.getResult());
-                }
-                lastValue = operator.getResult();
-            }
-            if (doReduce) {
-
-                output.put(key1, reduceOuput);
-            } else {
-                output.put(key1, output1);
-            }
-        }
-
-        polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-        return;
-    }*/
 
     public class AxisReduce implements StemUtility.StemAxisWalkerAction1 {
         ExpressionImpl operator;

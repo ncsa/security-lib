@@ -156,6 +156,13 @@ public class StemUtility {
         Object action(StemVariable inStem);
     }
 
+    /**
+     * Recurses through stem that has arbitrary rank.
+     * @param inStem
+     * @param depth
+     * @param walker
+     * @return
+     */
     public static Object axisWalker(StemVariable inStem, int depth, StemAxisWalkerAction1 walker) {
         if (inStem.getRank() < depth+1) {
             throw new RankException("error: axis " + depth + " requested on stem of rank " + inStem.getRank() );

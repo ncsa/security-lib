@@ -53,6 +53,12 @@ public class StemVariable extends HashMap<String, Object> {
             return get((Long) key);
         }
         if (key instanceof String) {
+            String sKey = (String)key;
+            if(StemPath.isPath(sKey)){
+                StemPath stemPath = new StemPath();
+                stemPath.parsePath(sKey);
+                  return get(stemPath);
+            }
             return get((String) key);
         }
         return super.get(key);
@@ -138,6 +144,11 @@ public class StemVariable extends HashMap<String, Object> {
             if (!containsKey(key) && defaultValue != null) {
                 return defaultValue;
             }
+                if(StemPath.isPath(key)) {
+                    StemPath stemPath = new StemPath();
+                    stemPath.parsePath(key);
+                    return get(stemPath);
+                }
             return super.get(key);
         } catch (StackOverflowError | PatternSyntaxException sto) {
             //In this case someplace there is a reference to the stem itself, e.g.

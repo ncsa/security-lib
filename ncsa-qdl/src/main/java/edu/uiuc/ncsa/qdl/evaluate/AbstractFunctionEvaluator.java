@@ -573,7 +573,7 @@ return StemUtility.areNoneStems(objects);    }
      * @param frNode
      * @return
      */
-    protected ExpressionImpl getOperator(State state, FunctionReferenceNode frNode) {
+    protected ExpressionImpl getOperator(State state, FunctionReferenceNode frNode, int nAry) {
         ExpressionImpl operator;
         String operatorName = frNode.getFunctionName();
         if (state.getOpEvaluator().isMathOperator(operatorName)) {
@@ -582,9 +582,9 @@ return StemUtility.areNoneStems(objects);    }
             if(state.getMetaEvaluator().isBuiltInFunction(operatorName)){
                 operator  = new Polyad(operatorName);
             }else{
-                FunctionRecord functionRecord = state.getFTStack().get(operatorName, 2); // It's a dyad!
+                FunctionRecord functionRecord = state.getFTStack().get(operatorName, nAry); // It's a dyad!
                 if(functionRecord == null){
-                    throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined");
+                    throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined with " + nAry + " arguments");
                 }
                 Polyad polyad1 = new Polyad(operatorName);
                 polyad1.setBuiltIn(false); // or it will not execute!

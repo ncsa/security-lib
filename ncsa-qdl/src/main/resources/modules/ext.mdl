@@ -36,24 +36,6 @@ module[
      return(dyad(monad1(x.),monad2(x.)));
    ];
 
-
-
-
-      define[
-         for_each(@f(),a.)
-      ][
-         >> Apply a function to each element of a list. Some functions,
-         >> such as to_string, operate on lists rather than element-wise
-         >> This will apply the function to each enry of a stem.
-         >> For instance, if you are doing an export of a stem to some file format
-         >> like CVS, you would need to turn each line into a string to process it
-         >> with a command like
-         >> for_each(@to_string(), my_stem.)
-         z. := null;
-         while[for_keys(k,a.)][z.k := f(a.k);];
-         return(z.);
-     ];  // end for_each
-
      define[
         to_csv(a.)
      ][

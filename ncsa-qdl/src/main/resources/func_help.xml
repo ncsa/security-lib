@@ -1884,6 +1884,38 @@ them on for development and off in production.
 ]]>
             </body>
         </entry>
+    <entry id="for_each">
+            <body>
+                <![CDATA[
+for_each(@f, arg_1., arg_2., ..., arg_n.) - Apply the n-adic function, f, to
+           each element of the outer product of the arg_k.
+Simple example, making a multiplication table.
+   a. := for_each(@*, 1+n(5), 1+n(6))
+   a.
+[
+   [1,2,3,4,5,6],
+   [2,4,6,8,10,12],
+   [3,6,9,12,15,18],
+   [4,8,12,16,20,24],
+   [5,10,15,20,25,30]
+]
+
+Things to note. The result is the product of the stems, so here there is
+a 5 x 6 array that results. a.i.j is the product of the i-th and j-th elements.
+
+Another example. Create the grid points for a quadric (polynomial) surface over
+a a region.
+   z(x,y) -> x*y;
+   z. := for_each(@z, [|-1;1;15|],[0;3;0.25])
+   dim(z.)
+[15,12]
+This creates a table over the region of the plane for -1 <= x <= 1
+and 0 <= y < 3. There are 15 total points in the x direction and
+the y direction is done in increments of 0.25, resulting in 12 values,
+so the result is a 15 x 12 array, with z evaluated at each point.
+                ]]>
+            </body>
+        </entry>
 
     <!--
         entry template

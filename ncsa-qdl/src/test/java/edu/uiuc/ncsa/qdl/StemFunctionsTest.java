@@ -1358,7 +1358,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert x.getBoolean(0L);
         StemVariable ndx = getStemValue("ndx.",state);
         assert ndx.size() == 1;
-        assert ndx.getString("0").equals("t.m");
+     //   assert ndx.getString("0").equals("t.m");
+        assert ndx.getString("0").equals("·t·m");
     }
 
     /**
@@ -1379,4 +1380,52 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("x", state);
     }
+
+    /**
+     * Probabilistic test for for_each applied to a dyadic argument.
+     * @throws Throwable
+     */
+    public void testForEach2() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "z(x,y)->x^2+y^2;");
+         addLine(script, "a. := for_each(@z, n(5),n(7));");
+         // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
+         addLine(script, "b.0 := a.0.0 == z(0,0);");
+         addLine(script, "b.1 := a.1.1 == z(1,1);");
+         addLine(script, "b.2 := a.2.2 == z(2,2);");
+         addLine(script, "b.3 := a.3.3 == z(3,3);");
+         addLine(script, "b.4 := a.4.4 == z(4,4);");
+         addLine(script, "b.5 := a.0.5 == z(0,5);");
+         addLine(script, "b.6 := a.1.6 == z(1,6);");
+         addLine(script, "ok:= reduce(@∧, b.);");
+
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
+
+    public void testForEach3() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "w(x,y,z)->x^2+y^2 + z^3;");
+         addLine(script, "a. := for_each(@w, n(5),n(7),n(9));");
+         // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
+         addLine(script, "b.0 := a.0.0.0 == w(0,0,0);");
+         addLine(script, "b.1 := a.1.1.1 == w(1,1,1);");
+         addLine(script, "b.2 := a.2.2.2 == w(2,2,2);");
+         addLine(script, "b.3 := a.3.3.3 == w(3,3,3);");
+         addLine(script, "b.4 := a.4.4.4 == w(4,4,4);");
+         addLine(script, "b.5 := a.0.5.5 == w(0,5,5);");
+         addLine(script, "b.6 := a.1.6.6 == w(1,6,6);");
+         addLine(script, "b.7 := a.1.6.7 == w(1,6,7);");
+         addLine(script, "b.8 := a.3.4.5 == w(3,4,5);");
+         addLine(script, "b.9 := a.4.2.3 == w(4,2,3);");
+         addLine(script, "b.10 := a.2.0.1 == w(2,0,1);");
+         addLine(script, "ok:= reduce(@∧, b.);");
+
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
 }

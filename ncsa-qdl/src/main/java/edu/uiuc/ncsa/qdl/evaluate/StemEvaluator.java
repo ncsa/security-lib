@@ -8,9 +8,12 @@ import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -88,6 +91,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String RANK = "rank";
     public static final String FQ_RANK = STEM_FQ + RANK;
     public static final int RANK_TYPE = 15 + STEM_FUNCTION_BASE_VALUE;
+
+    public static final String FOR_EACH = "for_each";
+    public static final String FQ_FOR_EACH = STEM_FQ + FOR_EACH;
+    public static final int FOR_EACH_TYPE = 16 + STEM_FUNCTION_BASE_VALUE;
 
     // Key functions
     public static final String COMMON_KEYS = "common_keys";
@@ -211,6 +218,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             BOX,
             UNBOX,
             UNION,
+            FOR_EACH,
             COMMON_KEYS,
             EXCLUDE_KEYS,
             LIST_KEYS,
@@ -244,6 +252,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_BOX,
             FQ_UNBOX,
             FQ_UNION,
+            FQ_FOR_EACH,
             FQ_COMMON_KEYS,
             FQ_EXCLUDE_KEYS,
             FQ_LIST_KEYS,
@@ -392,6 +401,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case JSON_PATH_QUERY:
             case FQ_JSON_PATH_QUERY:
                 return JSON_PATH_QUERY_TYPE;
+            case FOR_EACH:
+            case FQ_FOR_EACH:
+                return FOR_EACH_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -535,6 +547,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_TO_JSON:
                 doToJSON(polyad, state);
                 return true;
+            case FOR_EACH:
+            case FQ_FOR_EACH:
+                doForEach(polyad, state);
+                return true;
             case FROM_JSON:
             case FQ_FROM_JSON:
                 doFromJSON(polyad, state);
@@ -545,6 +561,140 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Apply n-ary function to outer product of stems. There n stems passed in.
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doForEach(Polyad polyad, State state) {
+        Object arg0 = polyad.getArguments().get(0);
+        if (!(arg0 instanceof FunctionReferenceNode)) {
+            throw new IllegalArgumentException("error: first argument of " + FOR_EACH + " must be a function reference");
+        }
+
+
+        StemVariable[] stems = new StemVariable[polyad.getArgCount() - 1];
+        for (int i = 1; i < polyad.getArgCount(); i++) {
+
+            Object arg = polyad.evalArg(i, state);
+            if (!isStem(arg)) {
+                throw new IllegalArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
+            }
+            stems[i - 1] = (StemVariable) arg;
+        }
+        ExpressionImpl f = getOperator(state, (FunctionReferenceNode) arg0, stems.length);
+
+        StemVariable output = new StemVariable();
+        // special case single args. Otherwise have to special case a bunch of stuff in forEachRecursion
+
+        if (stems.length == 1) {
+            for (String key0 : stems[0].keySet()) {
+                Object obj = stems[0].get(key0);
+                ArrayList<Object> rawArgs = new ArrayList<>();
+                rawArgs.add(obj);
+                f.setArguments(toConstants(rawArgs));
+                f.evaluate(state);
+                output.put(key0, f.getResult());
+            }
+        } else {
+            forEachRecursion(output, f, state, stems);
+        }
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+
+    }
+
+    protected void forEachRecursion(StemVariable output, ExpressionImpl f, State state, StemVariable[] stems) {
+        int argCount = stems.length - 1;
+        for (String key : stems[0].keySet()) {
+            ArrayList<Object> rawArgs = new ArrayList<>();
+            rawArgs.add(stems[0].get(key));
+            StemVariable output1 = new StemVariable();
+                forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
+            output.put(key, output1);
+        }
+    }
+
+    protected void forEachRecursion(StemVariable output, ExpressionImpl f, State state, StemVariable[] stems, ArrayList<Object> rawArgs, int depth) {
+        ArrayList<StatementWithResultInterface> args = null;
+        int currentIndex = stems.length - depth - 1;
+        if (depth == 0) {
+            args = toConstants(rawArgs); // convert 0,...n-1 args
+            args.add(null);
+        } else {
+            rawArgs.add(null);
+        }
+        for (String key : stems[currentIndex].keySet()) {
+            if (depth == 0) {
+                Object o = stems[currentIndex].get(key);
+                args.set(currentIndex, new ConstantNode(o, Constant.getType(o)));
+                f.setArguments(args);
+                f.evaluate(state);
+                output.put(key, f.getResult());
+            } else {
+                rawArgs.set(currentIndex, stems[currentIndex].get(key));
+                StemVariable output1 = new StemVariable();
+                forEachRecursion(output1, f, state, stems, rawArgs, depth - 1);
+                output.put(key, output1);
+            }
+        }
+    }
+
+    /*
+     f(x)->x+2
+    for_each(@f, n(5))
+[2,3,4,5,6]
+  for_each(@size, n(4,5))
+
+  z(x,y)->x^2+y^2
+  for_each(@z, n(3),n(5))
+[
+   [0,1,4,9,16],
+   [1,2,5,10,17],
+   [4,5,8,13,20]
+]
+
+      w(x,y,z)->x^2+y^2+z^2
+ for_each(@w, n(4), n(3), n(5))
+ // yields a 4 x 3 x 5 array.
+[
+ [
+   [0,1,4,9,16],
+   [1,2,5,10,17],
+   [4,5,8,13,20]
+ ],
+ [
+   [1,2,5,10,17],
+   [2,3,6,11,18],
+   [5,6,9,14,21]
+ ],
+ [
+    [4,5,8,13,20],
+    [5,6,9,14,21],
+    [8,9,12,17,24]
+ ],
+ [
+    [9,10,13,18,25],
+    [10,11,14,19,26],
+    [13,14,17,22,29]
+ ]
+]
+     */
+    protected ArrayList<StatementWithResultInterface> toConstants(ArrayList<Object> objects) {
+        ArrayList<StatementWithResultInterface> args = new ArrayList<>();
+        for (Object obj : objects) {
+            int type = Constant.getType(obj);
+            if (type == Constant.UNKNOWN_TYPE) {
+                // Future proofing in case something changes in the future internally
+                throw new IllegalArgumentException("error: unknown object type");
+            }
+            args.add(new ConstantNode(obj, type));
+        }
+        return args;
     }
 
     protected void doJPathQuery(Polyad polyad, State state) {
@@ -584,7 +734,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 conf = Configuration.builder()
                         .options(Option.ALWAYS_RETURN_LIST).build();
 
-              //  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
+                //  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
                 output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
 
             } catch (JsonPathException jpe) {
@@ -612,6 +762,42 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @return
      */
     protected String crappyConverter(String indexList) {
+        return crappyConverterNew(indexList);
+    }
+
+    /*
+      x. := {'sub':'http://cilogon.org/serverT/users/17048', 'idp_name':'Supercomputing at BSU', 'eppn':'rbriuis@bigstate.edu', 'cert_subject_dn':'/DC=org/DC=cilogon/C=US/O=Big State Supercomputing Center/CN=Robert Bruce T17099', 'eptid':'https://idp.bigstate.edu/idp/shibboleth!https://cilogon.org/shibboleth!65P3o9FNjrp4z6+WI7Dir/4I=', 'iss':'https://test.cilogon.org', 'given_name':'Robert', 'voPersonExternalID':'rbriuis@bigstate.edu', 'nonce':'R72KPZ4Pwo9nPd9z1qCA04hBALMC-yVGUOGyTn-miHo', 'aud':'myproxy:oa4mp,2012:/client_id/910d7984412870aa6e199f9afrab8', 'acr':'https://refeds.org/profile/mfa', 'uid':'rbriuis', 'idp':'https://idp.bigstate.edu/idp/shibboleth', 'affiliation':'staff@bigstate.edu;employee@bigstate.edu;member@bigstate.edu', 'uidNumber':'55939', 'auth_time':'1623103279', 'name':'Roibert a Briuis', 'isMemberOf':[{'name':'all_users', 'id':13002},{'name':'staff_reporting', 'id':16405},{'name':'list_allbsu', 'id':18942}], 'exp':1624053679, 'iat':1623103279, 'family_name':'Bruce', 'email':'bob@bigstate.edu'}
+     ndx. :=  query(x., '$..name', true)
+     x.ndx.1
+
+     */
+    protected String crappyConverterNew(String indexList) {
+        QDLCodec codec = new QDLCodec();
+        JSONArray arrayIn = JSONArray.fromObject(indexList);
+        JSONArray arrayOut = new JSONArray();
+        for (int i = 0; i < arrayIn.size(); i++) {
+            String x = arrayIn.getString(i);
+            x = x.substring(2); // All JSON paths start with a $.
+            StringTokenizer tokenizer = new StringTokenizer(x, "[");
+            String r = "";
+            while (tokenizer.hasMoreTokens()) {
+                String nextOne = tokenizer.nextToken();
+                if (nextOne.startsWith("'")) {
+                    nextOne = nextOne.substring(1);
+                }
+                nextOne = nextOne.substring(0, nextOne.length() - 1);
+                if (nextOne.endsWith("'")) {
+                    nextOne = nextOne.substring(0, nextOne.length() - 1);
+                }
+                r = r + QDLConstants.STEM_PATH_MARKER2 + codec.encode(nextOne);
+            }
+            arrayOut.add(r);
+
+        }
+        return arrayOut.toString();
+    }
+
+    protected String crappyConverterStem(String indexList) {
         JSONArray arrayIn = JSONArray.fromObject(indexList);
         JSONArray arrayOut = new JSONArray();
         for (int i = 0; i < arrayIn.size(); i++) {
@@ -641,6 +827,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         return arrayOut.toString();
     }
+
 
     private void doRank(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0 || !isStem(polyad.evalArg(0, state))) {
@@ -1714,11 +1901,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean isDef = false;
         try {
             polyad.evalArg(0, state);
-        }catch(IndexError | UnknownSymbolException exception){
+        } catch (IndexError | UnknownSymbolException exception) {
             polyad.setResult(isDef);
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             polyad.setEvaluated(true);
-return;
+            return;
         }
         if (polyad.getArguments().get(0) instanceof VariableNode) {
             VariableNode variableNode = (VariableNode) polyad.getArguments().get(0);

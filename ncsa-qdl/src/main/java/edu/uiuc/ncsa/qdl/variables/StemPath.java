@@ -35,6 +35,7 @@ public class StemPath<V extends StemPathEntry> extends ArrayList<V> {
     }
 
     public void parsePath(String path) {
+        QDLCodec codec = new QDLCodec();
         if(!isPath(path)){
             V stemPathEntry = (V) new StemPathEntry(path);
             add(stemPathEntry);
@@ -43,7 +44,7 @@ public class StemPath<V extends StemPathEntry> extends ArrayList<V> {
 
         String[] components = path.split(regex);
         for(int i = 1; i < components.length; i++){
-
+             add((V) new StemPathEntry(components[i],false));
         }
     }
     public String toPath(boolean useUnicode){
