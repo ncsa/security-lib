@@ -234,7 +234,8 @@ public class QDLWorkspace {
         //System.setProperty("org.jline.terminal.dumb", "true"); // kludge for jline
         ISO6429IO iso6429IO = null; // only make one of these if you need it because jLine takes over all IO!
         if (argLine.hasArg("-ansi")) {
-            iso6429IO = new ISO6429IO();
+            QDLTerminal qdlTerminal = new QDLTerminal(null);
+            iso6429IO = new ISO6429IO(qdlTerminal, false);
             workspaceCommands = new WorkspaceCommands(iso6429IO);
             isoTerminal = true;
         } else {
@@ -245,7 +246,7 @@ public class QDLWorkspace {
         if (workspaceCommands.isRunScript()) {
             return;
         }
-        if (isoTerminal) {
+        if ((!argLine.hasArg(CLA_NO_BANNER)) && isoTerminal) {
             System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
         }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);

@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +22,7 @@ public class ISO6429IO implements IOInterface {
 
     // This turns it on for everything and is ONLY a low-level debug hack.
     // This will put out a lot of output since it does spit out each keystroke!
-    boolean debugON = true;
+    boolean debugON = false;
 
     public MyLoggingFacade getLoggingFacade() {
         return loggingFacade;
@@ -47,14 +46,18 @@ public class ISO6429IO implements IOInterface {
 
     ArrayList<String> commandCompletion;
 
-    public ISO6429IO(MyLoggingFacade loggingFacade) throws IOException {
+    public ISO6429IO(MyLoggingFacade loggingFacade, boolean noBanner) throws IOException {
         this.loggingFacade = loggingFacade;
-        init();
+        init(noBanner);
 
     }
 
-    public ISO6429IO() throws IOException {
-        this(null);
+    public ISO6429IO(ISO6429Terminal terminal, boolean noBanner) throws IOException {
+          this((MyLoggingFacade) null, noBanner);
+          this.terminal = terminal;
+      }
+    public ISO6429IO(boolean noBanner) throws IOException {
+        this((MyLoggingFacade) null, noBanner);
     }
 
     ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
@@ -74,7 +77,7 @@ public class ISO6429IO implements IOInterface {
     // terminal when you toggle paste mode (ctrl+p). This is very useful in isolating exactly what you
     // just did rather than digging in the logs for it.
     // Use in conjunction with the ansi script mentioned above.
-    boolean showDebugBuffer = false;
+    boolean showDebugBuffer = true;
 
     @Override
     public String readline(String prompt) throws IOException {
@@ -378,7 +381,11 @@ public class ISO6429IO implements IOInterface {
         return null;
     }
 
-    public ISO6429Terminal getTerminal() {
+    public ISO6429Terminal getTerminal() throws IOException {
+        if(terminal == null){
+            // generic terminal
+            terminal= new ISO6429Terminal(loggingFacade);
+        }
         return terminal;
     }
 
@@ -411,16 +418,16 @@ public class ISO6429IO implements IOInterface {
         terminal.getCharPS().flush();
     }
 
-    ISO6429Terminal terminal;
+    ISO6429Terminal terminal = null;
     int defaultColor = 37;
 
-    protected void init() throws IOException {
-        terminal = new ISO6429Terminal(loggingFacade);
+    protected void init(boolean noBanner) throws IOException {
+        terminal = getTerminal();
         terminal.setBold(true);
         terminal.setColor(defaultColor);
         commandCompletion = new ArrayList<>();
         int[] s = getScreenSize();
-        if (s != null && s.length == 2) {
+        if ((!noBanner)&& (s != null && s.length == 2)) {
             System.out.println("screen size = " + s[0] + "x" + s[1]);
         }
         if (loggingFacade != null) {
@@ -439,8 +446,8 @@ public class ISO6429IO implements IOInterface {
 
     public static void main(String[] args) {
         try {
-            ISO6429IO clMinder = new ISO6429IO();
-            clMinder.init();
+            ISO6429IO clMinder = new ISO6429IO(false);
+            clMinder.init(false);
             String current = "";
             while (!current.equals("exit")) {
                 current = clMinder.readline("foo>");
@@ -493,12 +500,3 @@ public class ISO6429IO implements IOInterface {
         return bufferingOn;
     }
 }
-/* for testing cut and paste
-a
-b
-c
-d
-e
-f
-
- */

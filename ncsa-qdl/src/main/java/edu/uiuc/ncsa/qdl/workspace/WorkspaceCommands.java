@@ -161,9 +161,9 @@ public class WorkspaceCommands implements Logable {
             say("Version " + QDLVersion.VERSION);
             say("Type " + HELP_COMMAND + " for help.");
             say("*****************************************");
-        } else {
+        } /*else {
             say("QDL Workspace, version " + QDLVersion.VERSION);
-        }
+        }*/
     }
 
     boolean showBanner = true;
@@ -2521,6 +2521,9 @@ public class WorkspaceCommands implements Logable {
             case DEBUG:
                 say(onOrOff(isDebugOn()));
                 break;
+            case UNICODE_ON:
+                say(onOrOff(State.isPrintUnicode()));
+                break;
             case ASSERTIONS_ON:
                 say(onOrOff(isAssertionsOn()));
                 break;
@@ -2600,6 +2603,7 @@ public class WorkspaceCommands implements Logable {
     public static final String PRETTY_PRINT_SHORT = "pp";
     public static final String PRETTY_PRINT = "pretty_print";
     public static final String ECHO = "echo";
+    public static final String UNICODE_ON = "unicode";
     public static final String DEBUG = "debug";
     public static final String START_TS = "start_ts";
     public static final String ROOT_DIR = "root_dir";
@@ -2801,6 +2805,9 @@ public class WorkspaceCommands implements Logable {
         // current file absolute means its been resolved.
         if (!currentFile.isAbsolute()) {
             if (saveDir == null) {
+                if(rootDir == null){
+                    return null;
+                }
                 currentFile = new File(rootDir, fileName);
             } else {
                 currentFile = new File(saveDir, fileName);
@@ -3070,6 +3077,10 @@ public class WorkspaceCommands implements Logable {
                 setDebugOn(isOnOrTrue(value));
                 say("debug " + (debugOn ? "on" : "off"));
                 break;
+            case UNICODE_ON:
+                State.setPrintUnicode(isOnOrTrue(value));
+                say("unicode printing of system constants is now " + (State.isPrintUnicode() ? "on" : "off"));
+                break;
             case USE_EXTERNAL_EDITOR:
                 setUseExternalEditor(isOnOrTrue(value));
                 say("use external editor " + (isUseExternalEditor() ? "on" : "off"));
@@ -3213,6 +3224,7 @@ public class WorkspaceCommands implements Logable {
     protected String[] ALL_WS_VARS = new String[]{
             COMPRESS_XML,
             DESCRIPTION,
+            UNICODE_ON,
             ECHO, DEBUG,
             PRETTY_PRINT,
             PRETTY_PRINT_SHORT,
@@ -4048,7 +4060,12 @@ public class WorkspaceCommands implements Logable {
         } else {
             rootDir = new File(qe.getWSHomeDir());
         }
-        File testSaveDir = new File(rootDir, "var/ws");
+        File testSaveDir;
+        if(qe.getSaveDir() != null){
+            testSaveDir = new File(qe.getSaveDir());
+        }else{
+            testSaveDir = new File(rootDir, "var/ws");
+        }
         if (testSaveDir.exists() && testSaveDir.isDirectory()) {
             saveDir = testSaveDir;
         }

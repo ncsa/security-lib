@@ -23,6 +23,9 @@ public class FunctionRecord implements Serializable, Cloneable {
     public boolean isFuncRef = false;
     public String fRefName = null;
 
+    public boolean hasName(){
+        return name != null;
+    }
     public int getArgCount() {
         if (isFuncRef) return FREF_ARG_COUNT;
         return argNames.size();

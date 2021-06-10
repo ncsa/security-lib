@@ -50,6 +50,7 @@ public interface QDLConfigurationConstants {
     String WS_ATTR_AUTOSAVE_MESSAGES_ON = "autoSaveMessagesOn";
     String WS_ENV = "env";
     String WS_HOME_DIR_TAG = "home_dir";
+    String WS_SAVE_DIR = "save_dir"; // for specifying the initial WS directory.
     String WS_COMPRESS_SERIALIZATION_TAG = "compress_xml";
     String WS_EDITOR_NAME = "editor_name";
     String WS_EDITOR_ENABLE = "use_editor";

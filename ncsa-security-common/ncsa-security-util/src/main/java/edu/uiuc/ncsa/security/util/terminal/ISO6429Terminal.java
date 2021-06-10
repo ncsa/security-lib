@@ -9,6 +9,7 @@ import org.jline.utils.NonBlockingReader;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringTokenizer;
@@ -29,10 +30,11 @@ import java.util.StringTokenizer;
  *     some configuration in the OS to enable ANSI support in command lines though.</li>
  * </ul>
  * Typically, if the device does not support this, you start seeing sets of weird characters around your text.
+ * A bunch of control sequence are pretty well laid out here : https://en.wikipedia.org/wiki/ANSI_escape_code
  * <p>Created by Jeff Gaynor<br>
  * on 6/5/20 at  8:42 AM
  */
-public class ISO6429Terminal{
+public class ISO6429Terminal {
     MyLoggingFacade loggingFacade;
 
     public ISO6429Terminal(MyLoggingFacade loggingFacade) throws IOException {
@@ -63,7 +65,7 @@ public class ISO6429Terminal{
     }
 
     Terminal terminal = null;
-    NonBlockingReader reader = null;
+    protected NonBlockingReader reader = null;
 
     protected void init() throws IOException {
         terminal = TerminalBuilder.terminal();
@@ -149,7 +151,7 @@ public class ISO6429Terminal{
         //    return getCharPS();
 
         if (cps == null) {
-          //  cps = System.out;
+            //  cps = System.out;
             cps = System.err;
         }
         return cps;
@@ -168,8 +170,9 @@ public class ISO6429Terminal{
 
     protected KeyStroke getCharacter() throws IOException {
         int x = reader.read();
-        debug("  > got int=" + x);
+        debug("  > 1st char =" + x);
         CSI csi;
+        // returned number is exactly a control char
         switch (x) {
             case 9: // Tab
                 csi = new CSI();
@@ -193,6 +196,9 @@ public class ISO6429Terminal{
                 csi.rawCommand = String.valueOf((char) 127);
                 return new KeyStroke(KeyType.Backspace, csi);
         }
+        // Process escape. Sequence come as e.g. ESC [ A (== up arrow)
+        // OR the user just might press escape. This tests that if the user
+        // just presses escape and waits then it is interpreted as an escape.
         if (x == 27) {
             if (reader.peek(1) == -2) {
                 // trickery. If the user types a control key, then there is no appreciable
@@ -202,14 +208,28 @@ public class ISO6429Terminal{
                 // There has to be a better way to pick up on this...
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 27);
+                debug("returning escape");
 
                 return new KeyStroke(KeyType.Escape, csi);
             }
             // start of standard escape sequence.
             int y = reader.read();
-            if (y == 91) {
+            debug("  > 2nd char =" + y);
+
+            // handle ALT char remappings first
+                 // These are of the form 'ESC char' and are case sensitive
+                 // so
+                 // ESC A = alt+shift + a was pressed vs.
+                 // ESC a = alt + a was pressed
+            // If there is a byte after this, then it is part of a control
+            // sequence, so do not convert to a special char.
+            KeyStroke x1 = getKeyRemap((char) y);
+            if (x1 != null) return x1;
+
+            if (y == 91) { // ASCII 91 == [
                 csi = getCSI();
-                // start of escape [ sequence, so called CSI
+                debug(" Got CSI=" + csi);
+                // start of escape [ sequence, so called CSI = "Control Sequence Introducer"
                 switch (csi.op) {
                     case 'A':
                         return new KeyStroke(KeyType.ArrowUp, csi);
@@ -254,13 +274,32 @@ public class ISO6429Terminal{
             csi.rawCommand = "\033";
             return new KeyStroke(KeyType.Escape, csi);
         }
+
+        debug(" returning char");
         return new KeyStroke((char) x);
     }
 
+    /**
+     * If you want to add key remappings (like QDL) override this.
+     * @param y  the second byte after and escape from the terminal. If there is no more input after that, interpret
+     *           it as being an alt or other key stroke.
+     * @return
+     * @throws IOException
+     */
+    protected KeyStroke getKeyRemap(char y) throws IOException {
+        return null;
+    }
+
+    /**
+     * You can run this with
+     * mvn compile exec:java -Dexec.mainClass="edu.uiuc.ncsa.security.util.terminal.ISO6429Terminal"
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             ISO6429Terminal t = new ISO6429Terminal(null);
-            System.out.println("terminal Test:" + t.testTerminal());
+     //       System.out.println("terminal Test:" + t.testTerminal());
             boolean keepReading = true;
             t.setColor(33);
             t.setCursor(10, 25);
@@ -301,7 +340,7 @@ public class ISO6429Terminal{
         @Override
         public String toString() {
             return "CSI{" +
-                    "raw=\"" + rawCommand + "\"" +
+                    "raw=\"" + rawCommand.getBytes(StandardCharsets.UTF_8)[0] + "\"" +
                     ", parameters=" + Arrays.toString(parameters) +
                     ", op=" + op +
                     ", intermediateCommands='" + intermediateCommands + '\'' +
@@ -310,18 +349,20 @@ public class ISO6429Terminal{
     }
 
     protected CSI getCSI() throws IOException {
+        debug("In getCSI()");
         CSI csi = new CSI();
         String raw = "\033[";
         StringBuilder parameterBytes = new StringBuilder();
         int x = reader.read();
+        debug("csi x = " + x);
         // 0x30–0x3F
-        while (0x30 <= x && x <= 0x3F) {
-            parameterBytes.append((char) x);
-            x = reader.read();
-        }
+            while (0x30 <= x && x <= 0x3F) {
+                parameterBytes.append((char) x);
+                x = reader.read();
+            }
         raw = raw + parameterBytes.toString();
         // This is the spec. that any chars in this range are allowed. IN PRACTICE however, only
-        // integer lists delinited by semi-colons are allowed. There may be missing parameters
+        // integer lists delimited by semi-colons are allowed. There may be missing parameters
 
         if (parameterBytes.length() == 0) {
             csi.parameters = new int[]{CSI.MISSING_PARAMETER};
@@ -361,6 +402,7 @@ public class ISO6429Terminal{
         csi.intermediateCommands = intermediateBytes.toString();
         // so there should be a single final byte in this range:
         // 0x40–0x7E
+        debug("after read x = " + x);
         if (!(0x40 <= x && x <= 0x7E)) {
             // not a final byte.
             throw new IllegalArgumentException("error: Unknown CSI terminator");
@@ -371,20 +413,24 @@ public class ISO6429Terminal{
 
         return csi;
     }
-    protected void info(String x){
-        if(loggingFacade != null){
+
+    protected void info(String x) {
+        if (loggingFacade != null) {
             loggingFacade.info(x);
         }
     }
-    protected void warn(String x, Throwable t){
-        if(loggingFacade != null){
+
+    protected void warn(String x, Throwable t) {
+        if (loggingFacade != null) {
             loggingFacade.warn(x, t);
         }
     }
-    protected void debug(String x){
-        if(loggingFacade != null){
+
+    protected void debug(String x) {
+        if (loggingFacade != null) {
             loggingFacade.debug(x);
         }
+   //     System.out.println(x);
     }
 }
 /*

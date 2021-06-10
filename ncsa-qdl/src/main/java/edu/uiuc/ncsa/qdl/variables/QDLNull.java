@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.state.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,12 @@ public class QDLNull extends ConstantNode {
 
     private QDLNull() {
         super(null, Constant.NULL_TYPE);  // Have to set since the result is QDLNode which does not exist yet.
-        List<String> source =new ArrayList<>();
-        source.add("null");
+        List<String> source = new ArrayList<>();
+        if (State.isPrintUnicode()) {
+            source.add("∅");
+        } else {
+            source.add("null");
+        }
         setSourceCode(source);
         setResultType(Constant.NULL_TYPE);
         setResult(this);
@@ -33,6 +38,9 @@ public class QDLNull extends ConstantNode {
 
     @Override
     public String toString() {
+        if (State.isPrintUnicode()) {
+            return "∅";
+        }
         return "null";
     }
 }

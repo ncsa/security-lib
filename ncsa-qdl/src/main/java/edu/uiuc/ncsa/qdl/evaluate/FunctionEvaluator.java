@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
+import edu.uiuc.ncsa.qdl.functions.LambdaDefinitionNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
@@ -242,23 +243,47 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getLocalST();
-        boolean hasLocalFunctionTable = false;
+        //   boolean hasLocalFunctionTable = false;
+        for (int i = 0; i < polyad.getArgCount(); i++) {
+            if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
+                LambdaDefinitionNode ldn = (LambdaDefinitionNode) polyad.getArguments().get(i);
+                ldn.evaluate(localState);
+            }
+        }
+        /*
+            Two ways to do test
+             g(@f, x)-> f(x)^3
+             g(v(x)->x^2, 5)
+            w(x)->x^2
+            g(@w, 5)
+
+         */
+        //  g(@f, x)-> x^3
+//         g(v(x)->x^2, 5)
         // now we populate the local state with the variables.
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
             // note that the call evaluates the state in the non-local environment as per contract,
             // but the named result goes in to the localState.
             String localName = functionRecord.argNames.get(i);
+
             if (isFunctionReference(localName)) {
                 localName = dereferenceFunctionName(localName);
-                if (!hasLocalFunctionTable) {
-                    localState.getFTStack().pushNew();
-                    hasLocalFunctionTable = true;
-                }
+                localState.getFTStack().pushNew();
                 // This is the local name of the function.
-                if (!(polyad.getArguments().get(i) instanceof FunctionReferenceNode)) {
-                    throw new IllegalArgumentException("error: The supplied argument was not a function reference");
+                FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(i), false);
+
+/*
+                if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
+                    frn = new FunctionReferenceNode();
+                    frn.setFunctionName(((LambdaDefinitionNode) polyad.getArguments().get(i)).getFunctionRecord().name);
+                    //frn = ((LambdaDefinitionNode)polyad.getArguments().get(i)).getFunction;
+                } else {
+                    if (!(polyad.getArguments().get(i) instanceof FunctionReferenceNode)) {
+                        throw new IllegalArgumentException("error: The supplied argument was not a function reference");
+                    }
+                    frn = (FunctionReferenceNode) polyad.getArguments().get(i);
                 }
-                FunctionReferenceNode frn = (FunctionReferenceNode) polyad.getArguments().get(i);
+*/
                 String xname = frn.getFunctionName(); // dereferenced in the parser
                 boolean isBuiltin = state.getMetaEvaluator().isBuiltInFunction(xname) || state.getOpEvaluator().isMathOperator(xname);
 

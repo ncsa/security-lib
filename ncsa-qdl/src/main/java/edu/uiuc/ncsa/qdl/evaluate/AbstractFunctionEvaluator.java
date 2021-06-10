@@ -8,8 +8,7 @@ import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
+import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -17,8 +16,10 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
+import org.apache.commons.codec.binary.Base32;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -596,4 +597,90 @@ return StemUtility.areNoneStems(objects);    }
     public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
+
+    /**
+     * Create an unused name for a function. Note that this <i>cannot</i>
+     * produce a legal function name since the base 32 encoding slaps on trailing
+     * "=". This assures there will never be a collision with the ambient
+     * state.
+     * @param state
+     * @return
+     */
+    protected String tempFname(State state){
+        Base32 base32 = new Base32((byte)'=');
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[8];
+        random.nextBytes(bytes);
+        String tempName =  base32.encodeToString(bytes);
+        for(int i = 0; i < 10; i++){
+            if(state.getFTStack().getSomeFunction(tempName) == null){
+                return tempName;
+            }
+            tempName =  base32.encodeToString(bytes);
+
+        }
+        throw new IllegalStateException("cannot create anonymous function");
+    }
+
+    /**
+     * This will take a node that is either a function reference, {@link FunctionDefinitionStatement}
+     * or perhaps a {@link LambdaDefinitionNode} and determine the right {@link FunctionReferenceNode},
+     * updating the state (including adding local state as needed for the duration of the evaluation).
+     * It will also throw an exception if the argument is not of the right type.<p/><p/>
+     * Any place you want to use a function as an argument, pass it to this and let
+     * it do the work.
+     * @param state
+     * @param arg0
+     * @return
+     */
+    protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0, boolean pushNewState) {
+        FunctionReferenceNode frn = null;
+        if (arg0 instanceof LambdaDefinitionNode) {
+            LambdaDefinitionNode lds = (LambdaDefinitionNode) arg0;
+            if(!lds.hasName()){
+                lds.getFunctionRecord().name =tempFname(state);
+            }
+            if(pushNewState) {
+                FunctionTableImpl ft = new FunctionTableImpl();
+                ft.put(lds.getFunctionRecord());
+                state.getFTStack().push(ft);
+            }else{
+                lds.evaluate(state);
+            }
+            frn = new FunctionReferenceNode();
+            frn.setFunctionName(lds.getFunctionRecord().name);
+        }
+
+        if ((arg0 instanceof FunctionDefinitionStatement)) {
+            LambdaDefinitionNode lds = new LambdaDefinitionNode(((FunctionDefinitionStatement) arg0));
+            if(!lds.hasName()){
+                lds.getFunctionRecord().name =tempFname(state);
+            }
+            if(pushNewState) {
+                FunctionTableImpl ft = new FunctionTableImpl();
+                ft.put(lds.getFunctionRecord());
+                state.getFTStack().push(ft);
+            }else{
+                lds.evaluate(state);
+            }
+            frn = new FunctionReferenceNode();
+            frn.setFunctionName(lds.getFunctionRecord().name);
+
+        }
+        if (arg0 instanceof FunctionReferenceNode) {
+            frn = (FunctionReferenceNode) arg0;
+        }
+
+        if (frn == null) {
+            throw new IllegalArgumentException("error: The supplied argument was not a function reference or lambda");
+
+        }
+        return frn;
+    }
+
+
+    protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0) {
+        return getFunctionReferenceNode(state,arg0,false);
+    }
+
 }

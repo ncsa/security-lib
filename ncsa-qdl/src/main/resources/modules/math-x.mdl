@@ -32,7 +32,8 @@ module[
    ];
 
 
-   define[logn(x,n)][
+   define[logn(n,x)][
+     >> log(n,x)
      >> The logarithm, base n for x.
      >> Note that both may be stems.
      return(ln(x)/ln(n));

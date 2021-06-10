@@ -570,11 +570,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doForEach(Polyad polyad, State state) {
-        Object arg0 = polyad.getArguments().get(0);
-        if (!(arg0 instanceof FunctionReferenceNode)) {
-            throw new IllegalArgumentException("error: first argument of " + FOR_EACH + " must be a function reference");
-        }
-
+        FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(0), true);
 
         StemVariable[] stems = new StemVariable[polyad.getArgCount() - 1];
         for (int i = 1; i < polyad.getArgCount(); i++) {
@@ -585,7 +581,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             stems[i - 1] = (StemVariable) arg;
         }
-        ExpressionImpl f = getOperator(state, (FunctionReferenceNode) arg0, stems.length);
+        ExpressionImpl f = getOperator(state, frn, stems.length);
 
         StemVariable output = new StemVariable();
         // special case single args. Otherwise have to special case a bunch of stuff in forEachRecursion

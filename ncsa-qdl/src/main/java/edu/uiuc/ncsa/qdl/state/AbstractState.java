@@ -302,4 +302,14 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
     List<String> scriptPaths = new ArrayList<>();
+
+    public static boolean isPrintUnicode() {
+        return printUnicode;
+    }
+
+    public static void setPrintUnicode(boolean printU) {
+        printUnicode = printU;
+    }
+
+    static boolean printUnicode = false;
 }

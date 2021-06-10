@@ -5,6 +5,7 @@ package edu.uiuc.ncsa.security.util.terminal;
  * on 6/5/20 at  1:42 PM
  */
 public enum KeyType {
+    Alt,
     Character,
     ArrowUp,
     ArrowDown,

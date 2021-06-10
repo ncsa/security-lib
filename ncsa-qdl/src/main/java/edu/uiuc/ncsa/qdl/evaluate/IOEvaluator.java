@@ -390,7 +390,11 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             if (temp == null || temp instanceof QDLNull) {
-                result = "null";
+                if(State.isPrintUnicode()){
+                    result = "∅";
+                }else {
+                    result = "null";
+                }
 
             } else {
                 if (temp instanceof StemVariable) {
@@ -406,8 +410,11 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         result = InputFormUtil.inputForm((BigDecimal) temp);
 
                     } else{
-
-                        result = temp.toString();
+                         if(State.isPrintUnicode() && temp instanceof Boolean){
+                             result = ((Boolean)temp)?"⊤":"⊥";
+                         }else {
+                             result = temp.toString();
+                         }
                     }
                 }
             }

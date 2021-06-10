@@ -1835,25 +1835,33 @@ an ASCII version (usually a digraph).
 
 Here is a table of supported unicode characters in QDL:
 
-Standard    Unicode    escape code       What is it
-!              ¬          \u00ac         logical not
-*              ×          \u00d7         multiplication
-/              ÷          \u00f7         division
-->             →          \u2192         lambda function
-null           ∅          \u2205         null
-&&             ∧          \u2227         logical and
-||             ∨          \u2228         logical or
-:=             ≔          \u2254         left assignment
-=:             ≕          \u2255         right assignment
-=~             ≈          \u2248         regex matches
-!=             ≠          \u2260         not equal to
-==             ≡          \u2261         logical equality
-<=             ≤          \u2264         less than or equals
-=>             ≥          \u2265         greater than or equals
-true           ⊤          \u22a4         logical true
-false          ⊥          \u22a5         logical false
-[|             ⟦          \u27e6         left closed slice bracket
-|]             ⟧          \u27e7         right closed slice bracket
+Standard    Unicode   ALT   escape code   What is it
+!              ¬       !   \u00ac         logical not
+*              ×       *   \u00d7         multiplication
+/              ÷       /   \u00f7         division
+->             →       d   \u2192         lambda function
+null           ∅       n   \u2205         null
+&&             ∧       &   \u2227         logical and
+||             ∨       |   \u2228         logical or
+:=             ≔       :   \u2254         left assignment
+=:             ≕       "   \u2255         right assignment
+=~             ≈       -   \u2248         regex matches
+!=             ≠       +   \u2260         not equal to
+==             ≡       =   \u2261         logical equality
+<=             ≤       <   \u2264         less than or equals
+=>             ≥       >   \u2265         greater than or equals
+true           ⊤       t   \u22a4         logical true
+false          ⊥       f   \u22a5         logical false
+[|             ⟦       {   \u27e6         left closed slice bracket
+|]             ⟧       }   \u27e7         right closed slice bracket
+assert[][]     ⊨       a   \u22a8         assert
+pi             π       p   \u03c0         Greek letter pi.
+
+
+The ALT keys are only available if you are running QDL in ANSI mode. So
+alt+d inserts the definition arrow, for instance. Note that if you
+are running ANSI mode, the ALT keys do not work in external editors,
+since the mapping is local to QDL (or it might really screw up your system).
 
 You can request help on any QDL symbol by typing
     )help symbol

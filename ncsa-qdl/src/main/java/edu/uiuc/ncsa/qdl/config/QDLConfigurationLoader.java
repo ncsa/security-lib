@@ -128,7 +128,14 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         }
         return x;
     }
-
+    protected String getSaveDir() {
+         ConfigurationNode node = getFirstNode(cn, WS_TAG);
+         String x = getFirstAttribute(node, WS_SAVE_DIR);
+         if (isTrivial(x)) {
+             return null; // means none set.
+         }
+         return x;
+     }
 
     protected Editors getEditors() {
         Editors editors = EditorUtils.getEditors(cn); // never null
@@ -348,7 +355,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getExternalEditorPath(),
                 getEditors(),
                 isEnableLibrarySupport(),
-                areAssertionsEnabled());
+                areAssertionsEnabled(),
+                getSaveDir());
     }
 
     @Override

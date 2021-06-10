@@ -34,8 +34,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           boolean echoModeOn,
                           boolean prettyPrint,
                           boolean verboseOn,
-                          boolean showBanner,
                           boolean compressionOn,
+                          boolean showBanner,
                           List<VFSConfig> vfsConfigs,
                           List<ModuleConfig> moduleConfigs,
                           String scriptPath,
@@ -49,7 +49,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String externalEditorPath,
                           Editors qdlEditors,
                           boolean enableLibrarySupport,
-                          boolean assertionsOn) {
+                          boolean assertionsOn,
+                          String saveDir) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -78,7 +79,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.qdlEditors = qdlEditors;
         this.enableLibrarySupport = enableLibrarySupport;
         this.assertionsOn = assertionsOn;
+        this.saveDir = saveDir;
     }
+
+    public String getSaveDir() {
+        return saveDir;
+    }
+
+    public void setSaveDir(String saveDir) {
+        this.saveDir = saveDir;
+    }
+
+    String saveDir = null;
 
     public boolean isAssertionsOn() {
         return assertionsOn;

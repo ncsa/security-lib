@@ -55,7 +55,7 @@ assertStatement2:
 
     statementBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
-   expressionBlock : LeftBracket expression (';' expression)+ RightBracket;
+   expressionBlock : LeftBracket expression ';' ( expression ';')+ RightBracket;
   conditionalBlock : LeftBracket expression RightBracket;
    fdoc : FDOC;
 
@@ -79,14 +79,15 @@ assertStatement2:
         f_ref : F_REF;
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
-// and checking for regression. Also Antlr 4 interprets the comments in the right hand column and
-// will use these for generating method names in Java. Be careful of actually putting comments there!
+// and checking for regression. Also Antlr 4 interprets the #tag in the right hand column and
+// will use these for generating method names in Java. Be careful of altering these, they are not comments!
 
 
 expression
  :
    function                                                                    #functions
- //| function LambdaConnector expression                                         #lambdaDef
+ | (function | '(' f_args* ')')
+       LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval

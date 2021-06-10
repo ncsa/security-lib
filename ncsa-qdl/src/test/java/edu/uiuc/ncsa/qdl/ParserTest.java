@@ -2127,9 +2127,9 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "square(x)->x^2;");
         addLine(script, "cube(x)->x^3;");
         addLine(script, "f(@z(), x) → z(x);");
-        addLine(script, "x := f(@line(), 3);");
-        addLine(script, "y := f(@square(),3);");
-        addLine(script, "z := f(@cube(),3);");
+        addLine(script, "x := f(@line, 3);");
+        addLine(script, "y := f(@square,3);");
+        addLine(script, "z := f(@cube,3);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
@@ -2390,8 +2390,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testTMathOnArray() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "interval(x.)->n(x.2)/(x.2-1)*(x.1 - x.0) + x.0;");
-        addLine(script, "x. := sin(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2 + cos(n(2,3,4,interval([-pi()/2,pi()/2, 24])))^2;");
+        addLine(script, "x. := sin(n(2,3,4,[|-pi()/2;pi()/2; 24|]))^2 + cos(n(2,3,4,[|-pi()/2;pi()/2; 24|]))^2;");
         addLine(script, "y := reduce(@+, reduce(@+, reduce(@+, x.)));");  // add em all up
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -2415,5 +2414,85 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("y", state);
     }
 
+      /*
+          Does the following which computes (5^2)^3 == 5^6
+               g(@f, x)-> f(x)^3
+               g(v(x)->x^2, 5)
+            15625
 
+            Basic regression test to show that passing in a function definition
+            works.
+       */
+      public void testLambdaAsArgument() throws Throwable {
+           State state = testUtils.getNewState();
+           StringBuffer script = new StringBuffer();
+           addLine(script, "g(@f, x)-> f(x)^3;");
+           addLine(script, "ok := g(v(x)->x^2, 5) == 15625;");
+           QDLInterpreter interpreter = new QDLInterpreter(null, state);
+           interpreter.execute(script.toString());
+           assert getBooleanValue("ok", state);
+       }
+
+    public void testAnonymousLambdaAsArgument() throws Throwable {
+           State state = testUtils.getNewState();
+           StringBuffer script = new StringBuffer();
+           addLine(script, "g(@f, x)-> f(x)^4;");
+           addLine(script, "ok := g((x)->x^2, 2) == 256;");
+           QDLInterpreter interpreter = new QDLInterpreter(null, state);
+           interpreter.execute(script.toString());
+           assert getBooleanValue("ok", state);
+       }
+       /*
+                     reduce((x,y)->x+y, n(10))
+45
+        */
+       public void testAnonymousReduce() throws Throwable {
+              State state = testUtils.getNewState();
+              StringBuffer script = new StringBuffer();
+              addLine(script, "ok := reduce((x,y)->x+y, n(10)) == 45;");
+              QDLInterpreter interpreter = new QDLInterpreter(null, state);
+              interpreter.execute(script.toString());
+              assert getBooleanValue("ok", state);
+          }
+          /*
+            for_each((x,y)->x*y,n(10),[1;11])
+
+           */
+          public void testAnonymousForEach() throws Throwable{
+              State state = testUtils.getNewState();
+              StringBuffer script = new StringBuffer();
+              addLine(script, "x. := for_each((x,y)->x*y,n(10),[1;11]);");
+              addLine(script, "ok.0 := x.3.4 == 3*5;"); // second arg offset to 1 -10 range
+              addLine(script, "ok.1 := x.4.5 == 4*6;");
+              addLine(script, "ok.2 := x.5.6 == 5*7;");
+              addLine(script, "ok.3 := x.0.7 == 0;");
+              addLine(script, "ok.4 := x.1.9 == 10;");
+              addLine(script, "ok.5 := x.2.4 == 2*5;");
+              addLine(script, "ok.6 := x.9.9 == 90;");
+              addLine(script, "ok := reduce(@&&, ok.);");
+              QDLInterpreter interpreter = new QDLInterpreter(null, state);
+              interpreter.execute(script.toString());
+              assert getBooleanValue("ok", state);
+
+          }
+      /*
+
+     g(x,y)->x-y
+  reduce(g(x,y)->x+y, n(10))
+45
+  g(3,4)
+-1
+       */
+    public void testLambdaFunctionVisibility() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g(x,y)->x-y;"); // define g outside of function
+        addLine(script, "ok0 := reduce(g(x,y)->x+y, n(10))  == 45;");
+        addLine(script, "ok1 := g(3,4) == -1;"); // after the evaluation, the function table is not changed
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert getBooleanValue("ok1", state);
+
+    }
 }

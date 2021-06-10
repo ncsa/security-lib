@@ -426,14 +426,15 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
       reduce(@times(), 1+n(5))
 
      */
-    private void doReduceOrExpand(Polyad polyad, State state, boolean doReduce) {
+    private void doReduceOrExpand(Polyad polyad, State state0, boolean doReduce) {
+        State state = state0.newStateWithImports();
+        FunctionReferenceNode frn;
         StatementWithResultInterface arg0 = polyad.getArguments().get(0);
-        if (!(arg0 instanceof FunctionReferenceNode)) {
-            throw new IllegalArgumentException("error: first argument of " + (doReduce?REDUCE:EXPAND) + " must be a function reference");
-        }
+
+        frn = getFunctionReferenceNode(state, polyad.getArguments().get(0), true);
         Object arg1 = polyad.evalArg(1, state);
         if (!isStem(arg1)) {
-            throw new IllegalArgumentException("error: second argument of " + (doReduce?REDUCE:EXPAND) + " must be a stem");
+            throw new IllegalArgumentException("error: second argument of " + (doReduce ? REDUCE : EXPAND) + " must be a stem");
         }
         StemVariable stemVariable = (StemVariable) arg1;
         if (!stemVariable.isList()) {
@@ -443,7 +444,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
             if (!isLong(axisObj)) {
-                throw new IllegalArgumentException("error: third argument of " + (doReduce?REDUCE:EXPAND) + ", the axis, must be an integer");
+                throw new IllegalArgumentException("error: third argument of " + (doReduce ? REDUCE : EXPAND) + ", the axis, must be an integer");
             }
             axis = ((Long) axisObj).intValue();
         }
@@ -482,10 +483,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         // oldReduceOrExpand(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
         // oldReduceOrExpand2(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
         StemUtility.StemAxisWalkerAction1 axisWalker;
-        if(doReduce){
-            axisWalker = this.new AxisReduce(getOperator(state, (FunctionReferenceNode) arg0,2), state);
-        }else{
-            axisWalker = this.new AxisExpand(getOperator(state, (FunctionReferenceNode) arg0,2), state);
+        if (doReduce) {
+            axisWalker = this.new AxisReduce(getOperator(state, frn, 2), state);
+        } else {
+            axisWalker = this.new AxisExpand(getOperator(state, frn, 2), state);
         }
         Object result = axisWalker(stemVariable, axis, axisWalker);
         polyad.setResult(result);

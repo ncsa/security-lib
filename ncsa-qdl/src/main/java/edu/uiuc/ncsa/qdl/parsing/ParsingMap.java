@@ -206,7 +206,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
         if(returnNullOK){
             return null;
         }
-        throw new ParsingException("Depth error: possible missing parenthesis or bracket. ");
+        throw new ParsingException("Depth error: possible missing parenthesis or bracket or decimal without leading digit.");
     }
 
     int maxSearchDepth = 10; // how far down the tree's children we are willing to go before bailing.

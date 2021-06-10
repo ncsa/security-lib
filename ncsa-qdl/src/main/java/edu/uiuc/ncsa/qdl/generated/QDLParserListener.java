@@ -454,6 +454,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitPostfix(QDLParserParser.PostfixContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code lambdaDef}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterLambdaDef(QDLParserParser.LambdaDefContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code lambdaDef}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitLambdaDef(QDLParserParser.LambdaDefContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code realInterval}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
