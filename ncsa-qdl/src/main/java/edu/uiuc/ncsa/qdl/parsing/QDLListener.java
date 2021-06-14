@@ -1663,6 +1663,11 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitIInterval(QDLParserParser.IIntervalContext ctx) {
         SliceNode sliceNode = (SliceNode) parsingMap.getStatementFromContext(ctx);
+        // Missing zero-th argument
+        if(ctx.getChild(1) instanceof TerminalNodeImpl){
+            // Missing first argument, supply it
+            sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
+        }
         for (int i = 0; i < ctx.getChildCount(); i++) {
             if (ctx.getChild(i) instanceof TerminalNodeImpl) {
                 continue;
@@ -1679,6 +1684,10 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitRInterval(QDLParserParser.RIntervalContext ctx) {
         RealIntervalNode realIntervalNode = (RealIntervalNode) parsingMap.getStatementFromContext(ctx);
+        if(ctx.getChild(1) instanceof TerminalNodeImpl){
+                 // Missing first argument, supply it
+                 realIntervalNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
+             }
         for (int i = 0; i < ctx.getChildCount(); i++) {
             if (ctx.getChild(i) instanceof TerminalNodeImpl) {
                 continue;

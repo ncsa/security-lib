@@ -63,6 +63,18 @@ public class ESN2 extends ExpressionImpl {
 
         // Evaluation pass. Make sure everything resolves w.r.t. the state
         IndexList indexList = getIndexList(state, rightArgs);
+        if (indexList.size() == 0) {
+            // just wants whole stem, no indices
+            Object r0 = leftArgs.get(leftArgs.size() - 1).evaluate(state);
+            if (!(r0 instanceof StemVariable)) {
+                throw new IllegalStateException("error: left argument must evaluate to be a stem ");
+            }
+            StemVariable stemVariable = (StemVariable) r0;
+            setResult(stemVariable);
+            setResultType(Constant.STEM_TYPE);
+            setEvaluated(true);
+            return stemVariable;
+        }
         // Made it this far. Now we need to do this again, but handing off indices
         // to the stem as needed.
         whittleIndices(indexList);
@@ -72,11 +84,12 @@ public class ESN2 extends ExpressionImpl {
             throw new IllegalStateException("error: left argument must evaluate to be a stem ");
         }
         StemVariable stemVariable = (StemVariable) r0;
-        Object r = stemVariable.get(indexList);
-        setResult(r);
-        setResultType(Constant.getType(r));
+        IndexList r = stemVariable.get(indexList);
+        Object result = r.get(0);
+        setResult(result);
+        setResultType(Constant.getType(result));
         setEvaluated(true);
-        return r;
+        return result;
 
     }
 
@@ -88,14 +101,16 @@ public class ESN2 extends ExpressionImpl {
      * @param indexList
      */
     private void whittleIndices(IndexList indexList) {
-        Object r;
+        IndexList r;
         for (int i = indexList.size() - 1; 0 <= i; i--) {
             if (indexList.get(i) instanceof StemVariable) {
                 r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
-                if (!(r instanceof StemVariable)) {
+                indexList.truncate(i);
+                indexList.addAll(i, r);
+               /* if (!(r instanceof StemVariable)) {
                     indexList.truncate(i);
                     indexList.set(i, r); // replace i-th element with the result.
-                }
+                }*/
             }
         }
     }

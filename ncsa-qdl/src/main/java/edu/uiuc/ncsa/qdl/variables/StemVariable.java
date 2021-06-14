@@ -1407,7 +1407,47 @@ public class StemVariable extends HashMap<String, Object> {
         return currentObj;
     }
 
-    public Object get(IndexList indexList) {
+    /*
+    Contract: E.g. a. has rank 4, b. has rank 2 then
+    b.a.1.2.3.4.0 should resolve to b.(a.1.2.3.4).0 naturally.
+    This would get the indices [1,2,3,4,0] and return
+    [a.1.2.3.4, 0], i.e. zeroth element is the actual value (can even be a stem)
+    This is used to overlay the stem in the calling function
+    so arguments don't get lost
+     */
+    public IndexList get(IndexList indexList) {
+        IndexList rc = new IndexList();
+        StemVariable currentStem = this;
+        boolean gotOne = false;
+        Object obj = null;
+        for (int i = 0; i < indexList.size(); i++) {
+            if(gotOne){
+                rc.add(indexList.get(i));
+                continue;
+            }
+            obj = currentStem.get(indexList.get(i));
+            if(obj == null){
+                throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+            }
+            
+            if(obj instanceof StemVariable){
+                currentStem = (StemVariable) obj;
+            }else{
+                rc.add(obj); // 0th entry is returned value
+                gotOne = true;
+            }
+            if ((i == indexList.size() - 1) && !gotOne) {
+                rc.add(currentStem); // result is a stem
+            }
+        }
+        return rc;
+    }
+
+
+    /*
+    Old get -- does not return partial results, but nice and simple
+     */
+    public Object oldGet(IndexList indexList) {
         StemVariable currentStem = this;
         for (int i = 0; i < indexList.size(); i++) {
             Object obj = currentStem.get(indexList.get(i));

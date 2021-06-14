@@ -330,7 +330,47 @@ public class ParserTest extends AbstractQDLTester {
         }
     }
 
+    @Test
+        public void testLargeStemSubtraction() throws Throwable {
+            // Use new bracket for stems x. := [-5/8, -5/7, -5/6, -1, -5/4]
+            // and y. := [8/17, 7/16, 6/19, 5/11, 3/7]
+            // Aim is to show that having a bunch of hard-coded lists gets interpreted right
+            // and can do an operation on them.
 
+            String cf = "1/(2*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                    "+3*[8/17, 7/16, 6/19, 5/11, 3/7]/(4*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                    "+5*[8/17, 7/16, 6/19, 5/11, 3/7]/(6*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                    "+7*[8/17, 7/16, 6/19, 5/11, 3/7]/(8*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                    "+9*[8/17, 7/16, 6/19, 5/11, 3/7]/([-5/8, -5/7, -5/6, -1, -5/4]^2+[8/17, 7/16, 6/19, 5/11, 3/7]^2+1)))))";
+            String cf2 = "  (192*[-5/8, -5/7, -5/6, -1, -5/4]^3 + 192*[-5/8, -5/7, -5/6, -1, -5/4]^5 " +
+                    "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7] + 216*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] " +
+                    "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] + 45*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
+                    "     192*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^3)/" +
+                    "   (384*[-5/8, -5/7, -5/6, -1, -5/4]^4 + 384*[-5/8, -5/7, -5/6, -1, -5/4]^6 " +
+                    "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] + 432*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] " +
+                    "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7] + 21*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
+                    "     252*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 21*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^2 " +
+                    "+ 384*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^3 " +
+                    "+ 21*[8/17, 7/16, 6/19, 5/11, 3/7]^4)";
+
+            State state = testUtils.getNewState();
+            StringBuffer script = new StringBuffer();
+
+            addLine(script, "x. := " + cf + ";");
+            addLine(script, "y. := " + cf2 + ";");
+            // Evaluate this is two ways and check they match
+            addLine(script, "out1. := " + cf + "-" + cf2 + ";"); // single, massive expression
+            addLine(script, "out2. := x. - y.;"); // do separately, subtract results
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            StemVariable out1 = getStemValue("out1.", state);
+            StemVariable out2 = getStemValue("out2.", state);
+            assert out1.size() == 5;
+            assert out2.size() == 5;
+            for (long i = 0L; i < 5; i++) {
+                assert areEqual(out1.getDecimal(i), out2.getDecimal(i));
+            }
+        }
     /**
      * Test for multiplying two matrices with integer stems. Mostly this is a regression
      * test to check that compound stems (like a.0.0) are  resolved right. When twiddleing
@@ -2414,6 +2454,18 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("y", state);
     }
 
+    public void testSlicesDefaultValues() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := reduce(@∧, [;6]==[0,1,2,3,4,5]);");
+        addLine(script, "x := reduce(@∧, [;11;2]==[0,2,4,6,8,10]);");
+        addLine(script, "y := reduce(@∧, ⟦-1;2;6⟧ == [-1,-0.4,0.2,0.8,1.4,2]);");
+        addLine(script, "y := reduce(@∧, ⟦;2;6⟧ == [0,0.4,0.8,1.2,1.6,2]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("x", state);
+        assert getBooleanValue("y", state);
+    }
       /*
           Does the following which computes (5^2)^3 == 5^6
                g(@f, x)-> f(x)^3
@@ -2495,4 +2547,25 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok1", state);
 
     }
+    /*
+       while[for_next(i,2*[;5])][say(i);]
+     */
+
+    /**
+     * tests that supplying a loop
+     * @throws Throwable
+     */
+    public void testLoopOverList() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j := 0;"); // define g outside of function
+        addLine(script, "ok := true;");
+        addLine(script, "while[for_next(i,2*[;5])][ok := ok && (i == 2*j++);];");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getLongValue("j", state).equals(5L); // make sure it did all the elements
+
+    }
+
 }

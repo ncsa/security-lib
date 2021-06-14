@@ -37,5 +37,7 @@ public class IndexList extends ArrayList {
      */
     public void truncate(int n) {
         removeRange(n, size() - 1);
+        remove(n); 
+
     }
 }

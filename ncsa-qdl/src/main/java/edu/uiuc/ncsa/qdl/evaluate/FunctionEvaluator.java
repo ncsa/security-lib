@@ -310,7 +310,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
                 // This had better be a function reference or this should blow up.
             } else {
-                symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(state));
+                symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(localState));
             }
         }
         if (functionRecord.isFuncRef) {

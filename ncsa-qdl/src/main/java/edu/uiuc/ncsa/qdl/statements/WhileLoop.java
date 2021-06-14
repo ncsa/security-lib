@@ -43,20 +43,20 @@ public class WhileLoop implements Statement {
 
     @Override
     public Object evaluate(State state) {
-       State localState = state.newStateWithImports();
+        State localState = state.newStateWithImports();
         //State localState = state.new;
-        if(conditional instanceof Polyad){
-           Polyad p = (Polyad )conditional;
-           if(p.isBuiltIn()){
-               switch(p.getName()){
-                   case FOR_KEYS:
-                       return forKeysLoop(localState);
-                   case FOR_NEXT:
-                       return doForLoop(localState);
-                   case CHECK_AFTER:
-                       return doPostLoop(localState);
-               }
-           }
+        if (conditional instanceof Polyad) {
+            Polyad p = (Polyad) conditional;
+            if (p.isBuiltIn()) {
+                switch (p.getName()) {
+                    case FOR_KEYS:
+                        return forKeysLoop(localState);
+                    case FOR_NEXT:
+                        return doForLoop(localState);
+                    case CHECK_AFTER:
+                        return doPostLoop(localState);
+                }
+            }
         }
 
         // No built in looping function, so it is just some ordinary conditional,
@@ -92,7 +92,8 @@ public class WhileLoop implements Statement {
         boolean hasEndvalue = false;
         String loopArg = null;
         Object arg = null;
-
+        boolean doList = false;
+        StemVariable list = null;
         switch (conditional.getArgCount()) {
             case 4:
                 arg = conditional.getArguments().get(3).evaluate(localState);
@@ -110,12 +111,23 @@ public class WhileLoop implements Statement {
                 start = yyy.intValue();
             case 2:
                 arg = conditional.getArguments().get(1).evaluate(localState);
-                if (!(arg instanceof Long)) {
-                    throw new IllegalArgumentException("Error: the loop ending value must be a number");
+                boolean gotArg2 = false;
+                if ((arg instanceof Long)) {
+                    hasEndvalue = true;
+                    Long xxx = (Long) arg;
+                    endValue = xxx.intValue();
+                    gotArg2 = true;
                 }
-                hasEndvalue = true;
-                Long xxx = (Long) arg;
-                endValue = xxx.intValue();
+                if (arg instanceof StemVariable) {
+                    list = (StemVariable) arg;
+                    doList = true;
+                    gotArg2 = true;
+                    hasEndvalue = true;
+
+                }
+                if (!gotArg2) {
+                    throw new IllegalArgumentException("error: the argument \"" + arg + "\" must be a stem or long value");
+                }
             case 1:
                 if (!hasEndvalue) {
                     throw new IllegalArgumentException("Error: You did not specify the ending value for this loop!");
@@ -132,8 +144,24 @@ public class WhileLoop implements Statement {
                 throw new IllegalArgumentException("Error: incorrect number of arguments for " + FOR_NEXT + ".");
         }
         // while[for_next(j,0,10,-1)]do[say(j);];  // test statememt
-       // SymbolTable localST = localState.getSymbolStack().getLocalST();
-
+        // SymbolTable localST = localState.getSymbolStack().getLocalST();
+        if (doList) {
+            for (Object key : list.keySet()) {
+                localState.setValue(loopArg, list.get(key));
+                for (Statement statement : getStatements()) {
+                    try {
+                        statement.evaluate(localState);
+                    } catch (BreakException b) {
+                        return Boolean.TRUE;
+                    } catch (ContinueException cx) {
+                        // just continue.
+                    } catch (ReturnException rx) {
+                        return Boolean.TRUE;
+                    }
+                }
+            }
+            return Boolean.TRUE;
+        }
         for (int i = start; i != endValue; i = i + increment) {
             localState.setValue(loopArg, (long) i);
             for (Statement statement : getStatements()) {
@@ -167,7 +195,7 @@ public class WhileLoop implements Statement {
                 }
             }
             return Boolean.TRUE;
-        }catch(ClassCastException cce){
+        } catch (ClassCastException cce) {
             throw new IllegalStateException("Error: You must have a boolean value for your conditional");
         }
     }

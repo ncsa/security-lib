@@ -13,47 +13,7 @@ import org.junit.Test;
  */
 public class GlomTest extends AbstractQDLTester {
 
-    @Test
-    public void testContinuedFraction1() throws Throwable {
-        //Repeat this test from same named one in the ParserTest
-        // with new notation. x:= [-5/8, -5/7, -5/6, -1, -5/4]
-        // and y := [8/17, 7/16, 6/19, 5/11, 3/7]
-        // Aim is to show that having a bunch of hard-coded lists gets interpreted right
 
-        String cf = "1/(2*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                "+3*[8/17, 7/16, 6/19, 5/11, 3/7]/(4*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                "+5*[8/17, 7/16, 6/19, 5/11, 3/7]/(6*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                "+7*[8/17, 7/16, 6/19, 5/11, 3/7]/(8*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                "+9*[8/17, 7/16, 6/19, 5/11, 3/7]/([-5/8, -5/7, -5/6, -1, -5/4]^2+[8/17, 7/16, 6/19, 5/11, 3/7]^2+1)))))";
-        String cf2 = "  (192*[-5/8, -5/7, -5/6, -1, -5/4]^3 + 192*[-5/8, -5/7, -5/6, -1, -5/4]^5 " +
-                "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7] + 216*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] " +
-                "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] + 45*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
-                "     192*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^3)/" +
-                "   (384*[-5/8, -5/7, -5/6, -1, -5/4]^4 + 384*[-5/8, -5/7, -5/6, -1, -5/4]^6 " +
-                "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] + 432*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] " +
-                "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7] + 21*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
-                "     252*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 21*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^2 " +
-                "+ 384*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^3 " +
-                "+ 21*[8/17, 7/16, 6/19, 5/11, 3/7]^4)";
-
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-
-        addLine(script, "x. := " + cf + ";");
-        addLine(script, "y. := " + cf2 + ";");
-        // Evaluate this is two ways and check they match
-        addLine(script, "out1. := " + cf + "-" + cf2 + ";"); // single, massive expression
-        addLine(script, "out2. := x. - y.;"); // do separately, subtract results
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        StemVariable out1 = getStemValue("out1.", state);
-        StemVariable out2 = getStemValue("out2.", state);
-        assert out1.size() == 5;
-        assert out2.size() == 5;
-        for (long i = 0L; i < 5; i++) {
-            assert areEqual(out1.getDecimal(i), out2.getDecimal(i));
-        }
-    }
 
      /*
      What follows are a bunch of finger and toes checks for the tilde operator, initially these are to prove it

@@ -1032,6 +1032,25 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
     /**
+     * The contract for stem evaluation is that w.z.y.x uses stems unles told otherwise.
+     * This is an example that tests that. Passing in (y) tells the system to
+     * evaluate that and use it rather than fall back on the default. 
+     * @throws Throwable
+     */
+    @Test
+    public void testMultiIndexOverride() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.3 := -1; z.7.0 := 3; y :=7;");
+        addLine(script, "ok := w.z.(y).x == -1;"); // resolves to w.2 which is an integer here.
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+
+    }
+
+    /**
      * Test the has_value function. This test checks for conformability as well as results.
      * It is a bit long but it is critical that this work and in particular, if there is regression
      * it is found immediately.
@@ -1301,6 +1320,29 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("y", state);
     }
 
+    /*
+      a. := n(2,3,4,5, n(120))
+      a.1.2.3.4 := 0
+      b. := 10+n(3,3,n(9))
+      b.a.1.2.3.4.1; // same as b.0.1 == 11
+      b.(a.1.2.3.4).1; // same as b.0.1 == 11
+      b.a.1.2.3.4.2 := -1;
+      b.0.2 == -1;
+
+     */
+
+    /**
+     * Tests that in stem resolution, only what is understood by a stem is consumed,
+     * @throws Throwable
+     */
+    public void testMidTailResolution() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " x := (1+n(4)).(1+n(3)).(1+n(2)).i(0);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("x", state) == 3L;
+    }
     /**
      * Test that a list of indices like ['a.b.c'] can be used to access stems. This permits passing around
      * indices
