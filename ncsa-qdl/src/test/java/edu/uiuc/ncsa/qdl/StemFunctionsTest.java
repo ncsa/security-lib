@@ -1022,12 +1022,12 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testMultiIndex2() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3;");
-        addLine(script, "test := w.z.y.x;"); // resolves to w.2 which is an integer here.
+        addLine(script, "ok := w.z.y.x == 3;"); // resolves to w.2 which is an integer here.
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getLongValue("test", state).equals(3L);
+        assert getBooleanValue("ok", state);
 
     }
 
@@ -1146,7 +1146,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "k := 1;");
         addLine(script, "a := (n(4)^2-5).i(3);");
-        addLine(script, "b := [2+3*n(5),10 - n(4)].(k.0);");
+        // Previous version required parentheses. Now they actually work
+        //addLine(script, "b := [2+3*n(5),10 - n(4)].(k.0);");
+        addLine(script, "b := [2+3*n(5),10 - n(4)].k.0;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 4L;
@@ -1325,7 +1327,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
                 "{'author':'J. R. R. Tolkien', 'price':22.99, 'isbn':'0-395-19395-8', 'category':'fiction', 'title':'The Lord of the Rings'}" +
                 "]}, " +
                 "'expensive':10};");
-        addLine(script, " x. := ['store.bicycle.price','store.book.0.price','store.book.1.price','store.book.2.price','store.book.3.price'];");
+        addLine(script, " x. := ['`store`bicycle`price','`store`book`0`price','`store`book`1`price','`store`book`2`price','`store`book`3`price'];");
         addLine(script, "a := test.x.0;"); // resolves to test.store.bicycle.price
         addLine(script, "b := test.x.1;"); // resolves to test.store.book.0.price
         State state = testUtils.getNewState();

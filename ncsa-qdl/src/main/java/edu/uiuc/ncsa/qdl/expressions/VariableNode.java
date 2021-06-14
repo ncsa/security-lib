@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,6 +26,12 @@ public class VariableNode extends ExpressionImpl {
     public VariableNode(String variableReference) {
         this.variableReference = variableReference;
     }
+     public boolean isStem(){
+        if(variableReference == null){
+            return false;
+        }
+        return variableReference.endsWith(StemVariable.STEM_INDEX_MARKER);
+     }
 
     @Override
     public Object evaluate(State state) {

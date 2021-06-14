@@ -19,8 +19,9 @@ public class StatementRecord extends ParseRecord {
     public String toString() {
         return "StatementRecord[" +
                 "id='" + identifier + '\'' +
-                ", parentId='" + parentIdentifier + '\'' +
+                ", stmt type =" + statement == null? "(null)":statement.getClass().getSimpleName() +
                 ", stmt=" + statement.getSourceCode() +
+                ", parentId='" + parentIdentifier + '\'' +
                 ']';
     }
 }

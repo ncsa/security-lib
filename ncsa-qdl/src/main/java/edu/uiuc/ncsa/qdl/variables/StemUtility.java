@@ -1,6 +1,15 @@
 package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
+import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
+import edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+
+import java.util.ArrayList;
+
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -180,5 +189,102 @@ public class StemUtility {
         }
         return outStem;
     }
+    /*
+             a.b.c.d.i(0).j := 1
 
+             This exists because the parser was changed to try and get rid of a lot of
+             annoying parentheses, e.g.
+             (a.).(0).i(x).(2)
+
+             which can now be entered as
+             a.0.i(x).2
+             However, the machinery for accessing stems still treats the variable references to stem
+             markers as units, so 'a.b.c' is by the stem and resolved -- only the stem knows about b.c.
+             Now this is a tree of elements
+                  /\
+               /\   c
+             a   b
+
+             So this idea si to try and reverse the process here and pass along what used to be the case to the
+             system. This is horribly inefficient, since Antlr prases it, we deparse it, then reparse it in the
+             stem, but the alternative is a rewrite of how stems are managed which would be a large-scale
+             undertaking.
+         */
+        public static void doNodeSurgery(ExpressionStemNode ESN, State state) {
+
+            ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
+            ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();
+            StatementWithResultInterface swri = ESN;
+            while (swri != null) {
+                leftArgs.add(swri);
+                if (swri instanceof ExpressionStemNode) {
+                    ExpressionStemNode esn = (ExpressionStemNode) swri;
+                    rightArgs.add(esn.getRightArg());
+                    swri = esn.getLeftArg();
+                } else {
+                    swri = null;
+                }
+            }
+            if (!(leftArgs.get(leftArgs.size() - 1) instanceof VariableNode)) {
+                return; // do nothing
+            }
+            VariableNode actualStem = (VariableNode) leftArgs.get(leftArgs.size() - 1);
+            int i = 0;
+            String newVariableReference = actualStem.getVariableReference();
+            boolean isFirst = true;
+            for (i = rightArgs.size() - 1; 0 <= i; i--) {
+                swri = rightArgs.get(i);
+                boolean didIt = false;
+                String nextToken = "";
+                if (swri instanceof VariableNode) {
+                    VariableNode vNode = (VariableNode) swri;
+                    nextToken = vNode.getVariableReference();
+                    didIt = true;
+                }
+                if (swri instanceof ConstantNode) {
+                    ConstantNode cNode = (ConstantNode) swri;
+                    cNode.evaluate(state);
+                    nextToken = cNode.getResult().toString();
+                    didIt = true;
+                }
+                if (!didIt) {
+
+                    break; // jump out at first non-variable node
+                }
+                if (isFirst) {
+                    isFirst = false;
+                    newVariableReference = newVariableReference + nextToken;
+                } else {
+                    newVariableReference = newVariableReference + STEM_INDEX_MARKER + nextToken;
+                }
+            }
+
+            // If this ended with a "." then the r arg is set to a Java null.  This means
+            // we add it back in to the new variable reference or we'll get an error
+            // about setting a non-stem value.
+            if (rightArgs.get(0) == null) {
+                newVariableReference = newVariableReference + STEM_INDEX_MARKER;
+            }
+            VariableNode variableNode = new VariableNode(newVariableReference);
+            ExpressionStemNode newESN;
+            if (i <= 0) {
+                ESN.setLeftArg(variableNode);
+            } else {
+                newESN = (ExpressionStemNode) leftArgs.get(i);
+                newESN.setLeftArg(variableNode);
+            }
+
+           state.setValue(newVariableReference, null);
+            // last one
+        }
+        /*
+               x := 'h.i.j'
+              x1 := 'h.i.j.'
+             w.x := 5
+            w.x1 := 10
+            is_defined(w.h.i.j); // false
+         w.h.i.j := 100
+         w.x == w.'h.i.j'; // true
+         w.x1 == (w.).'h.i.j.';  // true
+         */
 }

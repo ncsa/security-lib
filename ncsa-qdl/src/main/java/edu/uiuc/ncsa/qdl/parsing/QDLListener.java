@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/15/20 at  6:17 AM
@@ -287,7 +289,6 @@ public class QDLListener implements QDLParserListener {
         } else {
             leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
             rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
-
         }
 
         if (leftArg instanceof ConstantNode) {
@@ -488,7 +489,15 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitAssociation(QDLParserParser.AssociationContext ctx) {
+        ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression();
+        ParseTree p = ctx.expression();
+        StatementWithResultInterface v = (StatementWithResultInterface) parsingMap.getStatementFromContext(p);
+        if (v == null) {
+            v = (StatementWithResultInterface) resolveChild(p);
+        }
+        parenthesizedExpression.setExpression(v);
 
+        stash(ctx, parenthesizedExpression);
     }
 
     @Override
@@ -1345,23 +1354,111 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterDotOp(QDLParserParser.DotOpContext ctx) {
-        ExpressionStemNode expressionStemNode = new ExpressionStemNode();
-        stash(ctx, expressionStemNode);
+        //ExpressionStemNode expressionStemNode = new ExpressionStemNode();
 
     }
 
+    boolean OLD_ESN = false;
+    /*
+         x. := [-5/8, -5/7, -5/6, -1, -5/4]
+         y. := [-2/3, 2, -4/7, 3, -3/2]
+        x. - y.
+     */
+
+    /**
+     * Takes the place of having variables with .'s baked in to them and promotes
+     * the 'childOf' operator to a proper first class citizen of QDL. There are some
+     * edge cases though.
+     * @param dotOpContext
+     */
     @Override
     public void exitDotOp(QDLParserParser.DotOpContext dotOpContext) {
-        ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(dotOpContext);
+        /*
+         First case of odd parsing is that in our grammar, x. - y. gets parsed as
+                    dotOp
+                 /    |   \
+                 x    .    unaryMinus
+                               \
+                               y.
+         I.e. it thinks it is x.(-y.) The problem with fixing this as is, is that
+         the issue is precedence and changing that either gets this to parse, and
+         screws up signed numbers or fails to resolve this.
+
+         A lot of reading about possible solutions convinced me that fixing it
+         after the fact was the way to go. Another options is a very careful restructuring
+         of the grammar, but that is apt to e quite paintaking and require a near complete
+         rewrite of large parts of the code.
+
+         */
+        if (dotOpContext.getChild(2) instanceof QDLParserParser.UnaryMinusExpressionContext) {
+            QDLParserParser.UnaryMinusExpressionContext um = (QDLParserParser.UnaryMinusExpressionContext) dotOpContext.getChild(2);
+            Dyad d = new Dyad(um.Plus() == null ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE);
+            d.setRightArgument((StatementWithResultInterface) parsingMap.getStatementFromContext(um.getChild(1)));
+            ESN2 leftArg = new ESN2();
+            //leftArg.setLeftArg((StatementWithResultInterface) parsingMap.getStatementFromContext(dotOpContext.getChild(0)));
+            Statement s = resolveChild(dotOpContext.getChild(0));
+            if(s instanceof VariableNode){
+                VariableNode vNode = (VariableNode)s;
+                vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                leftArg.setLeftArg(vNode);
+            }else {
+                leftArg.setLeftArg((StatementWithResultInterface)s);
+            }
+            leftArg.setRightArg(null);
+            d.setLeftArgument(leftArg);
+            stash(dotOpContext, d);
+            return;
+        }
+        ESN2 expressionStemNode = new ESN2();
+        stash(dotOpContext, expressionStemNode);
+
+        //  ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(dotOpContext);
+        // ESN2 expressionStemNode = (ESN2) parsingMap.getStatementFromContext(dotOpContext);
         expressionStemNode.setSourceCode(getSource(dotOpContext));
+        List<QDLParserParser.ExpressionContext> list = dotOpContext.expression();
+        StatementWithResultInterface exp = (StatementWithResultInterface) resolveChild(list.get(0));
         for (int i = 0; i < dotOpContext.getChildCount(); i++) {
             ParseTree p = dotOpContext.getChild(i);
             // If it is a termminal node (a node consisting of just be the stem marker) skip it
             if (!(p instanceof TerminalNodeImpl)) {
-                expressionStemNode.getStatements().add((StatementWithResultInterface) resolveChild(p));
+                StatementWithResultInterface swri = (StatementWithResultInterface) resolveChild(p);
+                if ((i == 0) && (swri instanceof VariableNode)) {
+                    VariableNode vNode = (VariableNode) swri;
+                    vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                    expressionStemNode.getArguments().add(vNode);
+                } else {
+                    expressionStemNode.getArguments().add(swri);
+                }
             }
+            // surgery might be needed. Getting the parser to see c.1.2.3.4 as not (c.).(1.2).(3.4)
+
         }
 
+        if (expressionStemNode.getRightArg() instanceof ConstantNode) {
+            if (expressionStemNode.getRightArg().getResult() instanceof BigDecimal) {
+                String a = expressionStemNode.getRightArg().getResult().toString();
+                String[] lr = a.split("\\.");
+                ESN2 childESN = new ESN2();
+                childESN.setLeftArg(expressionStemNode.getLeftArg());
+                childESN.setRightArg(new ConstantNode(Long.parseLong(lr[0]), Constant.LONG_TYPE));
+                expressionStemNode.setLeftArg(childESN);
+                expressionStemNode.setRightArg(new ConstantNode(Long.parseLong(lr[1]), Constant.LONG_TYPE));
+                // ISSUE: Parser needs some way (probably predicates???) to know that in the course of
+                // a stem, decimals are not allowed. This may be hard. What is next is a temporary
+                // workaround to get everything working.
+                // Need to replace this node with
+                /*
+                       c.1.2                   c.1.2
+                         .                       .
+                        / \       with          / \
+                       c   1.2                 .    2
+                                              / \
+                                             c   1
+                      Trick is that this instance of the stem is tied to the ctx so it is what
+                      the parse thinks "exists".
+                 */
+            }
+        }
     }
 
 
@@ -1701,26 +1798,31 @@ public class QDLListener implements QDLParserListener {
     throw new NotImplementedException("index sets not implemented");
     }*/
 
-    /*    @Override
+    @Override
     public void enterDotOp2(QDLParserParser.DotOp2Context ctx) {
-        ExpressionStemNode esn = new ExpressionStemNode();
-        stash(ctx, esn);
+
 
     }
 
     @Override
     public void exitDotOp2(QDLParserParser.DotOp2Context ctx) {
-        ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(ctx);
-        expressionStemNode.setSourceCode(getSource(ctx));
-
-         for (int i = 0; i < ctx.getChildCount(); i++) {
-             ParseTree p = ctx.getChild(i);
-             // If it is a termminal node (a node consisting of just be the stem marker) skip it
-             if (!(p instanceof TerminalNodeImpl)) {
-                 expressionStemNode.getStatements().add((StatementWithResultInterface) resolveChild(p));
-             }
-         }
-    }*/
+        QDLParserParser.ExpressionContext expressionContext = ctx.expression();
+        if (expressionContext instanceof QDLParserParser.VariablesContext) {
+            VariableNode vn = new VariableNode();
+            vn.setSourceCode(getSource(ctx));
+            //ExpressionStemNode esn = new ExpressionStemNode();
+            stash(ctx, vn);
+            QDLParserParser.VariablesContext variablesContext = (QDLParserParser.VariablesContext) ctx.expression();
+            vn.setVariableReference(variablesContext.variable().getText() + STEM_INDEX_MARKER);
+        }
+        if (expressionContext instanceof QDLParserParser.DotOpContext) {
+            //ExpressionStemNode esn = new ExpressionStemNode();
+            ESN2 esn = new ESN2();
+            esn.setSourceCode(getSource(ctx));
+            stash(ctx, esn);
+            esn.setLeftArg((StatementWithResultInterface) resolveChild(expressionContext));
+        }
+    }
 
     @Override
     public void enterLambdaDef(QDLParserParser.LambdaDefContext ctx) {

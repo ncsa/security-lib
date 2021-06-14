@@ -5,10 +5,11 @@ grammar QDLParser;
 
 import QDLLexer;
 
+
 elements : element* EOF;
 
 element : (statement ';' ) | (moduleStatement ';') ;
-
+       
 statement :
             defineStatement
           | conditionalStatement
@@ -86,7 +87,9 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
- | (function | '(' f_args* ')')
+  | expression StemDot+ expression                                              #dotOp
+   | expression postfix=StemDot                                                  #dotOp2
+   | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
@@ -107,8 +110,6 @@ expression
  | LogicalNot expression                                                       #notExpression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
- | expression StemDot+ expression                                              #dotOp
-// | expression postfix=StemDot                                                  #dotOp2
  | expression Backslash + expression                                           #restriction
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile

@@ -4,6 +4,8 @@
 
 */
 lexer grammar QDLLexer;
+
+
 // § 1 Keywords
   ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null;
 
@@ -118,8 +120,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 //   Stem_ref : Identifier '.';
 
 // § 8 Identifiers
- Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
-// Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;   // no .!
+// Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
+   Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;   // no .!
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
 

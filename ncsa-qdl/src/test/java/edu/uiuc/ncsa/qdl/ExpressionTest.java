@@ -135,43 +135,85 @@ public class ExpressionTest extends AbstractQDLTester {
     public void testStemAssignments() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := [1,2];");
-        addLine(script, "z. := [1,2];");
-        addLine(script, "az_ok :=reduce(@∧, a. == z.);");
-        addLine(script, "b.c := 2;");
-        addLine(script, "bc_ok := b.c == 2;"); // precedence test so it's not bc == b.c
-        addLine(script, "d.e.f := 3;");
-        addLine(script, "def_ok := d.e.f == 3;");
-        addLine(script, "g.h.i.j := 4;");
-        addLine(script, "ghij_ok := g.h.i.j == 4;");
         addLine(script, "x := 'h.i.j';");
         addLine(script, "x1 := 'h.i.j.';");
 
-        addLine(script, "x_not_ok := is_defined(g.x);"); //false
         addLine(script, "w.x := 5;");
         addLine(script, "w.x1 := 10;");
-        addLine(script, "wx1_ok := w.x1 == (w.).'h.i.j.';"); // test that keys with .'s can be used
+        addLine(script, "wx1_ok := w.x1 == w.'h.i.j.';"); // test that keys with .'s can be used
         addLine(script, "wx_not_ok := is_defined(w.h.i.j);"); // false
-        addLine(script, "wx_ok := w.x == (w.).'h.i.j';"); // test that keys with .'s can be used
+        addLine(script, "wx_ok := w.x == w.'h.i.j';"); // test that keys with .'s can be used
         addLine(script, "w.h.i.j := 100;");
         addLine(script, "w2_ok := w.h.i.j == 100;");
         addLine(script, "wx2_ok := w.x == (w.).'h.i.j';"); // test that keys with .'s can be used
-        addLine(script, "(b.).(q:= 'c');");
-        addLine(script, "q_ok := q == 'c';");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("az_ok", state);
-        assert getBooleanValue("def_ok", state);
-        assert getBooleanValue("ghij_ok", state);
-        assert !getBooleanValue("x_not_ok", state);
         assert !getBooleanValue("wx_not_ok", state);
         assert getBooleanValue("wx_ok", state);
         assert getBooleanValue("wx1_ok", state);
         assert getBooleanValue("w2_ok", state);
         assert getBooleanValue("wx2_ok", state);
-        assert getBooleanValue("bc_ok", state);
-        assert getBooleanValue("q_ok", state);
 
+    }
+    public void testStemAssignments0() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [1,2];");
+        addLine(script, "z. := [1,2];");
+        addLine(script, "az_ok :=reduce(@∧, a. == z.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("az_ok", state);
+    }
+    public void testStemAssignments1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b.c := 2;");
+        addLine(script, "bc_ok := b.c == 2;"); // precedence test so it's not bc == b.c
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("bc_ok", state);
+    }
+
+    public void testStemAssignments2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "d.e.f := 3;");
+        addLine(script, "def_ok := d.e.f == 3;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("def_ok", state);
+    }
+
+    public void testStemAssignments3() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "g.h.i.j := 4;");
+        addLine(script, "ghij_ok := g.h.i.j == 4;");
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ghij_ok", state);
+    }
+
+    public void testStemAssignments4() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "b.c := 2;");
+        addLine(script, "b.(q:= 'c');");
+        addLine(script, "q_ok := q == 'c';");
+        interpreter.execute(script.toString());
+        assert getBooleanValue("q_ok", state);
+    }
+    public void testStemAssignments5() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "x := 'h.i.j';"); // test that stem keys with embedded periods are handled right
+        addLine(script, "g.h.i.j := 4;");
+        addLine(script, "x_not_ok := is_defined(g.x);"); //false
+        interpreter.execute(script.toString());
+        assert !getBooleanValue("x_not_ok", state);
     }
 
 }

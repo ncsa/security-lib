@@ -247,7 +247,7 @@ return StemUtility.areNoneStems(objects);    }
             if(polyad.getArguments().get(0) instanceof VariableNode){
                 throw new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
             }
-            throw new UnknownSymbolException("Error: Unknown symbol");
+            throw new UnknownSymbolException("Error: Unknown (null) symbol ");
         }
         // Short circuit dyadic logical && ||
         if(arg1 instanceof Boolean){

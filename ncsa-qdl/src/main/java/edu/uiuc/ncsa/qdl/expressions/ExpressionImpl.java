@@ -100,6 +100,9 @@ public abstract class ExpressionImpl implements ExpressionNode {
 
     @Override
     public List<String> getSourceCode() {
+        if(sourceCode == null){
+            sourceCode = new ArrayList<>();
+        }
         return sourceCode;
     }
 

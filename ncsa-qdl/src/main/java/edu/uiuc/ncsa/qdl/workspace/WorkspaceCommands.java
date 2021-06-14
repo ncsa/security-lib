@@ -2025,7 +2025,9 @@ public class WorkspaceCommands implements Logable {
         say(funcs.size() + " total functions");
         return rc;
     }
-        public static final String LIST_MODULES_SWITCH = "-m";
+
+    public static final String LIST_MODULES_SWITCH = "-m";
+
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("list [" + COMPACT_ALIAS_SWITCH + "|" + LIST_MODULES_SWITCH + "]");
@@ -2111,18 +2113,18 @@ public class WorkspaceCommands implements Logable {
         String varName = inputLine.getLastArg();
         List<String> content = new ArrayList<>();
         boolean isDefined = getState().isDefined(varName);
-          //  isString = isDefined && (getState().getValue(varName) instanceof String);
-            if(isDefined){
-                if(isText){
-                    String v = getState().getValue(varName).toString();
-                    v.replace("\n","\\n");
-                    content = StringUtils.stringToList(v);
+        //  isString = isDefined && (getState().getValue(varName) instanceof String);
+        if (isDefined) {
+            if (isText) {
+                String v = getState().getValue(varName).toString();
+                v.replace("\n", "\\n");
+                content = StringUtils.stringToList(v);
 
-                }else{
-                    String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
-                    content.add(inputForm);
-                }
+            } else {
+                String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
+                content.add(inputForm);
             }
+        }
 
         if (useExternalEditor()) {
             content = _doExternalEdit(content);
@@ -2805,7 +2807,7 @@ public class WorkspaceCommands implements Logable {
         // current file absolute means its been resolved.
         if (!currentFile.isAbsolute()) {
             if (saveDir == null) {
-                if(rootDir == null){
+                if (rootDir == null) {
                     return null;
                 }
                 currentFile = new File(rootDir, fileName);
@@ -4061,9 +4063,9 @@ public class WorkspaceCommands implements Logable {
             rootDir = new File(qe.getWSHomeDir());
         }
         File testSaveDir;
-        if(qe.getSaveDir() != null){
+        if (qe.getSaveDir() != null) {
             testSaveDir = new File(qe.getSaveDir());
-        }else{
+        } else {
             testSaveDir = new File(rootDir, "var/ws");
         }
         if (testSaveDir.exists() && testSaveDir.isDirectory()) {
@@ -4371,6 +4373,13 @@ public class WorkspaceCommands implements Logable {
             if (!foundClasses.isEmpty()) {
                 env.put("externalModules", foundClasses);
             }
+        }
+        if (inputLine.hasArg(TRACE_ARG)) {
+            say("trace enabled");
+            setDebugOn(true);
+            DebugUtil.setIsEnabled(true);
+            DebugUtil.setDebugLevel(DebugConstants.DEBUG_LEVEL_TRACE);
+
         }
         interpreter = new QDLInterpreter(env, getState());
         interpreter.setEchoModeOn(true);

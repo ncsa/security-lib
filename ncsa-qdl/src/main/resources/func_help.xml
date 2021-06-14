@@ -1846,6 +1846,7 @@ null           ∅       n   \u2205         null
 :=             ≔       :   \u2254         left assignment
 =:             ≕       "   \u2255         right assignment
 =~             ≈       -   \u2248         regex matches
+`              ·       .   \u00b7         raised dot
 !=             ≠       +   \u2260         not equal to
 ==             ≡       =   \u2261         logical equality
 <=             ≤       <   \u2264         less than or equals

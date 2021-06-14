@@ -44,11 +44,24 @@ public class Dyad extends ExpressionImpl {
     }
 
     public void setLeftArgument(StatementWithResultInterface node) {
-        getArguments().add(0, node);
+        if(getArguments().size()==0){
+            getArguments().add(node);
+        }else {
+            getArguments().set(0, node);
+        }
     }
 
     public void setRightArgument(StatementWithResultInterface node) {
-        getArguments().add(1, node);
+        switch(getArguments().size()){
+            case 0:
+                getArguments().add(null);
+            case 1:
+                getArguments().add(node);
+                break;
+            case 2:
+                getArguments().set(1, node);
+        }
+
     }
 
     @Override

@@ -64,14 +64,83 @@ public class ANode2 extends ExpressionImpl {
 
     @Override
     public Object evaluate(State state) {
+        //     return oldAssign(state);
+        return newAssign(state);
+    }
+
+    public Object newAssign(State state) {
+        Dyad d = null;
+
+        if (getAssignmentType() != leftAssignmentType && getAssignmentType() != rightAssignmentType) {
+            // Do other assignments like +=
+            d = new Dyad(getAssignmentType());
+            if (getLeftArg() instanceof ANode2) {
+
+                d.setLeftArgument(((ANode2) getLeftArg()).getRightArg());
+            } else {
+                d.setLeftArgument(getLeftArg());
+            }
+
+            d.setRightArgument(getRightArg());
+            d.evaluate(state);
+            setResult(d.getResult());
+            setResultType(d.getResultType());
+        } else {
+            // regular assignment, evaluate RHS. That is result.
+            getRightArg().evaluate(state);
+            setResult(getRightArg().getResult());
+            setResultType(getRightArg().getResultType());
+        }
+        setEvaluated(true);
+        ANode2 lastAnode = this;
+        StatementWithResultInterface realLeftArg = getLeftArg();
+        boolean chained = false;
+        while (realLeftArg instanceof ANode2) {
+            ANode2 rla = (ANode2)realLeftArg;
+            ANode2 xNode = new ANode2();
+            xNode.setLeftArg(rla.getRightArg());
+            xNode.setRightArg(lastAnode.getRightArg());
+            xNode.setOp(lastAnode.getOp());
+            xNode.evaluate(state);
+            lastAnode = rla;
+            realLeftArg = rla.getLeftArg();
+            chained = true;
+        }
+        if(chained){
+            // Since this was chained, there is every reason to suspect that the
+            // value from earlier has been altered. Update it.
+            lastAnode.evaluate(state);
+            setResult(lastAnode.getResult());
+            setResultType(lastAnode.getResultType());
+            setEvaluated(true);
+        }
+        if(realLeftArg instanceof ParenthesizedExpression){
+            realLeftArg = ((ParenthesizedExpression)realLeftArg).getExpression();
+        }
+        if (realLeftArg instanceof VariableNode) {
+            state.setValue(((VariableNode)realLeftArg).getVariableReference(), getResult());
+            return getResult();
+        }
+        if (realLeftArg instanceof ConstantNode) {
+            throw new IllegalArgumentException("error: cannot assign value to constant \"" + getLeftArg().getResult() + "\"");
+        }
+        // So all we have in the LHS is an ESN2
+        if (realLeftArg instanceof ESN2) {
+            ((ESN2) realLeftArg).set(state, getResult());
+            return getResult();
+        }
+        throw new IllegalArgumentException("unknown node type");
+    }
+
+    public Object oldAssign(State state) {
         Dyad d = null;
 
         if (getAssignmentType() != leftAssignmentType && getAssignmentType() != rightAssignmentType) {
             d = new Dyad(getAssignmentType());
-            if(getLeftArg() instanceof ANode2){
+            if (getLeftArg() instanceof ANode2) {
 
-                d.setLeftArgument(((ANode2)getLeftArg()).getRightArg());
-            }else {
+                d.setLeftArgument(((ANode2) getLeftArg()).getRightArg());
+            } else {
                 d.setLeftArgument(getLeftArg());
             }
 
@@ -100,17 +169,23 @@ public class ANode2 extends ExpressionImpl {
             }
             // cannot evaluate the variable node at this point since if it does not exist,
             // it raises an exception.
-            if(!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
+            if (!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
                 getLeftArg().evaluate(state); // this chains to the next.
             }
         } else {
+            //          StemUtility.doNodeSurgery((ExpressionStemNode) getLeftArg(), state);
+
             // cannot evaluate the variable node at this point since if it does not exist,
             // it raises an exception.
+            if (getLeftArg() instanceof ESN2) {
+                ((ESN2) getLeftArg()).set(state, getRightArg());
+                wasSet = true;
+            }
             if (getLeftArg() instanceof ExpressionStemNode) {
-                   setExpValue(state, (ExpressionStemNode) getLeftArg(), getResultType(), getResult());
-                   wasSet = true;
-               }
-            if(!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
+                setExpValue(state, (ExpressionStemNode) getLeftArg(), getResultType(), getResult());
+                wasSet = true;
+            }
+            if (!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
                 getLeftArg().evaluate(state); // this chains to the next.
             }
 
@@ -127,6 +202,7 @@ public class ANode2 extends ExpressionImpl {
         return getResult();
     }
 
+
     @Override
     public StatementWithResultInterface makeCopy() {
         ANode2 aNode2 = new ANode2();
@@ -136,8 +212,8 @@ public class ANode2 extends ExpressionImpl {
         return aNode2;
     }
 
-   public static final int leftAssignmentType = -100;
-   public static final int rightAssignmentType = -200;
+    public static final int leftAssignmentType = -100;
+    public static final int rightAssignmentType = -200;
 
     public int getAssignmentType() {
         switch (op) {
@@ -214,7 +290,7 @@ public class ANode2 extends ExpressionImpl {
             case LONG_TYPE:
             case DECIMAL_TYPE:
                 if (variableReference.endsWith(STEM_INDEX_MARKER)) {
-                    throw new IllegalArgumentException("Error: Cannot set the scalar value to a stem variable");
+                    throw new IllegalArgumentException("Error: Cannot set the scalar value \"" + result + "\"to a stem variable \"" + variableReference + "\"");
                 }
 
                 state.setValue(variableReference, result);

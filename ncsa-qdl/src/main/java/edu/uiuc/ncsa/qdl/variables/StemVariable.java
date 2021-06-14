@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.expressions.IndexList;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.state.VariableState;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
@@ -53,11 +54,11 @@ public class StemVariable extends HashMap<String, Object> {
             return get((Long) key);
         }
         if (key instanceof String) {
-            String sKey = (String)key;
-            if(StemPath.isPath(sKey)){
+            String sKey = (String) key;
+            if (StemPath.isPath(sKey)) {
                 StemPath stemPath = new StemPath();
                 stemPath.parsePath(sKey);
-                  return get(stemPath);
+                return get(stemPath);
             }
             return get((String) key);
         }
@@ -144,11 +145,11 @@ public class StemVariable extends HashMap<String, Object> {
             if (!containsKey(key) && defaultValue != null) {
                 return defaultValue;
             }
-                if(StemPath.isPath(key)) {
-                    StemPath stemPath = new StemPath();
-                    stemPath.parsePath(key);
-                    return get(stemPath);
-                }
+            if (StemPath.isPath(key)) {
+                StemPath stemPath = new StemPath();
+                stemPath.parsePath(key);
+                return get(stemPath);
+            }
             return super.get(key);
         } catch (StackOverflowError | PatternSyntaxException sto) {
             //In this case someplace there is a reference to the stem itself, e.g.
@@ -1381,27 +1382,84 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Long getRank() {
-        return Math.max(getStemList().getRank(), size()) ;
+        return Math.max(getStemList().getRank(), size());
     }
-    public Object get(StemPath<StemPathEntry> stemPath){
-        if(stemPath.isEmpty()){
+
+    public Object get(StemPath<StemPathEntry> stemPath) {
+        if (stemPath.isEmpty()) {
             return null;
         }
         QDLCodec codec = new QDLCodec();
         Object currentObj = QDLNull.getInstance();
         StemVariable lastStem = this;
-        for(StemPathEntry spe : stemPath){
-             currentObj = lastStem.get(spe.isString()?codec.decode(spe.getKey()):spe.getIndex());
-             if(currentObj == null){
-                 return QDLNull.getInstance();
-             }
-             if(currentObj instanceof StemVariable){
-                 lastStem = (StemVariable) currentObj;
-             }else{
-                 lastStem = null;
-             }
+        for (StemPathEntry spe : stemPath) {
+            currentObj = lastStem.get(spe.isString() ? codec.decode(spe.getKey()) : spe.getIndex());
+            if (currentObj == null) {
+                return QDLNull.getInstance();
+            }
+            if (currentObj instanceof StemVariable) {
+                lastStem = (StemVariable) currentObj;
+            } else {
+                lastStem = null;
+            }
         }
 
         return currentObj;
+    }
+
+    public Object get(IndexList indexList) {
+        StemVariable currentStem = this;
+        for (int i = 0; i < indexList.size(); i++) {
+            Object obj = currentStem.get(indexList.get(i));
+            if (i == indexList.size() - 1) {
+                return obj;
+            }
+            if (!(obj instanceof StemVariable)) {
+                throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+            }
+            currentStem = (StemVariable) obj;
+        }
+        return currentStem;
+    }
+
+    public void set(IndexList indexList, Object value) {
+        StemVariable currentStem = this;
+        // Contract inside stems is that a variable is either a scalar
+        // or a stem (since it would be very hard to differentiate these
+        // in tail resolution.
+        Object currentIndex;
+        for (int i = 0; i < indexList.size() - 1; i++) {
+            currentIndex = indexList.get(i);
+            Object obj = currentStem.get(currentIndex);
+            if(obj == null){
+                StemVariable newStem = new StemVariable();
+                currentStem.myPut(currentIndex, newStem);
+                currentStem = newStem;
+
+            }else{
+                if (obj instanceof StemVariable) {
+                    currentStem = (StemVariable) currentStem.get(currentIndex);
+                } else {
+                    StemVariable newStem = new StemVariable();
+                    currentStem.myPut(indexList.get(i), newStem);
+                    currentStem = newStem;
+                }
+
+            }
+        }
+        currentStem.myPut(indexList.get(indexList.size() - 1), value);
+
+    }
+
+    protected void myPut(Object index, Object value) {
+        if (index instanceof Long) {
+            put((Long) index, value);
+            return;
+        }
+        if (index instanceof String) {
+            put((String) index, value);
+            return;
+        }
+        throw new IndexError("Unknown index type for \"" + index + "\"");
     }
 }

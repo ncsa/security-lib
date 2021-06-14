@@ -18,15 +18,15 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 3/5/21 at  5:58 AM
  */
 public class ExpressionStemNode implements StatementWithResultInterface {
-    public ArrayList<StatementWithResultInterface> getStatements() {
-        return statements;
+    public ArrayList<StatementWithResultInterface> getArguments() {
+        return arguments;
     }
 
-    public void setStatements(ArrayList<StatementWithResultInterface> statements) {
-        this.statements = statements;
+    public void setArguments(ArrayList<StatementWithResultInterface> arguments) {
+        this.arguments = arguments;
     }
 
-    ArrayList<StatementWithResultInterface> statements = new ArrayList<>();
+    ArrayList<StatementWithResultInterface> arguments = new ArrayList<>();
 
     Object result = null;
 
@@ -65,12 +65,34 @@ public class ExpressionStemNode implements StatementWithResultInterface {
         this.evaluated = evaluated;
     }
 
-    protected StatementWithResultInterface getLeftArg() {
-        return getStatements().get(0);
+    public StatementWithResultInterface getLeftArg() {
+        if(getArguments().isEmpty()){
+            return null;
+        }
+        return getArguments().get(0);
     }
 
-    protected StatementWithResultInterface getRightArg() {
-        return getStatements().get(1);
+    public void setLeftArg(StatementWithResultInterface swri){
+            if(getArguments().size() == 0){
+                getArguments().add(swri);
+            }else{
+                getArguments().set(0,swri);
+            }
+    }
+
+    public void setRightArg(StatementWithResultInterface swri){
+            if(getArguments().size() == 1){
+                getArguments().add(swri);
+            }else{
+                getArguments().set(1,swri);
+            }
+    }
+
+    public StatementWithResultInterface getRightArg() {
+        if(getArguments().size() < 2){
+            return null;
+        }
+        return getArguments().get(1);
     }
 
     /*
@@ -289,12 +311,18 @@ The following are working:
      */
     protected Object doLeftSVCase(StatementWithResultInterface leftArg, List<StatementWithResultInterface> indices, State state) {
         StemVariable stemLeft = (StemVariable) leftArg.getResult();
+        if(stemLeft == null){
+            if(indices.get(0) instanceof VariableNode) {
+                return ((VariableNode)indices.get(0)).getVariableReference();
+            }
+        }
         String rawMI = "_"; // dummy name for stem
         for (StatementWithResultInterface rightArg : indices) {
 
             boolean gotOne = false;
             if (rightArg instanceof VariableNode) {
                 VariableNode vn = (VariableNode) rightArg;
+                vn.evaluate(state);
                 if (vn.getResult() == null) {
                     // no such variable, so use name
                     StringTokenizer st = new StringTokenizer(vn.getVariableReference(), STEM_INDEX_MARKER);
@@ -308,6 +336,8 @@ The following are working:
                         }
                     }
                     gotOne = true;
+                } else{
+                    return stemLeft.get(vn.getResult());
                 }
             }
             if (!gotOne && (rightArg instanceof ConstantNode)) {
@@ -319,6 +349,8 @@ The following are working:
                     default:
                         new IllegalArgumentException("unknown stem index type ");
                 }
+                return stemLeft.get(rightArg.getResult());
+
             }
             if (!gotOne && (rightArg.getResultType() == STRING_TYPE || rightArg.getResultType() == LONG_TYPE)) {
                 rawMI = rawMI + STEM_INDEX_MARKER + rightArg.getResult().toString();
@@ -334,6 +366,7 @@ The following are working:
         }
 
         StemMultiIndex multiIndex = new StemMultiIndex(rawMI); // dummy variable
+
         return stemLeft.get(multiIndex);
     }
 

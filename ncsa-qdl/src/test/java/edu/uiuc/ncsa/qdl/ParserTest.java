@@ -998,11 +998,11 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        assert getStringValue("q", state).equals("abc");
-        assert getStringValue("A", state).equals("abc");
-        assert getStringValue("B", state).equals("bc");
-        assert getStringValue("C", state).equals("c");
         assert getStringValue("D", state).equals("c");
+        assert getStringValue("C", state).equals("c");
+        assert getStringValue("B", state).equals("bc");
+        assert getStringValue("A", state).equals("abc");
+        assert getStringValue("q", state).equals("abc");
     }
 
     /**

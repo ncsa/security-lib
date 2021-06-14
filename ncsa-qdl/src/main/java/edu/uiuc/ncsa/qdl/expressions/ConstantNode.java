@@ -17,6 +17,8 @@ public class ConstantNode extends ExpressionImpl {
         this.result = result;
         this.resultType = resultType;
         evaluated = true; //trivally
+
+        getSourceCode().add(result == null?"null":result.toString());
     }
 
     @Override
