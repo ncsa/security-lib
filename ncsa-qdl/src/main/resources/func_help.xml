@@ -922,12 +922,18 @@ for_keys(var, stem.)
 stem. - is a stem variable. The keys of this stem will be assigned to the var
         and may be accessed  in the loop.
 Note: This only operates inside of looping constructs.
+See also: for_next, to loop over values of the stem
                 ]]>
         </body>
     </entry>
     <entry id="for_next">
         <body>
             <![CDATA[
+There are two versions. The first allows you to simply define the looping
+parameters with integers, the second lets you use any list and iterate
+over the values
+Meth0d #1:
+----------
 for_next(var, stop_value [,start_value, increment])
         var - the variable to be used. As the loop is executed, this value will
               change.
@@ -937,7 +943,17 @@ for_next(var, stop_value [,start_value, increment])
 start_value - (optional, default is 0). The first value assigned to var.
   increment - (optional, default is 1). How much the loop variable should be
               incremented on each iteration.
+
+Method #2:
+----------
+for_next(var, arg.)
+        var - the variable to be used. As the loop is executed, this value will
+              change.
+        arg. - any stem. The keys are iterated over and the values are
+               assigned to var.
+
 Note: This only functions in looping constructs.
+See also: for_keys to loop over the keys in a stem.
                 ]]>
         </body>
     </entry>
@@ -1925,7 +1941,28 @@ so the result is a 15 x 12 array, with z evaluated at each point.
                 ]]>
             </body>
         </entry>
+    <entry id="⊨">
+            <body>
+                <![CDATA[
+⊨
+unicode 22a8, aka assert is used to mark a conditional that, when false, should stop
+program execution immediately. There are two forms,one with a keyword, assert
+and the other with the unicode Math symbol for assertion, ⊨. The general forms are
+⊨ conditional : message
+assert[ conditional ][ message]
 
+If the conditional is false, the message is returned.
+
+E.g.
+⊨ script_arg() ≡  2 : 'you must supply both a username and password';
+
+alternately
+
+assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
+
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

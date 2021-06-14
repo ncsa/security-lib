@@ -55,6 +55,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.*;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -2653,11 +2655,11 @@ public class WorkspaceCommands implements Logable {
             say("shows all workspaces that start with wlcg, restricting the per attributes output to a single line");
             say("(truncation is possible and denoted with an ellipsis), restricting the total width to 80 characters");
             say("Note that if you just ask it to list the directory, every file will be read, so for a very large");
-            say("this may take some time");
+            say("directory this may take some time");
             say("E.g.");
             say(")lib " + REGEX_SWITCH + " .*\\.ws");
             say("shows all files ending in .ws Since a period is special character in regexes, it must be escaped.");
-            say(".* means match any character, \\.ws means it must in in .ws.");
+            say(".* means match any character, \\.ws means it must end in '.ws'.");
 
             return RC_CONTINUE;
         }
@@ -2746,6 +2748,7 @@ public class WorkspaceCommands implements Logable {
         }
 
         boolean firstPass = true;
+        say("showing files for " + currentFile.getAbsolutePath());
         for (String absPath : sortedFiles.keySet()) {
             File fff = sortedFiles.get(absPath);
             WSLibEntry w = _getWSLibEntry(fff);
@@ -2891,18 +2894,41 @@ public class WorkspaceCommands implements Logable {
             }
             String out = pad2(isTrivial(filename) ? "(no file)" : filename, 15);
             out = out + " " + (isCompressed ? "*" : " ");
+            String lengthToken = "";
+            NumberFormat formatter = new DecimalFormat("#0.000");
+            double oneK = 1024.0;
+            if(0 <= length && length < oneK){
+                lengthToken = length + "b";
+
+            }
+            if(oneK <= length && length < Math.pow(oneK, 2)){
+                lengthToken = formatter.format((length/oneK)) + "k";
+
+            }
+            if(Math.pow(oneK, 2) <= length && length < Math.pow(oneK, 3)){
+                lengthToken = formatter.format(length/Math.pow(oneK, 2)) + "m";
+            }
+            if(Math.pow(oneK, 3) <= length && length < Math.pow(oneK, 4)){
+                lengthToken = formatter.format(length/Math.pow(oneK, 3)) + "g";
+            }
+
+
+            out = out + " " + pad2(lengthToken, 10);
+
             if (isTrivial(id)) {
-                out = out + " " + pad2("(no id)", 10);
+                //out = out + " " + pad2("(no id)", 10);
+                out = out + " " + pad2("    -", 10);
             } else {
-                out = out + " " + pad2(id, 10);
+                out = out + " " + pad2(id, 15);
             }
             if (ts == null) {
                 out = out + " " + pad2("(no date)", 25);
             } else {
-                out = out + " " + pad2(ts, 25);
+                out = out + " " + pad2(ts, false,30);
             }
             if (isTrivial(description)) {
-                out = out + " " + pad2("(no description)", displayWidth - 55);
+                //out = out + " " + pad2("(no description)", displayWidth - 55);
+                out = out + " " + pad2("    ----", displayWidth - 55);
             } else {
                 out = out + " " + pad2(description, displayWidth - 55);
             }

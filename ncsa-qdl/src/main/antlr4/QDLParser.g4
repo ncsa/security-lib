@@ -23,7 +23,7 @@ statement :
           ;
 
  conditionalStatement : ifStatement | ifElseStatement;
-
+                   
 ifStatement  :
      IF conditionalBlock THEN? statementBlock;
 
