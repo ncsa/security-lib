@@ -1226,7 +1226,16 @@ will be turned into a single string with linefeeds after each entry.
     <entry id="debug">
             <body>
                 <![CDATA[
-(workspace variable)
+Either a workspace variable or the system command to manage debugging
+System command:
+debug([level , message])
+     no args = print out current debug level
+       level = an integer in the range 0 (no output) to 5 (trace mode)
+               that determines the level of debugging output
+     message = A string that contains the entry to the debug log.
+See also: log_entry
+
+Workspace variable:
 debug - Toggle low-level debugging of the innards of the workspace and QDL.
         This is only useful if you are having a serious issue (such as
         writing a Java module and need to see stack traces). This may be
@@ -1559,7 +1568,8 @@ See also: ln(), exp()
     <entry id="log_entry">
             <body>
                 <![CDATA[
-log_entry(message) - put a message in the current log. 
+log_entry(level, message) - put a message in the current log.
+See also: debug (system command)
 ]]>
             </body>
         </entry>
@@ -1853,6 +1863,7 @@ Here is a table of supported unicode characters in QDL:
 
 Standard    Unicode   ALT   escape code   What is it
 !              ¬       !   \u00ac         logical not
+-              ¯       _   \u00af         unary minus
 *              ×       *   \u00d7         multiplication
 /              ÷       /   \u00f7         division
 ->             →       d   \u2192         lambda function

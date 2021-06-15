@@ -174,6 +174,14 @@ public class ISO6429Terminal {
         CSI csi;
         // returned number is exactly a control char
         switch (x) {
+            // Actually, intercepting ^c does not work from the CLI because the
+            // JVM intercepts it and shuts down. This would require some very specific
+            // and finicky 
+            case 3: // ^C
+                csi = new CSI();
+                csi.rawCommand = String.valueOf((char) 9);
+                return new KeyStroke(KeyType.ControlC, csi);
+
             case 9: // Tab
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 9);
@@ -217,17 +225,22 @@ public class ISO6429Terminal {
             debug("  > 2nd char =" + y);
 
             // handle ALT char remappings first
-                 // These are of the form 'ESC char' and are case sensitive
-                 // so
-                 // ESC A = alt+shift + a was pressed vs.
-                 // ESC a = alt + a was pressed
+            // These are of the form 'ESC char' and are case sensitive
+            // so
+            // ESC A = alt+shift + a was pressed vs.
+            // ESC a = alt + a was pressed
             // If there is a byte after this, then it is part of a control
             // sequence, so do not convert to a special char.
             KeyStroke x1 = getKeyRemap((char) y);
             if (x1 != null) return x1;
 
             if (y == 91) { // ASCII 91 == [
-                csi = getCSI();
+                try {
+                    csi = getCSI();
+                } catch (IllegalArgumentException iax) {
+                    // If the user types in something strange, just ignore it.
+                    return new KeyStroke((char) ' ');
+                }
                 debug(" Got CSI=" + csi);
                 // start of escape [ sequence, so called CSI = "Control Sequence Introducer"
                 switch (csi.op) {
@@ -281,8 +294,9 @@ public class ISO6429Terminal {
 
     /**
      * If you want to add key remappings (like QDL) override this.
-     * @param y  the second byte after and escape from the terminal. If there is no more input after that, interpret
-     *           it as being an alt or other key stroke.
+     *
+     * @param y the second byte after and escape from the terminal. If there is no more input after that, interpret
+     *          it as being an alt or other key stroke.
      * @return
      * @throws IOException
      */
@@ -298,8 +312,19 @@ public class ISO6429Terminal {
      */
     public static void main(String[] args) {
         try {
+            // In Java, you can add a shutdown hook, but cannot stop
+            // the actual JVM from shutting down with control+c. This
+            // is because ^c is intercepted by the OS which sends a SigTerm.
+            // Java processes the SigTerm and will let you add a shutdown hook
+            // (e.g. below) but you cannot stop the JVM from exiting.
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    System.out.println("Inside Add Shutdown Hook");
+                }
+            });
             ISO6429Terminal t = new ISO6429Terminal(null);
-     //       System.out.println("terminal Test:" + t.testTerminal());
+            //       System.out.println("terminal Test:" + t.testTerminal());
             boolean keepReading = true;
             t.setColor(33);
             t.setCursor(10, 25);
@@ -356,10 +381,10 @@ public class ISO6429Terminal {
         int x = reader.read();
         debug("csi x = " + x);
         // 0x30–0x3F
-            while (0x30 <= x && x <= 0x3F) {
-                parameterBytes.append((char) x);
-                x = reader.read();
-            }
+        while (0x30 <= x && x <= 0x3F) {
+            parameterBytes.append((char) x);
+            x = reader.read();
+        }
         raw = raw + parameterBytes.toString();
         // This is the spec. that any chars in this range are allowed. IN PRACTICE however, only
         // integer lists delimited by semi-colons are allowed. There may be missing parameters
@@ -430,7 +455,10 @@ public class ISO6429Terminal {
         if (loggingFacade != null) {
             loggingFacade.debug(x);
         }
-   //     System.out.println(x);
+        // next line prints out everything asap to the command line.
+        // Useful for hard to track down errors, but each character will
+        // have a full output stack printed.
+        //     System.out.println(x);
     }
 }
 /*

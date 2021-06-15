@@ -18,6 +18,13 @@ import java.util.Arrays;
  * <p>Created by Jeff Gaynor<br>
  * on 6/9/20 at  7:52 AM
  */
+/*
+There is a debugging script for this in the root dir (security-all) called
+
+ansi
+
+Run that at the command line to build everything and start qdl (no command line args).
+ */
 public class ISO6429IO implements IOInterface {
 
     // This turns it on for everything and is ONLY a low-level debug hack.
@@ -53,9 +60,10 @@ public class ISO6429IO implements IOInterface {
     }
 
     public ISO6429IO(ISO6429Terminal terminal, boolean noBanner) throws IOException {
-          this((MyLoggingFacade) null, noBanner);
-          this.terminal = terminal;
-      }
+        this((MyLoggingFacade) null, noBanner);
+        this.terminal = terminal;
+    }
+
     public ISO6429IO(boolean noBanner) throws IOException {
         this((MyLoggingFacade) null, noBanner);
     }
@@ -72,7 +80,7 @@ public class ISO6429IO implements IOInterface {
     /*
      * For debugging, use the ansi shell script in ~/security-all (top-level). This will do the minimal
      * compile then start up the minimal QDL workspace from maven, so the entire build does not have to be done.
-    */
+     */
     // This next flag will keep a running list of the debug output and paste it into the current
     // terminal when you toggle paste mode (ctrl+p). This is very useful in isolating exactly what you
     // just did rather than digging in the logs for it.
@@ -134,6 +142,9 @@ public class ISO6429IO implements IOInterface {
             KeyStroke keyStroke = terminal.getCharacter();
             debug("reading keystroke: " + keyStroke);
             switch (keyStroke.getKeyType()) {
+                case ControlC:
+                    // Intercept, do nothing.
+                    break;
                 case Character:
 
                     int position = currentCol0 - startCol;
@@ -175,7 +186,7 @@ public class ISO6429IO implements IOInterface {
                     Plan B is this: Tell it turn turn off cursor addressing and just snarf everything onto a single line.
                       
                      */
-                    if(!pasteModeOn && showDebugBuffer){
+                    if (!pasteModeOn && showDebugBuffer) {
                         System.out.println(stringBuffer.toString());
                         stringBuffer = new StringBuffer();
                     }
@@ -382,9 +393,9 @@ public class ISO6429IO implements IOInterface {
     }
 
     public ISO6429Terminal getTerminal() throws IOException {
-        if(terminal == null){
+        if (terminal == null) {
             // generic terminal
-            terminal= new ISO6429Terminal(loggingFacade);
+            terminal = new ISO6429Terminal(loggingFacade);
         }
         return terminal;
     }
@@ -427,12 +438,25 @@ public class ISO6429IO implements IOInterface {
         terminal.setColor(defaultColor);
         commandCompletion = new ArrayList<>();
         int[] s = getScreenSize();
-        if ((!noBanner)&& (s != null && s.length == 2)) {
+        if ((!noBanner) && (s != null && s.length == 2)) {
             System.out.println("screen size = " + s[0] + "x" + s[1]);
         }
         if (loggingFacade != null) {
             loggingFacade.setDebugOn(debugON);
         }
+        // the JVM does not ever get a ^c the user types under unix,
+        // the OS intercepts it and sends a SIGTERM to the JVM which then
+        // shutdown. You can add a hook (like here) but there is no good
+        // way to change this behavior. Since this is its own thread,
+        // the standard warning is that parts of the JVM might have already shut down
+        // so don't get fancy here and try to recover.
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                System.out.println("\nexiting...\n");
+            }
+        });
+
     }
 
     public int[] getScreenSize() throws IOException {
@@ -468,9 +492,11 @@ public class ISO6429IO implements IOInterface {
             loggingFacade.warn(x, t);
         }
     }
-      StringBuffer stringBuffer = new StringBuffer();
+
+    StringBuffer stringBuffer = new StringBuffer();
+
     protected void debug(String x) {
-        if(showDebugBuffer) {
+        if (showDebugBuffer) {
             stringBuffer.append(x + "\n");
         }
         if (loggingFacade != null) {

@@ -76,7 +76,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
           PlusPlus : '++';
               Plus : '+';
         MinusMinus : '--';
-             Minus : '-';
+             Minus : '-';  // ¯ \u 00af is raised unary minus.
           LessThan : '<';
        GreaterThan : '>';
        SingleEqual : '=';
@@ -96,6 +96,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
              Stile : '|';
         TildeRight : '~|';
            StemDot : '.' ;
+        UnaryMinus :  '¯'; // unicode 00af 
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here

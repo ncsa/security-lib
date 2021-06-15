@@ -32,6 +32,7 @@ ifElseStatement :
 
 loopStatement:
      WHILE conditionalBlock DO? statementBlock ;
+    // WHILE loopBlock DO? statementBlock ;
 
 switchStatement:
     SWITCH '['  (ifStatement ';')* ']';
@@ -51,6 +52,7 @@ tryCatchStatement:
   assertStatement :
        ASSERT LeftBracket expression RightBracket LeftBracket expression RightBracket;
 
+
 assertStatement2:
   ASSERT2 expression (':' expression)?;
 
@@ -58,6 +60,7 @@ assertStatement2:
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
    expressionBlock : LeftBracket expression ';' ( expression ';')+ RightBracket;
   conditionalBlock : LeftBracket expression RightBracket;
+  //loopBlock : LeftBracket (variable '∈')? expression RightBracket;
    fdoc : FDOC;
 
    iInterval : LeftBracket expression? ';' expression (';' expression)? RightBracket;
@@ -100,7 +103,7 @@ expression
  | prefix=('++'|'--') expression                                               #prefix
  | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
- | ('+' | '-') expression                                                      #unaryMinusExpression
+ | ('+' | Minus | UnaryMinus) expression                                       #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression

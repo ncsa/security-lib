@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.util.cli;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**
@@ -21,7 +22,22 @@ public class InputLine {
     }
 
     protected InputLine() {
+    }
 
+    /**
+     * Takes a <b>blank delimited</b> command string and turns it into an input line
+     * <pre>
+     *     )help -w 120 -modules
+     * </pre>
+     * @param unparsedString
+     */
+    public InputLine(String unparsedString) {
+        StringTokenizer stringTokenizer = new StringTokenizer(unparsedString, " ");
+        Vector<String> vector = new Vector<>();
+        while(stringTokenizer.hasMoreTokens()){
+            vector.add(stringTokenizer.nextToken());
+        }
+        parsedInput = vector;
     }
 
     public String getOriginalLine() {

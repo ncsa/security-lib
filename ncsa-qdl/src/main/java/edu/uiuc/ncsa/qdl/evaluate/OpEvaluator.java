@@ -35,6 +35,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String LESS_THAN_EQUAL2 = "=<";
     public static final String LESS_THAN_EQUAL3 = "≤"; // unicode 2264
     public static final String MINUS = "-";
+    public static final String MINUS2 = "¯";
     public static final String MINUS_MINUS = "--";
     public static final String MORE_THAN = ">";
     public static final String MORE_THAN_EQUAL = ">=";
@@ -93,7 +94,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             DIVIDE2,
             INTEGER_DIVIDE,
             PLUS,
-            MINUS,
+            MINUS, MINUS2,
             AND, AND2, AND3,
             OR,
             OR2, OR3,
@@ -183,6 +184,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case LESS_THAN_EQUAL3:
                 return LESS_THAN_EQUAL_VALUE;
             case MINUS:
+            case MINUS2:
                 return MINUS_VALUE;
             case MORE_THAN:
                 return MORE_THAN_VALUE;

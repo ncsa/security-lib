@@ -565,13 +565,15 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-        // ARGH as per antlr4 spec, this need not be called, and whether it is varies by compilation.
+        // ARGH as per antlr4 spec, this need not be called, and whether it is seems to vary by compilation.
         // Do not use this. Put everything in the exit statement.
     }
 
     @Override
     public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
-        Monad monad = new Monad(ctx.children.get(0).getText().equals(OpEvaluator.MINUS) ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE, false);
+        boolean isMinus = ctx.children.get(0).getText().equals(OpEvaluator.MINUS) || ctx.children.get(0).getText().equals(OpEvaluator.MINUS2);
+        Monad monad = new Monad(isMinus ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE, false);
+        monad.setSourceCode(getSource(ctx));
         stash(ctx, monad);
         finish(monad, ctx);
     }

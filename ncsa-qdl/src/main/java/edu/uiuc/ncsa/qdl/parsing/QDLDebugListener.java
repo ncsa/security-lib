@@ -364,7 +364,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     @Override
     public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) {
         sayi("exit unaryMinusExpression:" + xit("uminus"), ctx);
-        sayii("Minus=" + ctx.Minus());
+        sayii("Minus=" + ctx.UnaryMinus());
 
     }
 

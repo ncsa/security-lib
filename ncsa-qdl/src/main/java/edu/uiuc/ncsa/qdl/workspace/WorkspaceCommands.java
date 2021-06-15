@@ -4147,7 +4147,7 @@ public class WorkspaceCommands implements Logable {
         String[] foundModules = setupModules(qe, getState());
         // Just so the user can see it in the properties after load.
         if (foundModules[JAVA_MODULE_INDEX] != null && !foundModules[JAVA_MODULE_INDEX].isEmpty()) {
-            if (!isRunScript && isVerbose) {
+            if (showBanner && !isRunScript && isVerbose) {
                 say("loaded java modules:");
                 StringTokenizer t = new StringTokenizer(foundModules[JAVA_MODULE_INDEX], ",");
                 while (t.hasMoreTokens()) {
@@ -4157,7 +4157,7 @@ public class WorkspaceCommands implements Logable {
             env.put("java_modules", foundModules[JAVA_MODULE_INDEX]);
         }
         if (foundModules[QDL_MODULE_INDEX] != null && !foundModules[QDL_MODULE_INDEX].isEmpty()) {
-            if (!isRunScript && isVerbose) {
+            if (showBanner && !isRunScript && isVerbose) {
                 say("loaded QDL modules:");
                 StringTokenizer t = new StringTokenizer(foundModules[QDL_MODULE_INDEX], ",");
                 while (t.hasMoreTokens()) {

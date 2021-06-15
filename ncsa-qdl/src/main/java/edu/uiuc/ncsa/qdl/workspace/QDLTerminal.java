@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.util.terminal.KeyStroke;
 import java.io.IOException;
 
 /**
+ * Keymap extensions for QDL only.
  * <p>Created by Jeff Gaynor<br>
  * on 6/10/21 at  11:35 AM
  */
@@ -41,6 +42,8 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('∨');
                     case '-':
                         return new KeyStroke('≈');
+                    case '_':
+                        return new KeyStroke('¯');
                     case '.':
                         return new KeyStroke('·');
                     case 'a':

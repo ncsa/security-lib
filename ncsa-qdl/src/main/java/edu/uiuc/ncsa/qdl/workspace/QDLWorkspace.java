@@ -190,17 +190,65 @@ public class QDLWorkspace {
         return null;
     }
 
+    public static String HISTORY_CLEAR_SWITCH = "-clear";
+    public static String HISTORY_TRUNCATE_SWITCH = "-keep";
+
     protected String doHistory(String cmdLine) {
         if (cmdLine.contains("--help")) {
-            workspaceCommands.say(HISTORY_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
+            workspaceCommands.say(HISTORY_COMMAND + " [int | " + HISTORY_CLEAR_SWITCH + " | " + HISTORY_TRUNCATE_SWITCH + " n]");
+
+            workspaceCommands.say("(no args)" + " show complete history, executing nothing");
+            // Funny spaces below make it all line up when printed.
+            workspaceCommands.say("    int = the command at the given index.");
+            workspaceCommands.say(" " + HISTORY_CLEAR_SWITCH + " = clear the entire history.");
+            workspaceCommands.say(HISTORY_TRUNCATE_SWITCH + " n = keep n elements in the history, dropping the rest.");
             workspaceCommands.say("See also:" + REPEAT_COMMAND);
             return null; // do nothing
         }
         // Either of the following work:             getNamedConfig(
         // /h == print history with line numbers
         // /h int = execute line # int, or print history if that fails
+        InputLine inputLine = new InputLine(cmdLine);
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
         st.nextToken(); // This is the "/h" which we already know about
+        boolean truncate = inputLine.hasArg(HISTORY_TRUNCATE_SWITCH);
+
+        int truncateIndex = -1;
+        if(truncate){
+            String truncateIndexString = inputLine.getNextArgFor(HISTORY_TRUNCATE_SWITCH);
+
+            try {
+                truncateIndex = Integer.parseInt(truncateIndexString);
+            } catch (NumberFormatException nfx) {
+                workspaceCommands.say("sorry, but the argument to " + HISTORY_TRUNCATE_SWITCH + " was not an integer.");
+                return null;
+
+            }
+            inputLine.removeSwitchAndValue(HISTORY_TRUNCATE_SWITCH);
+        }
+        if(truncate){
+            if(truncateIndex < 0 ){
+                workspaceCommands.say("negative index. skipping...");
+                return null;
+            }
+            if(truncateIndex<workspaceCommands.commandHistory.size()) {
+                // next is an idiom, to clear this range from the history. It uses the fact that
+                // sublist is view of the list, not another object.
+                int numberRemoved = workspaceCommands.commandHistory.size() - truncateIndex;
+                workspaceCommands.commandHistory.subList(truncateIndex, workspaceCommands.commandHistory.size()).clear();
+                workspaceCommands.say(numberRemoved + " history entries removed.");
+                return null;
+
+            }
+        }
+        boolean clearHistory = inputLine.hasArg(HISTORY_CLEAR_SWITCH);
+        inputLine.removeSwitch(HISTORY_CLEAR_SWITCH);
+        if (clearHistory) {
+            workspaceCommands.commandHistory = new ArrayList<>();
+            workspaceCommands.say("history cleared");
+            return null;
+        }
+
         boolean printIt = true;
         if (st.hasMoreTokens()) {
             try {
@@ -235,7 +283,7 @@ public class QDLWorkspace {
         ISO6429IO iso6429IO = null; // only make one of these if you need it because jLine takes over all IO!
         if (argLine.hasArg("-ansi")) {
             QDLTerminal qdlTerminal = new QDLTerminal(null);
-            iso6429IO = new ISO6429IO(qdlTerminal, false);
+            iso6429IO = new ISO6429IO(qdlTerminal, true);
             workspaceCommands = new WorkspaceCommands(iso6429IO);
             isoTerminal = true;
         } else {
@@ -246,8 +294,9 @@ public class QDLWorkspace {
         if (workspaceCommands.isRunScript()) {
             return;
         }
-        if ((!argLine.hasArg(CLA_NO_BANNER)) && isoTerminal) {
-            System.out.println("ISO 6429 terminal:" + iso6429IO.getTerminal().getName());
+        if ((workspaceCommands.showBanner) && isoTerminal) {
+            //System.out.println("ISO 6429 terminal" + iso6429IO.getTerminal().getName());
+            System.out.println("ISO 6429 terminal");
         }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
         ArrayList<String> functions = new ArrayList<>();

@@ -280,6 +280,35 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
     }
 
+    public void testRaisedSignedNumbers() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.0 := ¯1;");
+        addLine(script, "a.1 := ¯2^2;");
+        addLine(script, "a.2 := ¯2^3;");
+        addLine(script, "a.3 := ¯0.1^2;");
+        addLine(script, "a.4 := ¯0.1^3;");
+        addLine(script, "a.5 := ¯3*4;");
+        addLine(script, "a.6 := ¯3*¯4;");
+        addLine(script, "a.7 := 3*¯4;");
+        addLine(script, "a.8 := (3)*(4);");
+        addLine(script, "a.9 := ¯0.1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("a.0", state) == -1L;
+        assert getLongValue("a.1", state) == -4L;
+        assert getLongValue("a.2", state) == -8L;
+
+        assert areEqual(getBDValue("a.3", state), new BigDecimal("-.01"));
+        assert areEqual(getBDValue("a.4", state), new BigDecimal("-.001"));
+
+        assert getLongValue("a.5", state) == -12L;
+        assert getLongValue("a.6", state) == 12L;
+        assert getLongValue("a.7", state) == -12L;
+        assert getLongValue("a.8", state) == 12L;
+        assert areEqual(getBDValue("a.9", state), new BigDecimal("-.1"));
+
+    }
     /**
      * Define a recursive function and invoke it. This will compute the Fibonacci numbers
      * 1,1,2,3,5,8,13,21,34,55,... It tests a single value.<br/><br/>
