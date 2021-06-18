@@ -27,8 +27,8 @@ public class QDLParserParser extends Parser {
 		LessEquals=45, MoreEquals=46, Equals=47, NotEquals=48, RegexMatches=49, 
 		LogicalNot=50, Exponentiation=51, And=52, Or=53, Backtick=54, Percent=55, 
 		Tilde=56, Backslash=57, Stile=58, TildeRight=59, StemDot=60, UnaryMinus=61, 
-		ASSIGN=62, Identifier=63, FuncStart=64, F_REF=65, FDOC=66, WS=67, COMMENT=68, 
-		LINE_COMMENT=69;
+		UnaryPlus=62, ASSIGN=63, Identifier=64, FuncStart=65, F_REF=66, FDOC=67, 
+		WS=68, COMMENT=69, LINE_COMMENT=70;
 	public static final int
 		RULE_elements = 0, RULE_element = 1, RULE_statement = 2, RULE_conditionalStatement = 3, 
 		RULE_ifStatement = 4, RULE_ifElseStatement = 5, RULE_loopStatement = 6, 
@@ -61,7 +61,7 @@ public class QDLParserParser extends Parser {
 			null, null, null, "'['", "']'", "','", "':'", "';'", null, null, null, 
 			null, null, "'++'", "'+'", "'--'", "'-'", "'<'", "'>'", "'='", null, 
 			null, null, null, null, null, "'^'", null, null, "'`'", "'%'", "'~'", 
-			"'\\'", "'|'", "'~|'", "'.'", "'\u00AF'"
+			"'\\'", "'|'", "'~|'", "'.'", "'\u00AF'", "'\u207A'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
@@ -76,8 +76,8 @@ public class QDLParserParser extends Parser {
 			"GreaterThan", "SingleEqual", "LessEquals", "MoreEquals", "Equals", "NotEquals", 
 			"RegexMatches", "LogicalNot", "Exponentiation", "And", "Or", "Backtick", 
 			"Percent", "Tilde", "Backslash", "Stile", "TildeRight", "StemDot", "UnaryMinus", 
-			"ASSIGN", "Identifier", "FuncStart", "F_REF", "FDOC", "WS", "COMMENT", 
-			"LINE_COMMENT"
+			"UnaryPlus", "ASSIGN", "Identifier", "FuncStart", "F_REF", "FDOC", "WS", 
+			"COMMENT", "LINE_COMMENT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -163,7 +163,7 @@ public class QDLParserParser extends Parser {
 			setState(71);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & ((1L << (T__0 - 1)) | (1L << (T__3 - 1)) | (1L << (ConstantKeywords - 1)) | (1L << (ASSERT - 1)) | (1L << (ASSERT2 - 1)) | (1L << (DEFINE - 1)) | (1L << (IF - 1)) | (1L << (MODULE - 1)) | (1L << (Null - 1)) | (1L << (SWITCH - 1)) | (1L << (TRY - 1)) | (1L << (WHILE - 1)) | (1L << (Integer - 1)) | (1L << (Decimal - 1)) | (1L << (SCIENTIFIC_NUMBER - 1)) | (1L << (Bool - 1)) | (1L << (STRING - 1)) | (1L << (LeftBracket - 1)) | (1L << (SemiColon - 1)) | (1L << (LDoubleBracket - 1)) | (1L << (PlusPlus - 1)) | (1L << (Plus - 1)) | (1L << (MinusMinus - 1)) | (1L << (Minus - 1)) | (1L << (LogicalNot - 1)) | (1L << (UnaryMinus - 1)) | (1L << (Identifier - 1)) | (1L << (FuncStart - 1)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << ASSERT) | (1L << ASSERT2) | (1L << DEFINE) | (1L << IF) | (1L << MODULE) | (1L << Null) | (1L << SWITCH) | (1L << TRY) | (1L << WHILE) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || _la==Identifier || _la==FuncStart) {
 				{
 				{
 				setState(68);
@@ -243,6 +243,7 @@ public class QDLParserParser extends Parser {
 			case Minus:
 			case LogicalNot:
 			case UnaryMinus:
+			case UnaryPlus:
 			case Identifier:
 			case FuncStart:
 				enterOuterAlt(_localctx, 1);
@@ -1138,7 +1139,7 @@ public class QDLParserParser extends Parser {
 			setState(188);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & ((1L << (T__0 - 1)) | (1L << (T__3 - 1)) | (1L << (ConstantKeywords - 1)) | (1L << (ASSERT - 1)) | (1L << (ASSERT2 - 1)) | (1L << (DEFINE - 1)) | (1L << (IF - 1)) | (1L << (Null - 1)) | (1L << (SWITCH - 1)) | (1L << (TRY - 1)) | (1L << (WHILE - 1)) | (1L << (Integer - 1)) | (1L << (Decimal - 1)) | (1L << (SCIENTIFIC_NUMBER - 1)) | (1L << (Bool - 1)) | (1L << (STRING - 1)) | (1L << (LeftBracket - 1)) | (1L << (SemiColon - 1)) | (1L << (LDoubleBracket - 1)) | (1L << (PlusPlus - 1)) | (1L << (Plus - 1)) | (1L << (MinusMinus - 1)) | (1L << (Minus - 1)) | (1L << (LogicalNot - 1)) | (1L << (UnaryMinus - 1)) | (1L << (Identifier - 1)) | (1L << (FuncStart - 1)))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << ASSERT) | (1L << ASSERT2) | (1L << DEFINE) | (1L << IF) | (1L << Null) | (1L << SWITCH) | (1L << TRY) | (1L << WHILE) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || _la==Identifier || _la==FuncStart) {
 				{
 				{
 				setState(183);
@@ -1237,7 +1238,7 @@ public class QDLParserParser extends Parser {
 				setState(205); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( ((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & ((1L << (T__0 - 1)) | (1L << (T__3 - 1)) | (1L << (ConstantKeywords - 1)) | (1L << (ASSERT - 1)) | (1L << (ASSERT2 - 1)) | (1L << (DEFINE - 1)) | (1L << (IF - 1)) | (1L << (Null - 1)) | (1L << (SWITCH - 1)) | (1L << (TRY - 1)) | (1L << (WHILE - 1)) | (1L << (Integer - 1)) | (1L << (Decimal - 1)) | (1L << (SCIENTIFIC_NUMBER - 1)) | (1L << (Bool - 1)) | (1L << (STRING - 1)) | (1L << (LeftBracket - 1)) | (1L << (SemiColon - 1)) | (1L << (LDoubleBracket - 1)) | (1L << (PlusPlus - 1)) | (1L << (Plus - 1)) | (1L << (MinusMinus - 1)) | (1L << (Minus - 1)) | (1L << (LogicalNot - 1)) | (1L << (UnaryMinus - 1)) | (1L << (Identifier - 1)) | (1L << (FuncStart - 1)))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << ASSERT) | (1L << ASSERT2) | (1L << DEFINE) | (1L << IF) | (1L << Null) | (1L << SWITCH) | (1L << TRY) | (1L << WHILE) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || _la==Identifier || _la==FuncStart );
 			setState(207);
 			match(RightBracket);
 			}
@@ -1308,7 +1309,7 @@ public class QDLParserParser extends Parser {
 				setState(217); 
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-			} while ( ((((_la - 1)) & ~0x3f) == 0 && ((1L << (_la - 1)) & ((1L << (T__0 - 1)) | (1L << (T__3 - 1)) | (1L << (ConstantKeywords - 1)) | (1L << (Null - 1)) | (1L << (Integer - 1)) | (1L << (Decimal - 1)) | (1L << (SCIENTIFIC_NUMBER - 1)) | (1L << (Bool - 1)) | (1L << (STRING - 1)) | (1L << (LeftBracket - 1)) | (1L << (SemiColon - 1)) | (1L << (LDoubleBracket - 1)) | (1L << (PlusPlus - 1)) | (1L << (Plus - 1)) | (1L << (MinusMinus - 1)) | (1L << (Minus - 1)) | (1L << (LogicalNot - 1)) | (1L << (UnaryMinus - 1)) | (1L << (Identifier - 1)) | (1L << (FuncStart - 1)))) != 0) );
+			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || _la==Identifier || _la==FuncStart );
 			setState(219);
 			match(RightBracket);
 			}
@@ -1689,6 +1690,7 @@ public class QDLParserParser extends Parser {
 			case Minus:
 			case LogicalNot:
 			case UnaryMinus:
+			case UnaryPlus:
 			case Identifier:
 			case FuncStart:
 				{
@@ -1899,7 +1901,7 @@ public class QDLParserParser extends Parser {
 			setState(295);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << Identifier))) != 0) || _la==FuncStart || _la==F_REF) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (Identifier - 64)) | (1L << (FuncStart - 64)) | (1L << (F_REF - 64)))) != 0)) {
 				{
 				{
 				setState(292);
@@ -1973,6 +1975,7 @@ public class QDLParserParser extends Parser {
 			case Minus:
 			case LogicalNot:
 			case UnaryMinus:
+			case UnaryPlus:
 			case Identifier:
 			case FuncStart:
 				{
@@ -2514,6 +2517,7 @@ public class QDLParserParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public TerminalNode Plus() { return getToken(QDLParserParser.Plus, 0); }
+		public TerminalNode UnaryPlus() { return getToken(QDLParserParser.UnaryPlus, 0); }
 		public TerminalNode Minus() { return getToken(QDLParserParser.Minus, 0); }
 		public TerminalNode UnaryMinus() { return getToken(QDLParserParser.UnaryMinus, 0); }
 		public UnaryMinusExpressionContext(ExpressionContext ctx) { copyFrom(ctx); }
@@ -2715,7 +2719,7 @@ public class QDLParserParser extends Parser {
 					setState(321);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
-					while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << Identifier))) != 0) || _la==FuncStart || _la==F_REF) {
+					while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (Identifier - 64)) | (1L << (FuncStart - 64)) | (1L << (F_REF - 64)))) != 0)) {
 						{
 						{
 						setState(318);
@@ -2816,7 +2820,7 @@ public class QDLParserParser extends Parser {
 				_prevctx = _localctx;
 				setState(338);
 				_la = _input.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << Plus) | (1L << Minus) | (1L << UnaryMinus))) != 0)) ) {
+				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << Plus) | (1L << Minus) | (1L << UnaryMinus) | (1L << UnaryPlus))) != 0)) ) {
 				_errHandler.recoverInline(this);
 				}
 				else {
@@ -3416,7 +3420,7 @@ public class QDLParserParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3G\u01aa\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3H\u01aa\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -3450,7 +3454,7 @@ public class QDLParserParser extends Parser {
 		"\37\3\37\6\37\u0191\n\37\r\37\16\37\u0192\3\37\3\37\3\37\3\37\3\37\3\37"+
 		"\3\37\3\37\7\37\u019d\n\37\f\37\16\37\u01a0\13\37\3 \3 \3!\3!\3\"\3\""+
 		"\3#\3#\3#\2\3<$\2\4\6\b\n\f\16\20\22\24\26\30\32\34\36 \"$&(*,.\60\62"+
-		"\64\668:<>@BD\2\n\4\2((**\5\2))++??\4\2::==\4\2&\'99\4\2))++\4\2,-/\60"+
+		"\64\668:<>@BD\2\n\4\2((**\5\2))++?@\4\2::==\4\2&\'99\4\2))++\4\2,-/\60"+
 		"\3\2\61\62\3\2\32\33\2\u01d1\2I\3\2\2\2\4T\3\2\2\2\6_\3\2\2\2\bc\3\2\2"+
 		"\2\ne\3\2\2\2\fl\3\2\2\2\16u\3\2\2\2\20|\3\2\2\2\22\u0088\3\2\2\2\24\u0096"+
 		"\3\2\2\2\26\u0098\3\2\2\2\30\u00a5\3\2\2\2\32\u00aa\3\2\2\2\34\u00b2\3"+
@@ -3500,7 +3504,7 @@ public class QDLParserParser extends Parser {
 		"\3\2\2\2\u00d9\u00d6\3\2\2\2\u00da\u00db\3\2\2\2\u00db\u00d9\3\2\2\2\u00db"+
 		"\u00dc\3\2\2\2\u00dc\u00dd\3\2\2\2\u00dd\u00de\7\37\2\2\u00de#\3\2\2\2"+
 		"\u00df\u00e0\7\36\2\2\u00e0\u00e1\5<\37\2\u00e1\u00e2\7\37\2\2\u00e2%"+
-		"\3\2\2\2\u00e3\u00e4\7D\2\2\u00e4\'\3\2\2\2\u00e5\u00e7\7\36\2\2\u00e6"+
+		"\3\2\2\2\u00e3\u00e4\7E\2\2\u00e4\'\3\2\2\2\u00e5\u00e7\7\36\2\2\u00e6"+
 		"\u00e8\5<\37\2\u00e7\u00e6\3\2\2\2\u00e7\u00e8\3\2\2\2\u00e8\u00e9\3\2"+
 		"\2\2\u00e9\u00ea\7\"\2\2\u00ea\u00ed\5<\37\2\u00eb\u00ec\7\"\2\2\u00ec"+
 		"\u00ee\5<\37\2\u00ed\u00eb\3\2\2\2\u00ed\u00ee\3\2\2\2\u00ee\u00ef\3\2"+
@@ -3521,14 +3525,14 @@ public class QDLParserParser extends Parser {
 		"\u011d\7\36\2\2\u011d\u011f\7\37\2\2\u011e\u0111\3\2\2\2\u011e\u011c\3"+
 		"\2\2\2\u011f\61\3\2\2\2\u0120\u0124\5<\37\2\u0121\u0124\5,\27\2\u0122"+
 		"\u0124\5\60\31\2\u0123\u0120\3\2\2\2\u0123\u0121\3\2\2\2\u0123\u0122\3"+
-		"\2\2\2\u0124\63\3\2\2\2\u0125\u0129\7B\2\2\u0126\u0128\58\35\2\u0127\u0126"+
+		"\2\2\2\u0124\63\3\2\2\2\u0125\u0129\7C\2\2\u0126\u0128\58\35\2\u0127\u0126"+
 		"\3\2\2\2\u0128\u012b\3\2\2\2\u0129\u0127\3\2\2\2\u0129\u012a\3\2\2\2\u012a"+
 		"\u012c\3\2\2\2\u012b\u0129\3\2\2\2\u012c\u012d\7\5\2\2\u012d\65\3\2\2"+
 		"\2\u012e\u0131\5\62\32\2\u012f\u0131\5:\36\2\u0130\u012e\3\2\2\2\u0130"+
 		"\u012f\3\2\2\2\u0131\67\3\2\2\2\u0132\u0137\5\66\34\2\u0133\u0134\7 \2"+
 		"\2\u0134\u0136\5\66\34\2\u0135\u0133\3\2\2\2\u0136\u0139\3\2\2\2\u0137"+
 		"\u0135\3\2\2\2\u0137\u0138\3\2\2\2\u01389\3\2\2\2\u0139\u0137\3\2\2\2"+
-		"\u013a\u013b\7C\2\2\u013b;\3\2\2\2\u013c\u013d\b\37\1\2\u013d\u0165\5"+
+		"\u013a\u013b\7D\2\2\u013b;\3\2\2\2\u013c\u013d\b\37\1\2\u013d\u0165\5"+
 		"\64\33\2\u013e\u0148\5\64\33\2\u013f\u0143\7\6\2\2\u0140\u0142\58\35\2"+
 		"\u0141\u0140\3\2\2\2\u0142\u0145\3\2\2\2\u0143\u0141\3\2\2\2\u0143\u0144"+
 		"\3\2\2\2\u0144\u0146\3\2\2\2\u0145\u0143\3\2\2\2\u0146\u0148\7\5\2\2\u0147"+
@@ -3560,7 +3564,7 @@ public class QDLParserParser extends Parser {
 		"\u018b\5<\37\2\u018b\u018c\7!\2\2\u018c\u018d\5<\37\16\u018d\u019d\3\2"+
 		"\2\2\u018e\u0190\f\f\2\2\u018f\u0191\7;\2\2\u0190\u018f\3\2\2\2\u0191"+
 		"\u0192\3\2\2\2\u0192\u0190\3\2\2\2\u0192\u0193\3\2\2\2\u0193\u0194\3\2"+
-		"\2\2\u0194\u019d\5<\37\r\u0195\u0196\f\4\2\2\u0196\u0197\7@\2\2\u0197"+
+		"\2\2\u0194\u019d\5<\37\r\u0195\u0196\f\4\2\2\u0196\u0197\7A\2\2\u0197"+
 		"\u019d\5<\37\5\u0198\u0199\f!\2\2\u0199\u019d\7>\2\2\u019a\u019b\f\32"+
 		"\2\2\u019b\u019d\t\2\2\2\u019c\u0166\3\2\2\2\u019c\u016d\3\2\2\2\u019c"+
 		"\u0170\3\2\2\2\u019c\u0173\3\2\2\2\u019c\u0176\3\2\2\2\u019c\u0179\3\2"+
@@ -3568,7 +3572,7 @@ public class QDLParserParser extends Parser {
 		"\u0185\3\2\2\2\u019c\u0188\3\2\2\2\u019c\u018e\3\2\2\2\u019c\u0195\3\2"+
 		"\2\2\u019c\u0198\3\2\2\2\u019c\u019a\3\2\2\2\u019d\u01a0\3\2\2\2\u019e"+
 		"\u019c\3\2\2\2\u019e\u019f\3\2\2\2\u019f=\3\2\2\2\u01a0\u019e\3\2\2\2"+
-		"\u01a1\u01a2\7A\2\2\u01a2?\3\2\2\2\u01a3\u01a4\t\t\2\2\u01a4A\3\2\2\2"+
+		"\u01a1\u01a2\7B\2\2\u01a2?\3\2\2\2\u01a3\u01a4\t\t\2\2\u01a4A\3\2\2\2"+
 		"\u01a5\u01a6\7\31\2\2\u01a6C\3\2\2\2\u01a7\u01a8\7\b\2\2\u01a8E\3\2\2"+
 		"\2\'IT_chox\u0083\u008d\u0096\u009d\u00a1\u00b6\u00be\u00c7\u00cf\u00db"+
 		"\u00e7\u00ed\u00f3\u0101\u0108\u010c\u0117\u011e\u0123\u0129\u0130\u0137"+

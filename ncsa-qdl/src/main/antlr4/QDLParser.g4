@@ -103,7 +103,7 @@ expression
  | prefix=('++'|'--') expression                                               #prefix
  | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
- | ('+' | Minus | UnaryMinus) expression                                       #unaryMinusExpression
+ | (Plus | UnaryPlus | Minus | UnaryMinus) expression                                       #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
@@ -117,6 +117,7 @@ expression
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
+// | expression '∈' expression                       #epsilon
  | STRING                                                                      #strings
  | integer                                                                     #integers
  | number                                                                      #numbers

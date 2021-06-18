@@ -40,6 +40,7 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  */
 public class QDLListener implements QDLParserListener {
     ParsingMap parsingMap = new ParsingMap();
+    private QDLParserParser.FdocContext ctx,fdoc;
 
     public ParsingMap getParsingMap() {
         return parsingMap;
@@ -894,9 +895,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitFdoc(QDLParserParser.FdocContext ctx) {
-        // we don't do anything with this element, but since we are implementing the interface,
-        // have to put it here. The fdoc elements are handled in the function definition
-        // code.
     }
 
     @Override
@@ -918,15 +916,25 @@ public class QDLListener implements QDLParserListener {
         // Best we can do with ANTLR...
 
         List<String> stringList = new ArrayList<>();
-        for (int i = 0; i < defineContext.getChildCount(); i++) {
-            stringList.add((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
+        for (int i = 0; i < defineContext.getChildCount()-1; i++) {
+            //stringList.add((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
+            stringList.add(defineContext.getChild(i).getText());
         }
+        //
+        QDLParserParser.DocStatementBlockContext docStatementBlockContext = defineContext.docStatementBlock();
+        for(int i = 0; i < docStatementBlockContext.getChildCount(); i++){
+            stringList.add(docStatementBlockContext.getChild(i).getText());
+        }
+
+        // grab the FDOC
+
         // ANTLR may strip final terminator. Put it back as needed.
+
         if (!stringList.get(stringList.size() - 1).endsWith(";")) {
             stringList.set(stringList.size() - 1, stringList.get(stringList.size() - 1) + ";");
         }
-        functionRecord.sourceCode = stringList;
 
+        functionRecord.sourceCode = stringList;
         QDLParserParser.FunctionContext nameAndArgsNode = defineContext.function();
         String name = nameAndArgsNode.getChild(0).getText();
         if (name.endsWith("(")) {
@@ -942,7 +950,7 @@ public class QDLListener implements QDLParserListener {
                 functionRecord.argNames.add(st.nextToken());
             }
         }
-        QDLParserParser.DocStatementBlockContext docStatementBlockContext = defineContext.docStatementBlock();
+        //docStatementBlockContext = defineContext.docStatementBlock();
         for (QDLParserParser.FdocContext fd : docStatementBlockContext.fdoc()) {
             String doc = fd.getText();
             // strip off function comment marker
@@ -1654,7 +1662,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitDocStatementBlock(QDLParserParser.DocStatementBlockContext ctx) {
-
     }
 
     @Override

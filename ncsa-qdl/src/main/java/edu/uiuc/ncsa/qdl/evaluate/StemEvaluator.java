@@ -937,17 +937,39 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
-        if (!isStem(leftArg)) {
-            throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the left argument.");
+        StemVariable leftStem =  null;
+        if(isString(leftArg)){
+                           leftStem = new StemVariable();
+                           leftStem.put(0L, leftArg);
         }
-        Object rightArg = polyad.evalArg(1, state);
-        if (!isStem(rightArg)) {
-            throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the right argument.");
+        if (leftStem == null ) {
+            if(isStem(leftArg)){
+                leftStem = (StemVariable) leftArg;
+            }else {
+                throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the left argument.");
+            }
         }
 
+        Object rightArg = polyad.evalArg(1, state);
+        StemVariable rightStem = null;
+        if(isString(rightArg)){
+            rightStem = new StemVariable();
+            rightStem.put(0L, rightArg);
+        }
+        if(rightStem == null){
+            if(isStem(rightArg)){
+                 rightStem = (StemVariable) rightArg;
+
+            }else{
+                throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the right argument.");
+            }
+        }
+       /*
+         g. := ['wlcg.groups', 'wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/ALARM','wlcg.groups:/cms/users']
+  w := 'wlcg.groups'
+  s. := 'openid' ~ 'email' ~ 'profile' ~ g.
+        */
         StemVariable output = new StemVariable();
-        StemVariable leftStem = (StemVariable) leftArg;
-        StemVariable rightStem = (StemVariable) rightArg;
         for (long i = 0; i < leftStem.size(); i++) {
             boolean gotOne = false;
             for (long j = 0; j < rightStem.size(); j++) {

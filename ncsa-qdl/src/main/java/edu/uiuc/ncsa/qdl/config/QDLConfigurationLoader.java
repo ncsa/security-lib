@@ -226,7 +226,11 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isEnableLibrarySupport() {
         return getFirstBooleanValue(cn, ENABLE_LIBRARY_SUPPORT, true);
     }
+      protected boolean isRunInitOnLoad(){
+          ConfigurationNode node = getFirstNode(cn, WS_TAG);
+          return getFirstBooleanValue(cn, RUN_INIT_ON_LOAD, true);
 
+      }
     protected int getNumericDigits() {
         String raw = getFirstAttribute(cn, CONFG_ATTR_NUMERIC_DIGITS);
         if (isTrivial(raw)) {

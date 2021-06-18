@@ -57,7 +57,7 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
 
             pool = new MariaDBConnectionPool(x);
             setPoolParameters(pool);
-            System.err.println( this.getClass().getSimpleName() + ": created connection pool with id " + pool.getUuid());
+       //     System.err.println( this.getClass().getSimpleName() + ": created connection pool with id " + pool.getUuid());
         }
         return pool;
     }

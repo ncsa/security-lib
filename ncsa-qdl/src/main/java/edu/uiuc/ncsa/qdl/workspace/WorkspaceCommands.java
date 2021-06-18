@@ -2491,17 +2491,87 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected void printAllWSVars() {
-        TreeSet<String> t = new TreeSet<>();
-        // alphabetizes them
+        Map<String, Object> allVars = new HashMap<>();
         for (String s : ALL_WS_VARS) {
-            t.add(s);
+            Object obj = getWSVariable(s);
+            allVars.put(s, obj);
         }
-        for (String s : t) {
+       List<String> list = StringUtils.formatMap(allVars, null, true, true, 0, 72);
+        for (String s : list) {
             say(s);
+        }
+
+    }
+
+    String NOT_SET = "(not set)";
+
+    protected Object getWSVariable(String key) {
+        switch (key) {
+            case PRETTY_PRINT:
+            case PRETTY_PRINT_SHORT:
+                return isPrettyPrint();
+            case ECHO:
+                return isEchoModeOn();
+            case DEBUG:
+                return isDebugOn();
+            case UNICODE_ON:
+                return State.isPrintUnicode();
+            case ASSERTIONS_ON:
+                return isAssertionsOn();
+            case RUN_INIT_ON_LOAD:
+                return runInitOnLoad;
+            case START_TS:
+                if (startTimeStamp != null) {
+                    return Iso8601.date2String(startTimeStamp);
+                }
+                return NOT_SET;
+            case EXTERNAL_EDITOR:
+                return getExternalEditorName();
+            case USE_EXTERNAL_EDITOR:
+                return isUseExternalEditor();
+            case ENABLE_LIBRARY_SUPPORT:
+                return getState().isEnableLibrarySupport();
+            case LIB_PATH_TAG:
+                return getState().getLibPath();
+            case DESCRIPTION:
+                if (isTrivial(getDescription())) {
+                    return NOT_SET;
+                }
+                return getDescription();
+            case CURRENT_WORKSPACE_FILE:
+                if (currentWorkspace == null) {
+                    return NOT_SET;
+                }
+                return currentWorkspace.getAbsolutePath();
+            case WS_ID:
+                if (isTrivial(getWSID())) {
+                    return NOT_SET;
+                }
+                return getWSID();
+            case COMPRESS_XML:
+                return isCompressXML();
+            case SAVE_DIR:
+                if (saveDir == null) {
+                    return NOT_SET;
+                }
+                return saveDir.getAbsolutePath();
+            case AUTOSAVE_ON:
+                return isAutosaveOn();
+            case AUTOSAVE_MESSAGES_ON:
+                return isAutosaveMessagesOn();
+            case AUTOSAVE_INTERVAL:
+                return getAutosaveInterval();
+            case ROOT_DIR:
+                if (rootDir == null) {
+                    return NOT_SET;
+                }
+                return rootDir.getAbsolutePath();
+            default:
+                return "unknown workspace variable";
         }
     }
 
-    private int _wsGet(InputLine inputLine) {
+    protected int _wsGet(InputLine inputLine) {
         if (_doHelp(inputLine)) {
             say("get [ws_variable]");
             sayi("Retrieve the value of the given variable for the workspace.");
@@ -2514,6 +2584,15 @@ public class WorkspaceCommands implements Logable {
             printAllWSVars();
             return RC_CONTINUE;
         }
+        String variable = inputLine.getArg(2);
+        Object value = getWSVariable(variable);
+        if (value instanceof Boolean) {
+            say(variable + " is " + onOrOff((Boolean) value));
+        } else {
+            say(variable + " is " + value);
+
+        }
+
         switch (inputLine.getArg(2)) {
             case PRETTY_PRINT:
             case PRETTY_PRINT_SHORT:
@@ -2530,6 +2609,9 @@ public class WorkspaceCommands implements Logable {
                 break;
             case ASSERTIONS_ON:
                 say(onOrOff(isAssertionsOn()));
+                break;
+            case RUN_INIT_ON_LOAD:
+                say(onOrOff(runInitOnLoad));
                 break;
             case START_TS:
                 if (startTimeStamp != null) {
@@ -2663,7 +2745,7 @@ public class WorkspaceCommands implements Logable {
 
             return RC_CONTINUE;
         }
-        String fileName = null;
+ //       String fileName = null;
         File currentFile = null;
         boolean showOnlyFailures = inputLine.hasArg(SHOW_ONLY_FAILURES);
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON); // print everything
@@ -2683,7 +2765,7 @@ public class WorkspaceCommands implements Logable {
         inputLine.removeSwitch(SHOW_ONLY_FAILURES);
         inputLine.removeSwitchAndValue(DISPLAY_WIDTH_SWITCH);
         Pattern pattern = null;
-        String regex = null;
+     //   String regex = null;
 
         FilenameFilter regexff = null;
         if (inputLine.hasArg(REGEX_SWITCH)) {
@@ -2897,19 +2979,19 @@ public class WorkspaceCommands implements Logable {
             String lengthToken = "";
             NumberFormat formatter = new DecimalFormat("#0.000");
             double oneK = 1024.0;
-            if(0 <= length && length < oneK){
+            if (0 <= length && length < oneK) {
                 lengthToken = length + "b";
 
             }
-            if(oneK <= length && length < Math.pow(oneK, 2)){
-                lengthToken = formatter.format((length/oneK)) + "k";
+            if (oneK <= length && length < Math.pow(oneK, 2)) {
+                lengthToken = formatter.format((length / oneK)) + "k";
 
             }
-            if(Math.pow(oneK, 2) <= length && length < Math.pow(oneK, 3)){
-                lengthToken = formatter.format(length/Math.pow(oneK, 2)) + "m";
+            if (Math.pow(oneK, 2) <= length && length < Math.pow(oneK, 3)) {
+                lengthToken = formatter.format(length / Math.pow(oneK, 2)) + "m";
             }
-            if(Math.pow(oneK, 3) <= length && length < Math.pow(oneK, 4)){
-                lengthToken = formatter.format(length/Math.pow(oneK, 3)) + "g";
+            if (Math.pow(oneK, 3) <= length && length < Math.pow(oneK, 4)) {
+                lengthToken = formatter.format(length / Math.pow(oneK, 3)) + "g";
             }
 
 
@@ -2924,7 +3006,7 @@ public class WorkspaceCommands implements Logable {
             if (ts == null) {
                 out = out + " " + pad2("(no date)", 25);
             } else {
-                out = out + " " + pad2(ts, false,30);
+                out = out + " " + pad2(ts, false, 30);
             }
             if (isTrivial(description)) {
                 //out = out + " " + pad2("(no description)", displayWidth - 55);
@@ -3135,7 +3217,10 @@ public class WorkspaceCommands implements Logable {
                 getState().setAssertionsOn(isOnOrTrue(value));
                 say("assertions are now " + (getState().isAssertionsOn() ? "on" : "off"));
                 break;
-
+            case RUN_INIT_ON_LOAD:
+                runInitOnLoad = isOnOrTrue(value);
+                say("run " + DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + " on loading this workspace is " + (getState().isAssertionsOn() ? "on" : "off"));
+                break;
             case LIB_PATH_TAG:
                 getState().setLibPath(value);
                 say("library path updated");
@@ -3250,23 +3335,27 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected String[] ALL_WS_VARS = new String[]{
-            COMPRESS_XML,
-            DESCRIPTION,
-            UNICODE_ON,
-            ECHO, DEBUG,
-            PRETTY_PRINT,
-            PRETTY_PRINT_SHORT,
-            SAVE_DIR,
+            ASSERTIONS_ON,
             AUTOSAVE_INTERVAL,
             AUTOSAVE_MESSAGES_ON,
             AUTOSAVE_ON,
-            START_TS,
-            ROOT_DIR,
-            WS_ID,
-            EXTERNAL_EDITOR,
-            USE_EXTERNAL_EDITOR,
+            COMPRESS_XML,
+            CURRENT_WORKSPACE_FILE,
+            DEBUG,
+            DESCRIPTION,
+            ECHO,
             ENABLE_LIBRARY_SUPPORT,
-            LIB_PATH_TAG
+            EXTERNAL_EDITOR,
+            LIB_PATH_TAG,
+            PRETTY_PRINT,
+            PRETTY_PRINT_SHORT,
+            ROOT_DIR,
+            RUN_INIT_ON_LOAD,
+            SAVE_DIR,
+            START_TS,
+            UNICODE_ON,
+            USE_EXTERNAL_EDITOR,
+            WS_ID
     };
     String wsID;
 
@@ -3627,6 +3716,10 @@ public class WorkspaceCommands implements Logable {
                 fromXML(xer);
                 xer.close();
                 currentWorkspace = f;
+                if (runInitOnLoad && state.getFTStack().isDefined(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+                    String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
+                    getInterpreter().execute(runnit);
+                }
                 return true;
             } catch (Throwable t) {
                 // First attempt can fail for, e.g., the default is compression but the file is not compressed.
@@ -3694,11 +3787,18 @@ public class WorkspaceCommands implements Logable {
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
+            if (runInitOnLoad && state.getFTStack().isDefined(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+                String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
+                getInterpreter().execute(runnit);
+            }
             return true;
         } catch (Throwable t) {
         }
         return false;
     }
+
+    String DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME = "__init";
+    boolean runInitOnLoad = true;
 
     File currentWorkspace;
     public final String RELOAD_FLAG = SWITCH + "reload";
@@ -4570,6 +4670,7 @@ public class WorkspaceCommands implements Logable {
             autosaveInterval = newCommands.getAutosaveInterval();
             autosaveMessagesOn = newCommands.isAutosaveMessagesOn();
             autosaveOn = newCommands.isAutosaveOn();
+            runInitOnLoad = newCommands.runInitOnLoad;
             if (autosaveOn) {
                 if (currentWorkspace == null) {
                     say("warning you need to set " + CURRENT_WORKSPACE_FILE + " then enable autosave. Autosave is off.");

@@ -49,6 +49,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String OR2 = "⋁"; // unicode 22c1
     public static final String OR3 = "∨"; // unicode 2228
     public static final String PLUS = "+";
+    public static final String PLUS2 = "⁺"; // unciode 207a unary plus
     public static final String PLUS_PLUS = "++";
     public static final String POWER = "^";
     public static final String TILDE = "~";
@@ -93,7 +94,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             DIVIDE,
             DIVIDE2,
             INTEGER_DIVIDE,
-            PLUS,
+            PLUS,PLUS2,
             MINUS, MINUS2,
             AND, AND2, AND3,
             OR,
@@ -200,6 +201,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case OR3:
                 return OR_VALUE;
             case PLUS:
+            case PLUS2:
                 return PLUS_VALUE;
             case POWER:
                 return POWER_VALUE;

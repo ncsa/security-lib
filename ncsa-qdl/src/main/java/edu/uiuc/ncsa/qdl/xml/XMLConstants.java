@@ -36,6 +36,7 @@ public interface XMLConstants {
     String ROOT_DIR = "root_dir";
     String SAVE_DIR = "save_dir";
     String RUN_SCRIPT_PATH = "run_script_path";
+    String RUN_INIT_ON_LOAD = "run_init_on_load";
     String CURRENT_PID = "current_pid";
     String CURRENT_WORKSPACE = "current_workspace"; // default file for saves
     String EDITOR_CLIPBOARD = "editor_clipboard";

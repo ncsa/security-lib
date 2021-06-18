@@ -288,11 +288,12 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "a.2 := ¯2^3;");
         addLine(script, "a.3 := ¯0.1^2;");
         addLine(script, "a.4 := ¯0.1^3;");
-        addLine(script, "a.5 := ¯3*4;");
+        addLine(script, "a.5 := ¯3*⁺4;");
         addLine(script, "a.6 := ¯3*¯4;");
         addLine(script, "a.7 := 3*¯4;");
         addLine(script, "a.8 := (3)*(4);");
         addLine(script, "a.9 := ¯0.1;");
+        addLine(script, "a.10 := 0.1^¯3;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a.0", state) == -1L;
@@ -307,6 +308,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert getLongValue("a.7", state) == -12L;
         assert getLongValue("a.8", state) == 12L;
         assert areEqual(getBDValue("a.9", state), new BigDecimal("-.1"));
+        assert areEqual(getBDValue("a.10", state), new BigDecimal("1000"));
 
     }
     /**

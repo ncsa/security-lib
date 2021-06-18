@@ -585,6 +585,13 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
 
+        if(argName == null){
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            polyad.setResult(QDLNull.getInstance());
+            return;
+
+        }
         if (polyad.getArgCount() == 1) {
             // simple variable case, no indent
             String output = InputFormUtil.inputFormVar(argName, state);
@@ -1282,7 +1289,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         if (2 < polyad.getArgCount()) {
             ArrayList<Object> aa = new ArrayList<>();
-            for (int i = 0; i < polyad.getArgCount(); i++) {
+            // zero-th argument is the name of the script, so start with element 1.
+            for (int i = 1; i < polyad.getArgCount(); i++) {
                 aa.add(polyad.evalArg(i, state));
             }
             argList = aa.toArray(new Object[0]);

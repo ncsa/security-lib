@@ -96,7 +96,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
              Stile : '|';
         TildeRight : '~|';
            StemDot : '.' ;
-        UnaryMinus :  '¯'; // unicode 00af 
+        UnaryMinus : '¯'; // unicode 00af
+         UnaryPlus : '⁺' ;// unicode 207a
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here

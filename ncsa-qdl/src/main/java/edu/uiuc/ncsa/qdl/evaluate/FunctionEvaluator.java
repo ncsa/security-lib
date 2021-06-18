@@ -220,13 +220,6 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
      */
 
     protected void doFunctionEvaluation(Polyad polyad, State state, FunctionRecord functionRecord) throws Throwable {
-        //FunctionRecord functionRecord ;
-        //      if(frs.functionRecord.isFuncRef){
-        //   functionRecord = frs.functionRecord;
-/*        } else{
-             functionRecord = frs.functionRecord.newInstance();
-        }*/
-
         if (functionRecord == null) {
             // see if its a reference instead
             functionRecord = state.getFTStack().getFunctionReference(polyad.getName());
@@ -272,18 +265,6 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 // This is the local name of the function.
                 FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(i), false);
 
-/*
-                if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
-                    frn = new FunctionReferenceNode();
-                    frn.setFunctionName(((LambdaDefinitionNode) polyad.getArguments().get(i)).getFunctionRecord().name);
-                    //frn = ((LambdaDefinitionNode)polyad.getArguments().get(i)).getFunction;
-                } else {
-                    if (!(polyad.getArguments().get(i) instanceof FunctionReferenceNode)) {
-                        throw new IllegalArgumentException("error: The supplied argument was not a function reference");
-                    }
-                    frn = (FunctionReferenceNode) polyad.getArguments().get(i);
-                }
-*/
                 String xname = frn.getFunctionName(); // dereferenced in the parser
                 boolean isBuiltin = state.getMetaEvaluator().isBuiltInFunction(xname) || state.getOpEvaluator().isMathOperator(xname);
 
@@ -352,12 +333,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         for (Statement statement : functionRecord.statements) {
             try {
-                /*if(statement instanceof StatementWithResultInterface){
-                    StatementWithResultInterface swri = ((StatementWithResultInterface)statement).makeCopy();
-                    swri.evaluate(state);
-                }else {*/
                 statement.evaluate(localState);
-                //}
             } catch (ReturnException rx) {
                 polyad.setResult(rx.result);
                 polyad.setResultType(rx.resultType);

@@ -59,6 +59,8 @@ public class WSXMLSerializer {
         xsw.writeAttribute(AUTOSAVE_MESSAGES_ON, Boolean.toString(workspaceCommands.isAutosaveMessagesOn()));
         xsw.writeAttribute(START_TS, Iso8601.date2String(workspaceCommands.startTimeStamp));
         xsw.writeAttribute(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
+        xsw.writeAttribute(RUN_INIT_ON_LOAD, Boolean.toString(workspaceCommands.runInitOnLoad));
+
         xsw.writeAttribute(COMPRESS_XML, Boolean.toString(workspaceCommands.compressXML));
         xsw.writeAttribute(USE_EXTERNAL_EDITOR, Boolean.toString(workspaceCommands.isUseExternalEditor()));
         xsw.writeAttribute(ASSERTIONS_ON, Boolean.toString(workspaceCommands.isAssertionsOn()));
@@ -427,6 +429,8 @@ public class WSXMLSerializer {
                 case CURRENT_PID:
                     testCommands.currentPID = Integer.parseInt(v);
                     break;
+                case RUN_INIT_ON_LOAD:
+                    testCommands.runInitOnLoad = Boolean.parseBoolean(v);
                 case RUN_SCRIPT_PATH:
                     testCommands.runScriptPath = v;
                     break;

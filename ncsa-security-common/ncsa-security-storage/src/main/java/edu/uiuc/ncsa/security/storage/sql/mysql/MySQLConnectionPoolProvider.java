@@ -58,7 +58,7 @@ public class MySQLConnectionPoolProvider extends ConnectionPoolProvider<MySQLCon
             );
             pool =  new MySQLConnectionPool(x);
             setPoolParameters(pool);
-            System.err.println( this.getClass().getSimpleName() + ": created connection pool with id " + pool.getUuid());
+      //      System.err.println( this.getClass().getSimpleName() + ": created connection pool with id " + pool.getUuid());
      //       (new GeneralException("boot")).printStackTrace();
         }
         return pool;
