@@ -585,7 +585,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
 
-        if(argName == null){
+        if (argName == null) {
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(true);
             polyad.setResult(QDLNull.getInstance());
@@ -1035,6 +1035,16 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalArgumentException(SCRIPT_ARGS_COMMAND + " requires an integer argument.");
             }
             int index = ((Long) obj).intValue();
+            if (index == -1L) {
+                StemVariable args = new StemVariable();
+                for (Object object : state.getScriptArgs()) {
+                    args.listAppend(object);
+                }
+                polyad.setEvaluated(true);
+                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setResult(args);
+                return;
+            }
             if (index < 0) {
                 throw new IllegalArgumentException(SCRIPT_ARGS_COMMAND + " requires a non-negative integer argument.");
             }
@@ -1271,7 +1281,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         Object arg1 = polyad.evalArg(0, state);
         Object[] argList = new Object[0];
-        if (2 == polyad.getArgCount()) {
+/*        if (2 == polyad.getArgCount()) {
             Object arg2 = polyad.evalArg(1, state);
             if (arg2 instanceof StemVariable) {
                 StemList stemList = ((StemVariable) arg2).getStemList();
@@ -1286,8 +1296,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             } else {
                 argList = new Object[]{arg2}; // pass back single non-stem argument
             }
-        }
-        if (2 < polyad.getArgCount()) {
+        }*/
+        if (2 <= polyad.getArgCount()) {
             ArrayList<Object> aa = new ArrayList<>();
             // zero-th argument is the name of the script, so start with element 1.
             for (int i = 1; i < polyad.getArgCount(); i++) {

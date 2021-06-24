@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
@@ -196,4 +197,22 @@ public class QDLVariableTest extends AbstractQDLTester {
         assert stack.isDefined(stem);
     }
 
+    /**
+     * Regression test after parser updated to use . as bona fide operator (rather than having it folded into
+     * the variable). New {@link edu.uiuc.ncsa.qdl.expressions.ANode2} class did not quite resolve the
+     * case of an {@link edu.uiuc.ncsa.qdl.expressions.ESN2}.
+     * @throws Throwable
+     */
+    public void testIsDefined() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.epe. := {'a':'b','b':'c'};");
+        addLine(script, "b := 'foo';");
+        addLine(script, "ok0 := is_defined(a.epe) && is_defined(a.epe.);"); // should handle both cases of trailing . or not
+        addLine(script, "ok1 := is_defined(b);"); // most basic test
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : "is_defined failed for a stem";
+        assert getBooleanValue("ok1", state) : "is_defined failed for a scalar variable";
+    }
 }

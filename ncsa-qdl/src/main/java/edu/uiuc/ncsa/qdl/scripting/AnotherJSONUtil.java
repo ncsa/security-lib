@@ -230,7 +230,9 @@ public class AnotherJSONUtil {
         }else{
             out = StemEvaluator.FROM_JSON  + "('" + json.toString() + "')";
         }
-        out = "to_list(" + out + ")";
+        // Do not build it as a list, pass the arguments so we are consistent
+        // with script arguments across the board.
+        //out = "to_list(" + out + ")";
         DebugUtil.trace(AnotherJSONUtil.class, "returned arg list =" + out);
         return out;
         // must be a stem list

@@ -689,12 +689,17 @@ execute(arg) - take the argument which is a string and execute it as if it
     <entry id="script_args">
         <body>
             <![CDATA[
-script_args() - print out the list of arguments to this script
-script_args(n) - print the n-1 argument (first argument is 0).
+  script_args() - prints out the number of arguments to this script
+script_args(-1) - returns the script arguments as a list.
+ script_args(n) - print the nth argument (first argument is 0).
+
 Note: This is specific to scripts. If the script is called in QDL, the
       arguments may be any QDL data type. If this is called from the command
       line by another process, the arguments will all be strings (even if they
-      are passed in as, e.g. numbers).
+      are passed in as, e.g. numbers). This is why there is a specific argument
+      (== -1) to get the result as a stem. If the script is called by QDL, then
+      the argument types are preserved.
+See also: script_load, script_run
                 ]]>
         </body>
     </entry>
@@ -1974,6 +1979,26 @@ assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
                 ]]>
             </body>
         </entry>
+    <entry id="block">
+            <body>
+                <![CDATA[
+block is a reserved work to denote the beginning of a local environment.
+It is set off with []. Anything defined inside the block is local only
+to that block.
+E.g.
+   a := 'foo';
+   block[a := 'baz'; ok := true;];
+   is_defined(ok);
+false
+   a
+baz
+
+a gets re-assigned to 'baz' inside the block, ok does not exist any place but the block.
+This is extremely useful in many places, such as scripts.
+                ]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->

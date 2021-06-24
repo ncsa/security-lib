@@ -357,7 +357,7 @@ public class ISO6429Terminal {
 
     public static class CSI {
         static int MISSING_PARAMETER = -1;
-        int[] parameters;
+        int[] parameters = new int[]{};
         char op;
         String intermediateCommands;
         String rawCommand = null;

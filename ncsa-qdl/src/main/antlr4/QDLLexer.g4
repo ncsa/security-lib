@@ -13,6 +13,7 @@ lexer grammar QDLLexer;
          ASSERT2 : '⊨'; // unicode 22a8 
      BOOL_FALSE : 'false'  | '⊥'; // unicode 22a5
       BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
+          BLOCK : 'block';
            BODY : 'body';
           CATCH : 'catch';
          DEFINE : 'define';
@@ -122,7 +123,6 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 //   Stem_ref : Identifier '.';
 
 // § 8 Identifiers
-// Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9.]*;   // Implicit definition of stem variables here!
    Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;   // no .!
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));

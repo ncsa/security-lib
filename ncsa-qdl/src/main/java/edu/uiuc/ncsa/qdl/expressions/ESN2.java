@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -100,19 +101,52 @@ public class ESN2 extends ExpressionImpl {
      *
      * @param indexList
      */
-    private void whittleIndices(IndexList indexList) {
-        IndexList r;
-        for (int i = indexList.size() - 1; 0 <= i; i--) {
-            if (indexList.get(i) instanceof StemVariable) {
-                r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
-                indexList.truncate(i);
-                indexList.addAll(i, r);
-               /* if (!(r instanceof StemVariable)) {
-                    indexList.truncate(i);
-                    indexList.set(i, r); // replace i-th element with the result.
-                }*/
-            }
+    protected void whittleIndices(IndexList indexList) {
+        if(experimental) {
+            newWhittle(indexList);
+        }else{
+            oldWhittle(indexList);
         }
+    }
+    protected void oldWhittle(IndexList indexList){
+        IndexList r;
+
+            for (int i = indexList.size() - 1; 0 <= i; i--) {
+                if (indexList.get(i) instanceof StemVariable) {
+                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
+                    indexList.truncate(i);
+                    indexList.addAll(i, r);
+                }
+            }
+    }
+
+    /**
+     * Turns on or off all machinery associated with the allowing . to accept stem lists
+     * as multi indices.
+     */
+    public static boolean experimental = true;
+
+    protected void newWhittle(IndexList indexList){
+        IndexList r;
+
+            for (int i = indexList.size() - 1; 0 <= i; i--) {
+                if (indexList.get(i) instanceof StemVariable) {
+                    if(i == indexList.size() - 1 ){
+                        continue;
+                       }
+                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
+                    indexList.truncate(i);
+                    indexList.addAll(i, r);
+                }else{
+                    // Case that left most argument is not a stem, but that the rhs is
+                    // which implies the user made a boo-boo
+                    if(i<indexList.size()-1){
+                        if(indexList.get(i+1) instanceof StemVariable){
+                            throw new IndexError("error: lhs is not a stem.");
+                        }
+                    }
+                }
+            }
     }
 
     private IndexList getIndexList(State state, ArrayList<StatementWithResultInterface> rightArgs) {

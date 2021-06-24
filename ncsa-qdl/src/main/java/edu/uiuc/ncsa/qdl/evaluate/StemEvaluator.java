@@ -7,10 +7,7 @@ import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
@@ -1938,6 +1935,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 isDef = false;
             } else {
                 isDef = state.isDefined(x.toString());
+            }
+        }
+        if(polyad.getArguments().get(0) instanceof ESN2){
+            Object object  = polyad.getArguments().get(0).getResult();
+            if(object == null){
+                isDef = false;
+            }else{
+                isDef = true;
             }
         }
         polyad.setResult(isDef);

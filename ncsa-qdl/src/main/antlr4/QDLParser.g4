@@ -20,6 +20,7 @@ statement :
           | lambdaStatement
           | assertStatement
           | assertStatement2
+          | blockStatement
           ;
 
  conditionalStatement : ifStatement | ifElseStatement;
@@ -52,6 +53,8 @@ tryCatchStatement:
   assertStatement :
        ASSERT LeftBracket expression RightBracket LeftBracket expression RightBracket;
 
+   blockStatement:
+       BLOCK statementBlock;
 
 assertStatement2:
   ASSERT2 expression (':' expression)?;
@@ -90,8 +93,8 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
-  | expression StemDot+ expression                                              #dotOp
-   | expression postfix=StemDot                                                  #dotOp2
+  | expression StemDot+ expression                                             #dotOp
+   | expression postfix=StemDot                                                #dotOp2
    | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
@@ -103,7 +106,7 @@ expression
  | prefix=('++'|'--') expression                                               #prefix
  | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
- | (Plus | UnaryPlus | Minus | UnaryMinus) expression                                       #unaryMinusExpression
+ | (Plus | UnaryPlus | Minus | UnaryMinus) expression                          #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
@@ -117,7 +120,7 @@ expression
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
-// | expression '∈' expression                       #epsilon
+// | expression '∈' expression                                                   #epsilon
  | STRING                                                                      #strings
  | integer                                                                     #integers
  | number                                                                      #numbers
@@ -128,13 +131,10 @@ expression
  | expression  op=ASSIGN  expression                                           #assignment
  | ';'                                                                         #semi_for_empty_expressions
  ;
-// This *could* be added but does not work quite as expected because variables are allowed to have . to show they
-// are stems. A (probably quite substantial) rewrite of the parser would be in order to change this
 
        variable : Identifier ;
          number : Decimal |  SCIENTIFIC_NUMBER;
         integer : Integer;
-
 
    keyword : ConstantKeywords;
 

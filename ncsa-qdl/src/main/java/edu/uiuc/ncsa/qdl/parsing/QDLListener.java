@@ -40,7 +40,7 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  */
 public class QDLListener implements QDLParserListener {
     ParsingMap parsingMap = new ParsingMap();
-    private QDLParserParser.FdocContext ctx,fdoc;
+    private QDLParserParser.FdocContext ctx, fdoc;
 
     public ParsingMap getParsingMap() {
         return parsingMap;
@@ -916,13 +916,13 @@ public class QDLListener implements QDLParserListener {
         // Best we can do with ANTLR...
 
         List<String> stringList = new ArrayList<>();
-        for (int i = 0; i < defineContext.getChildCount()-1; i++) {
+        for (int i = 0; i < defineContext.getChildCount() - 1; i++) {
             //stringList.add((i == 0 ? "" : "\n") + defineContext.getChild(i).getText());
             stringList.add(defineContext.getChild(i).getText());
         }
         //
         QDLParserParser.DocStatementBlockContext docStatementBlockContext = defineContext.docStatementBlock();
-        for(int i = 0; i < docStatementBlockContext.getChildCount(); i++){
+        for (int i = 0; i < docStatementBlockContext.getChildCount(); i++) {
             stringList.add(docStatementBlockContext.getChild(i).getText());
         }
 
@@ -1379,6 +1379,7 @@ public class QDLListener implements QDLParserListener {
      * Takes the place of having variables with .'s baked in to them and promotes
      * the 'childOf' operator to a proper first class citizen of QDL. There are some
      * edge cases though.
+     *
      * @param dotOpContext
      */
     @Override
@@ -1407,12 +1408,12 @@ public class QDLListener implements QDLParserListener {
             ESN2 leftArg = new ESN2();
             //leftArg.setLeftArg((StatementWithResultInterface) parsingMap.getStatementFromContext(dotOpContext.getChild(0)));
             Statement s = resolveChild(dotOpContext.getChild(0));
-            if(s instanceof VariableNode){
-                VariableNode vNode = (VariableNode)s;
+            if (s instanceof VariableNode) {
+                VariableNode vNode = (VariableNode) s;
                 vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
                 leftArg.setLeftArg(vNode);
-            }else {
-                leftArg.setLeftArg((StatementWithResultInterface)s);
+            } else {
+                leftArg.setLeftArg((StatementWithResultInterface) s);
             }
             leftArg.setRightArg(null);
             d.setLeftArgument(leftArg);
@@ -1673,7 +1674,7 @@ public class QDLListener implements QDLParserListener {
     public void exitIInterval(QDLParserParser.IIntervalContext ctx) {
         SliceNode sliceNode = (SliceNode) parsingMap.getStatementFromContext(ctx);
         // Missing zero-th argument
-        if(ctx.getChild(1) instanceof TerminalNodeImpl){
+        if (ctx.getChild(1) instanceof TerminalNodeImpl) {
             // Missing first argument, supply it
             sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
         }
@@ -1693,10 +1694,10 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitRInterval(QDLParserParser.RIntervalContext ctx) {
         RealIntervalNode realIntervalNode = (RealIntervalNode) parsingMap.getStatementFromContext(ctx);
-        if(ctx.getChild(1) instanceof TerminalNodeImpl){
-                 // Missing first argument, supply it
-                 realIntervalNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
-             }
+        if (ctx.getChild(1) instanceof TerminalNodeImpl) {
+            // Missing first argument, supply it
+            realIntervalNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
+        }
         for (int i = 0; i < ctx.getChildCount(); i++) {
             if (ctx.getChild(i) instanceof TerminalNodeImpl) {
                 continue;
@@ -1942,6 +1943,26 @@ public class QDLListener implements QDLParserListener {
 
         }
         //doDefine2(ctx);
+    }
+
+    @Override
+    public void enterBlockStatement(QDLParserParser.BlockStatementContext ctx) {
+        stash(ctx, new BlockStatement());
+    }
+
+    @Override
+    public void exitBlockStatement(QDLParserParser.BlockStatementContext ctx) {
+        BlockStatement block = (BlockStatement) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            // has a single parse statement block.
+            ParseStatementBlock parseStatementBlock = (ParseStatementBlock) parsingMap.getStatementFromContext(ctx.getChild(i));
+
+//            block.getStatements().add(resolveChild(ctx.getChild(i)));
+            block.setStatements(parseStatementBlock.getStatements());
+        }
     }
 }
 

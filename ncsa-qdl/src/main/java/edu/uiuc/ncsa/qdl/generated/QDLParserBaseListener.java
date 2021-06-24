@@ -172,6 +172,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterBlockStatement(QDLParserParser.BlockStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBlockStatement(QDLParserParser.BlockStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAssertStatement2(QDLParserParser.AssertStatement2Context ctx) { }
 	/**
 	 * {@inheritDoc}

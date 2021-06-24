@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import static edu.uiuc.ncsa.qdl.evaluate.OpEvaluator.*;
+import static edu.uiuc.ncsa.qdl.expressions.ESN2.experimental;
 
 /**
  * A class for testing the parser. Write little scripts, test that the state is what is should be.
@@ -2567,5 +2569,136 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("j", state).equals(5L); // make sure it did all the elements
 
     }
+    /* The following is an experiment with allowing lists of indices to be used for ste
+       access. E.g.
+                   a. := n(2,3,4,n(24))
+                   nn. := n(2,3,4)
+                   a.[1,2,3] == a.1.2.3
+              true
+                   a.1.2.nn.[1,2,3]  == a.1.2.3
+               true
 
+       This has been on the radar for a while, but there were a lot of competing models of how to do it.
+        settled on letting . be distributive, i.e. a.[0,1,2] distributes as a.0.1.2 rather than being
+        termwise (cf. a. * [0,1,2] which would result in a.[0,1,2] ==  [a.0, a.1, a.2] which is quite difference
+        as a. is a higher dimension stem.) This allows for creating indices programatically which is important
+        if the structure of a stem has to be interrogated before using it
+     */
+    public void testListsAsIndices0() throws Throwable{
+        if(!experimental){
+            return;
+        }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "nn. := n(2,3,4);");
+        addLine(script, "ok := a.[1,2,3] == a.1.2.3;"); // most basic test
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+    public void testBadListsAsIndices0() throws Throwable{
+        if(!experimental){
+            return;
+        }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "nn. := n(2,3,4);");
+        addLine(script, "a.1.nn.[1,2,2].0;"); // most basic test
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "a.1.nn.[1,2,2].0 should have thrown an index error";
+        }catch(IndexError ie){
+            assert true;
+        }
+    }
+    public void testBadListsAsIndices1() throws Throwable{
+         if(!experimental){
+             return;
+         }
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+         addLine(script, "nn. := n(2,3,4);");
+        addLine(script, "a.0.nn.[1,2,2].1  == a.0.2.1;"); // fails before [1,2,2].1-> 2.
+
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         try {
+             interpreter.execute(script.toString());
+             assert false : "a.0.nn.[1,2,2].1 should have thrown an index error";
+         }catch(IndexError ie){
+             assert true;
+         }
+     }
+    public void testBadListsAsIndices2() throws Throwable{
+         if(!experimental){
+             return;
+         }
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+         addLine(script, "nn. := n(2,3,4);");
+        addLine(script, " a.nn.[1,2,1].2.0  == a.1.2.0;"); // fails because [1,2,1].2.0 does not resolve.
+
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         try {
+             interpreter.execute(script.toString());
+             assert false : "a.nn.[1,2,1].2.0 should have thrown an index error";
+         }catch(IndexError ie){
+             assert true;
+         }
+     }
+
+    public void testListsAsIndices1() throws Throwable{
+        if(!experimental){
+            return;
+        }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "nn. := n(2,3,4);");
+
+        addLine(script, "ok0 := a.1.2.nn.[1,2,3]  == a.1.2.3;"); // works because nothing to its right
+        addLine(script, "ok1 := a.1.2.(nn.[1,2,3])  == a.1.2.3;"); // most basic test
+        addLine(script, "ok2 := a.1.2.nn.1.2.3  == a.1.2.3;");   // most basic test
+
+        addLine(script, "ok3 := a.0.(nn.[1,2,2]).1  == a.0.2.1;");
+        addLine(script, "ok4 := a.0.nn.1.2.2.1  == a.0.2.1;");
+
+        addLine(script, "ok5 := a.(nn.[1,2,1]).2.0  == a.1.2.0;"); // most basic test
+        addLine(script, "ok6 := a.nn.1.2.1.2.0  == a.1.2.0;"); // most basic test
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert getBooleanValue("ok1", state);
+        assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok3", state);
+        assert getBooleanValue("ok4", state);
+        assert getBooleanValue("ok5", state);
+        assert getBooleanValue("ok6", state);
+    }
+
+    public void testSetWithListIndex() throws Throwable{
+        if(!experimental){
+            return;
+        }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "p. := [2,0,1];");
+        addLine(script,"b.shuffle([0,1,2],p.) := a.[0,1,2];");
+        addLine(script, "ok := b.2.0.1 == 6;"); // most basic test
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+    /*  Get the rotation of the stem a. around given axes.
+          a. := n(2,3,4,n(24))
+          p. := [2,0,1]
+          b.shuffle([0,1,2],p.) := a.[0,1,2]
+          b.
+{2:[{1:6}]}
+     */
 }

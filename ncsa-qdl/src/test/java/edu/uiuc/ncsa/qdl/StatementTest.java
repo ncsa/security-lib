@@ -173,4 +173,36 @@ public class StatementTest extends AbstractQDLTester {
         }
     }
 
+    /**
+     * Simple block test. This resets a global variable, ok, and sets a local
+     * variable, a.
+     * @throws Throwable
+     */
+    public void testVariableBlock() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := false;");
+        addLine(script, "block[a:=2;ok:=a==2;];");// set local variable, a, reset ok
+        addLine(script, "oka := !is_defined(a);"); // check that a does not exist outside of block
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("oka", state);
+    }
+
+    /**
+     * tests that function defined in a block are local to the block.
+     * @throws Throwable
+     */
+    public void testFunctionBlock() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := false;");
+        addLine(script, "block[f(x)->!x; ok :=f(false);];");
+        addLine(script, "okf := !is_function(f,1);"); // check that a does not exist outside of block
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("okf", state);
+    }
 }

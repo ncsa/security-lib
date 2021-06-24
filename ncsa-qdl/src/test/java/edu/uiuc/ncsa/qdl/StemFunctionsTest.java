@@ -1472,4 +1472,30 @@ public class StemFunctionsTest extends AbstractQDLTester {
          interpreter.execute(script.toString());
          assert getBooleanValue("ok", state);
      }
+     /*
+      a.user.b.4.foo.5 := 2
+  a.
+{user:{b:{4:{foo:{5:2}}}}}
+  a.'0' := 1
+  a.
+[1]~{user:{b:{4:{foo:{5:2}}}}}
+      */
+
+    /**
+     * Create a stem in two ways and verify that they are the same
+     * @throws Throwable
+     */
+    public void testExpressionStemNodeAssignment() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := {'user':{'b':{'4':{'foo':{'5':2}}}}};");
+        addLine(script, " a.user.b.4.foo.5 := 2;");
+        addLine(script, " ok := a.user.b.4.foo.5 == x.user.b.4.foo.5;");
+        addLine(script, " ok0 := size(a.) == size(x.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok0", state);
+    }
+
 }
