@@ -2686,7 +2686,7 @@ public class ParserTest extends AbstractQDLTester {
         }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "a. := n(2,3,4,n(24));");
         addLine(script, "p. := [2,0,1];");
         addLine(script,"b.shuffle([0,1,2],p.) := a.[0,1,2];");
         addLine(script, "ok := b.2.0.1 == 6;"); // most basic test

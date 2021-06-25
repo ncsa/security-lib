@@ -16,7 +16,7 @@ public class DebugUtil implements DebugConstants{
 
     static MetaDebugUtil debugUtil = null;
 
-    protected static MetaDebugUtil getInstance() {
+    public static MetaDebugUtil getInstance() {
         if (debugUtil == null) {
             debugUtil = new MetaDebugUtil();
         }

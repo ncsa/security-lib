@@ -211,6 +211,8 @@ public class CLIDriver {
         if (st.hasMoreTokens()) {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
+                // allow signed command history numbers. so /h -1 is ok.
+                lineNo = lineNo <0 ? (commandHistory.size() + lineNo): lineNo;
                 if (0 <= lineNo && lineNo < commandHistory.size()) {
                     return commandHistory.get(lineNo);
                 }

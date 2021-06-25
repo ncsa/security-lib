@@ -253,6 +253,7 @@ public class QDLWorkspace {
         if (st.hasMoreTokens()) {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
+                lineNo = (lineNo <0)?(workspaceCommands.commandHistory.size() + lineNo):lineNo;
                 if (0 <= lineNo && lineNo < workspaceCommands.commandHistory.size()) {
                     return workspaceCommands.commandHistory.get(lineNo);
                 }

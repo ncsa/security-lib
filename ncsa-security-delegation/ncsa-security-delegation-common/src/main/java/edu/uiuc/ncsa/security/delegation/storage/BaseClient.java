@@ -103,4 +103,13 @@ public class BaseClient extends IdentifiableImpl {
                 "]";
     }
 
+    public boolean isDebugOn() {
+        return debugOn;
+    }
+
+    public void setDebugOn(boolean debugOn) {
+        this.debugOn = debugOn;
+    }
+
+    boolean debugOn = false;
 }
