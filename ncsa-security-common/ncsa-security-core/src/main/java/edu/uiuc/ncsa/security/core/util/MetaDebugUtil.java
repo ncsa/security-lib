@@ -10,7 +10,15 @@ import java.util.Date;
  * on 10/23/20 at  2:54 PM
  */
 public class MetaDebugUtil implements DebugConstants, Serializable {
+    public boolean isPrintTS() {
+        return printTS;
+    }
 
+    public void setPrintTS(boolean printTS) {
+        this.printTS = printTS;
+    }
+
+    boolean printTS = false;
 
 
     protected  String toLabel(int level) {
@@ -83,9 +91,10 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
         // Standard logging format is date host service: message
         if (level <= getDebugLevel()) {
             if(host == null || host.isEmpty()) {
-                printIt(Iso8601.date2String(new Date()) + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+
+                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }else{
-                printIt(Iso8601.date2String(new Date()) + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
+                printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }
         }
     }

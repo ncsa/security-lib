@@ -198,7 +198,11 @@ public class CLIDriver {
 
     protected String doHistory(String cmdLine) {
         if (cmdLine.contains(HELP_SWITCH)) {
-            say(HISTORY_LIST_COMMAND + "[int] = either show the entire history (no argument) or execute the one at the given index.");
+            say(HISTORY_LIST_COMMAND + "[int] = either show the entire history (no argument)");
+            say("  or execute the command at the given index. Note that signed indices are allowed,");
+            say("  so the /h -1 would execute the very last command in the buffer, /h -2 executes");
+            say("  the next to last, etc., Note that as ");
+            say("  commands are added, the relative indices tail of the command history do not change.");
             say("See also:" + WRITE_BUFFER_COMMAND + ", " + LOAD_BUFFER_COMMAND + ", " + REPEAT_LAST_COMMAND);
             return null; // do nothing
         }

@@ -1387,12 +1387,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}};");
         addLine(script, "x. := query(a., '$..m');");
         addLine(script, "ndx. := query(a., '$..m',true);");
-    /*
-[true
-   ndx. := query(a., '$..m',true)
-   ndx.
-[t.m]
-     */
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -1402,7 +1396,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert x.getBoolean(0L);
         StemVariable ndx = getStemValue("ndx.",state);
         assert ndx.size() == 1;
-     //   assert ndx.getString("0").equals("t.m");
         assert ndx.getString("0").equals("·t·m");
     }
 

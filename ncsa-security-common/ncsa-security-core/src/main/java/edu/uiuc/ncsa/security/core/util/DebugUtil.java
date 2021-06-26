@@ -23,7 +23,13 @@ public class DebugUtil implements DebugConstants{
         return debugUtil;
     }
 
+    public static boolean isPrintTS() {
+        return getInstance().isPrintTS();
+    }
 
+    public static void setPrintTS(boolean printTS) {
+        getInstance().setPrintTS( printTS);
+    }
     protected static String toLabel(int level) {
         if (level == DEBUG_LEVEL_OFF) return "";
         if (level == DEBUG_LEVEL_INFO) return DEBUG_LEVEL_INFO_LABEL;

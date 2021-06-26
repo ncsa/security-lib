@@ -1680,12 +1680,19 @@ E.g. 1: getting a result set
   price:8.99,
   isbn:0-553-21311-3,...
 
-  Note well that results are returned as stem lists.
+  Note well that results are returned as stem lists of v paths.
+
+  A v path is a string of the form
+
+  (` | · ) vpath0 (` | · ) vpath1 (` | · )
+
+  whose paths are v-encoded. You may use either a backtick ` or a
+  raised dot · (unicode \u00b7).
 
 E.g. 2: Getting the indices
   ndx. := query(test., '$..book[?(@.isbn)]', true); // Just get the indices
   ndx.
-[store.book.2,store.book.3]
+['`store`book`2','`store`book`3']
 
 E.g. 3: Using the indices
    my_json.ndx.0
