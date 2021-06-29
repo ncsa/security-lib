@@ -36,7 +36,7 @@ lexer grammar QDLLexer;
 
 SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
        fragment E : 'E' | 'e';
-    fragment SIGN : ('+' | '-');
+    fragment SIGN : (Plus | UnaryPlus | Minus | UnaryMinus);
 
 // § 4 Booleans
 

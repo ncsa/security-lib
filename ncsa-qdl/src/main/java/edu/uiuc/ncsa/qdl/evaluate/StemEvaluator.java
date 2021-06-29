@@ -607,12 +607,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             ArrayList<Object> rawArgs = new ArrayList<>();
             rawArgs.add(stems[0].get(key));
             StemVariable output1 = new StemVariable();
-                forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
+            forEachRecursion(output1, f, state, stems, rawArgs, argCount - 1);
             output.put(key, output1);
         }
     }
 
-    protected void forEachRecursion(StemVariable output, ExpressionImpl f, State state, StemVariable[] stems, ArrayList<Object> rawArgs, int depth) {
+    protected void forEachRecursion(StemVariable output,
+                                    ExpressionImpl f,
+                                    State state,
+                                    StemVariable[] stems,
+                                    ArrayList<Object> rawArgs,
+                                    int depth) {
         ArrayList<StatementWithResultInterface> args = null;
         int currentIndex = stems.length - depth - 1;
         if (depth == 0) {
@@ -934,30 +939,30 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
-        StemVariable leftStem =  null;
-        if(isString(leftArg)){
-                           leftStem = new StemVariable();
-                           leftStem.put(0L, leftArg);
+        StemVariable leftStem = null;
+        if (isString(leftArg)) {
+            leftStem = new StemVariable();
+            leftStem.put(0L, leftArg);
         }
-        if (leftStem == null ) {
-            if(isStem(leftArg)){
+        if (leftStem == null) {
+            if (isStem(leftArg)) {
                 leftStem = (StemVariable) leftArg;
-            }else {
+            } else {
                 throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the left argument.");
             }
         }
 
         Object rightArg = polyad.evalArg(1, state);
         StemVariable rightStem = null;
-        if(isString(rightArg)){
+        if (isString(rightArg)) {
             rightStem = new StemVariable();
             rightStem.put(0L, rightArg);
         }
-        if(rightStem == null){
-            if(isStem(rightArg)){
-                 rightStem = (StemVariable) rightArg;
+        if (rightStem == null) {
+            if (isStem(rightArg)) {
+                rightStem = (StemVariable) rightArg;
 
-            }else{
+            } else {
                 throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires a stem for the right argument.");
             }
         }
@@ -1937,11 +1942,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 isDef = state.isDefined(x.toString());
             }
         }
-        if(polyad.getArguments().get(0) instanceof ESN2){
-            Object object  = polyad.getArguments().get(0).getResult();
-            if(object == null){
+        if (polyad.getArguments().get(0) instanceof ESN2) {
+            Object object = polyad.getArguments().get(0).getResult();
+            if (object == null) {
                 isDef = false;
-            }else{
+            } else {
                 isDef = true;
             }
         }

@@ -18,6 +18,8 @@ public interface ScriptingConstants {
     String SRE_POST_REFRESH = "post_refresh";
     String SRE_PRE_EXCHANGE = "pre_exchange";
     String SRE_POST_EXCHANGE = "post_exchange";
+    String SRE_PRE_USER_INFO = "pre_user_info";
+    String SRE_POST_USER_INFO = "post_user_info";
     String SRE_REQ_CLAIMS = "claims";
     String SRE_REQ_ACCESS_TOKEN = "access_token";
     String SRE_REQ_REFRESH_TOKEN = "refresh_token";
@@ -39,6 +41,8 @@ public interface ScriptingConstants {
             SRE_PRE_REFRESH,
             SRE_PRE_REFRESH,
             SRE_PRE_EXCHANGE,
-            SRE_POST_EXCHANGE};
+            SRE_POST_EXCHANGE,
+            SRE_PRE_USER_INFO,
+            SRE_POST_USER_INFO};
 
 }

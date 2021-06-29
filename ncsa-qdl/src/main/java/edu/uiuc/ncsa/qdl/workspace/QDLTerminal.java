@@ -40,9 +40,11 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('∧');
                     case '|':
                         return new KeyStroke('∨');
-                    case '-':
+                    case '+':
+                        return new KeyStroke('⁺');
+                    case '?':
                         return new KeyStroke('≈');
-                    case '_':
+                    case '-':
                         return new KeyStroke('¯');
                     case '.':
                         return new KeyStroke('·');
@@ -62,7 +64,7 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('≔');
                     case '"':
                         return new KeyStroke('≕');
-                    case '+':
+                    case '\\':
                         return new KeyStroke('≠');
 
                 }

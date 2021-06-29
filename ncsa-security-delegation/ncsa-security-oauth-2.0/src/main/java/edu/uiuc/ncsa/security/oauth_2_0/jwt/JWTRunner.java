@@ -147,6 +147,26 @@ public class JWTRunner {
         }
     }
 
+    public void doUserInfo() throws Throwable {
+        for (PayloadHandler h : handlers) {
+            h.setAccountingInformation();
+        }
+        doScript(SRE_PRE_USER_INFO);
+
+        doScript(SRE_POST_USER_INFO);
+        for (PayloadHandler h : handlers) {
+            h.checkClaims();
+        }
+
+        for (PayloadHandler h : handlers) {
+            h.saveState();
+        }
+
+        for (PayloadHandler h : handlers) {
+            h.finish(SRE_POST_EXCHANGE);
+        }
+    }
+
     public void doTokenClaims() throws Throwable {
         doTokenClaims(false);
     }

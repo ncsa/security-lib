@@ -94,7 +94,7 @@ expression
  :
    function                                                                    #functions
   | expression StemDot+ expression                                             #dotOp
-   | expression postfix=StemDot                                                #dotOp2
+  | expression postfix=StemDot                                                #dotOp2
    | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar

@@ -1875,18 +1875,19 @@ Here is a table of supported unicode characters in QDL:
 
 Standard    Unicode   ALT   escape code   What is it
 !              ¬       !   \u00ac         logical not
--              ¯       _   \u00af         unary minus
+-              ¯       -   \u00af         unary minus
 *              ×       *   \u00d7         multiplication
 /              ÷       /   \u00f7         division
++              ⁺       +   \u207a         unary plus
 ->             →       d   \u2192         lambda function
 null           ∅       n   \u2205         null
 &&             ∧       &   \u2227         logical and
 ||             ∨       |   \u2228         logical or
 :=             ≔       :   \u2254         left assignment
 =:             ≕       "   \u2255         right assignment
-=~             ≈       -   \u2248         regex matches
+=~             ≈       ?   \u2248         regex matches
 `              ·       .   \u00b7         raised dot
-!=             ≠       +   \u2260         not equal to
+!=             ≠       \   \u2260         not equal to
 ==             ≡       =   \u2261         logical equality
 <=             ≤       <   \u2264         less than or equals
 =>             ≥       >   \u2265         greater than or equals
