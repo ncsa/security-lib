@@ -70,6 +70,39 @@ public class State extends FunctionState implements QDLConstants {
 
     int pid = 0;
 
+    /**
+     * If you extend this class, you must override this method to return a new instance
+     * of your state with everything in it you want or need.
+     * @param resolver
+     * @param symbolStack
+     * @param opEvaluator
+     * @param metaEvaluator
+     * @param ftStack
+     * @param moduleMap
+     * @param myLoggingFacade
+     * @param isServerMode
+     * @param assertionsOn
+     * @return
+     */
+    public State newInstance(ImportManager resolver,
+                     SymbolStack symbolStack,
+                     OpEvaluator opEvaluator,
+                     MetaEvaluator metaEvaluator,
+                     FTStack ftStack,
+                     ModuleMap moduleMap,
+                     MyLoggingFacade myLoggingFacade,
+                     boolean isServerMode,
+                     boolean assertionsOn){
+        return new State(resolver,
+                          symbolStack,
+                          opEvaluator,
+                          metaEvaluator,
+                          ftStack,
+                          moduleMap,
+                          myLoggingFacade,
+                          isServerMode,
+                         assertionsOn);
+    }
     public State(ImportManager resolver,
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
@@ -407,7 +440,7 @@ public class State extends FunctionState implements QDLConstants {
     public State newStateNoImports() {
         ImportManager nr = new ImportManager();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = new State(nr,
+        State newState = newInstance(nr,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -432,7 +465,7 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newStateWithImports() {
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = new State(importManager,
+        State newState = newInstance(importManager,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -492,7 +525,7 @@ public class State extends FunctionState implements QDLConstants {
         ImportManager r = new ImportManager();
         SymbolStack newStack = new SymbolStack();
         //      newStack.addParent(new SymbolTableImpl());
-        State newState = new State(r,
+        State newState = newInstance(r,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -521,7 +554,7 @@ public class State extends FunctionState implements QDLConstants {
         ImportManager r = new ImportManager();
         SymbolStack newStack = new SymbolStack();
         //       newStack.addParent(new SymbolTableImpl());
-        State newState = new State(r,
+        State newState = newInstance(r,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
