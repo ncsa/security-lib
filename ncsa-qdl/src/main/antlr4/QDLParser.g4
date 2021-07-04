@@ -93,9 +93,9 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
+  | expression postfix=StemDot                                                 #dotOp2
   | expression StemDot+ expression                                             #dotOp
-  | expression postfix=StemDot                                                #dotOp2
-   | (function | '(' f_args* ')')
+  | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi

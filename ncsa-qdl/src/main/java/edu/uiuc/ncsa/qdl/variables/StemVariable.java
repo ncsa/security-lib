@@ -786,6 +786,10 @@ public class StemVariable extends HashMap<String, Object> {
         return super.put(key, value);
     }
 
+    public Object put(int index, Object value) {
+        return put(new Long(index), value);
+    }
+
     public Object put(Long index, Object value) {
         StemEntry stemEntry = new StemEntry(index, value);
         getStemList().remove(stemEntry);
@@ -1420,11 +1424,12 @@ public class StemVariable extends HashMap<String, Object> {
     so arguments don't get lost
      */
     public IndexList get(IndexList indexList) {
-        if(experimental){
+        if (experimental) {
             return newGet(indexList);
         }
         return oldGet(indexList);
     }
+
     /*  testing allowing lists as stem indices with the . operator:
 
                     a. := n(2,3,4,n(24))
@@ -1492,10 +1497,10 @@ public class StemVariable extends HashMap<String, Object> {
                 if (obj == null) {
                     throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
                 }
-                if(obj instanceof StemVariable){
+                if (obj instanceof StemVariable) {
                     lastStem = (StemVariable) obj;
-                }else{
-                    if(i != stemList.size() -1){
+                } else {
+                    if (i != stemList.size() - 1) {
                         throw new IndexError("error:  index depth error \"" + obj + "\" is not a stem.");
 
                     }
@@ -1590,13 +1595,13 @@ public class StemVariable extends HashMap<String, Object> {
             put((String) index, value);
             return;
         }
-        if(experimental  ){
-           if(index instanceof StemVariable){
-               StemVariable s = (StemVariable)  index;
-               IndexList indexList = new IndexList(s);
-              set(indexList, value);
-              return;
-           }
+        if (experimental) {
+            if (index instanceof StemVariable) {
+                StemVariable s = (StemVariable) index;
+                IndexList indexList = new IndexList(s);
+                set(indexList, value);
+                return;
+            }
         }
         throw new IndexError("Unknown index type for \"" + index + "\"");
     }

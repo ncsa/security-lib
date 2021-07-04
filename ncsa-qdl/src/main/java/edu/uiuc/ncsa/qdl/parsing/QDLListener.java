@@ -1379,52 +1379,55 @@ public class QDLListener implements QDLParserListener {
      * Takes the place of having variables with .'s baked in to them and promotes
      * the 'childOf' operator to a proper first class citizen of QDL. There are some
      * edge cases though.
+     * <pre>
+     * First case of odd parsing is that in our grammar, x. - y. gets parsed as
+     *            dotOp
+     *         /    |   \
+     *         x    .    unaryMinus
+     *                       \
+     *                       y.
+     * I.e. it thinks it is x.(-y) The problem with fixing this as is, is that
+     * the issue is precedence and changing that either gets this to parse, and
+     * screws up signed numbers or fails to resolve this.
+     *
+     * A lot of reading about possible solutions convinced me that fixing it
+     * after the fact was the way to go. Another options is a very careful restructuring
+     * of the grammar, but that is apt to be quite painstaking and require a near complete
+     * rewrite of large parts of the code.
+     * </pre>
      *
      * @param dotOpContext
      */
     @Override
     public void exitDotOp(QDLParserParser.DotOpContext dotOpContext) {
         /*
-         First case of odd parsing is that in our grammar, x. - y. gets parsed as
-                    dotOp
-                 /    |   \
-                 x    .    unaryMinus
-                               \
-                               y.
-         I.e. it thinks it is x.(-y.) The problem with fixing this as is, is that
-         the issue is precedence and changing that either gets this to parse, and
-         screws up signed numbers or fails to resolve this.
-
-         A lot of reading about possible solutions convinced me that fixing it
-         after the fact was the way to go. Another options is a very careful restructuring
-         of the grammar, but that is apt to e quite paintaking and require a near complete
-         rewrite of large parts of the code.
 
          */
         if (dotOpContext.getChild(2) instanceof QDLParserParser.UnaryMinusExpressionContext) {
             QDLParserParser.UnaryMinusExpressionContext um = (QDLParserParser.UnaryMinusExpressionContext) dotOpContext.getChild(2);
-            Dyad d = new Dyad(um.Plus() == null ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE);
-            d.setRightArgument((StatementWithResultInterface) parsingMap.getStatementFromContext(um.getChild(1)));
-            ESN2 leftArg = new ESN2();
-            //leftArg.setLeftArg((StatementWithResultInterface) parsingMap.getStatementFromContext(dotOpContext.getChild(0)));
-            Statement s = resolveChild(dotOpContext.getChild(0));
-            if (s instanceof VariableNode) {
-                VariableNode vNode = (VariableNode) s;
-                vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
-                leftArg.setLeftArg(vNode);
-            } else {
-                leftArg.setLeftArg((StatementWithResultInterface) s);
+            // Important bit: If the user actually uses leading high minue ¯ or plus ⁺ then they really do want a negative
+            // value. Pass it along. The problem is the - is ambiguous as an monadic or dyadic operator in some contexts.
+            if ((!um.getChild(0).getText().equals(OpEvaluator.MINUS2)) && !um.getChild(0).getText().equals(OpEvaluator.PLUS2)) {
+                Dyad d = new Dyad(um.Plus() == null ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE);
+                d.setRightArgument((StatementWithResultInterface) resolveChild(um.getChild(1)));
+                ESN2 leftArg = new ESN2();
+                Statement s = resolveChild(dotOpContext.getChild(0));
+                if (s instanceof VariableNode) {
+                    VariableNode vNode = (VariableNode) s;
+                    vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                    leftArg.setLeftArg(vNode);
+                } else {
+                    leftArg.setLeftArg((StatementWithResultInterface) s);
+                }
+                leftArg.setRightArg(null);
+                d.setLeftArgument(leftArg);
+                stash(dotOpContext, d);
+                return;
             }
-            leftArg.setRightArg(null);
-            d.setLeftArgument(leftArg);
-            stash(dotOpContext, d);
-            return;
         }
         ESN2 expressionStemNode = new ESN2();
         stash(dotOpContext, expressionStemNode);
 
-        //  ExpressionStemNode expressionStemNode = (ExpressionStemNode) parsingMap.getStatementFromContext(dotOpContext);
-        // ESN2 expressionStemNode = (ESN2) parsingMap.getStatementFromContext(dotOpContext);
         expressionStemNode.setSourceCode(getSource(dotOpContext));
         List<QDLParserParser.ExpressionContext> list = dotOpContext.expression();
         StatementWithResultInterface exp = (StatementWithResultInterface) resolveChild(list.get(0));
@@ -1455,7 +1458,8 @@ public class QDLListener implements QDLParserListener {
                 expressionStemNode.setLeftArg(childESN);
                 expressionStemNode.setRightArg(new ConstantNode(Long.parseLong(lr[1]), Constant.LONG_TYPE));
                 // ISSUE: Parser needs some way (probably predicates???) to know that in the course of
-                // a stem, decimals are not allowed. This may be hard. What is next is a temporary
+                // a stem, decimals are not allowed. This is hard, since we want to allow arbitrary expression.
+                // which should evaluate to integers. What is next is a temporary
                 // workaround to get everything working.
                 // Need to replace this node with
                 /*
@@ -1466,7 +1470,7 @@ public class QDLListener implements QDLParserListener {
                                               / \
                                              c   1
                       Trick is that this instance of the stem is tied to the ctx so it is what
-                      the parse thinks "exists".
+                      the parser thinks "exists".
                  */
             }
         }

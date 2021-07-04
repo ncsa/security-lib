@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
@@ -1387,6 +1388,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}};");
         addLine(script, "x. := query(a., '$..m');");
         addLine(script, "ndx. := query(a., '$..m',true);");
+        addLine(script, "ok := reduce(@&&, ndx.0 == ['t','m']);");
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -1396,7 +1398,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert x.getBoolean(0L);
         StemVariable ndx = getStemValue("ndx.",state);
         assert ndx.size() == 1;
-        assert ndx.getString("0").equals("·t·m");
+        assert getBooleanValue("ok", state);
     }
 
     /**
@@ -1490,5 +1492,21 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok0", state);
     }
+
+    /**
+     * (See related note in {@link edu.uiuc.ncsa.qdl.parsing.QDLListener#exitDotOp(QDLParserParser.DotOpContext)})
+     * This tests that b. - 2 (subtracting 2 from a stem) works. This is a simple
+     * regression test.
+     * @throws Throwable
+     */
+    public void testDyadicStemSubtraction() throws Throwable {
+    State state = testUtils.getNewState();
+    StringBuffer script = new StringBuffer();
+    addLine(script, "b. := [;5];");
+    addLine(script, " ok := reduce(@&&, [-2,-1,0,1,2] == (b. - 2));");
+    QDLInterpreter interpreter = new QDLInterpreter(null, state);
+    interpreter.execute(script.toString());
+    assert getBooleanValue("ok", state);
+}
 
 }

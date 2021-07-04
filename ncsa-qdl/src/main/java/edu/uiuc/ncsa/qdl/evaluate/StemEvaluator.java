@@ -719,49 +719,54 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                     .options(Option.AS_PATH_LIST).build();
         }
         String output;
+        StemVariable outStem;
+
         if (returnAsPaths) {
             try {
                 output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
             } catch (JsonPathException jpe) {
                 throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
             }
-
-            output = crappyConverter(output);
+            outStem = stemPathConverter(output);
         } else {
             try {
                 conf = Configuration.builder()
                         .options(Option.ALWAYS_RETURN_LIST).build();
-
-                //  output = JsonPath.read(stemVariable.toJSON().toString(), query).toString();
+                // This type of query returns the values of the query, not the indices, so
+                // we just have to convert it to a stem and return that. Handles the couple cases
+                // of a JSON array vs object. The JsonPath generally tends to return arrays so we
+                // test for that first.
                 output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+                outStem = new StemVariable();
+                try {
+                    JSONArray array = JSONArray.fromObject(output);
+                    outStem.fromJSON(array);
+                } catch (JSONException x) {
+                    JSONObject jo = JSONObject.fromObject(output);
+                    outStem.fromJSON(jo);
+                }
 
             } catch (JsonPathException jpe) {
                 throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
             }
-        }
-        StemVariable outStem = new StemVariable();
-        try {
-            JSONArray array = JSONArray.fromObject(output);
-            outStem.fromJSON(array);
-        } catch (JSONException x) {
-            JSONObject jo = JSONObject.fromObject(output);
-            outStem.fromJSON(jo);
         }
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
-    /**
+    /*
      * This converts a list of JSON Path indices to stem indices. It is very simple
      * minded.
      *
      * @param indexList
      * @return
      */
+/*
     protected String crappyConverter(String indexList) {
-        return crappyConverterNew(indexList);
+        return vPathConverter(indexList);
     }
+*/
 
     /*
       x. := {'sub':'http://cilogon.org/serverT/users/17048', 'idp_name':'Supercomputing at BSU', 'eppn':'rbriuis@bigstate.edu', 'cert_subject_dn':'/DC=org/DC=cilogon/C=US/O=Big State Supercomputing Center/CN=Robert Bruce T17099', 'eptid':'https://idp.bigstate.edu/idp/shibboleth!https://cilogon.org/shibboleth!65P3o9FNjrp4z6+WI7Dir/4I=', 'iss':'https://test.cilogon.org', 'given_name':'Robert', 'voPersonExternalID':'rbriuis@bigstate.edu', 'nonce':'R72KPZ4Pwo9nPd9z1qCA04hBALMC-yVGUOGyTn-miHo', 'aud':'myproxy:oa4mp,2012:/client_id/910d7984412870aa6e199f9afrab8', 'acr':'https://refeds.org/profile/mfa', 'uid':'rbriuis', 'idp':'https://idp.bigstate.edu/idp/shibboleth', 'affiliation':'staff@bigstate.edu;employee@bigstate.edu;member@bigstate.edu', 'uidNumber':'55939', 'auth_time':'1623103279', 'name':'Roibert a Briuis', 'isMemberOf':[{'name':'all_users', 'id':13002},{'name':'staff_reporting', 'id':16405},{'name':'list_allbsu', 'id':18942}], 'exp':1624053679, 'iat':1623103279, 'family_name':'Bruce', 'email':'bob@bigstate.edu'}
@@ -769,7 +774,23 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      x.ndx.1
 
      */
-    protected String crappyConverterNew(String indexList) {
+
+    /**
+     * Converts the result of a JSON Path query to a list of vPaths like
+     * <pre>
+     * ['·isMemberOf·0·name','·isMemberOf·2·name']
+     * </pre>
+     * This works peachy but  QDL 1.4 has support for index lists directly, so
+     * we should use that.
+     * <p>
+     * Might want to have these returned as an option though so keep.
+     * </p>
+     *
+     *
+     * @param indexList
+     * @return
+     */
+    protected StemVariable vPathConverter(String indexList) {
         QDLCodec codec = new QDLCodec();
         JSONArray arrayIn = JSONArray.fromObject(indexList);
         JSONArray arrayOut = new JSONArray();
@@ -792,7 +813,49 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             arrayOut.add(r);
 
         }
-        return arrayOut.toString();
+        StemVariable outStem = new StemVariable();
+        try {
+            JSONArray array = JSONArray.fromObject(arrayOut.toString());
+            outStem.fromJSON(array);
+        } catch (JSONException x) {
+            JSONObject jo = JSONObject.fromObject(arrayOut.toString());
+            outStem.fromJSON(jo);
+        }
+                            return outStem;
+    }
+
+    /**
+     * Convert output of a JSON query to a stem of lists. Each list is an
+     * index entry.
+     *
+     * @param indexList
+     * @return
+     */
+    protected StemVariable stemPathConverter(String indexList) {
+        QDLCodec codec = new QDLCodec();
+        JSONArray arrayIn = JSONArray.fromObject(indexList);
+        StemVariable arrayOut = new StemVariable();
+        for (int i = 0; i < arrayIn.size(); i++) {
+            String x = arrayIn.getString(i);
+            x = x.substring(2); // All JSON paths start with a $.
+            StringTokenizer tokenizer = new StringTokenizer(x, "[");
+            StemVariable r = new StemVariable();
+            while (tokenizer.hasMoreTokens()) {
+                String nextOne = tokenizer.nextToken();
+                if (nextOne.startsWith("'")) {
+                    nextOne = nextOne.substring(1);
+                }
+                nextOne = nextOne.substring(0, nextOne.length() - 1);
+                if (nextOne.endsWith("'")) {
+                    nextOne = nextOne.substring(0, nextOne.length() - 1);
+                }
+                r.listAppend(nextOne);
+                //  r = r + QDLConstants.STEM_PATH_MARKER2 + codec.encode(nextOne);
+            }
+            arrayOut.put(i, r);
+
+        }
+        return arrayOut;
     }
 
     protected String crappyConverterStem(String indexList) {
