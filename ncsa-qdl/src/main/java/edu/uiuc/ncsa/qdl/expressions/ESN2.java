@@ -85,7 +85,7 @@ public class ESN2 extends ExpressionImpl {
             throw new IllegalStateException("error: left argument must evaluate to be a stem ");
         }
         StemVariable stemVariable = (StemVariable) r0;
-        IndexList r = stemVariable.get(indexList);
+        IndexList r = stemVariable.get(indexList,true);
         Object result = r.get(0);
         setResult(result);
         setResultType(Constant.getType(result));
@@ -113,7 +113,7 @@ public class ESN2 extends ExpressionImpl {
 
             for (int i = indexList.size() - 1; 0 <= i; i--) {
                 if (indexList.get(i) instanceof StemVariable) {
-                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
+                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
                     indexList.truncate(i);
                     indexList.addAll(i, r);
                 }
@@ -134,7 +134,7 @@ public class ESN2 extends ExpressionImpl {
                     if(i == indexList.size() - 1 ){
                         continue;
                        }
-                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1));
+                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
                     indexList.truncate(i);
                     indexList.addAll(i, r);
                 }else{

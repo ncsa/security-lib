@@ -1127,9 +1127,16 @@ So options = 0 means append, have a trailing delimiter
    options = 1 means prepend, "   "     leading "
    options = 2 means append, omit trailing delimiter
    options = 3 means prepend, omit first delimiter
-E.g. detokenize(indices(4), ' ') yields the string
-'0 1 2 3 '
-(Note the trailing blank added at the end.)
+E.g.
+   detokenize([;4],'|')
+0|1|2|3|
+
+Note the trailing | added at the end.
+E.g.
+   detokenize([;4]], '|',2)
+'0 1 2 3'
+
+omits the trailing |.
 See also: truncate, constants (which contains the option values for reference)
 
                 ]]>
@@ -1680,19 +1687,12 @@ E.g. 1: getting a result set
   price:8.99,
   isbn:0-553-21311-3,...
 
-  Note well that results are returned as stem lists of v paths.
-
-  A v path is a string of the form
-
-  (` | · ) vpath0 (` | · ) vpath1 (` | · )
-
-  whose paths are v-encoded. You may use either a backtick ` or a
-  raised dot · (unicode \u00b7).
+  Note well that results are returned as stem lists of paths.
 
 E.g. 2: Getting the indices
   ndx. := query(test., '$..book[?(@.isbn)]', true); // Just get the indices
   ndx.
-['`store`book`2','`store`book`3']
+[[store,book,2],[store,book,3]]
 
 E.g. 3: Using the indices
    my_json.ndx.0
@@ -1704,7 +1704,6 @@ E.g. 3: Using the indices
 Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/my_json.json
        and issue
        my_json. := from_json(file_read('/my/path/my_json.json'));
-
                 ]]>
             </body>
         </entry>

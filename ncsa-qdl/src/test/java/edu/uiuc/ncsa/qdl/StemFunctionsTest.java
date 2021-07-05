@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -1508,5 +1509,31 @@ public class StemFunctionsTest extends AbstractQDLTester {
     interpreter.execute(script.toString());
     assert getBooleanValue("ok", state);
 }
+
+    public void testExtraIndices() throws Throwable {
+    State state = testUtils.getNewState();
+    StringBuffer script = new StringBuffer();
+    addLine(script, "b. := [;5].2.4;");
+    QDLInterpreter interpreter = new QDLInterpreter(null, state);
+    try {
+        interpreter.execute(script.toString());
+        assert false : "was able to access a non-existant index in a stem";
+    }catch(IndexError ie){
+        assert true;
+    }
+}
+
+    public void testExtraIndices2() throws Throwable {
+     State state = testUtils.getNewState();
+     StringBuffer script = new StringBuffer();
+     addLine(script, "b. := [;5].i(2).i(4);");
+     QDLInterpreter interpreter = new QDLInterpreter(null, state);
+     try {
+         interpreter.execute(script.toString());
+         assert false : "was able to access a non-existant index in a stem";
+     }catch(IndexError ie){
+         assert true;
+     }
+ }
 
 }

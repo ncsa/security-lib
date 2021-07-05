@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ESN2.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ESN2.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
@@ -164,7 +163,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.44942528" />
-    <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -657,14 +656,7 @@
       <workItem from="1622807504789" duration="4953000" />
       <workItem from="1622814789812" duration="218351000" />
       <workItem from="1623775388443" duration="106173000" />
-      <workItem from="1624665988397" duration="42920000" />
-    </task>
-    <task id="LOCAL-00063" summary="Vastly better ways to edit files from within the QDL workspace.">
-      <created>1615590918888</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1615590918888</updated>
+      <workItem from="1624665988397" duration="50152000" />
     </task>
     <task id="LOCAL-00064" summary="QDL: Refactor of functions (moved stuff to its own package finally), documentation. Changed one property from being a string to being a list of them.">
       <created>1615806889550</created>
@@ -1002,7 +994,14 @@
       <option name="project" value="LOCAL" />
       <updated>1625175919427</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <task id="LOCAL-00112" summary="Changed how indices were being returned from a utility. Updates to documentation. Figured out how to do command line conversions of Libre Office to PDFs so I won't ever forget to update those again in a release. :) :) :)">
+      <created>1625401777178</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1625401777178</updated>
+    </task>
+    <option name="localTasksCounter" value="113" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1012,7 +1011,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-974 fixes: more exception types for various JWT verification failures so understandable error messages can be generated and logged." />
     <MESSAGE value="Updated a toString method." />
     <MESSAGE value="pooling improvements." />
     <MESSAGE value="CIL-986 fixes. Added better way to call the endpoints for testing." />
@@ -1037,7 +1035,8 @@
     <MESSAGE value="Updated some help. added flag to debug util so the log messages look better." />
     <MESSAGE value="CIL-1002,  CIL-1012, CIL-1014, CIL-1019" />
     <MESSAGE value="CIL-1011 support. Final checkin of stuff before cutting 5.1.4." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1011 support. Final checkin of stuff before cutting 5.1.4." />
+    <MESSAGE value="Changed how indices were being returned from a utility. Updates to documentation. Figured out how to do command line conversions of Libre Office to PDFs so I won't ever forget to update those again in a release. :) :) :)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Changed how indices were being returned from a utility. Updates to documentation. Figured out how to do command line conversions of Libre Office to PDFs so I won't ever forget to update those again in a release. :) :) :)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1134,7 +1133,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java</url>
-          <line>1234</line>
+          <line>1235</line>
           <option name="timeStamp" value="313" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1373,26 +1372,6 @@
           <option name="timeStamp" value="959" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/statements/BlockStatement.java</url>
-          <line>26</line>
-          <option name="timeStamp" value="974" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1967</line>
-          <option name="timeStamp" value="976" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
-          <line>1985</line>
-          <option name="timeStamp" value="978" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>1523</line>
-          <option name="timeStamp" value="980" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WSXMLSerializer.java</url>
           <line>192</line>
           <option name="timeStamp" value="988" />
@@ -1406,6 +1385,11 @@
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
           <line>793</line>
           <option name="timeStamp" value="996" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
+          <line>1533</line>
+          <option name="timeStamp" value="1000" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

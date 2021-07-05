@@ -1423,9 +1423,9 @@ public class StemVariable extends HashMap<String, Object> {
     This is used to overlay the stem in the calling function
     so arguments don't get lost
      */
-    public IndexList get(IndexList indexList) {
+    public IndexList get(IndexList indexList, boolean strictMatching) {
         if (experimental) {
-            return newGet(indexList);
+            return newGet(indexList, strictMatching);
         }
         return oldGet(indexList);
     }
@@ -1484,6 +1484,9 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public IndexList newGet(IndexList indexList) {
+                                        return newGet(indexList, true);
+    }
+    public IndexList newGet(IndexList indexList, boolean strictMatching) {
         if (indexList.get(indexList.size() - 1) instanceof StemVariable) {
             StemVariable ndx = (StemVariable) indexList.get(indexList.size() - 1);
             if (!ndx.isList()) {
@@ -1527,6 +1530,9 @@ public class StemVariable extends HashMap<String, Object> {
             if (obj instanceof StemVariable) {
                 currentStem = (StemVariable) obj;
             } else {
+                if(strictMatching && i != indexList.size()-1){
+                    throw new IndexError("error:  scalars do not have indices.");
+                }
                 rc.add(obj); // 0th entry is returned value
                 gotOne = true;
             }
