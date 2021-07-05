@@ -121,6 +121,13 @@ mod(a,b) - compute the modulus, i.e., the remainder after long division, of two
 numeric_digits(arg) - set the precision to the value of arg, which is a
                       positive integer.
                       The result displayed is the old precision.
+Note: Precision refers to the total number of digits that are considered
+      accurate. So if the precision is 5, the number 4321.12345 is actually
+      only accurate to 4321.1 and anything after that is an artifact of
+      approximation. QDL will show values as accurately as possible,
+      so if the value were 1.00000009 then QDL would display 1 as the
+      value, since up to precision, they are the same.
+      See the reference manual for a more information.
                 ]]>
         </body>
     </entry>
@@ -1134,7 +1141,7 @@ E.g.
 Note the trailing | added at the end.
 E.g.
    detokenize([;4]], '|',2)
-'0 1 2 3'
+0|1|2|3
 
 omits the trailing |.
 See also: truncate, constants (which contains the option values for reference)
@@ -1734,6 +1741,15 @@ You may use ⟦ (\u27e6) or [| ,  ⟧ (\u27e7) or |].
 ⟦ start;stop;count ⟧
 will create the list with count elements evenly distributed between start and stop,
 inclusive.
+See also: slice
+                ]]>
+            </body>
+        </entry>
+    <entry id="[|">
+            <body>
+                <![CDATA[
+Closed slice operator open bracket.
+See ⟦, slice
                 ]]>
             </body>
         </entry>
@@ -1743,9 +1759,19 @@ inclusive.
 Unicode \u27e7. Part of a closed slice.
 Equivalent to: |]
 Please see help for ⟦
+See also: slice
                 ]]>
             </body>
         </entry>
+    <entry id="|]">
+            <body>
+                <![CDATA[
+Closed slice operator close bracket.
+See ⟧, slice
+                ]]>
+            </body>
+        </entry>
+
     <entry id="→">
             <body>
                 <![CDATA[
@@ -2003,6 +2029,41 @@ baz
 a gets re-assigned to 'baz' inside the block, ok does not exist any place but the block.
 This is extremely useful in many places, such as scripts.
                 ]]>
+            </body>
+        </entry>
+
+    <entry id="slice">
+            <body>
+                <![CDATA[
+A slice is an list of numbers. There are two main types
+Open slice: [start;stop;step]
+which will produce the list
+[start, start+step, start +2*step, ... ]
+ending when stop < start + n*step.
+If start is omitted, it is assumed to be 0 (zero).
+If step is omitted, it is assumed to be 1.
+E.g. [;5]
+[0,1,2,3,4]
+E.g. using a slice in a loop
+  while[for_next(j, 1+2*[;6])][say(j);]
+prints 1, 3, 5, 7, 9, 11
+E.g. [2;5;0.7]
+[2,2.7,3.4,4.1,4.8]
+Note well: in an open slice, you do not necessarily know how
+           many elements are in the resulting list. Here there
+           are 5.
+
+Closed slice [|start;stop;count|]
+This will produce the list from
+[start, ... , stop] (inclusive)
+and will have exactly count element in it.
+If start is omitted, it is assumed to be 0 (zero).
+E.g. [|-pi()/4; pi()/3; 11 |]
+[-0.785398163397447,-0.602138591938043, ... ,1.047197551196593]
+
+produces a list of 11 equally spaced numbers from -pi/4 to pi/3,
+including the endpoints.
+]]>
             </body>
         </entry>
 

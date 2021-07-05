@@ -16,41 +16,77 @@ module[
       asech(x)->acosh(1/x);
       acsch(x)->asinh(1/x);
       acoth(x)->atanh(1/x);
+//      max(a,b) -> (a + b + abs(a-b))/2;
+  //    min(a,b) -> (a + b - abs(a-b))/2;
+
 
   // Here starts definitions using the full syntax, so we can include some
   // online help.
-   define[hypotenuse(a,b)][
-     >> The hypotenuse of a right triangle, given the other two sides.
-     >> sqrt(a^2 + b^2);
-     return(sqrt(a^2 + b^2));
+
+   define[
+       max(a,b)
+    ][
+       >> max(a,b) - return the maximum of a or b.
+       >> E.g. max(-2, 3) returns 3.
+       >> E.g. on stems -- corresponding entries are compared
+       >>   max([;5],([;5]-2)*3)
+       >> [0,1,2,3,6]
+       return((a + b + abs(a-b))/2);
+    ];
+
+   define[
+       min(a,b)
+    ][
+       >> min(a,b) - return the minimum of a or b.
+       >> E.g. min(-2, 3) returns -2.
+       >> E.g. on stems -- corresponding entries are compared
+       >>   min([;5],([;5]-2)*3)
+       >> [-6,-3,0,3,4]
+       return((a + b - abs(a-b))/2);
+    ];
+
+   define[
+       hypotenuse(a,b)
+    ][
+       >> The hypotenuse of a right triangle, given the other two sides.
+       >> sqrt(a^2 + b^2);
+       return(sqrt(a^2 + b^2));
    ];
 
 
-   define[sqrt(x)][
-     >> The (non-negative) square root of the argument
-     return(nroot(x, 2));
+   define[
+       sqrt(x)
+    ][
+       >> The (non-negative) square root of the argument
+       return(nroot(x, 2));
    ];
 
 
-   define[logn(n,x)][
-     >> log(n,x)
-     >> The logarithm, base n for x.
-     >> Note that both may be stems.
-     return(ln(x)/ln(n));
+   define[
+       logn(n,x)
+    ][
+        >> log(n,x)
+        >> The logarithm, base n for x.
+        >> Note that both may be stems.
+        return(ln(x)/ln(n));
    ];
 
 
-   define[polynomial(coefficients., x)][
-     >> polynomial(coefficients., arg) takes a list of coefficients (0th index) is constant and evaluates it.
-     >> so polynomial([3,5,7,11], x) == 11*x^3 + 7*x^2 + 5*x + 3
-     return(reduce(@+, coefficients.*(x^n(size(coefficients.)))));
+   define[
+        polynomial(coefficients., x)
+    ][
+        >> polynomial(coefficients., arg) takes a list of coefficients (0th index) is constant and evaluates it.
+        >> so polynomial([3,5,7,11], x) == 11*x^3 + 7*x^2 + 5*x + 3
+        return(reduce(@+, coefficients.*(x^n(size(coefficients.)))));
    ];
 
-   define[poly2(coefficients., x)][
-     >> poly2(coefficients., arg) takes a list of coefficients (last index is the constant) and evaluates it.
-     >> so poly2([11,7,5,3], x) == 11*x^3 + 7*x^2 + 5*x + 3
-     >> This is because some people just find it optically easier.
-     return(reduce(@+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
+   define[
+         poly2(coefficients., x)
+    ][
+         >> poly2(coefficients., arg) takes a list of coefficients (last index is the constant) and evaluates it.
+         >> so poly2([11,7,5,3], x) == 11*x^3 + 7*x^2 + 5*x + 3
+         >> This is because some people just find it optically easier.
+         return(reduce(@+, list_reverse(coefficients.)*(x^n(size(coefficients.)))));
    ];
 
 
@@ -72,7 +108,7 @@ module[
         >> A program to generate the parametric plot points of two real valued function over an interval.
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
-        >> pplot(@sin(),@cos(),  [|0; pi()/2; 10|])
+        >> pplot(@sin,@cos,  [|0; pi()/2; 10|])
          x. := x(t.);
          y. := y(t.);
          return(x.~|y.);
@@ -106,7 +142,4 @@ module[
          s. :=⟦0,1,10⟧
          splot(@x, @y, @z, t., s.)
        */
-
-
-
 ]; // end module

@@ -183,7 +183,9 @@ public class WorkspaceCommands implements Logable {
         say(HELP_COMMAND + " syntax:");
         say(HELP_COMMAND + " - (no arg) print generic help for the workspace.");
         say(HELP_COMMAND + " * - print a short summary of help for every user defined function.");
-        say(HELP_COMMAND + " name - print help. System functions will have a summary printed (read the manual for more).");
+        say(HELP_COMMAND + " -online - print a list of all online help topics.");
+        say(HELP_COMMAND + " name - print short help for name. System functions will have a");
+        say("        summary printed (read the manual for more).");
         say("        For user defined function, a summary of all calls with various argument counts will be shown.");
         say(HELP_COMMAND + " name arg_count - print out detailed information for the user-defined function and the given number of arguments.");
 
@@ -2225,7 +2227,17 @@ public class WorkspaceCommands implements Logable {
             }
             return printList(inputLine, treeSet);
         }
+        if(name.equals("-online")){
+            TreeSet<String> treeSet = new TreeSet<>();
+            treeSet.addAll(onlineHelp.keySet());
+            if (treeSet.isEmpty()) {
+                say("(no online help)");
+                return RC_CONTINUE;
+            }
+            say("Help is available for the following (" + treeSet.size() + " topics):");
+            return printList(inputLine, treeSet);
 
+        }
         if (onlineHelp.containsKey(name)) {
             say(onlineHelp.get(name));
             return RC_CONTINUE;
