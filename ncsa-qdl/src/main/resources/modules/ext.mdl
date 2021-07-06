@@ -17,8 +17,15 @@ module[
         >> sets element 42 in b. as well. To have them independent, use this
         assert[var_type(arg) == constants('var_type').stem][' clone requires a stem as its argument'];
         return(from_json(to_json(arg)));
-      ];
+   ];
 
+   define[string_copy(s, n)][
+     >> Create a stem with 0 < n copies of a single string in it.
+     out. := null;
+     if[n <= 0][return([]);];
+     while[for_next(j, [;n])][out.j := s;];
+     return(out.);
+   ];
 
 
    define[ fork(@monad1(),@dyad(),@monad2(),x.)][
@@ -36,22 +43,22 @@ module[
      return(dyad(monad1(x.),monad2(x.)));
    ];
 
-     define[
-        to_csv(a.)
-     ][
-        >> convert a stem., a., to csv (comma separated values) format.
-        >> a. stem to be converted. Each element is a list and will be a line
-        >> in the output.
-        >> typical use is
-        >> file_write(my_file, to_cvs(data.));
-        >> E.g. here is the start of one
-        >> a.0 := ['t', 'x', 'y']; // header
-        >> a.1 := [0, .5, .345723445]; // first line of data
-        >> tip:  [['t', 'x','y']]~a. would stick in the headers.
-        // convert each entry and remove the [] so its just numbers
-        z. := for_each(@to_string(), a.) - ']' - '[';
-        return(z.);
-     ]; //end to_cvs
+   define[
+      to_csv(a.)
+    ][
+      >> convert a stem., a., to csv (comma separated values) format.
+      >> a. stem to be converted. Each element is a list and will be a line
+      >> in the output.
+      >> typical use is
+      >> file_write(my_file, to_cvs(data.));
+      >> E.g. here is the start of one
+      >> a.0 := ['t', 'x', 'y']; // header
+      >> a.1 := [0, .5, .345723445]; // first line of data
+      >> tip:  [['t', 'x','y']]~a. would stick in the headers.
+      // convert each entry and remove the [] so its just numbers
+      z. := for_each(@to_string(), a.) - ']' - '[';
+      return(z.);
+   ]; //end to_cvs
      /*
         To use this with gnuplot, go to a work directory (here I am using /tmp
         but you should create your own),  and create
