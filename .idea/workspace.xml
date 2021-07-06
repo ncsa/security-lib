@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL.">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/ext.mdl" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/ext.mdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/Pool.class" afterDir="false" />
@@ -657,14 +655,7 @@
       <workItem from="1622814789812" duration="218351000" />
       <workItem from="1623775388443" duration="106173000" />
       <workItem from="1624665988397" duration="59649000" />
-      <workItem from="1625569935067" duration="3809000" />
-    </task>
-    <task id="LOCAL-00066" summary="One edge case with serialization to XML.">
-      <created>1615821880216</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
-      <option name="project" value="LOCAL" />
-      <updated>1615821880216</updated>
+      <workItem from="1625569935067" duration="4148000" />
     </task>
     <task id="LOCAL-00067" summary="QDL: support for function pointers. Tests.">
       <created>1615912534532</created>
@@ -1002,7 +993,14 @@
       <option name="project" value="LOCAL" />
       <updated>1625516534589</updated>
     </task>
-    <option name="localTasksCounter" value="115" />
+    <task id="LOCAL-00115" summary="Last checkin before rolling 5.1.4 release.">
+      <created>1625578589510</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1625578589510</updated>
+    </task>
+    <option name="localTasksCounter" value="116" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1012,7 +1010,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-986 fixes. Added better way to call the endpoints for testing." />
     <MESSAGE value="A few tweaks, added a test, updated lagging documents. Added support for JSON Path queries in QDL." />
     <MESSAGE value="Cleaned up parser and added a few tests." />
     <MESSAGE value="More parser cleanup and housekeeping. Updated documentation. More regression tests." />
@@ -1037,7 +1034,8 @@
     <MESSAGE value="Changed how indices were being returned from a utility. Updates to documentation. Figured out how to do command line conversions of Libre Office to PDFs so I won't ever forget to update those again in a release. :) :) :)" />
     <MESSAGE value="Lots of documentation upgrades. Found an edge case in writing and example and fixed it with refgression tests." />
     <MESSAGE value="Mostly changed documentation." />
-    <option name="LAST_COMMIT_MESSAGE" value="Mostly changed documentation." />
+    <MESSAGE value="Last checkin before rolling 5.1.4 release." />
+    <option name="LAST_COMMIT_MESSAGE" value="Last checkin before rolling 5.1.4 release." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
