@@ -700,4 +700,33 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getBooleanValue("z", state);
 
     }
+    /*
+       diff('abcde', 'ab')
+2
+   diff('abcd','abcd')
+-1
+   diff(['abcd','efghij'],['abq','efgp'])
+[2,3]
+  diff(['abcde','abed'], 'abcq')
+[3,2]
+     */
+    @Test
+    public void testDiff() throws Throwable{
+        // π
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 ≔ differ_at('abcde', 'ab') == 2;");
+        addLine(script, "ok1 ≔ differ_at('abcde', 'abcde') == -1;");
+        addLine(script, "ok2 ≔ reduce(@∧, differ_at(['abcd','efghij'],['abq','efgp'])==[2,3]);");
+        addLine(script, "ok3 ≔ reduce(@∧, differ_at(['abcde','abed'], 'abcq')==[3,2]);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : "diff failed for two strings";
+        assert getBooleanValue("ok1", state) : "diff equality failed";
+        assert getBooleanValue("ok2", state) : "diff of two stems failed";
+        assert getBooleanValue("ok3", state) : "diff of stem and string failed";
+
+    }
+
 }

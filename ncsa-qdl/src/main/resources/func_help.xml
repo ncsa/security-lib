@@ -52,17 +52,43 @@ See also: decode_b64
     <entry id="head">
         <body>
             <![CDATA[
-head(target, stopChar[,is_case_sensitive]) - Return up to stopChar in the
+head(target, delim[,is_regex]) - Return up to delim in the
                  target. Both of the first arguments
                  may be conformable stems. The result is always conformable to
                  target.
-                 is_case_sensitive - if true (default) does case sensitive
-                                     checking.
+                 is_regex - if true splits using the second as a regex.
 E.g.
     head(['bob@foo', 'todd@foo', 'rolf!baz'], '@')
 [bob,todd,]
-    Note that there is no match for the last element, so an empty string is
-    returned.
+
+Note that there is no match for the last element, so an empty string is
+returned.
+Equivalent to tokenize(target, delim, is_regex).0
+See also: tail
+                ]]>
+        </body>
+    </entry>
+    <entry id="tail">
+        <body>
+            <![CDATA[
+tail(target, delim[,is_regex]) - Return from after the last
+                 delim in the target to the end of the string.
+                 Both of the first arguments may be conformable stems.
+                 The result is always conformable to target.
+                 is_regex - if true treats the second argument as
+                 a regular expression
+E.g.
+      tail(['bob@psu.edu', 'todd@bsu.edi', 'rolf!baz'], '@')
+[psu.edu,bsu.edi,]
+
+Note that there is no match for the last element, so an empty string is
+returned.
+
+      tail('a d, m,\ti.n','\\s+', true);    // uses whitespace
+i.n
+
+This is equivalent to returning tokenize(a,b,is_regex).(-1);
+See also: head
                 ]]>
         </body>
     </entry>
@@ -1901,6 +1927,7 @@ Here is a table of supported unicode characters in QDL:
 Standard    Unicode   ALT   escape code   What is it
 !              ¬       !   \u00ac         logical not
 -              ¯       -   \u00af         unary minus
+`              ·       .   \u00b7         raised dot
 *              ×       *   \u00d7         multiplication
 /              ÷       /   \u00f7         division
 +              ⁺       +   \u207a         unary plus
@@ -1908,19 +1935,18 @@ Standard    Unicode   ALT   escape code   What is it
 null           ∅       n   \u2205         null
 &&             ∧       &   \u2227         logical and
 ||             ∨       |   \u2228         logical or
+=~             ≈       ?   \u2248         regex matches
 :=             ≔       :   \u2254         left assignment
 =:             ≕       "   \u2255         right assignment
-=~             ≈       ?   \u2248         regex matches
-`              ·       .   \u00b7         raised dot
 !=             ≠       \   \u2260         not equal to
 ==             ≡       =   \u2261         logical equality
 <=             ≤       <   \u2264         less than or equals
 =>             ≥       >   \u2265         greater than or equals
 true           ⊤       t   \u22a4         logical true
 false          ⊥       f   \u22a5         logical false
+assert[][]     ⊨       a   \u22a8         assert
 [|             ⟦       {   \u27e6         left closed slice bracket
 |]             ⟧       }   \u27e7         right closed slice bracket
-assert[][]     ⊨       a   \u22a8         assert
 pi             π       p   \u03c0         Greek letter pi.
 
 
@@ -2066,7 +2092,36 @@ including the endpoints.
 ]]>
             </body>
         </entry>
+    <entry id="differ_at">
+            <body>
+                <![CDATA[
+differ_at(s0, s1) - find first index at which two strings differ. If the
+               strings are equal then a value of -1 is returned.
+               Read: 's0 and s1 differ at index i'
+               If one string is a substring of
+               another, then the index is the length (i.e. this is the index in
+               the longer string). You may also apply this to stems of strings.
 
+E.g.
+   differ_at('abcde', 'ab')
+2
+   differ_at('abcd','abcd')
+-1
+   differ_at(['abcd','efghij'],['abq','efgp'])
+[2,3]
+  differ_at(['abcde','abed'], 'abcq')
+[3,2]
+]]>
+            </body>
+        </entry>
+
+    <entry id="version">
+            <body>
+                <![CDATA[
+The current version of QDL is 1.3-QDL-SNAPSHOT
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

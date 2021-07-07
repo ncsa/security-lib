@@ -4,23 +4,25 @@ module[
    >> This module defines several additional functions for mathematics
    >> These include sec(), sech() etc.
    >>    clone(arg.) - make a complete copy of a stem
-   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
    >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
+   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
+   >>    n_copy(s,n) - make a stem with n copies of the argument s
    >>    to_cvs(arg.)- export a stem to comma separated format.
 
     define[clone(arg)][
-        >> clone(arg.)
-        >> Returns a completely new copy of the stem. Since generally
-        >> to stems are used, something like
+        >> clone(arg.) - Returns a completely new copy of the stem.
+        >> Since generally stems are by reference, not value,  something like
         >> a. := b.
         >> a.0 := 42
         >> sets element 42 in b. as well. To have them independent, use this
-        assert[var_type(arg) == constants('var_type').stem][' clone requires a stem as its argument'];
+        >> If arg is not a stem, it is simply returned since all other references
+        >> are by value.
+        if[var_type(arg) != constants('var_type').stem][return(arg);];
         return(from_json(to_json(arg)));
    ];
 
-   define[string_copy(s, n)][
-     >> Create a stem with 0 < n copies of a single string in it.
+   define[n_copy(s, n)][
+     >> n_copy(s,n) - Create a stem with 0 < n copies of the single argument s.
      out. := null;
      if[n <= 0][return([]);];
      while[for_next(j, [;n])][out.j := s;];
@@ -29,6 +31,7 @@ module[
 
 
    define[ fork(@monad1(),@dyad(),@monad2(),x.)][
+     >> fork(@monad1(),@dyad(),@monad2(),x.) - apply a fork to a stem.
      >> A fork is defined as a taking a dyad and two monads and applying them to an argument
      >>    dyad(monad1(x.), monad2(x.)
      >> A surprisingly large number of problems are addressed by this: transform the argument
@@ -46,8 +49,8 @@ module[
    define[
       to_csv(a.)
     ][
-      >> convert a stem., a., to csv (comma separated values) format.
-      >> a. stem to be converted. Each element is a list and will be a line
+      >> to_cvs(arg.) - Convert a stem., a., to csv (comma separated values) format.
+      >> arg. is the stem to be converted. Each element is a list and will be a line
       >> in the output.
       >> typical use is
       >> file_write(my_file, to_cvs(data.));

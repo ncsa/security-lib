@@ -75,11 +75,12 @@ module[
      define[
         tractrix(a, interval.)
      ][
-       >> The tractrix (or "Hundekurve" in German) is formed by pulling a point at the end of a segment.
+       >> The tractrix (or "Hundekurve" in German) is formed by pulling a point
+       >> at the end of a segment.
        >> The parameter a is simply a scale factor and can usually be set to 1.
        >> The interval is (-pi()/2, pi()/2) (no endpoints, since it is infinite there).
-       >> The German name means "dog curve" and refers to the path a dog at the end of a leash makes
-       >> as you drag him for a walk.
+       >> The German name means "dog curve" and refers to the path an unwilling
+       >> dog at the end of a leash makes as you drag him for a walk.
        x(t.)->a*(t. -tanh(t.));
        y(t.)->a*sech(t.);
        return(pplot(@x(),@y(),interval.));
@@ -99,8 +100,9 @@ E.g.
     module_load('/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/curves.mdl')
     module_import('qdl:/math/curves')
     r(t.)->1
-    polar_plot(@r(), [0,2*pi(),20])
-    rose(1,3,[0,2*pi(),20]);
+    polar_plot(@r(), ⟦0;2*pi();20⟧)
+    rose(1,3,⟦0;2*pi();2000⟧);
+    s:=date_ms();x.:=rose(1,3,⟦0;2*pi();200⟧);date_ms()-s;
 
 */
 ]; //end module

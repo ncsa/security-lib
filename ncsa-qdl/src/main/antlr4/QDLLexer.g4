@@ -10,7 +10,7 @@ lexer grammar QDLLexer;
   ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null;
 
          ASSERT : 'assert'; 
-         ASSERT2 : '⊨'; // unicode 22a8 
+        ASSERT2 : '⊨'; // unicode 22a8
      BOOL_FALSE : 'false'  | '⊥'; // unicode 22a5
       BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
           BLOCK : 'block';
@@ -22,7 +22,7 @@ lexer grammar QDLLexer;
              IF : 'if';
          MODULE : 'module';
            Null : 'null'   | '∅';  // unicode 2205
-          SWITCH: 'switch';
+         SWITCH : 'switch';
            THEN : 'then';
             TRY : 'try';
           WHILE : 'while';
@@ -123,7 +123,12 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 //   Stem_ref : Identifier '.';
 
 // § 8 Identifiers
-   Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;   // no .!
+   /*
+      This include standard upper and lower case Greek letters as well as ϑ - \u03d1, which is
+      a variation of theta and my personal favorite Greek letter.
+   */
+   Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
+
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
 
@@ -136,7 +141,7 @@ fragment AllOps :
      RegexMatches;
 
 fragment FUNCTION_NAME :
-     [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9]*;
+     [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;
 
  // Note that the extra characters for && and || are there because certain unicode aware keyboards
  // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly

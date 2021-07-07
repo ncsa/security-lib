@@ -90,8 +90,18 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final String SYS_CAPUT = STRING_FQ + CAPUT;
     public static final int CAPUT_TYPE = 15 + STRING_FUNCTION_BASE_VALUE;
 
+    public static final String DIFF = "differ_at";
+    public static final String SYS_DIFF = STRING_FQ + DIFF;
+    public static final int DIFF_TYPE = 16 + STRING_FUNCTION_BASE_VALUE;
+
+    public static final String TAIL = "tail";
+    public static final String SYS_TAIL = STRING_FQ + TAIL;
+    public static final int TAIL_TYPE = 17 + STRING_FUNCTION_BASE_VALUE;
+
     public static String FUNC_NAMES[] = new String[]{
             CONTAINS,
+            TAIL,
+            DIFF,
             TO_LOWER,
             TO_UPPER,
             TRIM,
@@ -108,6 +118,8 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             FROM_URI};
     public static String FQ_FUNC_NAMES[] = new String[]{
             SYS_CONTAINS,
+            SYS_DIFF,
+            SYS_TAIL,
             SYS_TO_LOWER,
             SYS_TO_UPPER,
             SYS_TRIM,
@@ -167,6 +179,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case CAPUT:
             case SYS_CAPUT:
                 return CAPUT_TYPE;
+            case TAIL:
+            case SYS_TAIL:
+                return TAIL_TYPE;
             case TOKENIZE:
             case SYS_TOKENIZE:
                 return TOKENIZE_TYPE;
@@ -185,6 +200,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case FROM_URI:
             case SYS_FROM_URI:
                 return FROM_URI_TYPE;
+            case DIFF:
+            case SYS_DIFF:
+                return DIFF_TYPE;
         }
         return UNKNOWN_VALUE;
     }
@@ -203,6 +221,10 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case CAPUT:
             case SYS_CAPUT:
                 doCaput(polyad, state);
+                return true;
+            case TAIL:
+            case SYS_TAIL:
+                doTail(polyad, state);
                 return true;
             case INDEX_OF:
             case SYS_INDEX_OF:
@@ -252,8 +274,98 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             case SYS_FROM_URI:
                 doFromURI(polyad, state);
                 return true;
+            case DIFF:
+            case SYS_DIFF:
+                doDiff(polyad, state);
+                return true;
         }
         return false;
+    }
+   //       tail('a d, m,\ti.n','\\s+|,|\\s*', true);
+   //       tail('a d, m,\ti.n','\\s+', true);
+   //       head('a\t\t d, \tm,\ti.n','\\s+', true);
+    //   tail('qweaAzxc', '[aA]*,', true)
+    protected void doTail(Polyad polyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                int pos = -1;
+                boolean isRegEx = false;
+                if (objects.length == 3) {
+                    if (!(objects[2] instanceof Boolean)) {
+                        throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
+                    }
+                    isRegEx = (Boolean) objects[2];
+                }
+
+                if (areAllStrings(objects[0], objects[1])) {
+                    String s0 = (String) objects[0];
+                    String s1 = (String) objects[1];
+                    if (isRegEx) {
+                        String[] x = s0.split(s1);
+                        if(x == null || x.length == 0){
+                            r.result = "";
+                        }else{
+                            r.result = x[x.length - 1];
+                        }
+                    } else {
+                        pos = s0.lastIndexOf(s1);
+                        if (pos < 0) {
+                            // not found
+                            r.result = "";
+                        } else {
+                            r.result = s0.substring(pos + s1.length());
+                        }
+                    }
+                }
+                r.resultType = Constant.STRING_TYPE;
+                return r;
+            }
+        };
+        process2(polyad, pointer, TAIL, state, true);
+
+    }
+
+    protected void doDiff(Polyad polyad, State state) {
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                int pos = -1;
+                boolean caseSensitive = true;
+
+                if (areAllStrings(objects[0], objects[1])) {
+                    String s0 = (String) objects[0];
+                    String s1 = (String) objects[1];
+                    if (StringUtils.isTrivial(s0) || StringUtils.isTrivial(s1)) {
+                        r.result = 0L;
+                        r.resultType = Constant.LONG_TYPE;
+                        return r;
+                    }
+                    char[] b0 = s0.toCharArray();
+                    char[] b1 = s1.toCharArray();
+                    int stop = Math.min(b0.length, b1.length);
+                    for (int i = 0; i < stop; i++) {
+                        if (b0[i] != b1[i]) {
+                            r.result = (long) i;
+                            r.resultType = Constant.LONG_TYPE;
+                            return r;
+                        }
+                    }
+                    if (b0.length == stop && b1.length == stop) {
+                        r.result = -1L;
+                        r.resultType = Constant.LONG_TYPE;
+                        return r;
+                    }
+                    r.result = (long) stop;
+                    r.resultType = Constant.LONG_TYPE;
+                    return r;
+                }
+                throw new IllegalArgumentException("error: " + DIFF + " requires both argument be strings.");
+            }
+        };
+        process2(polyad, pointer, DIFF, state, false);
     }
 
     protected void doCaput(Polyad polyad, State state) {
@@ -262,27 +374,33 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 int pos = -1;
-                boolean caseSensitive = true;
+                boolean isRegEx = false;
                 if (objects.length == 3) {
                     if (!(objects[2] instanceof Boolean)) {
                         throw new IllegalArgumentException("if the 3rd argument is given, it must be a boolean.");
                     }
-                    caseSensitive = (Boolean) objects[2];
+                    isRegEx = (Boolean) objects[2];
                 }
 
                 if (areAllStrings(objects[0], objects[1])) {
                     String s0 = (String) objects[0];
                     String s1 = (String) objects[1];
-                    if (caseSensitive) {
+                    if (isRegEx) {
+                        String[] x = s0.split(s1);
+                        if(x == null && x.length == 0){
+                            // no match
+                            r.result = "";
+                        }else{
+                            r.result = x[0];
+                        }
+                    } else {
                         pos = s0.indexOf(s1);
-                    } else {
-                        pos = s0.toLowerCase().indexOf(s1.toLowerCase());
-                    }
-                    if (pos < 0) {
-                        // not found
-                        r.result = "";
-                    } else {
-                        r.result = s0.substring(0, pos);
+                        if (pos < 0) {
+                            // not found
+                            r.result = "";
+                        } else {
+                            r.result = s0.substring(0, pos);
+                        }
                     }
 
                 }
@@ -695,7 +813,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     }
                     doregex = (Boolean) objects[3];
                 }
-                if (areAllStrings(objects[0],objects[1],objects[2])) {
+                if (areAllStrings(objects[0], objects[1], objects[2])) {
                     if (doregex) {
                         r.result = objects[0].toString().replaceAll(objects[1].toString(), objects[2].toString());
                     } else {
