@@ -52,8 +52,8 @@ public class TryCatch implements Statement {
         return this.tryStatements;
     }
 
-    public void seTryStatements(List<Statement> tryStatements) {
-        this.catchStatements = catchStatements;
+    public void setTryStatements(List<Statement> tryStatements) {
+        this.tryStatements = tryStatements;
     }
 
     @Override

@@ -229,7 +229,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
 
         addLine(script, "f(x,y)->" + cf);
-        addLine(script, "-" + cf2 + ";");
+        addLine(script, "-" + cf2 + ";"); // so f should be zero.
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 

@@ -1225,32 +1225,20 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, tryCatch);
     }
 
+    // try[to_number('foo');]catch[say('That is no number!');];
+    // try[my_number := to_number(scan('enter value>'));]catch[say('That is no number!');];
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
         tryCatch.setSourceCode(getSource(tcContext));
-        boolean addToTry = true;
-        try {
-            for (int i = 1; i < tcContext.getChildCount(); i++) {
-                ParseTree p = tcContext.getChild(i);
-                if (p.getText().equals("]catch[")) {
-                    addToTry = false;
-                    continue;
-                }
-                if (p.getText().equals(";") || p.getText().equals("]")) {
-                    continue;
-                }
-                if (addToTry) {
-                    Statement s = resolveChild(p);
-                    tryCatch.getTryStatements().add(s);
-                } else {
-                    tryCatch.getCatchStatements().add(resolveChild(p));
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        // new in 1.4 -- much simpler handling here because of parser rewrite.
+        QDLParserParser.StatementBlockContext statementBlockContext = tcContext.statementBlock(0);
+        ParseStatementBlock parseStatementBlock = (ParseStatementBlock) resolveChild(statementBlockContext);
+        tryCatch.setTryStatements(parseStatementBlock.getStatements());
 
+        statementBlockContext = tcContext.statementBlock(1);
+        parseStatementBlock = (ParseStatementBlock) resolveChild(statementBlockContext);
+        tryCatch.setCatchStatements(parseStatementBlock.getStatements());
     }
 
     @Override
@@ -1653,10 +1641,10 @@ public class QDLListener implements QDLParserListener {
                 // typically these are just parse tokens like [, ;, ], comma
                 continue;
             }
-            // Typically this is populated with statment contexts that hold exactly what we want.
+            // Typically this is populated with statement contexts that hold exactly what we want.
+
             ParseTree expr = ctx.getChild(i).getChild(0);
             parseStatementBlock.getStatements().add(resolveChild(expr));
-
         }
     }
 
@@ -1946,7 +1934,6 @@ public class QDLListener implements QDLParserListener {
             }
 
         }
-        //doDefine2(ctx);
     }
 
     @Override
@@ -1962,9 +1949,8 @@ public class QDLListener implements QDLParserListener {
                 continue;
             }
             // has a single parse statement block.
-            ParseStatementBlock parseStatementBlock = (ParseStatementBlock) parsingMap.getStatementFromContext(ctx.getChild(i));
-
-//            block.getStatements().add(resolveChild(ctx.getChild(i)));
+            QDLParserParser.StatementBlockContext statementBlockContext = (QDLParserParser.StatementBlockContext) ctx.getChild(i);
+            ParseStatementBlock parseStatementBlock = (ParseStatementBlock) resolveChild(statementBlockContext);
             block.setStatements(parseStatementBlock.getStatements());
         }
     }

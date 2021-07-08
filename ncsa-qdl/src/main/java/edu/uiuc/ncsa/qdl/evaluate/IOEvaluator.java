@@ -344,7 +344,15 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLRuntimeException("scan is not allowed in server mode.");
         }
-
+        if(polyad.isEvaluated()){
+            // If this has already been run, then do not prompt the user repeatedly.
+            // If scan is used as an argument to a function, e.g.
+            // to_number(scan('>'))
+            // then it would be called twice, once, for itself, and the second time when
+            // to_number tries to re-evaluate it to get the most current state.
+            // scanned input is a one-time read operation, in other words. 
+            return;
+        }
         if (polyad.getArgCount() != 0) {
             // This is the prompt.
             state.getIoInterface().print(polyad.evalArg(0, state));

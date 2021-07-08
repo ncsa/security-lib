@@ -76,13 +76,10 @@ public class StatementTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "i:=0;");
         addLine(script, "while[");
-        addLine(script, "   i + 2");
+        addLine(script, "   i + 2"); // Not a conditional, so the system should throw it out.
         addLine(script, "]do[");
         addLine(script, "  say(i);");
         addLine(script, "]; // end while");
-        // Note the conditional for the loop has i = 0,1,2,3,4
-        // but inside the loop it has been incremented and is 1,2,3,4,5
-        // With the multiplication assignment to j, this results in fast exponential growth.
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -115,8 +112,6 @@ public class StatementTest extends AbstractQDLTester {
 
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_FALSE + " := 1;");
-
-        //QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
@@ -126,8 +121,6 @@ public class StatementTest extends AbstractQDLTester {
 
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_NULL + " := 'foo';");
-
-        // QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
             assert false : "Error; Was able to assign " + QDLConstants.RESERVED_NULL + " a value";
@@ -205,4 +198,72 @@ public class StatementTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
         assert getBooleanValue("okf", state);
     }
+
+    /**
+     * Basic try ... catch block. This has spaces to test new parser upgrades in 1.4.
+     * @throws Throwable
+     */
+    public void testTryCatch() throws Throwable{
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a := -1;");
+         addLine(script, "try   [to_number('foo');a:=1;] catch  [a:=2;];");// set local variable, a,
+         addLine(script, "ok := a == 2;"); // check that a does not exist outside of block
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
+    public void testSwitch0() throws Throwable{
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a := -1;b:=2;");
+         addLine(script, "switch   [");// set local variable, a,
+         addLine(script, "   if[a+b < 0][a:=-2;];");
+         addLine(script, "   if[a-b > 0][a:=-3;];");
+         addLine(script, "   if[a*b < 0][a:=0;];");
+         addLine(script, "];");
+         addLine(script, "ok := a == 0;");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
+
+    /**
+     * Same as {@link #testSwitch0()}, just change the order of the conditionals
+     * @throws Throwable
+     */
+    public void testSwitch1() throws Throwable{
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a := -1;b:=2;");
+         addLine(script, "switch   [");// set local variable, a,
+         addLine(script, "   if[a+b < 0][a:=-2;];");
+        addLine(script, "   if[a*b < 0][a:=0;];");
+        addLine(script, "   if[a-b > 0][a:=-3;];");
+         addLine(script, "];");
+         addLine(script, "ok := a == 0;");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
+
+    /**
+     * Same as {@link #testSwitch0()}, just change the order of the conditionals
+     * @throws Throwable
+     */
+    public void testSwitch2() throws Throwable{
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a := -1;b:=2;");
+         addLine(script, "switch   [");// set local variable, a,
+        addLine(script, "   if[a*b < 0][a:=0;];");
+        addLine(script, "   if[a-b > 0][a:=-3;];");
+        addLine(script, "   if[a+b < 0][a:=-2;];");
+         addLine(script, "];");
+         addLine(script, "ok := a == 0;");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
+
 }
