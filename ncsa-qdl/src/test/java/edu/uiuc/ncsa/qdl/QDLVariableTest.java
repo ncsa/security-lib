@@ -59,6 +59,10 @@ public class QDLVariableTest extends AbstractQDLTester {
         assert state.getValue("foo.i").equals(value);
     }
 
+    /**
+     * This tests that remove via the state object works.
+     * @throws Exception
+     */
     @Test
     public void testRemove() throws Exception {
         State state = testUtils.getNewState();
@@ -215,4 +219,60 @@ public class QDLVariableTest extends AbstractQDLTester {
         assert getBooleanValue("ok0", state) : "is_defined failed for a stem";
         assert getBooleanValue("ok1", state) : "is_defined failed for a scalar variable";
     }
+    public void testRemoveVariable() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 1;");
+        addLine(script, "remove(a);");
+        addLine(script, "ok := !is_defined(a);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Did not remove a scalar variable";
+    }
+    public void testRemoveStem() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [;5];");
+        addLine(script, "remove(a.);");
+        addLine(script, "ok := !is_defined(a.);"); // should handle both cases of trailing . or not
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Did not remove a stem variable";
+    }
+
+    public void testRemoveStemEntry() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := [;5];");
+        addLine(script, "remove(a.2);");
+        addLine(script, "ok := !is_defined(a.2);"); // should handle both cases of trailing . or not
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Did not remove a stem entry";
+    }
+
+    public void testRemoveStemEntry2() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(4,5);");
+        addLine(script, "remove(a.2.3);");
+        addLine(script, "ok := !is_defined(a.2.3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Did not remove a stem entry";
+    }
+    public void testRemoveVariables() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 1;");
+        addLine(script, "a. := [;6];");
+        addLine(script, "remove(a);");
+        addLine(script, "ok0 := !is_defined(a);");
+        addLine(script, "ok1 := is_defined(a.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : "Did not remove a scalar variable";
+        assert getBooleanValue("ok1", state) : "removed stem by accident";
+    }
+
 }

@@ -266,4 +266,45 @@ public class StatementTest extends AbstractQDLTester {
          assert getBooleanValue("ok", state);
      }
 
+    /**
+     * how to do a default case for a switch in QDL: Since the statements are evaluated in order, just
+     * have the last one as if[true]. This test shows that if an earlier one works, then that is chosen.
+     * @throws Throwable
+     */
+    public void testSwitchDefault() throws Throwable{
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "a := -1;b:=2;");
+          addLine(script, "switch   [");// set local variable, a,
+          addLine(script, "   if[a*b < 0][a:=-4;];");
+          addLine(script, "   if[a-b > 0][a:=-3;];");
+          addLine(script, "   if[a+b == 0][a:=-2;];");
+          addLine(script, "   if[true][a:=0;];");  // default case, not used
+          addLine(script, "];");
+          addLine(script, "ok := a == -4;");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          interpreter.execute(script.toString());
+          assert getBooleanValue("ok", state);
+      }
+
+    /**
+     * How to do a default case for a switch in QDL part 2:  This test shows that
+     * the default is use if all the others fail.
+     * @throws Throwable
+     */
+    public void testSwitchDefault1() throws Throwable{
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "a := -1;b:=2;");
+          addLine(script, "switch   [");// set local variable, a,
+          addLine(script, "   if[a*b > 0][a:=-4;];");
+          addLine(script, "   if[a-b > 0][a:=-3;];");
+          addLine(script, "   if[a+b == 0][a:=-2;];");
+          addLine(script, "   if[true][a:=0;];"); // default case used
+          addLine(script, "];");
+          addLine(script, "ok := a == 0;");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          interpreter.execute(script.toString());
+          assert getBooleanValue("ok", state);
+      }
 }

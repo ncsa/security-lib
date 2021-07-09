@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
+import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionDefinitionStatement;
@@ -1230,6 +1231,9 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
+        if(tcContext.getChildCount() == 2){
+            throw new ParsingException("missing catch clause");
+        }
         tryCatch.setSourceCode(getSource(tcContext));
         // new in 1.4 -- much simpler handling here because of parser rewrite.
         QDLParserParser.StatementBlockContext statementBlockContext = tcContext.statementBlock(0);

@@ -1483,9 +1483,34 @@ public class StemVariable extends HashMap<String, Object> {
 
     }
 
-    public IndexList newGet(IndexList indexList) {
-                                        return newGet(indexList, true);
+    public boolean remove(IndexList indexList) {
+        StemVariable currentStem = this;
+        for (int i = 0; i < indexList.size() - 1; i++) {
+            String name = indexList.get(i) + STEM_INDEX_MARKER;
+            StemVariable nextStem = (StemVariable) currentStem.get(name);
+            if (nextStem == null) {
+                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"");
+            }
+            currentStem = nextStem;
+        }
+        // for last one. May be a variable or a stem
+                  Object lastIndex = indexList.get(indexList.size()-1);
+        switch (Constant.getType(lastIndex)){
+            case Constant.LONG_TYPE:
+                currentStem.remove((Long)lastIndex);
+                return true;
+            case Constant.STRING_TYPE:
+                currentStem.remove((String) lastIndex);
+                return true;
+
+        }
+        return false;
     }
+
+    public IndexList newGet(IndexList indexList) {
+        return newGet(indexList, true);
+    }
+
     public IndexList newGet(IndexList indexList, boolean strictMatching) {
         if (indexList.get(indexList.size() - 1) instanceof StemVariable) {
             StemVariable ndx = (StemVariable) indexList.get(indexList.size() - 1);
@@ -1530,7 +1555,7 @@ public class StemVariable extends HashMap<String, Object> {
             if (obj instanceof StemVariable) {
                 currentStem = (StemVariable) obj;
             } else {
-                if(strictMatching && i != indexList.size()-1){
+                if (strictMatching && i != indexList.size() - 1) {
                     throw new IndexError("error:  scalars do not have indices.");
                 }
                 rc.add(obj); // 0th entry is returned value

@@ -180,14 +180,7 @@ public class ESN2 extends ExpressionImpl {
 
                 }
             }
-
-/*            if (rightArgs.get(i) instanceof VariableNode) {
-                if (obj == null) {
-                    obj = ((VariableNode) rightArgs.get(i)).getVariableReference();
-                }
-            }
-
- */
+            
             if (obj == null) {
                 VariableNode vNode = null;
                 StatementWithResultInterface x;
@@ -231,7 +224,31 @@ public class ESN2 extends ExpressionImpl {
         leftArgs.add(swri);
         Collections.reverse(rightArgs);
     }
+     public boolean remove(State state){
+         ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
+         ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();
+         linearizeTree(leftArgs, rightArgs);
+         // Evaluation pass. Make sure everything resolves w.r.t. the state
+         IndexList indexList = getIndexList(state, rightArgs);
 
+         // Made it this far. Now we need to do this again, but handing off indices
+         // to the stem as needed.
+         whittleIndices(indexList);
+         StemVariable stemVariable = null;
+         boolean gotOne = false;
+         StatementWithResultInterface realLeftArg = leftArgs.get(leftArgs.size() - 1);
+         Object arg0 = realLeftArg.evaluate(state);
+         if(arg0 instanceof StemVariable){
+             StemVariable arg = (StemVariable) arg0;
+             try {
+                 return arg.remove(indexList);
+             }catch(IndexError indexError){
+                 // means they want something removed that is not there. Peachy
+                 return true; 
+             }
+         }
+         return false;
+     }
     public void set(State state, Object newValue) {
         ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
         ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();

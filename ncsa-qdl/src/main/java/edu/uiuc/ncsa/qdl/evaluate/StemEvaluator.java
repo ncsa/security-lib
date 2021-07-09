@@ -1952,27 +1952,43 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException(REMOVE + " requires 1 argument");
         }
-        polyad.evalArg(0, state);
+        try {
+            polyad.evalArg(0, state);
+        }catch(IndexError indexError){
+            // it is possible that the user is trying to grab something impossible
+            polyad.setEvaluated(true);
+            polyad.setResult(Boolean.TRUE);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            return;
+        }
         String var = null;
         if (polyad.getArguments().get(0) instanceof VariableNode) {
             VariableNode variableNode = (VariableNode) polyad.getArguments().get(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
             // if the name is defined.
             var = variableNode.getVariableReference();
+            if (var == null) {
+                 polyad.setResult(Boolean.FALSE);
+             } else {
+                 state.remove(var);
+                 polyad.setResult(Boolean.TRUE);
+             }
         }
         if (polyad.getArguments().get(0) instanceof ConstantNode) {
-            ConstantNode variableNode = (ConstantNode) polyad.getArguments().get(0);
-            Object x = variableNode.getResult();
+            throw new IllegalArgumentException("error: cannot remove a constant");
+/*
+            ConstantNode constantNode = (ConstantNode) polyad.getArguments().get(0);
+            Object x = constantNode.getResult();
             if (x != null) {
                 var = x.toString();
             }
+*/
         }
-        if (var == null) {
-            polyad.setResult(Boolean.FALSE);
-        } else {
-            state.remove(var);
-            polyad.setResult(Boolean.TRUE);
+        if(polyad.getArguments().get(0) instanceof ESN2){
+            ESN2 esn2 = (ESN2) polyad.getArguments().get(0);
+            polyad.setResult(esn2.remove(state));
         }
+
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
