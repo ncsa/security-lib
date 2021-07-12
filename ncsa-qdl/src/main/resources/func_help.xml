@@ -1803,6 +1803,7 @@ See ⟧, slice
                 <![CDATA[
 Unicode \u2192 which is a left arrow used in defining lambdas.
 Equivalent to: ->
+See also: ->
                 ]]>
             </body>
         </entry>
@@ -2119,6 +2120,201 @@ E.g.
             <body>
                 <![CDATA[
 The current version of QDL is 1.3-QDL-SNAPSHOT
+                ]]>
+            </body>
+        </entry>
+    <entry id="if">
+                <body>
+                    <![CDATA[
+Keyword.
+Denotes a conditional statement:
+Basic conditional
+   if[ boolean ][ (statement;)*];
+Conditional with an else clause
+   if[ boolean ][ (statement;)*]else[ (statement;)*];
+
+See also: then, else, ?
+                    ]]>
+                </body>
+            </entry>
+    <entry id="?">
+                <body>
+                    <![CDATA[
+Used in the ternary operator
+   boolean ? expression0 : expression1
+If boolean is true, then expression 0 is evaluated and returned. Otherwise
+expression1 is used.
+
+    user_name := script_args() == 2 ? script_args(1) : 'guest';
+
+These may be used like any other algebraic expression, where the if conditional
+cannot be.
+See also: if, then, else
+                    ]]>
+                </body>
+            </entry>
+    <entry id="then">
+                <body>
+                    <![CDATA[
+Keyword.
+Optional connector in conditional statements. It may be ommitted or not.
+These are equivalent
+   if[2 < 3][say('foo');];
+   if[2 < 3]then[say('foo');];
+You may have space around the then keyword.
+See also: if, else, ?
+                    ]]>
+                </body>
+            </entry>
+    <entry id="else">
+            <body>
+                <![CDATA[
+Keyword.
+This is used in conditional statements. It is optional in the sense that
+not every conditional needs one, but if you do, it must be included, unlike
+the then keyword.
+   if[2<4][say('then');]else[say('else');];
+See also: if, then, ?
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="while">
+            <body>
+                <![CDATA[
+Keyword.
+This is used for QDL's looping  construction:
+   while[ boolean ][(statement;)*];
+or with the optional do keyword
+   while[ boolean ]do[(statement;)*];
+See also: do, for_next, for_keys, return
+                ]]>
+            </body>
+        </entry>
+    <entry id="do">
+            <body>
+                <![CDATA[
+Keyword
+Optional connector in while loops.
+See also: while
+                ]]>
+            </body>
+        </entry>
+    <entry id="module">
+            <body>
+                <![CDATA[
+Keyword.
+This is for the QDLs modules which are self-contained units of code:
+module[uri, alias
+  ][
+  >> General comments
+  (statement;)*
+];
+To see the general comments for a module in the workspace type
+   )modules uri|alias -help
+
+See also: body, module_load, module_import.
+                ]]>
+            </body>
+        </entry>
+    <entry id="body">
+            <body>
+                <![CDATA[
+Keyword.
+Optional keyword connecting clauses in define and module statements.
+E.g.
+   define[f(x)][...
+   define[f(x)]body[...
+See also: define, ->
+                ]]>
+            </body>
+        </entry>
+    <entry id="->">
+            <body>
+                <![CDATA[
+Lambda function definition. A lambda function a user defined function:
+   f(x)->cos(x);
+would create a new function called f(x) which would evaluate the cosine
+and automatically return it.
+For multiple expressions, use [ ] and there is no automatic return:
+   f(x)->[y:= x/2;return(cos(y));];
+See also: define
+                ]]>
+            </body>
+        </entry>
+    <entry id="keywords">
+            <body>
+                <![CDATA[
+The reserved keywords in QDL are
+
+true    if     while   try     module   define   block
+false   then   do      catch   body
+null    else
+
+You may use the help facility for any of these.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="try">
+            <body>
+                <![CDATA[
+Keyword
+try denotes the QDLs exception handling statement.
+
+   try[(statement;)*]catch[(statement;)*];
+
+Note that the catch keyword is not optional. In this case, the statements in
+the try[ ... ] block are done and only if there is an error, the statements
+in the catch[ ... ] block are done.
+
+   try[1/0;]catch[say('oops!');]
+oops!
+                ]]>
+            </body>
+        </entry>
+    <entry id="catch">
+            <body>
+                <![CDATA[
+Keyword
+Used as part of the try[ ... ] catch[ ... ] statement.
+See also: try
+                ]]>
+            </body>
+        </entry>
+    <entry id="true">
+            <body>
+                <![CDATA[
+Keyword
+Logical true.
+See also: false
+                ]]>
+            </body>
+        </entry>
+    <entry id="false">
+            <body>
+                <![CDATA[
+Keyword
+Logical false
+See also: true
+                ]]>
+            </body>
+        </entry>
+    <entry id="null">
+            <body>
+                <![CDATA[
+Keyword
+The null, (or unicode 2205, ∅) a special value that denotes that
+no definite value has been assigned yet.
+A common use is to define a variable to null to put it
+in the correct scope for subsequent operations:
+   a := null;
+   if[2 < 3][a :=0;]else[a:=1;]
+   a
+0
+Had a not been set to null first, then it would have only existed inside
+the conditional and attempts to access it would result in an error.
+See also: is_defined
                 ]]>
             </body>
         </entry>

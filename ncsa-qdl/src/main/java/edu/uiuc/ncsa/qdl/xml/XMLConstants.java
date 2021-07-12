@@ -27,6 +27,7 @@ public interface XMLConstants {
     String WS_ENV_TAG = "env";
     String ENV_FILE = "env_file";
     String PRETTY_PRINT = "pretty_print";
+    String BUFFER_DEFAULT_SAVE_PATH = "buffer_default_save_path";
     String ECHO_MODE = "echo_mode";
     String DEBUG_MODE = "debug_mode";
     String AUTOSAVE_ON = "autosave_on";
@@ -74,8 +75,11 @@ public interface XMLConstants {
     String BUFFER_RECORDS = "records";
     String BUFFER_RECORD = "record";
     String BR_SOURCE = "src";
+    String BR_SOURCE_SAVE_PATH = "src_save_path";
     String BR_LINK = "link";
+    String BR_LINK_SAVE_PATH = "link_save_path";
     String BR_EDITED = "edited";
+    String BR_MEMORY_ONLY = "memory_only";
     String BR_DELETED = "deleted";
     String BR_CONTENT = "content";
 }

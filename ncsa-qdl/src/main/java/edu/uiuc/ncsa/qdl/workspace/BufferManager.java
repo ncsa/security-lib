@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
@@ -17,6 +18,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
+import java.io.File;
 import java.io.Serializable;
 import java.util.*;
 
@@ -36,6 +38,9 @@ public class BufferManager implements Serializable {
         boolean edited = false;
         boolean deleted = false;
         List<String> content = null;
+        boolean memoryOnly = false;
+        String srcSavePath = null;
+        String linkSavePath = null;
 
 
         public List<String> getContent() {
@@ -72,6 +77,13 @@ public class BufferManager implements Serializable {
             }
             xsw.writeAttribute(BR_EDITED, Boolean.toString(edited));
             xsw.writeAttribute(BR_DELETED, Boolean.toString(deleted));
+            xsw.writeAttribute(BR_MEMORY_ONLY, Boolean.toString(memoryOnly));
+            if(srcSavePath != null){
+                xsw.writeAttribute(BR_SOURCE_SAVE_PATH, srcSavePath);
+            }
+            if(linkSavePath != null){
+                xsw.writeAttribute(BR_LINK_SAVE_PATH, linkSavePath);
+            }
             if (content != null && !content.isEmpty()) {
                 xsw.writeStartElement(BR_CONTENT);
                 StemVariable s = new StemVariable();
@@ -93,14 +105,23 @@ public class BufferManager implements Serializable {
                     case BR_SOURCE:
                         src = v;
                         break;
+                    case BR_SOURCE_SAVE_PATH:
+                        srcSavePath = v;
+                        break;
                     case BR_LINK:
                         link = v;
+                        break;
+                    case BR_LINK_SAVE_PATH:
+                        linkSavePath = v;
                         break;
                     case BR_DELETED:
                         deleted = Boolean.parseBoolean(v);
                         break;
                     case BR_EDITED:
                         edited = Boolean.parseBoolean(v);
+                        break;
+                    case BR_MEMORY_ONLY:
+                        memoryOnly = Boolean.parseBoolean(v);
                         break;
                 }
 
@@ -252,21 +273,48 @@ public class BufferManager implements Serializable {
         if (currentBR == null) {
             return null;
         }
-        String f = useSource ? currentBR.src : currentBR.link;
+
+        String f = useSource ? currentBR.srcSavePath : currentBR.linkSavePath;
         return readFile(f);
     }
 
+    /**
+     *
+     * @param parent
+     * @param name
+     * @return
+     */
+    protected String figureOutSavePath(String parent, String name) {
+        // Figure it out.
+        if (name.contains(VFSPaths.SCHEME_DELIMITER)) {
+            // so its in a VFS and its absolute
+            return name;
+        }
+        if (parent.contains(VFSPaths.SCHEME_DELIMITER)) {
+            return parent + name;
+        }
+
+        // it's a regular file
+        File targetForSave = new File(name);
+        if (!targetForSave.isAbsolute()) {
+            // resolve it against the parent
+            return (new File(parent, name)).getAbsolutePath();
+        } else {
+            return targetForSave.getAbsolutePath();
+        }
+    }
 
     public boolean write(BufferRecord currentBR) {
         //BufferRecord currentBR = getBufferRecord(index);
         if (currentBR == null) {
             return false;
         }
+
+
         if (currentBR.isLink()) {
-            // so this is a link but there is nothing in the buffer
-            // copy the link to the source
-            String readIt = IOEvaluator.READ_FILE + "('" + currentBR.link + "')";
-            String raw = IOEvaluator.WRITE_FILE + "('" + currentBR.src + "'," + readIt + ");";
+            // save br.link to br.src
+            String readIt = IOEvaluator.READ_FILE + "('" + currentBR.linkSavePath + "')";
+            String raw = IOEvaluator.WRITE_FILE + "('" + currentBR.srcSavePath + "'," + readIt + ");";
             try {
                 QDLInterpreter parser = new QDLInterpreter(getState());
                 parser.setEchoModeOn(false);// no output
@@ -279,12 +327,14 @@ public class BufferManager implements Serializable {
         }
 
         if (currentBR.edited) {
+            // Some save logic first
+            File f = new File(currentBR.src);
             Polyad request = new Polyad(IOEvaluator.WRITE_FILE);
             StemVariable stemVariable = new StemVariable();
             List<Object> castList = new LinkedList<>();
             castList.addAll(currentBR.getContent());
             stemVariable.addList(castList);
-            request.addArgument(new ConstantNode(currentBR.src, Constant.STRING_TYPE));
+            request.addArgument(new ConstantNode(currentBR.srcSavePath, Constant.STRING_TYPE));
             request.addArgument(new ConstantNode(stemVariable, Constant.STEM_TYPE));
             request.addArgument(new ConstantNode(Boolean.FALSE, Constant.BOOLEAN_TYPE)); // or its will be treated as binary
             getState().getMetaEvaluator().evaluate(request, getState());
@@ -320,49 +370,50 @@ public class BufferManager implements Serializable {
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
-           switch(xe.getEventType()){
-               case XMLEvent.START_ELEMENT:
-                   if(xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORDS)){
-                       doBRecs(xer);
-                   }
-                   break;
-               case XMLEvent.END_ELEMENT:
-                   if(xe.asEndElement().getName().getLocalPart().equals(BUFFER_MANAGER)){
-                       return;
-                   }
-                   break;
-           }
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    if (xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORDS)) {
+                        doBRecs(xer);
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(BUFFER_MANAGER)) {
+                        return;
+                    }
+                    break;
+            }
             xer.next();
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + BUFFER_MANAGER);
 
     }
 
-    protected void doBRecs(XMLEventReader xer) throws XMLStreamException{
+    protected void doBRecs(XMLEventReader xer) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
-           switch(xe.getEventType()) {
-               case XMLEvent.START_ELEMENT:
-                   if(xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORD)){
-                       BufferRecord br = new BufferRecord();
-                       br.fromXML(xer);
-                       bufferRecords.add(br);
-                       brMap.put(br.src, br);
-                   }
-                   break;
-               case XMLEvent.END_ELEMENT:
-                   if(xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORDS)){
-                       return;
-                   }
-                   break;
-           }
-           xer.next();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    if (xe.asStartElement().getName().getLocalPart().equals(BUFFER_RECORD)) {
+                        BufferRecord br = new BufferRecord();
+                        br.fromXML(xer);
+                        bufferRecords.add(br);
+                        brMap.put(br.src, br);
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORDS)) {
+                        return;
+                    }
+                    break;
+            }
+            xer.next();
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + BUFFER_RECORDS);
 
     }
-    public boolean isEmpty(){
+
+    public boolean isEmpty() {
         return bufferRecords.isEmpty();
     }
 }

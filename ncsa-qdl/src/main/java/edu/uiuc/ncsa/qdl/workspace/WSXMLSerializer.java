@@ -52,6 +52,7 @@ public class WSXMLSerializer {
         xsw.writeComment(comment);
         xsw.writeStartElement(WS_ENV_TAG);
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
+        xsw.writeAttribute(BUFFER_DEFAULT_SAVE_PATH, workspaceCommands.getBufferDefaultSavePath());
         xsw.writeAttribute(ECHO_MODE, Boolean.toString(workspaceCommands.echoModeOn));
         xsw.writeAttribute(DEBUG_MODE, Boolean.toString(workspaceCommands.debugOn));
         xsw.writeAttribute(AUTOSAVE_ON, Boolean.toString(workspaceCommands.isAutosaveOn()));
@@ -117,7 +118,9 @@ public class WSXMLSerializer {
 
         xsw.writeEndElement(); // end WS env
         if (workspaceCommands.bufferManager != null && !workspaceCommands.bufferManager.isEmpty()) {
+            xsw.writeStartElement(BUFFER_MANAGER);
             workspaceCommands.bufferManager.toXML(xsw);
+            xsw.writeEndElement();
         }
 
         List<String> ch = workspaceCommands.commandHistory;
@@ -242,7 +245,6 @@ public class WSXMLSerializer {
                                 break;
                             case BUFFER_MANAGER:
                                 if (!workspaceAttributesOnly) {
-
                                     testCommands.bufferManager = new BufferManager();
                                     testCommands.bufferManager.fromXML(xer);
                                 }
@@ -390,6 +392,9 @@ public class WSXMLSerializer {
             switch (a.getName().getLocalPart()) {
                 case PRETTY_PRINT:
                     testCommands.setPrettyPrint(Boolean.parseBoolean(v));
+                    break;
+                case BUFFER_DEFAULT_SAVE_PATH:
+                    testCommands.bufferDefaultSavePath = v;
                     break;
                 case AUTOSAVE_INTERVAL:
                     if(v!= null) {

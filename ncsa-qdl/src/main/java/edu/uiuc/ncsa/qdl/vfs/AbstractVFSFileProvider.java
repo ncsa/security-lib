@@ -135,7 +135,7 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
      * @param path
      * @return
      */
-    static boolean isAbsolute(String path) {
+   public static boolean isAbsolute(String path) {
         return getUnqPath(path).startsWith(VFSPaths.PATH_SEPARATOR);
     }
     /**

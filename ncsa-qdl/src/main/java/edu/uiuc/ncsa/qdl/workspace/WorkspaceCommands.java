@@ -28,6 +28,7 @@ import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.vfs.AbstractVFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
@@ -670,17 +671,21 @@ public class WorkspaceCommands implements Logable {
             case "--help":
                 say("buffer commands:");
                 say("# refers to the buffer number");
-                sayi("create - create a new buffer.");
+                sayi("create [" + BUFFER_IN_MEMORY_ONLY_SWITCH + "] - create a new buffer.");
                 sayi("check # - run the buffer through the parser and check for syntax errors. Do not execute.");
                 sayi("delete or rm #- delete the buffer. This does not delete the file.");
                 sayi("edit # - Start the built-in line editor and load the given buffer ");
-                sayi("link target source - create a link for given target to the source");
+                sayi("link target source - create a link for given target to the source. Link will be copied to source on save.");
                 sayi("ls or list - display all the active buffers and their numbers");
+                sayi("path [new_path] - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
+                say("reload # - reload the buffer from disk.");
                 sayi("reset - deletes all buffers and sets the start number to zero. This clears the buffer state.");
                 sayi("run # [&] -  Run the buffer. If & is there, do it in its own environment");
                 sayi("show # - identical to ls. ");
                 sayi("write or save # - save the buffer. If linked, source is copied to target.");
                 return RC_NO_OP;
+            case "reload":
+                return _doBufferReload(inputLine);
             case "create":
                 return _doBufferCreate(inputLine);
             case "check":
@@ -701,6 +706,8 @@ public class WorkspaceCommands implements Logable {
                 return _doBufferRun(inputLine);
             case "show":
                 return _doBufferShow(inputLine);
+            case "path":
+                return _doBufferPath(inputLine);
             case "write":
             case "save":
                 return _doBufferWrite(inputLine);
@@ -709,6 +716,100 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
         }
 
+    }
+
+    private int _doBufferReload(InputLine inputLine) {
+        BufferManager.BufferRecord br = getBR(inputLine);
+        if (br == null) {
+            say("buffer not found");
+            return RC_NO_OP;
+        }
+        if(br.memoryOnly){
+            return RC_NO_OP;
+        }
+        if (br.isLink()) {
+            br.setContent(bufferManager.readFile(br.linkSavePath));
+        } else {
+            br.setContent(bufferManager.readFile(br.srcSavePath));
+        }
+        say("done");
+        return RC_CONTINUE;
+    }
+
+    public String getBufferDefaultSavePath() {
+        if (bufferDefaultSavePath == null) {
+            bufferDefaultSavePath = getTempDir().getAbsolutePath();
+            if (!bufferDefaultSavePath.endsWith("/")) {
+                bufferDefaultSavePath = bufferDefaultSavePath + "/";
+            }
+        }
+        return bufferDefaultSavePath;
+    }
+
+    String bufferDefaultSavePath = null;
+
+    private int _doBufferPath(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("path [new_path]");
+            say("(no arg) - show the current default path for saving buffers. This is used ");
+            say("           in the case that the buffer is not an absolute path.");
+            say("new_path - sets the current path.");
+            return RC_NO_OP;
+        }
+        if (1 == inputLine.getArgCount()) { // zeroth arg is "path" which got us here. Args start at index 1;
+            say("current default save path for relative buffers is " + getBufferDefaultSavePath());
+            return RC_CONTINUE;
+        }
+        String newPath = inputLine.getLastArg();
+        if (newPath.contains(SCHEME_DELIMITER)) {
+            // its a VFS entry
+            try {
+                AbstractVFSFileProvider vfs = (AbstractVFSFileProvider) getState().getVFS(newPath);
+                if (vfs == null) {
+                    say("\"" + newPath + "\" is not a mounted VFS. Please mount it first.");
+                    return RC_NO_OP;
+
+                }
+                if (!AbstractVFSFileProvider.isAbsolute(newPath)) {
+                    say("\"" + newPath + "\" must not be relative");
+                    return RC_NO_OP;
+                }
+                if (!vfs.canWrite()) {
+                    say("sorry but you do not have permission to write to \"" + newPath + "\".");
+                    return RC_NO_OP;
+                }
+                if (vfs.get(newPath) != null) {
+                    say("sorry but \"" + newPath + "\" is a file.");
+                    return RC_NO_OP;
+                }
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        } else {
+            File f = new File(newPath);
+            if (!f.isAbsolute()) {
+                say("\"" + f.getAbsolutePath() + "\" must not be relative");
+                return RC_NO_OP;
+
+            }
+            if (f.isFile()) {
+                say("sorry but \"" + f.getAbsolutePath() + "\" is a file.");
+                return RC_NO_OP;
+            }
+            if (!f.canWrite()) {
+                say("sorry but you do not have permission to write to \"" + f.getAbsolutePath() + "\".");
+                return RC_NO_OP;
+            }
+            if (!f.exists()) {
+                say("warning. \"" + f.getAbsolutePath() + "\" does not exist. You should create it before saving.");
+            }
+            // just in case the OS does something to the path (like there are embedded .. that it resolves).
+            newPath = f.getAbsolutePath();
+        }
+        String oldPath = getBufferDefaultSavePath();
+        bufferDefaultSavePath = newPath;
+        say("new default buffer save path is \"" + newPath + "\", was \"" + oldPath + "\"");
+        return RC_CONTINUE;
     }
 
     private int _doBufferCheck(InputLine inputLine) {
@@ -899,12 +1000,17 @@ public class WorkspaceCommands implements Logable {
             sayi("Write (aka save) the buffer. If there is a link, the target is written to the source.");
             return RC_NO_OP;
         }
-
+        // If it is a link, br.link is read and written to br.src
         BufferManager.BufferRecord br = getBR(inputLine);
         if (br == null || br.deleted) {
             say("buffer not found");
             return RC_NO_OP;
         }
+        if (br.memoryOnly) {
+            say("buffer is in-memory only");
+            return RC_NO_OP;
+        }
+
         boolean ok = bufferManager.write(br);
         if (ok) {
             say("done");
@@ -1015,9 +1121,13 @@ public class WorkspaceCommands implements Logable {
         if (br.hasContent()) {
             content = br.getContent();
         } else {
-            String fName = br.isLink() ? br.link : br.src;
+            String fName = br.isLink() ? br.linkSavePath : br.srcSavePath;
             try {
-                content = bufferManager.readFile(fName);
+                if (br.memoryOnly) {
+                    content = br.getContent();
+                } else {
+                    content = bufferManager.readFile(fName);
+                }
             } catch (QDLException q) {
                 getState().info("no file " + fName + " found, creating new one.");
                 content = new ArrayList<>();
@@ -1110,8 +1220,13 @@ public class WorkspaceCommands implements Logable {
             }
             tempFile.deleteOnExit();
             FileWriter fw = new FileWriter(tempFile);
-            for (String x : content) {
-                fw.write(x + "\n");
+            if(content == null){
+                fw.write(""); // create empty file
+            }
+            else {
+                for (String x : content) {
+                    fw.write(x + "\n");
+                }
             }
             fw.flush();
             fw.close();
@@ -1351,6 +1466,9 @@ public class WorkspaceCommands implements Logable {
         String saved = (br.isLink() ? "?" : "") + (br.hasContent() ? "*" : " ");
 
         String a = BUFFER_RECORD_SEPARATOR + saved + BUFFER_RECORD_SEPARATOR;
+        if (br.memoryOnly) {
+            a = a + "m" + BUFFER_RECORD_SEPARATOR;
+        }
         return ndx + a + br;
     }
 
@@ -1375,7 +1493,10 @@ public class WorkspaceCommands implements Logable {
             target = inputLine.getArg(FIRST_ARG_INDEX + 1);
         }
         int ndx = bufferManager.link(source, target);
+
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
+        br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+        br.linkSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.link);
         say(formatBufferRecord(ndx, br));
 
         if (inputLine.hasArg("-copy")) {
@@ -1401,12 +1522,17 @@ public class WorkspaceCommands implements Logable {
         return false;
     }
 
+    protected static final String BUFFER_IN_MEMORY_ONLY_SWITCH = "-m";
+
     private int _doBufferCreate(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-            say("create path");
+            say("create path [" + BUFFER_IN_MEMORY_ONLY_SWITCH + "]");
             sayi("create a new buffer for the path.");
+            sayi(BUFFER_IN_MEMORY_ONLY_SWITCH + " (optional) set this to be an in-memory only buffer.");
             return RC_CONTINUE;
         }
+        boolean inMemoryOnly = inputLine.hasArg(BUFFER_IN_MEMORY_ONLY_SWITCH);
+        inputLine.removeSwitch(BUFFER_IN_MEMORY_ONLY_SWITCH);
         if (!inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             say("sorry, you must supply a file name.");
             return RC_CONTINUE;
@@ -1422,6 +1548,8 @@ public class WorkspaceCommands implements Logable {
         }
         int ndx = bufferManager.create(source);
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
+        br.memoryOnly = inMemoryOnly;
+        br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
         say(formatBufferRecord(ndx, br));
         return RC_CONTINUE;
     }
@@ -2227,7 +2355,7 @@ public class WorkspaceCommands implements Logable {
             }
             return printList(inputLine, treeSet);
         }
-        if(name.equals("-online")){
+        if (name.equals("-online")) {
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(onlineHelp.keySet());
             if (treeSet.isEmpty()) {
@@ -2508,7 +2636,7 @@ public class WorkspaceCommands implements Logable {
             Object obj = getWSVariable(s);
             allVars.put(s, obj);
         }
-       List<String> list = StringUtils.formatMap(allVars, null, true, true, 0, 72);
+        List<String> list = StringUtils.formatMap(allVars, null, true, true, 0, 72);
         for (String s : list) {
             say(s);
         }
@@ -2757,7 +2885,7 @@ public class WorkspaceCommands implements Logable {
 
             return RC_CONTINUE;
         }
- //       String fileName = null;
+        //       String fileName = null;
         File currentFile = null;
         boolean showOnlyFailures = inputLine.hasArg(SHOW_ONLY_FAILURES);
         boolean isVerbose = inputLine.hasArg(CLA_VERBOSE_ON); // print everything
@@ -2777,7 +2905,7 @@ public class WorkspaceCommands implements Logable {
         inputLine.removeSwitch(SHOW_ONLY_FAILURES);
         inputLine.removeSwitchAndValue(DISPLAY_WIDTH_SWITCH);
         Pattern pattern = null;
-     //   String regex = null;
+        //   String regex = null;
 
         FilenameFilter regexff = null;
         if (inputLine.hasArg(REGEX_SWITCH)) {
@@ -3522,44 +3650,68 @@ public class WorkspaceCommands implements Logable {
         String fName = null;
 
 
+        if (showFile) {
+            try {
+                long uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
+                say("size is " + uncompressedXMLSize);
+                return RC_CONTINUE;
+            } catch (Throwable throwable) {
+                say("warning. could not show file \"" + throwable.getMessage() + "\"");
+                return RC_NO_OP;
+            }
+
+        }
         try {
-            if (!showFile) {
-                if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
-                    fName = inputLine.getArg(FIRST_ARG_INDEX);
-                    // Figure out extension.
-                    if (!fName.contains(".")) {
-                        if (qdlDump) {
-                            fName = fName + DEFAULT_QDL_DUMP_FILE_EXTENSION;
-                        } else {
-                            if (doJava) {
-                                fName = fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION;
-                            } else {
-                                fName = fName + DEFAULT_XML_SAVE_FILE_EXTENSION;
-                            }
+
+            if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
+                fName = inputLine.getArg(FIRST_ARG_INDEX);
+                try {
+                    int index = Integer.parseInt(fName);
+                    if (bufferManager.hasBR(index)) {
+                        say("warning: There is a buffer \"" + index + "\". If you want to save that, then use the buffer save command.");
+                        if (!readline("save as workspace? (y/n)").equals("y")) {
+                            say("ok. aborting save.");
+                            return RC_NO_OP;
                         }
                     }
-                    target = new File(fName);
-                } else {
-                    if (currentWorkspace == null) {
-                        say("sorry, no default file set.");
-                        return RC_NO_OP;
-                    } else {
-                        target = currentWorkspace;
-                    }
-                }
-                if (!target.isAbsolute()) {
-                    if (saveDir == null) {
-                        target = new File(rootDir, fName);
-                    } else {
-                        target = new File(saveDir, fName);
-                    }
-                }
-                if (target.exists() && target.isDirectory()) {
-                    say("sorry, but " + target.getAbsolutePath() + " is not a directory.");
-                    return RC_NO_OP;
-                }
 
+                } catch (NumberFormatException nfx) {
+                    // rock on
+                }
+                // Figure out extension.
+                if (!fName.contains(".")) {
+                    if (qdlDump) {
+                        fName = fName + DEFAULT_QDL_DUMP_FILE_EXTENSION;
+                    } else {
+                        if (doJava) {
+                            fName = fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION;
+                        } else {
+                            fName = fName + DEFAULT_XML_SAVE_FILE_EXTENSION;
+                        }
+                    }
+                }
+                target = new File(fName);
+            } else {
+                if (currentWorkspace == null) {
+                    say("sorry, no default file set.");
+                    return RC_NO_OP;
+                } else {
+                    target = currentWorkspace;
+                }
             }
+            if (!target.isAbsolute()) {
+                if (saveDir == null) {
+                    target = new File(rootDir, fName);
+                } else {
+                    target = new File(saveDir, fName);
+                }
+            }
+            if (target.exists() && target.isDirectory()) {
+                say("sorry, but " + target.getAbsolutePath() + " is not a directory.");
+                return RC_NO_OP;
+            }
+
+
             if (qdlDump || target.getAbsolutePath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)) {
                 _doQDLDump(target);
                 say("dumped " + target.length() + " bytes to \"" + target.getAbsolutePath() + "\"");
@@ -3571,19 +3723,14 @@ public class WorkspaceCommands implements Logable {
             } else {
                 uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
             }
-            if (!showFile) {
-                String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
-                if (!silentMode) {
-                    say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
-                }
-                if (!keepCurrentWS) {
-                    currentWorkspace = target;
-                }
-            } else {
-                if (!silentMode) {
-                    say(uncompressedXMLSize + " bytes.");
-                }
+            String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
+            if (!silentMode) {
+                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
             }
+            if (!keepCurrentWS) {
+                currentWorkspace = target;
+            }
+
         } catch (Throwable t) {
             logger.error("could not save workspace.", t);
             say("could not save the workspace:" + t.getMessage());
@@ -4672,6 +4819,7 @@ public class WorkspaceCommands implements Logable {
             setPrettyPrint(newCommands.isPrettyPrint());
             state.createSystemInfo(null);
             state.createSystemConstants();
+
             currentPID = newCommands.currentPID;
             wsID = newCommands.wsID;
             description = newCommands.description;
@@ -4700,6 +4848,9 @@ public class WorkspaceCommands implements Logable {
             interpreter = new QDLInterpreter(env, newCommands.getState());
             interpreter.setEchoModeOn(newCommands.isEchoModeOn());
             interpreter.setPrettyPrint(newCommands.isPrettyPrint());
+            bufferManager = newCommands.bufferManager;
+            bufferManager.state = state;
+            bufferDefaultSavePath = newCommands.bufferDefaultSavePath;
             return true;
         } catch (Throwable t) {
             // This should return a nice message to display.
