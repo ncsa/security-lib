@@ -121,13 +121,13 @@ public class LineEditor extends AbstractEditor {
         say("This is the line editor. It operates per line. Each command is of the form");
         say("command [start,stop,target] arg0 arg1 arg2...");
         say("where ");
-        say("command is a command for the editor (list below). There are long and short forms");
+        say("command is a command for the editor (list below). There are long and short forms.");
         say("[start,stop,target] are line numbers hence integers.");
         say("    start = the starting index, always 0 or greater");
         say("    stop = the ending index. All operations are inclusive of this line number");
-        say("    target = where to apply the [start,stop] interval. E.g. the insertion point for copying text.");
-        say("arg0, arg1,... = list of strings, possibly in quotes if needed, that are arguments to the command.");
-        say("\nTo see help on a specific command, type ? after the command, e.g. to get help on the insert command type");
+        say("    target = where to apply the [start,stop] interval. E.g. the insertion point\nfor copying text.");
+        say("arg0, arg1,... = list of strings, possibly in quotes if needed, that are arguments\nto the command.");
+        say("\nTo see help on a specific command, type ? after the command, e.g. to get help on\nthe insert command type");
         say("i ?");
         say("List of commands");
         say(APPEND_COMMAND + " (" + APPEND_COMMAND_LONG + ") append text either before a given line or to the end of the buffer.");

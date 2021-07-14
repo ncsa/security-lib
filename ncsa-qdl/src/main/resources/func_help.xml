@@ -2042,6 +2042,7 @@ assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
     <entry id="block">
             <body>
                 <![CDATA[
+Keyword.
 block is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside the block is local only
 to that block.
@@ -2249,7 +2250,7 @@ The reserved keywords in QDL are
 
 true    if     while   try     module   define   block
 false   then   do      catch   body
-null    else
+null    else   assert
 
 You may use the help facility for any of these.
                 ]]>

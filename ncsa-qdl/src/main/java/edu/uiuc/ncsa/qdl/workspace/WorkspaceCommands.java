@@ -43,6 +43,7 @@ import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+import net.sf.json.JSONArray;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.w3c.dom.CharacterData;
@@ -675,7 +676,7 @@ public class WorkspaceCommands implements Logable {
                 sayi("check # - run the buffer through the parser and check for syntax errors. Do not execute.");
                 sayi("delete or rm #- delete the buffer. This does not delete the file.");
                 sayi("edit # - Start the built-in line editor and load the given buffer ");
-                sayi("link target source - create a link for given target to the source. Link will be copied to source on save.");
+                sayi("link source target - create a link for given source to the target. The target will be copied to source on save.");
                 sayi("ls or list - display all the active buffers and their numbers");
                 sayi("path [new_path] - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
                 say("reload # - reload the buffer from disk.");
@@ -724,7 +725,7 @@ public class WorkspaceCommands implements Logable {
             say("buffer not found");
             return RC_NO_OP;
         }
-        if(br.memoryOnly){
+        if (br.memoryOnly) {
             return RC_NO_OP;
         }
         if (br.isLink()) {
@@ -1220,10 +1221,9 @@ public class WorkspaceCommands implements Logable {
             }
             tempFile.deleteOnExit();
             FileWriter fw = new FileWriter(tempFile);
-            if(content == null){
+            if (content == null) {
                 fw.write(""); // create empty file
-            }
-            else {
+            } else {
                 for (String x : content) {
                     fw.write(x + "\n");
                 }
@@ -1476,6 +1476,9 @@ public class WorkspaceCommands implements Logable {
         if (_doHelp(inputLine)) {
             say("link source target [-copy]");
             sayi("Creates a link (for external editing) between source and target.");
+            sayi("A common pattern is that source is on a VFS and target is a local file that you edit");
+            sayi("Generally this is only needed if for some reason your editor cannot be configured to");
+            sayi("work as an external editor.");
             sayi("If the -copy flag is used, target will be overwritten. In subsequent commands, e.g. run, save this will resolve the link.");
             return RC_NO_OP;
         }
@@ -2245,28 +2248,49 @@ public class WorkspaceCommands implements Logable {
         String varName = inputLine.getLastArg();
         List<String> content = new ArrayList<>();
         boolean isDefined = getState().isDefined(varName);
-        //  isString = isDefined && (getState().getValue(varName) instanceof String);
+        boolean isStem = varName.endsWith(StemVariable.STEM_INDEX_MARKER);
         if (isDefined) {
             if (isText) {
-                String v = getState().getValue(varName).toString();
-                v.replace("\n", "\\n");
-                content = StringUtils.stringToList(v);
+                if (isStem) {
+                    // convert stem to list
+                    StemVariable v = (StemVariable) getState().getValue(varName);
+                    if (!v.isList()) {
+                        say("sorry, but only a list of strings can be edited as text");
+                        return RC_NO_OP;
+                    }
+                    JSONArray jsonArray = (JSONArray) v.toJSON();
+                    content = jsonArray;
+                } else {
+                    String v = getState().getValue(varName).toString();
+                    v.replace("\n", "\\n");
+                    content = StringUtils.stringToList(v);
+                }
 
             } else {
                 String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
                 content.add(inputForm);
             }
-        }
+        } 
 
         if (useExternalEditor()) {
             content = _doExternalEdit(content);
         } else {
             content = _doLineEditor(content);
         }
-        String newValue = StringUtils.listToString(content);
+
         if (isText) {
-            getState().setValue(varName, newValue);
+            if (isStem) {
+                StemVariable newStem = new StemVariable();
+                newStem.addList(content);
+                getState().setValue(varName, newStem);
+            } else {
+                String newValue = StringUtils.listToString(content);
+
+                getState().setValue(varName, newValue);
+            }
         } else {
+            String newValue = StringUtils.listToString(content);
+
             newValue = newValue.trim();
             if (!newValue.endsWith(";")) {
                 newValue = newValue + ";";

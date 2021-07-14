@@ -50,23 +50,29 @@ public interface RFC8628Constants {
     //char[] CODE_CHARS="0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz".toCharArray();
     // next has upper case vowels in it.
     //char[] CODE_CHARS="0123456789ABCDEFGHIJKLMNPQRSTUVWXYZ".toCharArray();
-    char[] CODE_CHARS = "0123456789BCDFGHJKLMNPQRSTVWXZ".toCharArray();
+    //char[] CODE_CHARS = "0123456789CDFGHJKLMNPQRTVWXZ".toCharArray();
+    // After a lot of discussions, this was decided upon. Might want this to be configurable???
+   char[] CODE_CHARS = "234679CDFGHJKLMNPQRTVWXZ".toCharArray();
 
     /**
-     * Number of bytes in a user code.
+     * Number of characters in a user code.
+     * So if this is 6, then a user code of ABC_DEF (6 actual characters, exclusive of separator)
+     * will be created. To be safe, 8*USER_CODE_DEFAULT_LENGTH is the number of bytes created,
+     * since how many we need is based on the number of CODE_CHARS and it gets murky fast how to
+     * exactly compute the number of bytes. T
      */
-    int USER_CODE_DEFAULT_LENGTH = 6;
+     int USER_CODE_DEFAULT_LENGTH = 9;
     /**
      * Used between sets of 4 characters in the user code for readability
      */
-    char USER_CODE_SEPERATOR_CHAR = '-';
+     char USER_CODE_SEPERATOR_CHAR = '-';
 
     /**
      * Number of milliseconds that we wait between calls to create a new user code.
      * Spec suggests 5 seconds.
      */
-    long DEFAULT_WAIT = 5000;
+     long DEFAULT_WAIT = 5000;
 
-    int userCodePeriodLength = 3;
+     int USER_CODE_PERIOD_LENGTH = 3;
 
 }
