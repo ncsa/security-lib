@@ -21,7 +21,7 @@ public interface OA2Scopes {
     /**
      * These are the basic scopes supported by the OA4MP OIDC protocol.
      */
-    String[] basicScopes = {SCOPE_EMAIL,SCOPE_OFFLINE_ACCESS,SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
+    String[] basicScopes = {SCOPE_EMAIL,SCOPE_MYPROXY, SCOPE_CILOGON_INFO, SCOPE_OPENID, SCOPE_PROFILE};
 
 
     /**

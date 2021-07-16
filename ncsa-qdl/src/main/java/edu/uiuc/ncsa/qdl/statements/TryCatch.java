@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class TryCatch implements Statement {
     public static final Long RESERVED_ERROR_CODE = -1L;
+
     @Override
     public Object evaluate(State state) {
         State localState = state.newStateWithImports();
@@ -26,13 +27,13 @@ public class TryCatch implements Statement {
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }
-        }catch(Throwable otherT){
+        } catch (Throwable otherT) {
             // everything else.
             localState.getSymbolStack().getLocalST().setStringValue("error_message", otherT.getMessage());
-                       localState.getSymbolStack().getLocalST().setLongValue("error_code", RESERVED_ERROR_CODE);
-                       for (Statement c : catchStatements) {
-                           c.evaluate(localState);
-                       }
+            localState.getSymbolStack().getLocalST().setLongValue("error_code", RESERVED_ERROR_CODE);
+            for (Statement c : catchStatements) {
+                c.evaluate(localState);
+            }
         }
         return null;
     }

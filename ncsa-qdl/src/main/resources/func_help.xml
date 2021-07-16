@@ -1034,7 +1034,36 @@ module_load(path, type) - load the module. If type is 'file' (default) then
 raise_error(message) - raises an error and propagates the message in to the
                        catch block
 raise_error(message, code) - add and option numeric code
-Note: This ONLY works inside a try[ ... ]catch[] block!
+Note: This ONLY works inside a try[ ... ]catch[] block
+
+Inside the catch block the message and code arguments are accsesible as
+error_message
+error_code
+
+The error_code of -1 is reserved by the system, so if there is system error
+you can catch that:
+
+   try[3/0;]catch[if[error_code==-1]then[say(error_message);];];
+divide by zero
+
+Here is an example of how to handle mutliple conditions. we are simply
+echoing the error_message, but yo can have any processing at that point
+you need/want
+
+j := 41;
+try[
+     remainder := mod(j, 3);
+     if[remainder == 0][say('A remainder of 0 is fine.');];
+     if[remainder == 1][raise_error(j + ' not divisible by 3, R==1', 1);];
+     if[remainder == 2][raise_error(j + ' not divisible by 3, R==2', 2);];
+ ]catch[
+    if[error_code == 1][say(error_message);];
+    if[error_code == 2][say(error_message);];
+ ]; // end catch block
+41 not divisible by 3, R==2
+
+
+See also:try, catch
                 ]]>
         </body>
     </entry>
@@ -2271,6 +2300,11 @@ in the catch[ ... ] block are done.
 
    try[1/0;]catch[say('oops!');]
 oops!
+
+The raise_error function lets you have much more fine-grained handling of
+errors.
+
+See also: raise_error
                 ]]>
             </body>
         </entry>

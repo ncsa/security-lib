@@ -1145,7 +1145,7 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a:='" + test + "';");
-        addLine(script, "say('test print chars:');");
+        addLine(script, "say('test say:');");
         addLine(script, "say(a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());

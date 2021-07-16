@@ -637,53 +637,20 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
                     r.resultType = Constant.DECIMAL_TYPE;
                     return r;
-                     /*
-                    if (areAllLongs(objects)) {
-                        if (doTimes) {
-                            try {
-                                r.result = Math.multiplyExact((Long) objects[0], (Long) objects[1]);
-                            } catch (ArithmeticException arithmeticException) {
-                                // ok, so over flow
-                                BigDecimal left = toBD(objects[0]);
-                                BigDecimal right = toBD(objects[1]);
-                                r.result = left.multiply(right);
-                                r.resultType = Constant.DECIMAL_TYPE;
-                                return r;
-                            }
-                        } else {
-                            // So dividing a long by a long might result in
-                            // a decimal. This checks that and if so, return it,
-                            // otherwise it returns a long.
-                            Long leftLong = (Long) objects[0];
-                            Long rightLong = (Long) objects[1];
-                            if (leftLong % rightLong == 0) {
-                                r.result = leftLong / rightLong;
-                            } else {
-                                BigDecimal left = new BigDecimal((Long) objects[0]);
-                                BigDecimal right = new BigDecimal((Long) objects[1]);
-                                try {
-                                    BigDecimal out = left.divide(right, getNumericDigits(), RoundingMode.DOWN);
-                                    r.result = out;
-                                    r.resultType = Constant.DECIMAL_TYPE;
-                                    return r;
-                                } catch (ArithmeticException x) {
 
-                                }
-                            }
-                        }
-                        r.resultType = Constant.LONG_TYPE;
-                    } else {
-                        BigDecimal left = toBD(objects[0]);
-                        BigDecimal right = toBD(objects[1]);
-                        r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
-                        r.resultType = Constant.DECIMAL_TYPE;
-                    }*/
                 } else {
                     throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
             }
         };
-        process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
+        try {
+            process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
+        }catch(ArithmeticException ax){
+            if(ax.getMessage().equals("/ by zero")){
+                 ax = new ArithmeticException("divide by zero");
+            }
+            throw ax;
+        }
     }
 
     /*

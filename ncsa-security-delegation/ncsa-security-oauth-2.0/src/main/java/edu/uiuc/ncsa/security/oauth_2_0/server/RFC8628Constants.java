@@ -22,6 +22,7 @@ public interface RFC8628Constants {
      */
     String VERIFICATION_URI = "verification_uri";
     String VERIFICATION_URI_ENDPOINT = "device";
+    String DEVICE_AUTHORIZATION_ENDPOINT = "device_authorization";
 
 
     /**

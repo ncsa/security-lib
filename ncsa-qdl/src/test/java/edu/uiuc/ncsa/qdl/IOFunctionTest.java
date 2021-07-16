@@ -35,6 +35,6 @@ public class IOFunctionTest extends AbstractQDLTester {
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
         polyad.getArguments().add(prompt);
         polyad.evaluate(state);
-        System.out.println("Check that the phrase :\"" + testString + "\" was printed");
+        System.out.println("Check that the phrase \"" + testString + "\" was printed");
     }
 }
