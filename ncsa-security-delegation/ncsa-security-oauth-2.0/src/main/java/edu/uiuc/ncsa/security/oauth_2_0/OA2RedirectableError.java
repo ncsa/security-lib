@@ -57,4 +57,15 @@ public class OA2RedirectableError extends OA2GeneralError {
     public boolean hasCallback(){
         return callback != null;
     }
+
+    @Override
+    public String toString() {
+        return "OA2RedirectableError{" +
+                "httpStatus=" + httpStatus +
+                ", error='" + error + '\'' +
+                ", description='" + description + '\'' +
+                ", state='" + state + '\'' +
+                ", callback=" + callback +
+                '}';
+    }
 }

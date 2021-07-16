@@ -49,5 +49,13 @@ public class OA2ATException extends OA2GeneralError {
         super(error, description, httpStatus, state);
     }
 
-
+    @Override
+    public String toString() {
+        return "OA2ATException{" +
+                "httpStatus=" + httpStatus +
+                ", error='" + error + '\'' +
+                ", description='" + description + '\'' +
+                ", state='" + state + '\'' +
+                '}';
+    }
 }
