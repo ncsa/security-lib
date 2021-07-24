@@ -6,6 +6,9 @@ import java.net.URI;
  * A standard OIDC error, where there is a valid redirect and the return codes are turned into parameters in the
  * redirect. In cases where there is no redirect available, you must use an {@link OA2GeneralError}
  * instead.
+ * <h3>Note</h3>
+ * This is typically used in the authorization leg of the code flow. For the token leg
+ * use {@link OA2ATException} instead.
  * <p>Created by Jeff Gaynor<br>
  * on 2/6/15 at  11:33 AM
  */

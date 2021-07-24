@@ -2353,6 +2353,33 @@ See also: is_defined
                 ]]>
             </body>
         </entry>
+    <entry id="values">
+            <body>
+                <![CDATA[
+values(arg) - return the values of a stem as a flat list
+
+Note that if arg is a scalar, the result is a stem of the value only.
+
+This is a compliment to list_keys(arg.) which returns the keys as a list.
+One caveat is that there is no general order and only unique values are
+returned. This does only processes a single dimension in a stem,  hence will
+not unpack embedded stems.
+E.g.
+    zeta.'A' := ['p','q'];zeta.'B' := 'r';zeta.'C' := 's'
+    values(zeta.)
+[[p,q],r,s]
+    reduce(@~, values(mask(zeta., {'A':true,'B':false,'C':true})))
+[p,q,s]
+
+E.g. values returned are unique.
+  arg.foo := 2; arg.bar := 2; arg.baz := 2
+  values(arg.)
+[2]
+
+See also: list_keys, keys.
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

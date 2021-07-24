@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.Pool;
@@ -185,6 +186,7 @@ public class ServiceClient {
     /**
      * Do amn HTTP POST to the endpoint sending along basic authorization and any parameters.
      * This returns a string, so do process the result.
+     *
      * @param parameters
      * @param id
      * @param secret
@@ -205,22 +207,24 @@ public class ServiceClient {
 
     /**
      * Do post using a bearer token
+     *
      * @param parameters
      * @param bearerToken
      * @return
      */
     public String doPost(Map<String, Object> parameters, String bearerToken) {
-         HttpPost post = new HttpPost(host().toString());
-         List<NameValuePair> params = getNameValuePairs(parameters);
+        HttpPost post = new HttpPost(host().toString());
+        List<NameValuePair> params = getNameValuePairs(parameters);
 
-         try {
-             post.setEntity(new UrlEncodedFormEntity(params));
-         } catch (UnsupportedEncodingException e) {
-             throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
-         }
+        try {
+            post.setEntity(new UrlEncodedFormEntity(params));
+        } catch (UnsupportedEncodingException e) {
+            throw new GeneralException("error encoding form \"" + e.getMessage() + "\"", e);
+        }
 
-         return doBearerRequest(post, bearerToken);
-     }
+        return doBearerRequest(post, bearerToken);
+    }
+
     private List<NameValuePair> getNameValuePairs(Map<String, Object> parameters) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         for (String key : parameters.keySet()) {
@@ -241,7 +245,12 @@ public class ServiceClient {
      * @return
      */
     protected String doRequest(HttpRequestBase httpRequestBase, String id, String secret) {
-        String creds = id + ":" + secret;
+        String creds;
+        try {
+            creds = URLEncoder.encode(id, "UTF-8") + ":" + URLEncoder.encode(secret, "UTF-8");
+        } catch (UnsupportedEncodingException usx) {
+            throw new NFWException("unsupported encoded for UTF-8");
+        }
         creds = Base64.encodeBase64String(creds.getBytes());
         while (creds.endsWith("=")) {
             // shave off any trailing = from the encoding. 
@@ -254,19 +263,20 @@ public class ServiceClient {
 
     /**
      * If the token is not already base 64 or 32 encoded, option flag to do so.
+     *
      * @param httpRequestBase
      * @param token
      * @param base64Encode
      * @return
      */
     protected String doBearerRequest(HttpRequestBase httpRequestBase, String token, boolean base64Encode) {
-        if(base64Encode) {
-           String creds = Base64.encodeBase64String(token.getBytes());
+        if (base64Encode) {
+            String creds = Base64.encodeBase64String(token.getBytes());
             while (creds.endsWith("=")) {
                 // shave off any trailing = from the encoding.
                 creds = creds.substring(0, creds.length() - 1);
             }
-           token = creds; // replace token, rock on
+            token = creds; // replace token, rock on
         }
         DebugUtil.trace(this, "Doing request with bearer token " + token);
         httpRequestBase.setHeader("Authorization", "Bearer " + token);
@@ -275,6 +285,7 @@ public class ServiceClient {
 
     /**
      * Process the request, but use a bearer token (the access token which should eb suitably encoded)
+     *
      * @param httpRequestBase
      * @param token
      * @return
@@ -282,6 +293,7 @@ public class ServiceClient {
     protected String doBearerRequest(HttpRequestBase httpRequestBase, String token) {
         return doBearerRequest(httpRequestBase, token, false);
     }
+
     protected String doRequest(HttpRequestBase httpRequestBase) {
         HttpClient client = clientPool.pop();
         HttpResponse response = null;

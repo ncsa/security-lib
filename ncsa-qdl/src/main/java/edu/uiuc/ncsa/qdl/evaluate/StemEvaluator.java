@@ -184,6 +184,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_LIST_REVERSE = LIST_FQ + LIST_REVERSE;
     public static final int LIST_REVERSE_TYPE = 207 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String VALUES = "values";
+    public static final String FQ_VALUES = STEM_FQ + VALUES;
+    public static final int VALUES_TYPE = 208 + STEM_FUNCTION_BASE_VALUE;
+
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
     public static final String FQ_TO_JSON = STEM_FQ + TO_JSON;
@@ -224,7 +228,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             RENAME_KEYS,
             SHUFFLE,
             MASK,
-            KEYS,
+            KEYS,VALUES,
             LIST_APPEND,
             LIST_INSERT_AT,
             LIST_SUBSET,
@@ -258,7 +262,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_RENAME_KEYS,
             FQ_SHUFFLE,
             FQ_MASK,
-            FQ_KEYS,
+            FQ_KEYS, FQ_VALUES,
             FQ_LIST_APPEND,
             FQ_LIST_INSERT_AT,
             FQ_LIST_SUBSET,
@@ -316,6 +320,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case KEYS:
             case FQ_KEYS:
                 return KEYS_TYPE;
+            case VALUES:
+            case FQ_VALUES:
+                return VALUES_TYPE;
             case LIST_KEYS:
             case FQ_LIST_KEYS:
                 return LIST_KEYS_TYPE;
@@ -445,6 +452,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_KEYS:
                 doKeys(polyad, state);
                 return true;
+            case VALUES:
+            case FQ_VALUES:
+                doValues(polyad, state);
+                return true;
             case LIST_KEYS:
             case FQ_LIST_KEYS:
                 doListKeys(polyad, state);
@@ -558,6 +569,31 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doValues(Polyad polyad, State state) {
+        // create a list of values for a stem.
+        StemVariable out = new StemVariable();
+        Object object0 = polyad.evalArg(0, state);
+        if(isStem(object0)){
+            StemVariable inStem = (StemVariable)  object0;
+            ArrayList values = new ArrayList();
+            for(Object key: inStem.keySet()){
+                Object obj = inStem.get(key);
+                if(!values.contains(obj)) {
+                    values.add(inStem.get(key));
+                }
+            }
+            out.addList(values);
+
+        }else {
+            out.put(0L, object0);
+        }
+
+        polyad.setResult(out);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+
     }
 
     /**

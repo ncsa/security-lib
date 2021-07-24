@@ -7,7 +7,8 @@ import org.apache.http.HttpStatus;
  * must include JSON.  Mostly we need this for the type to make sure it can
  * be identified and handled properly. Note the error from the token endpoint
  * is never a redirect to the client's error endpoint, but the response is always
- * a JSON object.
+ * a JSON object. The  default status code for all of these is 400, bad request,
+ * unless the spec. states otherwise.
  * <p>Created by Jeff Gaynor<br>
  * on 9/14/16 at  12:26 PM
  */
