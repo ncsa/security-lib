@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="4" failures="0" name="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" time="0.129" errors="0" skipped="0">
+<testsuite tests="4" failures="0" name="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" time="0.12" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/java/jdk1.8.0_231/jre/lib/amd64"/>
     <property name="java.vm.version" value="25.231-b11"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core"/>
+    <property name="maven.multiModuleProjectDirectory" value="/home/ncsa/dev/ncsa-git/security-lib"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=":"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core"/>
+    <property name="user.dir" value="/home/ncsa/dev/ncsa-git/security-lib"/>
     <property name="java.runtime.version" value="1.8.0_231-b11"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="/usr/java/jdk1.8.0_231/jre/lib/endorsed"/>
@@ -32,7 +32,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="java.class.version" value="52.0"/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
-    <property name="os.version" value="5.4.0-58-generic"/>
+    <property name="os.version" value="5.4.0-77-generic"/>
     <property name="library.jansi.path" value="/usr/share/maven/lib/jansi-native"/>
     <property name="user.home" value="/home/ncsa"/>
     <property name="user.timezone" value="America/Chicago"/>
@@ -62,8 +62,8 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testAll" time="0.085"/>
-  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNSAll" time="0.043"/>
-  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNSResolution" time="0"/>
-  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNamespace" time="0.001"/>
+  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testAll" time="0.082"/>
+  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNSAll" time="0.037"/>
+  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNSResolution" time="0.001"/>
+  <testcase classname="edu.uiuc.ncsa.security.core.configuration.XPropertiesTest" name="testNamespace" time="0"/>
 </testsuite>

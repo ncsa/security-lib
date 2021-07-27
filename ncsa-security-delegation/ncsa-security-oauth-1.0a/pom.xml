@@ -6,7 +6,7 @@
     <parent>
         <groupId>edu.uiuc.ncsa.security.delegation</groupId>
         <artifactId>ncsa-security-delegation</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.0</version>
     </parent>
 
     <artifactId>ncsa-security-oauth-1.0a</artifactId>
@@ -16,12 +16,12 @@
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-server</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.0</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security.delegation</groupId>
             <artifactId>ncsa-security-delegation-client</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.0</version>
         </dependency>
         <dependency>
             <groupId>net.oauth.core</groupId>
