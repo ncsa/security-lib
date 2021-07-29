@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static edu.uiuc.ncsa.qdl.expressions.ESN2.experimental;
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemConverter.convert;
 
@@ -1424,10 +1423,8 @@ public class StemVariable extends HashMap<String, Object> {
     so arguments don't get lost
      */
     public IndexList get(IndexList indexList, boolean strictMatching) {
-        if (experimental) {
             return newGet(indexList, strictMatching);
-        }
-        return oldGet(indexList);
+     //   return oldGet(indexList);
     }
 
     /*  testing allowing lists as stem indices with the . operator:
@@ -1511,6 +1508,13 @@ public class StemVariable extends HashMap<String, Object> {
         return newGet(indexList, true);
     }
 
+    /**
+     * Strict matching is used at the last resolution of the stem. It means that left over scalars
+     * are flagged as errors since there is no stem waiting to resolve them.
+     * @param indexList
+     * @param strictMatching
+     * @return
+     */
     public IndexList newGet(IndexList indexList, boolean strictMatching) {
         if (indexList.get(indexList.size() - 1) instanceof StemVariable) {
             StemVariable ndx = (StemVariable) indexList.get(indexList.size() - 1);
@@ -1626,13 +1630,11 @@ public class StemVariable extends HashMap<String, Object> {
             put((String) index, value);
             return;
         }
-        if (experimental) {
             if (index instanceof StemVariable) {
                 StemVariable s = (StemVariable) index;
                 IndexList indexList = new IndexList(s);
                 set(indexList, value);
                 return;
-            }
         }
         throw new IndexError("Unknown index type for \"" + index + "\"");
     }

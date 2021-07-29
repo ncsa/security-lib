@@ -12,7 +12,6 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import static edu.uiuc.ncsa.qdl.evaluate.OpEvaluator.*;
-import static edu.uiuc.ncsa.qdl.expressions.ESN2.experimental;
 
 /**
  * A class for testing the parser. Write little scripts, test that the state is what is should be.
@@ -254,9 +253,9 @@ public class ParserTest extends AbstractQDLTester {
      *
      *                1
      *  -----------------------------------------------------
-     *        3 h(y)
+     *            3 h(y)
      * 2 g(x) + --------------------------------------------
-     *            5 h(y)
+     *              5 h(y)
      * 4 g(x) + -----------------------------------
      *                 7 h(y)
      * 6 g(x) + --------------------------
@@ -975,7 +974,10 @@ public class ParserTest extends AbstractQDLTester {
         assert e.equals(-19l);
     }
 
-
+    /**
+     * Basic test of assignments. Shows that := is treated as a digraph. Very basic but essential test.
+     * @throws Throwable
+     */
     @Test
     public void testAssignment() throws Throwable {
         State state = testUtils.getNewState();
@@ -1094,7 +1096,15 @@ public class ParserTest extends AbstractQDLTester {
         assert !getBooleanValue("a.19", state);
     }
 
-
+    /**
+     * Tests order of operations with logical operators is respected.
+     * <pre>
+     *     a:=5;b:=10;c:=-5;
+     *     a&lt;b&&c&lt;a
+     *  true
+     * </pre>
+     * @throws Throwable
+     */
     @Test
     public void testLogic() throws Throwable {
         State state = testUtils.getNewState();
@@ -2046,7 +2056,14 @@ public class ParserTest extends AbstractQDLTester {
 
     }
 
-
+    /**
+     * Basic test of reduce over a list. Computes the factorial.
+     * <pre>
+     *    reduce(@*, 1+n(5))
+     *  120
+     * </pre>
+     * @throws Throwable
+     */
     @Test
     public void testReduceWithOperator() throws Throwable {
         State state = testUtils.getNewState();
@@ -2057,6 +2074,15 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 120L;
     }
 
+    /**
+     * Basic test of reduce with a user-defined function.
+     * <pre>
+     *     times(x,y)->x*y;
+     *     reduce(@times(), 1+n(5));
+     *  120
+     * </pre>
+     * @throws Throwable
+     */
     @Test
     public void testReduceWithUserFunction() throws Throwable {
         State state = testUtils.getNewState();
@@ -2068,6 +2094,15 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 120L;
     }
 
+    /**
+     * Basci test of the expansion operator
+     * <pre>
+     *    a. := [1,3,5,7];b. := [1,3,6,7];
+     *    expand(@&&, a. == b.);
+     * [true, true, false, false]
+     * </pre>
+     * @throws Throwable
+     */
     @Test
     public void testExpandWithOperator() throws Throwable {
         State state = testUtils.getNewState();
@@ -2100,7 +2135,7 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * In this test, a function named h is defined and *h() is used as a reference in another
      * function. What <i>should</i> happen is that inside the function, *h resolves to what
-     * was passed in, not the global defintion. If this test breaks, it is a critical bit
+     * was passed in, not the global definition. If this test breaks, it is a critical bit
      * of regression.
      *
      * @throws Throwable
@@ -2282,11 +2317,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("w", state).equals(4L);
     }
 
-    /*
-    module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];
-    module_import('a:a');
-    y := g(1);
-     */
+
 
     /**
      * Case of a simple module. The point is that a function f, is defined in the module and that
@@ -2294,7 +2325,12 @@ public class ParserTest extends AbstractQDLTester {
      * in the state, which would throw a namespace exception) is that g uses f and that is
      * that. If the module functions are not being added only to the module state, then there would be errors.
      * Critical simple use case.
-     *
+     * <pre>
+     *     module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];
+     *     module_import('a:a');
+     *     g(1);
+     *  4
+     * </pre>
      * @throws Throwable
      */
     public void testModuleFunctionVisibility() throws Throwable {
@@ -2389,6 +2425,12 @@ public class ParserTest extends AbstractQDLTester {
         StemVariable stem = getStemValue("x.", state);
     }
 
+    /**
+     * Longs in Java have a max value of 9223372036854775806 and a min value of
+     * -9223372036854775805. What should happen is that when this is reached, the
+     * value is seamlessly converted to a BigDecimal internally.
+     * @throws Throwable
+     */
     @Test
     public void testOverflowAdd() throws Throwable {
         State state = testUtils.getNewState();
@@ -2402,6 +2444,11 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(getBDValue("y", state), new BigDecimal("-9223372036854775811"));
     }
 
+    /**
+     * Tests various combinations of numbers with E in them.  Also does a few with
+     * e (lower case) too, showing case insensitivity.
+     * @throws Throwable
+     */
     @Test
     public void testEngineeringNotation() throws Throwable {
         State state = testUtils.getNewState();
@@ -2410,8 +2457,8 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "x := 1.2E3+2.3E-2;");
         addLine(script, "y := 1.2E3-2.3E-2;");
         addLine(script, "z := 1.2E3*2.3E-2;");
-        addLine(script, "w := 1.2E3/2.3E-2;");
-        addLine(script, "t := 1.2E3^2.3E-2;");
+        addLine(script, "w := 1.2e3/2.3e-2;");
+        addLine(script, "t := 1.2e3^2.3e-2;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert areEqual(getBDValue("x", state), new BigDecimal("1200.023"));
@@ -2468,15 +2515,18 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("x", state);
         assert getBooleanValue("y", state);
     }
-      /*
-          Does the following which computes (5^2)^3 == 5^6
-               g(@f, x)-> f(x)^3
-               g(v(x)->x^2, 5)
-            15625
 
-            Basic regression test to show that passing in a function definition
-            works.
-       */
+    /**
+     *
+     * Basic regression test to show that passing in a function definition
+     * works.
+     * <pre>
+     *     g(@f, x)-> f(x)^3
+     *     g(v(x)->x^2, 5); //computes (5^2)^3 == 5^6
+     * 15625
+     * </pre>
+     * @throws Throwable
+     */
       public void testLambdaAsArgument() throws Throwable {
            State state = testUtils.getNewState();
            StringBuffer script = new StringBuffer();
@@ -2487,6 +2537,15 @@ public class ParserTest extends AbstractQDLTester {
            assert getBooleanValue("ok", state);
        }
 
+    /**
+     * Anonymous lambda function test. Pass in a function with no name as an argument.
+     * <pre>
+     *     g(@f, x)-> f(x)^4;
+     *     g((x)->x^2, 2);  //evaluates to 2^8
+     *  256
+     * </pre>
+     * @throws Throwable
+     */
     public void testAnonymousLambdaAsArgument() throws Throwable {
            State state = testUtils.getNewState();
            StringBuffer script = new StringBuffer();
@@ -2529,14 +2588,22 @@ public class ParserTest extends AbstractQDLTester {
               assert getBooleanValue("ok", state);
 
           }
-      /*
 
-     g(x,y)->x-y
-  reduce(g(x,y)->x+y, n(10))
-45
-  g(3,4)
--1
-       */
+
+    /**
+     * Tests visibility of lambda. One version of g is created, then a dummy function
+     * named g is passed in. The correct behavior is that the function reference is evaluated
+     * locally only. Last check (ok1 == -1) shows that the original function is still
+     * available unchanged.
+     * <pre>
+     *   g(x,y)->x-y
+     *   reduce(g(x,y)->x+y, n(10))
+     * 45
+     *   g(3,4)
+     * -1
+     * </pre>
+     * @throws Throwable
+     */
     public void testLambdaFunctionVisibility() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2549,18 +2616,16 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok1", state);
 
     }
-    /*
-       while[for_next(i,2*[;5])][say(i);]
-     */
+
 
     /**
-     * tests that supplying a loop
+     * tests that supplying a loop with a list in the for_next function works.
      * @throws Throwable
      */
     public void testLoopOverList() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "j := 0;"); // define g outside of function
+        addLine(script, "j := 0;");
         addLine(script, "ok := true;");
         addLine(script, "while[for_next(i,2*[;5])][ok := ok && (i == 2*j++);];");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -2584,28 +2649,37 @@ public class ParserTest extends AbstractQDLTester {
         as a. is a higher dimension stem.) This allows for creating indices programatically which is important
         if the structure of a stem has to be interrogated before using it
      */
+
+    /**
+     * Tests that list indices are transitive, i.e.
+     * <pre>
+     *    a.[1,2,3] == a.1.2.3
+     * </pre>
+     * @throws Throwable
+     */
     public void testListsAsIndices0() throws Throwable{
-        if(!experimental){
-            return;
-        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "a. := n(2,3,4,n(24));");
         addLine(script, "nn. := n(2,3,4);");
-        addLine(script, "ok := a.[1,2,3] == a.1.2.3;"); // most basic test
+        addLine(script, "ok := a.[1,2,3] == a.1.2.3;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
+
+    /**
+     * Test bad index where a higher dimension stem as part of the index does not resolve
+     * correctly. This tells us that if a stem gets another, higher ranked stem as its
+     * index, that should throw an index error.
+     * @throws Throwable
+     */
     public void testBadListsAsIndices0() throws Throwable{
-        if(!experimental){
-            return;
-        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "a. := n(2,3,4,n(24));");
         addLine(script, "nn. := n(2,3,4);");
-        addLine(script, "a.1.nn.[1,2,2].0;"); // most basic test
+        addLine(script, "a.1.nn.[1,2,2].0;");//nn.1 is a 3 rank stem, so cannot be an index
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
@@ -2615,12 +2689,9 @@ public class ParserTest extends AbstractQDLTester {
         }
     }
     public void testBadListsAsIndices1() throws Throwable{
-         if(!experimental){
-             return;
-         }
          State state = testUtils.getNewState();
          StringBuffer script = new StringBuffer();
-         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+         addLine(script, "a. := n(2,3,4,n(24));");
          addLine(script, "nn. := n(2,3,4);");
         addLine(script, "a.0.nn.[1,2,2].1  == a.0.2.1;"); // fails before [1,2,2].1-> 2.
 
@@ -2632,10 +2703,12 @@ public class ParserTest extends AbstractQDLTester {
              assert true;
          }
      }
+
+    /**
+     * Checks that referncing non-existent elements fails at is should.
+     * @throws Throwable
+     */
     public void testBadListsAsIndices2() throws Throwable{
-         if(!experimental){
-             return;
-         }
          State state = testUtils.getNewState();
          StringBuffer script = new StringBuffer();
          addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
@@ -2651,10 +2724,11 @@ public class ParserTest extends AbstractQDLTester {
          }
      }
 
+    /**
+     * Test lots of simple cases for list indices.
+     * @throws Throwable
+     */
     public void testListsAsIndices1() throws Throwable{
-        if(!experimental){
-            return;
-        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
@@ -2680,10 +2754,19 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok6", state);
     }
 
+    /**
+     * Tests the list indices by shuffling the indices and accessing
+     * one element and setting the another:
+     * <pre>
+     *     a. := n(2,3,4,n(24))
+     *     p. := [2,0,1]
+     *     b.shuffle([0,1,2],p.) := a.[0,1,2]
+     *     b.
+     * {2:[{1:6}]}
+     * </pre>
+     * @throws Throwable
+     */
     public void testSetWithListIndex() throws Throwable{
-        if(!experimental){
-            return;
-        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));");
@@ -2694,11 +2777,25 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
-    /*  Get the rotation of the stem a. around given axes.
-          a. := n(2,3,4,n(24))
-          p. := [2,0,1]
-          b.shuffle([0,1,2],p.) := a.[0,1,2]
-          b.
-{2:[{1:6}]}
+
+
+    /**
+     * Very simple recursion test using lambdas
+     * <pre>
+     *     sum(n)->(n!=0)?sum(n-1)+n : 0; // recursive function
+     *     sum(7)
+     * 28
+     * </pre>
+     * @throws Throwable
      */
+    public void testLambdaRecursion() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "sum(n)->(n!=0)?sum(n-1)+n:0;");
+        addLine(script, "ok := sum(7)==28;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Recursion failed for a lambda function";
+    }
+
 }

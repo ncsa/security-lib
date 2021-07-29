@@ -198,7 +198,7 @@ public class JWTUtil2 {
         switch (st.countTokens()) {
             case 0:
             case 1:
-                throw new IllegalArgumentException("Error: No JWT components foound.");
+                throw new IllegalArgumentException("Error: No JWT components found.");
             case 2:
                 output[HEADER_INDEX] = st.nextToken();
                 output[PAYLOAD_INDEX] = st.nextToken();

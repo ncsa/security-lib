@@ -102,11 +102,8 @@ public class ESN2 extends ExpressionImpl {
      * @param indexList
      */
     protected void whittleIndices(IndexList indexList) {
-        if(experimental) {
             newWhittle(indexList);
-        }else{
-            oldWhittle(indexList);
-        }
+//            oldWhittle(indexList);
     }
     protected void oldWhittle(IndexList indexList){
         IndexList r;
@@ -124,7 +121,6 @@ public class ESN2 extends ExpressionImpl {
      * Turns on or off all machinery associated with the allowing . to accept stem lists
      * as multi indices.
      */
-    public static boolean experimental = true;
 
     protected void newWhittle(IndexList indexList){
         IndexList r;
