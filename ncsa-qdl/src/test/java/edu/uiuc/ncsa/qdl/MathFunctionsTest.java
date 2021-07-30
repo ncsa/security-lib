@@ -320,10 +320,36 @@ public class MathFunctionsTest extends AbstractQDLTester {
      * Also, this test gets the 20th Fibonacci number which will take a bit. Again this is seeing
      * that the state gets managed for a stack of 20 calls then unravelled correctly. Since each call
      * calls up two more instances of this function, there is exponential growth in the number of calls
-     * pending as it runs. Yes this could be optimized not to do that, and QDL could easily have
+     * pending as it runs. Java itself falls over for a native version at about n = 50.
+     * Yes this could be optimized not to do that (the math extensions module has an implementation of
+     * Binet's formula), and QDL could easily have
      * a few simple expression to compute the numbers efficiently, but that is not the point of this test.
      * The point of the test is to have thousands of pending calls, each with their own state, that the system
-     * has to keep straight or the result is wrong.
+     * has to keep straight or the result is wrong. Therefore, this is a version of Knuth's
+     * "man or boy" test.
+     * <p>
+     *     If you really want to compute the nth Fibonacci number fast, use Binet's formula:
+     *  <pre>
+     *      γ := (1+sqrt(5))/2
+     *     γ1 := (1-sqrt(5))/2
+     *      ρ := (γ^n -γ1^n)/sqrt(5)
+     *     floor(ρ+0.1); // compensate for rounding errors
+     *  </pre>
+     *  This would calculate the 1000th (n = 1000) Fibonacci number almost instantly
+     *  as <br/><br/>
+     *  4.346655768694153E208
+     * </p>
+     * <p>Here is a simple lambda for this. It shows fib(20) takes 1564 ms.</p>
+     *  <pre>
+     *     fib(n)->n<=2?1:fib(n-1)+fib(n-2)
+     *       date_ms();fib(20);date_ms()
+     * 1627617295780
+     * 6765
+     * 1627617297334
+     *   97344-95780
+     * 1564
+     * </pre>
+
      * @throws Throwable
      */
     @Test

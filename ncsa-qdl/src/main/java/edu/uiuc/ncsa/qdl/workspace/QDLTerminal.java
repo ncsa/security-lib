@@ -54,6 +54,10 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('→');
                     case 'f':
                         return new KeyStroke('⊥');
+                    case 'l':
+                        return new KeyStroke('⌊');
+                    case 'k':
+                        return new KeyStroke('⌈');
                     case 'n':
                         return new KeyStroke('∅');
                     case 'p':

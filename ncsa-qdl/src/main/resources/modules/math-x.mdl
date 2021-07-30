@@ -53,6 +53,27 @@ module[
        return(sqrt(a^2 + b^2));
    ];
 
+   define[
+       fibonacci(n)
+     ][
+       >> Compute the nth Fibonacci number. Note that this uses Binet's  formula
+       >> and is very, very fast, even for huge values of 0 <= n.
+       >> E.g.
+       >>    fibonacci(1000000)
+       >> 1.953282128891003E208987
+       >>    
+       >>    fibonacci([10;20])
+       >> [55,89,144,233,377,610,987,1597,2584,4181]
+       if[
+           reduce(@||, n <0 || floor(n)!=n) // if any are negative or not integers, bail.
+         ][
+           raise_error('illegal argument. The argument must be a positive integer');
+        ];
+       root5 := sqrt(5);
+           γ := (1+root5)/2;
+          γ1 := (1-root5)/2;
+          return(floor((γ^n -γ1^n)/root5 + 0.1)); // compensate for rounding errors
+     ]; //end fibonacci
 
    define[
        sqrt(x)

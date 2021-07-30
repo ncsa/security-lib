@@ -8,6 +8,7 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.evaluate.MathEvaluator.MATH_FQ;
@@ -92,16 +93,28 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_N_ROOT = MATH_FQ + N_ROOT;
     public static final int N_ROOT_TYPE = 18 + TMATH_FUNCTION_BASE_VALUE;
 
+    public static final String FLOOR = "floor";
+    public static final String FLOOR2 = "⌊"; // unicode 2308
+    public static final String FQ_FLOOR = MATH_FQ + FLOOR;
+    public static final String FQ_FLOOR2 = MATH_FQ + FLOOR2;
+    public static final int FLOOR_TYPE = 19 + TMATH_FUNCTION_BASE_VALUE;
+
+    public static final String CEILING = "ceiling";
+    public static final String CEILING2 = "⌈"; // unicode 2308
+    public static final String FQ_CEILING = MATH_FQ + CEILING;
+    public static final String FQ_CEILING2 = MATH_FQ + CEILING2;
+    public static final int CEILING_TYPE = 20 + TMATH_FUNCTION_BASE_VALUE;
+
     public static String FUNC_NAMES[] = new String[]{
             COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
             ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
-            N_ROOT
+            N_ROOT, FLOOR2, FLOOR, CEILING, CEILING2
     };
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_COSINE, FQ_SINE, FQ_TANGENT, FQ_LOG_10, FQ_LOG_E, FQ_EXP,
             FQ_SINH, FQ_COSH, FQ_TANH,
             FQ_ARC_COSINE, FQ_ARC_SINE, FQ_ARC_TANGENT, FQ_ARC_COSH, FQ_ARC_SINH, FQ_ARC_TANH, FQ_PI, FQ_PI2,
-            FQ_N_ROOT
+            FQ_N_ROOT, FQ_FLOOR, FQ_FLOOR2, FQ_CEILING, FQ_CEILING2
     };
 
     @Override
@@ -214,8 +227,56 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             case FQ_N_ROOT:
                 doNRoot(polyad, state);
                 return true;
+            case FLOOR:
+            case FLOOR2:
+                doFloor(polyad, state);
+                return true;
+            case CEILING:
+            case CEILING2:
+                doCeiling(polyad, state);
+                return true;
         }
         return false;
+    }
+
+    private void doCeiling(Polyad polyad, State state) {
+        doFloorOrCeiling(polyad, state, false);
+    }
+
+    private void doFloor(Polyad polyad, State state) {
+        doFloorOrCeiling(polyad, state, true);
+    }
+
+    private void doFloorOrCeiling(Polyad polyad, State state, boolean isFloor) {
+
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                BigDecimal bd = null;
+                Object ob = objects[0];
+                if (ob instanceof Long) {
+                    r.result = ob;
+                    r.resultType = Constant.LONG_TYPE;
+                    return r;
+                }
+
+                if (ob instanceof BigDecimal) {
+                    bd = (BigDecimal) ob;
+                } else {
+                    throw new IllegalArgumentException((isFloor?FLOOR:CEILING) + " is only defined for numbers");
+                }
+                if (isFloor) {
+                    r.result = bd.setScale(0, RoundingMode.FLOOR);
+                } else {
+                    r.result = bd.setScale(0, RoundingMode.CEILING);
+                }
+                r.resultType = Constant.DECIMAL_TYPE;
+                return r;
+            }
+        };
+        process1(polyad, pointer, isFloor ? FLOOR : CEILING, state);
+
     }
 
     private void doNRoot(Polyad polyad, State state) {
@@ -364,6 +425,16 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             case N_ROOT:
             case FQ_N_ROOT:
                 return N_ROOT_TYPE;
+            case FLOOR:
+            case FLOOR2:
+            case FQ_FLOOR:
+            case FQ_FLOOR2:
+                return FLOOR_TYPE;
+            case CEILING:
+            case CEILING2:
+            case FQ_CEILING:
+            case FQ_CEILING2:
+                return CEILING_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -465,7 +536,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 }
 
                 if (bd == null) {
-                    throw new IllegalArgumentException("error, " + op + "() got '"+ ob + "', requires a number");
+                    throw new IllegalArgumentException("error, " + op + "() got '" + ob + "', requires a number");
                 }
 
                 r.result = evaluateBD(bd, OpEvaluator.getMathContext(), op);

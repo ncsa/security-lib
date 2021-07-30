@@ -1975,6 +1975,8 @@ null           ∅       n   \u2205         null
 true           ⊤       t   \u22a4         logical true
 false          ⊥       f   \u22a5         logical false
 assert[][]     ⊨       a   \u22a8         assert
+ceiling        ⌈       k   \u2308         ceiling
+floor          ⌊       l   \u230a         floor
 [|             ⟦       {   \u27e6         left closed slice bracket
 |]             ⟧       }   \u27e7         right closed slice bracket
 pi             π       p   \u03c0         Greek letter pi.
@@ -2380,6 +2382,52 @@ See also: list_keys, keys.
                 ]]>
             </body>
         </entry>
+    <entry id="floor">
+            <body>
+                <![CDATA[
+floor(arg) - compute the mathematical floor of the argument.
+             This is the greatest integer less than or equal to it argument
+
+E.g.
+   floor(3.4)
+3
+    ⌊(-3.4)
+-4
+See also: ceiling
+                ]]>
+            </body>
+        </entry>
+    <entry id="⌊">
+            <body>
+                <![CDATA[
+unicode 230a aka floor.
+See also: floor
+                ]]>
+            </body>
+        </entry>
+    <entry id="ceiling">
+            <body>
+                <![CDATA[
+ceiling(arg) - compute the ceiling of the argument.
+               This is the least integer greater than or equal to arg.
+
+E.g.
+   ceiling(4.5)
+5
+   ceiling(-4.5)
+-4
+                ]]>
+            </body>
+        </entry>
+    <entry id="⌈">
+            <body>
+                <![CDATA[
+unicode 2308 aka ceiling.
+See also: ceiling
+                ]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->
