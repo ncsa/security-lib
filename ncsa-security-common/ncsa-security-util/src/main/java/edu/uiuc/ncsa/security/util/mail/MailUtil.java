@@ -3,7 +3,9 @@ package edu.uiuc.ncsa.security.util.mail;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
 
 import javax.mail.*;
@@ -169,7 +171,7 @@ public class MailUtil extends TemplateUtil implements Logable {
         String subjectTemplate;
         public InternetAddress[] recipients;
 
-        protected InternetAddress[] parseRecipients(String x) throws AddressException {
+        public InternetAddress[] parseRecipients(String x) throws AddressException {
             InternetAddress[] z = null;
             if (x != null) {
                 String[] addresses = x.split(ADDRESS_SEPARATOR);
@@ -192,6 +194,10 @@ public class MailUtil extends TemplateUtil implements Logable {
     }
 
     MailEnvironment mailEnvironment;
+    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements)  {
+        return sendMessage(subjectTemplate, messageTemplate, replacements, null);
+    }
+
 
     /**
      * This allows for sending with a specific subject and message template. This is useful for
@@ -203,9 +209,27 @@ public class MailUtil extends TemplateUtil implements Logable {
      * @param replacements
      * @return
      */
-    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
+    synchronized public boolean sendMessage(String subjectTemplate,
+                                            String messageTemplate,
+                                            Map replacements,
+                                            String newRecipients) {
         Transport tr = null;
 
+        InternetAddress[] recipients = getMailEnvironment().recipients;
+        
+        if(!StringUtils.isTrivial(newRecipients)){
+            try {
+                getMailEnvironment().parseRecipients(newRecipients);
+            }catch(AddressException addressException){
+                if(DebugUtil.isEnabled()){
+                    addressException.printStackTrace();
+                }
+                warn( "The requested list of recipients \"" + newRecipients + "\" could not be parsed.\n" +
+                        "error message reads \""+ addressException.getMessage() + "\"\n"+
+                        "Did you use the right separator \"" + MailUtil.ADDRESS_SEPARATOR + "\" between addresses?\n" +
+                        "Using default addresses.");
+            }
+        }
         try {
 
             info("Preparing to send mail notification");
@@ -244,15 +268,16 @@ public class MailUtil extends TemplateUtil implements Logable {
                     getMailEnvironment().password);
             Message message = new MimeMessage(session);
             message.setFrom(getMailEnvironment().from);
-            message.setRecipients(Message.RecipientType.TO, getMailEnvironment().recipients);
+
+            message.setRecipients(Message.RecipientType.TO, recipients);
             message.setSubject(replaceAll(subjectTemplate, replacements));
             message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
             if(replacements.containsKey("reply-to")){
                 InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
                 message.setReplyTo(new Address[]{address});
             }
-            tr.sendMessage(message, getMailEnvironment().recipients);
-            info("Mail notification sent to " + Arrays.toString(getMailEnvironment().recipients));
+            tr.sendMessage(message, recipients);
+            info("Mail notification sent to " + Arrays.toString(recipients));
             return true;
         } catch (Throwable throwable) {
             info("got exception sending message:");

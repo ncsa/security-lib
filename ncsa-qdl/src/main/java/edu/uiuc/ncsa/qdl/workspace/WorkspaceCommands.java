@@ -4196,7 +4196,6 @@ public class WorkspaceCommands implements Logable {
      */
     public void say(String x) {
         getIoInterface().println(defaultIndent + x);
-        // getPrintStream().println(defaultIndent + x);
     }
 
     public static final String INDENT = "  "; // use this in implementations for consistent indenting.

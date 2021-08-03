@@ -85,7 +85,7 @@ public class ISO6429IO implements IOInterface {
     // terminal when you toggle paste mode (ctrl+p). This is very useful in isolating exactly what you
     // just did rather than digging in the logs for it.
     // Use in conjunction with the ansi script mentioned above.
-    boolean showDebugBuffer = true;
+    boolean showDebugBuffer = false;
 
     @Override
     public String readline(String prompt) throws IOException {
@@ -496,6 +496,9 @@ public class ISO6429IO implements IOInterface {
     StringBuffer stringBuffer = new StringBuffer();
 
     protected void debug(String x) {
+        if(!debugON){
+            return;
+        }
         if (showDebugBuffer) {
             stringBuffer.append(x + "\n");
         }

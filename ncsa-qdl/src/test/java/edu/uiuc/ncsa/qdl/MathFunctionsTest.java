@@ -394,5 +394,28 @@ public class MathFunctionsTest extends AbstractQDLTester {
        assert getBooleanValue("ok2", state);
    }
 
+    /**
+     * Test nroot and sqrt. this computes the closed form solution of
+     * <pre>
+     *     r^3 = r + 1
+     * </pre>
+     * using Cardano's formula. The test is to compute it:
+     * <pre>
+     *      r := (nroot((27+3*sqrt(69))/2,3) + nroot((27-3*sqrt(69))/2,3))/3
+     * </pre>
+     * and verify that indeed it works up to comparison tolerances.
+     * @throws Throwable
+     */
+    public void testRoots() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "sqrt(x)->nroot(x,2);") ;
+        addLine(script, "r := (nroot((27+3*sqrt(69))/2,3) + nroot((27-3*sqrt(69))/2,3))/3;"); //
+        addLine(script, "s := r^3 - r - 1;"); // should return zero
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert areEqual(getBDValue("s", state), BigDecimal.ZERO);
+    }
+
 }
 
