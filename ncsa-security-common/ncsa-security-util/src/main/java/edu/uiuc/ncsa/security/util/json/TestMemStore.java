@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.json;
 
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 
@@ -69,5 +70,13 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         return null;
+    }
+
+    @Override
+    public boolean remove(List<Identifiable> objects) {
+        for(Identifiable identifiable : objects){
+             remove(identifiable);
+        }
+        return true;
     }
 }

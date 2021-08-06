@@ -13,6 +13,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
 
 
 public class Client extends BaseClient {
+
     @Override
     public Client clone() {
         Client c = new Client(getIdentifier());

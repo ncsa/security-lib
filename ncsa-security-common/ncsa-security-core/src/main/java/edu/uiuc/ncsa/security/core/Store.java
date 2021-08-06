@@ -81,4 +81,11 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
 
     public int size(boolean includeVersions);
 
+    /**
+     * Removes a list of identifiable object from the store by ID.
+     * @param objects
+     * @return
+     */
+     boolean remove(List<Identifiable> objects);
+
 }

@@ -106,6 +106,7 @@ expression
  | prefix=('++'|'--') expression                                               #prefix
  | expression Exponentiation expression                                        #powerExpression
  | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
+ | (Floor | Ceiling) expression                                                #floorOrCeilingExpression
  | (Plus | UnaryPlus | Minus | UnaryMinus) expression                          #unaryMinusExpression
  | expression op=('+' | '-' ) expression                                       #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression

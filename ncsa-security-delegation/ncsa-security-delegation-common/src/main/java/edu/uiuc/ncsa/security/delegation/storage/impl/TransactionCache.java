@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
+import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.cache.CachedMapFacade;
@@ -510,6 +511,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
 
     @Override
     public MapConverter getMapConverter() {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
+    }
+
+    @Override
+    public boolean remove(List<Identifiable> objects) {
         throw new NotImplementedException("Error: This is not yet implemented for cache");
     }
 }

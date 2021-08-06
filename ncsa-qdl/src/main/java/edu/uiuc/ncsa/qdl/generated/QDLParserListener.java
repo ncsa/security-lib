@@ -404,6 +404,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitMultiplyExpression(QDLParserParser.MultiplyExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code floorOrCeilingExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code floorOrCeilingExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code integers}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

@@ -16,8 +16,6 @@ module[
       asech(x)->acosh(1/x);
       acsch(x)->asinh(1/x);
       acoth(x)->atanh(1/x);
-//      max(a,b) -> (a + b + abs(a-b))/2;
-  //    min(a,b) -> (a + b - abs(a-b))/2;
 
 
   // Here starts definitions using the full syntax, so we can include some
@@ -29,7 +27,7 @@ module[
        >> max(a,b) - return the maximum of a or b.
        >> E.g. max(-2, 3) returns 3.
        >> E.g. on stems -- corresponding entries are compared
-       >>   max([;5],([;5]-2)*3)
+       >>    max([;5],([;5]-2)*3)
        >> [0,1,2,3,6]
        return((a + b + abs(a-b))/2);
     ];
@@ -40,9 +38,39 @@ module[
        >> min(a,b) - return the minimum of a or b.
        >> E.g. min(-2, 3) returns -2.
        >> E.g. on stems -- corresponding entries are compared
-       >>   min([;5],([;5]-2)*3)
+       >>    min([;5],([;5]-2)*3)
        >> [-6,-3,0,3,4]
        return((a + b - abs(a-b))/2);
+    ];
+
+   define[
+      int(x)
+    ][
+       >>int(x) - return the integer part of a number
+       >>
+       >> E.g.
+       >>    5432/432
+       >> 12.574074074074074
+       >>    int(5432/432)
+       >> 12
+       >>
+       >> See also: frac(x)
+       return(x%1);
+    ];
+
+   define[
+      frac(x)
+    ][
+       >>frac(x) - return the fractional part of a number
+       >>
+       >> E.g.
+       >>   5432/432
+       >> 12.574074074074074
+       >>    frac(5432/432)
+       >>0.574074074074074
+       >>
+       >> See also: int(x)
+       return(x - x%1);
     ];
 
    define[

@@ -20,6 +20,8 @@ public class BaseClientKeys extends SerializationKeys {
         if (0 < x.length) name = x[0];
         return name;
     }
+
+
     public String debugOn(String... x) {
         if (0 < x.length) debugOn = x[0];
         return debugOn;

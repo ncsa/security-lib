@@ -4,6 +4,8 @@ import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.List;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/9/12 at  4:47 PM
@@ -24,6 +26,5 @@ public interface ClientApprovalStore<V extends ClientApproval> extends Store<V> 
     int getUnapprovedCount();
     int getPendingCount();
     MapConverter getMapConverter();
-
-
+    List<Identifier> statusSearch(String status);
 }

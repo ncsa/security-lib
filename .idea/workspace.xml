@@ -5,13 +5,69 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL.">
+      <change afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientSQLStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/AbstractFunctionEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/AbstractFunctionEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/docs/qdl_reference.odt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/TMathEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/TMathEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.interp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParser.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserBaseListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.interp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserLexer.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AddExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AndExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssignmentContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssignmentContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$AssociationContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$CompExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ConditionalStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$DefineStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ElementsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$EqExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FdocContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FdocContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$FunctionsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfElseStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$IfStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LogicalContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$LoopStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$ModuleStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$MultiplyExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$MultiplyExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NotExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NotExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NullContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NullContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumberContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumberContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumbersContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$NumbersContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$OrExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$OrExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PostfixContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PostfixContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PowerExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PowerExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PrefixContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$PrefixContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$Semi_for_empty_expressionsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$Semi_for_empty_expressionsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StringsContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$StringsContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$SwitchStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$SwitchStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$TryCatchStatementContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$TryCatchStatementContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$UnaryMinusExpressionContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$UnaryMinusExpressionContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariableContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariableContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser$VariablesContext.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated/QDLParserParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/math-x.mdl" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/math-x.mdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/qdl.nanorc" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/qdl.nanorc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/qdl.nanorc-2.3.1" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/qdl.nanorc-2.3.1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/MathFunctionsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/MathFunctionsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/Store.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
@@ -22,6 +78,13 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/classes/edu/uiuc/ncsa/security/servlet/ServiceClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/AggregateStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/FileStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/MemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/src/main/java/edu/uiuc/ncsa/security/storage/sql/SQLStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/FileStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/MemoryStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/MemoryStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPool.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/ConnectionPoolProvider.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/DBInitializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/DBInitializer.class" afterDir="false" />
@@ -32,25 +95,48 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/mysql/MySQLConnectionPoolProvider.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/postgres/PGConnectionPoolProvider.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/json/TestMemStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/json/TestMemStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/mail/MailUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429IO.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/terminal/ISO6429IO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/DelegationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/DelegationService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/DelegatedAssetRequest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/BaseClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/BaseClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClient.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/BaseClientKeys.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/Client.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/Client.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/BaseClientConverter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache$TransactionIndices.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/classes/edu/uiuc/ncsa/security/delegation/storage/impl/TransactionCache.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/AggregateClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/AggregateClientStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/src/main/java/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateCAStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateClientStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/AggregateClientStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/BaseClientStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/ClientApprovalStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/ClientMemoryStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/classes/edu/uiuc/ncsa/security/delegation/server/storage/impl/FSClientStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ATException.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2ConfigurationLoaderUtils.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/OA2GeneralError.class" afterDir="false" />
@@ -189,7 +275,7 @@
       <command value="mvn clean" />
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.QDL Test Suite">
+  <component name="RunManager" selected="Application.QDL default">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
@@ -661,14 +747,7 @@
       <workItem from="1625569935067" duration="3809000" />
       <workItem from="1625914499084" duration="71006000" />
       <workItem from="1626611907400" duration="40099000" />
-      <workItem from="1627556750839" duration="42776000" />
-    </task>
-    <task id="LOCAL-00077" summary="parser tweak, state management improvement. test for under/overflow errors.">
-      <created>1616606932506</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1616606932507</updated>
+      <workItem from="1627556750839" duration="73530000" />
     </task>
     <task id="LOCAL-00078" summary="documentation. Changed the name of an example script. Removed some dead code. SLightly updated a test.">
       <created>1616621567138</created>
@@ -1006,7 +1085,14 @@
       <option name="project" value="LOCAL" />
       <updated>1627656931596</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <task id="LOCAL-00126" summary="CIL-607, Updated nano syntax files. Added a test.">
+      <created>1628027627366</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1628027627367</updated>
+    </task>
+    <option name="localTasksCounter" value="127" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1016,7 +1102,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL. ISO 6429 improvements." />
     <MESSAGE value="reworked stem assignments. Bunch of stuff (newer code deplaced older code, which is still intact in ase we want to revert.) Much cleaner and leaner. Want to get it in github just in case." />
     <MESSAGE value="Found and fixed an edge case. Updated out of date documentation. Allow for default values in slices. More regression tests." />
     <MESSAGE value="Mostly making sure everything (in particular the documentation which git seems to miss regularly) end up pushed." />
@@ -1041,7 +1126,8 @@
     <MESSAGE value="QDl documentation. twiddled some exceptions to regularize their use." />
     <MESSAGE value="Fixed a few minor things (mis-spellings in comments) and added comments to unit tests." />
     <MESSAGE value="Added floor and ceiling functions to QDL (way overdue) since I have a little time to play catch up. Documented." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added floor and ceiling functions to QDL (way overdue) since I have a little time to play catch up. Documented." />
+    <MESSAGE value="CIL-607, Updated nano syntax files. Added a test." />
+    <option name="LAST_COMMIT_MESSAGE" value="CIL-607, Updated nano syntax files. Added a test." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1148,7 +1234,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1504</line>
+          <line>1505</line>
           <option name="timeStamp" value="511" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1193,17 +1279,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>169</line>
+          <line>170</line>
           <option name="timeStamp" value="702" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1319</line>
+          <line>1320</line>
           <option name="timeStamp" value="704" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>198</line>
+          <line>199</line>
           <option name="timeStamp" value="708" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1213,12 +1299,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>793</line>
+          <line>794</line>
           <option name="timeStamp" value="729" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>149</line>
+          <line>150</line>
           <option name="timeStamp" value="745" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1268,17 +1354,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>996</line>
+          <line>997</line>
           <option name="timeStamp" value="834" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1037</line>
+          <line>1038</line>
           <option name="timeStamp" value="846" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1591</line>
+          <line>1592</line>
           <option name="timeStamp" value="857" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1363,7 +1449,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1955</line>
+          <line>1956</line>
           <option name="timeStamp" value="1019" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

@@ -263,8 +263,12 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             attributes = "*";
         } else {
             attributes = "";
+            boolean isFirst = true;
             for (String a : attr) {
-                attributes = attributes + a + " ";
+                attributes = attributes + (isFirst?"":",") + a ;
+                if(isFirst ){
+                    isFirst = false;
+                }
             }
         }
         String searchString = "select " + attributes + " from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
@@ -412,7 +416,29 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         return null;
     }
+    public boolean remove(List<Identifiable> objects){
+        String inSql = String.join(",", Collections.nCopies(objects.size(), "?"));
+        inSql = "(" + inSql + ")";
+        String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + " IN " + inSql;
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
 
+        try {
+            PreparedStatement stmt = c.prepareStatement(query);
+            for(int i = 0; i < objects.size() ; i++){
+                // Reminder that parameters have index origin 1
+                stmt.setString(i + 1, objects.get(i).getIdentifierString());
+            }
+            stmt.execute();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error removing list", e);
+        }
+        return true;
+
+    }
     public V remove(Object key) {
         V oldObject = null;
         try {

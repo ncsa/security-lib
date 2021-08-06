@@ -6,6 +6,8 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.storage.AggregateStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
+import java.util.List;
+
 /**
  * An aggregate client approval store.
  * <p>Created by Jeff Gaynor<br>
@@ -50,5 +52,10 @@ public class AggregateCAStore<V extends ClientApprovalStore> extends AggregateSt
     @Override
     public MapConverter getMapConverter() {
         throw new NotImplementedException("Error: Cannot have a single converter for an aggregate store.");
+    }
+
+    @Override
+    public List<Identifier> statusSearch(String status) {
+        throw new NotImplementedException();
     }
 }

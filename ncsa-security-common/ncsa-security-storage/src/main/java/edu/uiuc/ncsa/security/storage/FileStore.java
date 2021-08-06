@@ -426,6 +426,20 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
         return allEntries;
     }
 
+    /**
+     * Terribly inefficient. Terribly. However, the assumption is that a file store is small
+     * rather than large. For larger numbers of entries, use a database.
+     * @param objects
+     * @return
+     */
+    @Override
+    public boolean remove(List<Identifiable> objects) {
+        for(Identifiable identifiable : objects){
+            delete(identifiable.getIdentifierString());
+        }
+        return true;
+    }
+
     public boolean delete(String identifier) {
         V t = loadByIdentifier(identifier);
         try {

@@ -35,7 +35,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String LESS_THAN_EQUAL2 = "=<";
     public static final String LESS_THAN_EQUAL3 = "≤"; // unicode 2264
     public static final String MINUS = "-";
-    public static final String MINUS2 = "¯";
+    public static final String MINUS2 = "¯";  // unicode 00af
     public static final String MINUS_MINUS = "--";
     public static final String MORE_THAN = ">";
     public static final String MORE_THAN_EQUAL = ">=";

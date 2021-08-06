@@ -270,19 +270,23 @@ public class MailUtil extends TemplateUtil implements Logable {
             message.setFrom(getMailEnvironment().from);
 
             message.setRecipients(Message.RecipientType.TO, recipients);
-            message.setSubject(replaceAll(subjectTemplate, replacements));
-            message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
-            if(replacements.containsKey("reply-to")){
-                InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
-                message.setReplyTo(new Address[]{address});
+            if(replacements != null) {
+                message.setSubject(replaceAll(subjectTemplate, replacements));
+                message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
+                if (replacements.containsKey("reply-to")) {
+                    InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
+                    message.setReplyTo(new Address[]{address});
+                }
             }
             tr.sendMessage(message, recipients);
             info("Mail notification sent to " + Arrays.toString(recipients));
             return true;
         } catch (Throwable throwable) {
             info("got exception sending message:");
-            for (Object key : replacements.keySet()) {
-                info("(" + key + "," + replacements.get(key.toString()) + ")");
+            if(replacements != null) {
+                for (Object key : replacements.keySet()) {
+                    info("(" + key + "," + replacements.get(key.toString()) + ")");
+                }
             }
             throwable.printStackTrace();
             error("Sending mail failed. Continuing & message reads \"" + throwable.getMessage() + "\"");

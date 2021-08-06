@@ -472,6 +472,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterIntegers(QDLParserParser.IntegersContext ctx) { }
 	/**
 	 * {@inheritDoc}

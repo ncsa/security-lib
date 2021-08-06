@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
@@ -1231,7 +1232,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitTryCatchStatement(QDLParserParser.TryCatchStatementContext tcContext) {
         TryCatch tryCatch = (TryCatch) parsingMap.getStatementFromContext(tcContext);
-        if(tcContext.getChildCount() == 2){
+        if (tcContext.getChildCount() == 2) {
             throw new ParsingException("missing catch clause");
         }
         tryCatch.setSourceCode(getSource(tcContext));
@@ -1957,6 +1958,26 @@ public class QDLListener implements QDLParserListener {
             ParseStatementBlock parseStatementBlock = (ParseStatementBlock) resolveChild(statementBlockContext);
             block.setStatements(parseStatementBlock.getStatements());
         }
+    }
+
+    @Override
+    public void enterFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) {
+
+    }
+
+    @Override
+    public void exitFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) {
+        Polyad polyad;
+        if (null == ctx.Ceiling()) {
+            polyad = new Polyad(TMathEvaluator.FLOOR);
+        } else {
+            polyad = new Polyad(TMathEvaluator.CEILING);
+        }
+        polyad.addArgument((StatementWithResultInterface) resolveChild(ctx.getChild(1)));
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        polyad.setSourceCode(source);
+        stash(ctx, polyad);
     }
 }
 

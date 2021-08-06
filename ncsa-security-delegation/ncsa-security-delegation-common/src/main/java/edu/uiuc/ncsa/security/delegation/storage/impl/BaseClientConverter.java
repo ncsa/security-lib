@@ -94,6 +94,7 @@ public abstract class BaseClientConverter<V extends BaseClient> extends MapConve
         JSONObject content = new JSONObject();
         json.put(getJSONComponentName(), content);
         getJsonUtil().setJSONValue(json, getBKK().identifier(), client.getIdentifierString());
+
         getJsonUtil().setJSONValue(json, getBKK().email(), client.getEmail());
         getJsonUtil().setJSONValue(json, getBKK().name(), client.getName());
         getJsonUtil().setJSONValue(json, getBKK().secret(), client.getSecret());

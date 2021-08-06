@@ -169,4 +169,12 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     public MapConverter getMapConverter(){
         return null;
     }
+
+    @Override
+    public boolean remove(List<Identifiable> objects) {
+        for(Identifiable identifiable : objects){
+            remove(identifiable.getIdentifier());
+        }
+        return true;
+    }
 }

@@ -99,6 +99,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
            StemDot : '.' ;
         UnaryMinus : '¯'; // unicode 00af
          UnaryPlus : '⁺' ;// unicode 207a
+             Floor : '⌊';
+           Ceiling : '⌈';
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here

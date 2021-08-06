@@ -2391,17 +2391,27 @@ floor(arg) - compute the mathematical floor of the argument.
 E.g.
    floor(3.4)
 3
-    ⌊(-3.4)
+
+Compare with the floor operator, ⌊, which behaves identically, but is not a function
+
+    floor(-3.4)
 -4
-See also: ceiling
+See also: ⌊, ceiling, ⌈
                 ]]>
             </body>
         </entry>
     <entry id="⌊">
             <body>
                 <![CDATA[
-unicode 230a aka floor.
-See also: floor
+unicode 230a aka the floor operator. This behaves identically to the floor
+function, but is an operator:
+E.g.
+   ⌊-3.4
+-4
+   ⌊[-2;3;0.7]
+[-2,-2,-1,0,0,1,2,2]
+
+See also: floor, ceiling, ⌈
                 ]]>
             </body>
         </entry>
@@ -2422,8 +2432,30 @@ E.g.
     <entry id="⌈">
             <body>
                 <![CDATA[
-unicode 2308 aka ceiling.
-See also: ceiling
+
+unicode 2308 aka the ceiling operator. This behaves identically to the ceiling
+function, but is an operator.
+E.g.
+  ⌈[-2;3;0.7]
+[-2,-1,0,1,1,2,3,3]
+
+See also: ceiling, floor, ⌊
+                ]]>
+            </body>
+        </entry>
+    <entry id="%">
+            <body>
+                <![CDATA[
+Integer division. This is normal division, but the remainder is discarded.
+The result is always an integer.
+E.g.
+  5432%321
+16
+  3245.4432%1; // % by 1 effective returns the integer part of a decimal
+3245
+   frac(x)->x - x%1; // returns fractional part of a number
+   frac(5432/432)
+0.574074074074074
                 ]]>
             </body>
         </entry>

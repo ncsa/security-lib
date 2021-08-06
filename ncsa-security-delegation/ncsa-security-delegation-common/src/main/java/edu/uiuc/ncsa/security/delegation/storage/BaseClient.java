@@ -13,6 +13,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * on 5/12/16 at  4:32 PM
  */
 public class BaseClient extends IdentifiableImpl {
+
     public BaseClient(Identifier identifier) {
         super(identifier);
     }
