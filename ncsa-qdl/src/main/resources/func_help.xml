@@ -2426,6 +2426,7 @@ E.g.
 5
    ceiling(-4.5)
 -4
+See also: floor, ⌊
                 ]]>
             </body>
         </entry>
@@ -2459,7 +2460,30 @@ E.g.
                 ]]>
             </body>
         </entry>
+    <entry id="define">
+            <body>
+                <![CDATA[
+Keyword.
+This denotes a full function definition. Functions definitions are different
+from lambdas in that they may contain statements. So for instance, you may
+have an if[]then[] in a defined function, but have to use the ternary operator
+of boolean?x:y in a lambda definition. Full syntax is
 
+define[
+   function_signature
+   ][
+   >> Comments
+   body
+ ]
+
+Comments will be displayed in system help under
+
+)help name arg_count
+
+
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

@@ -4,8 +4,10 @@ import edu.uiuc.ncsa.security.core.*;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * An in-memory store. This is useful in several different ways and is in effect
@@ -118,38 +120,25 @@ public abstract class MemoryStore<V extends Identifiable> extends HashMap<Identi
     }
 
     @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
+        return GenericStoreUtils.search(this,
+                 key,
+                 condition,
+                 isRegEx,
+                 attr,
+                 dateField,
+                 before,
+                 after);
+    }
+
+    @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
-        /*
-        This is boilerplated from the FileStore class. Searching a memory store is really almost never
-        needed in practice and this should be treated as a debugging tool more than anything else.
-        It may lag if FileStore gets updates....
-         */
-        ArrayList<V> results = new ArrayList();
-        Collection<V> values = values();
-        Iterator iterator = values.iterator();
-        Pattern pattern = null;
-        if (isRegEx) {
-            pattern = Pattern.compile(condition);
-        }
-        while (iterator.hasNext()) {
-            V v = (V) iterator.next();
-            XMLMap map = new XMLMap();
-
-            getXMLConverter().toMap(v, map);
-            String targetValue = map.get(key).toString();
-
-            if (isRegEx) {
-                if (pattern.matcher(targetValue).matches()) {
-                    results.add(v);
-                }
-            } else {
-                if (targetValue.equals(condition)) {
-                    results.add(v);
-                }
-            }
-
-        }
-        return results;
+        return GenericStoreUtils.search(this,
+                 key,
+                 condition,
+                 isRegEx,
+                 attr,
+                 null,null,null);
     }
 
     @Override

@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * A store backed by the file system. This works with all implementations since it just serializes whatever
@@ -528,37 +527,22 @@ public abstract class FileStore<V extends Identifiable> extends IndexedStreamSto
 
     @Override
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
-        /*
-        This can be a very expensive way to do this, but it does allow for searching through an
-        entire file store for things.
-        MemoryStore has this code boilerplated into it...
-         */
-        ArrayList<V> results = new ArrayList();
-        Collection<V> values = values();
-        Iterator iterator = values.iterator();
-        Pattern pattern = null;
-        if (isRegEx) {
-            pattern = Pattern.compile(condition);
-        }
-        while (iterator.hasNext()) {
-            V v = (V) iterator.next();
-            XMLMap map = new XMLMap();
+        return GenericStoreUtils.search(this,
+                key,
+                condition,
+                isRegEx,
+                attr,null,null,null);    }
 
-            getXMLConverter().toMap(v, map);
-            String targetValue = map.get(key).toString();
-            map.removeKeys(attr);
-            if (isRegEx) {
-                if (pattern.matcher(targetValue).matches()) {
-                    results.add(v);
-                }
-
-            } else {
-                if (targetValue.equals(condition)) {
-                    results.add(v);
-                }
-            }
-        }
-        return results;
+    @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
+      return GenericStoreUtils.search(this,
+              key,
+              condition,
+              isRegEx,
+              attr,
+              dateField,
+              before,
+              after);
     }
 
     @Override

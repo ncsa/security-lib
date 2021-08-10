@@ -510,6 +510,11 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     }
 
     @Override
+    public List<V> search(String key, String condition, boolean isRegEx, List<String> attr, String dateField, Date before, Date after) {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
+    }
+
+    @Override
     public MapConverter getMapConverter() {
         throw new NotImplementedException("Error: This is not yet implemented for cache");
     }

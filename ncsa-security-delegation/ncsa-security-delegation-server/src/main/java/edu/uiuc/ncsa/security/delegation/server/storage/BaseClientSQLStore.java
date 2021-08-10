@@ -43,47 +43,60 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends SQLStore<
        */
       @Override
       public List<Identifier> getByStatus(String status, ClientApprovalStore clientApprovalStore) {
-          List<Identifier> ids = new ArrayList<>();
-          if (!(clientApprovalStore instanceof SQLStore)) {
-              throw new IllegalStateException("Cannot perform this against a non-SQL store. ");
-          }
           SQLStore caStore = (SQLStore) clientApprovalStore;
-          // so now we have to create a very specific left join to get this information, which is why
-          // everything has to live in the same database.
           ClientApprovalKeys caKeys = (ClientApprovalKeys) caStore.getMapConverter().getKeys();
-          String clientField = getMapConverter().getKeys().identifier();
-          String approvalField = caKeys.identifier();
-          String clientTableName = getTable().getFQTablename();
-          String approvalTableName = caStore.getTable().getFQTablename();
-
-          String query = "select p." + clientField + " from " + clientTableName +
-                  " as p left join " + approvalTableName + " as s on p." + clientField +
-                  " = s." + approvalField + " where s." + caKeys.status() + " = ?";
-
-          ConnectionRecord cr = getConnection();
-          Connection c = cr.connection;
-
-          V t = null;
-          try {
-              PreparedStatement stmt = c.prepareStatement(query);
-              stmt.setString(1, status);
-              stmt.executeQuery();
-              ResultSet rs = stmt.getResultSet();
-              // Now we have to pull in all the values.
-              while (rs.next()) {
-                  ids.add(new BasicIdentifier(rs.getString(clientField)));
-              }
-
-              rs.close();
-              stmt.close();
-              releaseConnection(cr);
-          } catch (SQLException e) {
-              destroyConnection(cr);
-              if (DebugUtil.isEnabled()) {
-                  e.printStackTrace();
-              }
-              throw new GeneralException("Error getting aprpovals for status \"" + status + "\"", e);
-          }
-          return ids;
+          return getByField(caKeys.status(), status, clientApprovalStore);
       }
+
+    @Override
+    public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
+        SQLStore caStore = (SQLStore) clientApprovalStore;
+        ClientApprovalKeys caKeys = (ClientApprovalKeys) caStore.getMapConverter().getKeys();
+        return getByField(caKeys.approver(), approver, clientApprovalStore);
+    }
+
+    public List<Identifier> getByField(String fieldName, String field, ClientApprovalStore clientApprovalStore) {
+              List<Identifier> ids = new ArrayList<>();
+              if (!(clientApprovalStore instanceof SQLStore)) {
+                  throw new IllegalStateException("Cannot perform this against a non-SQL store. ");
+              }
+              SQLStore caStore = (SQLStore) clientApprovalStore;
+              // so now we have to create a very specific left join to get this information, which is why
+              // everything has to live in the same database.
+              ClientApprovalKeys caKeys = (ClientApprovalKeys) caStore.getMapConverter().getKeys();
+              String clientID = getMapConverter().getKeys().identifier();
+              String approvalID = caKeys.identifier();
+              String clientTableName = getTable().getFQTablename();
+              String approvalTableName = caStore.getTable().getFQTablename();
+
+              String query = "select p." + clientID + " from " + clientTableName +
+                      " as p left join " + approvalTableName + " as s on p." + clientID +
+                      " = s." + approvalID + " where s." + fieldName + " = ?";
+
+              ConnectionRecord cr = getConnection();
+              Connection c = cr.connection;
+
+              V t = null;
+              try {
+                  PreparedStatement stmt = c.prepareStatement(query);
+                  stmt.setString(1, field);
+                  stmt.executeQuery();
+                  ResultSet rs = stmt.getResultSet();
+                  // Now we have to pull in all the values.
+                  while (rs.next()) {
+                      ids.add(new BasicIdentifier(rs.getString(clientID)));
+                  }
+
+                  rs.close();
+                  stmt.close();
+                  releaseConnection(cr);
+              } catch (SQLException e) {
+                  destroyConnection(cr);
+                  if (DebugUtil.isEnabled()) {
+                      e.printStackTrace();
+                  }
+                  throw new GeneralException("Error getting aprpovals for status \"" + field + "\"", e);
+              }
+              return ids;
+          }
 }

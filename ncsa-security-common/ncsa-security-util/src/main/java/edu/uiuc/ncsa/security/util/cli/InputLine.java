@@ -1,9 +1,8 @@
 package edu.uiuc.ncsa.security.util.cli;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
+
+import java.util.*;
 
 /**
  * A utility to take an input line and turn it into a command line. The zero-th index is
@@ -15,10 +14,18 @@ import java.util.Vector;
  * on 5/17/13 at  11:10 AM
  */
 public class InputLine {
-    public static final String COMMAND_DELIMITER = "";
+    public static final String DELIMITER = " "; // what's between commands
 
     public InputLine(Vector v) {
         parsedInput = v;
+        originalLine = "";
+        boolean isFirstPass = true;
+        for (Object obj : v) {
+            originalLine = originalLine + (isFirstPass ? "" : DELIMITER) + obj;
+            if (isFirstPass) {
+                isFirstPass = false;
+            }
+        }
     }
 
     protected InputLine() {
@@ -29,13 +36,25 @@ public class InputLine {
      * <pre>
      *     )help -w 120 -modules
      * </pre>
+     *
      * @param unparsedString
      */
     public InputLine(String unparsedString) {
-        StringTokenizer stringTokenizer = new StringTokenizer(unparsedString, " ");
+        originalLine = unparsedString;
+        StringTokenizer stringTokenizer = new StringTokenizer(unparsedString, DELIMITER);
         Vector<String> vector = new Vector<>();
-        while(stringTokenizer.hasMoreTokens()){
-            vector.add(stringTokenizer.nextToken());
+        while (stringTokenizer.hasMoreTokens()) {
+            String token = stringTokenizer.nextToken();
+            if(token.startsWith(LIST_START_DELIMITER)){
+                String x = token;
+                while(!token.contains(LIST_END_DELIMITER)){
+                    token = stringTokenizer.nextToken();
+                    x =x + token;
+                }
+                vector.add(x);
+            }else {
+                vector.add(token);
+            }
         }
         parsedInput = vector;
     }
@@ -87,6 +106,8 @@ public class InputLine {
     /**
      * Use for switches with value, e.g. if you have "-foo bar" then invoke this with "-foo" and bar will be removed too.
      * To remove a single value, use {@link #removeSwitch(String)}
+     * <h3>NOTE</h3>
+     * This does not remove lists as of yet.
      *
      * @param value
      */
@@ -95,8 +116,34 @@ public class InputLine {
             return;
         }
         String x = getNextArgFor(value);
-        removeSwitch(x);
-        removeSwitch(value);
+        if(StringUtils.isTrivial(x)){
+            // case is that they asked to remove a switch and value but there is no value.
+            removeSwitch(value);
+            return;
+        }
+        if (x.startsWith(LIST_START_DELIMITER)) {
+            if (x.endsWith(LIST_END_DELIMITER)) {
+                removeSwitch(x);
+                removeSwitch(value);
+            } else {
+                int ndx = indexOf(value);
+                int nextIndex = ndx;
+                boolean loop = true;
+                while (loop) {
+                    String y = parsedInput.get(nextIndex++);
+                    if (y.endsWith(LIST_END_DELIMITER)) {
+                        loop = false;
+                    }
+                }
+                List<String> newPI = new ArrayList<>();
+                newPI.addAll(parsedInput.subList(0, ndx));
+                newPI.addAll(parsedInput.subList(nextIndex, parsedInput.size()));
+                parsedInput = newPI;
+            }
+        } else {
+            removeSwitch(x);
+            removeSwitch(value);
+        }
     }
 
     public void removeSwitchAndValue(String... values) {
@@ -138,6 +185,7 @@ public class InputLine {
         }
         return this;
     }
+
     @Override
 
     public String toString() {
@@ -155,7 +203,7 @@ public class InputLine {
                     firstPass = false;
                     out = x;
                 } else {
-                    out = out + " " + x;
+                    out = out + DELIMITER + x;
                 }
             }
         }
@@ -372,6 +420,22 @@ public class InputLine {
         }
         return getArg(1 + index); // finally, a result!
     }
+      public static final String  SWITCH = "-";
+
+    /**
+     * checks if the very next component is an argument, not a switch.
+     * @param key
+     * @return
+     */
+    public boolean hasNextArgFor(String key) {
+        int index = indexOf(key);
+        // NOTE that the indexOf command starts at 1, since the zeroth index is always omitted
+        if (index == getArgs().size()) { // so it is the last arg in the string and there cannot be another
+            return false;
+        }
+
+        return !getArg(1 + index).startsWith(SWITCH); // finally, a result!
+    }
 
     /**
      * Returns the number of arguments for this input line. This does <b>not</b> include the original
@@ -384,5 +448,53 @@ public class InputLine {
             return 0;
         }
         return parsedInput.size() - 1;
+    }
+
+    String LIST_START_DELIMITER = "[";
+    String LIST_END_DELIMITER = "]";
+    String LIST_SEPARATOR = ",";
+
+    public List<String> getArgList(String flag) {
+        List<String> list = new ArrayList<>();
+        String rawLine = getOriginalLine();
+
+        if (rawLine == null || rawLine.isEmpty()) {
+            return list;
+        }
+        int ndx = rawLine.indexOf(flag);
+        int nextSwitch = rawLine.indexOf("-",ndx+1);
+        int startListIndex = rawLine.indexOf(LIST_START_DELIMITER, ndx);
+        if((-1 < nextSwitch) && (nextSwitch < startListIndex)){
+            // -1 for next switch means this is the last argument
+            // -1 < nextSwitch means that there is another switch with a list, like
+            // foo -zero -one [a,b,c]
+            // We don't want a request for -zero to just return the next list.
+            return list;
+        }
+        int endListIndex = rawLine.indexOf(LIST_END_DELIMITER, ndx);
+        if (startListIndex == -1 || endListIndex == -1) {
+            return list;
+        }
+        String rawList = rawLine.substring(startListIndex + 1, endListIndex);
+        StringTokenizer st = new StringTokenizer(rawList, LIST_SEPARATOR);
+        while (st.hasMoreElements()) {
+            list.add(st.nextToken().trim());
+        }
+
+        return list;
+    }
+
+    public static void main(String[] args) {
+        InputLine inputLine = new InputLine("foo -zero -one [2,3,4] -arf blarf -woof -two [abc,  def, g] -fnord 3455.34665 -three [  a,b,   c]");
+
+        System.out.println(inputLine.getArgList("-zero")); // should be empty
+        System.out.println(inputLine.getArgList("-one"));
+        System.out.println(inputLine.getArgList("-two"));
+        System.out.println(inputLine.getArgList("-three"));
+        System.out.println(inputLine);
+        inputLine.removeSwitchAndValue("-two");
+        System.out.println(inputLine);
+        inputLine.removeSwitchAndValue("-one");
+        System.out.println(inputLine);
     }
 }

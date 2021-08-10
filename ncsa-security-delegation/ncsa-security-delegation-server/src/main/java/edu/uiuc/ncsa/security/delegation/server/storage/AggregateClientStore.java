@@ -31,7 +31,12 @@ public class AggregateClientStore<V extends ClientStore> extends AggregateStore<
     public List<Identifier> getByStatus(String status, ClientApprovalStore clientApprovalStore) {
         throw new NotImplementedException("Error: No single converter for an aggregate store is possible");
     }
-/*    @Override
+
+    @Override
+    public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
+        throw new NotImplementedException("Error: No single converter for an aggregate store is possible");
+    }
+    /*    @Override
     public IdentifiableProvider getACProvider() {
         return null;
     }*/

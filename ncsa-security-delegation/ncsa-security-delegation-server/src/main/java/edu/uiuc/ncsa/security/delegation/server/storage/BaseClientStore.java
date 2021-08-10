@@ -17,5 +17,6 @@ public interface BaseClientStore<V extends BaseClient> extends Store<V> {
      * @return
      */
     List<Identifier> getByStatus(String status, ClientApprovalStore clientApprovalStore);
+    List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore);
 
 }

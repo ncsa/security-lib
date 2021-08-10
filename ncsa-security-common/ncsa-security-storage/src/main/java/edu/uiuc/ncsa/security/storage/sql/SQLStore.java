@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptors;
@@ -257,6 +258,92 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
 
+    public List<V> search(String key, String condition,
+                          boolean isRegEx,
+                          List<String> attr,
+                          String dateField,
+                          Date before,
+                          Date after) {
+
+        String attributes = null;
+        if (attr == null || attr.isEmpty()) {
+            attributes = "*";
+        } else {
+            attributes = "";
+            boolean isFirst = true;
+            for (String a : attr) {
+                attributes = attributes + (isFirst?"":",") + a ;
+                if(isFirst ){
+                    isFirst = false;
+                }
+            }
+        }
+        String searchString = "select " + attributes +
+                " from " + getTable().getFQTablename();
+
+        boolean hasKey  = !StringUtils.isTrivial(key);
+        if(hasKey){
+            searchString = searchString + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ? ";
+        }
+        boolean hasBefore = before!=null;
+        boolean hasAfter = after != null;
+
+        if(hasAfter){
+            if(hasBefore){
+                // between two dates.
+                searchString = searchString + (hasKey?" and ":" where ") + dateField + " between ? and ?";
+            }else{
+                // only after
+                searchString = searchString + (hasKey?" and ":" where ") + "? <= " + dateField ;
+            }
+        }else{
+            if(hasBefore){
+                searchString = searchString + (hasKey?" and ":" where ") + dateField + "  <= ? ";
+                // only before
+            }else{
+               // no time clause
+            }
+        }
+        List<V> values = new ArrayList<>();
+        if(!hasKey && !hasBefore && !hasAfter){
+            // If they munged their query and didn't ask for anything, don't return anything.
+            return values;
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(searchString);
+            int pIndex = 1;
+            if(hasKey) {
+                stmt.setString(pIndex++, condition);
+            }
+            if(hasAfter){
+                stmt.setDate(pIndex++, new java.sql.Date(after.getTime()));
+            }
+            if(hasBefore){
+                stmt.setDate(pIndex++, new java.sql.Date(before.getTime()));
+            }
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                values.add(t);
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting object with identifier \"" + key + "\"", e);
+        }
+        return values;
+    }
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
         String attributes = null;
         if (attr == null || attr.isEmpty()) {
@@ -271,7 +358,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 }
             }
         }
-        String searchString = "select " + attributes + " from " + getTable().getFQTablename() + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
+        String searchString = "select " + attributes +
+                " from " + getTable().getFQTablename() +
+                " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
         List<V> values = new ArrayList<>();
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;

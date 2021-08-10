@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.core;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -78,6 +79,13 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      * @return
      */
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr);
+
+    public List<V> search(String key, String condition,
+                              boolean isRegEx,
+                              List<String> attr,
+                              String dateField,
+                              Date before,
+                              Date after);
 
     public int size(boolean includeVersions);
 

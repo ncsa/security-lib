@@ -268,6 +268,11 @@ public class AggregateStore<V extends Store> implements Store {
     }
 
     @Override
+    public List search(String key, String condition, boolean isRegEx, List attr, String dateField, Date before, Date after) {
+        throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
+    }
+
+    @Override
     public boolean remove(List objects) {
         throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }

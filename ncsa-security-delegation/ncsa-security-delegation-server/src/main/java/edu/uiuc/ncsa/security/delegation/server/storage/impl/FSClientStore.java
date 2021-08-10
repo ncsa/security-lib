@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.server.storage.impl;
 
 import edu.uiuc.ncsa.security.core.Identifier;
-import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.IdentifiableProviderImpl;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
@@ -41,7 +40,11 @@ public abstract class FSClientStore<V extends Client> extends FileStore<V> imple
 
     @Override
     public List<Identifier> getByStatus(String status, ClientApprovalStore clientApprovalStore) {
-        throw new NotImplementedException();
+        return GenericClientStoreUtils.getByStatus(this, status, clientApprovalStore);
+    }
 
+    @Override
+    public List<Identifier> getByApprover(String approver, ClientApprovalStore clientApprovalStore) {
+        return GenericClientStoreUtils.getByApprover(this, approver, clientApprovalStore);
     }
 }

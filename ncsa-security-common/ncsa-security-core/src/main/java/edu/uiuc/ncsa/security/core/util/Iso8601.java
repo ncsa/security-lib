@@ -47,6 +47,7 @@ import java.util.TimeZone;
 
 
 /**
+ *
  * Note: This is taken from the old defunct  Tupelo project at the NCSA. The handling of
  * dates was very hard to get right and rather than introduce a dependency on
  * that (very large) project,
@@ -54,6 +55,8 @@ import java.util.TimeZone;
  * legal notice.
  *
  * This class provides some utilities for creating and parsing ISO 8601 dates.
+ * It dates way back to Java 2 or so and should probably be replaced by java.time
+ * classes in  introduced in Java 8.
  * <H3>Commentary</H3>
  * This has a few things that need to be mentioned. As per contract
  * <br>date to string conversions always only return a date in UTC, i.e., ending with a "Z"
@@ -68,6 +71,11 @@ import java.util.TimeZone;
  * fractions of seconds are handled in an unintiutive way so that errors were being consistently introduced. The method
  * <code>fixSeconds</code> fixes this and there are regression tests to catch this now as well.
  *
+ */
+/*
+TODO This should have its functionality replaced with the java.time classes.
+The original version of this dated back to Java 4 or some such when ISO date handling had not
+been adopted and the Java Date and Calendar classes were mostly broken to boot.
  */
 public class Iso8601 {
     /**
@@ -205,6 +213,25 @@ public class Iso8601 {
         Calendar c = Calendar.getInstance();
         c.setTimeZone(TimeZone.getTimeZone("UTC"));
         return c;
+    }
+    public static void main(String[] args){
+        try {
+            TimeZone tz = TimeZone.getDefault();
+
+            System.out.println(tz);
+            System.out.println(tz.getRawOffset());
+            System.out.println(tz.getRawOffset()/1000/60);
+            String tzOffset = (tz.getRawOffset()<0)?"-":"+";
+            int hr =Math.abs(tz.getRawOffset()/1000/60/60);
+            int min = Math.abs(tz.getRawOffset()/1000%60);
+            tzOffset = tzOffset + ((hr<10?"0":"") + hr) +":" + ((min<10?"0":"" )+ min);
+            Calendar calendar = string2Date("2021-04-05T12:34:56" + tzOffset);
+            System.out.println(calendar.getTime());
+             calendar = string2Date("2021-04-05T12:34:56");
+
+        }catch (Throwable t){
+            t.printStackTrace();
+        }
     }
 }
 
