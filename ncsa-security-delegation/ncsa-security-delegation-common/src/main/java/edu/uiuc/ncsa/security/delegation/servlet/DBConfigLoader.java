@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.security.delegation.servlet;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.LoggingConfigLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.mariadb.MariaDBConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPoolProvider;
 import edu.uiuc.ncsa.security.storage.sql.postgres.PGConnectionPoolProvider;
@@ -39,10 +40,7 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
 
     MySQLConnectionPoolProvider mySQLConnectionPoolProvider;
 
-    // ALWAYS return a new connection provider or you will only get the same connection repeatedly (and if there
-    // are multiple stores with multiple users you will get authentication errors!)
-    // ALSO, these get no configuration here since this will be determined later and set by
-    // the store provider. At this point which mysql instance is being used is undecidable!
+
     public MySQLConnectionPoolProvider getMySQLConnectionPoolProvider() {
         if (mySQLConnectionPoolProvider == null) {
             mySQLConnectionPoolProvider = getMySQLConnectionPoolProvider("oauth", "oauth");  // database, schema are set to default
@@ -78,6 +76,18 @@ public abstract class DBConfigLoader<T extends AbstractEnvironment> extends Logg
         return mariaDBConnectionPoolProvider;
     }
 
+    DerbyConnectionPoolProvider derbyConnectionPoolProvider;
+    // need no-arg constructor whose values will be overriden later from configuration.
+
+    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(){
+           return getDerbyConnectionPoolProvider("oa4mp", "oauth2");
+    }
+    public DerbyConnectionPoolProvider getDerbyConnectionPoolProvider(String databaseName, String schema){
+        if(derbyConnectionPoolProvider == null){
+                     derbyConnectionPoolProvider = new DerbyConnectionPoolProvider(databaseName, schema);
+        }
+        return derbyConnectionPoolProvider;
+    }
 
     PGConnectionPoolProvider pgConnectionPoolProvider = null;
 

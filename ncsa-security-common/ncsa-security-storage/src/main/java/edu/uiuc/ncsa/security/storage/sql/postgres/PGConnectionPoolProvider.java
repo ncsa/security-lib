@@ -45,7 +45,7 @@ public class PGConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
                     checkValue(DRIVER, driver),
                     checkValue(USE_SSL, useSSL),
                     checkValue(PARAMETERS,""));
-            pool = new ConnectionPool(x);
+            pool = new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_POSTGRES);
             setPoolParameters(pool
             );
         }

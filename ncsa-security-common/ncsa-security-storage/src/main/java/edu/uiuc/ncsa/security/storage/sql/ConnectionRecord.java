@@ -47,7 +47,6 @@ public class ConnectionRecord implements Identifiable {
     Identifier identifier;
     long lastAccessed = 0L;
     boolean isClosed = true;
-
     @Override
     public String toString() {
         return "ConnectionRecord{" +

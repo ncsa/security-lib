@@ -17,6 +17,6 @@ import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
  */
 public class MySQLConnectionPool extends ConnectionPool {
     public MySQLConnectionPool(SQLConnectionImpl connectionParameters) {
-        super(connectionParameters);
+        super(connectionParameters, CONNECTION_TYPE_MYSQL);
     }
 }

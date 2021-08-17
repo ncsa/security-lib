@@ -8,12 +8,18 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
+import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  1:12 PM
  */
 public class TestUtils {
+
+    public static void set_instance(TestUtils _instance) {
+        TestUtils._instance = _instance;
+    }
+
     static TestUtils _instance;
 
     static public TestUtils newInstance() {
@@ -25,11 +31,31 @@ public class TestUtils {
 
     ImportManager namespaceResolver = ImportManager.getResolver();
 
+    public State createStateObject(ImportManager resolver,
+                                   SymbolStack symbolStack,
+                                   OpEvaluator opEvaluator,
+                                   MetaEvaluator metaEvaluator,
+                                   FTStack ftStack,
+                                   ModuleMap moduleMap,
+                                   MyLoggingFacade myLoggingFacade,
+                                   boolean isServerMode,
+                                   boolean assertionsOn) {
+        return new State(new ImportManager(),
+                symbolStack,
+                new OpEvaluator(),
+                MetaEvaluator.getInstance(),
+                new FTStack(),
+                new ModuleMap(),
+                null,
+                false,
+                true);
+    }
+
     public State getNewState() {
         SymbolTableImpl st = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(st);
-        State state = new State(new ImportManager(),
+        State state = createStateObject(new ImportManager(),
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
@@ -43,21 +69,22 @@ public class TestUtils {
 
     /**
      * Send along the state but with the pre-populated symbol stack.
+     *
      * @return
      */
     public State getTestState() {
 
-           State state = new State(namespaceResolver,
-                   getTestSymbolStack(),
-                   new OpEvaluator(),
-                   MetaEvaluator.getInstance(),
-                   new FTStack(),
-                   new ModuleMap(),
-                   null,
-                   false,
-                   true);
-           return state;
-       }
+        State state = createStateObject(namespaceResolver,
+                getTestSymbolStack(),
+                new OpEvaluator(),
+                MetaEvaluator.getInstance(),
+                new FTStack(),
+                new ModuleMap(),
+                null,
+                false,
+                true);
+        return state;
+    }
 
 
     /**

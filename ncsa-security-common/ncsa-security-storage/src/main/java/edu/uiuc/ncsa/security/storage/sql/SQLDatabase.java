@@ -4,6 +4,10 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.PoolException;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnMap;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -74,7 +78,33 @@ public class SQLDatabase {
             String colName = rsmd.getColumnName(i);
             Object obj = null;
             obj = rs.getObject(colName);
-            map.put(colName, obj);
+            if(obj instanceof Clob){
+             // some vendors return a clob which requires an open connection to the database to retrieve.
+            // This will bomb later because we close connections. Get it now.
+             Clob clob = (Clob)obj;
+             if(clob.length() < Integer.MAX_VALUE) {
+                 Reader r = clob.getCharacterStream();
+                 BufferedReader bufferedReader = new BufferedReader(r);
+                 try {
+                     String lineIn = bufferedReader.readLine();
+                     boolean isFirst = true;
+                     StringBuffer stringBuffer = new StringBuffer();
+                     while (lineIn != null) {
+                          stringBuffer.append((isFirst?"":"\n") + lineIn);
+                          if(isFirst) isFirst = false;
+                          lineIn = bufferedReader.readLine();
+                     }
+                     map.put(colName, stringBuffer.toString());
+
+                 }catch(IOException iox){
+                     throw new IllegalStateException("Error: Could not read stream from database CLOB " + iox.getMessage());
+                 }
+             }else{
+                 throw new IllegalStateException("error: the clob is too large to represent as a string");
+             }
+            }else {
+                map.put(colName, obj);
+            }
         }
         return map;
     }

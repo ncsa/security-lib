@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.storage.sql.derby;
 
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
 
 /**
@@ -14,10 +15,11 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
         if(inMemory){
            url = url + "memory:" + databaseName + ";create=true";
         }else{
-            url = url + databaseName;
+            url = url + databaseName + ";user=" + username + ";password=" + password +
+                    (!StringUtils.isTrivial(bootPassword)?";bootPassword=" + bootPassword:"");
         }
         return url;
-        //
+        // jdbc:derby:PATH_TO_DATABASE;create=true;dataEncryption=true;bootPassword=BOOT_PASSWORD;
         //return "'jdbc:derby:" + (useSSL?"ssl":"tcp") + "://" + host  + (0<port?":"+port:"")  + "/" + databaseName;
     }
 
@@ -30,12 +32,15 @@ public class DerbyConnectionParameters extends SQLConnectionImpl {
                                      String jdbcDriver,
                                      boolean useSSL,
                                      boolean inMemory,
+                                     String bootPassword,
                                      String parameters
     ) {
         super(username, password, databaseName, schema, host, port, jdbcDriver, useSSL, parameters);
         this.inMemory = inMemory;
+        this.bootPassword = bootPassword;
     }
 
+    protected String bootPassword = null;
     protected boolean inMemory = false;
 
 }

@@ -28,9 +28,10 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
 
     ConnectionParameters connectionParameters;
 
-    public ConnectionPool(SQLConnectionImpl connectionParameters) {
+    public ConnectionPool(SQLConnectionImpl connectionParameters, int connectionType) {
         this.connectionParameters = connectionParameters;
         stack = new StackMap<>();
+        type = connectionType;
     }
     public StackMap getStackMap(){
         return (StackMap) stack;
@@ -147,4 +148,17 @@ public class ConnectionPool<T extends ConnectionRecord> extends Pool<T> {
     public void setQueueInterval(long queueInterval) {
         this.queueInterval = queueInterval;
     }
+
+    public int getType() {
+        return type;
+    }
+
+    int type = CONNECTION_TYPE_UNKNOWN;
+
+    public static final int CONNECTION_TYPE_UNKNOWN =-1;
+    public static final int CONNECTION_TYPE_MYSQL =1;
+    public static final int CONNECTION_TYPE_MARIADB =2;
+    public static final int CONNECTION_TYPE_POSTGRES =3;
+    public static final int CONNECTION_TYPE_DEBRY =4;
+    public static final int CONNECTION_TYPE_H2 =5;
 }

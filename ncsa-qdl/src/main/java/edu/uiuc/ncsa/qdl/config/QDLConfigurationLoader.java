@@ -386,7 +386,6 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         System.out.println("ws pretty print = " + config.isPrettyPrint());
         System.out.println("vfs config = " + config.getVFSConfigurations());
         System.out.println("module config = " + config.getModuleConfigs());
-
     }
 
     @Override

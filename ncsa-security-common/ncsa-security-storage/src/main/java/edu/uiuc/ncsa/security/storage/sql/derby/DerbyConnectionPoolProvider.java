@@ -9,10 +9,6 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
  * on 5/2/12 at  1:46 PM
  */
 public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<ConnectionPool> {
-    /**
-     * the default port is 8084 for localhost connections. Non-local-host connections should specify port 8085
-     * (for a standard install) and use ssl.
-     */
 
     public DerbyConnectionPoolProvider(String database,
                                        String schema,
@@ -32,6 +28,7 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
     }
 
     boolean inMemory = false;
+    String bootPassword = "";
     @Override
     protected boolean checkEvent(CfgEvent cfgEvent) {
         return false;
@@ -54,9 +51,10 @@ public class DerbyConnectionPoolProvider extends ConnectionPoolProvider<Connecti
                 checkValue(PORT, port),
                 checkValue(DRIVER, driver),
                 checkValue(USE_SSL, useSSL),
-                checkValue("inMemory", inMemory),
+                checkValue(IN_MEMORY, inMemory),
+                checkValue(BOOT_PASSWORD, bootPassword),
                 checkValue(PARAMETERS, "")
         );
-        return new ConnectionPool(x);
+        return new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_DEBRY);
     }
 }

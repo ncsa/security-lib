@@ -19,6 +19,6 @@ import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
 public class MariaDBConnectionPool extends ConnectionPool {
 
     public MariaDBConnectionPool(SQLConnectionImpl connectionParameters) {
-        super(connectionParameters);
+        super(connectionParameters, CONNECTION_TYPE_MARIADB);
     }
 }

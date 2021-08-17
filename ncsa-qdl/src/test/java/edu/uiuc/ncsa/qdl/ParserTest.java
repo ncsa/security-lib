@@ -2705,7 +2705,7 @@ public class ParserTest extends AbstractQDLTester {
      }
 
     /**
-     * Checks that referncing non-existent elements fails at is should.
+     * Checks that referencing non-existent elements fails at is should.
      * @throws Throwable
      */
     public void testBadListsAsIndices2() throws Throwable{

@@ -27,6 +27,8 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     public static final String DATABASE = "database";
     public static final String PARAMETERS = "parameters";
     public static final String SCHEMA = SQLStoreProvider.SCHEMA; // since this is shared, really.
+    public static final String BOOT_PASSWORD = "bootPassword"; // for derby databases
+    public static final String IN_MEMORY = "inMemory"; // for derby databases
     public static final String CONNECTION_MAX = "maxConnections";
     public static final String CONNECTION_IDLE_TIMEOUT = "idleTimeout";
     public static final String CONNECTION_CLEANUP_INTERVAL = "cleanupInterval";

@@ -13,6 +13,7 @@ public interface StorageConfigurationTags extends ConfigurationTags {
     public static final String MYSQL_STORE = "mysql";
     public static final String MARIADB_STORE = "mariadb";
     public static final String POSTGRESQL_STORE = "postgresql";
+    public static final String DERBY_STORE = "derby";
 
     // for file stores
     public static final String FS_PATH = "path";

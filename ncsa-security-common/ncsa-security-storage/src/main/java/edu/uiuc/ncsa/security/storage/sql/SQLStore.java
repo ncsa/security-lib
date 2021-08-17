@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.UnregisteredObjectException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StatusValue;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.internals.ColumnDescriptorEntry;
@@ -116,14 +117,17 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 if (!cde.isPrimaryKey()) {
                     Object obj = map.get(cde.getName());
                     // Dates confuse setObject, so turn it into an SQL Timestamp object.
+                    boolean gotOne = false;
                     if (obj instanceof Date) {
                         obj = new Timestamp(((Date) obj).getTime());
                     }
                     if (obj instanceof BasicIdentifier) {
-                        stmt.setString(i++, obj.toString());
-                    } else {
-                        stmt.setObject(i++, obj);
+                        obj = obj.toString();
                     }
+                    if (obj instanceof StatusValue) {
+                        obj = ((StatusValue) obj).getStatus();
+                    }
+                        stmt.setObject(i++, obj);
                 }
             }
 
@@ -272,8 +276,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             attributes = "";
             boolean isFirst = true;
             for (String a : attr) {
-                attributes = attributes + (isFirst?"":",") + a ;
-                if(isFirst ){
+                attributes = attributes + (isFirst ? "" : ",") + a;
+                if (isFirst) {
                     isFirst = false;
                 }
             }
@@ -281,31 +285,31 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         String searchString = "select " + attributes +
                 " from " + getTable().getFQTablename();
 
-        boolean hasKey  = !StringUtils.isTrivial(key);
-        if(hasKey){
+        boolean hasKey = !StringUtils.isTrivial(key);
+        if (hasKey) {
             searchString = searchString + " where " + key + " " + (isRegEx ? "regexp" : "=") + " ? ";
         }
-        boolean hasBefore = before!=null;
+        boolean hasBefore = before != null;
         boolean hasAfter = after != null;
 
-        if(hasAfter){
-            if(hasBefore){
+        if (hasAfter) {
+            if (hasBefore) {
                 // between two dates.
-                searchString = searchString + (hasKey?" and ":" where ") + dateField + " between ? and ?";
-            }else{
+                searchString = searchString + (hasKey ? " and " : " where ") + dateField + " between ? and ?";
+            } else {
                 // only after
-                searchString = searchString + (hasKey?" and ":" where ") + "? <= " + dateField ;
+                searchString = searchString + (hasKey ? " and " : " where ") + "? <= " + dateField;
             }
-        }else{
-            if(hasBefore){
-                searchString = searchString + (hasKey?" and ":" where ") + dateField + "  <= ? ";
+        } else {
+            if (hasBefore) {
+                searchString = searchString + (hasKey ? " and " : " where ") + dateField + "  <= ? ";
                 // only before
-            }else{
-               // no time clause
+            } else {
+                // no time clause
             }
         }
         List<V> values = new ArrayList<>();
-        if(!hasKey && !hasBefore && !hasAfter){
+        if (!hasKey && !hasBefore && !hasAfter) {
             // If they munged their query and didn't ask for anything, don't return anything.
             return values;
         }
@@ -316,13 +320,13 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         try {
             PreparedStatement stmt = c.prepareStatement(searchString);
             int pIndex = 1;
-            if(hasKey) {
+            if (hasKey) {
                 stmt.setString(pIndex++, condition);
             }
-            if(hasAfter){
+            if (hasAfter) {
                 stmt.setDate(pIndex++, new java.sql.Date(after.getTime()));
             }
-            if(hasBefore){
+            if (hasBefore) {
                 stmt.setDate(pIndex++, new java.sql.Date(before.getTime()));
             }
             stmt.executeQuery();
@@ -344,7 +348,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         return values;
     }
+
     public List<V> search(String key, String condition, boolean isRegEx, List<String> attr) {
+
         String attributes = null;
         if (attr == null || attr.isEmpty()) {
             attributes = "*";
@@ -352,15 +358,31 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             attributes = "";
             boolean isFirst = true;
             for (String a : attr) {
-                attributes = attributes + (isFirst?"":",") + a ;
-                if(isFirst ){
+                attributes = attributes + (isFirst ? "" : ",") + a;
+                if (isFirst) {
                     isFirst = false;
                 }
             }
         }
-        String searchString = "select " + attributes +
-                " from " + getTable().getFQTablename() +
-                " where " + key + " " + (isRegEx ? "regexp" : "=") + " ?";
+        String searchString;
+        if (isRegEx) {
+            if (getConnectionPool().getType() == ConnectionPool.CONNECTION_TYPE_DEBRY) {
+                searchString = "select " + attributes +
+                        " from " + getTable().getFQTablename() +
+                        " where " + key + " LIKE ?";
+
+            } else {
+                searchString = "select " + attributes +
+                        " from " + getTable().getFQTablename() +
+                        " where " + key + " regexp = ?";
+            }
+
+        } else {
+            searchString = "select " + attributes +
+                    " from " + getTable().getFQTablename() +
+                    " where " + key + " =  ?";
+
+        }
         List<V> values = new ArrayList<>();
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
@@ -505,7 +527,8 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         return null;
     }
-    public boolean remove(List<Identifiable> objects){
+
+    public boolean remove(List<Identifiable> objects) {
         String inSql = String.join(",", Collections.nCopies(objects.size(), "?"));
         inSql = "(" + inSql + ")";
         String query = "DELETE FROM " + getTable().getFQTablename() + " WHERE " + getTable().getPrimaryKeyColumnName() + " IN " + inSql;
@@ -514,7 +537,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
 
         try {
             PreparedStatement stmt = c.prepareStatement(query);
-            for(int i = 0; i < objects.size() ; i++){
+            for (int i = 0; i < objects.size(); i++) {
                 // Reminder that parameters have index origin 1
                 stmt.setString(i + 1, objects.get(i).getIdentifierString());
             }
@@ -528,6 +551,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         return true;
 
     }
+
     public V remove(Object key) {
         V oldObject = null;
         try {
@@ -709,8 +733,13 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
         }
         // LONGVARCHAR and LONGNVARCHAR are Java SQL types but not SQL-standard.
         // Since every SQL engine uses the more modern type of TEXT instead, we special case this.
-        jdbcMappings.put(Types.LONGNVARCHAR, "TEXT");
-        jdbcMappings.put(Types.LONGVARCHAR, "TEXT");
+        if (getConnectionPool().getType() == ConnectionPool.CONNECTION_TYPE_DEBRY) {
+            jdbcMappings.put(Types.LONGNVARCHAR, "CLOB");
+            jdbcMappings.put(Types.LONGVARCHAR, "CLOB");
+        } else {
+            jdbcMappings.put(Types.LONGNVARCHAR, "TEXT");
+            jdbcMappings.put(Types.LONGVARCHAR, "TEXT");
+        }
         for (ColumnDescriptorEntry cde : cds) {
             if (!foundCols.containsKey(cde.getName().toLowerCase())) {
                 // create the column
@@ -736,6 +765,10 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     }
 
     public void checkTable() {
+        if (getConnectionPool().getType() == ConnectionPool.CONNECTION_TYPE_DEBRY) {
+            System.err.println("Warning: Derby does not support database meta data for tables. Cannot check tables.");
+            return;
+        }
         ConnectionRecord cr = getConnection();
         Connection c = cr.connection;
         try {
@@ -750,6 +783,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
                 // So we will try this and just log how it works out.
                 System.err.println("Table " + getTable().getTablename() + " does not exist. Attempting to create");
                 stmt = c.createStatement();
+                System.err.println("Executing\"" + getTable().getCreateTableStatement() + "\"");
                 boolean rc = stmt.execute(getTable().getCreateTableStatement());
                 if (stmt != null) {
                     stmt.close();
@@ -759,6 +793,9 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             releaseConnection(cr);
 
         } catch (SQLException x) {
+            if (DebugUtil.isEnabled()) {
+                x.printStackTrace();
+            }
             System.err.println("failed to create " + getTable().getTablename() + " msg=" + x.getMessage());
         }
     }

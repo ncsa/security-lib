@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.delegation.server.storage;
 
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
+import edu.uiuc.ncsa.security.core.util.StatusValue;
 
 import java.util.Date;
 
@@ -22,9 +23,7 @@ public class ClientApproval extends IdentifiableImpl {
     String approver;
     Date approvalTimestamp;
 
-    interface StatusValue {
-        String getStatus();
-    }
+
 
     /**
      * This status enum has values that the elements assume. This is to control their actual internal values so that

@@ -49,6 +49,6 @@ public class H2ConnectionPoolProvider extends ConnectionPoolProvider<ConnectionP
                 checkValue(USE_SSL, useSSL),
                 checkValue(PARAMETERS, "")
         );
-        return new ConnectionPool(x);
+        return new ConnectionPool(x, ConnectionPool.CONNECTION_TYPE_H2);
     }
 }
