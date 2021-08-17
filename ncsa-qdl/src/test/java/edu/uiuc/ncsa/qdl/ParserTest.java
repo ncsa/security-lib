@@ -1151,11 +1151,10 @@ public class ParserTest extends AbstractQDLTester {
      */
     @Test
     public void testString() throws Throwable {
-        String test = getRandomString(100) + "\\'!@#$%^&*()-_=+[{]}`~;:,<.>";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a:='" + test + "';");
-        addLine(script, "say('test say:');");
+        addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()\\'\"-_=+|[]{};:,<.>/?¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧';");
+        addLine(script, "say('printing all base characters with say:');");
         addLine(script, "say(a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
