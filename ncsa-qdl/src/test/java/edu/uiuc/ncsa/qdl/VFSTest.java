@@ -3,10 +3,13 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
+import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -373,29 +376,113 @@ public class VFSTest extends AbstractQDLTester {
 
     }
 
-
-    @Test
-    public void testDBVFS() throws Throwable {
-        if (System.getProperty("username") == null || System.getProperty("password") == null) {
+    public void testDerbyVFS() throws Throwable {
+        DerbyConnectionParameters params = null;
+        if (hasConfig()) {
+            params = new DerbyConnectionParameters(
+                    getXp().getString(DERBY + USERNAME).trim(),
+                    getXp().getString(DERBY + PASSWORD).trim(),
+                    getXp().getString(DERBY + DATABASE).trim(),
+                    getXp().getString(DERBY + SCHEMA).trim(),
+                    "locahost",
+                    1527,
+                    "org.apache.derby.jdbc.EmbeddedDriver",
+                    false,
+                    false,
+                    getXp().getString(DERBY + BOOT_PASSWORD).trim(),
+                    ""
+            );
+        } else {
             System.out.println("No user name and password supplied, cannot do VFS MySQL tests.");
-            return;
         }
-        MySQLConnectionParameters params = new MySQLConnectionParameters(
-                System.getProperty("username"),
-                System.getProperty("password"),
-                "oauth2",
-                "oauth2",
-                "localhost",
-                3306,
-                "com.mysql.cj.jdbc.Driver",
-                false,
-                "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
-        );
-        MySQLConnectionPool connectionPool = new MySQLConnectionPool(params);
-        VFSDatabase db = new VFSDatabase(connectionPool, "qdl_vfs");
+
+        ConnectionPool connectionPool = new ConnectionPool(params, ConnectionPool.CONNECTION_TYPE_DEBRY);
+
+        VFSDatabase db = new VFSDatabase(connectionPool, getXp().getString(DERBY + TABLE).trim());
         VFSMySQLProvider vfs = new VFSMySQLProvider(
                 db,
-                "qdl-vfs",
+                "qdl-vfs", // scheme here refers to QDL, not the database.
+                "/",
+                true,
+                true);
+
+
+        runVFSTests(vfs);
+    }
+
+    String propertiesFile = "/home/ncsa/dev/csd/config/qdl-test.properties";
+    // names of things in the properties file.
+    String MYSQL = "mysql.";
+    String DERBY = "derby.";
+    String USERNAME = "user";
+    String PASSWORD = "password";
+    String DATABASE = "database";
+    String SCHEMA = "schema";
+    String TABLE = "table";
+    String BOOT_PASSWORD = "bootPassword";
+
+    boolean gotConfig = false;
+
+    boolean hasConfig() {
+        return getXp() != null;
+    }
+
+    public XProperties getXp() {
+        if (xp == null && !gotConfig) {
+            xp = new XProperties();
+            File file = new File(propertiesFile);
+            if (!file.exists()) {
+                System.out.println("warning, properties file " + propertiesFile + " not found");
+                gotConfig = true;
+                return null;
+            }
+            xp.load(propertiesFile);
+        }
+        return xp;
+    }
+
+    XProperties xp;
+
+    @Test
+    public void testMySQLVFS() throws Throwable {
+        MySQLConnectionParameters params;
+        String tableName = "qdl_vfs"; // default;
+        if (hasConfig()) {
+            params = new MySQLConnectionParameters(
+                    getXp().getString(MYSQL + USERNAME).trim(),
+                    getXp().getString(MYSQL + PASSWORD).trim(),
+                    getXp().getString(MYSQL + DATABASE).trim(),
+                    getXp().getString(MYSQL + SCHEMA).trim(),
+                    "localhost",
+                    3306,
+                    "com.mysql.cj.jdbc.Driver",
+                    false,
+                    "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
+            );
+            tableName = getXp().getString(MYSQL + TABLE).trim();
+        } else {
+            if (System.getProperty("username") == null || System.getProperty("password") == null) {
+                System.out.println("No user name and password supplied, cannot do VFS MySQL tests.");
+                return;
+            }
+            params = new MySQLConnectionParameters(
+                    System.getProperty("username"),
+                    System.getProperty("password"),
+                    "oauth2",
+                    "oauth2",
+                    "localhost",
+                    3306,
+                    "com.mysql.cj.jdbc.Driver",
+                    false,
+                    "useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=America/Chicago"
+            );
+        }
+
+        MySQLConnectionPool connectionPool = new MySQLConnectionPool(params);
+        VFSDatabase db = new VFSDatabase(connectionPool, tableName);
+        VFSMySQLProvider vfs = new VFSMySQLProvider(
+                db,
+                "qdl-vfs",  // Scheme here refers to QDL, not the database!
                 "/",
                 true,
                 true);
