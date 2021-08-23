@@ -44,6 +44,10 @@ See also: encode_b64
         <body>
             <![CDATA[
 encode_b64(arg) - encode a string or stem of string into base 64.
+We follow RFC 4648, meaning that the result is not padded with
+things like ='s, and the character set is a-zA-Z0-9-_.
+This makes the result always URL safe.
+Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
 See also: decode_b64
                 ]]>
         </body>
@@ -211,12 +215,6 @@ E.g.
 
 Note: The result will be a subset of target. that contains none of the keys
       listed in the list. argument.
-                ]]>
-        </body>
-    </entry>
-    <entry id="encode_b64">
-        <body>
-            <![CDATA[
                 ]]>
         </body>
     </entry>

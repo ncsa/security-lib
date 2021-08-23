@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL.">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_derby_derby_10_14_1_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/vfs-derby.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/VFSTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/VFSTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/configuration/Configurations.class" afterDir="false" />
@@ -401,13 +396,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -692,14 +689,8 @@
       <workItem from="1625569935067" duration="3809000" />
       <workItem from="1625914499084" duration="71006000" />
       <workItem from="1626611907400" duration="40099000" />
-      <workItem from="1627556750839" duration="210558000" />
-    </task>
-    <task id="LOCAL-00082" summary="Formatting improvement.">
-      <created>1617400803280</created>
-      <option name="number" value="00082" />
-      <option name="presentableId" value="LOCAL-00082" />
-      <option name="project" value="LOCAL" />
-      <updated>1617400803280</updated>
+      <workItem from="1627556750839" duration="210843000" />
+      <workItem from="1629545451794" duration="8433000" />
     </task>
     <task id="LOCAL-00083" summary="Tweaked scripts. Now shebang supported. Example + documentation.">
       <created>1617538941151</created>
@@ -1037,7 +1028,14 @@
       <option name="project" value="LOCAL" />
       <updated>1629237894093</updated>
     </task>
-    <option name="localTasksCounter" value="131" />
+    <task id="LOCAL-00131" summary="Tidying up before 5.2.1">
+      <created>1629498444691</created>
+      <option name="number" value="00131" />
+      <option name="presentableId" value="LOCAL-00131" />
+      <option name="project" value="LOCAL" />
+      <updated>1629498444692</updated>
+    </task>
+    <option name="localTasksCounter" value="132" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1047,7 +1045,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Found and fixed small bug with passing certain arguments to scripts. Removed annoying debug statements still in DB connection classes." />
     <MESSAGE value="Found a bug in how (in certain cases) script arguments are not propagated correctly in QDL. Added block for better scoping of variables. Finally found and fixed annoying ISO 6429 bug. Experimental support for lists as indices." />
     <MESSAGE value="Fixes for CIL-1012, CIL-1002" />
     <MESSAGE value="Updated some help. added flag to debug util so the log messages look better." />
@@ -1072,7 +1069,8 @@
     <MESSAGE value="Many changes relating to improving searchs in the CLI. Now you can issue searches by approval status or approver (for clients) and generally search on any field with date ranges. Storing these as results sets to be consumed later is also supported." />
     <MESSAGE value="Adding back in Derby support. Slight bit of genericizing since the SQL calls were a bit too optimized for MySQL." />
     <MESSAGE value="Finally fixed an annoying test for printing a string." />
-    <option name="LAST_COMMIT_MESSAGE" value="Finally fixed an annoying test for printing a string." />
+    <MESSAGE value="Tidying up before 5.2.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tidying up before 5.2.1" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
