@@ -464,6 +464,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitCompExpression(QDLParserParser.CompExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code unaryTildeExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code unaryTildeExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code postfix}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

@@ -1036,7 +1036,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
     /**
      * The contract for stem evaluation is that w.z.y.x uses stems unles told otherwise.
      * This is an example that tests that. Passing in (y) tells the system to
-     * evaluate that and use it rather than fall back on the default. 
+     * evaluate that and use it rather than fall back on the default.
+     *
      * @throws Throwable
      */
     @Test
@@ -1335,6 +1336,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Tests that in stem resolution, only what is understood by a stem is consumed,
+     *
      * @throws Throwable
      */
     public void testMidTailResolution() throws Throwable {
@@ -1345,6 +1347,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getLongValue("x", state) == 3L;
     }
+
     /**
      * Test that a list of indices like ['a.b.c'] can be used to access stems. This permits passing around
      * indices
@@ -1384,7 +1387,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    public void testJPathQuery() throws Throwable{
+    public void testJPathQuery() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := {'p':'x', 'q':'y', 'r':5, 's':[2,4,6], 't':{'m':true,'n':345.345}};");
         addLine(script, "x. := query(a., '$..m');");
@@ -1394,10 +1397,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        StemVariable x = getStemValue("x.",state);
+        StemVariable x = getStemValue("x.", state);
         assert x.size() == 1;
         assert x.getBoolean(0L);
-        StemVariable ndx = getStemValue("ndx.",state);
+        StemVariable ndx = getStemValue("ndx.", state);
         assert ndx.size() == 1;
         assert getBooleanValue("ok", state);
     }
@@ -1423,51 +1426,52 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Probabilistic test for for_each applied to a dyadic argument.
+     *
      * @throws Throwable
      */
     public void testForEach2() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "z(x,y)->x^2+y^2;");
-         addLine(script, "a. := for_each(@z, n(5),n(7));");
-         // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
-         addLine(script, "b.0 := a.0.0 == z(0,0);");
-         addLine(script, "b.1 := a.1.1 == z(1,1);");
-         addLine(script, "b.2 := a.2.2 == z(2,2);");
-         addLine(script, "b.3 := a.3.3 == z(3,3);");
-         addLine(script, "b.4 := a.4.4 == z(4,4);");
-         addLine(script, "b.5 := a.0.5 == z(0,5);");
-         addLine(script, "b.6 := a.1.6 == z(1,6);");
-         addLine(script, "ok:= reduce(@∧, b.);");
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "z(x,y)->x^2+y^2;");
+        addLine(script, "a. := for_each(@z, n(5),n(7));");
+        // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
+        addLine(script, "b.0 := a.0.0 == z(0,0);");
+        addLine(script, "b.1 := a.1.1 == z(1,1);");
+        addLine(script, "b.2 := a.2.2 == z(2,2);");
+        addLine(script, "b.3 := a.3.3 == z(3,3);");
+        addLine(script, "b.4 := a.4.4 == z(4,4);");
+        addLine(script, "b.5 := a.0.5 == z(0,5);");
+        addLine(script, "b.6 := a.1.6 == z(1,6);");
+        addLine(script, "ok:= reduce(@∧, b.);");
 
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state);
-     }
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
     public void testForEach3() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "w(x,y,z)->x^2+y^2 + z^3;");
-         addLine(script, "a. := for_each(@w, n(5),n(7),n(9));");
-         // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
-         addLine(script, "b.0 := a.0.0.0 == w(0,0,0);");
-         addLine(script, "b.1 := a.1.1.1 == w(1,1,1);");
-         addLine(script, "b.2 := a.2.2.2 == w(2,2,2);");
-         addLine(script, "b.3 := a.3.3.3 == w(3,3,3);");
-         addLine(script, "b.4 := a.4.4.4 == w(4,4,4);");
-         addLine(script, "b.5 := a.0.5.5 == w(0,5,5);");
-         addLine(script, "b.6 := a.1.6.6 == w(1,6,6);");
-         addLine(script, "b.7 := a.1.6.7 == w(1,6,7);");
-         addLine(script, "b.8 := a.3.4.5 == w(3,4,5);");
-         addLine(script, "b.9 := a.4.2.3 == w(4,2,3);");
-         addLine(script, "b.10 := a.2.0.1 == w(2,0,1);");
-         addLine(script, "ok:= reduce(@∧, b.);");
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "w(x,y,z)->x^2+y^2 + z^3;");
+        addLine(script, "a. := for_each(@w, n(5),n(7),n(9));");
+        // The test is that a.i.j == w(i,j) testing all of them is a pain, so we test some
+        addLine(script, "b.0 := a.0.0.0 == w(0,0,0);");
+        addLine(script, "b.1 := a.1.1.1 == w(1,1,1);");
+        addLine(script, "b.2 := a.2.2.2 == w(2,2,2);");
+        addLine(script, "b.3 := a.3.3.3 == w(3,3,3);");
+        addLine(script, "b.4 := a.4.4.4 == w(4,4,4);");
+        addLine(script, "b.5 := a.0.5.5 == w(0,5,5);");
+        addLine(script, "b.6 := a.1.6.6 == w(1,6,6);");
+        addLine(script, "b.7 := a.1.6.7 == w(1,6,7);");
+        addLine(script, "b.8 := a.3.4.5 == w(3,4,5);");
+        addLine(script, "b.9 := a.4.2.3 == w(4,2,3);");
+        addLine(script, "b.10 := a.2.0.1 == w(2,0,1);");
+        addLine(script, "ok:= reduce(@∧, b.);");
 
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state);
-     }
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
      /*
       a.user.b.4.foo.5 := 2
   a.
@@ -1479,6 +1483,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Create a stem in two ways and verify that they are the same
+     *
      * @throws Throwable
      */
     public void testExpressionStemNodeAssignment() throws Throwable {
@@ -1498,42 +1503,67 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * (See related note in {@link edu.uiuc.ncsa.qdl.parsing.QDLListener#exitDotOp(QDLParserParser.DotOpContext)})
      * This tests that b. - 2 (subtracting 2 from a stem) works. This is a simple
      * regression test.
+     *
      * @throws Throwable
      */
     public void testDyadicStemSubtraction() throws Throwable {
-    State state = testUtils.getNewState();
-    StringBuffer script = new StringBuffer();
-    addLine(script, "b. := [;5];");
-    addLine(script, " ok := reduce(@&&, [-2,-1,0,1,2] == (b. - 2));");
-    QDLInterpreter interpreter = new QDLInterpreter(null, state);
-    interpreter.execute(script.toString());
-    assert getBooleanValue("ok", state);
-}
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b. := [;5];");
+        addLine(script, " ok := reduce(@&&, [-2,-1,0,1,2] == (b. - 2));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
     public void testExtraIndices() throws Throwable {
-    State state = testUtils.getNewState();
-    StringBuffer script = new StringBuffer();
-    addLine(script, "b. := [;5].2.4;");
-    QDLInterpreter interpreter = new QDLInterpreter(null, state);
-    try {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b. := [;5].2.4;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access a non-existant index in a stem";
+        } catch (IndexError ie) {
+            assert true;
+        }
+    }
+
+    public void testExtraIndices2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "b. := [;5].i(2).i(4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access a non-existant index in a stem";
+        } catch (IndexError ie) {
+            assert true;
+        }
+
+
+    }
+
+    /**
+     * Tests the ~ applies to a list just reorders the list, i.e., it is fully
+     * equivalent to
+     *   ~a. == []~.a
+     * @throws Throwable
+     */
+    public void testUnaryTilde() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ξ. := mod(random(10), 97);"); // completely random set of numbers
+        addLine(script, "ξ1. := ~mask(ξ., ξ. < 0);");
+        addLine(script, "ξ2. := []~mask(ξ., ξ. < 0);");
+        addLine(script, "ok := reduce(@∧, ξ1. ≡ ξ2.);");
+        addLine(script,"ok2 := reduce(@∧, [4,5,7,-2] ≡ ~{2:4,3:5}~{1:7,11:-2}); ");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
         interpreter.execute(script.toString());
-        assert false : "was able to access a non-existant index in a stem";
-    }catch(IndexError ie){
-        assert true;
+        assert getBooleanValue("ok", state) : "Monadic ~ failed";
+        assert getBooleanValue("ok2", state) : "Monadic and dyadic ~ failed";
+
     }
 }
 
-    public void testExtraIndices2() throws Throwable {
-     State state = testUtils.getNewState();
-     StringBuffer script = new StringBuffer();
-     addLine(script, "b. := [;5].i(2).i(4);");
-     QDLInterpreter interpreter = new QDLInterpreter(null, state);
-     try {
-         interpreter.execute(script.toString());
-         assert false : "was able to access a non-existant index in a stem";
-     }catch(IndexError ie){
-         assert true;
-     }
- }
-
-}

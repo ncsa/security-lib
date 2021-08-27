@@ -54,6 +54,11 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         System.out.println(x);
     }
 
+    protected void sayv(String x){
+        if(isVerbose()){
+            say(x);
+        }
+    }
     public String getConfigName() {
         return configName;
     }
@@ -310,15 +315,15 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
     Map<Object, Object> globalEnv;
     String currentEnvFile = null;
 
-    protected void readEnv(String path) {
+    protected void readEnv(String path, boolean verbose) {
         // All errors loading the environment are benign.
         File f = new File(path);
         if (!f.exists()) {
-            say("Cannot read environment file \"" + path + "\"");
+            if(verbose)say("Cannot read environment file \"" + path + "\"");
             return;
         }
         if (!f.isFile()) {
-            say("\"" + path + "\" is not  file and cannot be read to set the environment.");
+            if(verbose)say("\"" + path + "\" is not  file and cannot be read to set the environment.");
             return;
         }
         String allLines = "";
@@ -332,7 +337,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             }
             bf.close();
         } catch (Throwable t) {
-            say("Error loading environment: \"" + t.getMessage() + "\"");
+            if(verbose)say("Error loading environment: \"" + t.getMessage() + "\"");
             if (isVerbose()) {
                 t.printStackTrace();
             }
@@ -358,7 +363,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
             if (isVerbose()) {
                 t.printStackTrace();
             }
-            say("Could not parse envirnoment file.");
+            if(verbose)say("Could not parse envirnoment file.");
         }
         currentEnvFile = path;
     }
@@ -407,7 +412,7 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         }
         if (hasOption(ENV_OPTION, ENV_LONG_OPTION)) {
             String envFile = getCommandLine().getOptionValue(ENV_OPTION);
-            readEnv(envFile);
+            readEnv(envFile, false); // on init, silently ignore unless -v option enabled.
             currentEnvFile = envFile;
         }
     }

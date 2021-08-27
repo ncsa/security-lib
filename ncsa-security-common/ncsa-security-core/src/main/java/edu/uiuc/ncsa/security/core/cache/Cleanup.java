@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.security.core.cache;
 
 
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.*;
@@ -158,7 +157,6 @@ public class Cleanup<K, V> extends Thread {
 
     @Override
     public void run() {
-        DebugUtil.trace(this, "start cleanup");
         log("starting cleanup thread for " + getMap());
         while (!isStopThread()) {
             try {

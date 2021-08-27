@@ -409,6 +409,19 @@ mask(target., bit_mask.) - returns a subset of target. corresponding to each
                            true value in the mask.
 Note: This operates generally on stems. Many operations return boolean stems
       which can be used with this function.
+E.g.
+Make a random list of numbers and get the negative then positive ones.
+Do note that the indices are not re-ordered (since mask applies to
+generic stems and that would be bad).
+
+  r. := mod(random(5),97)
+  r.
+[-93,77,56,-46,67]
+  mask(r., r. < 0)
+{0:-93,3:-46}
+
+  mask(r., r. > 0)
+{1:77,2:56,4:67}
                ]]>
         </body>
     </entry>
@@ -2482,6 +2495,117 @@ Comments will be displayed in system help under
                 ]]>
             </body>
         </entry>
+
+    <entry id="~">
+            <body>
+                <![CDATA[
+The join operator. This is both monadic and dyadic operates only on lists.
+
+The reason this only operates on lists is that if two stems share a common
+index, then it is unclear at all how to decide which to keep. Lists
+can, however, always be extended, since it is clear how to make more
+indices.
+
+Dyadic operation.
+a. ~ b. will append the second list to the first, extending indices as needed,
+E.g.
+  [3;7]~[4;11]
+[3,4,5,6,4,5,6,7,8,9,10]
+
+E.g. Operation on higher rank lists
+  n(4,5)~n(3,4)
+[
+  [0,1,2,3,4],
+  [0,1,2,3,4],
+  [0,1,2,3,4],
+  [0,1,2,3,4],
+  [0,1,2,3],
+  [0,1,2,3],
+  [0,1,2,3]
+ ]
+
+Monadic operation.
+~a. is equivalent to []~a. and has the effect of re-ordering the list
+from index 0. This is a very common idiom.
+E.g.
+  r. := [8,14,-7,16,0];
+  r1. := mask(r., r. <= 0)
+  r1.
+{2:-7,4:0}
+  ~r1.
+ [-7,0]
+
+E.g. Glom two lists together then re-index them
+  ~{2:4,3:5}~{1:7,11:-2}
+[4,5,7,-2]
+
+See also: ~|, join
+                ]]>
+            </body>
+        </entry>
+    <entry id="~|">
+                <body>
+                    <![CDATA[
+Join along last axis. Normal join, ~, operates along the zero-th
+axis.
+
+E.g.
+  [;5]~|[10;15]
+[
+  [0,10],
+  [1,11],
+  [2,12],
+  [3,13],
+  [4,14]
+ ]
+
+The last axis is the columns, so this in effect pastes two lists
+together to make an array.
+
+E.g. Making a table with headings. Make the table with |~ then stick
+     the heading at the top, which must conform to the shape of the
+     table.
+
+  [['x','y']]~([;5]~|[10;15])
+[
+  [x,y],
+  [0,10],
+  [1,11],
+  [2,12],
+  [3,13],
+  [4,14]
+ ]
+
+ E.g. A higher rank example. Note that subsetting is in effect, so the
+ resulting shape is limited to the smaller (left hand in this case)
+ argument. The join is along the last axis still, which is always
+ the columns.
+   n(3,4,100+n(12)) ~| n(4,5,n(20))
+[
+  [
+    [100,0],
+    [101,1],
+    [102,2],
+    [103,3]
+  ],
+  [
+    [104,5],
+    [105,6],
+    [106,7],
+    [107,8]
+  ],
+  [
+    [108,10],
+    [109,11],
+    [110,12],
+    [111,13]
+  ]
+ ]
+
+ See also: ~, join
+                    ]]>
+                </body>
+            </entry>
     <!--
         entry template
     -->

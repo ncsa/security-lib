@@ -243,9 +243,9 @@ public class QDLVariableTest extends AbstractQDLTester {
     public void testRemoveStemEntry() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := [;5];");
-        addLine(script, "remove(a.2);");
-        addLine(script, "ok := !is_defined(a.2);"); // should handle both cases of trailing . or not
+        addLine(script, "α. := [;5];");
+        addLine(script, "remove(α.2);");
+        addLine(script, "ok := !is_defined(α.2);"); // should handle both cases of trailing . or not
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Did not remove a stem entry";
@@ -254,9 +254,9 @@ public class QDLVariableTest extends AbstractQDLTester {
     public void testRemoveStemEntry2() throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := n(4,5);");
-        addLine(script, "remove(a.2.3);");
-        addLine(script, "ok := !is_defined(a.2.3);");
+        addLine(script, "ψ. := n(4,5);");
+        addLine(script, "remove(ψ.2.3);");
+        addLine(script, "ok := !is_defined(ψ.2.3);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Did not remove a stem entry";
@@ -267,12 +267,12 @@ public class QDLVariableTest extends AbstractQDLTester {
         addLine(script, "a := 1;");
         addLine(script, "a. := [;6];");
         addLine(script, "remove(a);");
-        addLine(script, "ok0 := !is_defined(a);");
-        addLine(script, "ok1 := is_defined(a.);");
+        addLine(script, "Ω0 := !is_defined(a);");
+        addLine(script, "Ω1 := is_defined(a.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok0", state) : "Did not remove a scalar variable";
-        assert getBooleanValue("ok1", state) : "removed stem by accident";
+        assert getBooleanValue("Ω0", state) : "Did not remove a scalar variable";
+        assert getBooleanValue("Ω1", state) : "removed stem by accident";
     }
 
 }

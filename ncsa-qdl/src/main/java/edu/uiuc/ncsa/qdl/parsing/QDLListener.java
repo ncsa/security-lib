@@ -1979,6 +1979,28 @@ public class QDLListener implements QDLParserListener {
         polyad.setSourceCode(source);
         stash(ctx, polyad);
     }
+
+    @Override
+    public void enterUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx) {
+
+    }
+
+    /**
+     * Syntactic sugar. Unary ~ means join to an empty stem so re-order the elements
+     * of the list.
+     * @param ctx the parse tree
+     */
+    @Override
+    public void exitUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx) {
+        Dyad dyad;
+        dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+        stash(ctx, dyad);
+        dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
+        dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        dyad.setSourceCode(source);
+    }
 }
 
 
