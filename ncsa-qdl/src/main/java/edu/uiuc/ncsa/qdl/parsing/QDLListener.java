@@ -1373,13 +1373,14 @@ public class QDLListener implements QDLParserListener {
      * the 'childOf' operator to a proper first class citizen of QDL. There are some
      * edge cases though.
      * <pre>
-     * First case of odd parsing is that in our grammar, x. - y. gets parsed as
+     * First case of odd parsing is that in our grammar, x. - y. (and for that matter
+     * x. ~ y. with unary join) gets parsed as
      *            dotOp
      *         /    |   \
      *         x    .    unaryMinus
      *                       \
      *                       y.
-     * I.e. it thinks it is x.(-y) The problem with fixing this as is, is that
+     * I.e. it thinks it is x.(-y.) The problem with fixing this as is, is that
      * the issue is precedence and changing that either gets this to parse, and
      * screws up signed numbers or fails to resolve this.
      *
@@ -1394,11 +1395,30 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitDotOp(QDLParserParser.DotOpContext dotOpContext) {
         /*
-
+           Special case monadic operators
          */
+        if (dotOpContext.getChild(2) instanceof QDLParserParser.UnaryTildeExpressionContext) {
+            QDLParserParser.UnaryTildeExpressionContext um = (QDLParserParser.UnaryTildeExpressionContext) dotOpContext.getChild(2);
+            Dyad d = new Dyad(OpEvaluator.TILDE_VALUE);
+            d.setRightArgument((StatementWithResultInterface) resolveChild(um.getChild(1)));
+            ESN2 leftArg = new ESN2();
+            Statement s = resolveChild(dotOpContext.getChild(0));
+            if (s instanceof VariableNode) {
+                VariableNode vNode = (VariableNode) s;
+                vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                leftArg.setLeftArg(vNode);
+            } else {
+                leftArg.setLeftArg((StatementWithResultInterface) s);
+            }
+            leftArg.setRightArg(null);
+            d.setLeftArgument(leftArg);
+            stash(dotOpContext, d);
+            return;
+        }
+
         if (dotOpContext.getChild(2) instanceof QDLParserParser.UnaryMinusExpressionContext) {
             QDLParserParser.UnaryMinusExpressionContext um = (QDLParserParser.UnaryMinusExpressionContext) dotOpContext.getChild(2);
-            // Important bit: If the user actually uses leading high minue ¯ or plus ⁺ then they really do want a negative
+            // Important bit: If the user actually uses leading high minus ¯ or plus ⁺ then they really do want a negative
             // value. Pass it along. The problem is the - is ambiguous as an monadic or dyadic operator in some contexts.
             if ((!um.getChild(0).getText().equals(OpEvaluator.MINUS2)) && !um.getChild(0).getText().equals(OpEvaluator.PLUS2)) {
                 Dyad d = new Dyad(um.Plus() == null ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE);
@@ -1988,6 +2008,7 @@ public class QDLListener implements QDLParserListener {
     /**
      * Syntactic sugar. Unary ~ means join to an empty stem so re-order the elements
      * of the list.
+     *
      * @param ctx the parse tree
      */
     @Override

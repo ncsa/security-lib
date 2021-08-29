@@ -1565,5 +1565,30 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok2", state) : "Monadic and dyadic ~ failed";
 
     }
+
+    /**
+     * Because ~ does not fit into the order of operations, expressions with a
+     * . and a ~ like
+     * x. ~ y.
+     * get parsed as
+     * (x) . (~y.)
+     * {@link edu.uiuc.ncsa.qdl.parsing.QDLListener} special cases this to handle it
+     * (rather than a complete rewrite of the parser).
+     * This test checks this works right.
+     * @throws Throwable
+     */
+    public void testTildeWithDot() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "ξ. := [;5];"); // completely random set of numbers
+         addLine(script, "ξ1. := [10;15];");
+         addLine(script, "ξ2. := ξ. ~ ξ1.;"); // do on one line to isolate this
+         addLine(script,"ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
+
+     }
 }
 
