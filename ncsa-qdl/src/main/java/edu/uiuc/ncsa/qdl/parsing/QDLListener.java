@@ -1373,16 +1373,18 @@ public class QDLListener implements QDLParserListener {
      * the 'childOf' operator to a proper first class citizen of QDL. There are some
      * edge cases though.
      * <pre>
-     * First case of odd parsing is that in our grammar, x. - y. (and for that matter
+     * First case of  parsing is that in our grammar, x. - y. (and for that matter
      * x. ~ y. with unary join) gets parsed as
      *            dotOp
      *         /    |   \
      *         x    .    unaryMinus
      *                       \
      *                       y.
-     * I.e. it thinks it is x.(-y.) The problem with fixing this as is, is that
-     * the issue is precedence and changing that either gets this to parse, and
-     * screws up signed numbers or fails to resolve this.
+     * I.e. it thinks it is x.(-y.) The reason is that we allow for a. as an expression
+     * and ~b. as a monad, so it cannot tell a. (~b.) from (a.) ~ b. and the former certainly
+     * could also occur, but the latter is much more intuitive. We do not
+     * have this problem with x. * y. since there is no monadic *y. We don't want x.^y.
+     * to behave differently from x.-y. for instance.
      *
      * A lot of reading about possible solutions convinced me that fixing it
      * after the fact was the way to go. Another options is a very careful restructuring

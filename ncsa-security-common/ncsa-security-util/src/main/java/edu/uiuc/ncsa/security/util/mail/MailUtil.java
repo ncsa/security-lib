@@ -26,7 +26,7 @@ import java.util.Properties;
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/11 at  1:18 PM
  */
-public class MailUtil extends TemplateUtil implements Logable {
+public class MailUtil  implements Logable {
     public Session getSession(Properties props) throws NamingException {
         return Session.getDefaultInstance(props);
     }
@@ -115,49 +115,6 @@ public class MailUtil extends TemplateUtil implements Logable {
         public void update(MailEnvironment otherME){
 
         }
-
-/*
-        protected void init(boolean mailEnabled,
-                            String server,
-                            int port,
-                            String password,
-                            String from,
-                            String recipients,
-                            String messageTemplate,
-                            String subjectTemplate,
-                            boolean useSSL,
-                            boolean starttls) throws AddressException {
-            this.mailEnabled = mailEnabled;
-            info("Mail notifications " + (mailEnabled ? "en" : "dis") + "abled");
-            this.useSSL = useSSL;
-            this.starttls = starttls;
-            if (from != null) {
-                this.from = new InternetAddress(from);
-            }
-
-            if (subjectTemplate == null) {
-                warn("Email: No subject template found, using default");
-                subjectTemplate = "Something happened on the server.";
-            } else {
-                this.subjectTemplate = subjectTemplate;
-            }
-
-            this.server = server;
-            if (messageTemplate == null) {
-                warn("Email: No message template found, using default");
-                messageTemplate = "Something happened on the server.";
-            } else {
-                this.messageTemplate = messageTemplate;
-            }
-
-            this.port = port;
-            this.password = password;
-            this.recipients = parseRecipients(recipients);
-            debug("Email uses ssl: " + (useSSL ? "y" : "n") + ", server=" + server + ", sender=" + from);
-
-        }
-*/
-
 
         boolean mailEnabled;
         boolean useSSL;
@@ -271,8 +228,8 @@ public class MailUtil extends TemplateUtil implements Logable {
 
             message.setRecipients(Message.RecipientType.TO, recipients);
             if(replacements != null) {
-                message.setSubject(replaceAll(subjectTemplate, replacements));
-                message.setContent(replaceAll(messageTemplate, replacements), "text/plain");
+                message.setSubject(TemplateUtil.replaceAll(subjectTemplate, replacements));
+                message.setContent(TemplateUtil.replaceAll(messageTemplate, replacements), "text/plain");
                 if (replacements.containsKey("reply-to")) {
                     InternetAddress address = new InternetAddress((String) replacements.get("reply-to"));
                     message.setReplyTo(new Address[]{address});

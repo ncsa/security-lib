@@ -1141,6 +1141,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
        */
     /* *********** Here below are test for functional stem notation e.g. f(x).j(n) ******* */
 
+    /**
+     * Test a define dfunction as index
+     * @throws Throwable
+     */
     @Test
     public void testSimpleSF0() throws Throwable {
         State state = testUtils.getNewState();
@@ -1152,6 +1156,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getStringValue("x", state).equals("b");
     }
 
+    /**
+     * Test a string constant index.
+     * @throws Throwable
+     */
     @Test
     public void testSimpleSF1() throws Throwable {
         State state = testUtils.getNewState();
@@ -1580,9 +1588,22 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testTildeWithDot() throws Throwable {
          State state = testUtils.getNewState();
          StringBuffer script = new StringBuffer();
-         addLine(script, "ξ. := [;5];"); // completely random set of numbers
+         addLine(script, "ξ. := [;5];"); // stem of numbers
          addLine(script, "ξ1. := [10;15];");
          addLine(script, "ξ2. := ξ. ~ ξ1.;"); // do on one line to isolate this
+         addLine(script,"ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
+
+     }
+
+    public void testTildeWithDot2() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "ξ. := [;5];"); // stem of numbers
+         addLine(script, "ξ2. := ξ. ~ [10;15];"); // do on one line to isolate this
          addLine(script,"ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
          QDLInterpreter interpreter = new QDLInterpreter(null, state);
 

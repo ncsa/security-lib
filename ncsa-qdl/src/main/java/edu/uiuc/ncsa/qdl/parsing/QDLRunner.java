@@ -107,8 +107,11 @@ public class QDLRunner implements Serializable {
                 } else {
                     if (isEchoModeOn()) {
                         // used by the workspace to print each statement's result to the console.
-                        if (((stmt instanceof ExpressionImpl)&& !(stmt instanceof ANode2))) {
-                            ExpressionImpl expression = (ExpressionImpl) stmt;
+                        // Checking for expression nodes allows for printing things like
+                        // (((2+2)))
+                        // correctly
+                        if (( (stmt instanceof ExpressionNode)&& !(stmt instanceof ANode2))) {
+                            ExpressionNode expression = (ExpressionNode) stmt;
                             if (expression instanceof Polyad) {
                                 // so if this is already a print statement, don't wrap it in one
                                 boolean isPrint = ((Polyad) expression).getName().equals(IOEvaluator.SAY_FUNCTION) ||
