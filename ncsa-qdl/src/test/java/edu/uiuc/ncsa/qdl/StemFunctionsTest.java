@@ -984,6 +984,82 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
+    /**
+     * test basic functionality that a list can be used to specify the subset
+     * @throws Throwable
+     */
+    public void testSubset3() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "r. := subset(3*[;15], 2*[;5]+1);");
+        addLine(script, "ok := reduce(@&&, r. == [3,9,15,21,27]);");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to get correct subset of a list.";
+    }
+
+    /**
+     * test that a stem of simple indices can be used to get a subset.
+     * @throws Throwable
+     */
+    public void testGenericSubset() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "r. := subset(3*[;15], {'foo':3,'bar':5,'baz':7});");
+        // trick. If two arbitrary stems are equal, then there is a single value of true from
+        // the values function. Can't do a reduce on an arbitrary stem (since it has an
+        // implicit assumption of value ordering), but this is the next best thing.
+        addLine(script, "test. := values(r. == {'bar':15, 'foo':9, 'baz':21});");
+        addLine(script, "ok := size(test.) == 1 && test.0;");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to get correct subset of a list.";
+    }
+
+    /*
+           subset(a., [[0,1],[1,1],[2,3]])
+     [1,5,11]
+        subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+    {bar:5, foo:1, baz:11}
+     */
+
+    /**
+     * Tests that a stem with non-integer indices can be used to extract a subset.
+     * @throws Throwable
+     */
+    public void testSubsetIndexList() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(3,4,n(12));");
+        addLine(script, "r. := subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]});");
+        // trick. If two arbitrary stems are equal, then there is a single value of true from
+        // the values function. Can't do a reduce on an arbitrary stem (since it has an
+        // implicit assumption of value ordering), but this is the next best thing.
+        addLine(script, "test. := values(r. == {'bar':5, 'foo':1, 'baz':11});");
+        addLine(script, "ok := size(test.) == 1 && test.0;");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to get correct subset of higher rank stem an index stem.";
+    }
+
+    /**
+     * Tests that a higher rank stem can have subsets extracted.
+     * @throws Throwable
+     */
+    public void testSubsetIndexList1() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(3,4,n(12));");
+        addLine(script, "r. := subset(a., [[0,1],[1,1],[2,3]]);");
+        addLine(script, "ok := reduce(@&&, r. == [1,5,11]);");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to get correct subset of higher rank stem from index list.";
+    }
 
     @Test
     public void testobjectAppend() throws Throwable {
@@ -1143,6 +1219,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Test a define dfunction as index
+     *
      * @throws Throwable
      */
     @Test
@@ -1158,6 +1235,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     /**
      * Test a string constant index.
+     *
      * @throws Throwable
      */
     @Test
@@ -1555,7 +1633,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
     /**
      * Tests the ~ applies to a list just reorders the list, i.e., it is fully
      * equivalent to
-     *   ~a. == []~.a
+     * ~a. == []~.a
+     *
      * @throws Throwable
      */
     public void testUnaryTilde() throws Throwable {
@@ -1565,7 +1644,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "ξ1. := ~mask(ξ., ξ. < 0);");
         addLine(script, "ξ2. := []~mask(ξ., ξ. < 0);");
         addLine(script, "ok := reduce(@∧, ξ1. ≡ ξ2.);");
-        addLine(script,"ok2 := reduce(@∧, [4,5,7,-2] ≡ ~{2:4,3:5}~{1:7,11:-2}); ");
+        addLine(script, "ok2 := reduce(@∧, [4,5,7,-2] ≡ ~{2:4,3:5}~{1:7,11:-2}); ");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
@@ -1583,33 +1662,34 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * {@link edu.uiuc.ncsa.qdl.parsing.QDLListener} special cases this to handle it
      * (rather than a complete rewrite of the parser).
      * This test checks this works right.
+     *
      * @throws Throwable
      */
     public void testTildeWithDot() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "ξ. := [;5];"); // stem of numbers
-         addLine(script, "ξ1. := [10;15];");
-         addLine(script, "ξ2. := ξ. ~ ξ1.;"); // do on one line to isolate this
-         addLine(script,"ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ξ. := [;5];"); // stem of numbers
+        addLine(script, "ξ1. := [10;15];");
+        addLine(script, "ξ2. := ξ. ~ ξ1.;"); // do on one line to isolate this
+        addLine(script, "ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
 
-     }
+    }
 
     public void testTildeWithDot2() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "ξ. := [;5];"); // stem of numbers
-         addLine(script, "ξ2. := ξ. ~ [10;15];"); // do on one line to isolate this
-         addLine(script,"ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ξ. := [;5];"); // stem of numbers
+        addLine(script, "ξ2. := ξ. ~ [10;15];"); // do on one line to isolate this
+        addLine(script, "ok := reduce(@∧, [0,1,2,3,4,10,11,12,13,14] ≡ ξ2.); ");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "stem. ~ stem. failed";
 
-     }
+    }
 }
 

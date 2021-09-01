@@ -1249,7 +1249,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             for (String p : paths) {
-                String resourceName = p + name;
+                String resourceName = p +  name;
                 DebugUtil.trace(ControlEvaluator.class, " path = " + resourceName);
                 if (state.isVFSFile(resourceName)) {
                     if (state.isVFSFile(resourceName)) {
@@ -1261,6 +1261,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                         }
                     }
                 } else {
+                    testFile = new File(resourceName);
                     if (testFile.exists() && testFile.isFile() && testFile.canRead()) {
                         return new QDLScript(QDLFileUtil.readFileAsLines(testFile.getCanonicalPath()), null);
                     }

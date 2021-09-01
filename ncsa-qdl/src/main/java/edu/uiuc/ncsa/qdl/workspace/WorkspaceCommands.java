@@ -3482,7 +3482,7 @@ public class WorkspaceCommands implements Logable {
                 say("autosave interval is now " + getAutosaveInterval() + " ms.");
                 break;
             default:
-                say("unknown ws variable");
+                say("unknown ws variable '" + inputLine.getArg(2) + "'");
                 break;
         }
 

@@ -228,7 +228,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             RENAME_KEYS,
             SHUFFLE,
             MASK,
-            KEYS,VALUES,
+            KEYS, VALUES,
             LIST_APPEND,
             LIST_INSERT_AT,
             LIST_SUBSET,
@@ -575,18 +575,18 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // create a list of values for a stem.
         StemVariable out = new StemVariable();
         Object object0 = polyad.evalArg(0, state);
-        if(isStem(object0)){
-            StemVariable inStem = (StemVariable)  object0;
+        if (isStem(object0)) {
+            StemVariable inStem = (StemVariable) object0;
             ArrayList values = new ArrayList();
-            for(Object key: inStem.keySet()){
+            for (Object key : inStem.keySet()) {
                 Object obj = inStem.get(key);
-                if(!values.contains(obj)) {
+                if (!values.contains(obj)) {
                     values.add(inStem.get(key));
                 }
             }
             out.addList(values);
 
-        }else {
+        } else {
             out.put(0L, object0);
         }
 
@@ -822,7 +822,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * Might want to have these returned as an option though so keep.
      * </p>
      *
-     *
      * @param indexList
      * @return
      */
@@ -857,7 +856,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             JSONObject jo = JSONObject.fromObject(arrayOut.toString());
             outStem.fromJSON(jo);
         }
-                            return outStem;
+        return outStem;
     }
 
     /**
@@ -1910,6 +1909,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    /*
+        subset(3*[;15], {'foo':3,'bar':5,'baz':7})
+        subset(3*[;15], 2*[;5]+1)
+        a. := n(3,4,n(12))
+        subset(a., [[0,1],[1,1],[2,3]])
+     [1,5,11]
+        subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+    {bar:5, foo:1, baz:11}
+     */
     protected void doListSubset(Polyad polyad, State state) {
         if (polyad.getArgCount() < 2 || 3 < polyad.getArgCount()) {
             throw new IllegalArgumentException("the " + LIST_SUBSET + " function requires  two or three arguments");
@@ -1920,21 +1928,56 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stem = (StemVariable) arg1;
         Object arg2 = polyad.evalArg(1, state);
-        if (!isLong(arg2)) {
-            throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its second argument");
-        }
-        Long startIndex = (Long) arg2;
-        Long endIndex = (long) stem.getStemList().size();
-        if (polyad.getArgCount() == 3) {
-            Object arg3 = polyad.evalArg(2, state);
-            if (!isLong(arg3)) {
-                throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
+        if (isLong(arg2)) {
+            Long startIndex = (Long) arg2;
+            Long endIndex = (long) stem.getStemList().size();
+            if (polyad.getArgCount() == 3) {
+                Object arg3 = polyad.evalArg(2, state);
+                if (!isLong(arg3)) {
+                    throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
+                }
+                endIndex = (Long) arg3;
             }
-            endIndex = (Long) arg3;
+
+            StemVariable outStem = stem.listSubset(startIndex, endIndex);
+            polyad.setResult(outStem);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (!isStem(arg2)) {
+            throw new IllegalArgumentException(LIST_SUBSET + " requires an stem or integer as its second argument");
+        }
+        StemVariable indices = (StemVariable) arg2;
+        StemVariable output = new StemVariable();
+        for (Object key : indices.keySet()) {
+            Object v = indices.get(key);
+            Object gotValue = null;
+            if (v instanceof StemVariable) {
+                StemVariable ii = (StemVariable) v;
+                if (!ii.isList()) {
+                    throw new IndexError("stem indices must be lists.");
+                }
+                IndexList indexList = new IndexList(ii);
+                IndexList returnedIL = stem.get(indexList, true);
+                if(returnedIL.size() == 1){
+                    gotValue = returnedIL.get(0);
+                }else{
+                    throw new IndexError("index does not resolve to a value.");
+                }
+            } else {
+                gotValue = stem.get(v);
+            }
+            if (gotValue != null) {
+                if (key instanceof Long) {
+                    output.put((Long) key, gotValue);
+                } else {
+                    output.put((String) key, gotValue);
+                }
+            }
         }
 
-        StemVariable outStem = stem.listSubset(startIndex, endIndex);
-        polyad.setResult(outStem);
+        polyad.setResult(output);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
@@ -1990,7 +2033,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         try {
             polyad.evalArg(0, state);
-        }catch(IndexError indexError){
+        } catch (IndexError indexError) {
             // it is possible that the user is trying to grab something impossible
             polyad.setEvaluated(true);
             polyad.setResult(Boolean.TRUE);
@@ -2004,11 +2047,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             // if the name is defined.
             var = variableNode.getVariableReference();
             if (var == null) {
-                 polyad.setResult(Boolean.FALSE);
-             } else {
-                 state.remove(var);
-                 polyad.setResult(Boolean.TRUE);
-             }
+                polyad.setResult(Boolean.FALSE);
+            } else {
+                state.remove(var);
+                polyad.setResult(Boolean.TRUE);
+            }
         }
         if (polyad.getArguments().get(0) instanceof ConstantNode) {
             throw new IllegalArgumentException("error: cannot remove a constant");
@@ -2020,7 +2063,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
 */
         }
-        if(polyad.getArguments().get(0) instanceof ESN2){
+        if (polyad.getArguments().get(0) instanceof ESN2) {
             ESN2 esn2 = (ESN2) polyad.getArguments().get(0);
             polyad.setResult(esn2.remove(state));
         }

@@ -1198,6 +1198,20 @@ public class StemVariable extends HashMap<String, Object> {
         return super.size() + getStemList().size();
     }
 
+    @Override
+    public boolean containsKey(Object key) {
+        if(key instanceof Long){
+            return containsKey((Long)key);
+        }
+        if(key instanceof String){
+            return containsKey((String)key);
+        }
+        if(key instanceof IndexList){
+            return get((IndexList) key,false)!= null;
+        }
+        return false;
+    }
+
     public boolean containsKey(Long key) {
         StemEntry s = new StemEntry(key);
         return getStemList().contains(s);
