@@ -174,16 +174,7 @@ return StemUtility.areNoneStems(objects);    }
             throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        if (arg1 == null) {
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(0) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(0) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg1, polyad.getArgAt(0), state);
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -247,16 +238,8 @@ return StemUtility.areNoneStems(objects);    }
             throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        if(arg1 == null){
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(0) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(0) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg1, polyad.getArgAt(0), state);
+
         // Short circuit dyadic logical && ||
         if(arg1 instanceof Boolean){
             if(polyad.getOperatorType() == OpEvaluator.OR_VALUE){
@@ -278,16 +261,7 @@ return StemUtility.areNoneStems(objects);    }
             }
         }
         Object arg2 = polyad.evalArg(1, state);
-        if (arg2 == null) {
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(1) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(1)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(1) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg2, polyad.getArgAt(1), state);
         Object[] argList = new Object[polyad.getArgCount()];
         argList[0] = arg1;
         argList[1] = arg2;
@@ -363,39 +337,12 @@ return StemUtility.areNoneStems(objects);    }
             throw new IllegalArgumentException("Error: the " + name + " function requires at least 3  arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        if(arg1 == null){
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(0) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(0)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(0) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg1, polyad.getArgAt(0), state);
         Object arg2 = polyad.evalArg(1, state);
-        if(arg2 == null){
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(1) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(1)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(1) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg2, polyad.getArgAt(1), state);
 
         Object arg3 = polyad.evalArg(2, state);
-        if(arg2 == null){
-            UnknownSymbolException unknownSymbolException;
-            if(polyad.getArguments().get(2) instanceof VariableNode){
-                unknownSymbolException =  new UnknownSymbolException("Error: unknown symbol '" + ((VariableNode)polyad.getArguments().get(2)).getVariableReference() + "'");
-            }else {
-                unknownSymbolException = new UnknownSymbolException("Error: Unknown symbol");
-            }
-            state.getLogger().error("Got unknown symbol for '" + polyad.getArguments().get(2) + "'", unknownSymbolException);
-            throw unknownSymbolException;
-        }
+        checkNull(arg3, polyad.getArgAt(3), state);
 
         if (arg1 == null || arg2 == null || arg3 == null) {
             throw new UnknownSymbolException("Error: Unknown symbol");
@@ -424,6 +371,8 @@ return StemUtility.areNoneStems(objects);    }
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
+
+
 
 
     protected void processStem3(StemVariable outStem,
@@ -709,4 +658,42 @@ return StemUtility.areNoneStems(objects);    }
         return getFunctionReferenceNode(state,arg0,false);
     }
 
+    /**
+     * If a function gets an argument whichs should not be a Java null, then this will
+     * try to track down the variable reference.
+     * @param arg
+     * @param swri
+     */
+    protected void checkNull(Object arg, StatementWithResultInterface swri){
+        if(arg != null){return;}
+        if(swri instanceof VariableNode){
+            VariableNode vNode = (VariableNode) swri;
+            throw new UnknownSymbolException("Error: unknown symbol '" + vNode.getVariableReference() + "'");
+        }
+        throw new UnknownSymbolException("Error: unknown symbol");
+    }
+
+    /**
+     * Check for nulls but log any error
+     * @param arg1
+     * @param swri
+     * @param state
+     */
+    protected void checkNull(Object arg1, StatementWithResultInterface swri, State state ) {
+        if(arg1 == null){
+            UnknownSymbolException unknownSymbolException;
+            String message  = "Error: unknown symbol";
+            if(swri instanceof VariableNode){
+                message = "Error: unknown symbol '" + ((VariableNode)swri).getVariableReference() + "'";
+                unknownSymbolException =  new UnknownSymbolException(message);
+            }else {
+                unknownSymbolException = new UnknownSymbolException(message);
+            }
+            if(state.getLogger() != null) {
+                // Check they have logging in the first place before writing to it.
+                state.getLogger().error(message);
+            }
+            throw unknownSymbolException;
+        }
+    }
 }

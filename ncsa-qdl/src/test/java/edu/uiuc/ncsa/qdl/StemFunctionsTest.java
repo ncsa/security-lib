@@ -1061,6 +1061,22 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "Failed to get correct subset of higher rank stem from index list.";
     }
 
+
+    /**
+     * Create a mixed stem and show that the elements can be addressed and returned as a list.
+     * @throws Throwable
+     */
+    public void testSubsetAddressing() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "r. := (3*[;7]-5)~{'a':42, 'b':43, 'woof':44};");
+        addLine(script, "ok := reduce(@&&, subset(r.,'woof'~[2,5,6]~'a') == [44,1,10,13,42]);");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to get correct subset with mixed list addressing.";
+    }
+
     @Test
     public void testobjectAppend() throws Throwable {
         StemVariable stemVariable = new StemVariable();

@@ -15,6 +15,8 @@ public interface ExpressionNode extends StatementWithResultInterface {
 
     ArrayList<StatementWithResultInterface> getArguments(); // need this to preserve order of lists
 
+    StatementWithResultInterface getArgAt(int index);
+
     void setArguments(ArrayList<StatementWithResultInterface> arguments);
 
     int getArgCount();

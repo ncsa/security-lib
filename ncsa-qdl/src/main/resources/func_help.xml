@@ -2609,7 +2609,7 @@ E.g.
   ~r1.
  [-7,0]
 
-E.g. Glom two lists together then re-index them
+E.g. Glom two sparse lists together then re-index them
   ~{2:4,3:5}~{1:7,11:-2}
 [4,5,7,-2]
 
@@ -2622,6 +2622,7 @@ See also: ~|, join
                     <![CDATA[
 Join along last axis. Normal join, ~, operates along the zero-th
 axis.
+    a. ~| b. == join(a., b., -1)
 
 E.g.
   [;5]~|[10;15]

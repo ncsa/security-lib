@@ -42,6 +42,14 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return arguments;
     }
 
+    @Override
+    public StatementWithResultInterface getArgAt(int index) {
+        if((index <0 ) || (getArgCount() <= index)) {
+            return null;
+        }
+         return getArguments().get(index);
+    }
+
     public Object evalArg(int index, State state){
         return getArguments().get(index).evaluate(state);
     }

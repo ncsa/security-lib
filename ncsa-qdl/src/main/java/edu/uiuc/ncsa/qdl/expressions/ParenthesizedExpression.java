@@ -19,6 +19,14 @@ public class ParenthesizedExpression implements ExpressionNode {
         return getArguments().get(0);
     }
 
+    @Override
+    public StatementWithResultInterface getArgAt(int index) {
+        if((index < 0)||(getArgCount() <= index)){
+            return null;
+        }
+        return getArguments().get(index);
+    }
+
     public void setExpression(StatementWithResultInterface expression) {
         if(getArgCount() == 0){
             getArguments().add(expression);
