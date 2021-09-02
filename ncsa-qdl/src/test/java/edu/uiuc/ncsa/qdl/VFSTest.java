@@ -22,7 +22,6 @@ import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
  * on 3/4/20 at  8:57 AM
  */
 public class VFSTest extends AbstractQDLTester {
-    @Test
     public void testPaths() {
         String absFQPath1 = "A#/a/b/c";
         String absUNQPath1 = "/a/b/c";
@@ -344,7 +343,7 @@ public class VFSTest extends AbstractQDLTester {
         assert !vfs.contains(p) : "Could not delete file from store";
     }
 
-    @Test
+     
     public void testFilePassThrough() throws Throwable {
         String rootDir = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources";
         VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(
@@ -367,7 +366,7 @@ public class VFSTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testMemoryStoreVFS() throws Throwable {
         VFSMemoryFileProvider vfs = new VFSMemoryFileProvider(
                 "qdl-vfs", "/", true, true
@@ -443,7 +442,7 @@ public class VFSTest extends AbstractQDLTester {
 
     XProperties xp;
 
-    @Test
+     
     public void testMySQLVFS() throws Throwable {
         MySQLConnectionParameters params;
         String tableName = "qdl_vfs"; // default;
@@ -498,7 +497,7 @@ public class VFSTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testZipVFS() throws Throwable {
 
         String pathToZip = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/vfs-test/vfs-test.zip";

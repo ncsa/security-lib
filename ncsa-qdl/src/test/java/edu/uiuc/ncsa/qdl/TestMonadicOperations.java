@@ -1,14 +1,13 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Monad;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -17,7 +16,7 @@ import org.junit.Test;
 public class TestMonadicOperations extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    @Test
+     
     public void testPlusPlusPostfix() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -37,7 +36,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testMinusMinusPostfix() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -54,7 +53,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         assert st.resolveValue(variableReference).equals(newValue);
     }
 
-    @Test
+     
     public void testPlusPlusPrefix() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -71,7 +70,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         assert st.resolveValue(variableReference).equals(newValue);
     }
 
-    @Test
+     
     public void testMinusMinusPrefix() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -87,7 +86,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         assert st.resolveValue(variableReference).equals(newValue);
     }
 
-    @Test
+     
     public void testNotPrefix() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -101,7 +100,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         assert myMonad.getResult().equals(newValue);
     }
 
-    @Test
+     
      public void testMinusPrefix() throws Exception {
         // Tests that the opposite of a value is returned.
          String variableReference = "i"; // name of the variable
@@ -113,7 +112,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
          myMonad.evaluate(state);
          assert myMonad.getResult().equals(newValue);
      }
-    @Test
+     
     public void testMMAndPPParsing() throws Throwable {
         StringBuffer script = new StringBuffer();
           addLine(script, "j := 5;");

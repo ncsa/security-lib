@@ -1,14 +1,13 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import org.junit.Test;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.math.BigDecimal;
 
@@ -19,7 +18,7 @@ import java.math.BigDecimal;
 public class TestDyadicOperations extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    @Test
+     
     public void testDyadicBDPlus() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("123.456"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new BigDecimal("-123.4560000"), Constant.DECIMAL_TYPE);
@@ -29,7 +28,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert ((BigDecimal) dyad.getResult()).compareTo(BigDecimal.ZERO) == 0;
     }
 
-    @Test
+     
     public void testDyadicBDMinus() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("123.456"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new BigDecimal("123.056"), Constant.DECIMAL_TYPE);
@@ -42,7 +41,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
     }
 
 
-    @Test
+     
     public void testDyadicMixedMinus() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("123.456"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new Long(23L), Constant.LONG_TYPE);
@@ -54,7 +53,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert (returnedResult.subtract(expectedResult)).compareTo(BigDecimal.ZERO) == 0;
     }
 
-    @Test
+     
     public void testDyadicMixedPlus() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("123.456"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new Long(23L), Constant.LONG_TYPE);
@@ -66,7 +65,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert (returnedResult.subtract(expectedResult)).compareTo(BigDecimal.ZERO) == 0;
     }
 
-    @Test
+     
     public void testStemScalarPlus() throws Exception {
         State state = testUtils.getNewState();
         StemVariable stemVariable = new StemVariable();
@@ -88,7 +87,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert testNumberEquals(result.get("3"), new BigDecimal("-120.987"));
     }
 
-    @Test
+     
     public void testDyadicLongPlus() throws Exception {
         ConstantNode left = new ConstantNode(1L, Constant.LONG_TYPE);
         ConstantNode right = new ConstantNode(2L, Constant.LONG_TYPE);
@@ -97,7 +96,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert dyad.getResult().equals(3L);
     }
 
-    @Test
+     
     public void testDyadicLongMinus() throws Exception {
         ConstantNode left = new ConstantNode(1L, Constant.LONG_TYPE);
         ConstantNode right = new ConstantNode(2L, Constant.LONG_TYPE);
@@ -106,7 +105,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert dyad.getResult().equals(-1L);
     }
 
-    @Test
+     
     public void testDyadicStringPlus() throws Exception {
         ConstantNode left = new ConstantNode("abc", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("def", Constant.STRING_TYPE);
@@ -115,7 +114,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert dyad.getResult().equals("abcdef");
     }
 
-    @Test
+     
     public void testDyadicStringMinus() throws Exception {
         ConstantNode left = new ConstantNode("abcdef", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("def", Constant.STRING_TYPE);
@@ -124,7 +123,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert dyad.getResult().equals("abc");
     }
 
-    @Test
+     
     public void testDyadicStringMinus2() throws Exception {
         // A - B for strings. removes *every* occurance of B found in A
         /// here abcabdeabf - ab = cdef
@@ -140,7 +139,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testVariableExpression() throws Exception {
         State state = testUtils.getTestState();
         SymbolTable st = state.getSymbolStack();
@@ -164,7 +163,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert variableNode.getResultType() == Constant.LONG_TYPE;
     }
 
-    @Test
+     
     public void testLongEquality() throws Exception {
         ConstantNode left = new ConstantNode(new Long(4), Constant.LONG_TYPE);
         ConstantNode right = new ConstantNode(new Long(5), Constant.LONG_TYPE);
@@ -177,7 +176,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert (Boolean) dyad.getResult();
     }
 
-    @Test
+     
     public void testBDEquality() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("4.43000000"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new BigDecimal("4.43"), Constant.DECIMAL_TYPE);
@@ -190,7 +189,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert !(Boolean) dyad.getResult();
     }
 
-    @Test
+     
     public void testMixedEquality() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("4.000000"), Constant.DECIMAL_TYPE);
         ConstantNode right = new ConstantNode(new Long(4L), Constant.DECIMAL_TYPE);
@@ -203,7 +202,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert !(Boolean) dyad.getResult();
     }
 
-    @Test
+     
     public void testStringEquality() throws Exception {
         ConstantNode left = new ConstantNode("little bunny foo foo", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("It was a dark and stormy night", Constant.STRING_TYPE);
@@ -220,7 +219,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert (Boolean) dyad.getResult();
     }
 
-    @Test
+     
     public void testLongComparison() throws Exception {
         ConstantNode left = new ConstantNode(new Long(4), Constant.LONG_TYPE);
         ConstantNode right = new ConstantNode(new Long(5), Constant.LONG_TYPE);

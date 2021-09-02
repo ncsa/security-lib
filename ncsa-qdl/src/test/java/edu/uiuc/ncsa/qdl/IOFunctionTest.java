@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -27,7 +26,7 @@ public class IOFunctionTest extends AbstractQDLTester {
         System.out.println("you entered:\"" + polyad.getResult() + "\"");
     }
 
-    @Test
+     
     public void testSay() throws Exception {
         State state = testUtils.getNewState();
         Polyad polyad = new Polyad(IOEvaluator.SAY_FUNCTION);

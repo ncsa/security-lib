@@ -10,7 +10,6 @@ import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -25,7 +24,7 @@ public class StatementTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testAssignment() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable st = state.getSymbolStack();
@@ -46,7 +45,7 @@ public class StatementTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testBasicLoop() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "i:=0;");
@@ -71,7 +70,7 @@ public class StatementTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testBadLoop() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "i:=0;");
@@ -96,7 +95,7 @@ public class StatementTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testReservedWordAssignments() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();

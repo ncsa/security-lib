@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -18,7 +17,7 @@ import org.junit.Test;
 public class StringFunctionTests extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    @Test
+     
     public void testContainsStringString() throws Exception {
         State state = testUtils.getNewState();
 
@@ -32,7 +31,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert (Boolean) polyad.getResult();
     }
 
-    @Test
+     
     public void testContainsStringStem() throws Exception {
         // test that the first argument is a string and the second is a stem variable.
         // result should be conformable with the second argument
@@ -75,7 +74,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testContainsStemString() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -108,7 +107,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert !result.getBoolean("bind");
     }
 
-    @Test
+     
     public void testContainsStemStringCaseInsensitive() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -143,7 +142,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert !result.getBoolean("bind");
     }
 
-    @Test
+     
     public void testContainsStemStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -178,7 +177,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert !result.getBoolean("bind");
     }
 
-    @Test
+     
     public void testStringTrim() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -195,7 +194,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testNumberTrim() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -211,7 +210,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testStemTrim() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -235,7 +234,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testIndexOfStringString() throws Exception {
         State state = testUtils.getNewState();
 
@@ -249,7 +248,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result == 3L;
     }
 
-    @Test
+     
     public void testIndexOfStringStem() throws Exception {
         State state = testUtils.getNewState();
 
@@ -278,7 +277,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.getLong("ago") == -1L;
     }
 
-    @Test
+     
     public void testIndexOfStemString() throws Exception {
         State state = testUtils.getTestState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -309,7 +308,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.getLong("bring") == 0L;
     }
 
-    @Test
+     
     public void testIndexOfStemString_ignoreCase() throws Exception {
         State state = testUtils.getTestState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -341,7 +340,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.getLong("bring") == 0L;
     }
 
-    @Test
+     
     public void testIndexOfStemStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -375,7 +374,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.getLong("bind") == 11L;
     }
 
-    @Test
+     
     public void testStringToUpper() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -391,7 +390,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testStringToLower() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -407,7 +406,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testStemToLower() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -434,7 +433,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testStemToUpper() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -461,7 +460,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testAllStringReplace() throws Exception {
         State state = testUtils.getNewState();
 
@@ -478,7 +477,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedValue);
     }
 
-    @Test
+     
     public void testStemStringReplace() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -512,7 +511,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert outStem.getString("bind").equals(expectedValue);
     }
 
-    @Test
+     
     public void testInsertStringString() throws Exception {
         State state = testUtils.getNewState();
 
@@ -534,7 +533,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testInsertStemString() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -571,7 +570,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testInsertStemStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -611,7 +610,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert result.getString("bind").startsWith(expectedResult);
     }
 
-    @Test
+     
     public void testDetokenize() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := indices(5);");
@@ -629,7 +628,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getStringValue("t3", state).equals("0k=1k=2k=3k=4");
     }
 
-    @Test
+     
     public void testSubstring() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -652,7 +651,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testRegexTokenize() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -665,7 +664,7 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testRegexMatches() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -684,7 +683,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      * Checks a few random unicode escapes mostly as regression if we break it.
      * @throws Throwable
      */
-    @Test
+     
     public void testUnicodeEscapes() throws Throwable{
         // π
         State state = testUtils.getNewState();
@@ -710,7 +709,7 @@ public class StringFunctionTests extends AbstractQDLTester {
   diff(['abcde','abed'], 'abcq')
 [3,2]
      */
-    @Test
+     
     public void testDiff() throws Throwable{
         // π
         State state = testUtils.getNewState();

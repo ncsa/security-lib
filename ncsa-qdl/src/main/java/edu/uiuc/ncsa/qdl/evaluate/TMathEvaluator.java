@@ -318,7 +318,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                 } else {
                     r.result = objects[0];
-                    r.resultType = polyad.getArguments().get(0).getResultType();
+                    r.resultType = polyad.getArgAt(0).getResultType();
                 }
                 if (!isBaseNonNegative && isExponentEven) {
                     throw new IllegalArgumentException(N_ROOT + " requires a positive base if the exponent is even.");

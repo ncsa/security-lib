@@ -508,6 +508,7 @@ rename_keys(target., new_names.) - rename the keys in target. using
                       {old0:new0, old1:new1,...}
                       where old* are the current names of the keys in target.
                       and new* are the new names
+                      Returns the modified target.
 E.g. To rename keys with a common prefix
     a. := {'x_x':'A','x_y':'B'};
     rename_keys(a., keys(a.)-'x_');

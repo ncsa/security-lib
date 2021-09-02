@@ -575,7 +575,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // create a list of values for a stem.
         StemVariable out = new StemVariable();
         Object object0 = polyad.evalArg(0, state);
-        checkNull(object0, polyad.getArguments().get(0));
+        checkNull(object0, polyad.getArgAt(0));
 
         if (isStem(object0)) {
             StemVariable inStem = (StemVariable) object0;
@@ -605,13 +605,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doForEach(Polyad polyad, State state) {
-        FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(0), true);
+        FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
 
         StemVariable[] stems = new StemVariable[polyad.getArgCount() - 1];
         for (int i = 1; i < polyad.getArgCount(); i++) {
 
             Object arg = polyad.evalArg(i, state);
-            checkNull(arg, polyad.getArguments().get(i));
+            checkNull(arg, polyad.getArgAt(i));
 
             if (!isStem(arg)) {
                 throw new IllegalArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
@@ -737,14 +737,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     protected void doJPathQuery(Polyad polyad, State state) {
         Object arg0 = polyad.evalArg(0, state);
-        checkNull(arg0, polyad.getArguments().get(0));
+        checkNull(arg0, polyad.getArgAt(0));
 
         if (!isStem(arg0)) {
             throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a stem as its first argument");
         }
         StemVariable stemVariable = (StemVariable) arg0;
         Object arg1 = polyad.evalArg(1, state);
-        checkNull(arg1, polyad.getArguments().get(1));
+        checkNull(arg1, polyad.getArgAt(1));
 
         if (!isString(arg1)) {
             throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a string as its second argument");
@@ -755,7 +755,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean returnAsPaths = false;
         if (polyad.getArgCount() == 3) {
             Object arg2 = polyad.evalArg(2, state);
-            checkNull(arg2, polyad.getArguments().get(2));
+            checkNull(arg2, polyad.getArgAt(2));
 
             if (!isBoolean(arg2)) {
                 throw new IllegalArgumentException(JSON_PATH_QUERY + " requires a boolean as its third argument");
@@ -943,7 +943,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         polyad.setEvaluated(true);
-        StemVariable s = (StemVariable) polyad.getArguments().get(0).getResult();
+        StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
         polyad.setResult(s.getRank());
         polyad.setResultType(Constant.LONG_TYPE);
 
@@ -958,7 +958,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         // so its a stem
         polyad.setEvaluated(true);
-        StemVariable s = (StemVariable) polyad.getArguments().get(0).getResult();
+        StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
         polyad.setResult(s.dim());
         polyad.setResultType(Constant.STEM_TYPE);
 
@@ -966,7 +966,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     protected void doListReverse(Polyad polyad, State state) {
         Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArguments().get(0));
+        checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
             throw new IllegalArgumentException("error:" + LIST_REVERSE + " requires a stem as its argument.");
@@ -974,7 +974,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         int axis = 0;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(1));
+            checkNull(arg2, polyad.getArgAt(1));
 
             if (!isLong(arg2)) {
                 throw new IllegalArgumentException("error:" + LIST_REVERSE + " an integer as its axis.");
@@ -1023,8 +1023,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
@@ -1053,7 +1053,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + LIST_STARTS_WITH + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
-        checkNull(leftArg, polyad.getArguments().get(0));
+        checkNull(leftArg, polyad.getArgAt(0));
 
         StemVariable leftStem = null;
         if (isString(leftArg)) {
@@ -1069,7 +1069,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object rightArg = polyad.evalArg(1, state);
-        checkNull(rightArg, polyad.getArguments().get(1));
+        checkNull(rightArg, polyad.getArgAt(1));
 
         StemVariable rightStem = null;
         if (isString(rightArg)) {
@@ -1119,10 +1119,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: " + HAS_VALUE + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
-        checkNull(leftArg, polyad.getArguments().get(0));
+        checkNull(leftArg, polyad.getArgAt(0));
 
         Object rightArg = polyad.evalArg(1, state);
-        checkNull(rightArg, polyad.getArguments().get(1));
+        checkNull(rightArg, polyad.getArgAt(1));
         // breaks down tidily in to 4 cases.
         if (isStem(leftArg)) {
             StemVariable lStem = (StemVariable) leftArg;
@@ -1186,13 +1186,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.evalArg(0, state);
         if (polyad.getArgCount() == 1) {
-            polyad.setResult(new Long(Constant.getType(polyad.getArguments().get(0).getResult())));
+            polyad.setResult(new Long(Constant.getType(polyad.getArgAt(0).getResult())));
             polyad.setResultType(Constant.LONG_TYPE);
             polyad.setEvaluated(true);
             return;
         }
         StemVariable output = new StemVariable();
-        output.put(0L, new Long(Constant.getType(polyad.getArguments().get(0).getResult())));
+        output.put(0L, new Long(Constant.getType(polyad.getArgAt(0).getResult())));
         for (int i = 1; i < polyad.getArgCount(); i++) {
             Object r = polyad.evalArg(i, state);
             output.put(new Long(i), new Long(Constant.getType(r)));
@@ -1207,7 +1207,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(FROM_JSON + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
 
         if (!isString(arg)) {
             throw new IllegalArgumentException(FROM_JSON + " requires a string as its argument");
@@ -1216,7 +1216,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(2));
+            checkNull(arg2, polyad.getArgAt(2));
             if (!isBoolean(arg2)) {
                 throw new IllegalArgumentException(FROM_JSON + " requires a boolean as its second argument if present.");
             }
@@ -1247,7 +1247,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(TO_JSON + " requires an argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArguments().get(0));
+        checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
             throw new IllegalArgumentException(TO_JSON + " requires a stem as its first argument");
@@ -1259,7 +1259,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
          */
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(1));
+            checkNull(arg2, polyad.getArgAt(1));
 
             boolean argOK = false; // got a valid input, boolean or long.
             if (isBoolean(arg2)) {
@@ -1281,7 +1281,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
          */
         if (polyad.getArgCount() == 3) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(1));
+            checkNull(arg2, polyad.getArgAt(1));
             if (isBoolean(arg2)) {
                 convertNames = (Boolean) arg2;
             } else {
@@ -1289,7 +1289,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
 
             Object arg3 = polyad.evalArg(2, state);
-            checkNull(arg3, polyad.getArguments().get(2));
+            checkNull(arg3, polyad.getArgAt(2));
             if (!isLong(arg3)) {
                 throw new IllegalArgumentException(TO_JSON + " requires an integer as its third argument");
             }
@@ -1322,19 +1322,19 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         for (int i = 0; i < polyad.getArgCount(); i++) {
             Object arg = polyad.evalArg(i, state);
-            checkNull(arg, polyad.getArguments().get(i));
+            checkNull(arg, polyad.getArgAt(i));
             if (!isStem(arg)) {
                 throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
             }
             outStem = outStem.union((StemVariable) arg);
 
 /*   really old stuff.
-            if (polyad.getArguments().get(i) instanceof StatementWithResultInterface) {
-                StatementWithResultInterface vn = polyad.getArguments().get(i);
+            if (polyad.getArgAt(i) instanceof StatementWithResultInterface) {
+                StatementWithResultInterface vn = polyad.getArgAt(i);
                 stem = (StemVariable) vn.getResult();
             }
-            if ((polyad.getArguments().get(i) instanceof StemVariable)) {
-                stem = (StemVariable) polyad.getArguments().get(i);
+            if ((polyad.getArgAt(i) instanceof StemVariable)) {
+                stem = (StemVariable) polyad.getArgAt(i);
             }
             if (stem == null) {
                 throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
@@ -1352,14 +1352,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + UNBOX + " function requires  at least 1 argument");
         }
         Object arg0 = polyad.evalArg(0, state);
-        checkNull(arg0, polyad.getArguments().get(0));
+        checkNull(arg0, polyad.getArgAt(0));
 
         // should take either a stem or a variable reference to it.
         StemVariable stem = null;
         Boolean safeMode = Boolean.TRUE;
         if (polyad.getArgCount() == 2) {
             Object o = polyad.evalArg(1, state);
-            checkNull(o, polyad.getArguments().get(1));
+            checkNull(o, polyad.getArgAt(1));
 
             if (!isBoolean(o)) {
                 throw new IllegalArgumentException("The second argument of " + UNBOX + " must be a boolean.");
@@ -1367,20 +1367,20 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             safeMode = (Boolean) o;
         }
         String varName = null;
-        if (polyad.getArguments().get(0) instanceof VariableNode) {
-            VariableNode vn = (VariableNode) polyad.getArguments().get(0);
+        if (polyad.getArgAt(0) instanceof VariableNode) {
+            VariableNode vn = (VariableNode) polyad.getArgAt(0);
             varName = vn.getVariableReference();
             if (!(vn.getResult() instanceof StemVariable)) {
                 throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
             }
             stem = (StemVariable) vn.getResult();
         }
-        if (polyad.getArguments().get(0) instanceof StemVariableNode) {
+        if (polyad.getArgAt(0) instanceof StemVariableNode) {
             stem = (StemVariable) polyad.evalArg(0, state);
         }
 
-        if ((polyad.getArguments().get(0) instanceof StemVariable)) {
-            stem = (StemVariable) polyad.getArguments().get(0);
+        if ((polyad.getArgAt(0) instanceof StemVariable)) {
+            stem = (StemVariable) polyad.getArgAt(0);
         }
         if (stem == null) {
             throw new IllegalArgumentException("You can only unbox a stem. This is not a stem.");
@@ -1444,10 +1444,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         for (int i = 0; i < polyad.getArgCount(); i++) {
             polyad.evalArg(i, state);
-            if (!(polyad.getArguments().get(i) instanceof VariableNode)) {
+            if (!(polyad.getArgAt(i) instanceof VariableNode)) {
                 throw new IllegalArgumentException("You must supply a list of variables to box.");
             }
-            VariableNode vn = (VariableNode) polyad.getArguments().get(i);
+            VariableNode vn = (VariableNode) polyad.getArgAt(i);
             varNames.add(vn.getVariableReference());
             stem.put(vn.getVariableReference(), vn.getResult());
         }
@@ -1464,7 +1464,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + SIZE + " function requires 1 argument");
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
 
         long size = 0;
         if (isStem(arg)) {
@@ -1495,14 +1495,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + LIST_KEYS + " function requires at least one argument");
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
 
         int returnScope = all_keys;
         int returnType = Constant.UNKNOWN_TYPE;
         boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(1));
+            checkNull(arg2, polyad.getArgAt(1));
 
             if (isBoolean(arg2)) {
                 returnByType = false;
@@ -1596,7 +1596,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + KEYS + " function requires at least 1 argument");
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
             polyad.setResultType(Constant.STEM_TYPE);
@@ -1608,7 +1608,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArguments().get(1));
+            checkNull(arg2, polyad.getArgAt(1));
 
             if (isBoolean(arg2)) {
                 returnByType = false;
@@ -1692,14 +1692,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + HAS_KEYS + " function requires 2 arguments");
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
             throw new IllegalArgumentException("The " + HAS_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
-        Object arg2 = polyad.getArguments().get(1).getResult();
-        checkNull(arg2, polyad.getArguments().get(1));
+        Object arg2 = polyad.getArgAt(1).getResult();
+        checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
             polyad.setResult(target.containsKey(arg2.toString()));
@@ -1719,7 +1719,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + MAKE_INDICES + " function requires at least 1 argument");
         }
         Object arg =polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArguments().get(0));
+        checkNull(arg, polyad.getArgAt(0));
 
         // First argument always has to be an integer.
         if (!(arg instanceof Long)) {
@@ -1730,7 +1730,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean hasFill = false;
         if (polyad.getArgCount() != 1) {
             Object lastArg = polyad.evalArg(polyad.getArgCount() - 1, state);
-            checkNull(lastArg, polyad.getArguments().get(polyad.getArgCount() - 1));
+            checkNull(lastArg, polyad.getArgAt(polyad.getArgCount() - 1));
 
             if (!isStem(lastArg)) {
                 // fine, no fill.
@@ -1904,7 +1904,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + LIST_COPY + " function requires 5 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArguments().get(0));
+        checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
             throw new IllegalArgumentException(LIST_COPY + " requires a stem as its first argument");
@@ -1912,14 +1912,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable souorceStem = (StemVariable) arg1;
 
         Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArguments().get(1));
+        checkNull(arg2, polyad.getArgAt(1));
         if (!isLong(arg2)) {
             throw new IllegalArgumentException(LIST_COPY + " requires an integer as its second argument");
         }
         Long startIndex = (Long) arg2;
 
         Object arg3 = polyad.evalArg(2, state);
-        checkNull(arg3, polyad.getArguments().get(2));
+        checkNull(arg3, polyad.getArgAt(2));
 
         if (!isLong(arg3)) {
             throw new IllegalArgumentException(LIST_COPY + " requires an integer as its third argument");
@@ -1928,13 +1928,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         // need to handle case that the target does not exist.
         StemVariable targetStem;
-        if (polyad.getArguments().get(3) instanceof VariableNode) {
-            targetStem = getOrCreateStem(polyad.getArguments().get(3),
+        if (polyad.getArgAt(3) instanceof VariableNode) {
+            targetStem = getOrCreateStem(polyad.getArgAt(3),
                     state, LIST_COPY + " requires a stem as its fourth argument"
             );
         } else {
             Object obj = polyad.evalArg(3, state);
-            checkNull(obj, polyad.getArguments().get(3));
+            checkNull(obj, polyad.getArgAt(3));
 
             if (!isStem(obj)) {
                 throw new IllegalArgumentException(LIST_COPY + " requires an integer as its fifth argument");
@@ -1944,7 +1944,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg5 = polyad.evalArg(4, state);
-        checkNull(arg5, polyad.getArguments().get(4));
+        checkNull(arg5, polyad.getArgAt(4));
 
         if (!isLong(arg5)) {
             throw new IllegalArgumentException(LIST_COPY + " requires an integer as its fifth argument");
@@ -1977,13 +1977,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + LIST_SUBSET + " function requires  two or three arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArguments().get(0));
+        checkNull(arg1, polyad.getArgAt(0));
         if (!isStem(arg1)) {
             throw new IllegalArgumentException(LIST_SUBSET + " requires stem as its first argument");
         }
         StemVariable stem = (StemVariable) arg1;
         Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArguments().get(1));
+        checkNull(arg2, polyad.getArgAt(1));
         if (isLong(arg2)) {
             Long startIndex = (Long) arg2;
             Long endIndex = (long) stem.getStemList().size();
@@ -1992,7 +1992,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             if (polyad.getArgCount() == 3) {
                 Object arg3 = polyad.evalArg(2, state);
-                checkNull(arg3, polyad.getArguments().get(2));
+                checkNull(arg3, polyad.getArgAt(2));
 
                 if (!isLong(arg3)) {
                     throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
@@ -2048,7 +2048,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(IS_LIST + " requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArguments().get(0));
+        checkNull(arg1, polyad.getArgAt(0));
         if (!isStem(arg1)) {
             throw new IllegalArgumentException(IS_LIST + " requires stem as its first argument");
         }
@@ -2066,7 +2066,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         // surgery. If the first argument is null and a stem, turn it in to one.
         StemVariable stem1 = getOrCreateStem(
-                polyad.getArguments().get(0),
+                polyad.getArgAt(0),
                 state,
                 LIST_APPEND + " requires stem as its first argument");
         Object arg2 = polyad.evalArg(1, state);
@@ -2103,8 +2103,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         String var = null;
-        if (polyad.getArguments().get(0) instanceof VariableNode) {
-            VariableNode variableNode = (VariableNode) polyad.getArguments().get(0);
+        if (polyad.getArgAt(0) instanceof VariableNode) {
+            VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
             // if the name is defined.
             var = variableNode.getVariableReference();
@@ -2115,11 +2115,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResult(Boolean.TRUE);
             }
         }
-        if (polyad.getArguments().get(0) instanceof ConstantNode) {
+        if (polyad.getArgAt(0) instanceof ConstantNode) {
             throw new IllegalArgumentException("error: cannot remove a constant");
         }
-        if (polyad.getArguments().get(0) instanceof ESN2) {
-            ESN2 esn2 = (ESN2) polyad.getArguments().get(0);
+        if (polyad.getArgAt(0) instanceof ESN2) {
+            ESN2 esn2 = (ESN2) polyad.getArgAt(0);
             polyad.setResult(esn2.remove(state));
         }
 
@@ -2140,14 +2140,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.getArguments().get(0) instanceof VariableNode) {
-            VariableNode variableNode = (VariableNode) polyad.getArguments().get(0);
+        if (polyad.getArgAt(0) instanceof VariableNode) {
+            VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
             // if the name is defined.
             isDef = state.isDefined(variableNode.getVariableReference());
         }
-        if (polyad.getArguments().get(0) instanceof ConstantNode) {
-            ConstantNode variableNode = (ConstantNode) polyad.getArguments().get(0);
+        if (polyad.getArgAt(0) instanceof ConstantNode) {
+            ConstantNode variableNode = (ConstantNode) polyad.getArgAt(0);
             Object x = variableNode.getResult();
             if (x == null) {
                 isDef = false;
@@ -2155,8 +2155,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 isDef = state.isDefined(x.toString());
             }
         }
-        if (polyad.getArguments().get(0) instanceof ESN2) {
-            Object object = polyad.getArguments().get(0).getResult();
+        if (polyad.getArgAt(0) instanceof ESN2) {
+            Object object = polyad.getArgAt(0).getResult();
             if (object == null) {
                 isDef = false;
             } else {
@@ -2179,16 +2179,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + INCLUDE_KEYS + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
             throw new IllegalArgumentException("The " + INCLUDE_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
-        Object arg2 = polyad.getArguments().get(1).getResult();
-        checkNull(arg2, polyad.getArguments().get(1));
+        Object arg2 = polyad.getArgAt(1).getResult();
+        checkNull(arg2, polyad.getArgAt(1));
         if (!isStem(arg2)) {
             StemVariable result = new StemVariable();
             if (target.containsKey(arg2.toString())) {
@@ -2216,15 +2216,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + EXCLUDE_KEYS + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
             throw new IllegalArgumentException("The " + EXCLUDE_KEYS + " command requires a stem as its first argument.");
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
-        Object arg2 = polyad.getArguments().get(1).getResult();
-        checkNull(arg2, polyad.getArguments().get(1));
+        Object arg2 = polyad.getArgAt(1).getResult();
+        checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
             StemVariable result = new StemVariable();
@@ -2279,8 +2279,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + SHUFFLE + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
 
         if (isLong(arg)) {
             Long argL = (Long) arg;
@@ -2308,9 +2308,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArguments().get(1));
+        checkNull(arg2, polyad.getArgAt(1));
 
-        // polyad.getArguments().get(1).getResult();
+        // polyad.getArgAt(1).getResult();
         //  polyad.evalArg(1, state);
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + SHUFFLE + " command requires a stem as its second argument.");
@@ -2355,17 +2355,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its first argument.");
         }
         polyad.evalArg(1, state);
 
-        Object arg2 = polyad.getArguments().get(1).getResult();
+        Object arg2 = polyad.getArgAt(1).getResult();
         polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArguments().get(1));
+        checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
@@ -2390,16 +2390,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("the " + COMMON_KEYS + " function requires 2 arguments");
         }
         polyad.evalArg(0, state);
-        Object arg = polyad.getArguments().get(0).getResult();
-        checkNull(arg, polyad.getArguments().get(0));
+        Object arg = polyad.getArgAt(0).getResult();
+        checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
             throw new IllegalArgumentException("The " + COMMON_KEYS + " command requires a stem as its first argument.");
         }
         polyad.evalArg(1, state);
 
-        Object arg2 = polyad.getArguments().get(1).getResult();
-        checkNull(arg2, polyad.getArguments().get(1));
+        Object arg2 = polyad.getArgAt(1).getResult();
+        checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
             throw new IllegalArgumentException("The " + COMMON_KEYS + " command requires a stem as its second argument.");
@@ -2423,19 +2423,19 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("the " + SET_DEFAULT + " function requires 2 arguments");
         }
-        StemVariable stemVariable = getOrCreateStem(polyad.getArguments().get(0),
+        StemVariable stemVariable = getOrCreateStem(polyad.getArgAt(0),
                 state,
                 "the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
 
         polyad.evalArg(1, state);
 
-        Object defaultValue = polyad.getArguments().get(1).getResult();
+        Object defaultValue = polyad.getArgAt(1).getResult();
         if (isStem(defaultValue)) {
             throw new IllegalArgumentException("the " + SET_DEFAULT + " command accepts only a scalar as its second argument.");
         }
         stemVariable.setDefaultValue(defaultValue);
         polyad.setResult(defaultValue);
-        polyad.setResultType(polyad.getArguments().get(1).getResultType());
+        polyad.setResultType(polyad.getArgAt(1).getResultType());
         polyad.setEvaluated(true);
     }
 
@@ -2445,11 +2445,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.evalArg(0, state);
         polyad.evalArg(1, state);
-        Object obj1 = polyad.getArguments().get(0).getResult();
-        checkNull(obj1, polyad.getArguments().get(0));
+        Object obj1 = polyad.getArgAt(0).getResult();
+        checkNull(obj1, polyad.getArgAt(0));
 
-        Object obj2 = polyad.getArguments().get(1).getResult();
-        checkNull(obj2, polyad.getArguments().get(1));
+        Object obj2 = polyad.getArgAt(1).getResult();
+        checkNull(obj2, polyad.getArgAt(1));
 
         if (!areAllStems(obj1, obj2)) {
             throw new IllegalArgumentException("the " + MASK + " requires both arguments be stem variables");
@@ -2545,7 +2545,7 @@ z. :=  join3(q.,w.)
         int argCount = polyad.getArgCount();
         for (int i = 0; i < argCount; i++) {
             args[i] = polyad.evalArg(i, state);
-            checkNull(args[i], polyad.getArguments().get(i));
+            checkNull(args[i], polyad.getArgAt(i));
         }
         int axis = ((Long) args[2]).intValue();
         StemVariable leftStem;

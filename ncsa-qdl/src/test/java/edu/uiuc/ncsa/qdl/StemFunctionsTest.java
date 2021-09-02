@@ -13,7 +13,6 @@ import edu.uiuc.ncsa.qdl.variables.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
 public class StemFunctionsTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    @Test
+     
     public void testSizeStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -46,7 +45,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert ((Long) polyad.getResult()) == 4L;
     }
 
-    @Test
+     
     public void testListKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -72,7 +71,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -100,7 +99,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testSizeString() throws Exception {
         String input = "One Ring to rule them all, One Ring to find them";
 
@@ -113,7 +112,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert ((Long) polyad.getResult()) == input.length();
     }
 
-    @Test
+     
     public void testSizeLong() throws Exception {
         State state = testUtils.getNewState();
 
@@ -124,7 +123,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert ((Long) polyad.getResult()) == 0L;
     }
 
-    @Test
+     
     public void testSizeKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -152,7 +151,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testCommonKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -189,7 +188,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testIncludeKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -229,7 +228,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testParserKeyFiltering() throws Throwable {
         String cf = " a. := ['a',null,['x','y'],2]~{'p':123.34, 'q': -321, 'r':false};";
         String cf2;
@@ -328,7 +327,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testRenameKeys() throws Exception {
         // Take a stem and a list of
         State state = testUtils.getNewState();
@@ -357,7 +356,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testExcludeKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -391,7 +390,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testExcludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -448,7 +447,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
 
-    @Test
+     
     public void testIncludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -475,7 +474,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert result.containsKey(targetKey);
     }
 
-    @Test
+     
     public void testHasKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -516,7 +515,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testHasScalarKeys() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -550,7 +549,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert (Boolean) polyad.getResult();
     }
 
-    @Test
+     
     public void testmakeIndex() throws Exception {
         State state = testUtils.getNewState();
         Polyad polyad = new Polyad(StemEvaluator.MAKE_INDICES);
@@ -568,7 +567,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert indices.getLong("3").equals(3L);
     }
 
-    @Test
+     
     public void testToStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -598,7 +597,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert result.getString("4").equals("baz");
     }
 
-    @Test
+     
     public void testRemoveStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -618,7 +617,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert !symbolTable.isDefined("sourceStem.");
     }
 
-    @Test
+     
     public void testdefaultValue() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -645,7 +644,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert sourceStem.get("foo").equals(expectedResult);
     }
 
-    @Test
+     
     public void testBadValue() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -671,7 +670,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testDefault_NoStem() throws Exception {
         State state = testUtils.getNewState();
         Long expectedResult = new Long(42L);
@@ -697,7 +696,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testJSONArray() throws Exception {
         String rawJSON = "{\n" +
                 "  \"isMemberOf\":   [" +
@@ -736,7 +735,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testMixedJSON() throws Exception {
         StemVariable s = new StemVariable();
         String name = "bob";
@@ -767,7 +766,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testJSONArray2() throws Exception {
         JSONArray array = new JSONArray();
         for (int i = 0; i < 2 * 2; i++) {
@@ -803,7 +802,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testJSONArrayOrder() throws Exception {
         JSONArray array = new JSONArray();
         for (int i = 0; i < 2 * count; i++) {
@@ -825,7 +824,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
 
-    @Test
+     
     public void testAddList() throws Throwable {
         StemVariable s = new StemVariable();
         ArrayList<Object> list = new ArrayList<>();
@@ -841,7 +840,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testListAppend() throws Throwable {
         StemList<StemEntry> stemList1 = new StemList();
         StemList<StemEntry> stemList2 = new StemList();
@@ -867,7 +866,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testListCopy() throws Throwable {
         StemList<StemEntry> stemList1 = new StemList();
         StemList<StemEntry> stemList2 = new StemList();
@@ -892,7 +891,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void oldTestListInsert() throws Throwable {
         StemList<StemEntry> stemList1 = new StemList();
         StemList<StemEntry> stemList2 = new StemList();
@@ -918,7 +917,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testListInsert() throws Throwable {
         StemList<StemEntry> sourceSL = new StemList();
         StemList<StemEntry> targetSL = new StemList();
@@ -945,7 +944,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
 
-    @Test
+     
     public void testListSubset() throws Throwable {
         StemList<StemEntry> sourceSL = new StemList();
         long count1 = 10L;
@@ -964,7 +963,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testListSubset2() throws Throwable {
         StemList<StemEntry> sourceSL = new StemList();
         long count1 = 10L;
@@ -1077,7 +1076,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "Failed to get correct subset with mixed list addressing.";
     }
 
-    @Test
+     
     public void testobjectAppend() throws Throwable {
         StemVariable stemVariable = new StemVariable();
         stemVariable.listAppend("foo");
@@ -1098,7 +1097,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testMultiIndex() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "x := 0; y.0 := 1; z.1 := 2;  w.2.0 :='a'; w.2.1 :='b';");
@@ -1112,7 +1111,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getStemValue("test.", state).size() == 2;
     }
 
-    @Test
+     
     public void testMultiIndex2() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3;");
@@ -1132,7 +1131,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testMultiIndexOverride() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "x := 0; y.0 := 1; z.1 := 2; w.2 := 3; w.3 := -1; z.7.0 := 3; y :=7;");
@@ -1152,7 +1151,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testHasValue() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := indices(3); b.:=2+indices(5);c.foo:=1;c.bar:='arf';");
@@ -1238,7 +1237,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testSimpleSF0() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1254,7 +1253,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testSimpleSF1() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1264,7 +1263,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getStringValue("x", state).equals("b");
     }
 
-    @Test
+     
     public void testSimpleSF2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1279,7 +1278,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getLongValue("b", state) == 10L;
     }
 
-    @Test
+     
     public void testSimpleSF3() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1291,7 +1290,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     }
 
-    @Test
+     
     public void testSimpleSFReturnsStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1302,7 +1301,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getStemValue("x.", state).size() == 4; // Noit a great check, but sufficient.
     }
 
-    @Test
+     
     public void testSFEmbeddedStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1324,7 +1323,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testBadSFEmbeddedStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1345,7 +1344,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testInitialStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1358,7 +1357,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("y", state);
     }
 
-    @Test
+     
     public void testThreeRankStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1382,7 +1381,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testTailResolution() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1392,7 +1391,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 3L;
     }
 
-    @Test
+     
     public void testTailResolution2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1411,7 +1410,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testTailParentheses() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1456,7 +1455,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    @Test
+     
     public void testEmbeddedIndex() throws Throwable {
         /*
                x. := ['store.bicycle.price','store.book.0.price','store.book.1.price','store.book.2.price','store.book.3.price']
@@ -1676,7 +1675,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * get parsed as
      * (x) . (~y.)
      * {@link edu.uiuc.ncsa.qdl.parsing.QDLListener} special cases this to handle it
-     * (rather than a complete rewrite of the parser).
+     * (rather than a complete rewrite of the parser).  This has to do with order of operations
+     * for QDL operators. Could try and tweak the parser to handle this, but that usually plays
+     * hob with other standard order of operations, which must be avoided at all costs.
      * This test checks this works right.
      *
      * @throws Throwable

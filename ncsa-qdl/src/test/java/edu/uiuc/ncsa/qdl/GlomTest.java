@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import org.junit.Test;
 
 /**
  * tests for "glomming" i.e. using the new tilde, ~, operator.  There are apt to be a lot of these ultimately , so
@@ -20,7 +19,7 @@ public class GlomTest extends AbstractQDLTester {
      works right, but are also the regression tests.
       */
 
-    @Test
+     
     public void testScalarGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -35,7 +34,7 @@ public class GlomTest extends AbstractQDLTester {
         assert stem.getLong("2") == 3L;
     }
 
-    @Test
+     
     public void testArrayGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -51,7 +50,7 @@ public class GlomTest extends AbstractQDLTester {
         assert stem.getLong("3") == 4L;
     }
 
-    @Test
+     
     public void testConcatenateGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -65,7 +64,7 @@ public class GlomTest extends AbstractQDLTester {
         assert stem.getString("1").equals("abcd");
     }
 
-    @Test
+     
     public void testMondicGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -80,7 +79,7 @@ public class GlomTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testStemGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -99,7 +98,7 @@ public class GlomTest extends AbstractQDLTester {
          * has the final say.
          * @throws Throwable
          */
-        @Test
+         
     public void testNonUniqueStemGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -111,7 +110,7 @@ public class GlomTest extends AbstractQDLTester {
         assert stem.size() == 1;
         assert stem.getString("a").equals("r");
     }
-        @Test
+         
     public void testMixedGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();

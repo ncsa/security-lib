@@ -6,7 +6,6 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
-import org.junit.Test;
 
 /**
  * Test that directly test the functioning of variables and state. These typically create and manipulate stacks
@@ -23,7 +22,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testVariables() throws Exception {
         SymbolTable st = new SymbolTableImpl();
         st.setRawValue("a", "12345");
@@ -44,7 +43,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testStemVariables() throws Exception {
         State state = testUtils.getNewState();
         state.setValue("i", 0L);
@@ -63,7 +62,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      * This tests that remove via the state object works.
      * @throws Exception
      */
-    @Test
+     
     public void testRemove() throws Exception {
         State state = testUtils.getNewState();
 
@@ -97,7 +96,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testDeepResolution() throws Exception {
         State state = testUtils.getNewState();
         state.setValue("z",   1L);
@@ -113,7 +112,7 @@ public class QDLVariableTest extends AbstractQDLTester {
         assert state.isDefined(stem);
     }
 
-    @Test
+     
     public void testDeepResolutionSet() throws Exception {
         State state = testUtils.getNewState();
         state.setValue("z", "1");
@@ -137,7 +136,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testDeepResolutionOnStack() throws Exception {
         SymbolTableImpl st0 = new SymbolTableImpl();
         SymbolTableImpl st1 = new SymbolTableImpl();
@@ -173,7 +172,7 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testDeepResolutionAndSetVariable() throws Exception {
         SymbolTableImpl st0 = new SymbolTableImpl();
         SymbolTableImpl st1 = new SymbolTableImpl();

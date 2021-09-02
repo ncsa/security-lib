@@ -6,14 +6,13 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import org.junit.Test;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  8:11 PM
  */
 public class ExpressionTest extends AbstractQDLTester {
-    @Test
+     
     public void testExpression1() throws Exception {
         TestUtils testUtils = TestUtils.newInstance();
 
@@ -41,7 +40,7 @@ public class ExpressionTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testMakeCopy() throws Exception {
         TestUtils testUtils = TestUtils.newInstance();
         //
@@ -96,7 +95,7 @@ public class ExpressionTest extends AbstractQDLTester {
      *  </pre>
      * @throws Throwable
      */
-    @Test
+     
     public void testInlineConditional() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();

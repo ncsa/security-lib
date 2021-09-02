@@ -252,9 +252,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("error: " + IDENTITY_FUNCTION + " requires a single argument");
         }
-        polyad.evalArg(0, state);
-        polyad.setResult(polyad.getArguments().get(0).getResult());
-        polyad.setResultType(polyad.getArguments().get(0).getResultType());
+        Object arg = polyad.evalArg(0, state);
+        checkNull(arg, polyad.getArgAt(0));
+
+        polyad.setResult(arg);
+        polyad.setResultType(polyad.getArgAt(0).getResultType());
         polyad.setEvaluated(true);
 
     }
@@ -300,7 +302,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
 
         // if the argument is a number return that many random numbers in a stem variable.
         Object arg = polyad.evalArg(0, state);
-        ;
+        checkNull(arg, polyad.getArgAt(0));
         if (arg instanceof Long) {
             int size = ((Long) arg).intValue();
             StemVariable stemVariable = new StemVariable();
@@ -329,6 +331,8 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
         } else {
             Object arg1 = polyad.evalArg(0, state);
+            checkNull(arg1, polyad.getArgAt(0));
+
             if (!isLong(arg1)) {
                 throw new IllegalArgumentException("the supplied arguments was not an integer");
             }
@@ -345,6 +349,8 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         if (0 < polyad.getArgCount()) {
             polyad.evalArg(0, state);
             Object obj = polyad.getArguments().get(0).getResult();
+            checkNull(obj, polyad.getArgAt(0));
+
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();
             } else {
@@ -357,6 +363,8 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 2) {
             polyad.evalArg(1, state);
             Object obj = polyad.getArguments().get(1).getResult();
+            checkNull(obj, polyad.getArgAt(1));// re-used varaible obj for arg #1
+
             if (!isLong(obj)) {
                 throw new IllegalArgumentException("The second argument must be an integer.");
             }

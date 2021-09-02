@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 
@@ -20,7 +19,7 @@ import java.math.BigDecimal;
 public class MathFunctionsTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    @Test
+     
     public void testAbsoluteValue() throws Exception {
         State state = testUtils.getNewState();
 
@@ -31,7 +30,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert (Long) polyad.getResult() == 5L;
     }
 
-    @Test
+     
     public void testAbsoluteValueStem() throws Exception {
 
         State state = testUtils.getNewState();
@@ -56,7 +55,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert r.getLong("3").equals(987654321L);
     }
 
-    @Test
+     
     public void testRandomValue() throws Exception {
         State state = testUtils.getNewState();
 
@@ -65,7 +64,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult() instanceof Long;
     }
 
-    @Test
+     
     public void testRandomValueWithArg() throws Exception {
         long count = 5L;
         State state = testUtils.getNewState();
@@ -78,7 +77,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert r.size() == count;
     }
 
-    @Test
+     
     public void testRandomString() throws Exception {
         State state = testUtils.getNewState();
 
@@ -87,7 +86,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult() instanceof String;
     }
 
-    @Test
+     
     public void testRandomStringWithArg() throws Exception {
         State state = testUtils.getNewState();
 
@@ -100,7 +99,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().toString().length() == 43;
     }
 
-    @Test
+     
     public void testHash() throws Exception {
         State state = testUtils.getNewState();
 
@@ -112,7 +111,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-    @Test
+     
     public void testHashStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -140,7 +139,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         }
     }
 
-    @Test
+     
     public void testB64Encode() throws Exception {
         State state = testUtils.getNewState();
 
@@ -153,7 +152,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-    @Test
+     
     public void testB64Decode() throws Exception {
         State state = testUtils.getNewState();
 
@@ -166,7 +165,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-    @Test
+     
     public void testToHex() throws Exception {
         State state = testUtils.getNewState();
 
@@ -179,7 +178,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-    @Test
+     
     public void testFromHex() throws Exception {
         State state = testUtils.getNewState();
 
@@ -201,7 +200,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-    @Test
+     
     public void testSignedNumbers() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -352,7 +351,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
      * @throws Throwable
      */
-    @Test
+     
     public void testRecursion() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
