@@ -42,6 +42,7 @@ public abstract class StateUtils {
         newState.setModulePaths(state.getModulePaths());
         newState.setVfsFileProviders(state.getVfsFileProviders());
         newState.setServerMode(state.isServerMode());
+        newState.setRestrictedIO(state.isRestrictedIO());
         return newState;
 
     }
@@ -158,6 +159,7 @@ public abstract class StateUtils {
                             new FTStack(),
                             new ModuleMap(),
                             new MyLoggingFacade("foo"),
+                            false,
                             false,
                             true);
                 }

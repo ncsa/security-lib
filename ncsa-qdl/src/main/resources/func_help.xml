@@ -732,9 +732,53 @@ scan([prompt]) - get user input. The prompt is optional, but will be printed.
 vfs_mount(cfg.) - mount a virtual file system.
 Note: The cfg. contains the configuration and is not trivial to describe.
       Read the reference manual for the details.
+
+E.g. mounting an in-memory VFS
+
+   cfg.type :='memory';
+   cfg.scheme := 'ram-disk';
+   cfg.mount_point := '/vfs/cache';
+   cfg.access := 'rw';
+   vfs_mount(cfg.);
+true
+
+Now you can issue commands like
+   file_write('ram-disk:#/vfs/cache/readme.txt', readme.);
+
+This will write the value of the variable readme. to the
+file readme.txt in the VFS.
+
+You can mount VFS's when starting the workspace. See the configuration
+reference manual for details.
+Alias: io#mount
+See also: vfs_unmount
              ]]>
         </body>
     </entry>
+    <entry id="vfs_unmount">
+            <body>
+                <![CDATA[
+vfs_unmount(mount_point) - unmount the file system at the given mount_point
+
+This does nothing to the mounted file system, it simply makes it inaccessible
+in the current environment. If the mount_point is invalid, an error is raised.
+Otherwise, a true is returned.
+E.g.
+   vfs_unmount('vfs#/mysql/')
+true
+
+The file system mounted at vfs#/mysql/ is now no longer accessible and any
+operations against it will fail henceforth, e.g.
+   dir('vfs#/mysql/')
+null
+
+Alias: io#unmount
+See also: vfs_mount
+                ]]>
+            </body>
+        </entry>
+
+
     <entry id="file_write">
         <body>
             <![CDATA[
@@ -2063,6 +2107,7 @@ false          ⊥       f    \u22a5         logical false
 assert[][]     ⊨       a    \u22a8         assert
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
+~|             ≁       ~    \u2241         last axis join
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
 pi             π       p    \u03c0         Greek letter pi.
@@ -2682,6 +2727,17 @@ E.g. Making a table with headings. Make the table with |~ then stick
                     ]]>
                 </body>
             </entry>
+    <entry id="≁">
+            <body>
+                <![CDATA[
+Unicode
+This is equivalent to ~|, join operator along last axis.
+
+See: ~|
+                ]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->

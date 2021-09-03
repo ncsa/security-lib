@@ -433,6 +433,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         frn = getFunctionReferenceNode(state, polyad.getArguments().get(0), true);
         Object arg1 = polyad.evalArg(1, state);
+        checkNull(arg1, polyad.getArgAt(1), state);
         if (!isStem(arg1)) {
             polyad.setResult(arg1);
             polyad.setResultType(Constant.getType(arg1));
@@ -447,6 +448,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         int axis = 0; // default
         if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
+            checkNull(axisObj, polyad.getArgAt(2));
             if (!isLong(axisObj)) {
                 throw new IllegalArgumentException("error: third argument of " + (doReduce ? REDUCE : EXPAND) + ", the axis, must be an integer");
             }
@@ -609,6 +611,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(INPUT_FORM + " requires the argument count or boolean as the second parameter");
         }
         Object arg2 = polyad.evalArg(1, state);
+        checkNull(arg2, polyad.getArgAt(1), state);
         boolean doIndent = false;
         int argCount = -1;
 
@@ -666,6 +669,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " requires a single argument.");
         }
         Object arg0 = polyad.evalArg(0, state);
+        checkNull(arg0, polyad.getArgAt(0), state);
         if (!isString(arg0)) {
             throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " must be a string.");
         }
@@ -805,12 +809,13 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         int newLogLevel = currentIntLevel;
 
         Object arg0 = polyad.evalArg(0, state);
+        checkNull(arg0, polyad.getArgAt(0), state);
         String message = null;
 
         if (polyad.getArgCount() == 1) {
             if (isLong(arg0)) {
                 // Cannot reset logging levels in server mode or server loses control of logging
-                if (!state.isServerMode()) {
+                if (!state.isRestrictedIO()) {
                     // Then they are setting the logging level
                     if (!isValidLoggingLevel((Long) arg0)) {
                         throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
@@ -839,7 +844,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 2) {
             // then the arguments are 0 is the level, 1 is the message
             Object arg1 = polyad.evalArg(1, state);
-
+            checkNull(arg1, polyad.getArgAt(1), state);
             if (isLong(arg0)) {
                 newLogLevel = ((Long) arg0).intValue();
                 if (!isValidLoggingLevel((Long) arg0)) {
@@ -927,6 +932,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         if (polyad.getArgCount() == 1) {
             Object obj = polyad.evalArg(0, state);
+            checkNull(obj, polyad.getArgAt(0), state);
             if (isString(obj)) {
                 state.setModulePaths(obj.toString());
                 polyad.setEvaluated(true);
@@ -983,6 +989,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         if (polyad.getArgCount() == 1) {
             Object obj = polyad.evalArg(0, state);
+            checkNull(obj, polyad.getArgAt(0), state);
             if (isString(obj)) {
                 state.setScriptPaths(obj.toString());
                 polyad.setEvaluated(true);
@@ -1033,8 +1040,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             Object obj = polyad.evalArg(0, state);
             if (!state.hasScriptArgs()) {
                 throw new IllegalArgumentException("index out of bounds for " + SCRIPT_ARGS_COMMAND + "-- no arguments found.");
-
             }
+            checkNull(obj,polyad.getArgAt(0), state);
             if (!isLong(obj)) {
                 throw new IllegalArgumentException(SCRIPT_ARGS_COMMAND + " requires an integer argument.");
             }
@@ -1095,6 +1102,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         for (int i = 0; i < argCount; i++) {
             Object obj = polyad.evalArg(i, state);
+            checkNull(obj, polyad.getArgAt(i));
             if (!isString(obj)) {
                 throw new IllegalArgumentException("argument with index " + i + " was not a string.");
             }
@@ -1134,6 +1142,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         Object obj = polyad.evalArg(0, state);
+        checkNull(obj, polyad.getArgAt(0), state);
         if (!isString(obj)) {
             throw new IllegalArgumentException("This requires a string as its argument.");
         }
@@ -1285,6 +1294,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg1 = polyad.evalArg(0, state);
+         checkNull(arg1, polyad.getArgAt(0), state);
         Object[] argList = new Object[0];
 /*        if (2 == polyad.getArgCount()) {
             Object arg2 = polyad.evalArg(1, state);
@@ -1306,7 +1316,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             ArrayList<Object> aa = new ArrayList<>();
             // zero-th argument is the name of the script, so start with element 1.
             for (int i = 1; i < polyad.getArgCount(); i++) {
-                aa.add(polyad.evalArg(i, state));
+                Object arg = polyad.evalArg(i, state);
+                checkNull(arg, polyad.getArgAt(i), state);
+                aa.add(arg);
             }
             argList = aa.toArray(new Object[0]);
         }
@@ -1362,6 +1374,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         state.setValue("error_message", arg1.toString());
         if (polyad.getArgCount() == 2) {
             arg2 = polyad.evalArg(1, state);
+            checkNull(arg2, polyad.getArgAt(1), state);
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
             }
@@ -1384,6 +1397,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 break;
             case 1:
                 Object r = polyad.evalArg(0, state);
+                checkNull(r, polyad.getArgAt(0), state);
                 polyad.setResult(r);
                 polyad.setResultType(polyad.getArguments().get(0).getResultType());
                 polyad.setEvaluated(true);
@@ -1416,6 +1430,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 2) {
             // Then this is probably a Java module
             Object arg2 = polyad.evalArg(1, state);
+            checkNull(arg2, polyad.getArgAt(1), state);
             if (isString(arg2)) {
                 loadTarget = arg2.toString().equals(MODULE_TYPE_JAVA) ? LOAD_JAVA : LOAD_FILE;
             } else {
@@ -1424,6 +1439,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         }
         Object arg = polyad.evalArg(0, state);
+        checkNull(arg, polyad.getArgAt(0),state);
 
         if (!isString(arg)) {
             throw new IllegalArgumentException(MODULE_LOAD + " requires a string as its argument, not '" + arg + "'");
@@ -1540,9 +1556,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("Error" + MODULE_IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
-        if (arg == null) {
-            throw new MissingArgumentException("You must supply at least the module namespace to import.");
-        }
+        checkNull(arg, polyad.getArgAt(0), state);
         URI moduleNS = null;
 
         try {
@@ -1566,7 +1580,8 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
-            if (arg2 == null || !isString(arg2)) {
+            checkNull(arg2, polyad.getArgAt(1), state);
+            if (!isString(arg2)) {
                 throw new MissingArgumentException("You must supply a valid alias import.");
             }
             alias = arg2.toString();
@@ -1589,6 +1604,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     "This requires a single argument that is a string or a list of them.");
         }
         Object result = polyad.evalArg(0, state);
+        checkNull(result, polyad.getArgAt(0), state);
         StemVariable stem = null;
 
         if (isString(result)) {

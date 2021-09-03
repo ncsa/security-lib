@@ -181,6 +181,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
     }
 
+    protected boolean isRestrictedIO() {
+        return getFirstBooleanValue(cn, CONFG_ATTR_RESTRICTED_IO_RESTRICTED, false);
+    }
+
     protected boolean areAssertionsEnabled() {
         return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
     }
@@ -337,6 +341,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getName(),
                 isEnabled(),
                 isServerModeOn(),
+                isRestrictedIO(),
                 getNumericDigits(),
                 getBootScript(),
                 getWSHomeDir(),

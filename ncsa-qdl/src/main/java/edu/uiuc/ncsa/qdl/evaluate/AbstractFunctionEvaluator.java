@@ -664,7 +664,7 @@ return StemUtility.areNoneStems(objects);    }
      * @param arg
      * @param swri
      */
-    protected void checkNull(Object arg, StatementWithResultInterface swri){
+    public static void checkNull(Object arg, StatementWithResultInterface swri){
         if(arg != null){return;}
         if(swri instanceof VariableNode){
             VariableNode vNode = (VariableNode) swri;
@@ -679,7 +679,7 @@ return StemUtility.areNoneStems(objects);    }
      * @param swri
      * @param state
      */
-    protected void checkNull(Object arg1, StatementWithResultInterface swri, State state ) {
+    public static void checkNull(Object arg1, StatementWithResultInterface swri, State state ) {
         if(arg1 == null){
             UnknownSymbolException unknownSymbolException;
             String message  = "Error: unknown symbol";

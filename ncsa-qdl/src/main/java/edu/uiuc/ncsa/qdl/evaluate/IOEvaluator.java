@@ -52,7 +52,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
     public static final String WRITE_FILE = "file_write";
-    public static final String IO_WRITE_FILE = IO_FQ + WRITE_FILE;
+    public static final String IO_WRITE_FILE = IO_FQ + "write";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
     public static final String DIR = "dir";
@@ -342,7 +342,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLRuntimeException("scan is not allowed in server mode.");
         }
-        if(polyad.isEvaluated()){
+        if (polyad.isEvaluated()) {
             // If this has already been run, then do not prompt the user repeatedly.
             // If scan is used as an argument to a function, e.g.
             // to_number(scan('>'))
@@ -377,7 +377,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
      * @param printIt
      */
     protected void doPrint(Polyad polyad, State state, boolean printIt) {
-        if (printIt && state.isServerMode()) {
+        if (printIt && state.isRestrictedIO()) {
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(true);
@@ -400,9 +400,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             if (temp == null || temp instanceof QDLNull) {
-                if(State.isPrintUnicode()){
+                if (State.isPrintUnicode()) {
                     result = "∅";
-                }else {
+                } else {
                     result = "null";
                 }
 
@@ -416,15 +416,15 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         result = temp.toString();
                     }
                 } else {
-                    if(temp instanceof BigDecimal){
+                    if (temp instanceof BigDecimal) {
                         result = InputFormUtil.inputForm((BigDecimal) temp);
 
-                    } else{
-                         if(State.isPrintUnicode() && temp instanceof Boolean){
-                             result = ((Boolean)temp)?"⊤":"⊥";
-                         }else {
-                             result = temp.toString();
-                         }
+                    } else {
+                        if (State.isPrintUnicode() && temp instanceof Boolean) {
+                            result = ((Boolean) temp) ? "⊤" : "⊥";
+                        } else {
+                            result = temp.toString();
+                        }
                     }
                 }
             }
@@ -666,6 +666,25 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
         }
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException(VFS_UNMOUNT + " requires a single argument");
+        }
+        Object arg = polyad.evalArg(0, state);
+
+        checkNull(arg, polyad.getArgAt(0), state);
+        if (!isString(arg)) {
+            throw new IllegalArgumentException(VFS_UNMOUNT + " requires a string as its argument");
+        }
+        String mountPoint = (String) arg;
+        if (!state.hasMountPoint(mountPoint)) {
+            throw new IllegalArgumentException("the mount point '" + mountPoint + "' is not valid.");
+        }
+        state.removeVFSProvider(mountPoint);
+
+        polyad.setEvaluated(true);
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+
     }
 
     protected void vfsMount(Polyad polyad, State state) {

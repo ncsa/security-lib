@@ -48,6 +48,7 @@ public class TestUtils {
                 new ModuleMap(),
                 null,
                 false,
+                false,
                 true);
     }
 

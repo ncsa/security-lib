@@ -163,7 +163,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     public static final String LIST_COPY = "list_copy";
     public static final String LIST_COPY2 = "copy";
-    public static final String FQ_LIST_COPY = LIST_FQ + LIST_COPY;
+    public static final String FQ_LIST_COPY = LIST_FQ + LIST_COPY2;
     public static final int LIST_COPY_TYPE = 203 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String IS_LIST = "is_list";

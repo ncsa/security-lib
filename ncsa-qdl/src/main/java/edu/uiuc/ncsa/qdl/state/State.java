@@ -92,6 +92,7 @@ public class State extends FunctionState implements QDLConstants {
                      ModuleMap moduleMap,
                      MyLoggingFacade myLoggingFacade,
                      boolean isServerMode,
+                     boolean isRestrictedIO,
                      boolean assertionsOn){
         return new State(resolver,
                           symbolStack,
@@ -101,6 +102,7 @@ public class State extends FunctionState implements QDLConstants {
                           moduleMap,
                           myLoggingFacade,
                           isServerMode,
+                         isRestrictedIO,
                          assertionsOn);
     }
     public State(ImportManager resolver,
@@ -111,6 +113,7 @@ public class State extends FunctionState implements QDLConstants {
                  ModuleMap moduleMap,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
+                 boolean isRestrictedIO,
                  boolean assertionsOn) {
         super(resolver,
                 symbolStack,
@@ -121,6 +124,7 @@ public class State extends FunctionState implements QDLConstants {
                 myLoggingFacade);
         this.serverMode = isServerMode;
         this.assertionsOn = assertionsOn;
+        this.restrictedIO = isRestrictedIO;
     }
 
     public StemVariable getSystemConstants() {
@@ -182,6 +186,7 @@ public class State extends FunctionState implements QDLConstants {
             qdl_props.put(SYS_BOOT_LOG_FILE, qe.getMyLogger().getFileName());
             qdl_props.put(SYS_BOOT_LOG_NAME, qe.getMyLogger().getClassName());
             qdl_props.put(SYS_BOOT_SERVER_MODE, isServerMode());
+            qdl_props.put(SYS_BOOT_RESTRICTED_IO_MODE, isRestrictedIO());
             qdl_props.put(SYS_SCRIPTS_PATH, qe.getScriptPath());
             systemInfo.put(SYS_BOOT, qdl_props);
             StemVariable versionInfo = addManifestConstants(qe.getWSHomeDir());
@@ -349,6 +354,20 @@ public class State extends FunctionState implements QDLConstants {
 
     boolean serverMode = false;
 
+    /**
+     * In server mode, some IO for debugging can still be allowed. This is checked
+     * @return
+     */
+    public boolean isRestrictedIO() {
+        return restrictedIO;
+    }
+
+    public void setRestrictedIO(boolean restrictedIO) {
+        this.restrictedIO = restrictedIO;
+    }
+
+    boolean restrictedIO = false;
+
     public HashMap<String, VFSFileProvider> getVfsFileProviders() {
         return vfsFileProviders;
     }
@@ -361,6 +380,12 @@ public class State extends FunctionState implements QDLConstants {
 
     public void addVFSProvider(VFSFileProvider scriptProvider) {
         vfsFileProviders.put(scriptProvider.getScheme() + VFSPaths.SCHEME_DELIMITER + scriptProvider.getMountPoint(), scriptProvider);
+    }
+    public boolean hasMountPoint(String mountPoint){
+        return vfsFileProviders.containsKey(mountPoint);
+    }
+    public void removeVFSProvider(String mountPoint){
+        vfsFileProviders.remove(mountPoint);
     }
 
     public void removeScriptProvider(String scheme) {
@@ -448,6 +473,7 @@ public class State extends FunctionState implements QDLConstants {
                 getModuleMap(),
                 getLogger(),
                 isServerMode(),
+                isRestrictedIO(),
                 isAssertionsOn());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
@@ -473,6 +499,7 @@ public class State extends FunctionState implements QDLConstants {
                 getModuleMap(),
                 getLogger(),
                 isServerMode(),
+                isRestrictedIO(),
                 isAssertionsOn());
         newState.setImportedModules(getImportedModules());
         newState.setScriptArgs(getScriptArgs());
@@ -533,6 +560,7 @@ public class State extends FunctionState implements QDLConstants {
                 getModuleMap(),
                 getLogger(),
                 isServerMode(),
+                isRestrictedIO(),
                 isAssertionsOn());
         // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());
@@ -562,6 +590,7 @@ public class State extends FunctionState implements QDLConstants {
                 new ModuleMap(), // so no modules
                 getLogger(),
                 isServerMode(),
+                isRestrictedIO(),
                 isAssertionsOn());
         // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());

@@ -101,15 +101,15 @@ expression
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval
  | iInterval                                                                   #intInterval
- | expression ('~' | '~|' ) expression                                         #tildeExpression
- | expression postfix=('++' | '--')                                            #postfix
- | prefix=('++'|'--') expression                                               #prefix
+ | expression (Tilde | TildeRight ) expression                                 #tildeExpression
+ | expression postfix=(PlusPlus | MinusMinus)                                  #postfix
+ | prefix=(PlusPlus | MinusMinus) expression                                   #prefix
  | expression Exponentiation expression                                        #powerExpression
- | expression op=(Times | Divide | '%' ) expression                            #multiplyExpression
+ | expression op=(Times | Divide | Percent ) expression                        #multiplyExpression
  | (Floor | Ceiling) expression                                                #floorOrCeilingExpression
  | (Plus | UnaryPlus | Minus | UnaryMinus) expression                          #unaryMinusExpression
  | Tilde expression                                                            #unaryTildeExpression
- | expression op=('+' | '-' ) expression                                       #addExpression
+ | expression op=(Plus | Minus ) expression                                    #addExpression
  | expression op=(LessThan | GreaterThan | LessEquals | MoreEquals) expression #compExpression
  | expression op=(Equals | NotEquals) expression                               #eqExpression
  | expression op=RegexMatches expression                                       #regexMatches

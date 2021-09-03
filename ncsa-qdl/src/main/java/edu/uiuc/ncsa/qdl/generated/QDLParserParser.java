@@ -61,7 +61,7 @@ public class QDLParserParser extends Parser {
 			null, null, null, null, "'['", "']'", "','", "':'", "';'", null, null, 
 			null, null, null, "'++'", "'+'", "'--'", "'-'", "'<'", "'>'", "'='", 
 			null, null, null, null, null, null, "'^'", null, null, "'`'", "'%'", 
-			"'~'", "'\\'", "'|'", "'~|'", "'.'", "'\u00AF'", "'\u207A'", "'\u230A'", 
+			"'~'", "'\\'", "'|'", null, "'.'", "'\u00AF'", "'\u207A'", "'\u230A'", 
 			"'\u2308'"
 		};
 	}

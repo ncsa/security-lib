@@ -95,7 +95,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
              Tilde : '~';
          Backslash : '\\';
              Stile : '|';
-        TildeRight : '~|';
+        TildeRight : '~|' | '≁'; // unicode 2241, tilde slash
            StemDot : '.' ;
         UnaryMinus : '¯'; // unicode 00af
          UnaryPlus : '⁺' ;// unicode 207a
@@ -139,8 +139,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 
 fragment AllOps :
      Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
-     LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | LogicalNot |
-     RegexMatches;
+     LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | TildeRight |
+     LogicalNot | RegexMatches;
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;

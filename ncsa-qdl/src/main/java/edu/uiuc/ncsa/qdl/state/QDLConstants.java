@@ -93,6 +93,7 @@ public interface QDLConstants {
     String SYS_BOOT_LOG_FILE = "log_file";
 
     String SYS_BOOT_SERVER_MODE = "server_mode_on";
+    String SYS_BOOT_RESTRICTED_IO_MODE = "restricted_io";
     String SYS_SCRIPTS_PATH = "scripts_path";
 
     String URI_FIELDS = "uri_fields.";

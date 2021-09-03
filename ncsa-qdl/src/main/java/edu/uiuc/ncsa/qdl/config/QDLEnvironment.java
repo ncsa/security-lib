@@ -27,6 +27,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           String name,
                           boolean isEnabled,
                           boolean isServerModeOn,
+                          boolean isRestrictedIO,
                           int numericDigits,
                           String bootScript,
                           String wsHomeDir,
@@ -80,6 +81,13 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.enableLibrarySupport = enableLibrarySupport;
         this.assertionsOn = assertionsOn;
         this.saveDir = saveDir;
+        this.isRestrictedIO = isRestrictedIO;
+    }
+
+    boolean isRestrictedIO = false;
+
+    public boolean isRestrictedIO() {
+        return isRestrictedIO;
     }
 
     public String getSaveDir() {
@@ -130,6 +138,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     String externalEditorPath;
+
     public boolean isAutosaveMessagesOn() {
         return autosaveMessagesOn;
     }
@@ -139,6 +148,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     boolean autosaveMessagesOn;
+
     public long getAutosaveInterval() {
         return autosaveInterval;
     }
@@ -148,6 +158,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     long autosaveInterval;
+
     public boolean isAutosaveOn() {
         return autosaveOn;
     }
@@ -177,6 +188,7 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     String debugLevel;
+
     public boolean isPrettyPrint() {
         return prettyPrint;
     }
@@ -287,7 +299,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
     }
 
     String modulePath = null;
-    public String getModulePath(){
+
+    public String getModulePath() {
         return modulePath;
     }
 

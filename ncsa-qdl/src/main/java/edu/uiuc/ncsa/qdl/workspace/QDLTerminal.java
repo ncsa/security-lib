@@ -70,6 +70,8 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('≕');
                     case '\\':
                         return new KeyStroke('≠');
+                    case '~':
+                        return new KeyStroke('≁');
 
                 }
 

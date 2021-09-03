@@ -4234,14 +4234,10 @@ public class WorkspaceCommands implements Logable {
                     new ModuleMap(),
                     logger,
                     false,
+                    false,
                     isAssertionsOn()
-            );// workspace is never in server mode
+            );// workspace is never in server mode, nor restricted IO
             state.setPID(0);
-            /*SIEntry sys = new SIEntry();
-            sys.state = state;
-            sys.pid = 0;
-            sys.message = "system";
-            siEntries.put(0, sys);*/
         }
         return state;
 
@@ -4489,8 +4485,8 @@ public class WorkspaceCommands implements Logable {
     AutosaveThread autosaveThread;
 
     protected void initAutosave() {
-        if (getState().isServerMode()) {
-            return; // absolutely refuse to turn this feature on in server mode.
+        if (getState().isServerMode() || getState().isRestrictedIO()) {
+            return; // absolutely refuse to turn this feature on in server or restrict IO mode.
         }
         if (isAutosaveOn()) {
             if (autosaveThread == null) {

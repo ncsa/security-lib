@@ -53,7 +53,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String PLUS_PLUS = "++";
     public static final String POWER = "^";
     public static final String TILDE = "~";
-    public static final String TILDE_STILE = "|~";
+    public static final String TILDE_STILE = "~|";
+    public static final String TILDE_STILE2 = "≁"; // unicode 2241
     public static final String TIMES = "*";
     public static final String TIMES2 = "×"; // unicode d7
     public static final String DOT = ".";
@@ -88,7 +89,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     public static String[] ALL_MATH_OPS = new String[]{
             POWER,
-            TILDE, TILDE_STILE,
+            TILDE, TILDE_STILE, TILDE_STILE2,
             TIMES,
             TIMES2,
             DIVIDE,
