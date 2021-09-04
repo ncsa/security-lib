@@ -77,7 +77,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
           PlusPlus : '++';
               Plus : '+';
         MinusMinus : '--';
-             Minus : '-';  // ¯ \u 00af is raised unary minus.
+             Minus : '-';
           LessThan : '<';
        GreaterThan : '>';
        SingleEqual : '=';
@@ -97,8 +97,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
              Stile : '|';
         TildeRight : '~|' | '≁'; // unicode 2241, tilde slash
            StemDot : '.' ;
-        UnaryMinus : '¯'; // unicode 00af
-         UnaryPlus : '⁺' ;// unicode 207a
+        UnaryMinus : '¯'; // unicode 00af raised unary minus.
+         UnaryPlus : '⁺' ;// unicode 207a raised unary plus.
              Floor : '⌊';
            Ceiling : '⌈';
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255

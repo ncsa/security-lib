@@ -652,7 +652,9 @@ union(arg0., arg1., ...) - takes the union of all stems, returning a single
             <![CDATA[
 dir(arg) - list the names of the files in a given location. Note that this
            is VFS aware.
-Note: Directory names will have a / appended to them.
+Note: Directory names will have a / appended to them. Also, if the directory is
+empty, the result will be an empty list. If the arg is not a directory, then
+the result is null.
            ]]>
         </body>
     </entry>
@@ -726,11 +728,11 @@ scan([prompt]) - get user input. The prompt is optional, but will be printed.
                 ]]>
         </body>
     </entry>
-    <entry id="vsf_mount">
+    <entry id="vfs_mount">
         <body>
             <![CDATA[
 vfs_mount(cfg.) - mount a virtual file system.
-Note: The cfg. contains the configuration and is not trivial to describe.
+Note: The cfg. contains the cf"dironfiguration and is not trivial to describe.
       Read the reference manual for the details.
 
 E.g. mounting an in-memory VFS

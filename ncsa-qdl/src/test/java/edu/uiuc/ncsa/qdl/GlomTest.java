@@ -11,15 +11,11 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
  * on 10/17/20 at  7:10 AM
  */
 public class GlomTest extends AbstractQDLTester {
-
-
-
      /*
-     What follows are a bunch of finger and toes checks for the tilde operator, initially these are to prove it
-     works right, but are also the regression tests.
+     What follows are a bunch of finger and toes checks for the tilde operators, ~ and ≁
+     initially these are to prove it works right, but are also the regression tests.
       */
 
-     
     public void testScalarGlom() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -125,4 +121,15 @@ public class GlomTest extends AbstractQDLTester {
         assert stem.getString("a").equals("b");
     }
 
+
+    public void testUnicodeGlom() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a. := ['a','b']≁['c','d'];");
+         addLine(script, "ok := reduce(@&&,reduce(@&&,[['a','c'],['b','d']] == a.));");
+
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state);
+     }
 }

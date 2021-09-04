@@ -1344,7 +1344,7 @@ public class QDLListener implements QDLParserListener {
     public void exitTildeExpression(QDLParserParser.TildeExpressionContext ctx) {
         String x = ctx.getChild(1).getText();
         Dyad dyad;
-        if (x.equals("~|")) {
+        if (x.equals(OpEvaluator.TILDE_STILE) || x.equals(OpEvaluator.TILDE_STILE2)) {
             dyad = new Dyad(OpEvaluator.TILDE_STILE_VALUE);
         } else {
             dyad = new Dyad(OpEvaluator.TILDE_VALUE);
@@ -1357,8 +1357,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterDotOp(QDLParserParser.DotOpContext ctx) {
-        //ExpressionStemNode expressionStemNode = new ExpressionStemNode();
-
     }
 
     boolean OLD_ESN = false;
