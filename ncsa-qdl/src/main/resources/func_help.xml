@@ -417,6 +417,13 @@ but
    subset(a., p,q) == subset(a., [;q]+p)
 since q counts the number of elements.
 
+Most general case
+subset(source_list., old_indices., new_indices) - returns the elements of source_list.
+          as specified by (assuming out. is the returned result)
+          out.new_indices.i := source_list.old_indices.i
+This permits a general remapping of any stem to any other stem. Remember that
+*_indices. are lists in 1 to 1 correspondence.
+
 Simple cases are quite simple.
 E.g.
     r. := subset(3*[;10], 2*[;5]+1)
@@ -472,6 +479,37 @@ do it is using the n function:
 It is vastly easier to do it this way than have some extremely complex remapping
 scheme for higher rank stems. You get back a (more or less) linear structure
 you can then recast as needed.
+
+Example: General case, getting the transpose of a stem.
+In linear algebra, a matrix A[i,j] is the transpose of B[i,j] if
+  A[i,j] = B[j,i]
+I.e., the term on the left has the indices swapped.
+In QDL, this is done by reversing each of the indices
+So if our stem is
+      a. := n(3,5,n(15))
+      say(a., true)
+      [
+        [0,1,2,3,4],
+        [5,6,7,8,9],
+        [10,11,12,13,14]
+       ]
+Then we need to reverse all the old indices (that means indices for the last
+axis), and we reverse each of them for the new indices.
+  old. := all_keys(a.-1)
+  new. := for_each(@reverse,  old.)
+So to get the transpose,
+   b. := subset(a., new., old.)
+   say(b., true)
+[
+  [0,5,10],
+  [1,6,11],
+  [2,7,12],
+  [3,8,13],
+  [4,9,14]
+ ]
+
+ Note that this works on any  higher order stems as well.
+
 See also: n()
 ]]>
         </body>
@@ -2739,7 +2777,28 @@ See: ~|
                 ]]>
             </body>
         </entry>
+    <entry id="all_keys">
+            <body>
+                <![CDATA[
+all_keys(args. ,[axis]) - return all the keys for either the entire stem
+            or for the given axis. The axis may be signed, so, e.g.
+            axis == -1 is the last axis.
+E.g.
+    a. := [;5]~n(2,3, n(6))
+    a.
+[0,1,2,3,4,[0,1,2],[3,4,5]]
+    all_keys(a., 0); // get the first axis
+[0,1,2,3,4]
+    all_keys(a., 1); // get the last axis
+[[5,0],[5,1],[5,2],[6,0],[6,1],[6,2]]
+    a.[6,2]
+5
 
+Note that all_keys(a., 1) == all_keys(a., -1) om this case.
+
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

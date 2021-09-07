@@ -1153,7 +1153,8 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         // Writing the next line was harder than it looks since it has to be a QDL string inside a Java string.
-        addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()[]{}<>/\\'\"" +
+        String slash = "\\";
+        addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`~!@#$%^&*()[]{}<>/\\\'\"" +
                 "-_=+|;:,.?¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧';");
         addLine(script, "say('printing all base characters with say:');");
         addLine(script, "say(a);");

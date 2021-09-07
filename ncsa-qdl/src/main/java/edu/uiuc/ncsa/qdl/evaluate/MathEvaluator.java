@@ -297,6 +297,9 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
+        if(1 < polyad.getArgCount()){
+            throw new IllegalArgumentException("unknown argument. " + RANDOM + " requires zero or 1 argument.");
+        }
         Object result;
         int resultType = 0;
 

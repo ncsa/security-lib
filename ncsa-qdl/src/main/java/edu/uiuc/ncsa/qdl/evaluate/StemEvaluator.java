@@ -141,6 +141,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_JOIN = STEM_FQ + JOIN;
     public static final int JOIN_TYPE = 110 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String ALL_KEYS = "all_keys";
+    public static final String FQ_ALL_KEYS = STEM_FQ + ALL_KEYS;
+    public static final int ALL_KEYS_TYPE = 111 + STEM_FUNCTION_BASE_VALUE;
+
 
     // list functions
     // older ones are prepended wit a list_. These still work but won't show up
@@ -223,6 +227,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             COMMON_KEYS,
             EXCLUDE_KEYS,
             LIST_KEYS,
+            ALL_KEYS,
             HAS_KEYS,
             INCLUDE_KEYS,
             RENAME_KEYS,
@@ -257,6 +262,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_COMMON_KEYS,
             FQ_EXCLUDE_KEYS,
             FQ_LIST_KEYS,
+            FQ_ALL_KEYS,
             FQ_HAS_KEYS,
             FQ_INCLUDE_KEYS,
             FQ_RENAME_KEYS,
@@ -326,6 +332,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_KEYS:
             case FQ_LIST_KEYS:
                 return LIST_KEYS_TYPE;
+            case ALL_KEYS:
+            case FQ_ALL_KEYS:
+                return ALL_KEYS_TYPE;
             case VAR_TYPE:
             case FQ_VAR_TYPE:
                 return VAR_TYPE_TYPE;
@@ -460,6 +469,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_KEYS:
                 doListKeys(polyad, state);
                 return true;
+            case ALL_KEYS:
+            case FQ_ALL_KEYS:
+                doAllKeys(polyad, state);
+                return true;
             case HAS_KEYS:
             case FQ_HAS_KEYS:
                 doHasKeys(polyad, state);
@@ -569,6 +582,38 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doAllKeys(Polyad polyad, State state) {
+             if(polyad.getArgCount() == 0){
+                 throw new IllegalArgumentException(ALL_KEYS + " requires at least one argument");
+             }
+
+        if(2 < polyad.getArgCount()){
+            throw new IllegalArgumentException(ALL_KEYS + " requires at most two arguments");
+        }
+
+        Object arg0 = polyad.evalArg(0,state);
+        checkNull(arg0, polyad.getArgAt(0),state);
+        if(!isStem(arg0)){
+            throw new IllegalArgumentException(ALL_KEYS + " requires a stem as its first argument");
+        }
+        StemVariable stem = (StemVariable) arg0;
+        boolean returnAll = true;
+        long axis = 0L;
+        if(polyad.getArgCount() == 2){
+            returnAll = false;
+            Object arg1 = polyad.evalArg(1,state);
+            checkNull(arg1, polyad.getArgAt(1), state);
+            if(!isLong(arg1)){
+                throw new IllegalArgumentException(ALL_KEYS + " requires the second argumement be an integer if present.");
+            }
+            axis = (Long)arg1;
+        }
+        StemVariable rc = returnAll?stem.allKeys():stem.allKeys(axis);
+        polyad.setResult(rc);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(Boolean.TRUE);
     }
 
     protected void doValues(Polyad polyad, State state) {
@@ -2009,7 +2054,32 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (!isStem(arg2)) {
             throw new IllegalArgumentException(LIST_SUBSET + " requires an stem or integer as its second argument");
         }
-        StemVariable indices = (StemVariable) arg2;
+        StemVariable stem3 = null;
+        if(polyad.getArgCount() == 3){
+           Object arg3 = polyad.evalArg(2,state);
+           checkNull(arg3, polyad.getArgAt(2), state);
+            if (!isStem(arg3)) {
+                throw new IllegalArgumentException(LIST_SUBSET + " requires an stem or integer as its third argument");
+            }
+
+            stem3 = (StemVariable) arg3;
+            threeArgSubset(polyad, stem, (StemVariable) arg2, stem3);
+            return;
+        }
+        twoArgSubset(polyad, stem, (StemVariable) arg2);
+    }
+
+    /**
+     * Processs case subset(arg., list.) so that
+     * <pre>
+     * out.i := arg.list.i
+     * </pre>
+     * @param polyad
+     * @param stem
+     * @param arg2
+     */
+    private void twoArgSubset(Polyad polyad, StemVariable stem, StemVariable arg2) {
+        StemVariable indices = arg2;
         StemVariable output = new StemVariable();
         for (Object key : indices.keySet()) {
             Object v = indices.get(key);
@@ -2043,6 +2113,38 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
+    /*
+      a. := n(3,5,n(15))
+  old. := all_keys(a.-1)
+  new. := for_each(@reverse,  all_keys(a.-1))
+  subset(a., new., old.)
+     */
+    /**
+     * Subset with remapping such that for subset(arg., new_indices., old_indices.) out. satisfies
+     * <pre>
+     *     out.new_indices.i := arg.old_indices.i;
+     * </pre>
+     * @param polyad
+     * @param stem
+     * @param newIndices
+     * @param oldIndices
+     */
+    private void threeArgSubset(Polyad polyad, StemVariable stem,
+                                StemVariable newIndices,
+                                StemVariable oldIndices) {
+        StemVariable output = new StemVariable();
+        for(long i = 0L; i < newIndices.size(); i++){
+             IndexList newIndex = new IndexList((StemVariable) newIndices.get(i));
+             IndexList oldIndex = new IndexList((StemVariable) oldIndices.get(i));
+             // Note that if there is strict matching on and it works, there is a single
+            // value at index 0 in the result.
+             output.set(newIndex, stem.get(oldIndex, true).get(0));
+        }
+
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+    }
     protected void doIsList(Polyad polyad, State state) {
         if (1 != polyad.getArgCount()) {
             throw new IllegalArgumentException(IS_LIST + " requires 1 argument");

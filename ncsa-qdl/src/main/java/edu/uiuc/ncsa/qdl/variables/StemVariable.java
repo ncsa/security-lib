@@ -50,6 +50,11 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public Object get(Object key) {
+        if (key instanceof StemVariable) {
+            // try to make a stem list
+            IndexList r = get(new IndexList((StemVariable) key), true);
+            return r.get(0);
+        }
         if (key instanceof Integer) {
             return get(new Long((Integer) key));
         }
@@ -902,7 +907,19 @@ public class StemVariable extends HashMap<String, Object> {
         s3.put("a3ghjjh", "422256456");
         s2.put("woof.", s3);
         s.put("foo.", s2);
-        System.out.println(s.toString(1));
+        System.out.println(InputFormUtil.inputForm(s));
+        System.out.println(s.allKeys2());
+        StemVariable allKeys = s.allKeys();
+        System.out.println(allKeys);
+        System.out.println(s.get(allKeys.get(10L)));
+        System.out.println(s.allKeys(0L));
+        System.out.println(s.allKeys(1L));
+        System.out.println(s.allKeys(2L));
+        System.out.println(s.allKeys(-1L));
+        System.out.println(s.allKeys(4L));
+
+
+
         System.out.println(s.toJSON().toString());
         String rawJSON = "{\n" +
                 "  \"isMemberOf\":   [" +
@@ -1200,14 +1217,14 @@ public class StemVariable extends HashMap<String, Object> {
 
     @Override
     public boolean containsKey(Object key) {
-        if(key instanceof Long){
-            return containsKey((Long)key);
+        if (key instanceof Long) {
+            return containsKey((Long) key);
         }
-        if(key instanceof String){
-            return containsKey((String)key);
+        if (key instanceof String) {
+            return containsKey((String) key);
         }
-        if(key instanceof IndexList){
-            return get((IndexList) key,false)!= null;
+        if (key instanceof IndexList) {
+            return get((IndexList) key, false) != null;
         }
         return false;
     }
@@ -1437,8 +1454,8 @@ public class StemVariable extends HashMap<String, Object> {
     so arguments don't get lost
      */
     public IndexList get(IndexList indexList, boolean strictMatching) {
-            return newGet(indexList, strictMatching);
-     //   return oldGet(indexList);
+        return newGet(indexList, strictMatching);
+        //   return oldGet(indexList);
     }
 
     /*  testing allowing lists as stem indices with the . operator:
@@ -1505,10 +1522,10 @@ public class StemVariable extends HashMap<String, Object> {
             currentStem = nextStem;
         }
         // for last one. May be a variable or a stem
-                  Object lastIndex = indexList.get(indexList.size()-1);
-        switch (Constant.getType(lastIndex)){
+        Object lastIndex = indexList.get(indexList.size() - 1);
+        switch (Constant.getType(lastIndex)) {
             case Constant.LONG_TYPE:
-                currentStem.remove((Long)lastIndex);
+                currentStem.remove((Long) lastIndex);
                 return true;
             case Constant.STRING_TYPE:
                 currentStem.remove((String) lastIndex);
@@ -1525,6 +1542,7 @@ public class StemVariable extends HashMap<String, Object> {
     /**
      * Strict matching is used at the last resolution of the stem. It means that left over scalars
      * are flagged as errors since there is no stem waiting to resolve them.
+     *
      * @param indexList
      * @param strictMatching
      * @return
@@ -1574,7 +1592,7 @@ public class StemVariable extends HashMap<String, Object> {
                 currentStem = (StemVariable) obj;
             } else {
                 if (strictMatching && i != indexList.size() - 1) {
-                    throw new IndexError("error:  scalars do not have indices.");
+                    throw new IndexError("no such stem at this multi-index.");
                 }
                 rc.add(obj); // 0th entry is returned value
                 gotOne = true;
@@ -1644,12 +1662,120 @@ public class StemVariable extends HashMap<String, Object> {
             put((String) index, value);
             return;
         }
-            if (index instanceof StemVariable) {
-                StemVariable s = (StemVariable) index;
-                IndexList indexList = new IndexList(s);
-                set(indexList, value);
-                return;
+        if (index instanceof StemVariable) {
+            StemVariable s = (StemVariable) index;
+            IndexList indexList = new IndexList(s);
+            set(indexList, value);
+            return;
         }
         throw new IndexError("Unknown index type for \"" + index + "\"");
+    }
+
+    public StemVariable allKeys(Long axis) {
+        KeyRankMap keysByRank = allKeys2();
+        //keysByRank.;
+        if (axis == 0L) {
+            StemVariable stemVariable = new StemVariable();
+            if (!keysByRank.containsKey(1)) {
+                return new StemVariable();
+            }
+            List<List> list = keysByRank.get(1);
+            for(List list1 : list){
+                stemVariable.addList(list1);
+            }
+            return stemVariable;
+        }
+        int targetAxis = axis < 0L ? keysByRank.lastKey() + axis.intValue() : axis.intValue();
+        if (!keysByRank.containsKey(targetAxis+1)) {
+            return new StemVariable();
+        }
+        List list = keysByRank.get(targetAxis+1);
+        return convertKeyByRank(list);
+    }
+
+    public StemVariable allKeys() {
+        KeyRankMap keysByRank = allKeys2();
+        StemVariable rc = new StemVariable();
+        // really simple case of a basic list with no structure. Just return the elements in a stem
+        if (keysByRank.size() == 1 && keysByRank.keySet().iterator().next() == 1) {
+            List indices = keysByRank.get(1);
+            rc.addList(indices);
+            return rc;
+        }
+        for (Integer i : keysByRank.keySet()) {
+            StemVariable stemVariable = convertKeyByRank(keysByRank.get(i));
+            for (Object key : stemVariable.keySet()) {
+                rc.getStemList().append(stemVariable.get(key));
+            }
+        }
+        return rc;
+    }
+
+    /**
+     * Gets a list of lists, e.g.
+     * <pre>
+     *  [[foo, 0], [foo, 1], [foo, 2], [foo, tyu]]
+     *  </pre>
+     * and returns a stem of these.
+     *
+     * @param list
+     * @return
+     */
+    protected StemVariable convertKeyByRank(List<List> list) {
+        StemVariable stemVariable = new StemVariable();
+        long i = 0;
+        for (List obj : list) {
+            StemVariable index = new StemVariable();
+            index.addList(obj);
+            stemVariable.put(i++, index);
+        }
+        return stemVariable;
+    }
+
+    protected KeyRankMap allKeys2() {
+        KeyRankMap keyRankMap = new KeyRankMap();
+        for (String key : keySet()) {
+            List list = new ArrayList();
+            if(isLongIndex(key)){
+                list.add(Long.parseLong(key));
+            }else {
+                list.add(key);
+            }
+            Object v = get(key);
+            if (v instanceof StemVariable) {
+                allKeys((StemVariable) v, list, keyRankMap);
+            } else {
+                keyRankMap.put(list);
+            }
+        }
+        return keyRankMap;
+    }
+
+    protected void allKeys(StemVariable v, List list, KeyRankMap keyRankMap) {
+        for (String key : v.keySet()) {
+            List list2 = new ArrayList();
+            list2.addAll(list);
+            if(isLongIndex(key)){
+                list2.add(Long.parseLong(key));
+            }else {
+                list2.add(key);
+            }
+            if (v.get(key) instanceof StemVariable) {
+                allKeys((StemVariable) v.get(key), list2, keyRankMap);
+            } else {
+                keyRankMap.put(list2);
+            }
+        }
+
+    }
+
+    public static class KeyRankMap extends TreeMap<Integer, List<List>> {
+        public void put(List list) {
+            if (!containsKey(list.size())) {
+                List enclosingList = new ArrayList();
+                put(list.size(), enclosingList);
+            }
+            get(list.size()).add(list);
+        }
     }
 }
