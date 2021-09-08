@@ -145,6 +145,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_ALL_KEYS = STEM_FQ + ALL_KEYS;
     public static final int ALL_KEYS_TYPE = 111 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String AXIS = "axis";
+    public static final String AXIS2 = "α";
+    public static final String FQ_AXIS = STEM_FQ + AXIS;
+    public static final String FQ_AXIS2 = STEM_FQ + AXIS2;
+    public static final int AXIS_TYPE = 112 + STEM_FUNCTION_BASE_VALUE;
 
     // list functions
     // older ones are prepended wit a list_. These still work but won't show up
@@ -211,6 +216,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
     public static String FUNC_NAMES[] = new String[]{
             DIMENSION, RANK,
+            AXIS, AXIS2,
             SIZE,
             JOIN,
             MAKE_INDICES,
@@ -247,6 +253,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FROM_JSON, JSON_PATH_QUERY};
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_DIMENSION, FQ_RANK,
+            FQ_AXIS, FQ_AXIS2,
             FQ_SIZE,
             FQ_JOIN,
             FQ_MAKE_INDICES,
@@ -370,6 +377,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_COPY2:
             case FQ_LIST_COPY:
                 return LIST_COPY_TYPE;
+            case AXIS:
+            case AXIS2:
+                return AXIS_TYPE;
             case LIST_REVERSE:
             case LIST_REVERSE2:
             case FQ_LIST_REVERSE:
@@ -447,7 +457,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case SET_DEFAULT:
             case FQ_SET_DEFAULT:
-                doSetDefault(polyad, state);
+               doSetDefault(polyad, state);
+                return true;
+            case AXIS:
+            case AXIS2:
+            case FQ_AXIS:
+            case FQ_AXIS2:
+                doAxis(polyad, state );
                 return true;
             case MASK:
             case FQ_MASK:
@@ -2758,5 +2774,57 @@ z. :=  join3(q.,w.)
         }
     }
 
+    protected void doAxis(Polyad polyad, State state){
+        /*  Waaaay easier to do this in QDL, but this should be in base system
+           not a module.
+                old. := all_keys(x., -1);
+         rank := size(old.0);
+         axis := (axis<0)?axis+rank:axis;
+         permute. := axis~[;axis]~[axis+1;rank];
+         new. := for_each(@shuffle, old., [permute.]);
+         return(subset(x., new., old.));
+         */
+        Object arg0 = polyad.evalArg(0,state);
+        checkNull(arg0, polyad.getArgAt(0), state);
+        if(!isStem(arg0)){
+            throw new IllegalArgumentException("axis operation requires a stem as its first argument");
+        }
+        StemVariable stem = (StemVariable) arg0;
+        Object arg1 = polyad.evalArg(1,state);
+        checkNull(arg1, polyad.getArgAt(1), state);
+        if(!isLong(arg1)){
+            throw new IllegalArgumentException("axis operation requires an integer as its second argument");
+        }
+        long axis = (Long) arg1;
+        StemVariable oldIndices = stem.allKeys(-1L);
+        int rank = ((StemVariable)oldIndices.get(0L)).size();
+        axis = (axis < 0L)?axis+rank:axis;
+        List<Long> permutation = new ArrayList<>();
+        permutation.add(axis);
+        for(long i = 0L; i < rank; i++){
+             if(i == axis){
+                 continue;
+             }
+             permutation.add(i);
+        }
+        StemVariable pStem0 = new StemVariable();
+        pStem0.addList(permutation);
+        StemVariable pStem = new StemVariable();
+        pStem.put(0L, pStem0); // makes [pstem.]
+        Polyad makeNew = new Polyad(FOR_EACH);
+        FunctionReferenceNode frn = new FunctionReferenceNode();
+        frn.setFunctionName(SHUFFLE);
+        makeNew.addArgument(frn);
+        makeNew.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));
+        makeNew.addArgument(new ConstantNode(pStem, Constant.STEM_TYPE));
+        StemVariable newIndices = (StemVariable) makeNew.evaluate(state);
 
+        Polyad subset = new Polyad(LIST_SUBSET);
+        subset.addArgument(new ConstantNode(stem, Constant.STEM_TYPE));
+        subset.addArgument(new ConstantNode(newIndices, Constant.STEM_TYPE));
+        subset.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));
+        polyad.setResult(subset.evaluate(state));
+        polyad.setEvaluated(Boolean.TRUE); // set evaluated true or next line bombs.
+        polyad.setResultType(Constant.getType(polyad.getResult()));
+    }
 }

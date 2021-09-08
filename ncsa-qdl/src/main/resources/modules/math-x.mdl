@@ -191,4 +191,55 @@ module[
          s. :=⟦0,1,10⟧
          splot(@x, @y, @z, t., s.)
        */
-]; // end module
+       define[
+         mm(x., y.)
+       ][
+       >> mm(x., y.) - multiply an n×m and m×n matrix.
+       >> mm stands for matrix multiply
+       >> E.g.
+       >>     a. := [[3,4],[7,2],[5,9]]
+       >>     b. := [[3,1,5],[6,9,7]]
+       >>     mm(a., b.)
+       >> [
+       >>   [33,39,43],
+       >>   [33,25,49],
+       >>   [69,86,88]
+       >>  ]
+       >> and the 3×2 multiplied by the 2×3 matrix yields a 3×3 result.
+       >> Cf. mm(b., a.) which yields a 2×2 result, simply showing that
+       >> matrix multiplication is not, of course, commutative.
+       return(reduce(@+, axis(for_each(@*, x., axis(y.,-1)) ,-1)));
+       ];
+
+       define[
+          transpose(x.)
+         ][
+         >> Reverse the axes of a stem. In the case of a 2 dimensional
+         >> stem with dimension n×m this is the matrix transpose, resulting in
+         >> an m×n stem.  In higher
+         >> dimensions, this flips the whole stem around the axis list.
+         >> E.g.
+         >> a. := n(2,3,4,n(24))
+         >> [
+         >>   [
+         >>     [0,1,2,3],
+         >>     [4,5,6,7], . .
+         >> transpose(a.)
+         >>  [
+         >>    [
+         >>      [0,12],
+         >>      [4,16],
+         >>      [8,20] . . .
+         >>     dim(transpose(a.))
+         >> [4,3,2]
+         >> Final note is that this works on the last axis of the stem, so
+         >> if the stem is ragged, this may not return some elements.
+         >> It is best to restict this (it being a generalization of
+         >> a math concept) stems whose entries all have the same rank
+         >> and dimension.
+          old. := all_keys(x., -1);
+          rank := size(old.0);
+          new. := for_each(@shuffle, old., [reverse([;rank])]);
+          return(subset(x., new., old.));
+         ];
+]; // enodule

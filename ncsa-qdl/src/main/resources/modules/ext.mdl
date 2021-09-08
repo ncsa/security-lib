@@ -51,12 +51,11 @@ module[
     ][
       >> to_cvs(arg.) - Convert a stem., a., to csv (comma separated values) format.
       >> arg. is the stem to be converted. Each element is a list and will be a line
-      >> in the output.
-      >> typical use is
-      >> file_write(my_file, to_cvs(data.));
+      >> in the output. A typical use is
+      >>     file_write(my_file, to_cvs(data.));
       >> E.g. here is the start of one
-      >> a.0 := ['t', 'x', 'y']; // header
-      >> a.1 := [0, .5, .345723445]; // first line of data
+      >>     a.0 := ['t', 'x', 'y']; // header
+      >>     a.1 := [0, .5, .345723445]; // first line of data
       >> tip:  [['t', 'x','y']]~a. would stick in the headers.
       // convert each entry and remove the [] so its just numbers
       z. := for_each(@to_string(), a.) - ']' - '[';

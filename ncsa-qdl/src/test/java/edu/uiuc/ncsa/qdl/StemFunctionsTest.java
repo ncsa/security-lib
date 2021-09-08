@@ -1784,6 +1784,34 @@ public class StemFunctionsTest extends AbstractQDLTester {
          interpreter.execute(script.toString());
          assert getBooleanValue("ok", state) : StemEvaluator.LIST_SUBSET + " did not create matrix transpose.";
      }
+/*
+        reduce(@+, axis(a., 2))
+        reduce(@+, axis(a., 0))
+        reduce(@+, axis(a., 1))
+[[10,35,60,85],[110,135,160,185],[210,235,260,285]]
+ */
+public void testAxisOperator() throws Throwable {
+     State state = testUtils.getNewState();
+     StringBuffer script = new StringBuffer();
+     addLine(script, "ξ.  := n(3,4,5,n(60));");
+     addLine(script, "ξ0. := reduce(@+, axis(ξ.,0));");
+     addLine(script, "ξ1. := reduce(@+, axis(ξ.,1));");
+     addLine(script, "ξ2. := reduce(@+, axis(ξ.,2));");
+     // Check against computed output. We break this up in statements or these get really long
+    addLine(script, "η0. := [[60,63,66,69,72],[75,78,81,84,87],[90,93,96,99,102],[105,108,111,114,117]];");
+    addLine(script, "η1. := [[30,34,38,42,46],[110,114,118,122,126],[190,194,198,202,206]];");
+    addLine(script, "η2. := [[10,35,60,85],[110,135,160,185],[210,235,260,285]];");
+
+     addLine(script, "ok0 := reduce(@∧, reduce(@∧, η0. ≡ ξ0.));");
+     addLine(script, "ok1 := reduce(@∧, reduce(@∧, η1. ≡ ξ1.));");
+     addLine(script, "ok2 := reduce(@∧, reduce(@∧, η2. ≡ ξ2.));");
+     QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+     interpreter.execute(script.toString());
+     assert getBooleanValue("ok0", state) : StemEvaluator.AXIS + " operator failed for axis = 0.";
+     assert getBooleanValue("ok1", state) : StemEvaluator.AXIS + " operator failed for axis = 1.";
+     assert getBooleanValue("ok2", state) : StemEvaluator.AXIS + " operator failed for axis = 2.";
+ }
 
 }
 

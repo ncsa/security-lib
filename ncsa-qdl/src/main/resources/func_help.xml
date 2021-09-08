@@ -2799,6 +2799,36 @@ Note that all_keys(a., 1) == all_keys(a., -1) om this case.
                 ]]>
             </body>
         </entry>
+    <entry id="axis">
+            <body>
+                <![CDATA[
+axis(x., a) - transform x. so that the zeroth axis is a.
+This does not alter x. It is used to
+do operations on axes other than 0 (default) for the basic
+commands. This can be extremely useful at restructuring
+data.
+
+Note that this intended to operate mostly on stem lists
+of higher dimension and on general stems may lose some of the
+entries (of lower dimensionality). The stems do not need all
+integer indices, just the same dimension.
+
+ E.g. Normally reduce operates on the first axis -- by row.
+To sum along the last axis (columns) compare
+    reduce(@+, [[1,2,3],[5,6,7]]); // adds the first row to the second
+[6,8,10]
+    // Now, add the columns, reducing each list.
+    reduce(@+, axis([[1,2,3],[5,6,7]],-1));
+[6,18]
+
+An axis of -1 is always the last axis.
+Alias: α (greek letter alpha).
+This could be an operator in its own right, but is much easier to
+work with as a function in most contexts. The alternate Greek letter
+is supplied if you want to make it more terse.
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->
