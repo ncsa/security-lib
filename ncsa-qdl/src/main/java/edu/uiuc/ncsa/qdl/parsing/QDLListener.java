@@ -470,8 +470,23 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitNumber(QDLParserParser.NumberContext ctx) {
-        BigDecimal decimal = new BigDecimal(ctx.getText());
-        ConstantNode constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
+        String rawNumber = ctx.getText();
+        ConstantNode constantNode;
+/*       Maybe someday support complex numbers
+        if(rawNumber.contains("J")){
+            int complexIndex = ctx.getText().indexOf("J");
+
+            BigComplex bigComplex = BigComplex.valueOf(new BigDecimal(rawNumber.substring(0,complexIndex)),
+                    new BigDecimal(rawNumber.substring(complexIndex+1)));
+            constantNode = new ConstantNode(bigComplex, Constant.COMPLEX_TYPE);
+
+        } else {
+            BigDecimal decimal = new BigDecimal(rawNumber);
+            constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
+        }
+*/
+        BigDecimal decimal = new BigDecimal(rawNumber);
+        constantNode = new ConstantNode(decimal, Constant.DECIMAL_TYPE);
         stash(ctx, constantNode);
     }
 

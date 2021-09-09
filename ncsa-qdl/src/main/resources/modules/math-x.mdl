@@ -194,7 +194,8 @@ module[
        define[
          mm(x., y.)
        ][
-       >> mm(x., y.) - multiply an n×m and m×n matrix.
+       >> mm(x., y.) - multiply an n×m and m×k matrix.
+       >> The result is the n×k matrix product.
        >> mm stands for matrix multiply
        >> E.g.
        >>     a. := [[3,4],[7,2],[5,9]]

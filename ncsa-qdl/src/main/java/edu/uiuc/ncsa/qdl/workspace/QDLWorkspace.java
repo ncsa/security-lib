@@ -286,6 +286,7 @@ public class QDLWorkspace {
             QDLTerminal qdlTerminal = new QDLTerminal(null);
             iso6429IO = new ISO6429IO(qdlTerminal, true);
             workspaceCommands = new WorkspaceCommands(iso6429IO);
+            workspaceCommands.setAnsiModeOn(true);
             isoTerminal = true;
         } else {
             workspaceCommands = new WorkspaceCommands(new BasicIO());

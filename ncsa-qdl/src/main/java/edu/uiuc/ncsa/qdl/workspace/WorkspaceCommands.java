@@ -2270,7 +2270,7 @@ public class WorkspaceCommands implements Logable {
                 String inputForm = InputFormUtil.inputFormVar(varName, 2, getState());
                 content.add(inputForm);
             }
-        } 
+        }
 
         if (useExternalEditor()) {
             content = _doExternalEdit(content);
@@ -2682,6 +2682,8 @@ public class WorkspaceCommands implements Logable {
                 return State.isPrintUnicode();
             case ASSERTIONS_ON:
                 return isAssertionsOn();
+            case ANSI_MODE_ON:
+                return isAnsiModeOn();
             case RUN_INIT_ON_LOAD:
                 return runInitOnLoad;
             case START_TS:
@@ -2777,6 +2779,9 @@ public class WorkspaceCommands implements Logable {
             case RUN_INIT_ON_LOAD:
                 say(onOrOff(runInitOnLoad));
                 break;
+            case ANSI_MODE_ON:
+                say(onOrOff(ansiModeOn));
+                break;
             case START_TS:
                 if (startTimeStamp != null) {
                     say("startup time at " + Iso8601.date2String(startTimeStamp));
@@ -2869,6 +2874,7 @@ public class WorkspaceCommands implements Logable {
     public static final String USE_EXTERNAL_EDITOR = "use_external_editor";
     public static final String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
     public static final String ASSERTIONS_ON = "assertions_on";
+    public static final String ANSI_MODE_ON = "ansi_mode";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -3355,6 +3361,31 @@ public class WorkspaceCommands implements Logable {
                 State.setPrintUnicode(isOnOrTrue(value));
                 say("unicode printing of system constants is now " + (State.isPrintUnicode() ? "on" : "off"));
                 break;
+            case ANSI_MODE_ON:
+
+/*          Can't actually do this since the system InputStream gets munged and
+            the whole JVM shuts down. There is probably a way to do it, but that is
+            highly non-obvious, so I'll leave this here now as a later improvement
+            if this gets important.
+            Another consideration is that there is no way to know if turning on ansi mode
+            will crash the JVM (some terminal types cannot use it), so at best being able
+            to toggle this is dicey.
+                if (isOnOrTrue(value)) {
+                    try {
+                        QDLTerminal qdlTerminal = new QDLTerminal(null);
+                        ISO6429IO iso6429IO = new ISO6429IO(qdlTerminal, true);
+                        setIoInterface(iso6429IO);
+                        getIoInterface().setBufferingOn(true);
+                        ansiModeOn = true;
+                    } catch (IOException iox) {
+                        say("sorry, could not switch to ansi mode:\"" + iox.getMessage() + "\"");
+                    }
+                } else {
+                    setIoInterface(new BasicIO());
+                    ansiModeOn = false;
+                }*/
+                say("ansi mode is read only and " + (ansiModeOn ? "on" : "off"));
+                break;
             case USE_EXTERNAL_EDITOR:
                 setUseExternalEditor(isOnOrTrue(value));
                 say("use external editor " + (isUseExternalEditor() ? "on" : "off"));
@@ -3499,6 +3530,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     protected String[] ALL_WS_VARS = new String[]{
+            ANSI_MODE_ON,
             ASSERTIONS_ON,
             AUTOSAVE_INTERVAL,
             AUTOSAVE_MESSAGES_ON,
@@ -4782,6 +4814,9 @@ public class WorkspaceCommands implements Logable {
         try {
             return getIoInterface().readline(prompt);
         } catch (IOException iox) {
+            if(DebugUtil.isEnabled()) {
+                iox.printStackTrace();
+            }
             throw new QDLException("Error reading input.");
         }
     }
@@ -4919,4 +4954,14 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean assertionsOn;
+
+    public boolean isAnsiModeOn() {
+        return ansiModeOn;
+    }
+
+    public void setAnsiModeOn(boolean ansiModeOn) {
+        this.ansiModeOn = ansiModeOn;
+    }
+
+    boolean ansiModeOn = false;
 }

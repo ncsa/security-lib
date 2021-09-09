@@ -136,6 +136,7 @@ expression
 
        variable : Identifier ;
          number : Decimal |  SCIENTIFIC_NUMBER;
+//         number : Decimal |  SCIENTIFIC_NUMBER | COMPLEX_NUMBER;
         integer : Integer;
 
    keyword : ConstantKeywords;

@@ -2144,12 +2144,13 @@ null           ∅       n    \u2205         null
 =>             ≥       >    \u2265         greater than or equals
 true           ⊤       t    \u22a4         logical true
 false          ⊥       f    \u22a5         logical false
-assert[][]     ⊨       a    \u22a8         assert
+assert[][]     ⊨       A    \u22a8         assert
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
 ~|             ≁       ~    \u2241         last axis join
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
+axis           α       a    \u03b1         alias for the axis function.
 pi             π       p    \u03c0         Greek letter pi.
 
 
@@ -2826,6 +2827,95 @@ Alias: α (greek letter alpha).
 This could be an operator in its own right, but is much easier to
 work with as a function in most contexts. The alternate Greek letter
 is supplied if you want to make it more terse.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="α">
+            <body>
+                <![CDATA[
+Alias for the axis function.
+See the entry for axis for more.
+                ]]>
+            </body>
+        </entry>
+    <entry id="greek">
+            <body>
+                <![CDATA[
+QDL supports Greek letters for function and variable names.
+These are, of course, strictly a matter of taste.
+Table of Greek letters with unicode:
+
+\u0391  Α α  \u03b1
+\u0392  Β β  \u03b2
+\u0393  Γ γ  \u03b3
+\u0394  Δ δ  \u03b4
+\u0395  Ε ε  \u03b5
+\u0396  Ζ ζ  \u03b6
+\u0397  Η η  \u03b7
+\u0398  Θ θ  \u03b8
+          ϑ  \u03d1
+\u0399  Ι ι  \u03b9
+\u039a  Κ κ  \u03ba
+          ϰ  \u03f0
+\u039b  Λ λ  \u03bb
+\u039c  Μ μ  \u03bc
+\u039s  Ν ν  \u03bd
+\u039e  Ξ ξ  \u03be
+\u039f  Ο ο  \u03bf
+\u03a0  Π π  \u03c0
+          ϖ  \u03d6
+\u03a1  Ρ ρ  \u03c1
+          ϱ  \u03f1
+\u03a2  Σ ς  \u03c2
+          σ  \u03c3
+\u03a3  Τ τ  \u03c4
+\u03a4  Υ υ  \u03c5
+\u03a5  Φ φ  \u03c6
+\u03a6  Χ χ  \u03c7
+\u03a7  Ψ ψ  \u03c8
+\u03a8  Ω ω  \u03c9
+
+Some of these (such as π()) are reserved and have keyboard
+shortcuts in ansi mode. There are variants (e.g. ϑ) allowed
+precisely because they are standard technical symbols. The intent
+is not to allow you to write in Greek, so none of the characters with
+diacritical marks, (e.g. ὰ) are here. Strings in QDL support unicode
+so you can certainly write Greek inside them:
+E.g.
+   say('ἀγεωμέτρητος μηδεὶς εἰσίτω')
+ἀγεωμέτρητος μηδεὶς εἰσίτω
+
+("Let no one untrained in geometry enter." -- motto of Plato's Academy)
+
+See also: unicode
+
+                ]]>
+            </body>
+        </entry>
+    <entry id="ansi_mode">
+            <body>
+                <![CDATA[
+(workspace variable)
+ansi_mode - (read only) true if QDL is running in ANSI mode.
+
+QDL may be started in ANSI (American Standards National Institute) mode
+which allows for command line editing (normally not possible in Java)
+and a host of other things. The default terminal for QDL is
+the ASCII (American Standard Code for Information Interchange)
+terminal, which is very limited but will run everywhere.
+ANSI is enabled by specifying the -ansi
+switch at the command line. See the details in your distro at
+
+docs\iso6429.pdf
+
+or online at
+
+https://cilogon.github.io/qdl/docs/iso6429.pdf
+
+Note that this does not persist through WS saves. If you are working
+in ANSI mode and the system is restarted in ASCII mode, that is
+what is available.
                 ]]>
             </body>
         </entry>

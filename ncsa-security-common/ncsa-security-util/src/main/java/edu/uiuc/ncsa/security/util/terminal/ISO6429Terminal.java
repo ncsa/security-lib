@@ -175,8 +175,7 @@ public class ISO6429Terminal {
         // returned number is exactly a control char
         switch (x) {
             // Actually, intercepting ^c does not work from the CLI because the
-            // JVM intercepts it and shuts down. This would require some very specific
-            // and finicky 
+            // OS intercepts it and shuts down the JVM, so Java is out of the loop.
             case 3: // ^C
                 csi = new CSI();
                 csi.rawCommand = String.valueOf((char) 9);

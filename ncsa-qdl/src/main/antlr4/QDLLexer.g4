@@ -32,7 +32,17 @@ lexer grammar QDLLexer;
 
 // § 3 Decimals, scientific notations
 //      Decimal : (Integer '.' Integer) | ('.' Integer);
+// Note you might be inclined to set this to
+// Decimal : Integer? '.' Integer
+// to  get numbers like .23, BUT, it will then misparse all stems like
+// a.23 as a and .23 and bomb since there is no operator.
       Decimal : Integer '.' Integer;
+
+/*
+COMPLEX_NUMBER : NNN J NNN;
+   fragment NNN : (Integer | Decimal | SCIENTIFIC_NUMBER);
+       fragment J : 'J' | 'j';
+*/
 
 SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
        fragment E : 'E' | 'e';
@@ -126,10 +136,13 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 
 // § 8 Identifiers
    /*
-      This include standard upper and lower case Greek letters as well as ϑ - \u03d1, which is
-      a variation of theta and my personal favorite Greek letter.
+      This include standard upper and lower case Greek letters as well as
+      ϑ - var theta, \u03d1,
+      ϖ - var pi, \u03d6
+      ϰ script kappa, \u03f0
+      ϱ var rho, \u03f1
    */
-   Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
+   Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
     FuncStart :  FUNCTION_NAME '(';
         F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
@@ -143,7 +156,7 @@ fragment AllOps :
      LogicalNot | RegexMatches;
 
 fragment FUNCTION_NAME :
-     [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;
+     [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;
 
  // Note that the extra characters for && and || are there because certain unicode aware keyboards
  // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
