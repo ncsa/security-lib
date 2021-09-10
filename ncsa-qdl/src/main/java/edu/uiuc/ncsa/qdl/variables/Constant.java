@@ -29,7 +29,7 @@ public class Constant {
     public static final int STEM_TYPE = 4; // these are mixed type
     public static final int DECIMAL_TYPE = 5;
     public static final int FUNCTION_TYPE = 6;
-    public static final int COMPLEX_TYPE = 7;
+    public static final int COMPLEX_TYPE = 7; // some day...
     Object value;
     int type = UNKNOWN_TYPE;
 

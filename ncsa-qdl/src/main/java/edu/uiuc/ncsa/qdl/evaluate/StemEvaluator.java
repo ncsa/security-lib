@@ -674,10 +674,23 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Object arg = polyad.evalArg(i, state);
             checkNull(arg, polyad.getArgAt(i));
 
+/*        If we wanted to allow for stems by converting them over to stems.
+          Downside is for_each(@f,a,b,c,d) is a 4 rank stem of dim [1,1,1,1]
+          which is messy to unpack. Either prohibit non-stems (now) or
+          possibly allow them but don't add rank for stems.
+            if (!isStem(arg)) {
+              //  throw new IllegalArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
+                StemVariable ss = new StemVariable();
+                ss.listAppend(arg);
+                stems[i - 1] = ss;
+            }else {
+                stems[i - 1] = (StemVariable) arg;
+            }
+*/
             if (!isStem(arg)) {
                 throw new IllegalArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
-            }
-            stems[i - 1] = (StemVariable) arg;
+              }
+                stems[i - 1] = (StemVariable) arg;
         }
         ExpressionImpl f = getOperator(state, frn, stems.length);
 
@@ -782,6 +795,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     [13,14,17,22,29]
  ]
 ]
+     */
+
+    /**
+     * Takes a list of Java objects and converts them to QDL constants to be used as
+     * arguments to functions. Checks also that there are no illegal values first.
+     * @param objects
+     * @return
      */
     protected ArrayList<StatementWithResultInterface> toConstants(ArrayList<Object> objects) {
         ArrayList<StatementWithResultInterface> args = new ArrayList<>();

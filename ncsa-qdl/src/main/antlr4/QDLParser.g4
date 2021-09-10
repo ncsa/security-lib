@@ -133,8 +133,9 @@ expression
  | expression  op=ASSIGN  expression                                           #assignment
  | ';'                                                                         #semi_for_empty_expressions
  ;
-
+                   
        variable : Identifier ;
+  //complex_number: (Decimal |  SCIENTIFIC_NUMBER) 'J' (Decimal |  SCIENTIFIC_NUMBER);
          number : Decimal |  SCIENTIFIC_NUMBER;
 //         number : Decimal |  SCIENTIFIC_NUMBER | COMPLEX_NUMBER;
         integer : Integer;

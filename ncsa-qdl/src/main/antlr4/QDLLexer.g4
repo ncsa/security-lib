@@ -7,7 +7,7 @@ lexer grammar QDLLexer;
 
 
 // § 1 Keywords
-  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null;
+  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | COMPLEX_I;
 
          ASSERT : 'assert'; 
         ASSERT2 : '⊨'; // unicode 22a8
@@ -16,6 +16,7 @@ lexer grammar QDLLexer;
           BLOCK : 'block';
            BODY : 'body';
           CATCH : 'catch';
+      COMPLEX_I : 'I';
          DEFINE : 'define';
              DO : 'do';
            ELSE : 'else';

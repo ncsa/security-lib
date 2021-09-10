@@ -1775,6 +1775,14 @@ public class QDLListener implements QDLParserListener {
                 constantNode.setResult(QDLNull.getInstance());
                 constantNode.setResultType(Constant.NULL_TYPE);
                 break;
+            case QDLConstants.RESERVED_COMPLEX_I:
+                throw new IllegalArgumentException("Complex numbers not supported.");
+/*
+               constantNode.setResult(BigComplex.I);
+                constantNode.setResultType(Constant.COMPLEX_TYPE);
+                break;
+
+  */
             default:
                 throw new IllegalArgumentException("error: unknown reserved keyword constant");
         }

@@ -31,6 +31,7 @@ public interface QDLConstants {
     String RESERVED_FALSE2 = "⊥";
     String RESERVED_NULL = "null";
     String RESERVED_NULL2 = "∅";
+    String RESERVED_COMPLEX_I = "I";
 
     String FUNCTION_REFERENCE_MARKER = "@";
 
