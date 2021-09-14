@@ -2,7 +2,7 @@
     Reference example for reduce across various axes and resulting way(s) to improve to_string
       y. := [n(4), n(4)+4, 8+n(4)];     //3x4
       yy. := [y., 100+y.];              // 2x3x4
-      yyy.:=[yy., 200 + yy., 400 + yy.] //3x2x3x4
+      yyy.:=[yy., 200 + yy., 400 + yy.]; //3x2x3x4
 
       // Axis 0 --> 2x3x4: 1 application of reduce
       yyy_reduce0. := reduce(@+, yyy.);
@@ -12,7 +12,7 @@
       yyy_reduce1.1. :=  yyy.1.0 + yyy.1.1
       yyy_reduce1.2. :=  yyy.2.0 + yyy.2.1
 
-      // Axis 2 -->  3x3x4: 3x2 = 6 applications
+      // Axis 2 -->  3x2x4: 3x2 = 6 applications
       yyy_reduce2.0.0. := yyy.0.0.0 + yyy.0.0.1 + yyy.0.0.2;
       yyy_reduce2.1.0. := yyy.1.0.0 + yyy.1.0.1 + yyy.1.0.2
       yyy_reduce2.1.1. := yyy.1.1.0 + yyy.1.1.1 + yyy.1.1.2

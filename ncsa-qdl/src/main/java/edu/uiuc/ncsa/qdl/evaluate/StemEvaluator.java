@@ -114,9 +114,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int INCLUDE_KEYS_TYPE = 104 + STEM_FUNCTION_BASE_VALUE;
 
 
-    public static final String RENAME_KEYS = "rename_keys";
+ /*   public static final String RENAME_KEYS = "rename_keys";
     public static final String FQ_RENAME_KEYS = STEM_FQ + RENAME_KEYS;
-    public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;
+    public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;*/
 
     public static final String MASK = "mask";
     public static final String FQ_MASK = STEM_FQ + MASK;
@@ -156,10 +156,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     // older ones are prepended with a list_. These still work but won't show up
     // in lists of functions.
 
-    public static final String LIST_APPEND = "append";
+/*    public static final String LIST_APPEND = "append";
     public static final String LIST_APPEND2 = "list_append";
     public static final String FQ_LIST_APPEND = LIST_FQ + LIST_APPEND;
-    public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;
+    public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;*/
 
     public static final String LIST_INSERT_AT = "insert_at";
     public static final String LIST_INSERT_AT2 = "list_insert_at";
@@ -237,11 +237,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             ALL_KEYS,
             HAS_KEYS,
             INCLUDE_KEYS,
-            RENAME_KEYS,
+      //      RENAME_KEYS,
             SHUFFLE,
             MASK,
             KEYS, VALUES,
-            LIST_APPEND,
+     //       LIST_APPEND,
             LIST_INSERT_AT,
             LIST_SUBSET,
             LIST_COPY,
@@ -274,11 +274,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_ALL_KEYS,
             FQ_HAS_KEYS,
             FQ_INCLUDE_KEYS,
-            FQ_RENAME_KEYS,
+     //       FQ_RENAME_KEYS,
             FQ_SHUFFLE,
             FQ_MASK,
             FQ_KEYS, FQ_VALUES,
-            FQ_LIST_APPEND,
+       //     FQ_LIST_APPEND,
             FQ_LIST_INSERT_AT,
             FQ_LIST_SUBSET,
             FQ_LIST_COPY,
@@ -359,9 +359,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case EXCLUDE_KEYS:
             case FQ_EXCLUDE_KEYS:
                 return EXCLUDE_KEYS_TYPE;
-            case RENAME_KEYS:
+/*            case RENAME_KEYS:
             case FQ_RENAME_KEYS:
-                return RENAME_KEYS_TYPE;
+                return RENAME_KEYS_TYPE;*/
             case SHUFFLE:
             case FQ_SHUFFLE:
                 return SHUFFLE_TYPE;
@@ -374,10 +374,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case TO_LIST:
             case FQ_TO_LIST:
                 return TO_LIST_TYPE;
-            case LIST_APPEND:
+/*            case LIST_APPEND:
             case LIST_APPEND2:
             case FQ_LIST_APPEND:
-                return LIST_APPEND_TYPE;
+                return LIST_APPEND_TYPE;*/
             case LIST_COPY:
             case LIST_COPY2:
             case FQ_LIST_COPY:
@@ -509,10 +509,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_EXCLUDE_KEYS:
                 doExcludeKeys(polyad, state);
                 return true;
-            case RENAME_KEYS:
+/*            case RENAME_KEYS:
             case FQ_RENAME_KEYS:
                 doRenameKeys(polyad, state);
-                return true;
+                return true;*/
             case SHUFFLE:
             case FQ_SHUFFLE:
                 shuffleKeys(polyad, state);
@@ -529,11 +529,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_TO_LIST:
                 doToList(polyad, state);
                 return true;
-            case LIST_APPEND:
+/*            case LIST_APPEND:
             case LIST_APPEND2:
             case FQ_LIST_APPEND:
                 doListAppend(polyad, state);
-                return true;
+                return true;*/
             case LIST_COPY:
             case LIST_COPY2:
             case FQ_LIST_COPY:
@@ -2229,7 +2229,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-
+/*
     protected void doListAppend(Polyad polyad, State state) {
         if (2 != polyad.getArgCount()) {
             throw new IllegalArgumentException(LIST_APPEND + " requires 2 arguments");
@@ -2251,7 +2251,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
-    }
+    }*/
 
     /**
      * Remove the entire variable from the symbol table.
@@ -2422,9 +2422,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param polyad
      * @param state
      */
-    protected void doRenameKeys(Polyad polyad, State state) {
+ /*   protected void doRenameKeys(Polyad polyad, State state) {
         oldRenameKeys(polyad, state);
-    }
+    }*/
 
     /**
      * Permute the elements in a stem. The right argument must contain every key in the left argument or
@@ -2520,7 +2520,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     /*
     This only renames keys in situ, i.e. it changes the stem given.
      */
-    protected void oldRenameKeys(Polyad polyad, State state) {
+/*    protected void oldRenameKeys(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
         }
@@ -2547,7 +2547,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(target);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
-    }
+    }*/
 
     /**
      * <code>common_keys(stem1., stem2.)</code><br/><br/> Return a list of keys common to both stems.

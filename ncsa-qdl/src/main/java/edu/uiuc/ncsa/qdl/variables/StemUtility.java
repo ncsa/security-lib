@@ -287,4 +287,39 @@ public class StemUtility {
          w.x == w.'h.i.j'; // true
          w.x1 == (w.).'h.i.j.';  // true
          */
+    // See list_formatting.txt for possible improvement to display stems.
+    public static void formatList(StemVariable stem){
+        if(!stem.isList()){
+             throw new IllegalArgumentException("cannot format general stem");
+        }
+    //     if(stem.getRank() == 1L){
+             for(String key : stem.keySet()){
+                 Object obj = stem.get(key);
+                 if(obj instanceof StemVariable){
+                     StemVariable stemVariable = (StemVariable) obj;
+                     String row = "";
+                     for(Object key2: stemVariable.keySet()){
+                         row = row + stemVariable.get(key2) + " ";
+                     }
+
+                     System.out.println(row);
+                 }else {
+                     System.out.println(stem.get(key));
+                 }
+             }
+             return;
+      //   }
+    }
+    public static void main(String[] args){
+        StemVariable outerStem = new StemVariable();
+        for(int j = 0 ;j < 4; j++){
+            StemVariable stemVariable = new StemVariable();
+            for(int i = 0; i<5; i++){
+                stemVariable.put(i, i+"b");
+            }
+            outerStem.put(j, stemVariable);
+
+        }
+                formatList(outerStem);
+    }
 }

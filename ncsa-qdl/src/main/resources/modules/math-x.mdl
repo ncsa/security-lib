@@ -209,7 +209,7 @@ module[
        >> and the 3×2 multiplied by the 2×3 matrix yields a 3×3 result.
        >> Cf. mm(b., a.) which yields a 2×2 result, simply showing that
        >> matrix multiplication is not, of course, commutative.
-       return(reduce(@+, axis(for_each(@*, x., axis(y.,-1)) ,-1)));
+       return(reduce(@+, τ(for_each(@*, x., τ(y.,-1)) ,-1)));
        ];
 
 /*      Promoted to language feature. Keep for reference.

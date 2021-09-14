@@ -7,7 +7,7 @@ module[
    >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
    >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
    >>    n_copy(s,n) - make a stem with n copies of the argument s
-   >>    to_cvs(arg.)- export a stem to comma separated format.
+   >>    to_csv(arg.)- export a stem to comma separated format.
 
     define[clone(arg)][
         >> clone(arg.) - Returns a completely new copy of the stem.
@@ -49,10 +49,10 @@ module[
    define[
       to_csv(a.)
     ][
-      >> to_cvs(arg.) - Convert a stem., a., to csv (comma separated values) format.
+      >> to_csv(arg.) - Convert a stem., a., to csv (comma separated values) format.
       >> arg. is the stem to be converted. Each element is a list and will be a line
       >> in the output. A typical use is
-      >>     file_write(my_file, to_cvs(data.));
+      >>     file_write(my_file, to_csv(data.));
       >> E.g. here is the start of one
       >>     a.0 := ['t', 'x', 'y']; // header
       >>     a.1 := [0, .5, .345723445]; // first line of data

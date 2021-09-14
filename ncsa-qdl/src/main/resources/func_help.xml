@@ -342,7 +342,7 @@ See also: list_keys(), rename_keys(), var_type(), constants('var_type')
                  ]]>
         </body>
     </entry>
-    <entry id="append">
+<!--    <entry id="append">
         <body>
             <![CDATA[
 append(list0., arg) - append arg to list0., adjusting the indices as
@@ -351,7 +351,7 @@ Note: If arg is a scalar, the single value is appended. If arg is a list,
       then the entire list is appended.
                  ]]>
         </body>
-    </entry>
+    </entry>-->
     <entry id="copy">
         <body>
             <![CDATA[
@@ -488,7 +488,7 @@ So if our stem is
        ]
 Then we need to reverse all the old indices (that means indices for the last
 axis), and we reverse each of them for the new indices.
-  old. := indices(a.-1)
+  old. := indices(a.,-1)
   new. := for_each(@reverse,  old.)
 So to get the transpose,
    b. := remap(a., new., old.)
@@ -548,7 +548,7 @@ generic stems and that would be bad).
                ]]>
         </body>
     </entry>
-    <entry id="rename_keys">
+<!--    <entry id="rename_keys">
         <body>
             <![CDATA[
 rename_keys(target., new_names.) - rename the keys in target. using
@@ -568,7 +568,7 @@ Note: The keys in new_names. are a subset of target. and their values
       target, it is ignored.
                 ]]>
         </body>
-    </entry>
+    </entry>-->
 
     <entry id="set_default">
         <body>
@@ -2806,7 +2806,7 @@ E.g.
     a.[6,2]
 5
 
-Note that indices(a., 1) == indices(a., -1) om this case.
+Note that indices(a., 1) == indices(a., -1) in this case.
 
                 ]]>
             </body>

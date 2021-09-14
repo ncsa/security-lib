@@ -328,32 +328,17 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
      
-    public void testRenameKeys() throws Exception {
-        // Take a stem and a list of
+    public void testRenameKeys() throws Throwable {
+
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ξ.  := ['Ur-A5sk','QCmVTOY','kmglAq8','3d2LTC4','lWkOYqU','GBzwNLo','hnWb1C8','7FCUL9U'];");
+        addLine(script, "ξ0. := remap(ξ., [5,3,4,2,0,1,7,6]);");
+        addLine(script, "ok := reduce(@&&, ξ0.== ['GBzwNLo','3d2LTC4','lWkOYqU','kmglAq8','Ur-A5sk','QCmVTOY','7FCUL9U','hnWb1C8']);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-
-        StemVariable sourceStem = new StemVariable();
-        StemVariable keys = new StemVariable();
-        int count = 5;
-        QDLCodec codec = new QDLCodec();
-        randomStem(sourceStem, 2 * count);
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("keys.", keys);
-        Polyad polyad = new Polyad(StemEvaluator.RENAME_KEYS);
-        VariableNode arg = new VariableNode("sourceStem.");
-        VariableNode arg2 = new VariableNode("keys.");
-        polyad.addArgument(arg);
-        polyad.addArgument(arg2);
-        polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
-        assert result.size() == 2 * count;
-        for (String key : keys.keySet()) {
-            assert result.containsKey(keys.get(key));
-            assert result.get(key) == sourceStem.get(key);
-        }
-
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : StemEvaluator.REMAP + " operator failed for simple list.";
     }
 
      

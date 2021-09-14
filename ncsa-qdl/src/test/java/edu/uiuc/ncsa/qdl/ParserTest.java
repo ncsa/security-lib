@@ -1315,7 +1315,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
      
-    public void testListAppend() throws Throwable {
+/*    public void testListAppend() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         String phrase = "This is my stem " + getRandomString();
@@ -1341,7 +1341,7 @@ public class ParserTest extends AbstractQDLTester {
 
         assert xstem.containsKey("help");
         assert !xstem.containsKey("foo");
-    }
+    }*/
 
      
     public void testSafeUnboxWithBadVariable() throws Throwable {
