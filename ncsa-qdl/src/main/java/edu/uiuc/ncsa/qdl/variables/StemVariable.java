@@ -909,14 +909,14 @@ public class StemVariable extends HashMap<String, Object> {
         s.put("foo.", s2);
         System.out.println(InputFormUtil.inputForm(s));
         System.out.println(s.allKeys2());
-        StemVariable allKeys = s.allKeys();
+        StemVariable allKeys = s.indices();
         System.out.println(allKeys);
         System.out.println(s.get(allKeys.get(10L)));
-        System.out.println(s.allKeys(0L));
-        System.out.println(s.allKeys(1L));
-        System.out.println(s.allKeys(2L));
-        System.out.println(s.allKeys(-1L));
-        System.out.println(s.allKeys(4L));
+        System.out.println(s.indices(0L));
+        System.out.println(s.indices(1L));
+        System.out.println(s.indices(2L));
+        System.out.println(s.indices(-1L));
+        System.out.println(s.indices(4L));
 
 
 
@@ -1671,7 +1671,7 @@ public class StemVariable extends HashMap<String, Object> {
         throw new IndexError("Unknown index type for \"" + index + "\"");
     }
 
-    public StemVariable allKeys(Long axis) {
+    public StemVariable indices(Long axis) {
         KeyRankMap keysByRank = allKeys2();
         //keysByRank.;
         if (axis == 0L) {
@@ -1693,7 +1693,7 @@ public class StemVariable extends HashMap<String, Object> {
         return convertKeyByRank(list);
     }
 
-    public StemVariable allKeys() {
+    public StemVariable indices() {
         KeyRankMap keysByRank = allKeys2();
         StemVariable rc = new StemVariable();
         // really simple case of a basic list with no structure. Just return the elements in a stem
@@ -1743,7 +1743,7 @@ public class StemVariable extends HashMap<String, Object> {
             }
             Object v = get(key);
             if (v instanceof StemVariable) {
-                allKeys((StemVariable) v, list, keyRankMap);
+                indices((StemVariable) v, list, keyRankMap);
             } else {
                 keyRankMap.put(list);
             }
@@ -1751,7 +1751,7 @@ public class StemVariable extends HashMap<String, Object> {
         return keyRankMap;
     }
 
-    protected void allKeys(StemVariable v, List list, KeyRankMap keyRankMap) {
+    protected void indices(StemVariable v, List list, KeyRankMap keyRankMap) {
         for (String key : v.keySet()) {
             List list2 = new ArrayList();
             list2.addAll(list);
@@ -1761,7 +1761,7 @@ public class StemVariable extends HashMap<String, Object> {
                 list2.add(key);
             }
             if (v.get(key) instanceof StemVariable) {
-                allKeys((StemVariable) v.get(key), list2, keyRankMap);
+                indices((StemVariable) v.get(key), list2, keyRankMap);
             } else {
                 keyRankMap.put(list2);
             }

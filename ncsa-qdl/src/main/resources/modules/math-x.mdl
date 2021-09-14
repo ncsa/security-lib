@@ -212,7 +212,8 @@ module[
        return(reduce(@+, axis(for_each(@*, x., axis(y.,-1)) ,-1)));
        ];
 
-       define[
+/*      Promoted to language feature. Keep for reference.
+        define[
           transpose(x.)
          ][
          >> Reverse the axes of a stem. In the case of a 2 dimensional
@@ -238,9 +239,43 @@ module[
          >> It is best to restict this (it being a generalization of
          >> a math concept) stems whose entries all have the same rank
          >> and dimension.
-          old. := all_keys(x., -1);
+          old. := indices(x., -1);
           rank := size(old.0);
           new. := for_each(@shuffle, old., [reverse([;rank])]);
           return(subset(x., new., old.));
          ];
-]; // enodule
+
+         define[
+            transpose(x., p)
+           ][
+           >> Reverse the axes of a stem. In the case of a 2 dimensional
+           >> stem with dimension n×m this is the matrix transpose, resulting in
+           >> an m×n stem.  In higher
+           >> dimensions, this flips the whole stem around the axis list.
+           >> E.g.
+           >> a. := n(2,3,4,n(24))
+           >> [
+           >>   [
+           >>     [0,1,2,3],
+           >>     [4,5,6,7], . .
+           >> transpose(a.)
+           >>  [
+           >>    [
+           >>      [0,12],
+           >>      [4,16],
+           >>      [8,20] . . .
+           >>     dim(transpose(a.))
+           >> [4,3,2]
+           >> Final note is that this works on the last axis of the stem, so
+           >> if the stem is ragged, this may not return some elements.
+           >> It is best to restict this (it being a generalization of
+           >> a math concept) stems whose entries all have the same rank
+           >> and dimension.
+          //  p. := is_number(p)?[p]:p.;
+            old. := indices(x., -1);
+            rank := size(old.0);
+            perm. := p~~exclude_keys([;rank], p);
+            new. := for_each(@shuffle, old., [perm.]);
+            return(remap(x., new., old.));
+           ];*/
+]; // end module

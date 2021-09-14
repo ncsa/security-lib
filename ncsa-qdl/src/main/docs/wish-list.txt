@@ -267,27 +267,6 @@ slice(arg., 1) -> 4x3x5  == [[arg2.0.0, arg2.1.0, arg2.2.0], [arg2.0.1, arg2.1.1
  Could get rid of 10 functions and make it more extensible.
 
 
-3/9/2021
-The current parser definitions require that expression stems components be either simple variables,
-functions or ( expression). So
-f(n).3 fails
-f(n).(3) works
-This is because parsing would tokenize
-a.0
-as the simple variable "a" followed by the decimal ".0" and then blow up. The parser tries to match
-in this way automatically. The way to fix this is with
-predicates in the grammar that plays with the input stream and tokens found up to this point. This
-is an entire chapter in the Antlr book, so it needs some serious study.
-
-For now, it all works, so the day to parser get rewritten with predicates just means parentheses
-can get dropped.
-
-10/5/2020
-- Workspace Library mangement
-    Be able to designate a command to run on load/reload
-    Have a run_on_load property in WS that is the name of a command?
-    Or have a designated method like on_boot() or init() that is always run? Gives another keyword
-    basically in QDL. :(
 
 
 

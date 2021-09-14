@@ -450,7 +450,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, set_b);
         addLine(script, "z. := mm(a.,b.);");
         addLine(script, "q := is_defined(c.);"); // double check internal state stays there
-        addLine(script, "w. := indices(4);"); // We want w. to exist outside of the loop so we can test it.
+        addLine(script, "w. := n(4);"); // We want w. to exist outside of the loop so we can test it.
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -489,7 +489,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "while[");
         addLine(script, "   for_next(j, 4)");
         addLine(script, "]do[");
-        addLine(script, "  if[mod(j,2)==0]then[a.j := j;]else[a.j.:=indices(2);];");
+        addLine(script, "  if[mod(j,2)==0]then[a.j := j;]else[a.j.:=n(2);];");
         addLine(script, "];");
         addLine(script, "// Now test that they work");
         addLine(script, "while[");
@@ -841,11 +841,11 @@ public class ParserTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
-        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);];");
+        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + n(5);];");
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
-        addLine(script, "list. := indices(10);");
+        addLine(script, "list. := n(10);");
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
         addLine(script, "d := a#list.b#i;");
@@ -911,8 +911,8 @@ public class ParserTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;list. := -10 + indices(5);];");
-        addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + indices(5);];");
+        addLine(script, "module['a:a','a']body[i:=2;list. := -10 + n(5);];");
+        addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + n(5);];");
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
         addLine(script, "p := i;");
@@ -951,12 +951,12 @@ public class ParserTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + indices(5);];");
-        addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + indices(5);];");
-        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := indices(5);];");
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);];");
+        addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + n(5);];");
+        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := n(5);];");
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
-        addLine(script, "list. := indices(10);");
+        addLine(script, "list. := n(10);");
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('b:b');");
         addLine(script, "module_import('a:b', 'd');");
@@ -1001,7 +1001,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testAssignments() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := indices(25);");
+        addLine(script, "a. := n(25);");
         addLine(script, "b := 3;");
         addLine(script, "a.0+=b;"); // 0 + 3 = 3
         addLine(script, "a.1-=b;"); // 1 - 3 = -2
@@ -1198,7 +1198,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a:=-4;");
         addLine(script, "b:=11;");
         addLine(script, "c:=-(11+2*a);");
-        addLine(script, "d.:=-indices(3);");
+        addLine(script, "d.:=-n(3);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == -4L;
@@ -1254,7 +1254,7 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "var. := random(5);");
-        addLine(script, "w. := indices(10);");
+        addLine(script, "w. := n(10);");
         addLine(script, "z. := has_keys(var., w.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1320,7 +1320,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         String phrase = "This is my stem " + getRandomString();
         addLine(script, "my_stem.help := '" + phrase + "';");
-        addLine(script, "b. := 10 + indices(5);");
+        addLine(script, "b. := 10 + n(5);");
         addLine(script, "b.foo := 'bar';");
         addLine(script, "x. := list_append(my_stem., b.);");
 
@@ -1485,7 +1485,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a. := null;");
         addLine(script, "r := 42;");
         addLine(script, "if[r < 100]then[a := 5;];");
-        addLine(script, "if[r < 57]then[a. := indices(2);];");
+        addLine(script, "if[r < 57]then[a. := n(2);];");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1867,7 +1867,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "a. := n(5);j(n)->n;f()->a.;");
         addLine(script, "f().j(2) := 100;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1890,7 +1890,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testMultiIndexExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := [-indices(5), indices(6)^2];j(n)->n;f()->a.;");
+        addLine(script, "a. := [-n(5), n(6)^2];j(n)->n;f()->a.;");
         addLine(script, "f().j(1).j(2) := 100;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1901,7 +1901,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testChainExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "q := 99; a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "q := 99; a. := n(5);j(n)->n;f()->a.;");
         addLine(script, "f().j(2) := p := q += 1;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1944,7 +1944,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testChainExpAssignment3() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "q := 99; a. := indices(5);j(n)->n;f()->a.;");
+        addLine(script, "q := 99; a. := n(5);j(n)->n;f()->a.;");
         addLine(script, "f().2 := p := q += 1;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1962,7 +1962,7 @@ public class ParserTest extends AbstractQDLTester {
     public void testReverseAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "99 =: q; indices(5) ≕ a. ;j(n)->n;f()->a.;");
+        addLine(script, "99 =: q; n(5) ≕ a. ;j(n)->n;f()->a.;");
         addLine(script, "q =: f().j(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());

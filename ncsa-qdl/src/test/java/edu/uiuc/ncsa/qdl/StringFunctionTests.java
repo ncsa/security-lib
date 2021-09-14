@@ -613,7 +613,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testDetokenize() throws Throwable {
         StringBuffer script = new StringBuffer();
-        addLine(script, "a. := indices(5);");
+        addLine(script, "a. := [;5];");
         addLine(script, "t0 := detokenize(a., ':');");
         addLine(script, "t1 := detokenize(a., 'k=', 1);"); // prepend
         addLine(script, "t2 := detokenize(a., ':', 2);"); // omit dangling

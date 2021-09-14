@@ -269,10 +269,10 @@ See also: exclude_keys
                  ]]>
         </body>
     </entry>
-    <entry id="indices">
+    <entry id="n">
         <body>
             <![CDATA[
-indices(n) - make a stem list whose values are 0,..., n-1
+n(n0,n1,...[, values.]) - make a stem list whose values are 0,..., n-1
 Note: This is extremely useful in certain looping constructs.
 See also: shuffle(n) which also creates the same list of integers, but in
           random order.
@@ -388,45 +388,21 @@ target_index = the index in the target that will receive the copy. Note that
 ]]>
         </body>
     </entry>
-    <entry id="subset">
-        <body>
-            <![CDATA[
-Function to extract a subset. Note that the result is *always*
-a rank 1 stem.
+    <entry id="remap">
+            <body>
+                <![CDATA[
+Take the elements in arg. and create a new stem. There are two cases:
 
-Simple subsets using ranges:
-subset(source_list., start_index) -
-          return a subset of the source_list starting at the given index.
-subset(source_list., start_index, n) -
-          return a subset of the source_list starting at the given index,
-          but only return n elements.
-Note: If n is omiited, then the rest of the list is returned from the start
-      index on. The source is not altered and the resulting list has 0 as
-      its first index.
+remap(source_list., index_list.) - returns the elements of source_list.
+          as specified in index_list. The result is always a simple list.
 
-Subsets specified by a list.
-subset(source_list., index_list.) - returns the elements of source_list.
-          as specified in index_list.
 The contract runs as follows. If
    index_list. := {k0:v0, k1:v1, ..., kn:vn}
 then the result, r., satisfies
   r.kj := source_list.vj;
-Note that
-   subset(a., p,q) != subset(a., [p;q])
-but
-   subset(a., p,q) == subset(a., [;q]+p)
-since q counts the number of elements.
 
-Most general case
-subset(source_list., old_indices., new_indices) - returns the elements of source_list.
-          as specified by (assuming out. is the returned result)
-          out.new_indices.i := source_list.old_indices.i
-This permits a general remapping of any stem to any other stem. Remember that
-*_indices. are lists in 1 to 1 correspondence.
-
-Simple cases are quite simple.
-E.g.
-    r. := subset(3*[;10], 2*[;5]+1)
+E.g. Show basic contract
+    r. := remap(3*[;10], 2*[;5]+1)
     r.
 [3,9,15,21,27]
 
@@ -440,8 +416,15 @@ Note that
   r.3 := source_list.7
   r.4 := source_list.9
 
+
+E.g: Turn an array into a flat list
+   a. := [;5]
+   a.'foo' := 'bar'
+  remap(a., indices(a.))
+[bar,0,1,2,3,4,5,6,7,8,9,10,11]
+
 E.g. Remapping the result to a non-list stem
-   r. := subset(3*[;15], {'foo':3,'bar':5,'baz':7})
+   r. := remap(3*[;15], {'foo':3,'bar':5,'baz':7})
    r.
 {bar:15, foo:9, baz:21}
 
@@ -450,12 +433,22 @@ E.g. Remapping the result to a non-list stem
    r.'bar' := source_list.5
    r.'baz' := source_list.7
 
+Most general case
+remap(source_list., old_indices., new_indices) - returns the elements of source_list.
+          as specified by (assuming out. is the returned result)
+
+          out.new_indices.i := source_list.old_indices.i
+
+This permits a very general remapping of any stem to any other stem,
+where new_indices. determines the resulting shape. Remember that
+*_indices. are lists in 1 to 1 correspondence.
+
 E.g. Using stem indices on higher rank arguments
 Remember that for a stem a.,
    a.[p,q] == a.p.q
 This lets you select a subset like so:
    a. := n(3,4,n(12))
-   r. := subset(a., [[0,1],[1,1],[2,3]])
+   r. := remap(a., [[0,1],[1,1],[2,3]])
    r.
 [1,5,11]
 
@@ -465,7 +458,7 @@ And
     r.2 := a.[2,3]
 
 Yes, you can use arbitrary indices to so
-   subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+   remap(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
 {bar:5, foo:1, baz:11}
 
 is fine, though, of course, in the general case of stems, there is no
@@ -473,7 +466,7 @@ canonical ordering of keys...
 
 Note: If you need to re-roll one array (e.g.) into another, the right way to
 do it is using the n function:
-   n(2,2, subset(a., [[0,1],[1,1],[2,3],[2,0]]))
+   n(2,2, remap(a., [[0,1],[1,1],[2,3],[2,0]]))
 [[1,5],[11,8]]
 
 It is vastly easier to do it this way than have some extremely complex remapping
@@ -495,10 +488,10 @@ So if our stem is
        ]
 Then we need to reverse all the old indices (that means indices for the last
 axis), and we reverse each of them for the new indices.
-  old. := all_keys(a.-1)
+  old. := indices(a.-1)
   new. := for_each(@reverse,  old.)
 So to get the transpose,
-   b. := subset(a., new., old.)
+   b. := remap(a., new., old.)
    say(b., true)
 [
   [0,5,10],
@@ -509,6 +502,24 @@ So to get the transpose,
  ]
 
  Note that this works on any  higher order stems as well.
+ See also: transpose, n (function)
+                ]]>
+            </body>
+        </entry>
+    <entry id="subset">
+        <body>
+            <![CDATA[
+Function to extract a subset. Note that the result is *always*
+a rank 1 stem and it operates only on the zeroth axis.
+
+subset(source_list., start_index) -
+          return a subset of the source_list starting at the given index.
+subset(source_list., start_index, n) -
+          return a subset of the source_list starting at the given index,
+          but only return n elements.
+Note: If n is omitted, then the rest of the list is returned from the start
+      index on. The source is not altered and the resulting list has 0 as
+      its first index.
 
 See also: n()
 ]]>
@@ -2142,15 +2153,15 @@ null           ∅       n    \u2205         null
 ==             ≡       =    \u2261         logical equality
 <=             ≤       <    \u2264         less than or equals
 =>             ≥       >    \u2265         greater than or equals
-true           ⊤       t    \u22a4         logical true
-false          ⊥       f    \u22a5         logical false
+true           ⊤       T    \u22a4         logical true
+false          ⊥       F    \u22a5         logical false
 assert[][]     ⊨       A    \u22a8         assert
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
 ~|             ≁       ~    \u2241         last axis join
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
-axis           α       a    \u03b1         alias for the axis function.
+transpose      τ       t    \u03c4         alias for the transpose function.
 pi             π       p    \u03c0         Greek letter pi.
 
 
@@ -2778,38 +2789,41 @@ See: ~|
                 ]]>
             </body>
         </entry>
-    <entry id="all_keys">
+    <entry id="indices">
             <body>
                 <![CDATA[
-all_keys(args. ,[axis]) - return all the keys for either the entire stem
+indices(args. ,[axis]) - return all the indices for either the entire stem
             or for the given axis. The axis may be signed, so, e.g.
             axis == -1 is the last axis.
 E.g.
     a. := [;5]~n(2,3, n(6))
     a.
 [0,1,2,3,4,[0,1,2],[3,4,5]]
-    all_keys(a., 0); // get the first axis
+    indices(a., 0); // get the first axis
 [0,1,2,3,4]
-    all_keys(a., 1); // get the last axis
+    indices(a., 1); // get the last axis
 [[5,0],[5,1],[5,2],[6,0],[6,1],[6,2]]
     a.[6,2]
 5
 
-Note that all_keys(a., 1) == all_keys(a., -1) om this case.
+Note that indices(a., 1) == indices(a., -1) om this case.
 
                 ]]>
             </body>
         </entry>
-    <entry id="axis">
+    <entry id="transpose">
             <body>
                 <![CDATA[
-axis(x., a) - transform x. so that the zeroth axis is a.
-This does not alter x. It is used to
-do operations on axes other than 0 (default) for the basic
-commands. This can be extremely useful at restructuring
-data.
+axis(x.) - reverses dim(x.) an remaps the axes of x. If x. is a matrix,
+           this is the standard matrix transpose
+axis(x., a) - transforms x. so that the zeroth axis is a.,
+axis(x., permutation.) - transforms x. as per the permutation.
 
-Note that this intended to operate mostly on stem lists
+This does not alter x.  This can be extremely useful at restructuring
+data. This has no effect on a rank 1 stem (i.e. a simple list).
+
+
+Note that this intended to operate  on stem lists
 of higher dimension and on general stems may lose some of the
 entries (of lower dimensionality). The stems do not need all
 integer indices, just the same dimension.
@@ -2819,7 +2833,7 @@ To sum along the last axis (columns) compare
     reduce(@+, [[1,2,3],[5,6,7]]); // adds the first row to the second
 [6,8,10]
     // Now, add the columns, reducing each list.
-    reduce(@+, axis([[1,2,3],[5,6,7]],-1));
+    reduce(@+, transpose([[1,2,3],[5,6,7]],-1));
 [6,18]
 
 An axis of -1 is always the last axis.
@@ -2918,7 +2932,24 @@ in ANSI mode and the system is restarted in ASCII mode, that is
 what is available.
                 ]]>
             </body>
+    </entry>
+
+	        <entry id="insert">
+            <body>
+   <![CDATA[
+insert(source, snippet, index) - insert the snippet into the source string
+     at the given index.
+
+E.g.
+    insert('abcd', 'foo', 2)
+abfoocd
+
+  insert('abcd', '....', differ_at('abc','abq'))
+ab....cd
+                ]]>
+            </body>
         </entry>
+
     <!--
         entry template
     -->

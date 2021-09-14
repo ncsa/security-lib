@@ -41,10 +41,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_SIZE = STEM_FQ + SIZE;
     public static final int SIZE_TYPE = 1 + STEM_FUNCTION_BASE_VALUE;
 
-
-    public static final String MAKE_INDICES = "indices";
     public static final String SHORT_MAKE_INDICES = "n";
-    public static final String FQ_MAKE_INDICES = STEM_FQ + MAKE_INDICES;
+    public static final String FQ_MAKE_INDICES = STEM_FQ + SHORT_MAKE_INDICES;
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 
 
@@ -141,18 +139,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_JOIN = STEM_FQ + JOIN;
     public static final int JOIN_TYPE = 110 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String ALL_KEYS = "all_keys";
+    public static final String ALL_KEYS = "indices";
     public static final String FQ_ALL_KEYS = STEM_FQ + ALL_KEYS;
     public static final int ALL_KEYS_TYPE = 111 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String AXIS = "axis";
-    public static final String AXIS2 = "α";
-    public static final String FQ_AXIS = STEM_FQ + AXIS;
-    public static final String FQ_AXIS2 = STEM_FQ + AXIS2;
-    public static final int AXIS_TYPE = 112 + STEM_FUNCTION_BASE_VALUE;
+    public static final String TRANSPOSE = "transpose";
+    public static final String TRANSPOSE2 = "τ";
+    public static final String FQ_TRANSPOSE = STEM_FQ + TRANSPOSE;
+    public static final String FQ_TRANSPOSE2 = STEM_FQ + TRANSPOSE2;
+    public static final int TRANSPOSE_TYPE = 112 + STEM_FUNCTION_BASE_VALUE;
 
+    public static final String REMAP = "remap";
+    public static final String FQ_REMAP = STEM_FQ + REMAP;
+    public static final int REMAP_TYPE = 114 + STEM_FUNCTION_BASE_VALUE;
     // list functions
-    // older ones are prepended wit a list_. These still work but won't show up
+    // older ones are prepended with a list_. These still work but won't show up
     // in lists of functions.
 
     public static final String LIST_APPEND = "append";
@@ -216,10 +217,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
     public static String FUNC_NAMES[] = new String[]{
             DIMENSION, RANK,
-            AXIS, AXIS2,
+            TRANSPOSE, TRANSPOSE2,
+            REMAP,
             SIZE,
             JOIN,
-            MAKE_INDICES,
             SHORT_MAKE_INDICES,
             HAS_VALUE,
             REMOVE,
@@ -253,7 +254,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FROM_JSON, JSON_PATH_QUERY};
     public static String FQ_FUNC_NAMES[] = new String[]{
             FQ_DIMENSION, FQ_RANK,
-            FQ_AXIS, FQ_AXIS2,
+            FQ_TRANSPOSE, FQ_TRANSPOSE2,
+            FQ_REMAP,
             FQ_SIZE,
             FQ_JOIN,
             FQ_MAKE_INDICES,
@@ -324,6 +326,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case HAS_VALUE:
             case FQ_HAS_VALUE:
                 return HAS_VALUE_TYPE;
+            case REMAP:
+            case FQ_REMAP:
+                return REMAP_TYPE;
             case MASK:
             case FQ_MASK:
                 return MASK_TYPE;
@@ -377,9 +382,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_COPY2:
             case FQ_LIST_COPY:
                 return LIST_COPY_TYPE;
-            case AXIS:
-            case AXIS2:
-                return AXIS_TYPE;
+            case TRANSPOSE:
+            case TRANSPOSE2:
+                return TRANSPOSE_TYPE;
             case LIST_REVERSE:
             case LIST_REVERSE2:
             case FQ_LIST_REVERSE:
@@ -396,7 +401,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case LIST_SUBSET2:
             case FQ_LIST_SUBSET:
                 return LIST_SUBSET_TYPE;
-            case MAKE_INDICES:
             case SHORT_MAKE_INDICES:
             case FQ_MAKE_INDICES:
                 return MAKE_INDICES_TYPE;
@@ -457,13 +461,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case SET_DEFAULT:
             case FQ_SET_DEFAULT:
-               doSetDefault(polyad, state);
+                doSetDefault(polyad, state);
                 return true;
-            case AXIS:
-            case AXIS2:
-            case FQ_AXIS:
-            case FQ_AXIS2:
-                doAxis(polyad, state );
+            case TRANSPOSE:
+            case TRANSPOSE2:
+            case FQ_TRANSPOSE:
+            case FQ_TRANSPOSE2:
+                doTransform(polyad, state);
                 return true;
             case MASK:
             case FQ_MASK:
@@ -487,7 +491,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case ALL_KEYS:
             case FQ_ALL_KEYS:
-                doAllKeys(polyad, state);
+                doIndices(polyad, state);
                 return true;
             case HAS_KEYS:
             case FQ_HAS_KEYS:
@@ -545,6 +549,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_SUBSET:
                 doListSubset(polyad, state);
                 return true;
+            case REMAP:
+            case FQ_REMAP:
+                doRemap(polyad, state);
+                return true;
             case LIST_REVERSE:
             case LIST_REVERSE2:
             case FQ_LIST_REVERSE:
@@ -555,7 +563,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_LIST_STARTS_WITH:
                 doListStartsWith(polyad, state);
                 return true;
-            case MAKE_INDICES:
             case SHORT_MAKE_INDICES:
             case FQ_MAKE_INDICES:
                 doMakeIndex(polyad, state);
@@ -600,33 +607,66 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
-    protected void doAllKeys(Polyad polyad, State state) {
-             if(polyad.getArgCount() == 0){
-                 throw new IllegalArgumentException(ALL_KEYS + " requires at least one argument");
-             }
+    private void doRemap(Polyad polyad, State state) {
+        if (polyad.getArgCount() < 2 || 3 < polyad.getArgCount()) {
+            throw new IllegalArgumentException("the " + REMAP + " function requires  two or three arguments");
+        }
+        Object arg1 = polyad.evalArg(0, state);
+        checkNull(arg1, polyad.getArgAt(0));
+        if (!isStem(arg1)) {
+            throw new IllegalArgumentException(REMAP + " requires stem as its first argument");
+        }
+        StemVariable stem = (StemVariable) arg1;
+        Object arg2 = polyad.evalArg(1, state);
+        checkNull(arg2, polyad.getArgAt(1));
 
-        if(2 < polyad.getArgCount()){
+        if (!isStem(arg2)) {
+            throw new IllegalArgumentException(REMAP + " requires an stem or integer as its second argument");
+        }
+        StemVariable stem3 = null;
+        if (polyad.getArgCount() == 3) {
+            Object arg3 = polyad.evalArg(2, state);
+            checkNull(arg3, polyad.getArgAt(2), state);
+            if (!isStem(arg3)) {
+                throw new IllegalArgumentException(REMAP + " requires an stem or integer as its third argument");
+            }
+
+            stem3 = (StemVariable) arg3;
+            threeArgRemap(polyad, stem, (StemVariable) arg2, stem3);
+            return;
+        }
+        twoArgRemap(polyad, stem, (StemVariable) arg2);
+
+
+    }
+
+    protected void doIndices(Polyad polyad, State state) {
+        if (polyad.getArgCount() == 0) {
+            throw new IllegalArgumentException(ALL_KEYS + " requires at least one argument");
+        }
+
+        if (2 < polyad.getArgCount()) {
             throw new IllegalArgumentException(ALL_KEYS + " requires at most two arguments");
         }
 
-        Object arg0 = polyad.evalArg(0,state);
-        checkNull(arg0, polyad.getArgAt(0),state);
-        if(!isStem(arg0)){
+        Object arg0 = polyad.evalArg(0, state);
+        checkNull(arg0, polyad.getArgAt(0), state);
+        if (!isStem(arg0)) {
             throw new IllegalArgumentException(ALL_KEYS + " requires a stem as its first argument");
         }
         StemVariable stem = (StemVariable) arg0;
         boolean returnAll = true;
         long axis = 0L;
-        if(polyad.getArgCount() == 2){
+        if (polyad.getArgCount() == 2) {
             returnAll = false;
-            Object arg1 = polyad.evalArg(1,state);
+            Object arg1 = polyad.evalArg(1, state);
             checkNull(arg1, polyad.getArgAt(1), state);
-            if(!isLong(arg1)){
+            if (!isLong(arg1)) {
                 throw new IllegalArgumentException(ALL_KEYS + " requires the second argumement be an integer if present.");
             }
-            axis = (Long)arg1;
+            axis = (Long) arg1;
         }
-        StemVariable rc = returnAll?stem.allKeys():stem.allKeys(axis);
+        StemVariable rc = returnAll ? stem.indices() : stem.indices(axis);
         polyad.setResult(rc);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(Boolean.TRUE);
@@ -689,8 +729,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 */
             if (!isStem(arg)) {
                 throw new IllegalArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
-              }
-                stems[i - 1] = (StemVariable) arg;
+            }
+            stems[i - 1] = (StemVariable) arg;
         }
         ExpressionImpl f = getOperator(state, frn, stems.length);
 
@@ -800,6 +840,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     /**
      * Takes a list of Java objects and converts them to QDL constants to be used as
      * arguments to functions. Checks also that there are no illegal values first.
+     *
      * @param objects
      * @return
      */
@@ -1797,14 +1838,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     protected void doMakeIndex(Polyad polyad, State state) {
         if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("the " + MAKE_INDICES + " function requires at least 1 argument");
+            throw new IllegalArgumentException("the " + SHORT_MAKE_INDICES + " function requires at least 1 argument");
         }
-        Object arg =polyad.evalArg(0, state);
+        Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
 
         // First argument always has to be an integer.
         if (!(arg instanceof Long)) {
-            throw new IndexError("error: only non-negative integer arguments are allowed in " + SHORT_MAKE_INDICES + " or " + MAKE_INDICES);
+            throw new IndexError("error: only non-negative integer arguments are allowed in " + SHORT_MAKE_INDICES);
         }
         Object[] fill = null;
         CyclicArgList cyclicArgList = null;
@@ -2065,56 +2106,44 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable stem = (StemVariable) arg1;
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
-        if (isLong(arg2)) {
-            Long startIndex = (Long) arg2;
-            Long endIndex = (long) stem.getStemList().size();
-            if (startIndex < 0) {
-                startIndex = startIndex + endIndex;
-            }
-            if (polyad.getArgCount() == 3) {
-                Object arg3 = polyad.evalArg(2, state);
-                checkNull(arg3, polyad.getArgAt(2));
-
-                if (!isLong(arg3)) {
-                    throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
-                }
-                endIndex = (Long) arg3;
-            }
-
-            StemVariable outStem = stem.listSubset(startIndex, endIndex);
-            polyad.setResult(outStem);
-            polyad.setResultType(Constant.STEM_TYPE);
-            polyad.setEvaluated(true);
-            return;
+        if (!isLong(arg2)) {
+            throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its second argument");
         }
-        if (!isStem(arg2)) {
-            throw new IllegalArgumentException(LIST_SUBSET + " requires an stem or integer as its second argument");
+        Long startIndex = (Long) arg2;
+        Long endIndex = (long) stem.getStemList().size();
+        if (startIndex < 0) {
+            startIndex = startIndex + endIndex;
         }
-        StemVariable stem3 = null;
-        if(polyad.getArgCount() == 3){
-           Object arg3 = polyad.evalArg(2,state);
-           checkNull(arg3, polyad.getArgAt(2), state);
-            if (!isStem(arg3)) {
-                throw new IllegalArgumentException(LIST_SUBSET + " requires an stem or integer as its third argument");
-            }
+        if (polyad.getArgCount() == 3) {
+            Object arg3 = polyad.evalArg(2, state);
+            checkNull(arg3, polyad.getArgAt(2));
 
-            stem3 = (StemVariable) arg3;
-            threeArgSubset(polyad, stem, (StemVariable) arg2, stem3);
-            return;
+            if (!isLong(arg3)) {
+                throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
+            }
+            endIndex = (Long) arg3;
         }
-        twoArgSubset(polyad, stem, (StemVariable) arg2);
+
+        StemVariable outStem = stem.listSubset(startIndex, endIndex);
+        polyad.setResult(outStem);
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setEvaluated(true);
+        return;
+
     }
+
 
     /**
      * Processs case subset(arg., list.) so that
      * <pre>
      * out.i := arg.list.i
      * </pre>
+     *
      * @param polyad
      * @param stem
      * @param arg2
      */
-    private void twoArgSubset(Polyad polyad, StemVariable stem, StemVariable arg2) {
+    private void twoArgRemap(Polyad polyad, StemVariable stem, StemVariable arg2) {
         StemVariable indices = arg2;
         StemVariable output = new StemVariable();
         for (Object key : indices.keySet()) {
@@ -2155,32 +2184,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
   new. := for_each(@reverse,  all_keys(a.-1))
   subset(a., new., old.)
      */
+
     /**
      * Subset with remapping such that for subset(arg., new_indices., old_indices.) out. satisfies
      * <pre>
      *     out.new_indices.i := arg.old_indices.i;
      * </pre>
+     *
      * @param polyad
      * @param stem
      * @param newIndices
      * @param oldIndices
      */
-    private void threeArgSubset(Polyad polyad, StemVariable stem,
-                                StemVariable newIndices,
-                                StemVariable oldIndices) {
+    private void threeArgRemap(Polyad polyad, StemVariable stem,
+                               StemVariable newIndices,
+                               StemVariable oldIndices) {
         StemVariable output = new StemVariable();
-        for(long i = 0L; i < newIndices.size(); i++){
-             IndexList newIndex = new IndexList((StemVariable) newIndices.get(i));
-             IndexList oldIndex = new IndexList((StemVariable) oldIndices.get(i));
-             // Note that if there is strict matching on and it works, there is a single
+        for (long i = 0L; i < newIndices.size(); i++) {
+            IndexList newIndex = new IndexList((StemVariable) newIndices.get(i));
+            IndexList oldIndex = new IndexList((StemVariable) oldIndices.get(i));
+            // Note that if there is strict matching on and it works, there is a single
             // value at index 0 in the result.
-             output.set(newIndex, stem.get(oldIndex, true).get(0));
+            output.set(newIndex, stem.get(oldIndex, true).get(0));
         }
 
         polyad.setResult(output);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
     }
+
     protected void doIsList(Polyad polyad, State state) {
         if (1 != polyad.getArgCount()) {
             throw new IllegalArgumentException(IS_LIST + " requires 1 argument");
@@ -2794,41 +2826,115 @@ z. :=  join3(q.,w.)
         }
     }
 
-    protected void doAxis(Polyad polyad, State state){
+    protected void doTransform(Polyad polyad, State state) {
         /*  Waaaay easier to do this in QDL, but this should be in base system
            not a module.
-                old. := all_keys(x., -1);
+         old. := all_keys(x., -1);
          rank := size(old.0);
          axis := (axis<0)?axis+rank:axis;
          permute. := axis~[;axis]~[axis+1;rank];
          new. := for_each(@shuffle, old., [permute.]);
          return(subset(x., new., old.));
+
+                           old. := indices(x., -1);
+                   rank := size(old.0);
+                   perm. := p~~exclude_keys([;rank], p);
+                   new. := for_each(@shuffle, old., [perm.]);
+                   return(subset(x., new., old.));
          */
-        Object arg0 = polyad.evalArg(0,state);
+        if (polyad.getArgCount() == 0) {
+            throw new IllegalArgumentException(TRANSPOSE + " requires at least one argument.");
+        }
+
+        if (2 < polyad.getArgCount()) {
+            throw new IllegalArgumentException(TRANSPOSE + " takes at most two arguments.");
+        }
+
+        Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0), state);
-        if(!isStem(arg0)){
-            throw new IllegalArgumentException("axis operation requires a stem as its first argument");
+        if (!isStem(arg0)) {
+            throw new IllegalArgumentException(TRANSPOSE + " requires a stem as its first argument");
         }
         StemVariable stem = (StemVariable) arg0;
-        Object arg1 = polyad.evalArg(1,state);
-        checkNull(arg1, polyad.getArgAt(1), state);
-        if(!isLong(arg1)){
-            throw new IllegalArgumentException("axis operation requires an integer as its second argument");
+
+        StemVariable oldIndices = stem.indices(-1L);
+        // kludge, assume that the rank of all at the last axis is the same.
+        int rank = ((StemVariable) oldIndices.get(0L)).size();
+
+        if (rank == 1) {
+            // nothing to do. This is just a list
+            polyad.setResult(stem);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(Boolean.TRUE);
+            return;
         }
-        long axis = (Long) arg1;
-        StemVariable oldIndices = stem.allKeys(-1L);
-        int rank = ((StemVariable)oldIndices.get(0L)).size();
-        axis = (axis < 0L)?axis+rank:axis;
-        List<Long> permutation = new ArrayList<>();
-        permutation.add(axis);
-        for(long i = 0L; i < rank; i++){
-             if(i == axis){
-                 continue;
-             }
-             permutation.add(i);
+
+        StemVariable pStem0;
+        // Start QDL. sliceNode is [;rank]
+        SliceNode sliceNode = new SliceNode();
+        sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
+        sliceNode.getArguments().add(new ConstantNode(Integer.toUnsignedLong(rank), Constant.LONG_TYPE));
+
+        if (polyad.getArgCount() == 2) {
+            Object arg1 = polyad.evalArg(1, state);
+            checkNull(arg1, polyad.getArgAt(1), state);
+            StemVariable stem1 = null;
+            boolean arg2ok = false;
+            if (isLong(arg1)) {
+                Long longArg = (Long)arg1 ;
+                if(longArg == 0L){
+                    // The are requesting essentially the identity permutation, so don't jump through hoops.
+                    polyad.setResult(stem);
+                    polyad.setResultType(Constant.STEM_TYPE);
+                    polyad.setEvaluated(Boolean.TRUE);
+                    return;
+                }
+                stem1 = new StemVariable();
+                if(longArg < 0){
+                    long newArg = rank  + longArg;
+                    if(newArg < 0 ){
+                        throw new IndexError("the requested axis of "  + longArg + " is not valid for a stem of rank " + rank);
+                    }
+                          stem1.listAppend(newArg);
+                }else {
+                    if(rank <= longArg){
+                        throw new IndexError("the requested axis of "  + longArg + " is not valid for a stem of rank " + rank);
+                    }
+                    stem1.listAppend(arg1);
+                }
+                arg2ok = true;
+            }
+            if (isStem(arg1)) {
+                stem1 = (StemVariable) arg1;
+                arg2ok = true;
+            }
+            if (!arg2ok) {
+                throw new IllegalArgumentException(TRANSPOSE + " requires an axis or stem of them as its second argument");
+            }
+            // If the second argument is p., then the new reshuffing is
+            // p. ~ ~ exclude_keys([;rank], p.)
+            Polyad excludeKeys = new Polyad(EXCLUDE_KEYS);
+            excludeKeys.addArgument(sliceNode);
+            excludeKeys.addArgument(new ConstantNode(stem1, Constant.STEM_TYPE));
+            Dyad monadicTilde = new Dyad(OpEvaluator.TILDE_VALUE); // mondic tilde does not exist. It is done as []~arg.
+            monadicTilde.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
+            monadicTilde.setRightArgument(excludeKeys);
+            Dyad dyadicTilde = new Dyad(OpEvaluator.TILDE_VALUE);
+            dyadicTilde.setLeftArgument(new ConstantNode(stem1, Constant.STEM_TYPE));
+            dyadicTilde.setRightArgument(monadicTilde);
+            dyadicTilde.evaluate(state);
+            pStem0 = (StemVariable) dyadicTilde.getResult();
+        } else {
+            // default is to use reverse([;rank]) as the second argument
+            Polyad reverse = new Polyad(LIST_REVERSE);
+            reverse.addArgument(sliceNode);
+            ;
+            reverse.evaluate(state);
+            pStem0 = (StemVariable) reverse.getResult();
         }
-        StemVariable pStem0 = new StemVariable();
-        pStem0.addList(permutation);
+
+        // Now we need to create QDL for
+        // newIndices. := shuffle(oldIndices., pStem0.)
         StemVariable pStem = new StemVariable();
         pStem.put(0L, pStem0); // makes [pstem.]
         Polyad makeNew = new Polyad(FOR_EACH);
@@ -2839,7 +2945,8 @@ z. :=  join3(q.,w.)
         makeNew.addArgument(new ConstantNode(pStem, Constant.STEM_TYPE));
         StemVariable newIndices = (StemVariable) makeNew.evaluate(state);
 
-        Polyad subset = new Polyad(LIST_SUBSET);
+        // QDl to remap everything.
+        Polyad subset = new Polyad(REMAP);
         subset.addArgument(new ConstantNode(stem, Constant.STEM_TYPE));
         subset.addArgument(new ConstantNode(newIndices, Constant.STEM_TYPE));
         subset.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));

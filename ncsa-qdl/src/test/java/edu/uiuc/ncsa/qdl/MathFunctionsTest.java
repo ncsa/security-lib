@@ -223,7 +223,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "a.15 := -0.3*(-0.4);");
         addLine(script, "a.16 := 0.3*(-0.4);");
         addLine(script, "a.17 := 0-0.3*(-0.4);");
-        addLine(script, "b. := -3 + indices(6);"); // {-3, -2, -1, 0, 1, 2}
+        addLine(script, "b. := -3 + n(6);"); // {-3, -2, -1, 0, 1, 2}
         addLine(script, "c. := -b.;"); // {3, 2, 1, 0, -1, -2}
         addLine(script, "d. := -b.^2;"); // {-9, -4, -1, 0, -1, -4}
         addLine(script, "e. := -b.^3;"); // {27, 8, 1, 0, -1, -8}
