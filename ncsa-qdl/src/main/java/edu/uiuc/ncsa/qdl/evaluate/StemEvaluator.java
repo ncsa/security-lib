@@ -114,9 +114,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int INCLUDE_KEYS_TYPE = 104 + STEM_FUNCTION_BASE_VALUE;
 
 
- /*   public static final String RENAME_KEYS = "rename_keys";
+    public static final String RENAME_KEYS = "rename_keys";
     public static final String FQ_RENAME_KEYS = STEM_FQ + RENAME_KEYS;
-    public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;*/
+    public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String MASK = "mask";
     public static final String FQ_MASK = STEM_FQ + MASK;
@@ -237,11 +237,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             ALL_KEYS,
             HAS_KEYS,
             INCLUDE_KEYS,
-      //      RENAME_KEYS,
+            RENAME_KEYS,
             SHUFFLE,
             MASK,
             KEYS, VALUES,
-     //       LIST_APPEND,
+            //       LIST_APPEND,
             LIST_INSERT_AT,
             LIST_SUBSET,
             LIST_COPY,
@@ -274,11 +274,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_ALL_KEYS,
             FQ_HAS_KEYS,
             FQ_INCLUDE_KEYS,
-     //       FQ_RENAME_KEYS,
+            FQ_RENAME_KEYS,
             FQ_SHUFFLE,
             FQ_MASK,
             FQ_KEYS, FQ_VALUES,
-       //     FQ_LIST_APPEND,
+            //     FQ_LIST_APPEND,
             FQ_LIST_INSERT_AT,
             FQ_LIST_SUBSET,
             FQ_LIST_COPY,
@@ -359,9 +359,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case EXCLUDE_KEYS:
             case FQ_EXCLUDE_KEYS:
                 return EXCLUDE_KEYS_TYPE;
-/*            case RENAME_KEYS:
+            case RENAME_KEYS:
             case FQ_RENAME_KEYS:
-                return RENAME_KEYS_TYPE;*/
+                return RENAME_KEYS_TYPE;
             case SHUFFLE:
             case FQ_SHUFFLE:
                 return SHUFFLE_TYPE;
@@ -509,10 +509,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_EXCLUDE_KEYS:
                 doExcludeKeys(polyad, state);
                 return true;
-/*            case RENAME_KEYS:
+            case RENAME_KEYS:
             case FQ_RENAME_KEYS:
                 doRenameKeys(polyad, state);
-                return true;*/
+                return true;
             case SHUFFLE:
             case FQ_SHUFFLE:
                 shuffleKeys(polyad, state);
@@ -2197,12 +2197,28 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param oldIndices
      */
     private void threeArgRemap(Polyad polyad, StemVariable stem,
-                               StemVariable newIndices,
-                               StemVariable oldIndices) {
+                               StemVariable oldIndices,
+                               StemVariable newIndices
+    ) {
         StemVariable output = new StemVariable();
         for (long i = 0L; i < newIndices.size(); i++) {
-            IndexList newIndex = new IndexList((StemVariable) newIndices.get(i));
-            IndexList oldIndex = new IndexList((StemVariable) oldIndices.get(i));
+
+            Object newI = newIndices.get(i);
+            Object oldI = oldIndices.get(i);
+            IndexList newIndex;
+            if (isStem(newI)) {
+                newIndex = new IndexList((StemVariable) newI);
+            } else {
+                newIndex = new IndexList();
+                newIndex.add(newI);
+            }
+            IndexList oldIndex;
+            if (isStem(oldI)) {
+                oldIndex = new IndexList((StemVariable) oldI);
+            } else {
+                oldIndex = new IndexList();
+                oldIndex.add(oldI);
+            }
             // Note that if there is strict matching on and it works, there is a single
             // value at index 0 in the result.
             output.set(newIndex, stem.get(oldIndex, true).get(0));
@@ -2414,17 +2430,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-    /**
-     * <code>rename_keys(stem., var | list., );</code><br/><br/> list. contains entries of the form list.old = new.
-     * The result is that each key in the stem. is renamed, but the values are not changed.
-     * If a key is in the list at the right and does not correspond to one on the left, it is skipped.
-     *
-     * @param polyad
-     * @param state
-     */
- /*   protected void doRenameKeys(Polyad polyad, State state) {
-        oldRenameKeys(polyad, state);
-    }*/
 
     /**
      * Permute the elements in a stem. The right argument must contain every key in the left argument or
@@ -2519,8 +2524,29 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     /*
     This only renames keys in situ, i.e. it changes the stem given.
+    THE critical difference between rename_keys and using remap is that
+    rename_keys alters its argument and as such, only the changes you want
+    to make happen. Using remap, omitting unchanged elements removes them
+    from the result.
      */
-/*    protected void oldRenameKeys(Polyad polyad, State state) {
+
+    /**
+     * <code>rename_keys(arg., indices.);</code><br/><br/> list. contains entries of the form
+     * <pre>
+     *    indices.old = new
+     * </pre>
+     * Note that this is different from {@link #doRemap(Polyad, State)}.
+     * The result is that each key in arg. is renamed, but the values are not changed.
+     * If a key is in indices. and does not correspond to one on the left, it is skipped,
+     * by subsetting rule.
+     * <br/><br/> Limitations are that it applies to the zeroth axis, modifies arg. and
+     * the indices. are different than remap.
+     *
+     * @param polyad
+     * @param state
+     */
+
+    protected void doRenameKeys(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2) {
             throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
         }
@@ -2547,7 +2573,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(target);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
-    }*/
+    }
 
     /**
      * <code>common_keys(stem1., stem2.)</code><br/><br/> Return a list of keys common to both stems.
@@ -2881,8 +2907,8 @@ z. :=  join3(q.,w.)
             StemVariable stem1 = null;
             boolean arg2ok = false;
             if (isLong(arg1)) {
-                Long longArg = (Long)arg1 ;
-                if(longArg == 0L){
+                Long longArg = (Long) arg1;
+                if (longArg == 0L) {
                     // The are requesting essentially the identity permutation, so don't jump through hoops.
                     polyad.setResult(stem);
                     polyad.setResultType(Constant.STEM_TYPE);
@@ -2890,15 +2916,15 @@ z. :=  join3(q.,w.)
                     return;
                 }
                 stem1 = new StemVariable();
-                if(longArg < 0){
-                    long newArg = rank  + longArg;
-                    if(newArg < 0 ){
-                        throw new IndexError("the requested axis of "  + longArg + " is not valid for a stem of rank " + rank);
+                if (longArg < 0) {
+                    long newArg = rank + longArg;
+                    if (newArg < 0) {
+                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank);
                     }
-                          stem1.listAppend(newArg);
-                }else {
-                    if(rank <= longArg){
-                        throw new IndexError("the requested axis of "  + longArg + " is not valid for a stem of rank " + rank);
+                    stem1.listAppend(newArg);
+                } else {
+                    if (rank <= longArg) {
+                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank);
                     }
                     stem1.listAppend(arg1);
                 }
@@ -2948,8 +2974,8 @@ z. :=  join3(q.,w.)
         // QDl to remap everything.
         Polyad subset = new Polyad(REMAP);
         subset.addArgument(new ConstantNode(stem, Constant.STEM_TYPE));
-        subset.addArgument(new ConstantNode(newIndices, Constant.STEM_TYPE));
         subset.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));
+        subset.addArgument(new ConstantNode(newIndices, Constant.STEM_TYPE));
         polyad.setResult(subset.evaluate(state));
         polyad.setEvaluated(Boolean.TRUE); // set evaluated true or next line bombs.
         polyad.setResultType(Constant.getType(polyad.getResult()));

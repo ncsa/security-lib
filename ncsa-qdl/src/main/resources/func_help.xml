@@ -491,7 +491,7 @@ axis), and we reverse each of them for the new indices.
   old. := indices(a.,-1)
   new. := for_each(@reverse,  old.)
 So to get the transpose,
-   b. := remap(a., new., old.)
+   b. := remap(a., old., new.)
    say(b., true)
 [
   [0,5,10],
@@ -502,7 +502,7 @@ So to get the transpose,
  ]
 
  Note that this works on any  higher order stems as well.
- See also: transpose, n (function)
+ See also: transpose, n (function), rename_keys
                 ]]>
             </body>
         </entry>
@@ -548,27 +548,38 @@ generic stems and that would be bad).
                ]]>
         </body>
     </entry>
-<!--    <entry id="rename_keys">
+    <entry id="rename_keys">
         <body>
             <![CDATA[
-rename_keys(target., new_names.) - rename the keys in target. using
-                      the new_names.
-                      new_names. is stem of the form
-                      {old0:new0, old1:new1,...}
-                      where old* are the current names of the keys in target.
-                      and new* are the new names
-                      Returns the modified target.
-E.g. To rename keys with a common prefix
+rename_keys(target., new_names.) - rename the keys in target. using new_names.
+           new_names. is stem of the form
+              {old0:new0, old1:new1,...}
+           where old* are the current names of the keys in target.
+           and new* are the new names
+           target.old_j is replaces with target.new_j but unspecified entries
+           are not changed.
+           Modifies target., returns the modified target.
+
+This function has relatively simple syntax and is a common idiom.
+
+E.g. Keys have a common prefix of 'x_' Remove the prefix.
     a. := {'x_x':'A','x_y':'B'};
     rename_keys(a., keys(a.)-'x_');
 {x:A,y:B}
 
-Note: The keys in new_names. are a subset of target. and their values
-      become the keys in target. If a key is in new_names, but not in
-      target, it is ignored.
+Note that a. has been altered.
+Remap can do something similar, but the arguments are different since they are
+lists. To repeat the above example using remap:
+
+    b. := {'x_x':'A','x_y':'B'};
+    remap(b.,list_keys(b.), list_keys(b.)-'x_')
+
+Note b. would not be changed.
+
+See also: remap
                 ]]>
         </body>
-    </entry>-->
+    </entry>
 
     <entry id="set_default">
         <body>
@@ -2159,6 +2170,7 @@ assert[][]     ⊨       A    \u22a8         assert
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
 ~|             ≁       ~    \u2241         last axis join
+@              ⊗       @    \u2297         function reference
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
 transpose      τ       t    \u03c4         alias for the transpose function.
@@ -2814,10 +2826,10 @@ Note that indices(a., 1) == indices(a., -1) in this case.
     <entry id="transpose">
             <body>
                 <![CDATA[
-axis(x.) - reverses dim(x.) an remaps the axes of x. If x. is a matrix,
+transpose(x.) - reverses dim(x.) an remaps the axes of x. If x. is a matrix,
            this is the standard matrix transpose
-axis(x., a) - transforms x. so that the zeroth axis is a.,
-axis(x., permutation.) - transforms x. as per the permutation.
+transpose(x., a) - transforms x. so that the zeroth axis is a.,
+transpose(x., permutation.) - transforms x. as per the permutation.
 
 This does not alter x.  This can be extremely useful at restructuring
 data. This has no effect on a rank 1 stem (i.e. a simple list).
@@ -2837,7 +2849,7 @@ To sum along the last axis (columns) compare
 [6,18]
 
 An axis of -1 is always the last axis.
-Alias: α (greek letter alpha).
+Alias: τ (greek letter tau).
 This could be an operator in its own right, but is much easier to
 work with as a function in most contexts. The alternate Greek letter
 is supplied if you want to make it more terse.
@@ -2845,11 +2857,11 @@ is supplied if you want to make it more terse.
             </body>
         </entry>
 
-    <entry id="α">
+    <entry id="τ">
             <body>
                 <![CDATA[
-Alias for the axis function.
-See the entry for axis for more.
+Alias for the transpose function.
+See the entry for transpose for more.
                 ]]>
             </body>
         </entry>

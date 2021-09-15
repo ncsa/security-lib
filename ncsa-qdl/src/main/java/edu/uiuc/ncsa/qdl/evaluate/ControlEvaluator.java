@@ -439,11 +439,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.getType(arg1));
             polyad.setEvaluated(true);
             return;
-            //throw new IllegalArgumentException("error: second argument of " + (doReduce ? REDUCE : EXPAND) + " must be a stem");
         }
         StemVariable stemVariable = (StemVariable) arg1;
         if (!stemVariable.isList()) {
-            throw new IllegalArgumentException("error: second argument of " + REDUCE + " must be a list");
+            throw new IllegalArgumentException("second argument of " + REDUCE + " must be a list");
         }
         int axis = 0; // default
         if (polyad.getArgCount() == 3) {

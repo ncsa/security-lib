@@ -27,8 +27,9 @@ public class QDLParserParser extends Parser {
 		SingleEqual=46, LessEquals=47, MoreEquals=48, Equals=49, NotEquals=50, 
 		RegexMatches=51, LogicalNot=52, Exponentiation=53, And=54, Or=55, Backtick=56, 
 		Percent=57, Tilde=58, Backslash=59, Stile=60, TildeRight=61, StemDot=62, 
-		UnaryMinus=63, UnaryPlus=64, Floor=65, Ceiling=66, ASSIGN=67, Identifier=68, 
-		FuncStart=69, F_REF=70, FDOC=71, WS=72, COMMENT=73, LINE_COMMENT=74;
+		UnaryMinus=63, UnaryPlus=64, Floor=65, Ceiling=66, FunctionMarker=67, 
+		ASSIGN=68, Identifier=69, FuncStart=70, F_REF=71, FDOC=72, WS=73, COMMENT=74, 
+		LINE_COMMENT=75;
 	public static final int
 		RULE_elements = 0, RULE_element = 1, RULE_statement = 2, RULE_conditionalStatement = 3, 
 		RULE_ifStatement = 4, RULE_ifElseStatement = 5, RULE_loopStatement = 6, 
@@ -77,8 +78,9 @@ public class QDLParserParser extends Parser {
 			"Minus", "LessThan", "GreaterThan", "SingleEqual", "LessEquals", "MoreEquals", 
 			"Equals", "NotEquals", "RegexMatches", "LogicalNot", "Exponentiation", 
 			"And", "Or", "Backtick", "Percent", "Tilde", "Backslash", "Stile", "TildeRight", 
-			"StemDot", "UnaryMinus", "UnaryPlus", "Floor", "Ceiling", "ASSIGN", "Identifier", 
-			"FuncStart", "F_REF", "FDOC", "WS", "COMMENT", "LINE_COMMENT"
+			"StemDot", "UnaryMinus", "UnaryPlus", "Floor", "Ceiling", "FunctionMarker", 
+			"ASSIGN", "Identifier", "FuncStart", "F_REF", "FDOC", "WS", "COMMENT", 
+			"LINE_COMMENT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -3544,7 +3546,7 @@ public class QDLParserParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3L\u01b4\4\2\t\2\4"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3M\u01b4\4\2\t\2\4"+
 		"\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t"+
 		"\13\4\f\t\f\4\r\t\r\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22"+
 		"\4\23\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30\4\31\t\31"+
@@ -3626,7 +3628,7 @@ public class QDLParserParser extends Parser {
 		"$\2\2\u00dc\u00dd\5> \2\u00dd\u00de\7$\2\2\u00de\u00e0\3\2\2\2\u00df\u00dc"+
 		"\3\2\2\2\u00e0\u00e1\3\2\2\2\u00e1\u00df\3\2\2\2\u00e1\u00e2\3\2\2\2\u00e2"+
 		"\u00e3\3\2\2\2\u00e3\u00e4\7!\2\2\u00e4%\3\2\2\2\u00e5\u00e6\7 \2\2\u00e6"+
-		"\u00e7\5> \2\u00e7\u00e8\7!\2\2\u00e8\'\3\2\2\2\u00e9\u00ea\7I\2\2\u00ea"+
+		"\u00e7\5> \2\u00e7\u00e8\7!\2\2\u00e8\'\3\2\2\2\u00e9\u00ea\7J\2\2\u00ea"+
 		")\3\2\2\2\u00eb\u00ed\7 \2\2\u00ec\u00ee\5> \2\u00ed\u00ec\3\2\2\2\u00ed"+
 		"\u00ee\3\2\2\2\u00ee\u00ef\3\2\2\2\u00ef\u00f0\7$\2\2\u00f0\u00f3\5> "+
 		"\2\u00f1\u00f2\7$\2\2\u00f2\u00f4\5> \2\u00f3\u00f1\3\2\2\2\u00f3\u00f4"+
@@ -3647,14 +3649,14 @@ public class QDLParserParser extends Parser {
 		"\u0125\3\2\2\2\u0122\u0123\7 \2\2\u0123\u0125\7!\2\2\u0124\u0117\3\2\2"+
 		"\2\u0124\u0122\3\2\2\2\u0125\63\3\2\2\2\u0126\u012a\5> \2\u0127\u012a"+
 		"\5.\30\2\u0128\u012a\5\62\32\2\u0129\u0126\3\2\2\2\u0129\u0127\3\2\2\2"+
-		"\u0129\u0128\3\2\2\2\u012a\65\3\2\2\2\u012b\u012f\7G\2\2\u012c\u012e\5"+
+		"\u0129\u0128\3\2\2\2\u012a\65\3\2\2\2\u012b\u012f\7H\2\2\u012c\u012e\5"+
 		":\36\2\u012d\u012c\3\2\2\2\u012e\u0131\3\2\2\2\u012f\u012d\3\2\2\2\u012f"+
 		"\u0130\3\2\2\2\u0130\u0132\3\2\2\2\u0131\u012f\3\2\2\2\u0132\u0133\7\5"+
 		"\2\2\u0133\67\3\2\2\2\u0134\u0137\5\64\33\2\u0135\u0137\5<\37\2\u0136"+
 		"\u0134\3\2\2\2\u0136\u0135\3\2\2\2\u01379\3\2\2\2\u0138\u013d\58\35\2"+
 		"\u0139\u013a\7\"\2\2\u013a\u013c\58\35\2\u013b\u0139\3\2\2\2\u013c\u013f"+
 		"\3\2\2\2\u013d\u013b\3\2\2\2\u013d\u013e\3\2\2\2\u013e;\3\2\2\2\u013f"+
-		"\u013d\3\2\2\2\u0140\u0141\7H\2\2\u0141=\3\2\2\2\u0142\u0143\b \1\2\u0143"+
+		"\u013d\3\2\2\2\u0140\u0141\7I\2\2\u0141=\3\2\2\2\u0142\u0143\b \1\2\u0143"+
 		"\u016f\5\66\34\2\u0144\u014e\5\66\34\2\u0145\u0149\7\6\2\2\u0146\u0148"+
 		"\5:\36\2\u0147\u0146\3\2\2\2\u0148\u014b\3\2\2\2\u0149\u0147\3\2\2\2\u0149"+
 		"\u014a\3\2\2\2\u014a\u014c\3\2\2\2\u014b\u0149\3\2\2\2\u014c\u014e\7\5"+
@@ -3687,7 +3689,7 @@ public class QDLParserParser extends Parser {
 		"\7\7\2\2\u0194\u0195\5> \2\u0195\u0196\7#\2\2\u0196\u0197\5> \16\u0197"+
 		"\u01a7\3\2\2\2\u0198\u019a\f\f\2\2\u0199\u019b\7=\2\2\u019a\u0199\3\2"+
 		"\2\2\u019b\u019c\3\2\2\2\u019c\u019a\3\2\2\2\u019c\u019d\3\2\2\2\u019d"+
-		"\u019e\3\2\2\2\u019e\u01a7\5> \r\u019f\u01a0\f\4\2\2\u01a0\u01a1\7E\2"+
+		"\u019e\3\2\2\2\u019e\u01a7\5> \r\u019f\u01a0\f\4\2\2\u01a0\u01a1\7F\2"+
 		"\2\u01a1\u01a7\5> \5\u01a2\u01a3\f#\2\2\u01a3\u01a7\7@\2\2\u01a4\u01a5"+
 		"\f\34\2\2\u01a5\u01a7\t\2\2\2\u01a6\u0170\3\2\2\2\u01a6\u0177\3\2\2\2"+
 		"\u01a6\u017a\3\2\2\2\u01a6\u017d\3\2\2\2\u01a6\u0180\3\2\2\2\u01a6\u0183"+
@@ -3695,7 +3697,7 @@ public class QDLParserParser extends Parser {
 		"\u018f\3\2\2\2\u01a6\u0192\3\2\2\2\u01a6\u0198\3\2\2\2\u01a6\u019f\3\2"+
 		"\2\2\u01a6\u01a2\3\2\2\2\u01a6\u01a4\3\2\2\2\u01a7\u01aa\3\2\2\2\u01a8"+
 		"\u01a6\3\2\2\2\u01a8\u01a9\3\2\2\2\u01a9?\3\2\2\2\u01aa\u01a8\3\2\2\2"+
-		"\u01ab\u01ac\7F\2\2\u01acA\3\2\2\2\u01ad\u01ae\t\n\2\2\u01aeC\3\2\2\2"+
+		"\u01ab\u01ac\7G\2\2\u01acA\3\2\2\2\u01ad\u01ae\t\n\2\2\u01aeC\3\2\2\2"+
 		"\u01af\u01b0\7\33\2\2\u01b0E\3\2\2\2\u01b1\u01b2\7\b\2\2\u01b2G\3\2\2"+
 		"\2\'KVbfkr{\u0086\u0090\u0099\u00a0\u00a4\u00bc\u00c4\u00cd\u00d5\u00e1"+
 		"\u00ed\u00f3\u00f9\u0107\u010e\u0112\u011d\u0124\u0129\u012f\u0136\u013d"+

@@ -1154,11 +1154,12 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         // Writing the next line was harder than it looks since it has to be a QDL string inside a Java string.
         String slash = "\\";
-        addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" +
-                "`~!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" +
-                "¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧\\n" +
-                "ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';");
-        addLine(script, "say('printing all base characters with say:');");
+        addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
+                "  `~!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
+                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧⊗\\n" + // unicode
+                "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
+        );
+        addLine(script, "say('printing all base characters with say:\\n');");
         addLine(script, "say(a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -1995,8 +1996,8 @@ public class ParserTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "r(x)->x^2 + 1;");
-        addLine(script, "f(@h, x) -> h(x);");
-        addLine(script, "a := f(@r, 2);");
+        addLine(script, "f(⊗h, x) -> h(x);");
+        addLine(script, "a := f(⊗r, 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getLongValue("a", state) == 5L;
@@ -2007,8 +2008,8 @@ public class ParserTest extends AbstractQDLTester {
     public void testBuiltInFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "g(@h, x, y)->h(x, y);");
-        addLine(script, "a := g(@substring, 'abcd', 2);");
+        addLine(script, "g(⊗h, x, y)->h(x, y);");
+        addLine(script, "a := g(⊗substring, 'abcd', 2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getStringValue("a", state).equals("cd");

@@ -312,12 +312,16 @@ public class StemUtility {
     }
     public static void main(String[] args){
         StemVariable outerStem = new StemVariable();
-        for(int j = 0 ;j < 4; j++){
-            StemVariable stemVariable = new StemVariable();
-            for(int i = 0; i<5; i++){
-                stemVariable.put(i, i+"b");
+        for(int k = 0; k <5l ; k++){
+            StemVariable stemVariable0 = new StemVariable();
+            for(int j = 0 ;j < 4; j++){
+                StemVariable stemVariable = new StemVariable();
+                for(int i = 0; i<5; i++){
+                    stemVariable.put(i, k + "_" + j + "_" + i);
+                }
+                stemVariable0.put(j, stemVariable);
             }
-            outerStem.put(j, stemVariable);
+            outerStem.put(k, stemVariable0);
 
         }
                 formatList(outerStem);

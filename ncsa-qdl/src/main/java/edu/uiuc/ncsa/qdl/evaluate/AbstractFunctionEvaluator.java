@@ -647,7 +647,7 @@ return StemUtility.areNoneStems(objects);    }
         }
 
         if (frn == null) {
-            throw new IllegalArgumentException("error: The supplied argument was not a function reference or lambda");
+            throw new IllegalArgumentException("the argument is not a function reference or lambda");
 
         }
         return frn;
@@ -668,9 +668,9 @@ return StemUtility.areNoneStems(objects);    }
         if(arg != null){return;}
         if(swri instanceof VariableNode){
             VariableNode vNode = (VariableNode) swri;
-            throw new UnknownSymbolException("Error: unknown symbol '" + vNode.getVariableReference() + "'");
+            throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'");
         }
-        throw new UnknownSymbolException("Error: unknown symbol");
+        throw new UnknownSymbolException("unknown symbol");
     }
 
     /**

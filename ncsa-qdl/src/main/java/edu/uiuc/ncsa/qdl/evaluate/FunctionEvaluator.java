@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER;
+import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER2;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -357,7 +358,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected boolean isFunctionReference(String name) {
-        return name.startsWith(FUNCTION_REFERENCE_MARKER);
+        return name.startsWith(FUNCTION_REFERENCE_MARKER) || name.startsWith(FUNCTION_REFERENCE_MARKER2);
     }
 
     protected String dereferenceFunctionName(String name) {

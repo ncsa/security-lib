@@ -112,6 +112,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
          UnaryPlus : '⁺' ;// unicode 207a raised unary plus.
              Floor : '⌊';
            Ceiling : '⌈';
+     FunctionMarker: '@' | '⊗';  // unicode 2297
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
 // Remember that changing this file is taking your life in your hands, since tiny changes here
@@ -146,7 +147,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
    Identifier :  [a-zA-Z_$#\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9#\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
     FuncStart :  FUNCTION_NAME '(';
-        F_REF : '@' (AllOps | FUNCTION_NAME | (FuncStart ')'));
+        F_REF : FunctionMarker (AllOps | FUNCTION_NAME | (FuncStart ')'));
 
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.

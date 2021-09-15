@@ -34,6 +34,7 @@ public interface QDLConstants {
     String RESERVED_COMPLEX_I = "I";
 
     String FUNCTION_REFERENCE_MARKER = "@";
+    String FUNCTION_REFERENCE_MARKER2 = "⊗"; // /u2297
 
     static boolean isReservedWord(String x) {
         return RESERVED_TRUE.equals(x) || RESERVED_FALSE.equals(x) || RESERVED_NULL.equals(x);
