@@ -7,9 +7,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * This is used internally by a stem to store its entries that have integer indices.
@@ -56,14 +54,26 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         Iterator<V> iterator = iterator();
         HashSet set = new HashSet();
         while (iterator.hasNext()) {
-            set.add(iterator.next().entry);
+            Object obj = iterator.next().entry;
+            if(obj instanceof StemVariable){
+                StemVariable ss = ((StemVariable)obj).almostUnique();
+                set.addAll(ss.getStemList().unique());
+            }else {
+                set.add(obj);
+            }
         }
         StemList stemList1 = new StemList();
+        HashSet hashSet1 = new HashSet();
+           for (Object obj : set) {
+               hashSet1.add(obj);
+           }
+
         for (Object object : set) {
             stemList1.append(object);
         }
         return stemList1;
     }
+
 
     public Object get(long index) {
         if (index < 0L) {
@@ -106,9 +116,14 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         add(newEntry);
     }
 
-    public String getInputForm(int indentFactor, String currentIndent) {
-        return null;
+    public void appendStem(StemList stemList){
+        Iterator<StemEntry> iterator = stemList.iterator();
+        while(iterator.hasNext()){
+            Object v = iterator.next().entry;
+            append(v);
+        }
     }
+
 
     public static class seGapException extends QDLException {
         // If there is a gap in the entries, fall back on stem notation.
@@ -300,4 +315,14 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
    public Long getRank(){
         return new Long(getSize().size());
    }
+
+   public List values(){
+        List list = new ArrayList();
+        Iterator<? extends StemEntry> iterator = iterator();
+        while(iterator.hasNext()){
+            list.add(iterator.next().entry);
+        }
+        return list;
+   }
+
 }

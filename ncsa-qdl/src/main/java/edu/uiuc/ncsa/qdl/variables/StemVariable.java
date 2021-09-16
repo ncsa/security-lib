@@ -919,7 +919,6 @@ public class StemVariable extends HashMap<String, Object> {
         System.out.println(s.indices(4L));
 
 
-
         System.out.println(s.toJSON().toString());
         String rawJSON = "{\n" +
                 "  \"isMemberOf\":   [" +
@@ -1189,7 +1188,7 @@ public class StemVariable extends HashMap<String, Object> {
      *
      * @return
      */
-    Set<String> unorderedKeySet() {
+/*    Set<String> unorderedKeySet() {
         HashSet<String> keys = new HashSet<>();
         keys.addAll(super.keySet()); // have to copy it since we cannot modify the key set of a map.
         if (getStemList().isEmpty()) {
@@ -1203,7 +1202,7 @@ public class StemVariable extends HashMap<String, Object> {
         sortedSet.addAll(keys);
         return sortedSet;
 
-    }
+    }*/
 
     @Override
     public Set<String> keySet() {
@@ -1406,9 +1405,56 @@ public class StemVariable extends HashMap<String, Object> {
         return getStemList().size() == size();
     }
 
-    public StemVariable unique() {
+    /*
+           a.'foo' := 'abctest0';
+ a.'bar' := 'abctest1';
+ a.'baz' := 'deftest2';
+ a.'fnord' := 'abdtest3';
+    b.'z' := 'baz'
+   b.w := 'foof';
+   b.3 := 42
+   a.www := b.
+   unique(a.)
+
+     unique(['a',2,4,true]~['a','b',0,3,true])
+     unique(['a','b',0]~[['a',2,4,true]]~[[['a','b',0,3,true]]])
+     unique(['a','b',0,3,true]~[['a','b',0,3,true]]~[[['a','b',0,3,true]]])
+
+     */
+
+    /**
+     * This almost returns all the unique elements. The issue is that if there are deeply
+     * nested stems, then do not entirely get made unique before getting added to the result,
+     * hence the simplest fix is that in that case is to call this twice. Someday this can
+     * be fixed with a careful rewrite of the recursion in stel lists.
+     * @return
+     */
+    public StemVariable almostUnique() {
         StemVariable output = new StemVariable();
-        output.setStemList(getStemList().unique());
+        if (isList()) {
+            output.setStemList(getStemList().unique());
+            return output;
+        }
+        HashSet hashSet = new HashSet();
+        for (Object key : keySet()) {
+            Object value = get(key);
+            if (value instanceof StemVariable) {
+                StemVariable ss = ((StemVariable) value).almostUnique();
+                hashSet.addAll(ss.getStemList().values());
+            } else {
+                hashSet.add(value);
+            }
+        }
+        StemList stemList1 = new StemList();
+        HashSet hashSet1 = new HashSet();
+        for (Object obj : hashSet) {
+            hashSet1.add(obj);
+        }
+
+        for (Object obj : hashSet) {
+            stemList1.append(obj);
+        }
+        output.setStemList(stemList1);
         return output;
     }
 
@@ -1680,16 +1726,16 @@ public class StemVariable extends HashMap<String, Object> {
                 return new StemVariable();
             }
             List<List> list = keysByRank.get(1);
-            for(List list1 : list){
+            for (List list1 : list) {
                 stemVariable.addList(list1);
             }
             return stemVariable;
         }
         int targetAxis = axis < 0L ? keysByRank.lastKey() + axis.intValue() : axis.intValue();
-        if (!keysByRank.containsKey(targetAxis+1)) {
+        if (!keysByRank.containsKey(targetAxis + 1)) {
             return new StemVariable();
         }
-        List list = keysByRank.get(targetAxis+1);
+        List list = keysByRank.get(targetAxis + 1);
         return convertKeyByRank(list);
     }
 
@@ -1736,9 +1782,9 @@ public class StemVariable extends HashMap<String, Object> {
         KeyRankMap keyRankMap = new KeyRankMap();
         for (String key : keySet()) {
             List list = new ArrayList();
-            if(isLongIndex(key)){
+            if (isLongIndex(key)) {
                 list.add(Long.parseLong(key));
-            }else {
+            } else {
                 list.add(key);
             }
             Object v = get(key);
@@ -1755,9 +1801,9 @@ public class StemVariable extends HashMap<String, Object> {
         for (String key : v.keySet()) {
             List list2 = new ArrayList();
             list2.addAll(list);
-            if(isLongIndex(key)){
+            if (isLongIndex(key)) {
                 list2.add(Long.parseLong(key));
-            }else {
+            } else {
                 list2.add(key);
             }
             if (v.get(key) instanceof StemVariable) {
@@ -1778,4 +1824,6 @@ public class StemVariable extends HashMap<String, Object> {
             get(list.size()).add(list);
         }
     }
+
+
 }

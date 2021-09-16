@@ -111,6 +111,13 @@ return StemUtility.areNoneStems(objects);    }
         return false;
     }
 
+    protected boolean areAllBigDecimals(Object... objects) {
+        for (Object arg : objects) {
+            if (!isBigDecimal(arg)) return false;
+        }
+        return true;
+    }
+
     /**
      * How to compare two big decimals requires some work.
      *

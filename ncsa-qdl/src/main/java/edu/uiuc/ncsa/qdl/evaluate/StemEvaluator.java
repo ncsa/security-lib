@@ -180,9 +180,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String FQ_IS_LIST = STEM_FQ + IS_LIST;
     public static final int IS_LIST_TYPE = 204 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String TO_LIST = "to_list";
+/*    public static final String TO_LIST = "to_list";
     public static final String FQ_TO_LIST = STEM_FQ + TO_LIST;
-    public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;
+    public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;*/
 
     public static final String LIST_STARTS_WITH = "starts_with";
     public static final String LIST_STARTS_WITH2 = "list_starts_with";
@@ -248,7 +248,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             LIST_REVERSE,
             LIST_STARTS_WITH,
             IS_LIST,
-            TO_LIST,
+        //    TO_LIST,
             UNIQUE_VALUES,
             TO_JSON,
             FROM_JSON, JSON_PATH_QUERY};
@@ -285,7 +285,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             FQ_LIST_REVERSE,
             FQ_LIST_STARTS_WITH,
             FQ_IS_LIST,
-            FQ_TO_LIST,
+   //         FQ_TO_LIST,
             FQ_UNIQUE_VALUES,
             FQ_TO_JSON,
             FQ_FROM_JSON, FQ_JSON_PATH_QUERY};
@@ -371,9 +371,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case IS_LIST:
             case FQ_IS_LIST:
                 return IS_LIST_TYPE;
-            case TO_LIST:
+/*            case TO_LIST:
             case FQ_TO_LIST:
-                return TO_LIST_TYPE;
+                return TO_LIST_TYPE;*/
 /*            case LIST_APPEND:
             case LIST_APPEND2:
             case FQ_LIST_APPEND:
@@ -525,10 +525,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             case FQ_IS_LIST:
                 doIsList(polyad, state);
                 return true;
-            case TO_LIST:
+/*            case TO_LIST:
             case FQ_TO_LIST:
                 doToList(polyad, state);
-                return true;
+                return true;*/
 /*            case LIST_APPEND:
             case LIST_APPEND2:
             case FQ_LIST_APPEND:
@@ -1155,7 +1155,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         StemVariable stemVariable = (StemVariable) arg;
-        StemVariable out = stemVariable.unique();
+        StemVariable out = stemVariable.almostUnique().almostUnique();
 
         polyad.setResult(out);
         polyad.setResultType(Constant.STEM_TYPE);

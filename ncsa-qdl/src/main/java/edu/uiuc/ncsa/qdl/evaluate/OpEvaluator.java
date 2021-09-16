@@ -95,7 +95,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             DIVIDE,
             DIVIDE2,
             INTEGER_DIVIDE,
-            PLUS,PLUS2,
+            PLUS, PLUS2,
             MINUS, MINUS2,
             AND, AND2, AND3,
             OR,
@@ -470,8 +470,17 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAnyBigDecimals(objects)) {
-                    BigDecimal left = toBD(objects[0]);
-                    BigDecimal right = toBD(objects[1]);
+                    BigDecimal left;
+                    BigDecimal right;
+                    try {
+                        left = toBD(objects[0]);
+                        right = toBD(objects[1]);
+                    }catch(IllegalArgumentException iax){
+                        // means that something cannot be converted to a big decimal
+                        r.result = Boolean.FALSE;
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        return r;
+                    }
                     switch (dyad.getOperatorType()) {
                         case EQUALS_VALUE:
                             r.result = bdEquals(left, right);
@@ -646,9 +655,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         };
         try {
             process2(dyad, pointer, doTimes ? TIMES : DIVIDE, state);
-        }catch(ArithmeticException ax){
-            if(ax.getMessage().equals("/ by zero")){
-                 ax = new ArithmeticException("divide by zero");
+        } catch (ArithmeticException ax) {
+            if (ax.getMessage().equals("/ by zero")) {
+                ax = new ArithmeticException("divide by zero");
             }
             throw ax;
         }

@@ -61,6 +61,39 @@ module[
       z. := for_each(@to_string(), a.) - ']' - '[';
       return(z.);
    ]; //end to_cvs
+
+   define[
+      inner_product(⊗f, x., ⊗g, y.)
+   ][
+     >> inner_product(⊗f, x., ⊗g, y.) - compute the inner product of x. and y.
+     >> using the given functions. f and g are dyadic. This applies g along
+     >> the first axis of x. and the last axis of y.,
+     >> then reduces along the last axis. It is a common idiom.
+     >> The result is conformable to x.
+     >>
+     >> E.g.
+     >> Given a long list of elements probably in random order, find which are included.
+     >>      ϱ. := unique(['a','b',0,3,true]~'c'~[['a','b',-2,'q',true]]~[[['aa','b',4,17,2/3]]])
+     >>      inner_product(⊗∨, ['a','b','s','c',0,3,true], @≡,  ϱ.)
+     >> [true,true,false,true,true,true,true]
+          return(reduce(⊗f, τ(for_each(⊗g, x., τ(y.,-1)) ,-1)));
+   ];
+
+   // The next is an example of using the inner product. It is identical in function to
+   // the built in has_value function.
+/*   define[
+      ε(x., y.)
+   ][
+   >> ε(x., y.) - the is member of function for two lists. This will return a boolean list
+   >> conformable to x. with true for elements that are in y. and false otherwise.
+   return(inner_product(@||, x., @==, y.));
+   ];*/
+/*
+   ε(x., y.) -> inner_product(@||, x., @==, y.)
+       ε(['a','b','s','c',0,3,true],ϱ. )
+  ϱ. := unique(['a','b',0,3,true]~'c'~[['a','b',-2,'q',true]]~[[['aa','b',4,17,2/3]]])
+     z. := ['a','b','s','c',0,3,true]
+ */
      /*
         To use this with gnuplot, go to a work directory (here I am using /tmp
         but you should create your own),  and create

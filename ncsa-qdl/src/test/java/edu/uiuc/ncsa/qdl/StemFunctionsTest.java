@@ -589,7 +589,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert indices.getLong("3").equals(3L);
     }
 
-
+/*   Formerly to test to_list, but since we have slices and bracket notation
+     this is never used and should be disposed of.
+     
     public void testToStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -617,7 +619,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert result.getString("2").equals("foo");
         assert result.getString("3").equals("bar");
         assert result.getString("4").equals("baz");
-    }
+    }*/
 
 
     public void testRemoveStem() throws Exception {
@@ -1841,6 +1843,20 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok2", state) : StemEvaluator.TRANSPOSE + " operator failed for axis = 2.";
     }
 
+/*
+     unique(['a','b',0,3,true]~[['a','b',0,3,true]]~[[['a','b',0,3,true]]])
+     [0,a,b,c,3,true]
+ */
 
+    public void testUnique() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ϱ. := unique(['a','b',0,3,true]~'c'~[['a','b',0,3,true]]~[[['a','b',0,3,true]]]);"); // matrix
+        addLine(script, "ok := reduce(⊗∧, reduce(⊗∨, for_each(⊗≡, ['a','b','c',0,3,true], ϱ.))); ");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : StemEvaluator.UNIQUE_VALUES + " failed.";
+    }
 }
 
