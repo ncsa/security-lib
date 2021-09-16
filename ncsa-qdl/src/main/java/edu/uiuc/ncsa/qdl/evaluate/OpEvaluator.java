@@ -475,9 +475,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     try {
                         left = toBD(objects[0]);
                         right = toBD(objects[1]);
-                    }catch(IllegalArgumentException iax){
+                    } catch (IllegalArgumentException iax) {
                         // means that something cannot be converted to a big decimal
-                        r.result = Boolean.FALSE;
+                        switch (dyad.getOperatorType()) {
+                            case EQUALS_VALUE:
+                                r.result = Boolean.FALSE;
+                                break;
+                            case NOT_EQUAL_VALUE:
+                                r.result = Boolean.TRUE;
+                                break;
+                        }
                         r.resultType = Constant.BOOLEAN_TYPE;
                         return r;
                     }

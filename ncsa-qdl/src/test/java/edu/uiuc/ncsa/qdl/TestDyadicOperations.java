@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -175,7 +176,16 @@ public class TestDyadicOperations extends AbstractQDLTester {
         dyad.evaluate(state);
         assert (Boolean) dyad.getResult();
     }
-
+    public void testLongEquality2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := 4 == 5;");
+        addLine(script, "ok1 := 4 != 5;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert !getBooleanValue("ok0", state);
+        assert getBooleanValue("ok1", state);
+    }
      
     public void testBDEquality() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("4.43000000"), Constant.DECIMAL_TYPE);
@@ -188,7 +198,16 @@ public class TestDyadicOperations extends AbstractQDLTester {
         dyad.evaluate(state);
         assert !(Boolean) dyad.getResult();
     }
-
+    public void testBDEquality2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := 4.430000 == 4.43;");
+        addLine(script, "ok1 := 4.430000 != 4.43;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert !getBooleanValue("ok1", state);
+    }
      
     public void testMixedEquality() throws Exception {
         ConstantNode left = new ConstantNode(new BigDecimal("4.000000"), Constant.DECIMAL_TYPE);
@@ -202,7 +221,16 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert !(Boolean) dyad.getResult();
     }
 
-     
+    public void testMixedEquality2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := 4.000 == 4;");
+        addLine(script, "ok1 := 4.000 != 4;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert !getBooleanValue("ok1", state);
+    }
     public void testStringEquality() throws Exception {
         ConstantNode left = new ConstantNode("little bunny foo foo", Constant.STRING_TYPE);
         ConstantNode right = new ConstantNode("It was a dark and stormy night", Constant.STRING_TYPE);
@@ -242,5 +270,53 @@ public class TestDyadicOperations extends AbstractQDLTester {
         assert (Boolean) dyad.getResult();
     }
 
+    public void testLongComparison2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := 4 < 5;");
+        addLine(script, "ok1 := 4 > 5;");
+        addLine(script, "ok2 := 4 <= 4;");
+        addLine(script, "ok3 := 4 >= 4;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert !getBooleanValue("ok1", state);
+        assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok3", state);
+    }
+    /**
+     * Checks that different types return false from equality. Found a bug where things like
+     * <pre>
+     *     3.21 == 'a'
+     *     false == 0
+     * </pre>
+     * would throw an illegal argument exceptions rather than return false
+     * @throws Throwable
+     */
+    public void testMixedUnequals() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := ['a','b','c',  'd','e',   1, 5,3,   4,  5,   true,false,false,true,true, null,null,null, null,'null',0.2,0.2,0.2,  0.2,0.2  ];");
+        addLine(script, "y. := ['q', 2,  true,3.4, null,'a',2,true,3.4,null,'a', 2,    true, 3.4,  null,'a',  2,  true, 3.4,null,  'a', 2,   true,3.4,null];");
+        addLine(script, "ok := !reduce(@∨, y.==x.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
+    /**
+     * Similar to the previous one, this is needed to check that the contract for not equals
+     * was not broken either at some point.
+     * @throws Throwable
+     */
+    public void testMixedUnequals2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := ['a','b','c',  'd','e',   1, 5,3,   4,  5,   true,false,false,true,true, null,null,null, null,'null',0.2,0.2,0.2,  0.2,0.2  ];");
+        addLine(script, "y. := ['q', 2,  true,3.4, null,'a',2,true,3.4,null,'a', 2,    true, 3.4,  null,'a',  2,  true, 3.4,null,  'a', 2,   true,3.4,null];");
+        addLine(script, "ok := reduce(@∧, y.!=x.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 }
