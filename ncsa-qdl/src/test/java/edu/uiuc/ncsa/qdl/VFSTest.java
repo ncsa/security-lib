@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
 import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
-import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -91,26 +90,39 @@ public class VFSTest extends AbstractQDLTester {
     protected void testMkdir(VFSFileProvider vfs) throws Throwable {
         String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         if (!vfs.canWrite()) {
-            // If it si not writeable ALL of these should get intercepted before any othe processing
+            // If it is not writeable ALL of these should get intercepted before any othe processing
             // takes place.
+            boolean bad = true;
             try {
                 vfs.mkdir(testHeadPath + "a/b/c/d/e/f");
-                assert false : "Error: Could create directory in not writeable VFS";
             } catch (QDLIOException q) {
-                assert true;
+                bad = false;
             }
+            if(bad){
+                assert false : "Error: Could create directory in not writeable VFS";
+            }
+            bad = true;
+
             try {
                 vfs.rmdir(testHeadPath + "a/");
-                assert false : "Error: Could remove directory in not writeable VFS";
             } catch (QDLIOException q) {
-                assert true;
+                bad = false;
             }
+            if(bad){
+                assert false : "Error: Could remove directory in not writeable VFS";
+            }
+           bad = true; 
+            
             try {
                 vfs.rm(testHeadPath + "a/foo");
                 assert false : "Error: Could remove file in not writeable VFS";
             } catch (QDLIOException q) {
-                assert true;
+                bad = false;
             }
+            if(bad){
+                assert false : "Was able to make an assignment with = not :=";
+            }
+            
 
             return;
         }
@@ -134,26 +146,34 @@ public class VFSTest extends AbstractQDLTester {
         String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         String testFileName = "foo.txt";
         String p = testHeadPath + testFileName;
-
+          boolean bad = true;
         try {
             vfs.get(p);
-            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Was able to read from a non-readable store";
+        }
+ bad = true;
         try {
             vfs.contains(p);
-            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
-
+        if(bad){
+            assert false : "Was able to read from a non-readable store";
+        }
+bad = true;
         try {
             vfs.dir(p);
-            assert false : "Was able to read from a non-readable store";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Was able to read from a non-readable store";
+        }
+
 
         vfs.setRead(orig);
     }
@@ -172,24 +192,34 @@ public class VFSTest extends AbstractQDLTester {
         String testFileName = "foo.txt";
         String p = testHeadPath + testFileName;
         fileEntry.setPath(p);
+        boolean bad = true;
         try {
             vfs.put(fileEntry);
-            assert false : " Was able to write to a not writeable vfs";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : " Was able to write to a not writeable vfs";
+        }
+         bad = true;
         try {
             vfs.put(p, fileEntry);
-            assert false : " Was able to write to a not writeable vfs";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : " Was able to write to a not writeable vfs";
+        }
+bad = true;
         try {
             vfs.delete(p);
-            assert false : "Was able to delete from a not writeable vfs";
         } catch (QDLIOException q) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Was able to delete from a not writeable vfs";
+        }
+
         vfs.setWrite(orig);
 
     }

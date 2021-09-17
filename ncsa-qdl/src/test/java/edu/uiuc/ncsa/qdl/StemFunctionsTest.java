@@ -686,12 +686,16 @@ public class StemFunctionsTest extends AbstractQDLTester {
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.addArgument(arg); // set second to be a stem so it fails
+        boolean bad = true;
         try {
             polyad.evaluate(state);
-            assert false;
         } catch (IllegalArgumentException x) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Could set second argument in " + StemEvaluator.SET_DEFAULT;
+        }
+
     }
 
 
@@ -1359,11 +1363,16 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, " j := 2;");
         addLine(script, " x := n(2).n(3).n(4).(a.k).n(6).n(7).j;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
         } catch (Throwable t) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "bad index resolved in a stem";
+        }
+        
     }
 
     /**
@@ -1649,12 +1658,16 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "b. := [;5].2.4;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "was able to access a non-existant index in a stem";
         } catch (IndexError ie) {
-            assert true;
+            bad =  false;
         }
+        if(bad){
+            assert false : "was able to access a non-existant index in a stem";
+        }
+
     }
 
     public void testExtraIndices2() throws Throwable {
@@ -1662,14 +1675,15 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "b. := [;5].i(2).i(4);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "was able to access a non-existant index in a stem";
         } catch (IndexError ie) {
-            assert true;
+            bad = false;
         }
-
-
+        if(bad){
+            assert false : "was able to access a non-existent index in a stem";
+        }
     }
 
     /**

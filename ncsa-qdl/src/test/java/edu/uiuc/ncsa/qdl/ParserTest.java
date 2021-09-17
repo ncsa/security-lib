@@ -32,7 +32,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testRational1() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("1.37037037037037"),
@@ -82,7 +82,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testRational2() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("1.38912043468865"),
@@ -119,7 +119,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testRational2Spaces() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("1.38912043468865"),
@@ -154,7 +154,7 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Same as previous, no <b>body</b> keyword.
      */
-     
+
     public void testRational2Spaces2() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("1.38912043468865"),
@@ -215,7 +215,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-     
+
     public void testContinuedFraction1() throws Throwable {
         String cf = "1/(2*x+3*y/(4*x+5*y/(6*x+7*y/(8*x+9*y/(x^2+y^2+1)))))";
         String cf2 = "  (192*x^3 + 192*x^5 + 68*x*y + 216*x^2*y + 68*x^3*y + 45*y^2 + " +
@@ -292,7 +292,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testCalledFunctions() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("0.224684095740375"),
@@ -330,47 +330,48 @@ public class ParserTest extends AbstractQDLTester {
         }
     }
 
-     
-        public void testLargeStemSubtraction() throws Throwable {
-            // Use new bracket for stems x. := [-5/8, -5/7, -5/6, -1, -5/4]
-            // and y. := [8/17, 7/16, 6/19, 5/11, 3/7]
-            // Aim is to show that having a bunch of hard-coded lists gets interpreted right
-            // and can do an operation on them.
 
-            String cf = "1/(2*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                    "+3*[8/17, 7/16, 6/19, 5/11, 3/7]/(4*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                    "+5*[8/17, 7/16, 6/19, 5/11, 3/7]/(6*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                    "+7*[8/17, 7/16, 6/19, 5/11, 3/7]/(8*[-5/8, -5/7, -5/6, -1, -5/4]" +
-                    "+9*[8/17, 7/16, 6/19, 5/11, 3/7]/([-5/8, -5/7, -5/6, -1, -5/4]^2+[8/17, 7/16, 6/19, 5/11, 3/7]^2+1)))))";
-            String cf2 = "  (192*[-5/8, -5/7, -5/6, -1, -5/4]^3 + 192*[-5/8, -5/7, -5/6, -1, -5/4]^5 " +
-                    "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7] + 216*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] " +
-                    "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] + 45*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
-                    "     192*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^3)/" +
-                    "   (384*[-5/8, -5/7, -5/6, -1, -5/4]^4 + 384*[-5/8, -5/7, -5/6, -1, -5/4]^6 " +
-                    "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] + 432*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] " +
-                    "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7] + 21*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
-                    "     252*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 21*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^2 " +
-                    "+ 384*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^3 " +
-                    "+ 21*[8/17, 7/16, 6/19, 5/11, 3/7]^4)";
+    public void testLargeStemSubtraction() throws Throwable {
+        // Use new bracket for stems x. := [-5/8, -5/7, -5/6, -1, -5/4]
+        // and y. := [8/17, 7/16, 6/19, 5/11, 3/7]
+        // Aim is to show that having a bunch of hard-coded lists gets interpreted right
+        // and can do an operation on them.
 
-            State state = testUtils.getNewState();
-            StringBuffer script = new StringBuffer();
+        String cf = "1/(2*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                "+3*[8/17, 7/16, 6/19, 5/11, 3/7]/(4*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                "+5*[8/17, 7/16, 6/19, 5/11, 3/7]/(6*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                "+7*[8/17, 7/16, 6/19, 5/11, 3/7]/(8*[-5/8, -5/7, -5/6, -1, -5/4]" +
+                "+9*[8/17, 7/16, 6/19, 5/11, 3/7]/([-5/8, -5/7, -5/6, -1, -5/4]^2+[8/17, 7/16, 6/19, 5/11, 3/7]^2+1)))))";
+        String cf2 = "  (192*[-5/8, -5/7, -5/6, -1, -5/4]^3 + 192*[-5/8, -5/7, -5/6, -1, -5/4]^5 " +
+                "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7] + 216*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] " +
+                "+ 68*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] + 45*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
+                "     192*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 68*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^3)/" +
+                "   (384*[-5/8, -5/7, -5/6, -1, -5/4]^4 + 384*[-5/8, -5/7, -5/6, -1, -5/4]^6 " +
+                "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7] + 432*[-5/8, -5/7, -5/6, -1, -5/4]^3*[8/17, 7/16, 6/19, 5/11, 3/7] " +
+                "+ 280*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7] + 21*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + " +
+                "     252*[-5/8, -5/7, -5/6, -1, -5/4]*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 21*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^2 " +
+                "+ 384*[-5/8, -5/7, -5/6, -1, -5/4]^4*[8/17, 7/16, 6/19, 5/11, 3/7]^2 + 280*[-5/8, -5/7, -5/6, -1, -5/4]^2*[8/17, 7/16, 6/19, 5/11, 3/7]^3 " +
+                "+ 21*[8/17, 7/16, 6/19, 5/11, 3/7]^4)";
 
-            addLine(script, "x. := " + cf + ";");
-            addLine(script, "y. := " + cf2 + ";");
-            // Evaluate this is two ways and check they match
-            addLine(script, "out1. := " + cf + "-" + cf2 + ";"); // single, massive expression
-            addLine(script, "out2. := x. - y.;"); // do separately, subtract results
-            QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            StemVariable out1 = getStemValue("out1.", state);
-            StemVariable out2 = getStemValue("out2.", state);
-            assert out1.size() == 5;
-            assert out2.size() == 5;
-            for (long i = 0L; i < 5; i++) {
-                assert areEqual(out1.getDecimal(i), out2.getDecimal(i));
-            }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+
+        addLine(script, "x. := " + cf + ";");
+        addLine(script, "y. := " + cf2 + ";");
+        // Evaluate this is two ways and check they match
+        addLine(script, "out1. := " + cf + "-" + cf2 + ";"); // single, massive expression
+        addLine(script, "out2. := x. - y.;"); // do separately, subtract results
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        StemVariable out1 = getStemValue("out1.", state);
+        StemVariable out2 = getStemValue("out2.", state);
+        assert out1.size() == 5;
+        assert out2.size() == 5;
+        for (long i = 0L; i < 5; i++) {
+            assert areEqual(out1.getDecimal(i), out2.getDecimal(i));
         }
+    }
+
     /**
      * Test for multiplying two matrices with integer stems. Mostly this is a regression
      * test to check that compound stems (like a.0.0) are  resolved right. When twiddleing
@@ -383,7 +384,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMatrixMultiply1() throws Throwable {
         // Takes x.i.j, y.i.j and returns the matrix product z.i.j
 
@@ -428,7 +429,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMatrixLoop() throws Throwable {
         // Takes x.i.j, y.i.j and returns the matrix product z.i.j
 
@@ -481,7 +482,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testLoopOrder() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := true;");
@@ -514,7 +515,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testListScope() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := null;");
@@ -540,7 +541,7 @@ public class ParserTest extends AbstractQDLTester {
         assert stemVariable.containsKey("0"); // evens are scalars
     }
 
-     
+
     public void testListScopeSpaces() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := null;");
@@ -575,7 +576,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testShortCircuitLogical() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a := 1;");
@@ -622,7 +623,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testSingleEquals() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "a=1;");
@@ -662,7 +663,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionAndModules_Bad() throws Throwable {
         String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
                 "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
@@ -703,7 +704,7 @@ public class ParserTest extends AbstractQDLTester {
 
     }
 
-     
+
     public void testFunctionAndModules_Good() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("0.224684095740375"),
@@ -758,7 +759,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMultipleModuleImport() throws Throwable {
         String g_x = "define[g(x)]body[return(x+1);];";
         String h_y = "define[h(y)]body[return(y-1);];";
@@ -796,7 +797,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testContinuedFraction2() throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("1.64705882352941"),
@@ -946,7 +947,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testImportAndAlias() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -975,9 +976,10 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * Basic test of assignments. Shows that := is treated as a digraph. Very basic but essential test.
+     *
      * @throws Throwable
      */
-     
+
     public void testAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -997,7 +999,7 @@ public class ParserTest extends AbstractQDLTester {
      * @throws Throwable
      */
 
-     
+
     public void testAssignments() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1030,7 +1032,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMultipleAssignments() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1053,7 +1055,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testComparisons() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1102,9 +1104,10 @@ public class ParserTest extends AbstractQDLTester {
      *     a&lt;b&&c&lt;a
      *  true
      * </pre>
+     *
      * @throws Throwable
      */
-     
+
     public void testLogic() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1123,7 +1126,7 @@ public class ParserTest extends AbstractQDLTester {
         assert !getBooleanValue("e", state);
     }
 
-     
+
     public void testLogic2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1148,7 +1151,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testString() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1156,7 +1159,7 @@ public class ParserTest extends AbstractQDLTester {
         String slash = "\\";
         addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
                 "  `~!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
-                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧⊗\\n" + // unicode
+                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧≁⊗\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );
         addLine(script, "say('printing all base characters with say:\\n');");
@@ -1170,7 +1173,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testUTF8StringDecodeEncode() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1192,7 +1195,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMinus() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1210,7 +1213,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("d.2", state) == -2L;
     }
 
-     
+
     public void testPreMinuses() throws Throwable {
         // This tests multiple decrements. NOTE that the values are multipled as it decrements,
         // so the effect is to compute the factorial in this case. Prefix means the new value
@@ -1226,7 +1229,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("b", state) == -6L;
     }
 
-     
+
     public void testPostMinuses() throws Throwable {
         // This tests multiple decrements. NOTE that the values are multiplied as it decrements,
         // so the effect is to compute the factorial in this case. Post decr. means the previous value
@@ -1249,7 +1252,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testHasKeys() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1276,20 +1279,22 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testBadAssignment() throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a = 3");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "Was able to make an assignment with = not :=";
         } catch (IllegalStateException t) {
-            assert true;
+            bad = false;
         }
-
+        if (bad) {
+            assert false : "Was able to make an assignment with = not :=";
+        }
     }
 
     /**
@@ -1300,7 +1305,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testCheckSymbolTableAssignment() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1344,7 +1349,7 @@ public class ParserTest extends AbstractQDLTester {
         assert !xstem.containsKey("foo");
     }*/
 
-     
+
     public void testSafeUnboxWithBadVariable() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1357,14 +1362,12 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         try {
             interpreter.execute(script.toString());
-            assert true;
         } catch (IllegalArgumentException ix) {
             assert false : "Was not able to unbox a variable with a bad name in safe mode.";
         }
     }
 
 
-     
     public void testUNSafeUnboxWithBadVariable() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1375,15 +1378,19 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "unbox(x., false);"); // try to overwrite without safe mode -- refuse
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "Was able to unbox a variable with a name clash in safe mode.";
         } catch (IllegalArgumentException ix) {
-            assert true;
+            bad = false;
         }
+        if (bad) {
+            assert false : "Was able to unbox a variable with a name clash in safe mode.";
+        }
+
     }
 
-     
+
     public void testSafeUnbox() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1391,15 +1398,19 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "unbox({'a':'b'});"); // try to overwrite it in safe mode -- should fail
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "Was able to unbox a variable with a name clash in safe mode.";
         } catch (IllegalArgumentException ix) {
-            assert true;
+            bad = false;
         }
+        if (bad) {
+            assert false : "Was able to unbox a variable with a name clash in safe mode.";
+        }
+
     }
 
-     
+
     public void testUnboxWithFlag() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1412,7 +1423,7 @@ public class ParserTest extends AbstractQDLTester {
                 "Failed to overwrite in unbox. Expected \"b\", got \"" + getStringValue("a", state) + "\"";
     }
 
-     
+
     public void testUnboxWithBadVariableAndFlag() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1431,7 +1442,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testURI() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1449,7 +1460,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testNullAssignments() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1477,7 +1488,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testNullAssignmentScope() throws Throwable {
 
         State state = testUtils.getNewState();
@@ -1497,7 +1508,7 @@ public class ParserTest extends AbstractQDLTester {
         assert a.getLong("1") == 1L;
     }
 
-     
+
     public void testExecute() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1514,7 +1525,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testVariableScope() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1534,7 +1545,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testVariableScopeSpaces1() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1554,7 +1565,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testVariableScopeSpaces2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1590,7 +1601,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testJSONInvariance() throws Throwable {
      /*  Used tot est with this but it fails now that string support has improved.
          probably because of embedded control characters. QDL strings do nto allow
@@ -1656,7 +1667,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testNestedVariableImport() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:/a','a']body[q:=1;];");
@@ -1689,7 +1700,7 @@ public class ParserTest extends AbstractQDLTester {
         w#a#f(3)
         w#g(2)
      */
-     
+
     public void testNestedFunctionImport() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "define[f(x)]body[return(x+100);];");
@@ -1746,7 +1757,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testNestedVariableScope() throws Throwable {
         StringBuffer script = new StringBuffer();
         State state = testUtils.getNewState();
@@ -1782,7 +1793,7 @@ public class ParserTest extends AbstractQDLTester {
         assert state.getValue("A") == null;// This is what is returned for actual variables that are undefined.
     }
 
-     
+
     public void testLambda() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1794,7 +1805,7 @@ public class ParserTest extends AbstractQDLTester {
 
     }
 
-     
+
     public void testMultiArgLambda() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1813,7 +1824,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testLambdaStemList() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1829,7 +1840,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testLambdaInBracket() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1840,7 +1851,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 16L;
     }
 
-     
+
     public void testMultiStatementLambda() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1851,7 +1862,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a", state) == 9L;
     }
 
-     
+
     public void testMultiStatementMultiArgLambda() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1864,7 +1875,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("b", state) == 6L;
     }
 
-     
+
     public void testExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1887,7 +1898,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testMultiIndexExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1898,7 +1909,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a.1.2", state) == 100L;
     }
 
-     
+
     public void testChainExpAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1929,6 +1940,7 @@ public class ParserTest extends AbstractQDLTester {
      * </pre>
      * Then either failing or giving squirrely but silent results
      * If this test breaks, then probably assignments
+     *
      * @throws Throwable
      */
     public void testChainExpAssignment2() throws Throwable {
@@ -1942,6 +1954,7 @@ public class ParserTest extends AbstractQDLTester {
         // check that exactly the value was updated
         assert getBooleanValue("rc", state);
     }
+
     public void testChainExpAssignment3() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1959,7 +1972,7 @@ public class ParserTest extends AbstractQDLTester {
         assert stemVariable.getLong(3L) == 3L;
         assert stemVariable.getLong(4L) == 4L;
     }
-     
+
     public void testReverseAssignment() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1977,21 +1990,25 @@ public class ParserTest extends AbstractQDLTester {
         assert stemVariable.getLong(4L) == 4L;
     }
 
-     
+
     public void testBadExpressionStem() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "(0).(1);");
+        boolean bad = true;
         try {
             QDLInterpreter interpreter = new QDLInterpreter(null, state);
             interpreter.execute(script.toString());
-            assert false : "Was able to create a stem from (0).(1)";
         } catch (IllegalStateException t) {
-            assert true;
+            bad = false;
         }
+        if (bad) {
+            assert false : "Was able to create a stem from (0).(1)";
+        }
+
     }
 
-     
+
     public void testUserFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2004,7 +2021,7 @@ public class ParserTest extends AbstractQDLTester {
 
     }
 
-     
+
     public void testBuiltInFunctionReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2020,7 +2037,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testBuiltInFunctionReference2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2031,7 +2048,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getStringValue("a", state).equals("dpqrcdtuv");
     }
 
-     
+
     public void testBuiltInFunctionReferenceOrder() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2042,7 +2059,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getStringValue("a", state).equals("dpqrcdtuv");
     }
 
-     
+
     public void testOpReference() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2066,9 +2083,10 @@ public class ParserTest extends AbstractQDLTester {
      *    reduce(@*, 1+n(5))
      *  120
      * </pre>
+     *
      * @throws Throwable
      */
-     
+
     public void testReduceWithOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2085,9 +2103,10 @@ public class ParserTest extends AbstractQDLTester {
      *     reduce(@times(), 1+n(5));
      *  120
      * </pre>
+     *
      * @throws Throwable
      */
-     
+
     public void testReduceWithUserFunction() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2105,9 +2124,10 @@ public class ParserTest extends AbstractQDLTester {
      *    expand(@&&, a. == b.);
      * [true, true, false, false]
      * </pre>
+     *
      * @throws Throwable
      */
-     
+
     public void testExpandWithOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2123,7 +2143,7 @@ public class ParserTest extends AbstractQDLTester {
         assert !getBooleanValue("x.3", state);
     }
 
-     
+
     public void testReduceWithLogicalOperator() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2144,7 +2164,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionReferenceVisibility() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2179,7 +2199,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionReferenceJFork() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2200,7 +2220,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionReferenceMultipleEvaluations() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2224,7 +2244,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionReferenceMonad() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2245,7 +2265,7 @@ public class ParserTest extends AbstractQDLTester {
      * @throws Throwable
      */
 
-     
+
     public void testFunctionReferenceMonad2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2266,7 +2286,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionDefVisibilityInConditional() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2297,7 +2317,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testFunctionDefVisibilityInConditional2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2322,7 +2342,6 @@ public class ParserTest extends AbstractQDLTester {
     }
 
 
-
     /**
      * Case of a simple module. The point is that a function f, is defined in the module and that
      * another module function g calls it. What should happen (assuming no other definitions of these
@@ -2335,6 +2354,7 @@ public class ParserTest extends AbstractQDLTester {
      *     g(1);
      *  4
      * </pre>
+     *
      * @throws Throwable
      */
     public void testModuleFunctionVisibility() throws Throwable {
@@ -2374,7 +2394,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testBadModuleFunctionVisibility() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2383,12 +2403,16 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "module_import('a:a');");
         addLine(script, "y := g(1);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "the visibility of module functions is incorrect";
         } catch (NamespaceException ix) {
-            assert true;
+            bad = false;
         }
+        if (bad) {
+            assert false : "the visibility of module functions is incorrect";
+        }
+
     }
 
     /**
@@ -2397,7 +2421,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-     
+
     public void testNestedFunction() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2413,7 +2437,7 @@ public class ParserTest extends AbstractQDLTester {
      * every value of the result is true as a string. This saves me from having
      * to do a low-level slog looking for any failures.
      */
-     
+
     public void testJoinOnLastAxis() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2433,9 +2457,10 @@ public class ParserTest extends AbstractQDLTester {
      * Longs in Java have a max value of 9223372036854775806 and a min value of
      * -9223372036854775805. What should happen is that when this is reached, the
      * value is seamlessly converted to a BigDecimal internally.
+     *
      * @throws Throwable
      */
-     
+
     public void testOverflowAdd() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2451,9 +2476,10 @@ public class ParserTest extends AbstractQDLTester {
     /**
      * Tests various combinations of numbers with E in them.  Also does a few with
      * e (lower case) too, showing case insensitivity.
+     *
      * @throws Throwable
      */
-     
+
     public void testEngineeringNotation() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2479,7 +2505,7 @@ public class ParserTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-     
+
     public void testTMathOnArray() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2521,7 +2547,6 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     /**
-     *
      * Basic regression test to show that passing in a function definition
      * works.
      * <pre>
@@ -2529,17 +2554,18 @@ public class ParserTest extends AbstractQDLTester {
      *     g(v(x)->x^2, 5); //computes (5^2)^3 == 5^6
      * 15625
      * </pre>
+     *
      * @throws Throwable
      */
-      public void testLambdaAsArgument() throws Throwable {
-           State state = testUtils.getNewState();
-           StringBuffer script = new StringBuffer();
-           addLine(script, "g(@f, x)-> f(x)^3;");
-           addLine(script, "ok := g(v(x)->x^2, 5) == 15625;");
-           QDLInterpreter interpreter = new QDLInterpreter(null, state);
-           interpreter.execute(script.toString());
-           assert getBooleanValue("ok", state);
-       }
+    public void testLambdaAsArgument() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g(@f, x)-> f(x)^3;");
+        addLine(script, "ok := g(v(x)->x^2, 5) == 15625;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
     /**
      * Anonymous lambda function test. Pass in a function with no name as an argument.
@@ -2548,50 +2574,53 @@ public class ParserTest extends AbstractQDLTester {
      *     g((x)->x^2, 2);  //evaluates to 2^8
      *  256
      * </pre>
+     *
      * @throws Throwable
      */
     public void testAnonymousLambdaAsArgument() throws Throwable {
-           State state = testUtils.getNewState();
-           StringBuffer script = new StringBuffer();
-           addLine(script, "g(@f, x)-> f(x)^4;");
-           addLine(script, "ok := g((x)->x^2, 2) == 256;");
-           QDLInterpreter interpreter = new QDLInterpreter(null, state);
-           interpreter.execute(script.toString());
-           assert getBooleanValue("ok", state);
-       }
-       /*
-                     reduce((x,y)->x+y, n(10))
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "g(@f, x)-> f(x)^4;");
+        addLine(script, "ok := g((x)->x^2, 2) == 256;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /*
+                  reduce((x,y)->x+y, n(10))
 45
-        */
-       public void testAnonymousReduce() throws Throwable {
-              State state = testUtils.getNewState();
-              StringBuffer script = new StringBuffer();
-              addLine(script, "ok := reduce((x,y)->x+y, n(10)) == 45;");
-              QDLInterpreter interpreter = new QDLInterpreter(null, state);
-              interpreter.execute(script.toString());
-              assert getBooleanValue("ok", state);
-          }
-          /*
-            for_each((x,y)->x*y,n(10),[1;11])
+     */
+    public void testAnonymousReduce() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := reduce((x,y)->x+y, n(10)) == 45;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
-           */
-          public void testAnonymousForEach() throws Throwable{
-              State state = testUtils.getNewState();
-              StringBuffer script = new StringBuffer();
-              addLine(script, "x. := for_each((x,y)->x*y,n(10),[1;11]);");
-              addLine(script, "ok.0 := x.3.4 == 3*5;"); // second arg offset to 1 -10 range
-              addLine(script, "ok.1 := x.4.5 == 4*6;");
-              addLine(script, "ok.2 := x.5.6 == 5*7;");
-              addLine(script, "ok.3 := x.0.7 == 0;");
-              addLine(script, "ok.4 := x.1.9 == 10;");
-              addLine(script, "ok.5 := x.2.4 == 2*5;");
-              addLine(script, "ok.6 := x.9.9 == 90;");
-              addLine(script, "ok := reduce(@&&, ok.);");
-              QDLInterpreter interpreter = new QDLInterpreter(null, state);
-              interpreter.execute(script.toString());
-              assert getBooleanValue("ok", state);
+    /*
+      for_each((x,y)->x*y,n(10),[1;11])
 
-          }
+     */
+    public void testAnonymousForEach() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. := for_each((x,y)->x*y,n(10),[1;11]);");
+        addLine(script, "ok.0 := x.3.4 == 3*5;"); // second arg offset to 1 -10 range
+        addLine(script, "ok.1 := x.4.5 == 4*6;");
+        addLine(script, "ok.2 := x.5.6 == 5*7;");
+        addLine(script, "ok.3 := x.0.7 == 0;");
+        addLine(script, "ok.4 := x.1.9 == 10;");
+        addLine(script, "ok.5 := x.2.4 == 2*5;");
+        addLine(script, "ok.6 := x.9.9 == 90;");
+        addLine(script, "ok := reduce(@&&, ok.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+
+    }
 
 
     /**
@@ -2606,9 +2635,10 @@ public class ParserTest extends AbstractQDLTester {
      *   g(3,4)
      * -1
      * </pre>
+     *
      * @throws Throwable
      */
-    public void testLambdaFunctionVisibility() throws Throwable{
+    public void testLambdaFunctionVisibility() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "g(x,y)->x-y;"); // define g outside of function
@@ -2624,9 +2654,10 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * tests that supplying a loop with a list in the for_next function works.
+     *
      * @throws Throwable
      */
-    public void testLoopOverList() throws Throwable{
+    public void testLoopOverList() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "j := 0;");
@@ -2659,9 +2690,10 @@ public class ParserTest extends AbstractQDLTester {
      * <pre>
      *    a.[1,2,3] == a.1.2.3
      * </pre>
+     *
      * @throws Throwable
      */
-    public void testListsAsIndices0() throws Throwable{
+    public void testListsAsIndices0() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));");
@@ -2676,63 +2708,79 @@ public class ParserTest extends AbstractQDLTester {
      * Test bad index where a higher dimension stem as part of the index does not resolve
      * correctly. This tells us that if a stem gets another, higher ranked stem as its
      * index, that should throw an index error.
+     *
      * @throws Throwable
      */
-    public void testBadListsAsIndices0() throws Throwable{
+    public void testBadListsAsIndices0() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));");
         addLine(script, "nn. := n(2,3,4);");
         addLine(script, "a.1.nn.[1,2,2].0;");//nn.1 is a 3 rank stem, so cannot be an index
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "a.1.nn.[1,2,2].0 should have thrown an index error";
-        }catch(IndexError ie){
-            assert true;
+        } catch (IndexError ie) {
+            bad = false;
         }
+        if(bad){
+            assert false : "a.1.nn.[1,2,2].0 should have thrown an index error";
+        }
+        
     }
-    public void testBadListsAsIndices1() throws Throwable{
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "a. := n(2,3,4,n(24));");
-         addLine(script, "nn. := n(2,3,4);");
+
+    public void testBadListsAsIndices1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));");
+        addLine(script, "nn. := n(2,3,4);");
         addLine(script, "a.0.nn.[1,2,2].1  == a.0.2.1;"); // fails before [1,2,2].1-> 2.
 
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         try {
-             interpreter.execute(script.toString());
-             assert false : "a.0.nn.[1,2,2].1 should have thrown an index error";
-         }catch(IndexError ie){
-             assert true;
-         }
-     }
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
+        try {
+            interpreter.execute(script.toString());
+        } catch (IndexError ie) {
+            bad = false;
+        }
+        if(bad){
+            assert false : "a.0.nn.[1,2,2].1 should have thrown an index error";
+        }
+        
+    }
 
     /**
      * Checks that referencing non-existent elements fails at is should.
+     *
      * @throws Throwable
      */
-    public void testBadListsAsIndices2() throws Throwable{
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
-         addLine(script, "nn. := n(2,3,4);");
+    public void testBadListsAsIndices2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
+        addLine(script, "nn. := n(2,3,4);");
         addLine(script, " a.nn.[1,2,1].2.0  == a.1.2.0;"); // fails because [1,2,1].2.0 does not resolve.
 
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         try {
-             interpreter.execute(script.toString());
-             assert false : "a.nn.[1,2,1].2.0 should have thrown an index error";
-         }catch(IndexError ie){
-             assert true;
-         }
-     }
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
+        try {
+            interpreter.execute(script.toString());
+        } catch (IndexError ie) {
+            bad = false;
+        }
+        if(bad){
+            assert false : "a.nn.[1,2,1].2.0 should have thrown an index error";
+        }
+        
+    }
 
     /**
      * Test lots of simple cases for list indices.
+     *
      * @throws Throwable
      */
-    public void testListsAsIndices1() throws Throwable{
+    public void testListsAsIndices1() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));"); // define g outside of function
@@ -2768,14 +2816,15 @@ public class ParserTest extends AbstractQDLTester {
      *     b.
      * {2:[{1:6}]}
      * </pre>
+     *
      * @throws Throwable
      */
-    public void testSetWithListIndex() throws Throwable{
+    public void testSetWithListIndex() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(2,3,4,n(24));");
         addLine(script, "p. := [2,0,1];");
-        addLine(script,"b.shuffle([0,1,2],p.) := a.[0,1,2];");
+        addLine(script, "b.shuffle([0,1,2],p.) := a.[0,1,2];");
         addLine(script, "ok := b.2.0.1 == 6;"); // most basic test
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -2790,9 +2839,10 @@ public class ParserTest extends AbstractQDLTester {
      *     sum(7)
      * 28
      * </pre>
+     *
      * @throws Throwable
      */
-    public void testLambdaRecursion() throws Throwable{
+    public void testLambdaRecursion() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "sum(n)->(n!=0)?sum(n-1)+n:0;");

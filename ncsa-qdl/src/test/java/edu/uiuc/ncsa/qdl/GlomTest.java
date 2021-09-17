@@ -67,13 +67,11 @@ public class GlomTest extends AbstractQDLTester {
         addLine(script, "a. := ~1;");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        try {
-            interpreter.execute(script.toString());
-            assert false : "Was able to execute a monadic glom ~1. It should have failed.";
-        } catch (Throwable t) {
-            assert true;
-        }
-    }
+        interpreter.execute(script.toString());
+        StemVariable stemVariable=getStemValue("a.", state);
+        assert stemVariable.size() == 1;
+        assert stemVariable.getLong(0L) == 1L;
+   }
 
      
     public void testStemGlom() throws Throwable {

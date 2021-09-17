@@ -30,8 +30,8 @@ module[
    ];
 
 
-   define[ fork(@monad1(),@dyad(),@monad2(),x.)][
-     >> fork(@monad1(),@dyad(),@monad2(),x.) - apply a fork to a stem.
+   define[ fork(⊗monad1,⊗dyad,⊗monad2,x.)][
+     >> fork(⊗monad1,⊗dyad,⊗monad2,x.) - apply a fork to a stem.
      >> A fork is defined as a taking a dyad and two monads and applying them to an argument
      >>    dyad(monad1(x.), monad2(x.)
      >> A surprisingly large number of problems are addressed by this: transform the argument
@@ -78,7 +78,28 @@ module[
      >> [true,true,false,true,true,true,true]
           return(reduce(⊗f, τ(for_each(⊗g, x., τ(y.,-1)) ,-1)));
    ];
-
+    define[
+       reduce_all(⊗f, arg.)
+    ][
+    >> reduce_all(⊗f, arg.) - apply reduce to the arguments until a scalar result.
+    >> This lets you check across large stems.
+    >>
+    >>     a. := n(3,4,5,6,[;3*4*5*6])
+    >>     reduce_all(⊗∧, a. < 1000)
+    >> true
+    >>
+    >> So every elements of a. is elss than 1000.
+       rank := rank(arg.);
+       foo. := arg.;
+       while[1 < rank--][
+          foo. := reduce(⊗f, foo.);
+       ];
+       return(reduce(⊗f, foo.));
+    ];
+    /*
+     a. := n(3,4,5,6,[;3*4*5*6])
+     reduce_all(@&&, a. < 1000)
+     */
    // The next is an example of using the inner product. It is identical in function to
    // the built in has_value function.
 /*   define[

@@ -41,11 +41,40 @@ public class StatementTest extends AbstractQDLTester {
     }
 
     /**
+     * Test that a malformed loop (conditional statement is not a conditional) fails reasonably.
+     *
+     * @throws Throwable
+     */
+
+    public void testBadLoop() throws Throwable {
+        StringBuffer script = new StringBuffer();
+        addLine(script, "i:=0;");
+        addLine(script, "while[");
+        addLine(script, "   i + 2"); // Not a conditional, so the system should throw it out.
+        addLine(script, "]do[");
+        addLine(script, "  say(i);");
+        addLine(script, "]; // end while");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
+        try {
+            interpreter.execute(script.toString());
+        } catch (IllegalStateException isx) {
+            bad = false;
+        }
+        if(bad){
+            assert false : "Was able to execute a loop without a valid conditional";
+        }
+
+    }
+
+    /**
      * Test a loop that has a basic conditional statement (with something that needs evaluated)
      *
      * @throws Throwable
      */
-     
+
     public void testBasicLoop() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "i:=0;");
@@ -66,31 +95,6 @@ public class StatementTest extends AbstractQDLTester {
     }
 
     /**
-     * Test that a malformed loop (conditional statement is not a conditional) fails reasonably.
-     *
-     * @throws Throwable
-     */
-     
-    public void testBadLoop() throws Throwable {
-        StringBuffer script = new StringBuffer();
-        addLine(script, "i:=0;");
-        addLine(script, "while[");
-        addLine(script, "   i + 2"); // Not a conditional, so the system should throw it out.
-        addLine(script, "]do[");
-        addLine(script, "  say(i);");
-        addLine(script, "]; // end while");
-        State state = testUtils.getNewState();
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        try {
-            interpreter.execute(script.toString());
-            assert false : "Was able to execute a loop without a valid conditional";
-        } catch (IllegalStateException isx) {
-            assert true;
-        }
-    }
-
-    /**
      * Test that assigning a value to a keyword, e.g. false := true fails.
      *
      * @throws Throwable
@@ -102,31 +106,39 @@ public class StatementTest extends AbstractQDLTester {
         addLine(script, QDLConstants.RESERVED_TRUE + " := 2;");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_TRUE + " a value";
         } catch (IllegalStateException | IllegalArgumentException iax) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_TRUE + " a value";
+        }
+        bad = true;
 
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_FALSE + " := 1;");
         try {
             interpreter.execute(script.toString());
-            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
         } catch (IllegalStateException | IllegalArgumentException iax) {
-            assert true;
+            bad = false;
         }
+        if(bad){
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_FALSE + " a value";
+        }
+bad = true;
 
         script = new StringBuffer();
         addLine(script, QDLConstants.RESERVED_NULL + " := 'foo';");
         try {
             interpreter.execute(script.toString());
-            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_NULL + " a value";
         } catch (IllegalArgumentException iax) {
-            assert true;
+            bad = false;
         }
-
+        if(bad){
+            assert false : "Error; Was able to assign " + QDLConstants.RESERVED_NULL + " a value";
+        }
     }
 
     public void testAssert() throws Throwable {
@@ -144,12 +156,17 @@ public class StatementTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "assert[3<2]['test 1'];");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "failed assertion not asserted";
         } catch (AssertionException assertionException) {
+            bad= false;
             assert assertionException.getMessage().equals("test 1");
         }
+        if(bad){
+            assert false : "failed assertion not asserted";
+        }
+
     }
 
     public void testBadAssert2() throws Throwable {
@@ -157,12 +174,17 @@ public class StatementTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "⊨ 3<2 : 'test 1';");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
-            assert false : "failed assertion not asserted";
         } catch (AssertionException assertionException) {
+            bad = false;
             assert assertionException.getMessage().equals("test 1");
         }
+        if(bad){
+            assert false : "failed assertion not asserted";
+        }
+
     }
 
     /**
