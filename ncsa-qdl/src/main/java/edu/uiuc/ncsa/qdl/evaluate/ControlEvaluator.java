@@ -392,7 +392,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
             case MODULE_IMPORT:
             case FQ_IMPORT:
-                doImport(polyad, state);
+                doModuleImport(polyad, state);
                 return true;
             case MODULE_LOAD:
             case FQ_LOAD_MODULE:
@@ -1040,7 +1040,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             if (!state.hasScriptArgs()) {
                 throw new IllegalArgumentException("index out of bounds for " + SCRIPT_ARGS_COMMAND + "-- no arguments found.");
             }
-            checkNull(obj,polyad.getArgAt(0), state);
+            checkNull(obj, polyad.getArgAt(0), state);
             if (!isLong(obj)) {
                 throw new IllegalArgumentException(SCRIPT_ARGS_COMMAND + " requires an integer argument.");
             }
@@ -1257,7 +1257,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             for (String p : paths) {
-                String resourceName = p +  name;
+                String resourceName = p + name;
                 DebugUtil.trace(ControlEvaluator.class, " path = " + resourceName);
                 if (state.isVFSFile(resourceName)) {
                     if (state.isVFSFile(resourceName)) {
@@ -1293,7 +1293,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
 
         Object arg1 = polyad.evalArg(0, state);
-         checkNull(arg1, polyad.getArgAt(0), state);
+        checkNull(arg1, polyad.getArgAt(0), state);
         Object[] argList = new Object[0];
 /*        if (2 == polyad.getArgCount()) {
             Object arg2 = polyad.evalArg(1, state);
@@ -1417,8 +1417,198 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
     static final int LOAD_JAVA = 1;
 
     public final static String MODULE_TYPE_JAVA = "java";
+    public final static String MODULE_DEFAULT_EXTENSION = ".mdl";
 
     protected void doLoadModule(Polyad polyad, State state) {
+        doNewLoadModule(polyad, state);
+    }
+
+    protected void doNewLoadModule(Polyad polyad, State state) {
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("reading files is not supported in server mode");
+        }
+        if(polyad.getArgCount() == 0){
+            throw new IllegalArgumentException(MODULE_LOAD + " requires at least one argument");
+        }
+        Object arg = polyad.evalArg(0, state);
+
+        if(arg == QDLNull.getInstance()){
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+
+        StemVariable argStem = convertArgsToStem(polyad, arg,  state, MODULE_LOAD);
+        StemVariable outStem = new StemVariable();
+        for (String key : argStem.keySet()) {
+            Object value = argStem.get(key);
+            int loadTarget = LOAD_FILE;
+            String resourceName = null;
+            if (isString(value)) {
+                resourceName = (String) value;
+            } else {
+                StemVariable q = (StemVariable) value;
+                resourceName = q.get(0L).toString();
+                loadTarget = q.get(1L).toString().equals(MODULE_TYPE_JAVA) ? LOAD_JAVA : LOAD_FILE;
+
+            }
+            List<String> loadedQNames = null;
+            if (loadTarget == LOAD_JAVA) {
+                loadedQNames = doJavaModuleLoad(state, resourceName);
+
+
+            } else {
+                loadedQNames = doQDLModuleLoad(state, resourceName);
+
+            }
+            Object newEntry = null;
+            if (loadedQNames == null || loadedQNames.isEmpty()) {
+                newEntry = QDLNull.getInstance();
+            } else {
+                if (loadedQNames.size() == 1) {
+                    newEntry = loadedQNames.get(0);
+                } else {
+                    StemVariable innerStem = new StemVariable();
+                    innerStem.addList(loadedQNames);
+                    newEntry = innerStem;
+                }
+            }
+            outStem.put(key, newEntry);
+        }
+        polyad.setEvaluated(true);
+        if (outStem.size() == 1) {
+
+
+            polyad.setResult(outStem.get(outStem.keySet().iterator().next()));
+            polyad.setResultType(Constant.STRING_TYPE);
+        } else {
+            polyad.setResult(outStem);
+            polyad.setResultType(Constant.STEM_TYPE);
+        }
+    }
+
+    /**
+     * Load a single java module, returning a null if it failed or the FQ name if it worked.
+     *
+     * @param state
+     * @param resourceName
+     */
+    private List<String> doJavaModuleLoad(State state, String resourceName) {
+        try {
+            Class klasse = state.getClass().forName(resourceName);
+            Object newThingy = klasse.newInstance();
+            QDLLoader qdlLoader;
+            if (newThingy instanceof JavaModule) {
+                // For a single instance, just create a barebones loader on the fly.
+                qdlLoader = new QDLLoader() {
+                    @Override
+                    public List<Module> load() {
+                        List<Module> m = new ArrayList<>();
+                        JavaModule javaModule = (JavaModule) newThingy;
+                        State newState = state.newModuleState();
+                        javaModule = (JavaModule) javaModule.newInstance(newState);
+                        javaModule.init(newState); // set it up
+                        m.add(javaModule);
+                        return m;
+                    }
+                };
+            } else {
+                if (!(newThingy instanceof QDLLoader)) {
+                    throw new IllegalArgumentException("Error: \"" + resourceName + "\" is neither a module nor a loader.");
+                }
+                qdlLoader = (QDLLoader) newThingy;
+            }
+            List<String> names = QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
+            if (names.isEmpty()) {
+                return null;
+            }
+            return names;
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new QDLException("Could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
+        }
+    }
+
+    /**
+     * Load a the module(s) in a single resource.
+     *
+     * @param state
+     * @param resourceName
+     * @return
+     */
+    private List<String> doQDLModuleLoad(State state, String resourceName) {
+        QDLScript script = null;
+        try {
+            script = resolveScript(resourceName, state.getModulePaths(), state);
+            if (script == null) {
+                script = resolveScript(resourceName + MODULE_DEFAULT_EXTENSION, state.getModulePaths(), state);
+            }
+        } catch (Throwable t) {
+            state.warn("Could not find module:" + t.getMessage());
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?", t);
+        }
+
+        File file = null;
+
+        if (script == null) {
+            file = new File(resourceName);
+            if (!file.exists()) {
+                throw new IllegalArgumentException("file, '" + file.getAbsolutePath() + "' does not exist");
+            }
+            if (!file.isFile()) {
+                throw new IllegalArgumentException("'" + file.getAbsolutePath() + "' is not a file");
+            }
+
+            if (!file.canRead()) {
+                throw new IllegalArgumentException("You do not have permission to read '" + file.getAbsolutePath() + "'.");
+            }
+
+        }
+        try {
+            QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
+            // Exceptional case where we just run it directly.
+            // note that since this is QDL ther emay be multiple modules, etc.
+            // in a single file, so there is no way to know what the user did except
+            // to look at the state before, then after. This should return the added
+            // modules fq paths.
+            List<String> b4load = new ArrayList<>();
+            for (URI uri : state.getModuleMap().keySet()) {
+                b4load.add(uri.toString());
+            }
+            if (script == null) {
+                if (state.isServerMode()) {
+                    throw new QDLServerModeException("File operations are not permitted in server mode");
+                }
+                FileReader fileReader = new FileReader(file);
+                QDLRunner runner = new QDLRunner(parserDriver.parse(fileReader));
+                runner.setState(state);
+                runner.run();
+            } else {
+                script.execute(state);
+            }
+            List<String> afterLoad = new ArrayList<>();
+            for (URI uri : state.getModuleMap().keySet()) {
+                String s = uri.toString();
+                if (!b4load.contains(s)) {
+                    afterLoad.add(s);
+                }
+            }
+            return afterLoad;
+        } catch (Throwable t) {
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    protected void doOldLoadModule(Polyad polyad, State state) {
         if (state.isServerMode()) {
             throw new QDLServerModeException("reading files is not supported in server mode");
         }
@@ -1438,7 +1628,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
         }
         Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArgAt(0),state);
+        checkNull(arg, polyad.getArgAt(0), state);
 
         if (!isString(arg)) {
             throw new IllegalArgumentException(MODULE_LOAD + " requires a string as its argument, not '" + arg + "'");
@@ -1470,9 +1660,23 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     }
                     qdlLoader = (QDLLoader) newThingy;
                 }
-                QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
-                polyad.setResultType(Constant.BOOLEAN_TYPE);
-                polyad.setResult(Boolean.TRUE);
+                List<String> names = QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
+                switch (names.size()) {
+                    case 0:
+                        polyad.setResultType(Constant.NULL_TYPE);
+                        polyad.setResult(QDLNull.getInstance());
+                        break;
+                    case 1:
+                        polyad.setResultType(Constant.STRING_TYPE);
+                        polyad.setResult(names.get(0));
+                        break;
+                    default:
+                        StemVariable stemVariable = new StemVariable();
+                        stemVariable.addList(names);
+                        polyad.setResult(names);
+                        polyad.setResultType(Constant.STEM_TYPE);
+
+                }
                 polyad.setEvaluated(true);
                 return;
             } catch (Throwable t) {
@@ -1485,6 +1689,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         QDLScript script = null;
         try {
             script = resolveScript(resourceName, state.getModulePaths(), state);
+            if (script == null) {
+                script = resolveScript(resourceName + MODULE_DEFAULT_EXTENSION, state.getModulePaths(), state);
+            }
         } catch (Throwable t) {
             state.warn("Could not find module:" + t.getMessage());
             if (t instanceof RuntimeException) {
@@ -1492,9 +1699,9 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             }
             throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?", t);
         }
-        if (script == null) {
+  /*      if (script == null) {
             throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?");
-        }
+        }*/
 
         File file = null;
 
@@ -1515,6 +1722,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         try {
             QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
             // Exceptional case where we just run it directly.
+            // note that since this is QDL ther emay be multiple modules, etc.
+            // in a single file, so there is no way to know what the user did except
+            // to look at the state before, then after. This should return the added
+            // modules fq paths.
+            List<String> b4load = new ArrayList<>();
+            for (URI uri : state.getModuleMap().keySet()) {
+                b4load.add(uri.toString());
+            }
             if (script == null) {
                 if (state.isServerMode()) {
                     throw new QDLServerModeException("File operations are not permitted in server mode");
@@ -1526,16 +1741,36 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             } else {
                 script.execute(state);
             }
-            //parserDriver.execute(Reader);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
-            polyad.setResult(Boolean.TRUE);
+            List<String> afterLoad = new ArrayList<>();
+            for (URI uri : state.getModuleMap().keySet()) {
+                String s = uri.toString();
+                if (!b4load.contains(s)) {
+                    afterLoad.add(s);
+                }
+            }
+            switch (afterLoad.size()) {
+                case 0:
+                    polyad.setResultType(Constant.NULL_TYPE);
+                    polyad.setResult(QDLNull.getInstance());
+                    break;
+                case 1:
+                    polyad.setResultType(Constant.STRING_TYPE);
+                    polyad.setResult(afterLoad.get(0));
+                    break;
+                default:
+                    StemVariable stemVariable = new StemVariable();
+                    stemVariable.addList(afterLoad);
+                    polyad.setResult(afterLoad);
+                    polyad.setResultType(Constant.STEM_TYPE);
+
+            }
             polyad.setEvaluated(true);
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
-            polyad.setResult(Boolean.FALSE);
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setResult(QDLNull.getInstance());
             polyad.setEvaluated(true);
         }
     }
@@ -1550,50 +1785,164 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
      *
      * @param polyad
      */
-    protected void doImport(Polyad polyad, State state) {
+    protected void doModuleImport(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException("Error" + MODULE_IMPORT + " requires an argument");
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0), state);
-        URI moduleNS = null;
-
-        try {
-            moduleNS = URI.create(arg.toString());
-        } catch (Throwable t) {
+        if (arg == QDLNull.getInstance()) {
+            // case that user tries to import q QDL null module. This can happen is
+            // the load fails. Don't have it as an error, return QDl null to show nothing
+            // happened (so user can check with conditional).
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
-            polyad.setEvaluated(false);
-            throw new QDLException("the module name '" + arg.toString() + "' must be a uri");
+            polyad.setEvaluated(true);
+            return;
         }
-        Module m = state.getModuleMap().get(moduleNS);
-
-        if (m == null) {
-            throw new IllegalStateException("no such module '" + moduleNS + "'");
-        }
-        String alias = null;
-        State newModuleState = state.newModuleState();
-        Module newInstance = m.newInstance(newModuleState);
-        if (newInstance instanceof JavaModule) {
-            ((JavaModule) newInstance).init(newModuleState);
-        }
-        if (polyad.getArgCount() == 2) {
-            Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArgAt(1), state);
-            if (!isString(arg2)) {
-                throw new MissingArgumentException("You must supply a valid alias import.");
+        StemVariable argStem = convertArgsToStem(polyad, arg, state, MODULE_IMPORT);
+        boolean gotOne;
+        // The arguments has been regularized so it is a stem of lists of the form
+        // [[fq0{,alias0}],[fq1{,alias1}],...,[fqn{,aliasn}]]
+        // {,alias} means that may or may not be present. If missing or null, use default.
+        // If there is no aliasj, then [fqj] can be replaced with fqj,
+        // E.g.
+        // [['fq:0','alias0'],'fq:1',['fq:2'],['fq:3','alias3']]
+        // should work
+        gotOne = false;
+        StemVariable outputStem = new StemVariable();
+        for (Object key : argStem.keySet()) {
+            Object value = argStem.get(key);
+            URI moduleNS = null;
+            String alias = null;
+            if (isString(value)) {
+                moduleNS = URI.create((String) value); // if this bombs it throws an illega argument exception, which is ok.
+                gotOne = true;
             }
-            alias = arg2.toString();
-        } else {
-            // no new alias supplied, so use the default in the module definition.
-            alias = m.getAlias();
+            if (isStem(value)) {
+                StemVariable innerStem = (StemVariable) value;
+                Object q = innerStem.get(0L);
+
+                if (!isString(q)) {
+                    throw new IllegalArgumentException(MODULE_IMPORT + ": the fully qualified name must be a string");
+                }
+                moduleNS = URI.create((String) q);
+
+                if (innerStem.containsKey(1L)) {
+                    q = innerStem.get(1L);
+                    if (!isString(q)) {
+                        throw new IllegalArgumentException(MODULE_IMPORT + ": the alias for \"" + moduleNS + " must be a string");
+                    }
+                    alias = (String) q;
+                }
+                gotOne = true;
+            }
+            if (!gotOne) {
+                throw new IllegalArgumentException(MODULE_IMPORT + ": unknown argument type");
+            }
+            Module m = state.getModuleMap().get(moduleNS);
+            if (m == null) {
+                throw new IllegalStateException("no such module '" + moduleNS + "'");
+            }
+
+            State newModuleState = state.newModuleState();
+            Module newInstance = m.newInstance(newModuleState);
+            if (newInstance instanceof JavaModule) {
+                ((JavaModule) newInstance).init(newModuleState);
+            }
+            if (alias == null) {
+                alias = m.getAlias();
+            }
+            ImportManager resolver = state.getImportManager();
+            resolver.addImport(moduleNS, alias);
+            state.getImportedModules().put(alias, newInstance);
+            if (isLong(key)) {
+                outputStem.put((Long) key, alias);
+            } else {
+                outputStem.put((String) key, alias);
+            }
+
         }
-        ImportManager resolver = state.getImportManager();
-        resolver.addImport(moduleNS, alias);
-        state.getImportedModules().put(alias, newInstance);
-        polyad.setResult(Boolean.TRUE);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        switch (outputStem.size()) {
+            case 0:
+                polyad.setResult(QDLNull.getInstance());
+                polyad.setResultType(Constant.NULL_TYPE);
+                break;
+            case 1:
+                polyad.setResult(outputStem.get(0L));
+                polyad.setResultType(Constant.STRING_TYPE);
+                break;
+            default:
+                polyad.setResult(outputStem);
+                polyad.setResultType(Constant.STEM_TYPE);
+        }
         polyad.setEvaluated(true);
+
+    }
+
+    /**
+     * Converts a couple of different arguments to the form
+     * [[a0{,b0}],[a1{,b1}],...,[an{,bn}] or (if a single argument that is
+     * a stem) can pass back:
+     * <p>
+     * {key0:[[a0{,b0}], key1:[a1{,b1}],...}
+     * <p>
+     * where the bk are optional. All ak, bk are strings.
+     * a,b -> [[a,b]] (pair of arguments, function is dyadic
+     * [a,b] ->[[a,b]] (simple list, convert to nested list
+     * [a0,a1,...] -> [[a0],[a1],...] allow for scalars
+     * Use in both module import and load for consistent arguments
+     *
+     * @param polyad
+     * @param state
+     * @param component
+     * @return
+     */
+    private StemVariable convertArgsToStem(Polyad polyad, Object arg, State state, String component) {
+//        Object arg = polyad.evalArg(0, state);
+        StemVariable argStem = null;
+
+        boolean gotOne = false;
+
+        switch (polyad.getArgCount()) {
+            case 0:
+                throw new IllegalArgumentException(component + " requires an argument");
+            case 1:
+                // single string arguments
+                if (isString(arg)) {
+                    argStem = new StemVariable();
+                    argStem.listAppend(arg);
+                    gotOne = true;
+                }
+                if (isStem(arg)) {
+                    argStem = (StemVariable) arg;
+                    gotOne = true;
+                }
+                break;
+            case 2:
+                if (!isString(arg)) {
+                    throw new IllegalArgumentException("Dyadic " + component + " requires string arguments only");
+                }
+                Object arg2 = polyad.evalArg(1, state);
+                checkNull(arg2, polyad.getArgAt(1), state);
+                if (!isString(arg2)) {
+                    throw new IllegalArgumentException("Dyadic " + component + " requires string arguments only");
+                }
+
+                argStem = new StemVariable();
+                StemVariable innerStem = new StemVariable();
+                innerStem.listAppend(arg);
+                innerStem.listAppend(arg2);
+                argStem.put(0L, innerStem);
+                gotOne = true;
+                break;
+            default:
+                throw new IllegalArgumentException(component + ": too many arguments");
+        }
+        if (!gotOne) {
+            throw new IllegalArgumentException(component + ": unknown argument type");
+        }
+        return argStem;
     }
 
     protected void doExecute(Polyad polyad, State state) {

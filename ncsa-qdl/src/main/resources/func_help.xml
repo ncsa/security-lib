@@ -1203,8 +1203,19 @@ index_of(source, snippets, case_sensitive) - if true (default) all comparisons
             <![CDATA[
 module_import(urn)- import the given module using its default alias.
 module_import(urn, alias) - import the module, assigning it a different alias.
+module_import(arg.) - import a bunch of modules in a stem
 Note: A module must be loaded before it can be imported or the system does not
       know about it.
+
+E.g.
+  module_import(urn0, [urn1, 'curves'], [urn2. 'complex'])
+
+This will import 3 modules with urn0, urn1 and urn2. urn0 is importe
+with the default alias, urn1 and urn2 are imported with the specified
+aliases.
+Returns:
+  - null if nothing imported
+  - a list of aliases that were imported that corresponds to the input arg.
 ]]>
         </body>
     </entry>
@@ -1217,6 +1228,26 @@ module_load(path, type) - load the module. If type is 'file' (default) then
                     this is assumed to be QDL and loaded. If the type is 'java'
                     then the path is actually the fully qualified class name
                     and this is loaded from the Java virtual machine.
+module_load([[path0{,type0}],path1{,type1}], . . . [pathn{,typen}]])
+          load all of the given modules. The typek are optional.
+Modules defined outside of the running QDL session must be loaded before being
+imported, since you may import multiple instances of the module with
+different aliases.
+
+Returns:
+  - null if nothing loaded
+  - fully qualified name  of the loaded module
+  - stem of fully qualified names (if there are multiple modules in the file).
+
+E.g. load and import a module
+   module_import(module_load('complex'))
+complex
+
+This looks for the module named complex then complex.mdl in the module
+path and loads it. It then imports an instance using the default alias
+the result is the name of the module in the session.
+
+See also:module_import
              ]]>
         </body>
     </entry>
@@ -1864,9 +1895,10 @@ See also: Reference manual on ^
     <entry id="join">
             <body>
                 <![CDATA[
-join(x., y., axis) - join two stems together along a given axis.
+join(x., y.[, axis]) - join two stems together along a given axis.
 See also: union or the ~ operator. Those are special cases of
-join(x., y., 0 ) == x.~y.
+join(x., y., 0 ) == x.~y. == join(x., y.)
+Omitting axis means use axis 0,
                 ]]>
             </body>
         </entry>

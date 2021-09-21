@@ -5,17 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Updating">
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/FormattedStem.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/FormattedStems.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/test.mdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/AbstractFunctionEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/AbstractFunctionEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoaderUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemList.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemList.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/func_help.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/complex.mdl" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/complex.mdl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/ext.mdl" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules/ext.mdl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StemFunctionsTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ExpressionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ExpressionTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" afterDir="false" />
@@ -674,28 +673,7 @@
       <workItem from="1627556750839" duration="210843000" />
       <workItem from="1629545451794" duration="8433000" />
       <workItem from="1630412191587" duration="149272000" />
-      <workItem from="1631532725842" duration="80167000" />
-    </task>
-    <task id="LOCAL-00098" summary="locally stashing this just in case an experiment fails">
-      <created>1622893872951</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1622893872951</updated>
-    </task>
-    <task id="LOCAL-00099" summary="Fixed edge case in QDL when setting a variable. Added more tests. Current count: 760 unit tests in QDL alone.">
-      <created>1623096749113</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1623096749113</updated>
-    </task>
-    <task id="LOCAL-00100" summary="QDL for_each support (does not impact anything, but a useful utility). Tests and documentation updated.">
-      <created>1623182956396</created>
-      <option name="number" value="00100" />
-      <option name="presentableId" value="LOCAL-00100" />
-      <option name="project" value="LOCAL" />
-      <updated>1623182956396</updated>
+      <workItem from="1631532725842" duration="119765000" />
     </task>
     <task id="LOCAL-00101" summary="Found issue with transposed boolean arguments. Added support for anonymous λ functions in QDL. ISO 6429 improvements.">
       <created>1623344103960</created>
@@ -1019,7 +997,28 @@
       <option name="project" value="LOCAL" />
       <updated>1631734437048</updated>
     </task>
-    <option name="localTasksCounter" value="147" />
+    <task id="LOCAL-00147" summary="Found a real edge case for comparing two values. Improved a function. Mostly this is cleanup running up to 5.2.2.">
+      <created>1631825311466</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1631825311466</updated>
+    </task>
+    <task id="LOCAL-00148" summary="Found another edge case, added slew of unit tests for parsing (ongoing, long term task) in QDL.">
+      <created>1631828643838</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1631828643838</updated>
+    </task>
+    <task id="LOCAL-00149" summary="Yikes! Upgrade to junit changed how assert was handled, effectively making a slew of my regression tests (potentially) giving false positives. QDL tests (rocking it at over 1400) amended. All was working, so no red flags and now that class of error detection has been replaced.">
+      <created>1631878823275</created>
+      <option name="number" value="00149" />
+      <option name="presentableId" value="LOCAL-00149" />
+      <option name="project" value="LOCAL" />
+      <updated>1631878823275</updated>
+    </task>
+    <option name="localTasksCounter" value="150" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1029,9 +1028,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="CIL-934 (device flow) part 3" />
-    <MESSAGE value="QDl documentation. twiddled some exceptions to regularize their use." />
-    <MESSAGE value="Fixed a few minor things (mis-spellings in comments) and added comments to unit tests." />
     <MESSAGE value="Added floor and ceiling functions to QDL (way overdue) since I have a little time to play catch up. Documented." />
     <MESSAGE value="CIL-607, Updated nano syntax files. Added a test." />
     <MESSAGE value="Mostly quality of life issues for the CLI. Added support for storing a result set and using it. Added tiny tweak to parser, which caused the whole thing to get rebuilt." />
@@ -1054,7 +1050,10 @@
     <MESSAGE value="Updating a few names of things. Refactoring." />
     <MESSAGE value="Updating" />
     <MESSAGE value="Tiny tweaks getting ready for 5.2.2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Tiny tweaks getting ready for 5.2.2" />
+    <MESSAGE value="Found a real edge case for comparing two values. Improved a function. Mostly this is cleanup running up to 5.2.2." />
+    <MESSAGE value="Found another edge case, added slew of unit tests for parsing (ongoing, long term task) in QDL." />
+    <MESSAGE value="Yikes! Upgrade to junit changed how assert was handled, effectively making a slew of my regression tests (potentially) giving false positives. QDL tests (rocking it at over 1400) amended. All was working, so no red flags and now that class of error detection has been replaced." />
+    <option name="LAST_COMMIT_MESSAGE" value="Yikes! Upgrade to junit changed how assert was handled, effectively making a slew of my regression tests (potentially) giving false positives. QDL tests (rocking it at over 1400) amended. All was working, so no red flags and now that class of error detection has been replaced." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1175,11 +1174,6 @@
           <option name="timeStamp" value="632" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
-          <line>1828</line>
-          <option name="timeStamp" value="636" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemUtility.java</url>
           <line>142</line>
           <option name="timeStamp" value="638" />
@@ -1211,7 +1205,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StatementTest.java</url>
-          <line>106</line>
+          <line>115</line>
           <option name="timeStamp" value="724" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -1360,24 +1354,9 @@
           <option name="timeStamp" value="1046" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/VFSTest.java</url>
-          <line>408</line>
-          <option name="timeStamp" value="1047" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java</url>
-          <line>1486</line>
-          <option name="timeStamp" value="1048" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/IOEvaluator.java</url>
           <line>665</line>
           <option name="timeStamp" value="1064" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>1640</line>
-          <option name="timeStamp" value="1065" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
@@ -1385,14 +1364,29 @@
           <option name="timeStamp" value="1095" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java</url>
-          <line>480</line>
-          <option name="timeStamp" value="1098" />
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/GlomTest.java</url>
+          <line>69</line>
+          <option name="timeStamp" value="1101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java</url>
-          <line>472</line>
-          <option name="timeStamp" value="1099" />
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ParserTest.java</url>
+          <line>1288</line>
+          <option name="timeStamp" value="1103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
+          <line>2745</line>
+          <option name="timeStamp" value="1104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/ControlEvaluator.java</url>
+          <line>1901</line>
+          <option name="timeStamp" value="1115" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/FunctionEvaluator.java</url>
+          <line>101</line>
+          <option name="timeStamp" value="1119" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -1403,6 +1397,7 @@
         <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode" memberName="statements" />
         <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.VFSTest" memberName="xp" />
         <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.expressions.Assignment" memberName="sourceCode" />
+        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.state.State" memberName="importedModules" />
       </pinned-members>
     </pin-to-top-manager>
   </component>

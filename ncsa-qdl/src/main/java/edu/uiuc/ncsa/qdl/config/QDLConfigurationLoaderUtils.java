@@ -16,9 +16,7 @@ import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
 import java.net.URI;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider.*;
@@ -230,18 +228,21 @@ public class QDLConfigurationLoaderUtils {
         return x;
     }
 
-    public static void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
+    public static List<String> setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
+         List<String> importedFQNames = new ArrayList<>();
         for (Module m : loader.load()) {
             m.setTemplate(true);
             state.addModule(m); // done!
             if (importASAP) {
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
+                importedFQNames.add(m.getNamespace().toString());
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
                 state.getImportedModules().put(m.getAlias(), mm);
             }
         }
+        return importedFQNames;
     }
 
     public static String runBootScript(QDLEnvironment config, State state) {

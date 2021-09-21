@@ -9,17 +9,23 @@ module[
     >> These do not work iteratively since the plan is to introduce
     >> actual complex number support at some point into QDL. These are
     >> examples and also allow for some quick calculations
-    c_plus(a.,b.)→a.+b.;
+     c_plus(a.,b.)→a.+b.;
     c_minus(a.,b.)→a.-b.;
-    c_times(a.,b.)→to_list(a.0×b.0 - a.1×b.1, a.0×b.1+b.0×a.1);
-    c_mod2(z.)→reduce(@+,z.^2);
-    c_mod(z.)→sqrt(c_mod2(z.));
-    c_conj(z.)→[z.0,-z.1];
-    c_div(a.,b.)→c_times(a., c_conj(b.))÷c_mod2(b.);
-    c_real(z.)→z.0;
-    c_im(z.)→z.1;
-    c_exp(z.)→exp(z.0)*[cos(z.1), sin(z.1)];
-    c_ln(z.)→to_list(ln(c_mod(z.)), atan(z.1/z.0)); // principal value only.
+    c_times(a.,b.)→(a.0×b.0 - a.1×b.1)~(a.0×b.1+b.0×a.1);
+        c_mod2(z.)→reduce(@+,z.^2);
+         c_mod(z.)→sqrt(c_mod2(z.));
+        c_conj(z.)→[z.0,-z.1];
+      c_div(a.,b.)→c_times(a., c_conj(b.))÷c_mod2(b.);
+        c_real(z.)→z.0;
+          c_im(z.)→z.1;
+         c_exp(z.)→exp(z.0)*[cos(z.1), sin(z.1)];
+          c_ln(z.)→ln(c_mod(z.)) ~ atan(z.1/z.0); // principal value only.
+         c_cos(z.)→c_div(c_exp(c_times(z., [0,1])) + c_exp(c_times(z., [0,-1])), [2,0]);
+        c_cosh(z.)→c_div(c_exp(z.) + c_exp(-z.), [2,0]);
+         c_sin(z.)→c_div(c_exp(c_times(z., [0,1])) - c_exp(c_times(z., [0,-1])), [0,2]);
+        c_sinh(z.)→c_div(c_exp(z.) - c_exp(-z.), [2,0]);
+         c_tan(z.)→c_div(c_sin(z.), c_cos(z.));
+        c_tanh(z.)→c_div(c_sinh(z.), c_cosh(z.));
     define[c_root(a,b)][
     >> c_root(a,b) will return the positive square root of a+i*b.
     >> See also: c_root(z.) to do this for complex numbers directly.

@@ -4818,6 +4818,11 @@ public class WorkspaceCommands implements Logable {
                 iox.printStackTrace();
             }
             throw new QDLException("Error reading input.");
+        } catch(ArrayIndexOutOfBoundsException ax){
+            if(DebugUtil.isEnabled()) {
+                ax.printStackTrace();
+            }
+            throw new QDLException("Error reading input.");
         }
     }
 

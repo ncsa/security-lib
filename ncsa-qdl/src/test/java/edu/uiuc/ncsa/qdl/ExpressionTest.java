@@ -36,6 +36,25 @@ public class ExpressionTest extends AbstractQDLTester {
     }
 
     /**
+     * Test the !(a+2)<(b-3) evaluates then applies monadic ! rather than implicitly
+     * regrouping as
+     * <pre>
+     *   (!(a+2))<(b-3)
+     * </pre>
+     * and failing.  (Regression test.)
+     * @throws Throwable
+     */
+    public void testExpression1a() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a:= 10; b := 4;");
+        addLine(script, "ok := !(a+2)<(b-3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /**
      * Create some nodes, then change the state and test that the cloning works.
      *
      * @throws Exception
@@ -76,6 +95,7 @@ public class ExpressionTest extends AbstractQDLTester {
         assert !(Boolean) notNode2.getResult();
 
     }
+
 
     /**
      * Test to check that inline conditionals of the form

@@ -1,0 +1,36 @@
+module[
+   'a:/b','X'
+   ][
+   u := 2;
+   v := 3;
+   times(x,y)->x*y;
+   f(x,y)->times(x,u)+times(y,v);
+   g()->u+v;
+  ];
+  /*
+      Regression test for module scope
+      This works as expected:
+
+        module_import(module_load('test'))
+      X
+        X#u := 5
+        X#v := 7
+        X#f(2,3)
+      31
+        X#g()
+      12
+
+       Loading another instance of the module, however, leads to serious problems:
+
+       module_import('a:/b','Y')
+       Y#u := -1; Y#v := -2;
+       X#f(2,3);
+    Error: There are multiple modules with a function named "times". You must fully qualify which one you want.
+       X#g();
+    Error: The variable "u" is defined in multiple modules. You must fully qualify it to use it.
+
+Fix: (probably) make sure that in the local state that the module's state by alias is available and
+     queried first. So glom the alias's symbol and function table onto the module local state(???)
+
+    This does not apply to Java modules.
+  */

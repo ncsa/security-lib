@@ -2743,7 +2743,10 @@ z. :=  join3(q.,w.)
             args[i] = polyad.evalArg(i, state);
             checkNull(args[i], polyad.getArgAt(i));
         }
-        int axis = ((Long) args[2]).intValue();
+        int axis = 0;
+        if(args.length == 3) {
+            axis = ((Long) args[2]).intValue();
+        }
         StemVariable leftStem;
         if (isStem(args[0])) {
             leftStem = (StemVariable) args[0];
