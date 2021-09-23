@@ -564,7 +564,7 @@ return StemUtility.areNoneStems(objects);    }
                 operator  = new Polyad(operatorName);
             }else{
                 //FunctionRecord functionRecord = state.getFTStack().get(operatorName, nAry); // It's a dyad!
-                FR_WithState fr_withState = state.resolveFunction(operatorName, nAry); // It's a dyad!
+                FR_WithState fr_withState = state.resolveFunction(operatorName, nAry, true); // It's a dyad!
 
                 if(fr_withState == null || fr_withState.functionRecord == null){
                     throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined with " + nAry + " arguments");

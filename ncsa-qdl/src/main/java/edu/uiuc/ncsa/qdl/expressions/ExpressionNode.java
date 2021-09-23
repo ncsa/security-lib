@@ -27,6 +27,4 @@ public interface ExpressionNode extends StatementWithResultInterface {
 
     void setOperatorType(int operatorType);
 
-    //Object evaluate(State state);
-
 }

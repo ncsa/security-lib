@@ -133,7 +133,7 @@ public class InputFormUtil {
      * @return
      */
     public static String inputForm(String fName, int argCount, State state) {
-        FR_WithState fr_withState = state.resolveFunction(fName, argCount);
+        FR_WithState fr_withState = state.resolveFunction(fName, argCount, true);
         String output = null;
 
         if (fr_withState == null) {

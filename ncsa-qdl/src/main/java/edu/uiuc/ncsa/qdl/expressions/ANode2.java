@@ -129,78 +129,14 @@ public class ANode2 extends ExpressionImpl {
             ((ESN2) realLeftArg).set(state, getResult());
             return getResult();
         }
+        if(realLeftArg instanceof ModuleExpression){
+            ((ModuleExpression)realLeftArg).set(state, getResult());
+            return getResult();
+        }
         throw new IllegalArgumentException("unknown node type");
     }
 
-    public Object oldAssign(State state) {
-        Dyad d = null;
 
-        if (getAssignmentType() != leftAssignmentType && getAssignmentType() != rightAssignmentType) {
-            d = new Dyad(getAssignmentType());
-            if (getLeftArg() instanceof ANode2) {
-
-                d.setLeftArgument(((ANode2) getLeftArg()).getRightArg());
-            } else {
-                d.setLeftArgument(getLeftArg());
-            }
-
-            d.setRightArgument(getRightArg());
-            d.evaluate(state);
-            setResult(d.getResult());
-            setResultType(d.getResultType());
-        } else {
-            getRightArg().evaluate(state);
-            setResult(getRightArg().getResult());
-            setResultType(getRightArg().getResultType());
-        }
-        setEvaluated(true);
-        boolean wasSet = false;
-        if (getLeftArg() instanceof ANode2) {
-            ANode2 lANode = (ANode2) getLeftArg();
-            lANode.getRightArg().evaluate(state);
-            if (lANode.getRightArg() instanceof VariableNode) {
-                VariableNode vNode = (VariableNode) lANode.getRightArg();
-                setVariableValue(state, vNode.getVariableReference(), getResultType(), getResult());
-                wasSet = true;
-            }
-            if (lANode.getRightArg() instanceof ExpressionStemNode) {
-                setExpValue(state, (ExpressionStemNode) lANode.getRightArg(), getRightArg().getResultType(), getRightArg().getResult());
-                wasSet = true;
-            }
-            // cannot evaluate the variable node at this point since if it does not exist,
-            // it raises an exception.
-            if (!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
-                getLeftArg().evaluate(state); // this chains to the next.
-            }
-        } else {
-            //          StemUtility.doNodeSurgery((ExpressionStemNode) getLeftArg(), state);
-
-            // cannot evaluate the variable node at this point since if it does not exist,
-            // it raises an exception.
-            if (getLeftArg() instanceof ESN2) {
-                ((ESN2) getLeftArg()).set(state, getRightArg());
-                wasSet = true;
-            }
-            if (getLeftArg() instanceof ExpressionStemNode) {
-                setExpValue(state, (ExpressionStemNode) getLeftArg(), getResultType(), getResult());
-                wasSet = true;
-            }
-            if (!getLeftArg().isEvaluated() && (!(getLeftArg() instanceof VariableNode))) {
-                getLeftArg().evaluate(state); // this chains to the next.
-            }
-
-            if (getLeftArg() instanceof VariableNode) {
-                setVariableValue(state, ((VariableNode) getLeftArg()).getVariableReference(), getResultType(), getResult());
-                wasSet = true;
-            }
-
-        }
-        if (!wasSet) {
-            throw new IllegalArgumentException("error: could not determine node type to assign value");
-        }
-
-        return getResult();
-    }
 
 
     @Override

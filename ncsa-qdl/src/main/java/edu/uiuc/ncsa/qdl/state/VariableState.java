@@ -179,7 +179,7 @@ public abstract class VariableState extends NamespaceAwareState {
      * @return
      */
     protected Object gsrNSStemOp(StemMultiIndex w, int op, Object value) {
-        checkNSClash(w.name);
+      //  checkNSClash(w.name);
         w = resolveStemIndices(w);
         String variableName;
         StemVariable stem = null;
@@ -305,8 +305,9 @@ public abstract class VariableState extends NamespaceAwareState {
             // and there is no need to jump through all of this.
             return null;
         }
-        checkNSClash(variableName); // just check first since its quick
-        if (isNSQname(variableName)) {
+     //   checkNSClash(variableName); // just check first since its quick
+       /* if (isNSQname(variableName)) {
+            System.out.println("VariableState.gsrNSScalarOp: checking variable #");
             // get the module, hand back the value.
             Module module = getImportedModules().get(getAlias(variableName));
             switch (op) {
@@ -324,7 +325,7 @@ public abstract class VariableState extends NamespaceAwareState {
         }
         if (isNSQLocalName(variableName)) {
             variableName = variableName.substring(1); // whack off first bit
-        }
+        }*/
         SymbolTable st = getSymbolStack().getRightST(variableName);
         Object v = st.resolveValue(variableName);
         if (v == null) {

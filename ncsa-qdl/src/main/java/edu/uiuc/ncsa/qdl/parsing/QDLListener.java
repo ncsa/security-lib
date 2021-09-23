@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.AssignmentException;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
@@ -147,135 +146,14 @@ public class QDLListener implements QDLParserListener {
     }
 
 
-    public void OLDexitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
-        Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
-        Assignment topNode = currentA;
-        topNode.setSourceCode(getSource(assignmentContext));
-        Assignment nextA = null;
-        // The variable is the 0th child, the argument is the last child (it is an expression and ends up in the symbol table).
-        int exprIndex = assignmentContext.children.size() - 1;
-        //     boolean isStem = false;
-        for (int i = 0; i < exprIndex; i++) {
-            boolean isVariableCase = true;
-            String currentVar = null;
-            if (assignmentContext.children.get(i) instanceof QDLParserParser.KeywordsContext) {
-                throw new IllegalArgumentException("error: cannot assign constant a value");
-
-            }
-            if (assignmentContext.children.get(i) instanceof QDLParserParser.VariablesContext) {
-                currentVar = assignmentContext.children.get(i).getText();
-                currentA.setVariableReference(currentVar);
-            } else {
-                Statement s = resolveChild(assignmentContext.children.get(i));
-                if (!(s instanceof StatementWithResultInterface)) {
-                    throw new IllegalArgumentException("error: illegal assignment expression ");
-                }
-                currentA.setLeftArg((StatementWithResultInterface) s);
-                isVariableCase = false;
-            }
-            // The general pattern (i.e.  the children of assignmentContext) is
-            //   V0 op0 V1 op1 V2 op2 V3 op3 Expr
-            // (The final argument must always be an expression). So this gets
-            //   V0 op0 V1
-            //  and increments the loop once, so the next iteration it gets
-            //   V1 op1 V2
-            // In this way it has enough information at each iteration to make the
-            // right type of assignment operator.
-            String op = assignmentContext.children.get(++i).getText(); // this is the operator
-            String nextVar;
-            if (currentA.getSourceCode() == null) {
-                List<String> source = new ArrayList<>();
-                if (isVariableCase) {
-                    source.add(currentVar + op + assignmentContext.children.get(i + 1).getText());
-                } else {
-                    source.add(currentA.getLeftArg().getSourceCode() + op + assignmentContext.children.get(i + 1).getText());
-                }
-                currentA.setSourceCode(source);
-            }
-            nextA = new Assignment();
-            if (assignmentContext.children.size() == i + 1) {
-                // no next element, implies the user sent something like a :=; so no rhs, OR the
-                // rhs was so munged the parser can't figure out what it is.
-                // Throw an  exception they can understand rather than an index out of bounds.
-                throw new AssignmentException("missing/unparseable right-hand expression for assignment");
-            }
-
-            if (assignmentContext.children.get(i + 1) instanceof QDLParserParser.VariablesContext) {
-                nextVar = assignmentContext.children.get(i + 1).getText();
-                nextA.setVariableReference(nextVar);
-            } else {
-                Statement s = resolveChild(assignmentContext.children.get(i + 1));
-                if (!(s instanceof StatementWithResultInterface)) {
-                    throw new IllegalArgumentException("error: illegal assignment expression ");
-                }
-                nextA.setLeftArg((StatementWithResultInterface) s);
-                // isVariableCase = false;
-            }
-//            nextVar = assignmentContext.children.get(i + 1).getText();
-            //          nextA.setVariableReference(nextVar);
-            // Special cases. := means assignment, if not then, then it is one
-            // of +=, *=,..., so create the appropriate dyad
-            if (op.equals(":=") || op.equals("≔") | op.equals("=:") | op.equals("≕")) {   // Allows unicode 2254, 2255 as assignment too.
-                if (op.equals("=:") | op.equals("≕")) {
-                    // This is the only place for sure we know what the operator is.
-                    currentA.setFlippedAssignment(true);
-                }
-
-                if (i + 1 == exprIndex) {
-                    Statement arg = resolveChild(assignmentContext.children.get(i + 1));
-                    currentA.setRightArg(arg);
-                    return;
-                    // test for this. q and A should have the value 'abc', B == 'bc'
-                    //  A := 'a'; B := 'b';
-                    // q := A += B += 'c';
-                }
-                currentA.setRightArg(nextA);
-            } else {
-                Dyad d = new Dyad(getAssignmentType(op));
-                d.setLeftArgument(new VariableNode(currentVar));
-                d.setRightArgument(new AssignmentNode(nextA));
-                currentA.setRightArg(d);
-            }
-            if (i + 1 == exprIndex) {
-                Statement arg = resolveChild(assignmentContext.children.get(i + 1));
-                // If this is not here, you will create a variable with the name of the argument,
-                // e.g. 'qqq'
-                if (isVariableCase) {
-                    nextA.setVariableReference(currentA.getVariableReference());
-                } else {
-                    nextA.setLeftArg(currentA.getLeftArg());
-                }
-                nextA.setRightArg(arg);
-                return;
-                //  A := 'a'; B := 'b';
-                // q := A += B += 'c';
-            } else {
-                // Chain them together if there are more to come
-            }
-            currentA = nextA;
-            //          i = nextIndex - 1; // back up cursor so on increment in loop it points to right place
-        } //end for
-    }
-
-    boolean useOldA = false;
-
     @Override
     public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
-        if (useOldA) {
-
-            stash(ctx, new Assignment());
-        } else {
-            stash(ctx, new ANode2());
-        }
+        stash(ctx, new ANode2());
     }
 
     @Override
     public void exitAssignment(QDLParserParser.AssignmentContext assignmentContext) {
-        if (useOldA) {
-            exitAssignment2(assignmentContext);
-        } else {
-            exitAssignmentANode(assignmentContext);
-        }
+        exitAssignmentANode(assignmentContext);
     }
 
     public void exitAssignmentANode(QDLParserParser.AssignmentContext assignmentContext) {
@@ -1541,9 +1419,9 @@ public class QDLListener implements QDLParserListener {
         // FunctionReferenceNode frn = new FunctionReferenceNode();
         FunctionReferenceNode frn = (FunctionReferenceNode) parsingMap.getStatementFromContext(ctx);
         String name = ctx.getText();
-        if(name.contains(QDLConstants.FUNCTION_REFERENCE_MARKER2)) {
+        if (name.contains(QDLConstants.FUNCTION_REFERENCE_MARKER2)) {
             name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER2.length());
-        }else{
+        } else {
             name = name.substring(QDLConstants.FUNCTION_REFERENCE_MARKER.length());
         }
         //frn.setFunctionName(name); // if we allow function references to not end in ()
@@ -2048,6 +1926,32 @@ public class QDLListener implements QDLParserListener {
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
         dyad.setSourceCode(source);
+    }
+
+    @Override
+    public void enterModuleExpression(QDLParserParser.ModuleExpressionContext ctx) {
+
+    }
+
+    @Override
+    public void exitModuleExpression(QDLParserParser.ModuleExpressionContext ctx) {
+        if(ctx.getChildCount() == 2){
+            // This is of the form #expression, so it is just an expression
+            // Don't wrap it and no special processing needed.
+            stash(ctx, resolveChild(ctx.expression()));
+            return;
+        }
+        ModuleExpression moduleExpression = new ModuleExpression();
+        stash(ctx, moduleExpression);
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        moduleExpression.setSourceCode(source);
+        StatementWithResultInterface var = (StatementWithResultInterface) resolveChild(ctx.variable());
+        if (!(var instanceof VariableNode)) {
+            throw new IllegalArgumentException("unexpected argument for alias");
+        }
+        moduleExpression.setAlias(((VariableNode) var).getVariableReference());
+        moduleExpression.setExpression((StatementWithResultInterface) resolveChild(ctx.expression()));
     }
 }
 

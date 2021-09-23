@@ -20,6 +20,17 @@ import java.util.List;
  * on 6/1/21 at  6:37 AM
  */
 public class ParseStatementBlock implements StatementWithResultInterface {
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
     @Override
     public Object getResult() {
         return null;

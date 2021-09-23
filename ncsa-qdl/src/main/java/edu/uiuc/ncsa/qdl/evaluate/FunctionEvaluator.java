@@ -92,14 +92,14 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     argCount = ((Long) object2).intValue();
                 }
 
-                polyad.setResult(state.resolveFunction(name, argCount).functionRecord != null);
+                polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setEvaluated(true);
                 return true;
         }
         if (!polyad.isBuiltIn()) {
             try {
-                figureOutEvaluation(polyad, state);
+                figureOutEvaluation(polyad, state, !polyad.isInModule());
             } catch (Throwable t) {
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
@@ -164,10 +164,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
-    protected void figureOutEvaluation(Polyad polyad, State state) throws Throwable {
+    protected void figureOutEvaluation(Polyad polyad, State state, boolean checkForDuplicates) throws Throwable {
         FR_WithState frs;
         try {
-            frs = state.resolveFunction(polyad);
+            frs = state.resolveFunction(polyad, checkForDuplicates);
         } catch (UndefinedFunctionException udx) {
             if (!state.isEnableLibrarySupport()) {
                 throw udx; // don't try to resolve libraries if support is off.
@@ -180,7 +180,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         if (frs.isExternalModule) {
             doJavaFunction(polyad, state, frs);
         } else {
-            doFunctionEvaluation(polyad, state, frs.functionRecord);
+            doFunctionEvaluation(polyad, state, frs);
         }
     }
 
@@ -220,7 +220,12 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
      */
 
-    protected void doFunctionEvaluation(Polyad polyad, State state, FunctionRecord functionRecord) throws Throwable {
+    protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) throws Throwable {
+        FunctionRecord functionRecord = frs.functionRecord;
+        State moduleState = null;
+        if(frs.isModule){
+            moduleState = (State) frs.state;
+        }
         if (functionRecord == null) {
             // see if its a reference instead
             functionRecord = state.getFTStack().getFunctionReference(polyad.getName());
@@ -232,8 +237,17 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         if (!functionRecord.isFuncRef) {
             functionRecord = functionRecord.newInstance();
         }
-        State localState = state.newStateWithImports();
-        //localState.getFTStack().push(frs.state.getFTStack().peek());
+        State localState;
+         if(moduleState == null){
+            localState = state.newStateWithImports();
+
+        }else{
+            localState = state.newStateWithImports(moduleState);
+        }
+       // State localState = state.newStateWithImports();
+
+   //     localState.getSymbolStack().addParent((SymbolTableImpl) moduleState.getSymbolStack().getLocalST());
+   //     localState.getFTStack().push(frs.state.getFTStack().peek());
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         SymbolTable symbolTable = localState.getSymbolStack().getLocalST();

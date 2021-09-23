@@ -637,7 +637,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(INPUT_FORM + " second argument must be an integer");
         }
 
-        FR_WithState fr_withState = state.resolveFunction(argName, argCount);
+        FR_WithState fr_withState = state.resolveFunction(argName, argCount, true);
         if (fr_withState == null) {
             // no such critter
             polyad.setResult("");

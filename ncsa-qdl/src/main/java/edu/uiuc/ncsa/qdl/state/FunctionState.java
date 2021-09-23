@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
@@ -16,7 +15,6 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
@@ -61,17 +59,16 @@ public abstract class FunctionState extends VariableState {
      * @param polyad
      * @return
      */
-    public FR_WithState resolveFunction(Polyad polyad) {
-        return resolveFunction(polyad.getName(), polyad.getArgCount());
+    public FR_WithState resolveFunction(Polyad polyad, boolean checkForDuplicates) {
+        return resolveFunction(polyad.getName(), polyad.getArgCount(), checkForDuplicates);
     }
 
-    public FR_WithState resolveFunction(String name, int argCount) {
-        FR_WithState frs = new FR_WithState();
+    public FR_WithState resolveFunction(String name, int argCount, boolean checkForDuplicates) {
         if (name == null || name.isEmpty()) {
             throw new NFWException(("Internal error: The function has not been named"));
         }
 
-        if (name.contains(NS_DELIMITER)) {
+     /*   if (name.contains(NS_DELIMITER)) {
             if (name.startsWith(NS_DELIMITER)) {
                 // case is that it is directly qualified for the top leve. Check it, return what is there.
                 frs.functionRecord = getFTStack().get(name.substring(1), argCount);
@@ -107,51 +104,72 @@ public abstract class FunctionState extends VariableState {
             }
             frs.state = module.getState();
             frs.isExternalModule = module.isExternal();
+            frs.isModule = true;
             return frs;
 
 
-        } else {
-            if (!getImportManager().hasImports()) {
-                // Nothing imported, so nothing to look through.
-                frs.state = this;
-                if (argCount == -1) {
-                    frs.functionRecord = getFTStack().getSomeFunction(name);
-                } else {
-                    frs.functionRecord = getFTStack().get(name, argCount);
-                }
-                return frs;
-            }
-            // check for unqualified names.
-            FR_WithState fr = new FR_WithState();
-            fr.functionRecord = getFTStack().get(name, argCount);
+        } else {*/
+        if (!getImportManager().hasImports()) {
+            FR_WithState frs = new FR_WithState();
 
-            fr.state = this;
-            for (String alias : getImportedModules().keySet()) {
-                if (fr.functionRecord == null) {
-                    FunctionRecord tempFR = getImportedModules().get(alias).getState().getFTStack().get(name, argCount);
-                    if(tempFR != null) {
-                        fr.functionRecord = tempFR;
-                        fr.state = getImportedModules().get(alias).getState();
-                        fr.isExternalModule = getImportedModules().get(alias).isExternal();
-                    }
-                } else {
-                    FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
-                    if (tempFR != null) {
-                        throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
-                    }
-                }
+            // Nothing imported, so nothing to look through.
+            frs.state = this;
+            if (argCount == -1) {
+                frs.functionRecord = getFTStack().getSomeFunction(name);
+            } else {
+                frs.functionRecord = getFTStack().get(name, argCount);
             }
-            if (fr.functionRecord == null) {
-                // edge case is that it is actually a built-in function reference.
-                fr.functionRecord=getFTStack().getFunctionReference(name);
-                //fr.isExternalModule = false; // just to be sure.
-                if(fr.functionRecord == null) {
-                    throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
-                }
-            }
-            return fr;
+            return frs;
         }
+        // check for unqualified names.
+        FR_WithState fr = new FR_WithState();
+        fr.functionRecord = getFTStack().get(name, argCount);
+
+        fr.state = this;
+        for (String alias : getImportedModules().keySet()) {
+            if (fr.functionRecord == null) {
+                FunctionRecord tempFR = getImportedModules().get(alias).getState().getFTStack().get(name, argCount);
+                if (tempFR != null) {
+                    fr.functionRecord = tempFR;
+                    fr.state = getImportedModules().get(alias).getState();
+                    fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                    fr.isModule = true;
+                    if (!checkForDuplicates) {
+                        return fr;
+                    }
+                }
+            } else {
+                FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
+                if ((checkForDuplicates) && tempFR != null) {
+                  //  System.out.println("FunctionState.resolveFunction: Found another module named \"" + name + "\"");
+            //        throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
+                }
+            }
+        }
+        if (fr.functionRecord == null) {
+            // edge case is that it is actually a built-in function reference.
+            fr.functionRecord = getFTStack().getFunctionReference(name);
+            //fr.isExternalModule = false; // just to be sure.
+            if (fr.functionRecord == null) {
+                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
+            }
+        }
+        return fr;
+        // }
     }
+     /*
+             module_import(module_load('test'))
+               module_import('a:/b', 'Y')
+
+           X#u := 5
+             X#f(2,3)
+
+  module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];
+  module_import('a:/b','X')
+  module_import('a:/b','Y')
+    X#u := 5;X#v := 7
+  X#g()
+      */
 
     /**
      * @param useCompactNotation
@@ -161,7 +179,7 @@ public abstract class FunctionState extends VariableState {
     public TreeSet<String> listFunctions(boolean useCompactNotation, String regex, boolean includeModules) {
         TreeSet<String> out = getFTStack().listFunctions(regex);
         // no module templates, so no need to snoop through them
-        if((!includeModules) || getModuleMap().isEmpty()){
+        if ((!includeModules) || getModuleMap().isEmpty()) {
             return out;
         }
         for (URI key : getImportManager().keySet()) {
@@ -200,11 +218,11 @@ public abstract class FunctionState extends VariableState {
 
     public List<String> listModuleDoc(String fname) {
         if (!fname.contains(NS_DELIMITER)) {
-             return new ArrayList<>(); // no help
+            return new ArrayList<>(); // no help
         }
         String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
 
-        if(!getModuleMap().containsKey(alias)){
+        if (!getModuleMap().containsKey(alias)) {
             return new ArrayList<>();
         }
         Module module = getModuleMap().get(alias);

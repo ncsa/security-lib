@@ -1939,7 +1939,7 @@ public class WorkspaceCommands implements Logable {
         }
         FR_WithState fr_withState = null;
         try {
-            fr_withState = getState().resolveFunction(fName, argCount);
+            fr_withState = getState().resolveFunction(fName, argCount, true);
             if (fr_withState.isExternalModule) {
                 say("cannot edit external functions.");
                 return RC_NO_OP;
@@ -1977,7 +1977,7 @@ public class WorkspaceCommands implements Logable {
         }
         try {
             getInterpreter().execute(f);
-            fr_withState = getState().resolveFunction(fName, argCount); // get it again because it was overwritten
+            fr_withState = getState().resolveFunction(fName, argCount, true); // get it again because it was overwritten
             fr_withState.functionRecord.sourceCode = f; // update source in the record.
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {

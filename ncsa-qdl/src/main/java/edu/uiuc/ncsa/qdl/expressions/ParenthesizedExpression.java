@@ -12,6 +12,18 @@ import java.util.List;
  * on 6/13/21 at  3:44 PM
  */
 public class ParenthesizedExpression implements ExpressionNode {
+
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
     public StatementWithResultInterface getExpression() {
         if(getArgCount() == 0){
             return null;

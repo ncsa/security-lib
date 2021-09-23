@@ -14,6 +14,7 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
+ * All the logic for various left/right assignments.
  * Once evaluated, this will return its value as the result.
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  5:08 PM
@@ -28,7 +29,17 @@ public class Assignment implements StatementWithResultInterface {
         assignment.variableReference = variableReference;
         return assignment;
     }
+    boolean inModule = false;
 
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
     public boolean isFlippedAssignment() {
         return flippedAssignment;
     }

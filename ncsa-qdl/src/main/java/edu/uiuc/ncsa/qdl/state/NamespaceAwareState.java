@@ -2,14 +2,8 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.ImportException;
-import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
-
-import java.net.URI;
 
 import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
 
@@ -34,25 +28,6 @@ public abstract class NamespaceAwareState extends AbstractState {
     }
     private static final long serialVersionUID = 0xcafed00d6L;
 
-    /**
-     * Takes any function and looks for the NS delimiter, returning a module if there
-     * is one.
-     *
-     * @param rawName
-     * @return
-     */
-    protected Module resolveRawNameToModule(String rawName) {
-        String alias = rawName.trim().substring(0, rawName.indexOf(NS_DELIMITER));
-        if (alias == null || alias.isEmpty()) {
-            throw new UnknownSymbolException(("Internal error: The alias has not set"));
-        }
-        if (!getImportManager().hasAlias(alias)) {
-            throw new UnknownSymbolException("Error: No such alias exists");
-        }
-        return getImportedModules().get(alias);
-
-    }
-
     public boolean isNSQname(String x) {
         return x.contains(ImportManager.NS_DELIMITER) && !x.startsWith(NS_DELIMITER);
     }
@@ -65,23 +40,16 @@ public abstract class NamespaceAwareState extends AbstractState {
      */
     public boolean isNSQLocalName(String x) {
         return x.startsWith(ImportManager.NS_DELIMITER);
-
     }
 
-    /**
-     * For and unqualified name, i.e., no #.
-     *
-     * @param x
-     * @return
-     */
-    public boolean isUNQName(String x) {
-        return -1 == x.indexOf(ImportManager.NS_DELIMITER);
-    }
 
     public void checkNSClash(String x) {
-        if (isNSQname(x) || isNSQLocalName(x)) return;
+
+/*        if (isNSQname(x) || isNSQLocalName(x)) return;
         // so it has no qualification.
         if (isNSQname(x)) {
+            System.out.println("VariableState.checkNSClash: checking for variable '" + x + "'");
+
             if (getImportManager().hasImports()) {
                 return;
             } else {
@@ -93,8 +61,8 @@ public abstract class NamespaceAwareState extends AbstractState {
             return;
         }
         // so we look at all imported modules for the name.
-        boolean isFound = getSymbolStack().isDefined(x);
-        for (URI uri : importManager.keySet()) {
+        boolean isFound = getSymbolStack().isDefined(x);*/
+      /*  for (URI uri : importManager.keySet()) {
             Module mm = getModuleMap().get(uri);
             if (mm != null) {
                 boolean y = mm.getState().isDefined(x);
@@ -109,7 +77,7 @@ public abstract class NamespaceAwareState extends AbstractState {
                     }
                 }
             }
-        }
+        }*/
     }
 
     /**

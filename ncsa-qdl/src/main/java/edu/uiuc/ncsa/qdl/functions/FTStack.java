@@ -83,6 +83,10 @@ public class FTStack implements FunctionTable {
         push(new FunctionTableImpl());
     }
 
+    public ArrayList<FunctionTable> getFtables(){
+        return ftables;
+    }
+
     @Override
     public FunctionRecord put(FunctionRecord value) {
         for(FunctionTable functionTable : ftables){

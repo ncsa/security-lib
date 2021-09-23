@@ -18,6 +18,17 @@ import java.util.List;
 public class StemEntryNode implements StatementWithResultInterface {
     StatementWithResultInterface key;
     StatementWithResultInterface value;
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
 
     public boolean isDefaultValue() {
         return isDefaultValue;

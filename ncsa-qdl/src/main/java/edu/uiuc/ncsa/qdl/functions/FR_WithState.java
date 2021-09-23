@@ -10,4 +10,5 @@ public class FR_WithState {
     public FunctionRecord functionRecord;
     public AbstractState state;
     public boolean isExternalModule = false;
+    public boolean isModule = false;
 }

@@ -12,9 +12,7 @@ module[
       This works as expected:
 
         module_import(module_load('test'))
-      X
-        X#u := 5
-        X#v := 7
+        X#u := 5;X#v := 7
         X#f(2,3)
       31
         X#g()

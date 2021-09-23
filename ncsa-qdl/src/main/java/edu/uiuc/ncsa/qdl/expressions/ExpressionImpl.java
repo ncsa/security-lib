@@ -16,6 +16,17 @@ public abstract class ExpressionImpl implements ExpressionNode {
     public ExpressionImpl() {
     }
 
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+            this.inModule = inModule;
+    }
 
     public ExpressionImpl(int operatorType) {
         this.operatorType = operatorType;

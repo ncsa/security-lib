@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
-import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -656,129 +655,9 @@ public class ParserTest extends AbstractQDLTester {
 
      */
 
-    /**
-     * Identical setup to {@link #testCalledFunctions()} but puts g and h into modules which are then imported
-     * outside the function and called. g is defined outside the module.
-     * This should <b>FAIL</b> since there are multiple definitions of g
-     *
-     * @throws Throwable
-     */
-
-    public void testFunctionAndModules_Bad() throws Throwable {
-        String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
-                "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
-                "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
-                "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
-                "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
-
-        String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
-        String g_module = "module['a:a','a']body[" + g_x + "];";
-        String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
-        String h_module = "module['b:b','b']body[" + h_y + "];";
-        String import_g = "module_import('a:a');";
-        String import_h = "module_import('b:b');";
-        String f_xy = "define[f(x,y)]body[return(" + f_body + ");];";
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, g_x);
-        addLine(script, g_module);
-        addLine(script, h_module);
-        addLine(script, import_g);
-        addLine(script, import_h);
-        addLine(script, f_xy);
-        // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-
-        // all that is set up. Now put in some values and try to evaluate it
-        script = new StringBuffer();
-        addLine(script, "x :=-3;");
-        addLine(script, "y := 5;");
-        addLine(script, "z := f(x,y);");
-        try {
-            interpreter.execute(script.toString());
-            assert false : "Was able to access imported functions inside another function without importing it";
-        } catch (NamespaceException ufx) {
-            assert true;
-        }
-
-    }
 
 
-    public void testFunctionAndModules_Good() throws Throwable {
-        BigDecimal[] results = {
-                new BigDecimal("0.224684095740375"),
-                new BigDecimal("0.542433484968442"),
-                new BigDecimal("1.22827852483025"),
-                new BigDecimal("-0.454986621086766"),
-                new BigDecimal("-0.749612627182112")
-        };
-        String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
-                "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
-                "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
-                "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
-                "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
 
-        String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
-        String g_module = "module['a:a','a']body[" + g_x + "];";
-        String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
-        String h_module = "module['b:b','b']body[" + h_y + "];";
-        String import_g = "module_import('a:a');";
-        String import_h = "module_import('b:b');";
-        String f_xy = "define[f(x,y)]body[" +
-                import_g + "\n" +
-                import_h + "\n" +
-                "return(" + f_body + ");];";
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, g_module);
-        addLine(script, h_module);
-        addLine(script, import_g);
-        addLine(script, import_h);
-        addLine(script, f_xy);
-        // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-
-
-        for (int i = 1; i < 1 + results.length; i++) {
-            script = new StringBuffer();
-            addLine(script, "x :=-3/" + i + ";");
-            addLine(script, "y := 5/" + i + ";");
-            addLine(script, "z := f(x,y);");
-            interpreter.execute(script.toString());
-            BigDecimal bd = results[i - 1];
-            BigDecimal d = getBDValue("z", state);
-            assert areEqual(d, bd);
-        }
-    }
-
-    /**
-     * Import the same module several times and show that the state of each
-     * is kept separate.
-     *
-     * @throws Throwable
-     */
-
-    public void testMultipleModuleImport() throws Throwable {
-        String g_x = "define[g(x)]body[return(x+1);];";
-        String h_y = "define[h(y)]body[return(y-1);];";
-        String g_module = "module['a:a','a']body[q:=2;w:=3;" + g_x + h_y + "];";
-        String import_g = "module_import('a:a');";
-        String import_g1 = "module_import('a:a', 'b');";
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, g_module);
-        addLine(script, import_g);
-        addLine(script, import_g1);
-        addLine(script, "a#q:=10;");
-        addLine(script, "b#q:=11;");
-        // It will ingest the function fine. It is attempting to use it later that will cause the error
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert state.getValue("a#q").equals(10L);
-        assert state.getValue("b#q").equals(11L);
-    }
 
 
     /**
@@ -832,35 +711,7 @@ public class ParserTest extends AbstractQDLTester {
 
     }
 
-    /**
-     * Make modules with the same variables, import then use NS qualification on the stem and its
-     * indices to access them.
-     *
-     * @throws Throwable
-     */
-    public void testNSAndStem() throws Throwable {
 
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);];");
-        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := -20 + n(5);];");
-        addLine(script, "i:=0;");
-        addLine(script, "j:=5;");
-        addLine(script, "list. := n(10);");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "module_import('a:b');");
-        addLine(script, "d := a#list.b#i;");
-        addLine(script, "e := b#list.#i;");
-
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-
-        Long d = getLongValue("d", state);
-        Long e = getLongValue("e", state);
-        assert d.equals(-9L);
-        assert e.equals(-20l);
-    }
 
     /**
      * very, very basic compact stem notation test.
@@ -901,78 +752,9 @@ public class ParserTest extends AbstractQDLTester {
         assert innnerStem.getLong("t").equals(42L);
     }
 
-    /**
-     * If a variable is in a module and that module is imported, you should be able
-     * to access the variable without a namespace if it has been imported and there
-     * are no clashes
-     *
-     * @throws Throwable
-     */
-    public void testNSAndVariableResolution() throws Throwable {
-
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;list. := -10 + n(5);];");
-        addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + n(5);];");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "module_import('a:b');");
-        addLine(script, "p := i;");
-        addLine(script, "q := list.0;");
-        addLine(script, "r := j;");
-        addLine(script, "s := list2.0;");
-        // Note that if we want to change the value, we need to qualify it still, however.
-        // Since an unqualified name gets created in the local state, not the module.
-        // May want to revisit how this is done in the design though....
-        addLine(script, "a#i := 5;");
 
 
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
 
-        Long p = getLongValue("p", state);
-        Long q = getLongValue("q", state);
-        Long r = getLongValue("r", state);
-        Long s = getLongValue("s", state);
-        Long i = getLongValue("i", state);
-        assert q.equals(-10L);
-        assert s.equals(-20l);
-        assert p.equals(2L);
-        assert r.equals(4L);
-        assert i.equals(5L);
-    }
-
-    /**
-     * In this case, modules have, of course, unique namespaces, but the aliases conflict so that is
-     * changed in import.
-     *
-     * @throws Throwable
-     */
-
-    public void testImportAndAlias() throws Throwable {
-
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);];");
-        addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + n(5);];");
-        addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := n(5);];");
-        addLine(script, "i:=0;");
-        addLine(script, "j:=5;");
-        addLine(script, "list. := n(10);");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "module_import('b:b');");
-        addLine(script, "module_import('a:b', 'd');");
-        addLine(script, "d := d#list.b#i;");
-        addLine(script, "e := b#list.d#i;");
-
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-
-        Long d = getLongValue("d", state);
-        Long e = getLongValue("e", state);
-        assert d.equals(1L);
-        assert e.equals(-19l);
-    }
 
     /**
      * Basic test of assignments. Shows that := is treated as a digraph. Very basic but essential test.
@@ -1661,68 +1443,8 @@ public class ParserTest extends AbstractQDLTester {
         }
     }
 
-    /**
-     * Create a module, then import it to another module. The variables should be resolvable transitively
-     * and the states should all be separate.
-     *
-     * @throws Throwable
-     */
 
-    public void testNestedVariableImport() throws Throwable {
-        StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:/a','a']body[q:=1;];");
-        addLine(script, "module_import('a:/a');");
-        addLine(script, "module_import('a:/a','b');");
-        addLine(script, "module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];");
-        addLine(script, "a#q:=10;");
-        addLine(script, "b#q:=11;");
-        // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "module_import('q:/q');");
-        addLine(script, "w#a#q:=3;");
-        State state = testUtils.getNewState();
 
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getLongValue("a#q", state) == 10L;
-        assert getLongValue("b#q", state) == 11L;
-        assert getLongValue("w#a#q", state) == 3L;
-
-    }
-
-    /*
-    Define a function then define variants in modules.  Values are checked to track whether the state
-    gets corrupted. This can be put into a QDL workspace to check manually:
-
-        define[f(x)]body[return(x+100);];
-        module['a:/t','a']body[define[f(x)]body[return(x+1);];];
-        module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];
-        module_import('q:/z');
-        w#a#f(3)
-        w#g(2)
-     */
-
-    public void testNestedFunctionImport() throws Throwable {
-        StringBuffer script = new StringBuffer();
-        addLine(script, "define[f(x)]body[return(x+100);];");
-        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
-        addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
-        addLine(script, "test_f:=f(1);");
-        addLine(script, "module_import('a:/t');");
-        addLine(script, "test_a:=a#f(1);");
-        // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "module_import('q:/z');");
-        addLine(script, "test_waf := w#a#f(2);");
-        addLine(script, "test_wg := w#g(2);");
-        State state = testUtils.getNewState();
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getLongValue("test_f", state) == 101L;
-        assert getLongValue("test_a", state) == 2L;
-        assert getLongValue("test_waf", state) == 3L;
-        assert getLongValue("test_wg", state) == 6L;
-
-    }
     /*
     Possible switch test?
 
@@ -2342,78 +2064,9 @@ public class ParserTest extends AbstractQDLTester {
     }
 
 
-    /**
-     * Case of a simple module. The point is that a function f, is defined in the module and that
-     * another module function g calls it. What should happen (assuming no other definitions of these
-     * in the state, which would throw a namespace exception) is that g uses f and that is
-     * that. If the module functions are not being added only to the module state, then there would be errors.
-     * Critical simple use case.
-     * <pre>
-     *     module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];
-     *     module_import('a:a');
-     *     g(1);
-     *  4
-     * </pre>
-     *
-     * @throws Throwable
-     */
-    public void testModuleFunctionVisibility() throws Throwable {
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "y := g(1);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
-        assert getLongValue("y", state).equals(4L);
-    }
 
-    /**
-     * Same as above, with spaces.
-     *
-     * @throws Throwable
-     */
-    public void testModuleFunctionVisibilitySpaces() throws Throwable {
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, " module   \n[\n'a:a',\n'a'\n]   \n\n[\n  f(x)->x^2;g(x)->f(x+1);  \n]   \n\n;");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "y := g(1);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        // returns true if any elements are true
-        StemVariable stem = getStemValue("x.", state);
-        assert getLongValue("y", state).equals(4L);
-    }
 
-    /**
-     * trigger that having competing function names between the workspace and a module
-     * is flagged as an error.
-     *
-     * @throws Throwable
-     */
 
-    public void testBadModuleFunctionVisibility() throws Throwable {
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        addLine(script, "f(x)->x;");
-        addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
-        addLine(script, "module_import('a:a');");
-        addLine(script, "y := g(1);");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        boolean bad = true;
-        try {
-            interpreter.execute(script.toString());
-        } catch (NamespaceException ix) {
-            bad = false;
-        }
-        if (bad) {
-            assert false : "the visibility of module functions is incorrect";
-        }
-
-    }
 
     /**
      * Tests that functions defined in functions are resolved correctly.
@@ -2724,10 +2377,10 @@ public class ParserTest extends AbstractQDLTester {
         } catch (IndexError ie) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "a.1.nn.[1,2,2].0 should have thrown an index error";
         }
-        
+
     }
 
     public void testBadListsAsIndices1() throws Throwable {
@@ -2744,10 +2397,10 @@ public class ParserTest extends AbstractQDLTester {
         } catch (IndexError ie) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "a.0.nn.[1,2,2].1 should have thrown an index error";
         }
-        
+
     }
 
     /**
@@ -2769,10 +2422,10 @@ public class ParserTest extends AbstractQDLTester {
         } catch (IndexError ie) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "a.nn.[1,2,1].2.0 should have thrown an index error";
         }
-        
+
     }
 
     /**

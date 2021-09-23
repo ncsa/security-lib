@@ -13,6 +13,18 @@ import java.util.List;
  * on 9/28/20 at  1:28 PM
  */
 public class StemListNode implements StatementWithResultInterface {
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+        this.inModule = inModule;
+    }
+
     StemVariable result;
 
     @Override
@@ -36,7 +48,7 @@ public class StemListNode implements StatementWithResultInterface {
     @Override
     public void setResultType(int type) {
         // No op, actually, since this only returns a single type of object.
-        if(type != Constant.STEM_TYPE){
+        if (type != Constant.STEM_TYPE) {
             throw new NFWException("Internal error: Attempt to set stem to type = " + type);
         }
     }
@@ -92,13 +104,13 @@ public class StemListNode implements StatementWithResultInterface {
     @Override
     public StatementWithResultInterface makeCopy() {
         StemListNode newSLN = new StemListNode();
-        for(StatementWithResultInterface s : statements){
+        for (StatementWithResultInterface s : statements) {
             newSLN.getStatements().add(s.makeCopy());
         }
         StemVariable newStem = new StemVariable();
 
         // Kludge, but it works.
-        newStem.fromJSON((JSONObject)((StemVariable)getResult()).toJSON());
+        newStem.fromJSON((JSONObject) ((StemVariable) getResult()).toJSON());
         newSLN.setResult(newStem);
         newSLN.setSourceCode(getSourceCode());
         newSLN.setEvaluated(isEvaluated());

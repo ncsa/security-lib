@@ -18,6 +18,17 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 3/5/21 at  5:58 AM
  */
 public class ExpressionStemNode implements StatementWithResultInterface {
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
     public ArrayList<StatementWithResultInterface> getArguments() {
         return arguments;
     }

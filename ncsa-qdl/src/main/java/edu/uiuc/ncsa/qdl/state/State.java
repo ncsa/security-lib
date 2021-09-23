@@ -508,7 +508,42 @@ public class State extends FunctionState implements QDLConstants {
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
+    public State newStateWithImports(State moduleState) {
+        SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
+        newStack.getParentTables().set(0,moduleState.symbolStack);
+        newStack.getParentTables().addAll(symbolStack.getParentTables());
 
+        FTStack ftStack = new FTStack();
+        ftStack.getFtables().set(0, moduleState.getFTStack());
+        ftStack.getFtables().add(getFTStack().clone());
+
+
+/*
+        SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
+        if(newStack.getParentTables().size() == 1){
+            newStack.getParentTables().add( moduleState.symbolStack);
+        }else {
+            newStack.getParentTables().set(1, moduleState.symbolStack);
+        }
+
+*/
+        State newState = newInstance(importManager,
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                ftStack,
+                getModuleMap(),
+                getLogger(),
+                isServerMode(),
+                isRestrictedIO(),
+                isAssertionsOn());
+        newState.setImportedModules(getImportedModules());
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
+        newState.setVfsFileProviders(getVfsFileProviders());
+        return newState;
+    }
     /**
      * For the case the this has been deserialized and needs to have its transient
      * fields initialized. These are things like the {@link MetaEvaluator} that

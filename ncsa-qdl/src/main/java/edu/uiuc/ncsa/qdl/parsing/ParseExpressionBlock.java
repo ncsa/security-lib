@@ -20,6 +20,18 @@ public class ParseExpressionBlock implements StatementWithResultInterface {
         this.expressionNodes = expressionNodes;
     }
 
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+        this.inModule = inModule;
+    }
+
     List<ExpressionNode> expressionNodes = new ArrayList<>();
 
     @Override
@@ -58,6 +70,7 @@ public class ParseExpressionBlock implements StatementWithResultInterface {
     }
 
     List<String> src = new ArrayList<>();
+
     @Override
     public List<String> getSourceCode() {
         return src;
@@ -65,7 +78,7 @@ public class ParseExpressionBlock implements StatementWithResultInterface {
 
     @Override
     public void setSourceCode(List<String> sourceCode) {
-                  this.src = sourceCode;
+        this.src = sourceCode;
     }
 
     @Override

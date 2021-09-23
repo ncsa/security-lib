@@ -12,6 +12,18 @@ import java.util.List;
  * on 3/14/21 at  3:26 PM
  */
 public class FunctionReferenceNode implements StatementWithResultInterface {
+    boolean inModule = false;
+
+    @Override
+    public boolean isInModule() {
+        return inModule;
+    }
+
+    @Override
+    public void setInModule(boolean inModule) {
+                     this.inModule = inModule;
+    }
+
     public String getFunctionName() {
         return functionName;
     }
