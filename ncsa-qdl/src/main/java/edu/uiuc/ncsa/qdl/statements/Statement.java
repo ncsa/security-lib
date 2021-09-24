@@ -11,7 +11,15 @@ import java.util.List;
  * on 1/14/20 at  9:11 AM
  */
 public interface Statement extends Serializable {
-    public Object evaluate(State state);
-    public List<String> getSourceCode();
-    public void setSourceCode(List<String> sourceCode);
+    Object evaluate(State state);
+
+    List<String> getSourceCode();
+
+    void setSourceCode(List<String> sourceCode);
+
+/*    Module getModule();
+
+    void setModule(Module newModule);
+
+    boolean hasModule();*/
 }

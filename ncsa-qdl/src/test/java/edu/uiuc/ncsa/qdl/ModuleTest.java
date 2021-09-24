@@ -10,130 +10,131 @@ import java.math.BigDecimal;
  * <p>Created by Jeff Gaynor<br>
  * on 9/23/21 at  2:20 PM
  */
-public class ModuleTest extends AbstractQDLTester{
+public class ModuleTest extends AbstractQDLTester {
     /**
-      * Shows that importing module functions g and h outside a function body but referencing them
-      * inside it will work: This means that, global functions can be used.
-      *
-      * @throws Throwable
-      */
+     * Shows that importing module functions g and h outside a function body but referencing them
+     * inside it will work: This means that, global functions can be used.
+     *
+     * @throws Throwable
+     */
 
-     public void testFunctionAndModules2() throws Throwable {
-         String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
-                 "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
-                 "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
-                 "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
-                 "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
+    public void testFunctionAndModules2() throws Throwable {
+        String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
+                "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
+                "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
+                "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
+                "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
 
-         String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
-         String g_module = "module['a:a','a']body[" + g_x + "];";
-         String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
-         String h_module = "module['b:b','b']body[" + h_y + "];";
-         // import the modules outside of f and try to use them.
-         String import_g = "module_import('a:a');";
-         String import_h = "module_import('b:b');";
-         String f_xy = "define[f(x,y)]body[return(" + f_body + ");];";
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, g_x);
-         addLine(script, g_module);
-         addLine(script, h_module);
-         addLine(script, import_g);
-         addLine(script, import_h);
-         addLine(script, f_xy);
-         // It will ingest the function fine. It is attempting to use it later that will cause the error
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
+        String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
+        String g_module = "module['a:a','a']body[" + g_x + "];";
+        String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
+        String h_module = "module['b:b','b']body[" + h_y + "];";
+        // import the modules outside of f and try to use them.
+        String import_g = "module_import('a:a');";
+        String import_h = "module_import('b:b');";
+        String f_xy = "define[f(x,y)]body[return(" + f_body + ");];";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, g_x);
+        addLine(script, g_module);
+        addLine(script, h_module);
+        addLine(script, import_g);
+        addLine(script, import_h);
+        addLine(script, f_xy);
+        // It will ingest the function fine. It is attempting to use it later that will cause the error
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
 
-         // all that is set up. Now put in some values and try to evaluate it
-         script = new StringBuffer();
-         addLine(script, "x :=-3;");
-         addLine(script, "y := 5;");
-         addLine(script, "z := f(x,y);");
-         //  try {
-         interpreter.execute(script.toString());
+        // all that is set up. Now put in some values and try to evaluate it
+        script = new StringBuffer();
+        addLine(script, "x :=-3;");
+        addLine(script, "y := 5;");
+        addLine(script, "z := f(x,y);");
+        //  try {
+        interpreter.execute(script.toString());
 
-         BigDecimal[] results = {
-                 new BigDecimal("0.224684095740375"),
-                 new BigDecimal("0.542433484968442"),
-                 new BigDecimal("1.22827852483025"),
-                 new BigDecimal("-0.454986621086766"),
-                 new BigDecimal("-0.749612627182112")
-         };
+        BigDecimal[] results = {
+                new BigDecimal("0.224684095740375"),
+                new BigDecimal("0.542433484968442"),
+                new BigDecimal("1.22827852483025"),
+                new BigDecimal("-0.454986621086766"),
+                new BigDecimal("-0.749612627182112")
+        };
 
-         for (int i = 1; i < 1 + results.length; i++) {
-             script = new StringBuffer();
-             addLine(script, "x :=-3/" + i + ";");
-             addLine(script, "y := 5/" + i + ";");
-             addLine(script, "z := f(x,y);");
-             interpreter.execute(script.toString());
-             BigDecimal bd = results[i - 1];
-             BigDecimal d = getBDValue("z", state);
-             assert areEqual(d, bd);
-         }
-     }
+        for (int i = 1; i < 1 + results.length; i++) {
+            script = new StringBuffer();
+            addLine(script, "x :=-3/" + i + ";");
+            addLine(script, "y := 5/" + i + ";");
+            addLine(script, "z := f(x,y);");
+            interpreter.execute(script.toString());
+            BigDecimal bd = results[i - 1];
+            BigDecimal d = getBDValue("z", state);
+            assert areEqual(d, bd);
+        }
+    }
         /*
             module['b:b','b'][h(x)->(3*x^3-2)/(4*x^2+x+1);];
             module['a:a','a'][g(x)->(x^2-1)/(x^4+1);];
             define[f(x,y)][module_import('a:a'); module_import('b:b')
          */
 
-     /**
-      * Shows importing a module into the body of a function works.
-      *
-      * @throws Throwable
-      */
-     public void testFunctionAndModules_Good() throws Throwable {
-         BigDecimal[] results = {
-                 new BigDecimal("0.224684095740375"),
-                 new BigDecimal("0.542433484968442"),
-                 new BigDecimal("1.22827852483025"),
-                 new BigDecimal("-0.454986621086766"),
-                 new BigDecimal("-0.749612627182112")
-         };
-         String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
-                 "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
-                 "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
-                 "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
-                 "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
+    /**
+     * Shows importing a module into the body of a function works.
+     *
+     * @throws Throwable
+     */
+    public void testFunctionAndModules_Good() throws Throwable {
+        BigDecimal[] results = {
+                new BigDecimal("0.224684095740375"),
+                new BigDecimal("0.542433484968442"),
+                new BigDecimal("1.22827852483025"),
+                new BigDecimal("-0.454986621086766"),
+                new BigDecimal("-0.749612627182112")
+        };
+        String f_body = "(192*g(x)^3 + 192*g(x)^5 + 68*g(x)*h(y) + 216*g(x)^2*h(y) + \n" +
+                "     68*g(x)^3*h(y) + 45*h(y)^2 + 192*g(x)^3*h(y)^2 + 68*g(x)*h(y)^3)/\n" +
+                "   (384*g(x)^4 + 384*g(x)^6 + 280*g(x)^2*h(y) + 432*g(x)^3*h(y) + \n" +
+                "     280*g(x)^4*h(y) + 21*h(y)^2 + 252*g(x)*h(y)^2 + 21*g(x)^2*h(y)^2 + \n" +
+                "     384*g(x)^4*h(y)^2 + 280*g(x)^2*h(y)^3 + 21*h(y)^4)";
 
-         String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
-         String g_module = "module['a:a','a']body[" + g_x + "];";
-         String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
-         String h_module = "module['b:b','b']body[" + h_y + "];";
-         String import_g = "module_import('a:a');";
-         String import_h = "module_import('b:b');";
-         String f_xy = "define[f(x,y)]body[" +
-                 import_g + "\n" +
-                 import_h + "\n" +
-                 "return(" + f_body + ");];";
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, g_module);
-         addLine(script, h_module);
-         addLine(script, import_g);
-         addLine(script, import_h);
-         addLine(script, f_xy);
-         addLine(script, "ok := !is_function(g,1);");// imported into f means not in session
-         addLine(script, "ok2 := !is_function(h,1);");// imported into f means not in session
-         // It will ingest the function fine. It is attempting to use it later that will cause the error
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
+        String g_x = "define[g(x)]body[return((x^2-1)/(x^4+1));];";
+        String g_module = "module['a:a','a']body[" + g_x + "];";
+        String h_y = "define[h(y)]body[return((3*y^3-2)/(4*y^2+y+1));];";
+        String h_module = "module['b:b','b']body[" + h_y + "];";
+        String import_g = "module_import('a:a');";
+        String import_h = "module_import('b:b');";
+        String f_xy = "define[f(x,y)]body[" +
+                import_g + "\n" +
+                import_h + "\n" +
+                "return(" + f_body + ");];";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, g_module);
+        addLine(script, h_module);
+        addLine(script, import_g);
+        addLine(script, import_h);
+        addLine(script, f_xy);
+        addLine(script, "ok := !is_function(g,1);");// imported into f means not in session
+        addLine(script, "ok2 := !is_function(h,1);");// imported into f means not in session
+        // It will ingest the function fine. It is attempting to use it later that will cause the error
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
 
-         assert getBooleanValue("ok", state);
-         assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok2", state);
 
-         for (int i = 1; i < 1 + results.length; i++) {
-             script = new StringBuffer();
-             addLine(script, "x :=-3/" + i + ";");
-             addLine(script, "y := 5/" + i + ";");
-             addLine(script, "z := f(x,y);");
-             interpreter.execute(script.toString());
-             BigDecimal bd = results[i - 1];
-             BigDecimal d = getBDValue("z", state);
-             assert areEqual(d, bd);
-         }
-     }
+        for (int i = 1; i < 1 + results.length; i++) {
+            script = new StringBuffer();
+            addLine(script, "x :=-3/" + i + ";");
+            addLine(script, "y := 5/" + i + ";");
+            addLine(script, "z := f(x,y);");
+            interpreter.execute(script.toString());
+            BigDecimal bd = results[i - 1];
+            BigDecimal d = getBDValue("z", state);
+            assert areEqual(d, bd);
+        }
+    }
+
     /**
      * Import the same module several times and show that the state of each
      * is kept separate.
@@ -164,6 +165,7 @@ public class ModuleTest extends AbstractQDLTester{
         assert getBooleanValue("oka", state);
         assert getBooleanValue("okb", state);
     }
+
     /**
      * Make modules with the same variables, import then use NS qualification on the stem and its
      * indices to access them.
@@ -265,6 +267,7 @@ public class ModuleTest extends AbstractQDLTester{
         assert d.equals(1L);
         assert e.equals(-19l);
     }
+
     /**
      * Create a module, then import it to another module. The variables should be resolvable transitively
      * and the states should all be separate.
@@ -359,6 +362,26 @@ public class ModuleTest extends AbstractQDLTester{
         StringBuffer script = new StringBuffer();
         addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
         addLine(script, "module_import('a:a');");
+        addLine(script, "ok := !is_function(f,1);"); // f didn't end up outside the module
+        addLine(script, "ok1 := 4 == g(1);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // returns true if any elements are true
+        StemVariable stem = getStemValue("x.", state);
+        assert getBooleanValue("ok1", state);
+        assert getBooleanValue("ok", state);
+    }
+
+    /**
+     * Same as above, with spaces.
+     *
+     * @throws Throwable
+     */
+    public void testModuleFunctionVisibilitySpaces() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " module   \n[\n'a:a',\n'a'\n]   \n\n[\n  f(x)->x^2;g(x)->f(x+1);  \n]   \n\n;");
+        addLine(script, "module_import('a:a');");
         addLine(script, "y := g(1);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -368,48 +391,32 @@ public class ModuleTest extends AbstractQDLTester{
     }
 
     /**
-       * Same as above, with spaces.
-       *
-       * @throws Throwable
-       */
-      public void testModuleFunctionVisibilitySpaces() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, " module   \n[\n'a:a',\n'a'\n]   \n\n[\n  f(x)->x^2;g(x)->f(x+1);  \n]   \n\n;");
-          addLine(script, "module_import('a:a');");
-          addLine(script, "y := g(1);");
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          interpreter.execute(script.toString());
-          // returns true if any elements are true
-          StemVariable stem = getStemValue("x.", state);
-          assert getLongValue("y", state).equals(4L);
-      }
+     * Tests that a function inside a module defined in terms of another inner function is resolved
+     * right.
+     *
+     * @throws Throwable
+     */
 
-      /**
-       * Tests that a function inside a module defined in terms of another inner function is resolved
-       * right.
-       *
-       * @throws Throwable
-       */
-
-      public void testFunctionVisibility() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "f(x)->x;");
-          addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
-          addLine(script, "module_import('a:a');");
-          addLine(script, "ok := 16 == g(3);"); // uses f inside the module
-          addLine(script, "okf := 2 == f(2);"); // does not effect f outside
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          interpreter.execute(script.toString());
-          assert getBooleanValue("ok", state);
-          assert getBooleanValue("okf", state);
-      }
+    public void testFunctionVisibility() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x)->x;");
+        addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "ok := 16 == g(3);"); // uses f inside the module
+        addLine(script, "okf := 2 == f(2);"); // does not effect f outside
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("okf", state);
+    }
         /*
         module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];
          */
+
     /**
      * Test that importing two modules keeps the namespaces straight with their state.
+     *
      * @throws Throwable
      */
     public void testMultipleModules() throws Throwable {
@@ -434,5 +441,58 @@ public class ModuleTest extends AbstractQDLTester{
         assert getBooleanValue("okyg", state);
         assert getBooleanValue("okxf2", state);
         assert getBooleanValue("okxg2", state);
+    }
+
+    /**
+     * Makes sure that importing different module versions are kept straight for input form,
+     * so if <code>X</code> and <code>Y</code> are two versions of the same module. Setting state and
+     * querying functions works
+     *
+     * <pre>
+     *
+     * </pre>
+     * @throws Throwable
+     */
+    public void testModuleInputForm() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "X#u:=42;");
+        addLine(script, "xf0 :=input_form(X#f,2);");
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)/times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','Y');");
+        addLine(script, "Y#u :=-7;");
+        addLine(script, "yf :=input_form(Y#f,2);");
+        addLine(script, "yu :=input_form(Y#u);");
+        addLine(script, "xf :=input_form(X#f,2);");
+        addLine(script, "xu :=input_form(X#u);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("yf", state).contains("times(x,u)/times(y,v)");
+        assert getStringValue("xf", state).contains("times(x,u)+times(y,v)");
+        assert getStringValue("xu", state).contains("42");
+        assert getStringValue("yu", state).contains("-7");
+
+    }
+    /**
+     * Test that creating a module inside another module works completely locally.
+     * <pre>
+     *   module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];module_import('b:b');];
+     * </pre>
+     */
+    public void testNestedModule() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];module_import('b:b');];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "-11 =:  A#B#u;");
+        addLine(script, "ok := -11 == A#B#u;"); // pull it out of the local state so we can test the value easily.
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
+
     }
 }

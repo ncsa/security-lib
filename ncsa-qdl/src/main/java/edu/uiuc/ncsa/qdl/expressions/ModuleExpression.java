@@ -99,7 +99,7 @@ public class ModuleExpression extends ExpressionImpl {
         this.moduleState = moduleState;
     }
 
-    protected State getLocalState(State state) {
+    public State getLocalState(State state) {
         return state.newStateWithImports(getModuleState(state));
     }
 

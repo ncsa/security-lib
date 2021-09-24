@@ -30,7 +30,7 @@ public class IOFunctionTest extends AbstractQDLTester {
     public void testSay() throws Exception {
         State state = testUtils.getNewState();
         Polyad polyad = new Polyad(IOEvaluator.SAY_FUNCTION);
-        String testString = "These are the droids you are looking for";
+        String testString = "These are not the droids you are looking for";
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
         polyad.getArguments().add(prompt);
         polyad.evaluate(state);

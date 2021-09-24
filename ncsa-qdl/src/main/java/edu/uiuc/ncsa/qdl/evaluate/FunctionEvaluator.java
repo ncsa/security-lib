@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.functions.LambdaDefinitionNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -347,6 +348,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             }
         }
         for (Statement statement : functionRecord.statements) {
+            if(statement instanceof StatementWithResultInterface){
+                ((StatementWithResultInterface)statement).setInModule(polyad.isInModule());
+            }
             try {
                 statement.evaluate(localState);
             } catch (ReturnException rx) {

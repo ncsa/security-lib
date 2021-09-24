@@ -8,8 +8,9 @@ import QDLLexer;
 
 elements : element* EOF;
 
-element : (statement ';' ) | (moduleStatement ';') ;
-       
+//element : (statement ';' ) | (moduleStatement ';') ;
+element : statement ';' ;
+
 statement :
             defineStatement
           | conditionalStatement
@@ -21,6 +22,7 @@ statement :
           | assertStatement
           | assertStatement2
           | blockStatement
+          | moduleStatement
           ;
 
  conditionalStatement : ifStatement | ifElseStatement;

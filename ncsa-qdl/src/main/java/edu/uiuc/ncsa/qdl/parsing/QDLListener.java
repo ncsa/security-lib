@@ -767,10 +767,8 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
         stash(ctx, new SwitchStatement());
-        parsingMap.startMark();
     }
 
-    // )load switch_test.qdl
     @Override
     public void exitSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
         SwitchStatement switchStatement = (SwitchStatement) parsingMap.getStatementFromContext(ctx);
@@ -779,9 +777,6 @@ public class QDLListener implements QDLParserListener {
             ConditionalStatement cs = (ConditionalStatement) parsingMap.getStatementFromContext(ifc);
             switchStatement.getArguments().add(cs);
         }
-        parsingMap.endMark();
-        parsingMap.rollback();
-        parsingMap.clearMark();
     }
 
     @Override
@@ -1022,16 +1017,7 @@ public class QDLListener implements QDLParserListener {
         moduleStatement = new ModuleStatement();
 
         stash(ctx, moduleStatement);
-        // start mark after module statement is added or it gets
-        // removed from the element list and never evaluates.
-        parsingMap.startMark();
 
-        isModule = true;
-        State localState = state.newModuleState();
-        currentModule = new QDLModule();
-        currentModule.setState(localState);
-        moduleStatement.setLocalState(localState);
-        // keep the top. level module but don't let the system try to turn anything else in to statements.
     }
 
     /**
@@ -1081,10 +1067,9 @@ public class QDLListener implements QDLParserListener {
         ModuleStatement moduleStatement = (ModuleStatement) parsingMap.getStatementFromContext(moduleContext);
         URI namespace = URI.create(stripSingleQuotes(moduleContext.STRING(0).toString()));
         String alias = stripSingleQuotes(moduleContext.STRING(1).toString());
-        currentModule.setNamespace(namespace);
-        currentModule.setAlias(alias);
+        moduleStatement.setAlias(alias);
+        moduleStatement.setNamespace(namespace);
         moduleStatement.setSourceCode(getSource(moduleContext));
-        state.getModuleMap().put(namespace, currentModule);
         QDLParserParser.DocStatementBlockContext docStatementBlockContext = moduleContext.docStatementBlock();
         for (QDLParserParser.StatementContext stmt : docStatementBlockContext.statement()) {
             // Issue is that resolving children as we do gets the function definitions.
@@ -1102,18 +1087,14 @@ public class QDLListener implements QDLParserListener {
             if (doc.startsWith(">>")) {
                 doc = doc.substring(2).trim();
             }
-            currentModule.getDocumentation().add(doc);
+            moduleStatement.getDocumentation().add(doc);
         }
         // Parser strips off trailing ; which in turn causes a parser error later when we are runnign the import command.
         moduleStatement.setSourceCode(getSource(moduleContext));
-        currentModule.setModuleStatement(moduleStatement);
-
-        parsingMap.endMark();
-        parsingMap.rollback();
-        parsingMap.clearMark();
-
     }
-
+        /*
+        module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];];module_import('b:b');say(B#u);];
+         */
     @Override
     public void enterTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx) {
         TryCatch tryCatch = new TryCatch();

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 
 import java.net.URI;
@@ -32,21 +33,23 @@ public class ModuleStatement implements Statement {
         this.alias = alias;
     }
 
-    public State getLocalState() {
-        return localState;
-    }
 
-    public void setLocalState(State localState) {
-        this.localState = localState;
-    }
-
-    State localState;
     @Override
     public Object evaluate(State state) {
         // Only use local state at this point.
+        State localState = state.newModuleState();
         for(Statement s : getStatements()){
-            s.evaluate(getLocalState());
+            s.evaluate(localState);
         }
+
+        QDLModule module = new QDLModule();
+        module.setNamespace(getNamespace());
+        module.setAlias(getAlias());
+        module.setState(localState);
+        module.setTemplate(true);
+        module.setModuleStatement(this);
+        state.getModuleMap().put(getNamespace(), module);
+
         return null;
     }
     List<Statement> statements = new ArrayList<>();
@@ -71,4 +74,13 @@ public class ModuleStatement implements Statement {
 
     List<String> sourceCode;
 
+    public List<String> getDocumentation() {
+        return documentation;
+    }
+
+    public void setDocumentation(List<String> documentation) {
+        this.documentation = documentation;
+    }
+
+    public List<String> documentation = new ArrayList();
 }

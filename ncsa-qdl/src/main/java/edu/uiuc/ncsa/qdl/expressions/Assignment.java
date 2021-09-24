@@ -29,6 +29,25 @@ public class Assignment implements StatementWithResultInterface {
         assignment.variableReference = variableReference;
         return assignment;
     }
+
+    /*    Module module = null;
+
+        @Override
+        public Module getModule() {
+            return module;
+        }
+
+        @Override
+        public void setModule(Module newModule) {
+             this.module = newModule;
+             getLeftArg().setModule(newModule );
+             getRightArg().setModule(newModule );
+        }
+
+        @Override
+        public boolean hasModule() {
+            return module!=null;
+        }*/
     boolean inModule = false;
 
     @Override
@@ -38,8 +57,9 @@ public class Assignment implements StatementWithResultInterface {
 
     @Override
     public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
+        this.inModule = inModule;
     }
+
     public boolean isFlippedAssignment() {
         return flippedAssignment;
     }
@@ -175,7 +195,7 @@ public class Assignment implements StatementWithResultInterface {
     protected Object setExpValue(State state, int resultType, Object result) {
         if (getLeftArg() instanceof Assignment) {
             Assignment assignment = (Assignment) getLeftArg();
-            if(assignment.getRightArg() instanceof VariableNode){
+            if (assignment.getRightArg() instanceof VariableNode) {
                 VariableNode variableNode = (VariableNode) assignment.getRightArg();
                 variableReference = variableNode.getVariableReference();
                 setVariableValue(state, resultType, result);
@@ -183,7 +203,7 @@ public class Assignment implements StatementWithResultInterface {
                 assignment.evaluate(state);
 
             }
-            if(assignment.getRightArg() instanceof Dyad){
+            if (assignment.getRightArg() instanceof Dyad) {
                 assignment.getRightArg().evaluate(state);
             }
             // here is where the daisy chaining happens.

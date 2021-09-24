@@ -11,8 +11,6 @@ import java.util.List;
  * on 1/17/20 at  3:34 PM
  */
 public class ConditionalStatement implements Statement {
-
-
     ExpressionNode conditional;
 
     public ExpressionNode getConditional() {

@@ -68,47 +68,6 @@ public abstract class FunctionState extends VariableState {
             throw new NFWException(("Internal error: The function has not been named"));
         }
 
-     /*   if (name.contains(NS_DELIMITER)) {
-            if (name.startsWith(NS_DELIMITER)) {
-                // case is that it is directly qualified for the top leve. Check it, return what is there.
-                frs.functionRecord = getFTStack().get(name.substring(1), argCount);
-                frs.state = this;
-                return frs;
-            }
-            StringTokenizer st = new StringTokenizer(name, NS_DELIMITER);
-            ArrayList<String> arrayList = new ArrayList<>();
-            while (st.hasMoreTokens()) {
-                arrayList.add(st.nextToken());
-            }
-            String resolvedName = arrayList.get(arrayList.size() - 1);// last one is name
-            arrayList.remove(arrayList.size() - 1); // remove it
-
-            Module currentModule = getImportedModules().get(arrayList.get(0));// there is at least one.
-            if(currentModule == null){
-                throw new IllegalArgumentException("No such module. You must import a module before accessing its functions");
-            }
-            arrayList.remove(0);
-            Module nextModule = null;
-            for (String aa : arrayList) {
-                nextModule = currentModule.getState().getImportedModules().get(aa);
-                currentModule = nextModule;
-            }
-
-            Module module = currentModule;
-
-
-            if (argCount == -1) {
-                frs.functionRecord = module.getState().getFTStack().getSomeFunction(resolvedName);
-            } else {
-                frs.functionRecord = module.getState().getFTStack().get(resolvedName, argCount);
-            }
-            frs.state = module.getState();
-            frs.isExternalModule = module.isExternal();
-            frs.isModule = true;
-            return frs;
-
-
-        } else {*/
         if (!getImportManager().hasImports()) {
             FR_WithState frs = new FR_WithState();
 
@@ -141,8 +100,8 @@ public abstract class FunctionState extends VariableState {
             } else {
                 FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
                 if ((checkForDuplicates) && tempFR != null) {
-                  //  System.out.println("FunctionState.resolveFunction: Found another module named \"" + name + "\"");
-            //        throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
+                //    System.out.println("FunctionState.resolveFunction: Found another module named \"" + name + "\"");
+                //    throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                 }
             }
         }

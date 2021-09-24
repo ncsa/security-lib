@@ -2,10 +2,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.exceptions.*;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
@@ -585,10 +582,33 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             polyad.setResult(out);
             return;
         }
-        if (!(polyad.getArguments().get(0) instanceof VariableNode)) {
+        boolean gotOne = false;
+        String argName = null;
+        Module module = null;
+        if (polyad.getArguments().get(0) instanceof ModuleExpression) {
+            ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
+            module = state.getImportedModules().get(moduleExpression.getAlias());
+            if (module == null) {
+                throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
+            }
+            if (!(moduleExpression.getExpression() instanceof VariableNode)) {
+                throw new IllegalArgumentException(INPUT_FORM + " requires a variable or function name");
+            }
+
+            argName = ((VariableNode) moduleExpression.getExpression()).getVariableReference();
+            moduleExpression.setModuleState(module.getState());
+            state = moduleExpression.getLocalState(state);
+            gotOne = true;
+        }
+
+        if (polyad.getArguments().get(0) instanceof VariableNode) {
+            argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
+            gotOne = true;
+        }
+
+        if (!gotOne) {
             throw new IllegalArgumentException(INPUT_FORM + " requires a variable or function name");
         }
-        String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
 
         if (argName == null) {
             polyad.setResultType(Constant.NULL_TYPE);
@@ -1427,19 +1447,19 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("reading files is not supported in server mode");
         }
-        if(polyad.getArgCount() == 0){
+        if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException(MODULE_LOAD + " requires at least one argument");
         }
         Object arg = polyad.evalArg(0, state);
 
-        if(arg == QDLNull.getInstance()){
+        if (arg == QDLNull.getInstance()) {
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(true);
             return;
         }
 
-        StemVariable argStem = convertArgsToStem(polyad, arg,  state, MODULE_LOAD);
+        StemVariable argStem = convertArgsToStem(polyad, arg, state, MODULE_LOAD);
         StemVariable outStem = new StemVariable();
         for (String key : argStem.keySet()) {
             Object value = argStem.get(key);

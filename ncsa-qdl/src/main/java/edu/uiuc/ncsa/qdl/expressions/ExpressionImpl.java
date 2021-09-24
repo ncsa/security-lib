@@ -16,6 +16,27 @@ public abstract class ExpressionImpl implements ExpressionNode {
     public ExpressionImpl() {
     }
 
+/*    Module module = null;
+
+    @Override
+    public Module getModule() {
+        return module;
+    }
+
+    @Override
+    public void setModule(Module newModule) {
+         this.module = newModule;
+        for(int i = 0; i < getArgCount(); i++){
+            getArguments().get(i).setModule(newModule);
+        }
+
+    }
+
+    @Override
+    public boolean hasModule() {
+        return module!=null;
+    }*/
+
     boolean inModule = false;
 
     @Override
@@ -25,9 +46,8 @@ public abstract class ExpressionImpl implements ExpressionNode {
 
     @Override
     public void setInModule(boolean inModule) {
-            this.inModule = inModule;
+        this.inModule = inModule;
     }
-
     public ExpressionImpl(int operatorType) {
         this.operatorType = operatorType;
     }
