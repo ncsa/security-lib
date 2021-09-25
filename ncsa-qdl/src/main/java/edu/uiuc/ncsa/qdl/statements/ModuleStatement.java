@@ -38,10 +38,14 @@ public class ModuleStatement implements Statement {
     public Object evaluate(State state) {
         // Only use local state at this point.
         State localState = state.newModuleState();
+        boolean restrictedio = state.isRestrictedIO();
+        // don't print stuff when creating the module.
+        state.setRestrictedIO(true);
         for(Statement s : getStatements()){
             s.evaluate(localState);
         }
 
+        state.setRestrictedIO(restrictedio);
         QDLModule module = new QDLModule();
         module.setNamespace(getNamespace());
         module.setAlias(getAlias());

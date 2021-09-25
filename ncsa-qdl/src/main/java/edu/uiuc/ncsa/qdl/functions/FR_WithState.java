@@ -11,4 +11,14 @@ public class FR_WithState {
     public AbstractState state;
     public boolean isExternalModule = false;
     public boolean isModule = false;
+
+    @Override
+    public String toString() {
+        return "FR_WithState{" +
+                "functionRecord=" + functionRecord +
+                ", state=" + state +
+                ", isExternalModule=" + isExternalModule +
+                ", isModule=" + isModule +
+                '}';
+    }
 }

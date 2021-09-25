@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
@@ -85,23 +86,28 @@ public abstract class FunctionState extends VariableState {
         fr.functionRecord = getFTStack().get(name, argCount);
 
         fr.state = this;
+        // if ther eis an unqualified named function, return it.
+         if(fr.functionRecord != null){
+             return fr;
+         }
+         // No UNQ function, so try to find one, but check that it is actually unique.
+
         for (String alias : getImportedModules().keySet()) {
             if (fr.functionRecord == null) {
-                FunctionRecord tempFR = getImportedModules().get(alias).getState().getFTStack().get(name, argCount);
+                FunctionRecord tempFR = getImportedModule(alias).getState().getFTStack().get(name, argCount);
                 if (tempFR != null) {
                     fr.functionRecord = tempFR;
                     fr.state = getImportedModules().get(alias).getState();
                     fr.isExternalModule = getImportedModules().get(alias).isExternal();
                     fr.isModule = true;
                     if (!checkForDuplicates) {
-                        return fr;
+                         return fr;
                     }
                 }
             } else {
                 FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
                 if ((checkForDuplicates) && tempFR != null) {
-                //    System.out.println("FunctionState.resolveFunction: Found another module named \"" + name + "\"");
-                //    throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
+                   throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                 }
             }
         }
@@ -130,6 +136,9 @@ public abstract class FunctionState extends VariableState {
   X#g()
       */
 
+          public Module getImportedModule(String alias){
+              return getImportedModules().get(alias);
+          }
     /**
      * @param useCompactNotation
      * @param regex
