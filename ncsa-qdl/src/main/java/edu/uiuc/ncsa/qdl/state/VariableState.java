@@ -302,8 +302,15 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = null;
         if (isPrivate(variableName)) {
             st = getSymbolStack();
-            v = st.resolveValue(variableName, 1);
-            if(v == null){
+            int startIndex = 1;
+            // startIndex == 0 means that there is exactly one stack, so moving up or down the
+            // stack does not work. This is the case of, e.g., a module being loaded the first time
+
+            if(st instanceof SymbolStack){
+                startIndex = ((SymbolStack)st).getParentTables().size() == 1?0:startIndex;
+            }
+            v = st.resolveValue(variableName, startIndex);
+            if(0<startIndex  && v == null){
                 throw new IntrinsicViolation("cannot access '" + variableName+"'");
             }
         } else {

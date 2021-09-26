@@ -4264,9 +4264,7 @@ public class WorkspaceCommands implements Logable {
 
     protected State getState() {
         if (state == null) {
-            SymbolTableImpl symbolTable = new SymbolTableImpl();
             SymbolStack stack = new SymbolStack();
-            stack.addParent(symbolTable);
             state = new State(ImportManager.getResolver(),
                     stack,
                     new OpEvaluator(),

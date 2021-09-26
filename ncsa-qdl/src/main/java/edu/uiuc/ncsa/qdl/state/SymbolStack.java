@@ -117,7 +117,7 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     public Object resolveValue(String variableName, int startIndex) {
-        return findValueInATable(variableName, 1); // to keep current code working
+        return findValueInATable(variableName, startIndex); // to keep current code working
 
     }
     public Object resolveValue(String variableName) {

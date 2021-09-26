@@ -28,7 +28,6 @@ public interface SymbolTable extends Serializable, XMLSerializable {
 
     Object resolveValue(String variable);
     Object resolveValue(String variable, int startIndex);
-
     boolean isDefined(String symbol);
 
     void remove(String symbol);

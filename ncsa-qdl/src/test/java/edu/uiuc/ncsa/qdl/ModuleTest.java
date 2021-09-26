@@ -559,6 +559,9 @@ public class ModuleTest extends AbstractQDLTester {
             assert true;
         }
     }
+    /*
+      Intrinsic variable tests
+     */
     public void testIntrinsicFunction() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -646,4 +649,98 @@ public class ModuleTest extends AbstractQDLTester {
             assert true;
         }
     }
+    /*
+    The next set of tests is pretty much the same as the previous set, except that it does done on a QDL module
+    loaded from disk. This is because the structure of the State is a little different when loading a module
+    (vs. running a module) and is special cased in the VariableState
+     */
+    protected String testModulePath = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl";
+    // ML = module_load
+    public void testMLIntrinsicFunction() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "__f(2,2);");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic function.";
+          }catch(UndefinedFunctionException iv){
+              assert true;
+          }
+      }
+      public void testMLIntrinsicFunction2() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "X#__f(2,2);");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic function.";
+          }catch(IntrinsicViolation iv){
+              assert true;
+          }
+      }
+      public void testMLIntrinsicFunctionDefine() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "X#__f(x,y)->x*y;");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic function.";
+          }catch(IntrinsicViolation iv){
+              assert true;
+          }
+      }
+
+      public void testMLIntrinsicVariable() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "say(X#__a);"); // FQ
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic variable.";
+          }catch(IntrinsicViolation iv){
+              assert true;
+          }
+      }
+
+      public void testMLIntrinsicVariable1() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "say(__a);"); // unqualified
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic variable.";
+          }catch(IntrinsicViolation iv){
+              assert true;
+          }
+      }
+
+      public void testMLIntrinsicVariableSet() throws Throwable {
+          State state = testUtils.getNewState();
+          StringBuffer script = new StringBuffer();
+          addLine(script, "module_load('" + testModulePath + "') =: q;");
+          addLine(script, "module_import(q,'X');");
+          addLine(script, "X#__a := 42;");
+          QDLInterpreter interpreter = new QDLInterpreter(null, state);
+          try {
+              interpreter.execute(script.toString());
+              assert false : "was able to access an intrinsic variable.";
+          }catch(IntrinsicViolation iv){
+              assert true;
+          }
+      }
 }
