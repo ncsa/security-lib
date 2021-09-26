@@ -1,11 +1,16 @@
 module[
    'a:/b','X'
    ][
+   >> Test module with two public variables and three functions.
    u := 2;
    v := 3;
+   __private := 4;
+   __w. := [;5];
    times(x,y)->x*y;
    f(x,y)->times(x,u)+times(y,v);
+   __f(x,y)->__w.*f(x,y)/__private;
    g()->u+v;
+   h(x,y)->__f(x,y);
   ];
   /*
       Regression test for module scope

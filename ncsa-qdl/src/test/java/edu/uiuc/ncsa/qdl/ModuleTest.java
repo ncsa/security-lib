@@ -1,5 +1,8 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
+import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -451,6 +454,7 @@ public class ModuleTest extends AbstractQDLTester {
      * <pre>
      *
      * </pre>
+     *
      * @throws Throwable
      */
     public void testModuleInputForm() throws Throwable {
@@ -476,6 +480,7 @@ public class ModuleTest extends AbstractQDLTester {
         assert getStringValue("yu", state).contains("-7");
 
     }
+
     /**
      * Test that creating a module inside another module works completely locally.
      * <pre>
@@ -494,5 +499,151 @@ public class ModuleTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
 
+    }
+
+    public void testUnqualifiedVariable() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "ok := u == 2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "was not able to get unqualified variable name";
+    }
+
+    /**
+     * Import 2 modules, repeat test. Should get a namespace exception.
+     *
+     * @throws Throwable
+     */
+    public void testUnqualifiedVariable2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "module_import('a:/b','Y');");
+        addLine(script, "ok := u == 2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "multiple namespaces with same variable failed unqualified test.";
+        } catch (NamespaceException nsx) {
+            assert true;
+        }
+    }
+
+    public void testUnqualifiedFunction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "ok := f(2,2) == 10;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "was not able to get unqualified function name.";
+    }
+
+    public void testUnqualifiedFunction2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "module_import('a:/b','Y');");
+        addLine(script, "ok := f(2,2) == 10;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "multiple namespaces with same funtions failed unqualified test.";
+        } catch (NamespaceException nsx) {
+            assert true;
+        }
+    }
+    public void testIntrinsicFunction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__f(x,y)->x*y;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "__f(2,2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        }catch(UndefinedFunctionException iv){
+            assert true;
+        }
+    }
+    public void testIntrinsicFunction2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__f(x,y)->x*y;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "X#__f(2,2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        }catch(IntrinsicViolation iv){
+            assert true;
+        }
+    }
+    public void testIntrinsicFunctionDefine() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__f(x,y)->x*y;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "X#__f(x,y)->x*y;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        }catch(IntrinsicViolation iv){
+            assert true;
+        }
+    }
+
+    public void testIntrinsicVariable() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__a:=1;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "say(X#__a);"); // FQ
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        }catch(IntrinsicViolation iv){
+            assert true;
+        }
+    }
+
+    public void testIntrinsicVariable1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__a:=1;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "say(__a);"); // unqualified
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        }catch(IntrinsicViolation iv){
+            assert true;
+        }
+    }
+
+    public void testIntrinsicVariableSet() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__a:=1;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "X#__a := 42;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        }catch(IntrinsicViolation iv){
+            assert true;
+        }
     }
 }

@@ -60,6 +60,9 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
             map.put(variableName, value);
             return;
         }
+        // from here down is, it seems, only used in low-level tests where the values of things
+        // are set directly.
+        // TODO -- figure out where this is used and remove it.
         if(isTotalStem(variableName)){
             // Simplest case of setting a. := stem. No resolution. 
             map.put(variableName, value);
@@ -150,6 +153,10 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
         map = new HashMap();
     }
 
+    @Override
+    public Object resolveValue(String variable, int startIndex) {
+        return resolveValue(variable);
+    }
 
     /**
      * This will do lookups <b>including resolutions for stem variables.</b>
@@ -166,6 +173,9 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
             }
             return null;
         }
+        // from here on almost never gets called after some parser updates,
+        // TODO -- track down the couple of edge cases in tests where this is exercised.
+        // See also setValue
         String head = getStemHead(variable);
         if (!map.containsKey(head)) {
             return null;

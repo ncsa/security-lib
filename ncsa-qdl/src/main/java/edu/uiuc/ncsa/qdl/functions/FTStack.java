@@ -24,11 +24,13 @@ public class FTStack implements FunctionTable {
 
     /**
      * Add the table to the end of the stack. Let's you control where the tables end up.
+     *
      * @param functionTable
      */
-    public void append(FunctionTable functionTable){
+    public void append(FunctionTable functionTable) {
         ftables.add(functionTable);
     }
+
     public boolean isEmpty() {
         boolean empty = true;
         for (FunctionTable functionTable : ftables) {
@@ -66,9 +68,10 @@ public class FTStack implements FunctionTable {
     public FunctionTable peek() {
         return ftables.get(0);
     }
-    public List<FunctionRecord> getAll(){
+
+    public List<FunctionRecord> getAll() {
         List<FunctionRecord> all = new ArrayList<>();
-        for(FunctionTable ft : ftables){
+        for (FunctionTable ft : ftables) {
 
             all.addAll(ft.getAll());
         }
@@ -83,14 +86,14 @@ public class FTStack implements FunctionTable {
         push(new FunctionTableImpl());
     }
 
-    public ArrayList<FunctionTable> getFtables(){
+    public ArrayList<FunctionTable> getFtables() {
         return ftables;
     }
 
     @Override
     public FunctionRecord put(FunctionRecord value) {
-        for(FunctionTable functionTable : ftables){
-            if(functionTable.isDefined(value.name, value.getArgCount())){
+        for (FunctionTable functionTable : ftables) {
+            if (functionTable.isDefined(value.name, value.getArgCount())) {
                 functionTable.put(value);
                 return value;
             }
@@ -123,8 +126,12 @@ public class FTStack implements FunctionTable {
 
     @Override
     public boolean isDefined(String var, int argCount) {
-        for (FunctionTable functionTable : ftables) {
-            if (functionTable.isDefined(var, argCount)) {
+        return isDefined(var, argCount, 0);
+    }
+
+    public boolean isDefined(String var, int argCount, int startTableIndex) {
+        for (int i = startTableIndex; i < ftables.size(); i++) {
+            if (ftables.get(i).isDefined(var, argCount)) {
                 return true;
             }
         }
@@ -267,7 +274,7 @@ public class FTStack implements FunctionTable {
     public FTStack clone() {
         FTStack cloned = new FTStack();
         for (FunctionTable ft : ftables) {
-               cloned.append(ft);
+            cloned.append(ft);
         }
         return cloned;
     }
@@ -281,10 +288,10 @@ public class FTStack implements FunctionTable {
         boolean isFirst = true;
         out = ", counts=[";
         for (FunctionTable functionTable : ftables) {
-            if(isFirst){
+            if (isFirst) {
                 isFirst = false;
                 out = out + functionTable.size();
-            }else {
+            } else {
                 out = out + "," + functionTable.size();
             }
             totalSymbols += functionTable.size();

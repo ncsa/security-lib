@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
@@ -1932,7 +1933,11 @@ public class QDLListener implements QDLParserListener {
             throw new IllegalArgumentException("unexpected argument for alias");
         }
         moduleExpression.setAlias(((VariableNode) var).getVariableReference());
-        moduleExpression.setExpression((StatementWithResultInterface) resolveChild(ctx.expression()));
+        Statement statement = resolveChild(ctx.expression());
+        if(statement instanceof FunctionDefinitionStatement){
+            throw new IntrinsicViolation("cannot define function in an existing module");
+        }
+        moduleExpression.setExpression((StatementWithResultInterface) statement);
     }
 }
 

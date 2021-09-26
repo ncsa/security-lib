@@ -24,7 +24,11 @@ import java.util.*;
  * on 2/2/20 at  6:37 AM
  */
 public abstract class AbstractState implements StateInterface, Logable {
+    public static final String  PRIVATE_PREFIX ="__";
 
+    public static boolean isPrivate(String x){
+        return x.startsWith(PRIVATE_PREFIX);
+    }
     public IOInterface getIoInterface() {
         if (ioInterface == null) {
             ioInterface = new BasicIO();
@@ -110,6 +114,18 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
     Map<String, Module> importedModules = new HashMap<>();
+
+    /**
+     * Get a single imported module by alias or null if there is no such module.
+     * @param alias
+     * @return
+     */
+    public Module getImportedModule(String alias){
+        if(alias == null){
+            return null;
+        }
+        return getImportedModules().get(alias);
+    }
 
     public void setSymbolStack(SymbolStack symbolStack) {
         this.symbolStack = symbolStack;

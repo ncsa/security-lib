@@ -1839,7 +1839,7 @@ public class WorkspaceCommands implements Logable {
         if (_doHelp(inputLine)) {
             say("imports");
             sayi("A table of imported modules and their aliases. ");
-            sayi("You must load a module with " + ControlEvaluator.MODULE_LOAD + " to make QDL aware of it before importing it");
+            sayi("You must either directly create a module or load it with " + ControlEvaluator.MODULE_LOAD + " to make QDL aware of it before importing it");
             return RC_NO_OP;
         }
 
@@ -2086,6 +2086,8 @@ public class WorkspaceCommands implements Logable {
                         list2.add(x);
                     }
                 }
+                list.clear();
+                list.addAll(list2);
                 list = list2;
             } catch (Throwable t) {
                 say("sorry but there was a problem with your regex \"" + inputLine.getNextArgFor(REGEX_SWITCH) + "\":" + t.getMessage());
@@ -2162,6 +2164,7 @@ public class WorkspaceCommands implements Logable {
     }
 
     public static final String LIST_MODULES_SWITCH = "-m";
+    public static final String LIST_INTRINSIC_SWITCH = "-intrinsic";
 
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -2174,12 +2177,15 @@ public class WorkspaceCommands implements Logable {
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
         boolean includeModules = inputLine.hasArg(LIST_MODULES_SWITCH);
         inputLine.removeSwitch(LIST_MODULES_SWITCH);
+        boolean showIntrinsic = inputLine.hasArg(LIST_INTRINSIC_SWITCH);
+        inputLine.removeSwitch(LIST_INTRINSIC_SWITCH);
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
-        TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null, includeModules);
+        TreeSet<String> funcs = getState().listFunctions(useCompactNotation, null, includeModules, showIntrinsic);
         // These are fully qualified.
         int rc = -1;
         if (listFQ) {
             rc = printList(inputLine, funcs);
+            say(funcs.size() + " total functions");
         } else {
             TreeSet<String> funcs2 = new TreeSet<>();
             for (String x : funcs) {
@@ -2191,8 +2197,9 @@ public class WorkspaceCommands implements Logable {
                 }
             }
             rc = printList(inputLine, funcs2);
+            say(funcs2.size() + " total functions");
+
         }
-        say(funcs.size() + " total functions");
         return rc;
     }
 
@@ -2341,9 +2348,11 @@ public class WorkspaceCommands implements Logable {
         }
         boolean includeModules = inputLine.hasArg(LIST_MODULES_SWITCH);
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
+        boolean showIntrinsic = inputLine.hasArg(LIST_INTRINSIC_SWITCH);
         inputLine.removeSwitch(LIST_MODULES_SWITCH);
         inputLine.removeSwitch(COMPACT_ALIAS_SWITCH);
-        return printList(inputLine, getState().listVariables(useCompactNotation, includeModules));
+        inputLine.removeSwitch(LIST_INTRINSIC_SWITCH);
+        return printList(inputLine, getState().listVariables(useCompactNotation, includeModules, showIntrinsic));
     }
 
     /**

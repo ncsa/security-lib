@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -113,8 +114,17 @@ public class ModuleExpression extends ExpressionImpl {
     public void set(State state, Object newValue) {
         if (getExpression() instanceof VariableNode) {
             VariableNode vNode = (VariableNode) getExpression();
-            State localState = getLocalState(state);
-            localState.setValue(vNode.getVariableReference(), newValue);
+            String variableName = vNode.getVariableReference();
+            if(state.isPrivate(variableName) && !getModuleState(state).isDefined(variableName)){
+                // check that if this is private
+                throw new IntrinsicViolation("cannot set an intrinsic variable");
+            }
+            if(getModuleState(state).isDefined(variableName)) {
+                State localState = getLocalState(state);
+                localState.setValue(variableName, newValue);
+            }else{
+                throw new IllegalArgumentException("Cannot define new variables in a module.");
+            }
             return;
         }
         if (getExpression() instanceof ConstantNode) {

@@ -2,9 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.IndexError;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.ModuleMap;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -156,7 +154,8 @@ public abstract class VariableState extends NamespaceAwareState {
                     }else{
                         w.getComponents().add(i++, nt);
                     }
-*/                newIndices.add(nt);
+*/
+                    newIndices.add(nt);
                 }
                 w.getComponents().remove(i); // replace the element at i with whatever was found.
                 w.getComponents().addAll(i, newIndices);
@@ -179,7 +178,7 @@ public abstract class VariableState extends NamespaceAwareState {
      * @return
      */
     protected Object gsrNSStemOp(StemMultiIndex w, int op, Object value) {
-      //  checkNSClash(w.name);
+        //  checkNSClash(w.name);
         w = resolveStemIndices(w);
         String variableName;
         StemVariable stem = null;
@@ -187,26 +186,17 @@ public abstract class VariableState extends NamespaceAwareState {
         URI uri = null;
         boolean isQDLNull = false;
         SymbolTable st = null;
-        if (isNSQname(w.name)) {
-            // easy case. Everything is qualified
-            isNSQ = true;
-            variableName = getFQName(w.name);
-            uri = importManager.getByAlias(getAlias(w.name));
-            Module m = getModuleMap().get(uri);
-            if (m == null) {
-                // So they specified a non-existent module. No such value.
-                return null;
+        variableName = w.name;
+        Object object;
+        if (isPrivate(variableName)) {
+            st = getSymbolStack();
+            object = st.resolveValue(variableName, 1);
+            if (object instanceof StemVariable) {
+                stem = (StemVariable) object;
             }
-            stem = (StemVariable) m.getState().getSymbolStack().resolveValue(variableName);
         } else {
-            // Local variables. Remove lead # if needed.
-            variableName = w.name;
-            if (isNSQLocalName(variableName)) {
-                variableName = variableName.substring(1); // whack off first bit
-            }
             st = getSymbolStack().getRightST(variableName);
-
-            Object object = st.resolveValue(getFQName(variableName));
+            object = st.resolveValue(getFQName(variableName));
             if (object instanceof QDLNull) {
                 isQDLNull = true;
             } else {
@@ -234,6 +224,8 @@ public abstract class VariableState extends NamespaceAwareState {
                 }
             }
         }
+
+        // }
         // Then this is of the form #foo and they are accessing local state explicitly
         switch (op) {
             case OP_GET:
@@ -305,43 +297,39 @@ public abstract class VariableState extends NamespaceAwareState {
             // and there is no need to jump through all of this.
             return null;
         }
-     //   checkNSClash(variableName); // just check first since its quick
-       /* if (isNSQname(variableName)) {
-            System.out.println("VariableState.gsrNSScalarOp: checking variable #");
-            // get the module, hand back the value.
-            Module module = getImportedModules().get(getAlias(variableName));
-            switch (op) {
-                case OP_GET:
-                    return module.getState().getValue(getFQName(variableName));
-                case OP_SET:
-                    module.getState().setValue(getFQName(variableName), value);
-                    return null;
-                case OP_REMOVE:
-                    module.getState().resolveStemIndex(getFQName(variableName));
 
+        Object v = null;
+        SymbolTable st = null;
+        if (isPrivate(variableName)) {
+            st = getSymbolStack();
+            v = st.resolveValue(variableName, 1);
+            if(v == null){
+                throw new IntrinsicViolation("cannot access '" + variableName+"'");
             }
-            return null;
-            // end of case that there is FQ name
-        }
-        if (isNSQLocalName(variableName)) {
-            variableName = variableName.substring(1); // whack off first bit
-        }*/
-        SymbolTable st = getSymbolStack().getRightST(variableName);
-        Object v = st.resolveValue(variableName);
-        if (v == null) {
-            if (!getImportedModules().isEmpty()) {
-                for (String key : getImportedModules().keySet()) {
-                    Module m = getImportedModules().get(key);
-                    if (m != null) {
-                        Object obj = m.getState().getValue(variableName);
-                        if (obj != null) {
-                            v = obj;
-                        }
+        } else {
+            st = getSymbolStack().getRightST(variableName);
+            v = st.resolveValue(variableName);
+            if (v == null) {
+                if (!getImportedModules().isEmpty()) {
+                    for (String key : getImportedModules().keySet()) {
+                        Module m = getImportedModule(key);
+                        if (m != null) {
+                            Object obj = m.getState().getValue(variableName);
+                            if (obj != null) {
+                                if (v != null) {
+                                    // uniqueness. Only get an unqualified name if it is unique within
+                                    // all modules. If there is a duplicated, throw an exception.
+                                    throw new NamespaceException("multiple modules found for '" + variableName + "', Please qualify the name.");
+                                }
+                                v = obj;
+                            }
 
+                        }
                     }
                 }
             }
         }
+
         switch (op) {
             case OP_GET:
                 return v;
@@ -397,9 +385,11 @@ public abstract class VariableState extends NamespaceAwareState {
         return resolveStemIndex(index, resolveState);
     }
 
-    public TreeSet<String> listVariables(boolean useCompactNotation, boolean includeModules) {
+    public TreeSet<String> listVariables(boolean useCompactNotation,
+                                         boolean includeModules,
+                                         boolean showIntrinsic) {
         TreeSet<String> out = getSymbolStack().listVariables();
-        if(!includeModules){
+        if (!includeModules) {
             return out;
         }
         for (URI key : getImportManager().keySet()) {
@@ -407,8 +397,12 @@ public abstract class VariableState extends NamespaceAwareState {
             if (m == null) {
                 continue; // the user specified a non-existent module.
             }
-            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation, true);
+            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation,
+                    true, showIntrinsic);
             for (String x : uqVars) {
+                if (isPrivate(x) && !showIntrinsic) {
+                    continue;
+                }
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
                 } else {

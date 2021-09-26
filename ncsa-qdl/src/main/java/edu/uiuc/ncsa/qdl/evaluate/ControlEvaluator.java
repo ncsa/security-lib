@@ -1593,14 +1593,17 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         try {
             QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
             // Exceptional case where we just run it directly.
-            // note that since this is QDL ther emay be multiple modules, etc.
+            // note that since this is QDL there may be multiple modules, etc.
             // in a single file, so there is no way to know what the user did except
             // to look at the state before, then after. This should return the added
             // modules fq paths.
+            state.getModuleMap().clearChangeList();
+/*
             List<String> b4load = new ArrayList<>();
             for (URI uri : state.getModuleMap().keySet()) {
                 b4load.add(uri.toString());
             }
+*/
             if (script == null) {
                 if (state.isServerMode()) {
                     throw new QDLServerModeException("File operations are not permitted in server mode");
@@ -1613,12 +1616,10 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 script.execute(state);
             }
             List<String> afterLoad = new ArrayList<>();
-            for (URI uri : state.getModuleMap().keySet()) {
-                String s = uri.toString();
-                if (!b4load.contains(s)) {
-                    afterLoad.add(s);
-                }
+            for (URI uri : state.getModuleMap().getChangeList()) {
+                    afterLoad.add(uri.toString());
             }
+            state.getModuleMap().clearChangeList();
             return afterLoad;
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {

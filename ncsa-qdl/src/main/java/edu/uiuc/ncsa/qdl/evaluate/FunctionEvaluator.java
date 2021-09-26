@@ -168,6 +168,12 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void figureOutEvaluation(Polyad polyad, State state, boolean checkForDuplicates) throws Throwable {
         FR_WithState frs;
         try {
+            if(state.isPrivate(polyad.getName()) && polyad.isInModule()){
+                // if it is in a module and at the top of the stack, then this is an access violation
+                if(state.getFTStack().getFtables().get(0).isDefined(polyad.getName(),polyad.getArgCount())){
+                    throw new IntrinsicViolation("cannot access intrinsic function directly.");
+                }
+            }
             frs = state.resolveFunction(polyad, checkForDuplicates);
         } catch (UndefinedFunctionException udx) {
             if (!state.isEnableLibrarySupport()) {
@@ -186,6 +192,11 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     }
 
     /*
+      module['a:/b','X'][__f(x,y)->x*y;]
+  module_import('a:/b', 'A')
+         A#__f(2,3)
+         // last should fail
+
       r(x)->x^2 + 1;
   f(*h(), x) -> h(x);
             f(*r(), 2)

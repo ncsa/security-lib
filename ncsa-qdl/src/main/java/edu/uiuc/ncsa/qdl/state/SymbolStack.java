@@ -88,17 +88,40 @@ public class SymbolStack extends AbstractSymbolTable {
      * @return
      */
     protected Object findValueInATable(String var) {
+        return findValueInATable(var, 0);
+    }
+
+    /**
+     * startIndex = 0 means look in local state too, startIndex = 1 means skip local state.
+     * @param var
+     * @param startIndex
+     * @return
+     */
+    protected Object findValueInATable(String var, int startIndex) {
+        for(int i = startIndex; i < getParentTables().size(); i++){
+            Object obj = getParentTables().get(i).resolveValue(var);
+            if (obj != null) {
+                return obj;
+            }
+
+        }
+/*
         for (SymbolTable s : getParentTables()) {
             Object obj = s.resolveValue(var);
             if (obj != null) {
                 return obj;
             }
         }
+*/
         return null;
     }
 
+    public Object resolveValue(String variableName, int startIndex) {
+        return findValueInATable(variableName, 1); // to keep current code working
+
+    }
     public Object resolveValue(String variableName) {
-        return findValueInATable(variableName); // to keep current code working
+        return findValueInATable(variableName, 0); // to keep current code working
     }
 
     /**

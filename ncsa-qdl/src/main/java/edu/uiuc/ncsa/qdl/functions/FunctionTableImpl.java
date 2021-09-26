@@ -103,6 +103,11 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     }
 
     @Override
+    public boolean isDefined(String var, int argCount, int startTableIndex) {
+        return isDefined(var,argCount);
+    }
+
+    @Override
     public TreeSet<String> listFunctions(String regex) {
         TreeSet<String> names = new TreeSet<>();
 
@@ -280,5 +285,13 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
             xer.nextEvent();
         }
         throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
+    }
+
+    @Override
+    public String toString() {
+        return "FunctionTableImpl{" +
+                "munger='" + munger + '\'' +
+                "values=" + toString() +
+                '}';
     }
 }

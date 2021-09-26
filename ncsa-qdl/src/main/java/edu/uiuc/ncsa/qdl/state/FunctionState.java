@@ -86,30 +86,38 @@ public abstract class FunctionState extends VariableState {
         fr.functionRecord = getFTStack().get(name, argCount);
 
         fr.state = this;
-        // if ther eis an unqualified named function, return it.
-         if(fr.functionRecord != null){
-             return fr;
-         }
-         // No UNQ function, so try to find one, but check that it is actually unique.
+        // if there is an unqualified named function, return it.
+        // Note that there cannot ever be an actual new definition of a function in a module
+        // since QDLListener will flag FunctionDefinitionStatements as illegal.
+        // So e.g.
+        //    X#f(x,y)->x*y;
+        // will fail.
 
-        for (String alias : getImportedModules().keySet()) {
-            if (fr.functionRecord == null) {
-                FunctionRecord tempFR = getImportedModule(alias).getState().getFTStack().get(name, argCount);
-                if (tempFR != null) {
-                    fr.functionRecord = tempFR;
-                    fr.state = getImportedModules().get(alias).getState();
-                    fr.isExternalModule = getImportedModules().get(alias).isExternal();
-                    fr.isModule = true;
-                    if (!checkForDuplicates) {
-                         return fr;
+        if (fr.functionRecord != null) {
+            return fr;
+        }
+        // No UNQ function, so try to find one, but check that it is actually unique.
+        if (!isPrivate(name)) {
+            for (String alias : getImportedModules().keySet()) {
+                if (fr.functionRecord == null) {
+                    FunctionRecord tempFR = getImportedModule(alias).getState().getFTStack().get(name, argCount);
+                    if (tempFR != null) {
+                        fr.functionRecord = tempFR;
+                        fr.state = getImportedModules().get(alias).getState();
+                        fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                        fr.isModule = true;
+                        if (!checkForDuplicates) {
+                            return fr;
+                        }
+                    }
+                } else {
+                    FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
+                    if ((checkForDuplicates) && tempFR != null) {
+                        throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                     }
                 }
-            } else {
-                FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
-                if ((checkForDuplicates) && tempFR != null) {
-                   throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
-                }
             }
+
         }
         if (fr.functionRecord == null) {
             // edge case is that it is actually a built-in function reference.
@@ -136,15 +144,15 @@ public abstract class FunctionState extends VariableState {
   X#g()
       */
 
-          public Module getImportedModule(String alias){
-              return getImportedModules().get(alias);
-          }
+
     /**
      * @param useCompactNotation
      * @param regex
      * @return
      */
-    public TreeSet<String> listFunctions(boolean useCompactNotation, String regex, boolean includeModules) {
+    public TreeSet<String> listFunctions(boolean useCompactNotation, String regex,
+                                         boolean includeModules,
+                                         boolean showIntrinsic) {
         TreeSet<String> out = getFTStack().listFunctions(regex);
         // no module templates, so no need to snoop through them
         if ((!includeModules) || getModuleMap().isEmpty()) {
@@ -152,8 +160,11 @@ public abstract class FunctionState extends VariableState {
         }
         for (URI key : getImportManager().keySet()) {
             Module mm = getModuleMap().get(key);
-            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true);
+            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
             for (String x : uqVars) {
+                if (isPrivate(x)&& !showIntrinsic) {
+                    continue;
+                }
                 if (useCompactNotation) {
                     out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
                 } else {
