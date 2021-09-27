@@ -57,7 +57,7 @@ public class PAServer2 extends ASImpl implements PAServer {
         m.put(OA2Constants.REDIRECT_URI,  props.get(OA2Constants.REDIRECT_URI));
         m.put(OA2Constants.CERT_REQ, String.valueOf(props.get(AbstractClientEnvironment.CERT_REQUEST_KEY)));
         m.put(OA2Constants.CERT_LIFETIME, String.valueOf(props.get(AbstractClientEnvironment.CERT_LIFETIME_KEY)));
-        String response = getServiceClient().getRawResponse(m); // No JSON in the spec. Just a string of certs.
+        String response = getServiceClient().doGet(m); // No JSON in the spec. Just a string of certs.
         MyX509Certificates myX509Certificate = null;
         try {
             myX509Certificate = new MyX509Certificates(CertUtil.fromX509PEM(response));

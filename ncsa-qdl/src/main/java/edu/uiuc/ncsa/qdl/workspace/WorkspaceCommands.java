@@ -2172,6 +2172,8 @@ public class WorkspaceCommands implements Logable {
             sayi("List all user defined functions.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             sayi(LIST_MODULES_SWITCH + " List modules as well. Default is just what you've defined.");
+            sayi(LIST_INTRINSIC_SWITCH + " List modules as well. Default is not to show them.");
+            sayi( "    Note that you cannot modify or query them, simply see what they are named.");
             return RC_NO_OP;
         }
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);

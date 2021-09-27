@@ -2469,10 +2469,13 @@ module[uri, alias
   >> General comments
   (statement;)*
 ];
+
+Modules may have intrinsic (called private in other languages)
+variables and functions if they start with __ to hide them.
 To see the general comments for a module in the workspace type
    )modules uri|alias -help
 
-See also: body, module_load, module_import.
+See also: body, module_load, module_import, intrinsic.
                 ]]>
             </body>
         </entry>
@@ -2990,6 +2993,34 @@ abfoocd
 
   insert('abcd', '....', differ_at('abc','abq'))
 ab....cd
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="intrinsic">
+             <body>
+                 <![CDATA[
+"Originating and included wholly within an organ or part."
+This refers to variables and functions defined inside a module which are not
+visible outside of the module. To mark a function or variable as intrinsic
+you prefix the name with a '__' (double underscore).
+E.g.
+(Inside the body of a module)
+
+__my_password := 'foo';
+__f(x)->x^2;
+
+Attempts to access __my_password or __f(x) will fail.
+See also: module.
+                 ]]>
+             </body>
+         </entry>
+
+    <entry id="__">
+            <body>
+                <![CDATA[
+Double underscore. Prefix for intrinsic variables and functions in a module
+See also: module, intrinsic.
                 ]]>
             </body>
         </entry>

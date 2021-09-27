@@ -62,7 +62,7 @@ public class RTServer2 extends TokenAwareServer implements RTServer {
         map.put(OA2Constants.CLIENT_ID, rtRequest.getClient().getIdentifierString());
         map.put(OA2Constants.CLIENT_SECRET, rtRequest.getClient().getSecret());
         map.putAll(rtRequest.getParameters());
-        String response = getServiceClient().getRawResponse(map);
+        String response = getServiceClient().doGet(map);
         return response;
     }
 

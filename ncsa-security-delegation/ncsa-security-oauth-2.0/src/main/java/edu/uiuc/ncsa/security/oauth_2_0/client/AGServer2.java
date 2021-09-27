@@ -61,7 +61,7 @@ public class AGServer2 extends ASImpl implements AGServer, OA2Constants {
         if (agRequest.getParameters().containsKey(RESPONSE_MODE)) {
             m.put(RESPONSE_MODE, agRequest.getParameters().get(RESPONSE_MODE));
         }
-        String responseString = getServiceClient().getRawResponse(m);
+        String responseString = getServiceClient().doGet(m);
         //System.out.println(getClass().getSimpleName() + ".processAGRequest: raw response=" + responseString);
         JSONObject json = JSONObject.fromObject(responseString);
         String accessCode = json.getString(AUTHORIZATION_CODE);

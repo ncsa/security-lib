@@ -652,7 +652,8 @@ public class ModuleTest extends AbstractQDLTester {
     /*
     The next set of tests is pretty much the same as the previous set, except that it does done on a QDL module
     loaded from disk. This is because the structure of the State is a little different when loading a module
-    (vs. running a module) and is special cased in the VariableState
+    (vs. running a module) and is special cased in the VariableState/FunctionState objects. Mostly this is to
+    guard against a change that breaks this. Simple, basic and essentail regression checks.
      */
     protected String testModulePath = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl";
     // ML = module_load

@@ -329,14 +329,14 @@ public class JWTUtil2 {
         }
 
         // Fix for OAUTH-164, id_token support follows.
-        String rawResponse = serviceClient.getRawResponse(wellKnown);
+        String rawResponse = serviceClient.doGet(wellKnown);
         JSON rawJSON = JSONSerializer.toJSON(rawResponse);
 
         if (!(rawJSON instanceof JSONObject)) {
             throw new IllegalStateException("Error: Attempted to get JSON Object but returned result is not JSON");
         }
         JSONObject json = (JSONObject) rawJSON;
-        String rawKeys = serviceClient.getRawResponse(json.getString("jwks_uri"));
+        String rawKeys = serviceClient.doGet(json.getString("jwks_uri"));
         JSONWebKeys keys = null;
         JSONObject claims = null;
         try {

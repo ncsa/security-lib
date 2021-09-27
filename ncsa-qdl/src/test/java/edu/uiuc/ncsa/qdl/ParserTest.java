@@ -940,7 +940,7 @@ public class ParserTest extends AbstractQDLTester {
         // Writing the next line was harder than it looks since it has to be a QDL string inside a Java string.
         String slash = "\\";
         addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
-                "  `~!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
+                "  ~`!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
                 "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧≁⊗\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );

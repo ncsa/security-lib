@@ -119,9 +119,9 @@ public class ATServer2 extends TokenAwareServer implements ATServer {
         }
         String response = null;
         if (useBasicAuth) {
-            response = getServiceClient().getRawResponse(m, clientID, clientSecret);
+            response = getServiceClient().doGet(m, clientID, clientSecret);
         } else {
-            response = getServiceClient().getRawResponse(m);
+            response = getServiceClient().doGet(m);
         }
         JSONObject jsonObject = getAndCheckResponse(response);
         if (!jsonObject.containsKey(ACCESS_TOKEN)) {

@@ -32,7 +32,7 @@ public class UIServer2 extends ASImpl implements UIServer {
     public UIResponse processUIRequest(UIRequest uiRequest) {
         HashMap m = new HashMap();
        m.put(OA2Constants.ACCESS_TOKEN, uiRequest.getAccessToken().getToken());
-        String response = getServiceClient().getRawResponse(m);
+        String response = getServiceClient().doGet(m);
     return new UIResponse(uiRequest.getAccessToken(), response);
     }
 }

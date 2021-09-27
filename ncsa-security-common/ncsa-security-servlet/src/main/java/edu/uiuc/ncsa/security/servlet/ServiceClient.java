@@ -88,7 +88,6 @@ public class ServiceClient {
         @Override
         public HttpClient create() {
             try {
-                // return getF().getClient(host.toString());
                 return getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
             } catch (IOException e) {
                 throw new GeneralException("Error getting https-aware client");
@@ -133,9 +132,6 @@ public class ServiceClient {
                 } else {
                     keyList.add(o.toString());
                     valueList.add(v.toString());
-
-//                    strings[i][0] = o.toString();
-                    //                  strings[i++][1] = v.toString();
                 }
             }
         }
@@ -150,12 +146,12 @@ public class ServiceClient {
         return convertToStringRequest(host, strings);
     }
 
-    public String getRawResponse(Map m, String id, String secret) {
-        return getRawResponse(convertToStringRequest(host().toString(), m), id, secret);
+    public String doGet(Map m, String id, String secret) {
+        return doGet(convertToStringRequest(host().toString(), m), id, secret);
     }
 
-    public String getRawResponse(Map m) {
-        return getRawResponse(convertToStringRequest(host().toString(), m));
+    public String doGet(Map m) {
+        return doGet(convertToStringRequest(host().toString(), m));
     }
 
 
@@ -265,7 +261,7 @@ public class ServiceClient {
      * If the token is not already base 64 or 32 encoded, option flag to do so.
      *
      * @param httpRequestBase
-     * @param token
+     * @param token -- the bearer token
      * @param base64Encode
      * @return
      */
@@ -341,12 +337,12 @@ public class ServiceClient {
 
     }
 
-    public String getRawResponse(String requestString, String id, String secret) {
+    public String doGet(String requestString, String id, String secret) {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet, id, secret);
     }
 
-    public String getRawResponse(String requestString) {
+    public String doGet(String requestString) {
         HttpGet httpGet = new HttpGet(requestString);
         return doRequest(httpGet);
     }
