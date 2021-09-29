@@ -1345,7 +1345,7 @@ public class StemVariable extends HashMap<String, Object> {
         for (long i = startIndex; i < startIndex + length; i++) {
             Object obj = sSL.get(i);
             if (obj == null) {
-                throw new IndexError("error: argument out of bounds for index " + i + ", object has size " + sSL.size());
+                throw new IndexError("argument out of bounds for index " + i + ", object has size " + sSL.size());
             }
             outSL.append(obj);
         }

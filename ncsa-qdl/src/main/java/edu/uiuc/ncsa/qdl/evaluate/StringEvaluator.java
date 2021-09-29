@@ -362,7 +362,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                     return r;
                 }
-                throw new IllegalArgumentException("error: " + DIFF + " requires both argument be strings.");
+                throw new IllegalArgumentException(DIFF + " requires both argument be strings.");
             }
         };
         process2(polyad, pointer, DIFF, state, false);
@@ -414,11 +414,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     private void doFromURI(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("Error: " + FROM_URI + " requires an argument");
+            throw new IllegalArgumentException(FROM_URI + " requires an argument");
         }
         Object object = polyad.evalArg(0, state);
         if (!isStem(object)) {
-            throw new IllegalArgumentException("Error: " + FROM_URI + " requires a stem as its argument");
+            throw new IllegalArgumentException(FROM_URI + " requires a stem as its argument");
         }
 
         StemVariable s = (StemVariable) object;
@@ -436,7 +436,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(Boolean.TRUE);
         } catch (URISyntaxException usx) {
-            throw new IllegalArgumentException("error: this is not a valid uri");
+            throw new IllegalArgumentException("not a valid uri");
         }
     }
 
@@ -448,11 +448,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
      */
     private void doToURI(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("Error: " + TO_URI + " requires an argument");
+            throw new IllegalArgumentException( TO_URI + " requires an argument");
         }
         Object object = polyad.evalArg(0, state);
         if (!isString(object)) {
-            throw new IllegalArgumentException("Error: " + TO_URI + " requires a string as its argument");
+            throw new IllegalArgumentException(TO_URI + " requires a string as its argument");
         }
         try {
             URI uri = URI.create(object.toString());
@@ -471,7 +471,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(Boolean.TRUE);
             return;
         } catch (Throwable t) {
-            throw new IllegalArgumentException("Error: \"" + object + "\" is not a valid uri: " + t.getMessage());
+            throw new IllegalArgumentException("'" + object + "' is not a valid uri: " + t.getMessage());
         }
 
     }
@@ -493,7 +493,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doDetokeninze(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2 && polyad.getArgCount() != 3) {
-            throw new IllegalArgumentException("Error: " + DETOKENIZE + " requires two or three arguments");
+            throw new IllegalArgumentException(DETOKENIZE + " requires two or three arguments");
         }
         Object leftArg = polyad.evalArg(0, state);
         Object rightArg = polyad.evalArg(1, state);
@@ -502,7 +502,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 3) {
             Object prepend = polyad.evalArg(2, state);
             if (!isLong(prepend)) {
-                throw new IllegalArgumentException("Error: the third argument for " + DETOKENIZE + " must be a n integer. You supplied '" + prepend + "'");
+                throw new IllegalArgumentException("the third argument for " + DETOKENIZE + " must be a n integer. You supplied '" + prepend + "'");
             }
             int options = ((Long) prepend).intValue();
             switch (options) {
@@ -586,7 +586,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
         } else {
             if (isStem(rightArg)) {
-                throw new IllegalArgumentException("Error: a stem of delimiters cannot be applied to a scalar.");
+                throw new IllegalArgumentException("a stem of delimiters cannot be applied to a scalar.");
             }
             if (omitDanglingDelimiter) {
                 result = leftArg.toString();

@@ -246,7 +246,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     // be string from external sources, e.g.
     private void doToBoolean(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("" + TO_BOOLEAN_TYPE + " requires an argument");
+            throw new IllegalArgumentException(TO_BOOLEAN_TYPE + " requires an argument");
         }
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
             @Override

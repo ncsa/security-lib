@@ -138,11 +138,11 @@ return StemUtility.areNoneStems(objects);    }
     }
 
     protected BigDecimal toBD(Object obj) {
-        if (!isNumber(obj)) throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
+        if (!isNumber(obj)) throw new IllegalArgumentException("'" + obj + "' is not a number");
         if (obj instanceof BigDecimal) return (BigDecimal) obj;
         if (obj instanceof Long) return new BigDecimal((Long) obj, OpEvaluator.getMathContext());
         if (obj instanceof Integer) return new BigDecimal((Integer) obj, OpEvaluator.getMathContext());
-        throw new IllegalArgumentException("Error: '" + obj + "' is not a number");
+        throw new IllegalArgumentException("'" + obj + "' is not a number");
     }
 
     protected StemVariable toStem(Object object) {
@@ -178,7 +178,7 @@ return StemUtility.areNoneStems(objects);    }
                             String name,
                             State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("Error: the " + name + " function requires 1 argument");
+            throw new IllegalArgumentException( name + " requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
@@ -242,7 +242,7 @@ return StemUtility.areNoneStems(objects);    }
                             State state,
                             boolean optionalArgs) {
         if (!optionalArgs && polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException("Error: the " + name + " function requires 2 arguments");
+            throw new IllegalArgumentException(name + " requires 2 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
@@ -341,7 +341,7 @@ return StemUtility.areNoneStems(objects);    }
                             State state,
                             boolean optionalArguments) {
         if (!optionalArguments && polyad.getArgCount() != 3) {
-            throw new IllegalArgumentException("Error: the " + name + " function requires at least 3  arguments");
+            throw new IllegalArgumentException(name + " requires at least 3  arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
@@ -352,7 +352,7 @@ return StemUtility.areNoneStems(objects);    }
         checkNull(arg3, polyad.getArgAt(3), state);
 
         if (arg1 == null || arg2 == null || arg3 == null) {
-            throw new UnknownSymbolException("Error: Unknown symbol");
+            throw new UnknownSymbolException("unknown symbol");
         }
         Object[] argList = new Object[polyad.getArgCount()];
         argList[0] = arg1;
@@ -513,8 +513,7 @@ return StemUtility.areNoneStems(objects);    }
             }
         }
         if (stem1 == null) {
-            throw new MissingArgumentException("error: the first argument is not a variable in this workspace.");
-            //throw new NFWException("Internal error: the supplied node is not a variable node. You probably supplied the wrong argument");
+            throw new MissingArgumentException("the first argument is not a variable in this workspace.");
         }
         return stem1;
     }
@@ -533,7 +532,7 @@ return StemUtility.areNoneStems(objects);    }
     protected VFSEntry resolveResourceToFile(String resourceName, State state) {
         if (state.isVFSFile(resourceName)) {
             if (!state.hasVFSProviders()) {
-                throw new QDLException("Error: unkonwn virtual file system for resource '" + resourceName + "'");
+                throw new QDLException("unkonwn virtual file system for resource '" + resourceName + "'");
             }
             try {
                 return state.getFileFromVFS(resourceName);
@@ -541,7 +540,7 @@ return StemUtility.areNoneStems(objects);    }
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
                 }
-                throw new QDLException("Error: could not file from VFS:" + t.getMessage(), t);
+                throw new QDLException("could not file from VFS:" + t.getMessage(), t);
             }
         }
         return null;
@@ -689,9 +688,9 @@ return StemUtility.areNoneStems(objects);    }
     public static void checkNull(Object arg1, StatementWithResultInterface swri, State state ) {
         if(arg1 == null){
             UnknownSymbolException unknownSymbolException;
-            String message  = "Error: unknown symbol";
+            String message  = "unknown symbol";
             if(swri instanceof VariableNode){
-                message = "Error: unknown symbol '" + ((VariableNode)swri).getVariableReference() + "'";
+                message = message + " '" + ((VariableNode)swri).getVariableReference() + "'";
                 unknownSymbolException =  new UnknownSymbolException(message);
             }else {
                 unknownSymbolException = new UnknownSymbolException(message);

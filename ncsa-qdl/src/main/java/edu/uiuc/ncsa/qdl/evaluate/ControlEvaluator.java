@@ -439,14 +439,14 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable stemVariable = (StemVariable) arg1;
         if (!stemVariable.isList()) {
-            throw new IllegalArgumentException("second argument of " + REDUCE + " must be a list");
+            throw new IllegalArgumentException("second argument of " + (doReduce ? REDUCE : EXPAND) + " must be a list");
         }
         int axis = 0; // default
         if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
             checkNull(axisObj, polyad.getArgAt(2));
             if (!isLong(axisObj)) {
-                throw new IllegalArgumentException("error: third argument of " + (doReduce ? REDUCE : EXPAND) + ", the axis, must be an integer");
+                throw new IllegalArgumentException("third argument of " + (doReduce ? REDUCE : EXPAND) + ", the axis, must be an integer");
             }
             axis = ((Long) axisObj).intValue();
         }
@@ -685,12 +685,12 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
 
     private void doCheckSyntax(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " requires a single argument.");
+            throw new IllegalArgumentException("argument to " + CHECK_SYNTAX + " requires a single argument.");
         }
         Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0), state);
         if (!isString(arg0)) {
-            throw new IllegalArgumentException("Error: the argument to " + CHECK_SYNTAX + " must be a string.");
+            throw new IllegalArgumentException("argument to " + CHECK_SYNTAX + " must be a string.");
         }
         StringReader r = new StringReader((String) arg0);
         String message = "";
@@ -733,7 +733,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Error: " + INTERRUPT + " accepts at most one argument.");
+                throw new IllegalArgumentException(INTERRUPT + " accepts at most one argument.");
         }
         SIEntry sie = new SIEntry();
         sie.state = state;
@@ -837,7 +837,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 if (!state.isRestrictedIO()) {
                     // Then they are setting the logging level
                     if (!isValidLoggingLevel((Long) arg0)) {
-                        throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
+                        throw new IllegalArgumentException("unknown logging level of " + arg0 + " encountered.");
                     }
                     newLogLevel = ((Long) arg0).intValue();
 
@@ -867,7 +867,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             if (isLong(arg0)) {
                 newLogLevel = ((Long) arg0).intValue();
                 if (!isValidLoggingLevel((Long) arg0)) {
-                    throw new IllegalArgumentException("error: unknown logging level of " + arg0 + " encountered.");
+                    throw new IllegalArgumentException("unknown logging level of " + arg0 + " encountered.");
                 }
 
             } else {
@@ -1535,7 +1535,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 };
             } else {
                 if (!(newThingy instanceof QDLLoader)) {
-                    throw new IllegalArgumentException("Error: \"" + resourceName + "\" is neither a module nor a loader.");
+                    throw new IllegalArgumentException("'" + resourceName + "' is neither a module nor a loader.");
                 }
                 qdlLoader = (QDLLoader) newThingy;
             }
@@ -1548,7 +1548,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             }
-            throw new QDLException("Could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
+            throw new QDLException("could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
         }
     }
 
@@ -1677,7 +1677,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                     };
                 } else {
                     if (!(newThingy instanceof QDLLoader)) {
-                        throw new IllegalArgumentException("Error: \"" + resourceName + "\" is neither a module nor a loader.");
+                        throw new IllegalArgumentException("'" + resourceName + "' is neither a module nor a loader.");
                     }
                     qdlLoader = (QDLLoader) newThingy;
                 }

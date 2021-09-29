@@ -649,6 +649,25 @@ public class ModuleTest extends AbstractQDLTester {
             assert true;
         }
     }
+
+    public void testIntrinsicGetter() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/b','X'][__a:=1;get_a()->__a;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "ok := 1 == X#get_a();");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert getBooleanValue("ok", state):"Could not access getter for private variable.";
+    }
+    /*
+             module['a:/b','X'][__a:=1;get_a()->__a;]
+  module_import('a:/b','X')
+    X#__a  X
+
+cannot access '__a'
+         X#get_a()
+     */
     /*
     The next set of tests is pretty much the same as the previous set, except that it does done on a QDL module
     loaded from disk. This is because the structure of the State is a little different when loading a module
@@ -744,4 +763,15 @@ public class ModuleTest extends AbstractQDLTester {
               assert true;
           }
       }
+
+    public void testMLIntrinsicGetter() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "ok := 4 == X#get_private();");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert getBooleanValue("ok", state):"Could not access getter for private variable.";
+    }
 }

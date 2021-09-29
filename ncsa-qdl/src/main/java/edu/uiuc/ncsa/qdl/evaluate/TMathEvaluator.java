@@ -359,7 +359,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
             }
             if (rr == null) {
-                throw new IllegalArgumentException("Error: argument must be a number");
+                throw new IllegalArgumentException("argument must be a number");
             }
             polyad.setResult(rr);
 

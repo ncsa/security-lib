@@ -122,6 +122,7 @@ expression
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
  | variable? Hash expression                                                   #moduleExpression
+// | expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel

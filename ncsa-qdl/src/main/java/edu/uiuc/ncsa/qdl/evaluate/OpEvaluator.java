@@ -322,7 +322,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         Object obj0 = dyad.evalArg(0, state);
         Object obj1 = dyad.evalArg(1, state);
         if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
-            throw new IllegalArgumentException("Error: cannot do a union a null");
+            throw new IllegalArgumentException("cannot do a union a null");
         }
         StemVariable stem0 = null;
         StemVariable stem1 = null;
@@ -719,7 +719,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     return r;
                 }
                 // This is a stem
-                throw new IllegalArgumentException("error: stem encountered in scalar operation");
+                throw new IllegalArgumentException("stem encountered in scalar operation");
             }
         };
         process2(dyad, pointer, PLUS, state);

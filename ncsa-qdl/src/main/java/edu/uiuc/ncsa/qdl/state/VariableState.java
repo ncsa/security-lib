@@ -191,6 +191,7 @@ public abstract class VariableState extends NamespaceAwareState {
         if (isPrivate(variableName)) {
             st = getSymbolStack();
             object = st.resolveValue(variableName, 1);
+            //object = st.resolveValue(variableName, ((SymbolStack) st).parentCount() - 1);
             if (object instanceof StemVariable) {
                 stem = (StemVariable) object;
             }
@@ -288,7 +289,12 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     Pattern intPattern = Pattern.compile(int_regex);
-
+     /*
+       module['a:/b','X'][__a:=1;get_a()->__a;]
+  module_import('a:/b','X')
+    X#__a
+       X#get_a()
+      */
     protected Object gsrNSScalarOp(String variableName, int op, Object value) {
         // if(!pattern.matcher(v.getName()).matches()){
         if (variableName.equals("0") || intPattern.matcher(variableName).matches()) {
@@ -310,6 +316,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 startIndex = ((SymbolStack)st).getParentTables().size() == 1?0:startIndex;
             }
             v = st.resolveValue(variableName, startIndex);
+            //v = st.resolveValue(variableName, ((SymbolStack)st).getParentTables().size()-1);
             if(0<startIndex  && v == null){
                 throw new IntrinsicViolation("cannot access '" + variableName+"'");
             }

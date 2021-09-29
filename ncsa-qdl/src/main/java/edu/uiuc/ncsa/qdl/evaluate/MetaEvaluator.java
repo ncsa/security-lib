@@ -74,7 +74,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         for (AbstractFunctionEvaluator evaluator : evaluators) {
             if (evaluator.evaluate(polyad, state)) return true;
         }
-        throw new UndefinedFunctionException("Unknown function '" + polyad.getName() + "'.");
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
     }
 
 

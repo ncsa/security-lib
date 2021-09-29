@@ -250,7 +250,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doIdentityFunction(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("error: " + IDENTITY_FUNCTION + " requires a single argument");
+            throw new IllegalArgumentException(IDENTITY_FUNCTION + " requires a single argument");
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));

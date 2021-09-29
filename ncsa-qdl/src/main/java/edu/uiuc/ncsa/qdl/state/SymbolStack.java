@@ -51,6 +51,9 @@ public class SymbolStack extends AbstractSymbolTable {
         addParent(new SymbolTableImpl());
     }
 
+    public int parentCount(){
+        return getParentTables().size();
+    }
     /*
         Note that the order of the parents is that the most recent comes 0th. So the local table
         is at index 0, then its parent is 1, ... the very last table is the global state.
@@ -99,6 +102,7 @@ public class SymbolStack extends AbstractSymbolTable {
      */
     protected Object findValueInATable(String var, int startIndex) {
         for(int i = startIndex; i < getParentTables().size(); i++){
+       // for(int i = 0; i < startIndex; i++){
             Object obj = getParentTables().get(i).resolveValue(var);
             if (obj != null) {
                 return obj;

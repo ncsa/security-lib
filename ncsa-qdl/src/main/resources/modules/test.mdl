@@ -10,6 +10,7 @@ module[
    f(x,y)->times(x,u)+times(y,v);
    __f(x,y)->__w.*f(x,y)/__private;
    g()->u+v;
+   get_private()->__private;
    h(x,y)->__f(x,y);
   ];
   /*
