@@ -32,6 +32,9 @@ public class FunctionDefinitionStatement implements Statement {
 
     @Override
     public Object evaluate(State state) {
+        if(state.getMetaEvaluator().isBuiltInFunction(functionRecord.name)){
+            throw new IllegalArgumentException("'" + functionRecord.name + "' already defined in this context");
+        }
         state.getFTStack().put(functionRecord);
         return QDLNull.getInstance(); // for now
     }

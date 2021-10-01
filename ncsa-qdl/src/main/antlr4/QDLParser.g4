@@ -99,6 +99,7 @@ expression
   | expression postfix=StemDot                                                 #dotOp2
   | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
+ | variable? Hash expression                                                   #moduleExpression
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval
@@ -121,7 +122,6 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
- | variable? Hash expression                                                   #moduleExpression
 // | expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile

@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
@@ -953,17 +953,17 @@ public class QDLListener implements QDLParserListener {
             if (stmt instanceof StatementWithResultInterface) {
                 if (stmt instanceof ExpressionImpl) {
                     ExpressionImpl expr = (ExpressionImpl) stmt;
-                    if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
-                        Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
-                        expr1.setName(ControlEvaluator.RETURN);
+                    if (expr.getOperatorType() != SystemEvaluator.RETURN_TYPE) {
+                        Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                        expr1.setName(SystemEvaluator.RETURN);
                         expr1.addArgument(expr);
                         functionRecord.statements.add(expr1); // wrapped in a return
                     } else {
                         functionRecord.statements.add(expr); // already has a return
                     }
                 } else {
-                    Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
-                    expr1.setName(ControlEvaluator.RETURN);
+                    Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                    expr1.setName(SystemEvaluator.RETURN);
                     expr1.addArgument((StatementWithResultInterface) stmt);
                     functionRecord.statements.add(expr1); // wrapped in a return
                 }
@@ -1827,17 +1827,17 @@ public class QDLListener implements QDLParserListener {
             if (stmt instanceof StatementWithResultInterface) {
                 if (stmt instanceof ExpressionImpl) {
                     ExpressionImpl expr = (ExpressionImpl) stmt;
-                    if (expr.getOperatorType() != ControlEvaluator.RETURN_TYPE) {
-                        Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
-                        expr1.setName(ControlEvaluator.RETURN);
+                    if (expr.getOperatorType() != SystemEvaluator.RETURN_TYPE) {
+                        Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                        expr1.setName(SystemEvaluator.RETURN);
                         expr1.addArgument(expr);
                         functionRecord.statements.add(expr1); // wrapped in a return
                     } else {
                         functionRecord.statements.add(expr); // already has a return
                     }
                 } else {
-                    Polyad expr1 = new Polyad(ControlEvaluator.RETURN_TYPE);
-                    expr1.setName(ControlEvaluator.RETURN);
+                    Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                    expr1.setName(SystemEvaluator.RETURN);
                     expr1.addArgument((StatementWithResultInterface) stmt);
                     functionRecord.statements.add(expr1); // wrapped in a return
                 }

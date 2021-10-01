@@ -14,5 +14,5 @@ public interface EvaluatorInterface extends Serializable {
     int getType(String name);
 
      TreeSet<String> listFunctions(boolean listFQ);
-
+     String getNamespace();
 }

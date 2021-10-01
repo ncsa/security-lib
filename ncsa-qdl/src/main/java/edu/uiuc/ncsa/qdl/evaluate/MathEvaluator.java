@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -13,120 +12,85 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  9:18 AM
  */
 public class MathEvaluator extends AbstractFunctionEvaluator {
+    @Override
+    public String getNamespace() {
+        return MATH_NAMESPACE;
+    }
+
     public static final String MATH_NAMESPACE = "math";
-    public static final String MATH_FQ = MATH_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int MATH_FUNCTION_BASE_VALUE = 1000;
+
     public static final String ABS_VALUE = "abs";
-    public static final String FQ_ABS_VALUE = MATH_FQ + ABS_VALUE;
     public static final int ABS_VALUE_TYPE = 1 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String RANDOM = "random";
-    public static final String FQ_RANDOM = MATH_FQ + RANDOM;
     public static final int RANDOM_TYPE = 2 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String RANDOM_STRING = "random_string";
-    public static final String FQ_RANDOM_STRING = MATH_FQ + RANDOM_STRING;
     public static final int RANDOM_STRING_TYPE = 3 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String HASH = "hash";
-    public static final String FQ_HASH = MATH_FQ + HASH;
     public static final int HASH_TYPE = 4 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String TO_HEX = "to_hex";
-    public static final String FQ_TO_HEX = MATH_FQ + TO_HEX;
     public static final int TO_HEX_TYPE = 5 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String FROM_HEX = "from_hex";
-    public static final String FQ_FROM_HEX = MATH_FQ + FROM_HEX;
     public static final int FROM_HEX_TYPE = 6 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String DATE_MS = "date_ms";
-    public static final String FQ_DATE_MS = MATH_FQ + DATE_MS;
     public static final int DATE_MS_TYPE = 7 + MATH_FUNCTION_BASE_VALUE;
 
 
     public static final String DECODE_B64 = "decode_b64";
-    public static final String FQ_DECODE_B64 = MATH_FQ + DECODE_B64;
     public static final int DECODE_B64_TYPE = 8 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String ENCODE_B64 = "encode_b64";
-    public static final String FQ_ENCODE_B64 = MATH_FQ + ENCODE_B64;
     public static final int ENCODE_B64_TYPE = 9 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String MOD = "mod";
-    public static final String FQ_MOD = MATH_FQ + MOD;
     public static final int MOD_TYPE = 10 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String DATE_ISO = "date_iso";
-    public static final String FQ_DATE_ISO = MATH_FQ + DATE_ISO;
     public static final int DATE_ISO_TYPE = 11 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String NUMERIC_DIGITS = "numeric_digits";
-    public static final String FQ_NUMERIC_DIGITS = MATH_FQ + NUMERIC_DIGITS;
     public static final int NUMERIC_DIGITS_TYPE = 12 + MATH_FUNCTION_BASE_VALUE;
 
     public static final String IDENTITY_FUNCTION = "i";
     public static final String LONG_IDENTITY_FUNCTION = "identity";
-    public static final String FQ_IDENTITY_FUNCTION = MATH_FQ + IDENTITY_FUNCTION;
-    public static final String FQ_LONG_IDENTITY_FUNCTION = MATH_FQ + "identity";
     public static final int IDENTITY_FUNCTION_TYPE = 14 + MATH_FUNCTION_BASE_VALUE;
 
 
 
-    public static String FUNC_NAMES[] = new String[]{
-            IDENTITY_FUNCTION,
-            LONG_IDENTITY_FUNCTION,
-            ABS_VALUE,
-            RANDOM,
-            RANDOM_STRING,
-            HASH,
-            TO_HEX,
-            FROM_HEX,
-            DATE_MS,
-            DATE_ISO,
-            NUMERIC_DIGITS,
-            DECODE_B64,
-            ENCODE_B64,
-            MOD,
-            DATE_ISO};
-
-    public static String FQ_FUNC_NAMES[] = new String[]{
-            FQ_IDENTITY_FUNCTION,
-            FQ_LONG_IDENTITY_FUNCTION,
-            FQ_ABS_VALUE,
-            FQ_RANDOM,
-            FQ_RANDOM_STRING,
-            FQ_HASH,
-            FQ_TO_HEX,
-            FQ_FROM_HEX,
-            FQ_DATE_MS,
-            FQ_DATE_ISO,
-            FQ_NUMERIC_DIGITS,
-            FQ_DECODE_B64,
-            FQ_ENCODE_B64,
-            FQ_MOD,
-            FQ_DATE_ISO};
-
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames = new String[]{
+                        IDENTITY_FUNCTION,
+                        LONG_IDENTITY_FUNCTION,
+                        ABS_VALUE,
+                        RANDOM,
+                        RANDOM_STRING,
+                        HASH,
+                        TO_HEX,
+                        FROM_HEX,
+                        DATE_MS,
+                        DATE_ISO,
+                        NUMERIC_DIGITS,
+                        DECODE_B64,
+                        ENCODE_B64,
+                        MOD,
+                        DATE_ISO};
+        }
+        return fNames;
     }
 
     @Override
@@ -134,44 +98,30 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         switch (name) {
             case IDENTITY_FUNCTION:
             case LONG_IDENTITY_FUNCTION:
-            case FQ_IDENTITY_FUNCTION:
-            case FQ_LONG_IDENTITY_FUNCTION:
                 return IDENTITY_FUNCTION_TYPE;
             case ABS_VALUE:
-            case FQ_ABS_VALUE:
                 return ABS_VALUE_TYPE;
             case RANDOM:
-            case FQ_RANDOM:
                 return RANDOM_TYPE;
             case RANDOM_STRING:
-            case FQ_RANDOM_STRING:
                 return RANDOM_STRING_TYPE;
             case HASH:
-            case FQ_HASH:
                 return HASH_TYPE;
             case TO_HEX:
-            case FQ_TO_HEX:
                 return TO_HEX_TYPE;
             case NUMERIC_DIGITS:
-            case FQ_NUMERIC_DIGITS:
                 return NUMERIC_DIGITS_TYPE;
             case FROM_HEX:
-            case FQ_FROM_HEX:
                 return FROM_HEX_TYPE;
             case ENCODE_B64:
-            case FQ_ENCODE_B64:
                 return ENCODE_B64_TYPE;
             case DECODE_B64:
-            case FQ_DECODE_B64:
                 return DECODE_B64_TYPE;
             case DATE_MS:
-            case FQ_DATE_MS:
                 return DATE_MS_TYPE;
             case DATE_ISO:
-            case FQ_DATE_ISO:
                 return DATE_ISO_TYPE;
             case MOD:
-            case FQ_MOD:
                 return MOD_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
@@ -182,58 +132,44 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
 
         switch (polyad.getName()) {
-            case FQ_IDENTITY_FUNCTION:
-            case FQ_LONG_IDENTITY_FUNCTION:
             case IDENTITY_FUNCTION:
             case LONG_IDENTITY_FUNCTION:
                 doIdentityFunction(polyad, state);
                 return true;
             case ABS_VALUE:
-            case FQ_ABS_VALUE:
                 doAbs(polyad, state);
                 return true;
             case RANDOM:
-            case FQ_RANDOM:
                 doRandom(polyad, state);
                 return true;
             case RANDOM_STRING:
-            case FQ_RANDOM_STRING:
                 doRandomString(polyad, state);
                 return true;
             case HASH:
-            case FQ_HASH:
                 doHash(polyad, state);
                 return true;
             case TO_HEX:
-            case FQ_TO_HEX:
                 toFromhex(polyad, state, true);
                 return true;
             case FROM_HEX:
-            case FQ_FROM_HEX:
                 toFromhex(polyad, state, false);
                 return true;
             case NUMERIC_DIGITS:
-            case FQ_NUMERIC_DIGITS:
                 doNumericDigits(polyad, state);
                 return true;
             case ENCODE_B64:
-            case FQ_ENCODE_B64:
                 doB64(polyad, state, true);
                 return true;
             case DECODE_B64:
-            case FQ_DECODE_B64:
                 doB64(polyad, state, false);
                 return true;
             case DATE_MS:
-            case FQ_DATE_MS:
                 doDates(polyad, state, true);
                 return true;
             case DATE_ISO:
-            case FQ_DATE_ISO:
                 doDates(polyad, state, false);
                 return true;
             case MOD:
-            case FQ_MOD:
                 doModulus(polyad, state);
                 return true;
         }

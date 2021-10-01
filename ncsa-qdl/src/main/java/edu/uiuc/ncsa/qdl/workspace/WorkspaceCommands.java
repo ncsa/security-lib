@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
@@ -1839,7 +1839,7 @@ public class WorkspaceCommands implements Logable {
         if (_doHelp(inputLine)) {
             say("imports");
             sayi("A table of imported modules and their aliases. ");
-            sayi("You must either directly create a module or load it with " + ControlEvaluator.MODULE_LOAD + " to make QDL aware of it before importing it");
+            sayi("You must either directly create a module or load it with " + SystemEvaluator.MODULE_LOAD + " to make QDL aware of it before importing it");
             return RC_NO_OP;
         }
 
@@ -3677,7 +3677,7 @@ public class WorkspaceCommands implements Logable {
             sayi("If you have already loaded (or saved) a file, that is remembered in the " + KEEP_WSF + " variable");
             sayi("and you do not need to specify it henceforth.");
             sayi("The file should be either a relative path (resolved against the default save location) or an absolute path.");
-            sayi(QDL_DUMP_FLAG + " = dump the contents of the workspace to a QDL file. You can just reload it using " + ControlEvaluator.LOAD_COMMAND);
+            sayi(QDL_DUMP_FLAG + " = dump the contents of the workspace to a QDL file. You can just reload it using " + SystemEvaluator.LOAD_COMMAND);
             sayi(JAVA_FLAG + " = save using Java serialization format. The default is XML.");
             sayi(SHOW_FLAG + " = (XML format only) dump the (uncompressed) result to the console instead. No file is needed.");
             sayi(COMPRESS_FLAG + " = compress the output. The resulting file will be a binary file. This overrides the configuration file setting.");
@@ -3819,8 +3819,8 @@ public class WorkspaceCommands implements Logable {
         for (URI key : getState().getModuleMap().keySet()) {
             String output = inputFormModule(key, state);
             if (output.startsWith(JAVA_CLASS_MARKER)) {
-                output = ControlEvaluator.MODULE_LOAD + "('" + output.substring(JAVA_CLASS_MARKER.length())
-                        + "' ,'" + ControlEvaluator.MODULE_TYPE_JAVA + "');";
+                output = SystemEvaluator.MODULE_LOAD + "('" + output.substring(JAVA_CLASS_MARKER.length())
+                        + "' ,'" + SystemEvaluator.MODULE_TYPE_JAVA + "');";
             }
             fileWriter.write(output + "\n");
 
@@ -3831,7 +3831,7 @@ public class WorkspaceCommands implements Logable {
         for (URI key : getState().getModuleMap().keySet()) {
             List<String> aliases = getState().getImportManager().getAlias(key);
             for (String alias : aliases) {
-                String output = ControlEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
+                String output = SystemEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
                 fileWriter.write(output + "\n");
             }
         }
@@ -4145,7 +4145,7 @@ public class WorkspaceCommands implements Logable {
             boolean echo = isEchoModeOn();
             boolean pp = isPrettyPrint();
             clearWS();
-            String command = ControlEvaluator.LOAD_COMMAND + "('" + target.getAbsolutePath() + "');";
+            String command = SystemEvaluator.LOAD_COMMAND + "('" + target.getAbsolutePath() + "');";
             try {
                 // Don't barf out everything to the command line when it loads.
                 getInterpreter().setPrettyPrint(false);

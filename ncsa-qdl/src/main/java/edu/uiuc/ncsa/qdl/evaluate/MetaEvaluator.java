@@ -23,7 +23,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     /**
      * Factory method. You should not override this class to add more of your own evaluators. Just
      * get the instance and {@link #addEvaluator(AbstractFunctionEvaluator)} to it. It will snoop
-     * through your evaluator too. If you are writing your own evaluator, start your type numbers
+     * through your evaluator too. If you are writing your own evaluator, your type numbers
      * should be negative.
      *
      * @return
@@ -31,18 +31,34 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     public static MetaEvaluator getInstance() {
         if (metaEvaluator == null) {
             metaEvaluator = new MetaEvaluator();                // NS base value. Must be distinct for new evaluators
-            metaEvaluator.addEvaluator(new StringEvaluator());  // 3000
-            metaEvaluator.addEvaluator(new StemEvaluator());    // 2000
-            metaEvaluator.addEvaluator(new IOEvaluator());      // 4000
-            metaEvaluator.addEvaluator(new ControlEvaluator()); // 5000
-            metaEvaluator.addEvaluator(new MathEvaluator());    // 1000
-            metaEvaluator.addEvaluator(new TMathEvaluator());   // 7000
+            metaEvaluator.addEvaluator(new StringEvaluator());  //  3000
+            metaEvaluator.addEvaluator(new StemEvaluator());    //  2000
+            metaEvaluator.addEvaluator(new ListEvaluator());    // 10000
+            metaEvaluator.addEvaluator(new IOEvaluator());      //  4000
+            metaEvaluator.addEvaluator(new SystemEvaluator());  //  5000
+            metaEvaluator.addEvaluator(new MathEvaluator());    //  1000
+            metaEvaluator.addEvaluator(new TMathEvaluator());   //  7000
             // must be last always to resolve user defined functions.
             metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000
+            systemNamespaces.add(StringEvaluator.STRING_NAMESPACE);
+            systemNamespaces.add(IOEvaluator.IO_NAMESPACE);
+            systemNamespaces.add(StemEvaluator.STEM_NAMESPACE);
+            systemNamespaces.add(ListEvaluator.LIST_NAMESPACE);
+            systemNamespaces.add(MathEvaluator.MATH_NAMESPACE);
+            systemNamespaces.add(TMathEvaluator.TMATH_NAMESPACE);
+            systemNamespaces.add(FunctionEvaluator.FUNCTION_NAMESPACE);
         }
         return metaEvaluator;
     }
 
+    public static boolean isSystemNS(String name){
+        return getSystemNamespaces().contains(name);
+    }
+    @Override
+    public String getNamespace() {
+        // not implemented at this level.
+        return null;
+    }
 
     public static void setMetaEvaluator(MetaEvaluator metaEvaluator) {
         MetaEvaluator.metaEvaluator = metaEvaluator;
@@ -77,6 +93,13 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
     }
 
+    public boolean evaluate(String alias, Polyad polyad, State state) {
+
+        for (AbstractFunctionEvaluator evaluator : evaluators) {
+            if (evaluator.evaluate(alias, polyad, state)) return true;
+        }
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
+    }
 
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
@@ -103,5 +126,8 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         }
         return allNames;
     }
-
+    static protected List<String> systemNamespaces = new ArrayList<>();
+     public static List<String> getSystemNamespaces(){
+                return systemNamespaces;
+     }
 }

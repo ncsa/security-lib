@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 import java.util.logging.Level;
@@ -47,268 +48,233 @@ import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
  * <p>Created by Jeff Gaynor<br>
  * on 1/18/20 at  11:49 AM
  */
-public class ControlEvaluator extends AbstractFunctionEvaluator {
+public class SystemEvaluator extends AbstractFunctionEvaluator {
+    public static final String SYS_NAMESPACE = "sys";
+    public static final String SYS_FQ = SYS_NAMESPACE + ImportManager.NS_DELIMITER;
+    public static final int SYSTEM_BASE_VALUE = 5000;
 
-    public static final int CONTROL_BASE_VALUE = 5000;
-
+    @Override
+    public String getNamespace() {
+        return SYS_NAMESPACE;
+    }
 
     // Looping stuff
     public static final String CONTINUE = "continue";
-    public static final String FQ_CONTINUE = SYS_FQ + CONTINUE;
-    public static final int CONTINUE_TYPE = 1 + CONTROL_BASE_VALUE;
+    public static final int CONTINUE_TYPE = 1 + SYSTEM_BASE_VALUE;
 
     public static final String BREAK = "break";
-    public static final String FQ_BREAK = SYS_FQ + BREAK;
-    public static final int BREAK_TYPE = 2 + CONTROL_BASE_VALUE;
+    public static final int BREAK_TYPE = 2 + SYSTEM_BASE_VALUE;
 
     public static final String FOR_KEYS = "for_keys";
-    public static final String FQ_FOR_KEYS = SYS_FQ + FOR_KEYS;
-    public static final int FOR_KEYS_TYPE = 3 + CONTROL_BASE_VALUE;
+    public static final int FOR_KEYS_TYPE = 3 + SYSTEM_BASE_VALUE;
 
     public static final String FOR_NEXT = "for_next";
-    public static final String FQ_FOR_NEXT = SYS_FQ + FOR_NEXT;
-    public static final int FOR_NEXT_TYPE = 4 + CONTROL_BASE_VALUE;
+    public static final int FOR_NEXT_TYPE = 4 + SYSTEM_BASE_VALUE;
 
     public static final String CHECK_AFTER = "check_after";
-    public static final String FQ_CHECK_AFTER = SYS_FQ + CHECK_AFTER;
-    public static final int CHECK_AFTER_TYPE = 5 + CONTROL_BASE_VALUE;
+    public static final int CHECK_AFTER_TYPE = 5 + SYSTEM_BASE_VALUE;
 
     public static final String INTERRUPT = "halt";
-    public static final String FQ_INTERRUPT = SYS_FQ + INTERRUPT;
-    public static final int INTERRUPT_TYPE = 6 + CONTROL_BASE_VALUE;
+    public static final int INTERRUPT_TYPE = 6 + SYSTEM_BASE_VALUE;
+
+    public static final String VAR_TYPE = "var_type";
+    public static final int VAR_TYPE_TYPE = 7 + SYSTEM_BASE_VALUE;
+    public static final String IS_DEFINED = "is_defined";
+    public static final int IS_DEFINED_TYPE = 8 + SYSTEM_BASE_VALUE;
 
     public static final String EXECUTE = "execute";
-    public static final String FQ_EXECUTE = SYS_FQ + EXECUTE;
-    public static final int EXECUTE_TYPE = 10 + CONTROL_BASE_VALUE;
+    public static final int EXECUTE_TYPE = 9 + SYSTEM_BASE_VALUE;
 
     public static final String CHECK_SYNTAX = "check_syntax";
-    public static final String FQ_CHECK_SYNTAX = SYS_FQ + CHECK_SYNTAX;
-    public static final int CHECK_SYNTAX_TYPE = 11 + CONTROL_BASE_VALUE;
+    public static final int CHECK_SYNTAX_TYPE = 10 + SYSTEM_BASE_VALUE;
 
     public static final String INPUT_FORM = "input_form";
-    public static final String FQ_INPUT_FORM = SYS_FQ + INPUT_FORM;
-    public static final int INPUT_FORM_TYPE = 12 + CONTROL_BASE_VALUE;
+    public static final int INPUT_FORM_TYPE = 11 + SYSTEM_BASE_VALUE;
 
     public static final String REDUCE = "reduce";
-    public static final String FQ_REDUCE = SYS_FQ + REDUCE;
-    public static final int REDUCE_TYPE = 14 + CONTROL_BASE_VALUE;
+    public static final int REDUCE_TYPE = 12 + SYSTEM_BASE_VALUE;
 
     public static final String EXPAND = "expand";
-    public static final String FQ_EXPAND = SYS_FQ + EXPAND;
-    public static final int EXPAND_TYPE = 15 + CONTROL_BASE_VALUE;
+    public static final int EXPAND_TYPE = 14 + SYSTEM_BASE_VALUE;
+
+    public static final String SAY_FUNCTION = "say";
+    public static final String PRINT_FUNCTION = "print";
+    public static final int SAY_TYPE = 15 + SYSTEM_BASE_VALUE;
+
+    public static final String TO_STRING = "to_string";
+    public static final int TO_STRING_TYPE = 16 + SYSTEM_BASE_VALUE;
+
+    public static final String TO_NUMBER = "to_number";
+    public static final int TO_NUMBER_TYPE = 20 + SYSTEM_BASE_VALUE;
+
+    public static final String TO_BOOLEAN = "to_boolean";
+    public static final int TO_BOOLEAN_TYPE = 21 + SYSTEM_BASE_VALUE;
 
     // function stuff
     public static final String RETURN = "return";
-    public static final String FQ_RETURN = SYS_FQ + RETURN;
-    public static final int RETURN_TYPE = 100 + CONTROL_BASE_VALUE;
+    public static final int RETURN_TYPE = 100 + SYSTEM_BASE_VALUE;
 
 
     public static final String MODULE_IMPORT = "module_import";
-    public static final String FQ_IMPORT = SYS_FQ + MODULE_IMPORT;
-    public static final int IMPORT_TYPE = 203 + CONTROL_BASE_VALUE;
+    public static final int IMPORT_TYPE = 203 + SYSTEM_BASE_VALUE;
 
     public static final String MODULE_LOAD = "module_load";
-    public static final String FQ_LOAD_MODULE = SYS_FQ + MODULE_LOAD;
-    public static final int LOAD_MODULE_TYPE = 205 + CONTROL_BASE_VALUE;
+    public static final int LOAD_MODULE_TYPE = 205 + SYSTEM_BASE_VALUE;
 
     public static final String MODULE_PATH = "module_path";
-    public static final String FQ_MODULE_PATH = SYS_FQ + MODULE_PATH;
-    public static final int MODULE_PATH_TYPE = 211 + CONTROL_BASE_VALUE;
+    public static final int MODULE_PATH_TYPE = 211 + SYSTEM_BASE_VALUE;
 
 
     // For system constants
     public static final String CONSTANTS = "constants";
-    public static final String FQ_CONSTANTS = SYS_FQ + CONSTANTS;
-    public static final int CONSTANTS_TYPE = 206 + CONTROL_BASE_VALUE;
+    public static final int CONSTANTS_TYPE = 206 + SYSTEM_BASE_VALUE;
 
     // For system info
     public static final String SYS_INFO = "info";
-    public static final String FQ_SYS_INFO = SYS_FQ + SYS_INFO;
-    public static final int SYS_INFO_TYPE = 207 + CONTROL_BASE_VALUE;
+    public static final int SYS_INFO_TYPE = 207 + SYSTEM_BASE_VALUE;
 
     // for os environment
     public static final String OS_ENV = "os_env";
-    public static final String FQ_OS_ENV = SYS_FQ + OS_ENV;
-    public static final int OS_ENV_TYPE = 208 + CONTROL_BASE_VALUE;
+    public static final int OS_ENV_TYPE = 208 + SYSTEM_BASE_VALUE;
 
     // logging
     public static final String SYSTEM_LOG = "log_entry";
-    public static final String FQ_SYSTEM_LOG = SYS_FQ + SYSTEM_LOG;
-    public static final int SYSTEM_LOG_TYPE = 209 + CONTROL_BASE_VALUE;
+    public static final int SYSTEM_LOG_TYPE = 209 + SYSTEM_BASE_VALUE;
 
 
     // logging
     public static final String DEBUG = "debug";
-    public static final String FQ_DEBUG = SYS_FQ + DEBUG;
-    public static final int DEBUG_TYPE = 210 + CONTROL_BASE_VALUE;
+    public static final int DEBUG_TYPE = 210 + SYSTEM_BASE_VALUE;
     // try ... catch
 
     public static final String RAISE_ERROR = "raise_error";
-    public static final String FQ_RAISE_ERROR = SYS_FQ + RAISE_ERROR;
-    public static final int RAISE_ERROR_TYPE = 300 + CONTROL_BASE_VALUE;
+    public static final int RAISE_ERROR_TYPE = 300 + SYSTEM_BASE_VALUE;
 
     // For external programs
 
     public static final String RUN_COMMAND = "script_run";
-    public static final String FQ_RUN_COMMAND = SYS_FQ + RUN_COMMAND;
-    public static final int RUN_COMMAND_TYPE = 400 + CONTROL_BASE_VALUE;
+    public static final int RUN_COMMAND_TYPE = 400 + SYSTEM_BASE_VALUE;
 
     public static final String LOAD_COMMAND = "script_load";
-    public static final String FQ_LOAD_COMMAND = SYS_FQ + LOAD_COMMAND;
-    public static final int LOAD_COMMAND_TYPE = 401 + CONTROL_BASE_VALUE;
+    public static final int LOAD_COMMAND_TYPE = 401 + SYSTEM_BASE_VALUE;
 
     public static final String SCRIPT_ARGS_COMMAND = "script_args";
-    public static final String FQ_SCRIPT_ARGS_COMMAND = SYS_FQ + SCRIPT_ARGS_COMMAND;
-    public static final int SCRIPT_ARGS_COMMAND_TYPE = 402 + CONTROL_BASE_VALUE;
+    public static final int SCRIPT_ARGS_COMMAND_TYPE = 402 + SYSTEM_BASE_VALUE;
 
     public static final String SCRIPT_PATH_COMMAND = "script_path";
-    public static final String FQ_SCRIPT_PATH_COMMAND = SYS_FQ + SCRIPT_PATH_COMMAND;
-    public static final int SCRIPT_PATH_COMMAND_TYPE = 403 + CONTROL_BASE_VALUE;
+    public static final int SCRIPT_PATH_COMMAND_TYPE = 403 + SYSTEM_BASE_VALUE;
 
 
-    public static String FUNC_NAMES[] = new String[]{
-            REDUCE, EXPAND,
-            SCRIPT_PATH_COMMAND,
-            SCRIPT_ARGS_COMMAND,
-            SYS_INFO,
-            OS_ENV,
-            SYSTEM_LOG,
-            DEBUG,
-            CONSTANTS,
-            CONTINUE,
-            INTERRUPT,
-            BREAK,
-            EXECUTE,
-            CHECK_SYNTAX,
-            INPUT_FORM,
-            FOR_KEYS,
-            FOR_NEXT,
-            CHECK_AFTER,
-            RETURN,
-            MODULE_IMPORT,
-            MODULE_LOAD,
-            MODULE_PATH,
-            RAISE_ERROR,
-            RUN_COMMAND,
-            LOAD_COMMAND};
 
-    public static String FQ_FUNC_NAMES[] = new String[]{
-            FQ_REDUCE, FQ_EXPAND,
-            FQ_SCRIPT_PATH_COMMAND,
-            FQ_SCRIPT_ARGS_COMMAND,
-            FQ_SYS_INFO,
-            FQ_OS_ENV,
-            FQ_SYSTEM_LOG,
-            FQ_DEBUG,
-            FQ_CONSTANTS,
-            FQ_CONTINUE,
-            FQ_INTERRUPT,
-            FQ_EXECUTE,
-            FQ_CHECK_SYNTAX,
-            FQ_INPUT_FORM,
-            FQ_BREAK,
-            FQ_FOR_KEYS,
-            FQ_FOR_NEXT,
-            FQ_CHECK_AFTER,
-            FQ_RETURN,
-            FQ_IMPORT,
-            FQ_LOAD_MODULE,
-            FQ_MODULE_PATH,
-            FQ_RAISE_ERROR,
-            FQ_RUN_COMMAND,
-            FQ_LOAD_COMMAND};
+
+
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames = new String[]{
+                        IS_DEFINED,
+                        VAR_TYPE,
+                        TO_NUMBER,
+                        TO_STRING,
+                        TO_BOOLEAN,
+                        SAY_FUNCTION,
+                        PRINT_FUNCTION,
+                        REDUCE, EXPAND,
+                        SCRIPT_PATH_COMMAND,
+                        SCRIPT_ARGS_COMMAND,
+                        SYS_INFO,
+                        OS_ENV,
+                        SYSTEM_LOG,
+                        DEBUG,
+                        CONSTANTS,
+                        CONTINUE,
+                        INTERRUPT,
+                        BREAK,
+                        EXECUTE,
+                        CHECK_SYNTAX,
+                        INPUT_FORM,
+                        FOR_KEYS,
+                        FOR_NEXT,
+                        CHECK_AFTER,
+                        RETURN,
+                        MODULE_IMPORT,
+                        MODULE_LOAD,
+                        MODULE_PATH,
+                        RAISE_ERROR,
+                        RUN_COMMAND,
+                        LOAD_COMMAND};
+        }
+        return fNames;
     }
 
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     @Override
     public int getType(String name) {
         switch (name) {
+            case VAR_TYPE:
+                return VAR_TYPE_TYPE;
+            case IS_DEFINED:
+                return IS_DEFINED_TYPE;
+            case PRINT_FUNCTION:
+            case SAY_FUNCTION:
+                return SAY_TYPE;
+            case TO_NUMBER:
+                return TO_NUMBER_TYPE;
+            case TO_STRING:
+                return TO_STRING_TYPE;
+            case TO_BOOLEAN:
+                return TO_BOOLEAN_TYPE;
             case EXPAND:
-            case FQ_EXPAND:
                 return EXPAND_TYPE;
             case REDUCE:
-            case FQ_REDUCE:
                 return REDUCE_TYPE;
             case SCRIPT_PATH_COMMAND:
-            case FQ_SCRIPT_PATH_COMMAND:
                 return SCRIPT_PATH_COMMAND_TYPE;
             case SCRIPT_ARGS_COMMAND:
-            case FQ_SCRIPT_ARGS_COMMAND:
                 return SCRIPT_ARGS_COMMAND_TYPE;
             case OS_ENV:
-            case FQ_OS_ENV:
                 return OS_ENV_TYPE;
             case DEBUG:
-            case FQ_DEBUG:
                 return DEBUG_TYPE;
             case SYSTEM_LOG:
-            case FQ_SYSTEM_LOG:
                 return SYSTEM_LOG_TYPE;
             case SYS_INFO:
-            case FQ_SYS_INFO:
                 return SYS_INFO_TYPE;
             case CONSTANTS:
-            case FQ_CONSTANTS:
                 return CONSTANTS_TYPE;
             case CONTINUE:
-            case FQ_CONTINUE:
                 return CONTINUE_TYPE;
             case EXECUTE:
-            case FQ_EXECUTE:
                 return EXECUTE_TYPE;
             case INPUT_FORM:
                 return INPUT_FORM_TYPE;
             case CHECK_SYNTAX:
-            case FQ_CHECK_SYNTAX:
                 return CHECK_SYNTAX_TYPE;
             case INTERRUPT:
-            case FQ_INTERRUPT:
                 return INTERRUPT_TYPE;
             case BREAK:
-            case FQ_BREAK:
                 return BREAK_TYPE;
             case RETURN:
-            case FQ_RETURN:
                 return RETURN_TYPE;
             case FOR_KEYS:
-            case FQ_FOR_KEYS:
                 return FOR_KEYS_TYPE;
             case FOR_NEXT:
-            case FQ_FOR_NEXT:
                 return FOR_NEXT_TYPE;
             case CHECK_AFTER:
-            case FQ_CHECK_AFTER:
                 return CHECK_AFTER_TYPE;
             // Module stuff
             case MODULE_IMPORT:
-            case FQ_IMPORT:
                 return IMPORT_TYPE;
             case MODULE_LOAD:
-            case FQ_LOAD_MODULE:
                 return LOAD_MODULE_TYPE;
             case MODULE_PATH:
-            case FQ_MODULE_PATH:
                 return MODULE_PATH_TYPE;
             case RAISE_ERROR:
-            case FQ_RAISE_ERROR:
                 return RAISE_ERROR_TYPE;
             case RUN_COMMAND:
-            case FQ_RUN_COMMAND:
                 return RUN_COMMAND_TYPE;
             case LOAD_COMMAND:
-            case FQ_LOAD_COMMAND:
                 return LOAD_COMMAND_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
@@ -320,95 +286,93 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         // the WhileLoop class they are picked apart for their contents and the correct looping strategy is
         // done. Look at the WhileLoop's evaluate method. All this evaluator
         // does is mark them as built in functions.
+        boolean printIt = false;
 
         switch (polyad.getName()) {
+            case VAR_TYPE:
+                doVarType(polyad, state);
+                return true;
+            case IS_DEFINED:
+                isDefined(polyad, state);
+                return true;
+            case TO_NUMBER:
+                doToNumber(polyad, state);
+                return true;
+            case TO_BOOLEAN:
+                doToBoolean(polyad, state);
+                return true;
+
+            case PRINT_FUNCTION:
+            case SAY_FUNCTION:
+                printIt = true;
+            case TO_STRING:
+                doPrint(polyad, state, printIt);
+                return true;
             case EXPAND:
-            case FQ_EXPAND:
                 doReduceOrExpand(polyad, state, false);
                 return true;
             case REDUCE:
-            case FQ_REDUCE:
                 doReduceOrExpand(polyad, state, true);
                 return true;
             case SCRIPT_PATH_COMMAND:
-            case FQ_SCRIPT_PATH_COMMAND:
                 doScriptPaths(polyad, state);
                 return true;
             case SCRIPT_ARGS_COMMAND:
-            case FQ_SCRIPT_ARGS_COMMAND:
                 doScriptArgs(polyad, state);
                 return true;
             case BREAK:
-            case FQ_BREAK:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new BreakException();
             case CONSTANTS:
-            case FQ_CONSTANTS:
                 doConstants(polyad, state);
                 return true;
             case SYS_INFO:
-            case FQ_SYS_INFO:
                 doSysInfo(polyad, state);
                 return true;
             case OS_ENV:
-            case FQ_OS_ENV:
                 doOSEnv(polyad, state);
                 return true;
             case SYSTEM_LOG:
-            case FQ_SYSTEM_LOG:
                 doSysLog(polyad, state, false);
                 return true;
             case DEBUG:
-            case FQ_DEBUG:
                 doSysLog(polyad, state, true);
                 return true;
             case CONTINUE:
-            case FQ_CONTINUE:
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
                 throw new ContinueException();
             case INTERRUPT:
-            case FQ_INTERRUPT:
                 doInterrupt(polyad, state);
                 return true;
             case RETURN:
-            case FQ_RETURN:
                 doReturn(polyad, state);
                 return true;
             case RUN_COMMAND:
-            case FQ_RUN_COMMAND:
                 runScript(polyad, state);
                 return true;
             case LOAD_COMMAND:
-            case FQ_LOAD_COMMAND:
                 loadScript(polyad, state);
                 return true;
-
             case MODULE_IMPORT:
-            case FQ_IMPORT:
                 doModuleImport(polyad, state);
                 return true;
             case MODULE_LOAD:
-            case FQ_LOAD_MODULE:
                 doLoadModule(polyad, state);
                 return true;
             case MODULE_PATH:
-            case FQ_MODULE_PATH:
                 doModulePaths(polyad, state);
                 return true;
             case RAISE_ERROR:
-            case FQ_RAISE_ERROR:
                 doRaiseError(polyad, state);
                 return true;
             case EXECUTE:
-            case FQ_EXECUTE:
                 doExecute(polyad, state);
                 return true;
             case CHECK_SYNTAX:
-            case FQ_CHECK_SYNTAX:
                 doCheckSyntax(polyad, state);
                 return true;
             case INPUT_FORM:
@@ -1255,11 +1219,11 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             String caput = name.substring(0, name.indexOf(SCHEME_DELIMITER));
             for (String p : paths) {
                 if (p.startsWith(caput)) {
-                    DebugUtil.trace(ControlEvaluator.class, " trying path = " + p + tempName);
+                    DebugUtil.trace(SystemEvaluator.class, " trying path = " + p + tempName);
 
                     QDLScript q = state.getScriptFromVFS(p + tempName);
                     if (q != null) {
-                        DebugUtil.trace(ControlEvaluator.class, " got path = " + p + tempName);
+                        DebugUtil.trace(SystemEvaluator.class, " got path = " + p + tempName);
 
                         return q;
                     }
@@ -1278,7 +1242,7 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
             }
             for (String p : paths) {
                 String resourceName = p + name;
-                DebugUtil.trace(ControlEvaluator.class, " path = " + resourceName);
+                DebugUtil.trace(SystemEvaluator.class, " path = " + resourceName);
                 if (state.isVFSFile(resourceName)) {
                     if (state.isVFSFile(resourceName)) {
                         if (state.hasVFSProviders()) {
@@ -1866,14 +1830,19 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }
 
-            State newModuleState = state.newModuleState();
+          State newModuleState = state.newModuleState();
+          newModuleState.setSuperState(state);
+          newModuleState.setSuperStateReadOnly(true);
+
             Module newInstance = m.newInstance(newModuleState);
             if (newInstance instanceof JavaModule) {
                 ((JavaModule) newInstance).init(newModuleState);
             }
+
             if (alias == null) {
                 alias = m.getAlias();
             }
+            newModuleState.setSuperState(null); // get rid of it now.
             ImportManager resolver = state.getImportManager();
             resolver.addImport(moduleNS, alias);
             state.getImportedModules().put(alias, newInstance);
@@ -2006,5 +1975,250 @@ public class ControlEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
 
     }
+    // Convert a wide variety of inputs to boolean. This is useful in scripts where the arguments might
+     // be string from external sources, e.g.
+     private void doToBoolean(Polyad polyad, State state) {
+         if (polyad.getArgCount() != 1) {
+             throw new IllegalArgumentException(TO_BOOLEAN_TYPE + " requires an argument");
+         }
+         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+             @Override
+             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                 switch (Constant.getType(objects[0])) {
+                     case Constant.BOOLEAN_TYPE:
+                         r.result = ((Boolean) objects[0]);
+                         r.resultType = Constant.BOOLEAN_TYPE;
+                         break;
+                     case Constant.STRING_TYPE:
+                         String x = (String) objects[0];
+                         r.result = x.equals("true");
+                         r.resultType = Constant.BOOLEAN_TYPE;
+                         break;
+                     case Constant.LONG_TYPE:
+                         Long y = (Long) objects[0];
+                         r.result = y.equals(1L);
+                         r.resultType = Constant.BOOLEAN_TYPE;
+                         break;
+                     case Constant.DECIMAL_TYPE:
+                         BigDecimal bd = (BigDecimal) objects[0];
+
+                         r.result = bd.longValue() == 1;
+                         r.resultType = Constant.BOOLEAN_TYPE;
+                         break;
+                     case Constant.NULL_TYPE:
+                         throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert null.");
+                     case Constant.STEM_TYPE:
+                         throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert a stem.");
+                     case Constant.UNKNOWN_TYPE:
+                         throw new IllegalArgumentException("" + TO_BOOLEAN + " unknown argument type.");
+                 }
+                 return r;
+             }
+         };
+         process1(polyad, pointer, TO_BOOLEAN, state);
+
+
+     }
+
+     //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
+     private void doToNumber(Polyad polyad, State state) {
+         if (polyad.getArgCount() != 1) {
+             throw new IllegalArgumentException("" + TO_NUMBER + " requires an argument");
+         }
+         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+             @Override
+             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                 switch (Constant.getType(objects[0])) {
+                     case Constant.BOOLEAN_TYPE:
+                         r.result = ((Boolean) objects[0]) ? 1L : 0L;
+                         r.resultType = Constant.LONG_TYPE;
+                         break;
+                     case Constant.STRING_TYPE:
+                         String x = (String) objects[0];
+                         try {
+                             r.result = Long.parseLong(x);
+                             r.resultType = Constant.LONG_TYPE;
+                         } catch (NumberFormatException nfx0) {
+                             try {
+                                 r.result = new BigDecimal(x);
+                                 r.resultType = Constant.DECIMAL_TYPE;
+                             } catch (NumberFormatException nfx2) {
+                                 // ok, kill it here.
+                                 throw new IllegalArgumentException(("" + objects[0] + " is not a number."));
+                             }
+                         }
+                         break;
+                     case Constant.LONG_TYPE:
+                         r.result = objects[0];
+                         r.resultType = Constant.LONG_TYPE;
+                         break;
+                     case Constant.DECIMAL_TYPE:
+                         r.result = objects[0];
+                         r.resultType = Constant.DECIMAL_TYPE;
+                         break;
+                     case Constant.NULL_TYPE:
+                         throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert null.");
+                     case Constant.STEM_TYPE:
+                         throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert a stem.");
+                     case Constant.UNKNOWN_TYPE:
+                         throw new IllegalArgumentException("" + TO_NUMBER + " unknown argument type.");
+                 }
+                 return r;
+             }
+         };
+         process1(polyad, pointer, TO_NUMBER, state);
+     }
+    /**
+       * Does print, say and to_string commands.
+       *
+       * @param polyad
+       * @param state
+       * @param printIt
+       */
+      protected void doPrint(Polyad polyad, State state, boolean printIt) {
+          if (printIt && state.isRestrictedIO()) {
+              polyad.setResult(QDLNull.getInstance());
+              polyad.setResultType(Constant.NULL_TYPE);
+              polyad.setEvaluated(true);
+              return;
+          }
+          String result = "";
+          boolean prettyPrintForStems = false;
+          if (polyad.getArgCount() != 0) {
+              Object temp = null;
+              temp = polyad.evalArg(0, state);
+              checkNull(temp, polyad.getArgAt(0));
+
+              // null ok here. Means undefined variable
+              if (polyad.getArgCount() == 2) {
+                  // assume pretty print for stems.
+                  Object flag = polyad.evalArg(1, state);
+                  checkNull(flag, polyad.getArgAt(1));
+                  if (flag instanceof Boolean) {
+                      prettyPrintForStems = (Boolean) flag;
+                  }
+              }
+              if (temp == null || temp instanceof QDLNull) {
+                  if (State.isPrintUnicode()) {
+                      result = "∅";
+                  } else {
+                      result = "null";
+                  }
+
+              } else {
+                  if (temp instanceof StemVariable) {
+                      StemVariable s = ((StemVariable) temp);
+                      if (prettyPrintForStems) {
+
+                          result = ((StemVariable) temp).toString(1);
+                      } else {
+                          result = temp.toString();
+                      }
+                  } else {
+                      if (temp instanceof BigDecimal) {
+                          result = InputFormUtil.inputForm((BigDecimal) temp);
+
+                      } else {
+                          if (State.isPrintUnicode() && temp instanceof Boolean) {
+                              result = ((Boolean) temp) ? "⊤" : "⊥";
+                          } else {
+                              result = temp.toString();
+                          }
+                      }
+                  }
+              }
+          }
+
+          if (printIt) {
+              state.getIoInterface().println(result);
+              //System.out.println(result);
+          }
+          if (polyad.getArgCount() == 0) {
+              polyad.setResult(QDLNull.getInstance());
+              polyad.setResultType(Constant.NULL_TYPE);
+          } else {
+              if (printIt) {
+                  polyad.setResult(polyad.getArgAt(0).getResult());
+                  polyad.setResultType(polyad.getArgAt(0).getResultType());
+
+              } else {
+                  polyad.setResult(result);
+                  polyad.setResultType(Constant.STRING_TYPE);
+              }
+          }
+          polyad.setEvaluated(true);
+      }
+    /**
+     * Get the type of the argument.
+     *
+     * @param polyad
+     * @param state
+     */
+    public void doVarType(Polyad polyad, State state) {
+        if (polyad.getArgCount() == 0) {
+            polyad.setResult(Constant.NULL_TYPE);
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        polyad.evalArg(0, state);
+        if (polyad.getArgCount() == 1) {
+            polyad.setResult(new Long(Constant.getType(polyad.getArgAt(0).getResult())));
+            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        StemVariable output = new StemVariable();
+        output.put(0L, new Long(Constant.getType(polyad.getArgAt(0).getResult())));
+        for (int i = 1; i < polyad.getArgCount(); i++) {
+            Object r = polyad.evalArg(i, state);
+            output.put(new Long(i), new Long(Constant.getType(r)));
+        }
+        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResult(output);
+        polyad.setEvaluated(true);
+    }
+    protected void isDefined(Polyad polyad, State state) {
+         if (polyad.getArgCount() != 1) {
+             throw new IllegalArgumentException("the " + IS_DEFINED + " function requires 1 argument");
+         }
+         boolean isDef = false;
+         try {
+             polyad.evalArg(0, state);
+         } catch (IndexError | UnknownSymbolException exception) {
+             polyad.setResult(isDef);
+             polyad.setResultType(Constant.BOOLEAN_TYPE);
+             polyad.setEvaluated(true);
+             return;
+         }
+         if (polyad.getArgAt(0) instanceof VariableNode) {
+             VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
+             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
+             // if the name is defined.
+             isDef = state.isDefined(variableNode.getVariableReference());
+         }
+         if (polyad.getArgAt(0) instanceof ConstantNode) {
+             ConstantNode variableNode = (ConstantNode) polyad.getArgAt(0);
+             Object x = variableNode.getResult();
+             if (x == null) {
+                 isDef = false;
+             } else {
+                 isDef = state.isDefined(x.toString());
+             }
+         }
+         if (polyad.getArgAt(0) instanceof ESN2) {
+             Object object = polyad.getArgAt(0).getResult();
+             if (object == null) {
+                 isDef = false;
+             } else {
+                 isDef = true;
+             }
+         }
+         polyad.setResult(isDef);
+         polyad.setResultType(Constant.BOOLEAN_TYPE);
+         polyad.setEvaluated(true);
+     }
 
 }

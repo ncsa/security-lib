@@ -1,5 +1,5 @@
 module[
-   'qdl:/math/x','mathx'
+   'qdl:/ext/math','mathx'
 ]body[
    >> This module defines several additional functions for mathematics
    >> These include sec(), sech() etc.

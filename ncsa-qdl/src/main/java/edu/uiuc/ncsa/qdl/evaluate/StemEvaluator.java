@@ -6,7 +6,6 @@ import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
@@ -24,7 +23,6 @@ import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
-import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
@@ -33,403 +31,221 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  */
 public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final String STEM_NAMESPACE = "stem";
-    public static final String LIST_NAMESPACE = "list";
+
+    @Override
+    public String getNamespace() {
+        return STEM_NAMESPACE;
+    }
+
     public static final String STEM_FQ = STEM_NAMESPACE + ImportManager.NS_DELIMITER;
-    public static final String LIST_FQ = LIST_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int STEM_FUNCTION_BASE_VALUE = 2000;
+
     public static final String SIZE = "size";
-    public static final String FQ_SIZE = STEM_FQ + SIZE;
     public static final int SIZE_TYPE = 1 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String SHORT_MAKE_INDICES = "n";
-    public static final String FQ_MAKE_INDICES = STEM_FQ + SHORT_MAKE_INDICES;
     public static final int MAKE_INDICES_TYPE = 4 + STEM_FUNCTION_BASE_VALUE;
 
 
     public static final String REMOVE = "remove";
-    public static final String FQ_REMOVE = STEM_FQ + REMOVE;
     public static final int REMOVE_TYPE = 5 + STEM_FUNCTION_BASE_VALUE;
 
-
-    public static final String IS_DEFINED = "is_defined";
-    public static final String FQ_IS_DEFINED = SYS_FQ + IS_DEFINED;
-    public static final int IS_DEFINED_TYPE = 6 + STEM_FUNCTION_BASE_VALUE;
-
     public static final String SET_DEFAULT = "set_default";
-    public static final String FQ_SET_DEFAULT = STEM_FQ + SET_DEFAULT;
     public static final int SET_DEFAULT_TYPE = 7 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String BOX = "box";
-    public static final String FQ_BOX = STEM_FQ + BOX;
     public static final int BOX_TYPE = 8 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String UNBOX = "unbox";
-    public static final String FQ_UNBOX = STEM_FQ + UNBOX;
     public static final int UNBOX_TYPE = 9 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String UNION = "union";
-    public static final String FQ_UNION = STEM_FQ + UNION;
     public static final int UNION_TYPE = 10 + STEM_FUNCTION_BASE_VALUE;
 
-    public static final String VAR_TYPE = "var_type";
-    public static final String FQ_VAR_TYPE = SYS_FQ + VAR_TYPE;
-    public static final int VAR_TYPE_TYPE = 11 + STEM_FUNCTION_BASE_VALUE;
+
 
     public static final String HAS_VALUE = "has_value";
-    public static final String FQ_HAS_VALUE = STEM_FQ + HAS_VALUE;
     public static final int HAS_VALUE_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String DIMENSION = "dim";
-    public static final String FQ_DIMENSION = STEM_FQ + DIMENSION;
     public static final int DIMENSION_TYPE = 14 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String RANK = "rank";
-    public static final String FQ_RANK = STEM_FQ + RANK;
     public static final int RANK_TYPE = 15 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String FOR_EACH = "for_each";
-    public static final String FQ_FOR_EACH = STEM_FQ + FOR_EACH;
     public static final int FOR_EACH_TYPE = 16 + STEM_FUNCTION_BASE_VALUE;
 
     // Key functions
     public static final String COMMON_KEYS = "common_keys";
-    public static final String FQ_COMMON_KEYS = STEM_FQ + COMMON_KEYS;
     public static final int COMMON_KEYS_TYPE = 100 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String EXCLUDE_KEYS = "exclude_keys";
-    public static final String FQ_EXCLUDE_KEYS = STEM_FQ + EXCLUDE_KEYS;
     public static final int EXCLUDE_KEYS_TYPE = 101 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String LIST_KEYS = "list_keys";
-    public static final String FQ_LIST_KEYS = STEM_FQ + LIST_KEYS;
     public static final int LIST_KEYS_TYPE = 102 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String HAS_KEYS = "has_keys";
-    public static final String FQ_HAS_KEYS = STEM_FQ + HAS_KEYS;
     public static final int HAS_KEYS_TYPE = 103 + STEM_FUNCTION_BASE_VALUE;
 
 
     public static final String INCLUDE_KEYS = "include_keys";
-    public static final String FQ_INCLUDE_KEYS = STEM_FQ + INCLUDE_KEYS;
     public static final int INCLUDE_KEYS_TYPE = 104 + STEM_FUNCTION_BASE_VALUE;
 
 
     public static final String RENAME_KEYS = "rename_keys";
-    public static final String FQ_RENAME_KEYS = STEM_FQ + RENAME_KEYS;
     public static final int RENAME_KEYS_TYPE = 105 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String MASK = "mask";
-    public static final String FQ_MASK = STEM_FQ + MASK;
     public static final int MASK_TYPE = 106 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String KEYS = "keys";
-    public static final String FQ_KEYS = STEM_FQ + KEYS;
     public static final int KEYS_TYPE = 107 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String SHUFFLE = "shuffle";
-    public static final String FQ_SHUFFLE = STEM_FQ + SHUFFLE;
     public static final int SHUFFLE_TYPE = 108 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String UNIQUE_VALUES = "unique";
-    public static final String FQ_UNIQUE_VALUES = STEM_FQ + UNIQUE_VALUES;
     public static final int UNIQUE_VALUES_TYPE = 109 + STEM_FUNCTION_BASE_VALUE;
 
 
     public static final String JOIN = "join";
-    public static final String FQ_JOIN = STEM_FQ + JOIN;
     public static final int JOIN_TYPE = 110 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String ALL_KEYS = "indices";
-    public static final String FQ_ALL_KEYS = STEM_FQ + ALL_KEYS;
     public static final int ALL_KEYS_TYPE = 111 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String TRANSPOSE = "transpose";
     public static final String TRANSPOSE2 = "τ";
-    public static final String FQ_TRANSPOSE = STEM_FQ + TRANSPOSE;
-    public static final String FQ_TRANSPOSE2 = STEM_FQ + TRANSPOSE2;
     public static final int TRANSPOSE_TYPE = 112 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String REMAP = "remap";
-    public static final String FQ_REMAP = STEM_FQ + REMAP;
     public static final int REMAP_TYPE = 114 + STEM_FUNCTION_BASE_VALUE;
-    // list functions
-    // older ones are prepended with a list_. These still work but won't show up
-    // in lists of functions.
-
-/*    public static final String LIST_APPEND = "append";
-    public static final String LIST_APPEND2 = "list_append";
-    public static final String FQ_LIST_APPEND = LIST_FQ + LIST_APPEND;
-    public static final int LIST_APPEND_TYPE = 200 + STEM_FUNCTION_BASE_VALUE;*/
-
-    public static final String LIST_INSERT_AT = "insert_at";
-    public static final String LIST_INSERT_AT2 = "list_insert_at";
-    public static final String FQ_LIST_INSERT_AT = LIST_FQ + LIST_INSERT_AT;
-    public static final int LIST_INSERT_AT_TYPE = 201 + STEM_FUNCTION_BASE_VALUE;
-
-    public static final String LIST_SUBSET = "subset";
-    public static final String LIST_SUBSET2 = "list_subset";
-    public static final String FQ_LIST_SUBSET = LIST_FQ + LIST_SUBSET;
-    public static final int LIST_SUBSET_TYPE = 202 + STEM_FUNCTION_BASE_VALUE;
-
-    public static final String LIST_COPY = "list_copy";
-    public static final String LIST_COPY2 = "copy";
-    public static final String FQ_LIST_COPY = LIST_FQ + LIST_COPY2;
-    public static final int LIST_COPY_TYPE = 203 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String IS_LIST = "is_list";
-    public static final String FQ_IS_LIST = STEM_FQ + IS_LIST;
     public static final int IS_LIST_TYPE = 204 + STEM_FUNCTION_BASE_VALUE;
 
-/*    public static final String TO_LIST = "to_list";
-    public static final String FQ_TO_LIST = STEM_FQ + TO_LIST;
-    public static final int TO_LIST_TYPE = 205 + STEM_FUNCTION_BASE_VALUE;*/
-
-    public static final String LIST_STARTS_WITH = "starts_with";
-    public static final String LIST_STARTS_WITH2 = "list_starts_with";
-    public static final String FQ_LIST_STARTS_WITH = LIST_FQ + LIST_STARTS_WITH;
-    public static final int LIST_STARTS_WITH_TYPE = 206 + STEM_FUNCTION_BASE_VALUE;
-
-    public static final String LIST_REVERSE = "reverse";
-    public static final String LIST_REVERSE2 = "list_reverse";
-    public static final String FQ_LIST_REVERSE = LIST_FQ + LIST_REVERSE;
-    public static final int LIST_REVERSE_TYPE = 207 + STEM_FUNCTION_BASE_VALUE;
-
     public static final String VALUES = "values";
-    public static final String FQ_VALUES = STEM_FQ + VALUES;
     public static final int VALUES_TYPE = 208 + STEM_FUNCTION_BASE_VALUE;
 
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
-    public static final String FQ_TO_JSON = STEM_FQ + TO_JSON;
     public static final int TO_JSON_TYPE = 300 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String FROM_JSON = "from_json";
-    public static final String FQ_FROM_JSON = STEM_FQ + FROM_JSON;
     public static final int FROM_JSON_TYPE = 301 + STEM_FUNCTION_BASE_VALUE;
 
     public static final String JSON_PATH_QUERY = "query";
-    public static final String FQ_JSON_PATH_QUERY = STEM_FQ + JSON_PATH_QUERY;
     public static final int JSON_PATH_QUERY_TYPE = 302 + STEM_FUNCTION_BASE_VALUE;
 
     /**
      * A list of the names that this Evaluator knows about. NOTE that this must be kept in sync
      * by the developer since it is used to determine if a function is built in or a user-defined function.
      */
-    public static String FUNC_NAMES[] = new String[]{
-            DIMENSION, RANK,
-            TRANSPOSE, TRANSPOSE2,
-            REMAP,
-            SIZE,
-            JOIN,
-            SHORT_MAKE_INDICES,
-            HAS_VALUE,
-            REMOVE,
-            IS_DEFINED,
-            VAR_TYPE,
-            SET_DEFAULT,
-            BOX,
-            UNBOX,
-            UNION,
-            FOR_EACH,
-            COMMON_KEYS,
-            EXCLUDE_KEYS,
-            LIST_KEYS,
-            ALL_KEYS,
-            HAS_KEYS,
-            INCLUDE_KEYS,
-            RENAME_KEYS,
-            SHUFFLE,
-            MASK,
-            KEYS, VALUES,
-            //       LIST_APPEND,
-            LIST_INSERT_AT,
-            LIST_SUBSET,
-            LIST_COPY,
-            LIST_REVERSE,
-            LIST_STARTS_WITH,
-            IS_LIST,
-            //    TO_LIST,
-            UNIQUE_VALUES,
-            TO_JSON,
-            FROM_JSON, JSON_PATH_QUERY};
-    public static String FQ_FUNC_NAMES[] = new String[]{
-            FQ_DIMENSION, FQ_RANK,
-            FQ_TRANSPOSE, FQ_TRANSPOSE2,
-            FQ_REMAP,
-            FQ_SIZE,
-            FQ_JOIN,
-            FQ_MAKE_INDICES,
-            FQ_HAS_VALUE,
-            FQ_REMOVE,
-            FQ_IS_DEFINED,
-            FQ_VAR_TYPE,
-            FQ_SET_DEFAULT,
-            FQ_BOX,
-            FQ_UNBOX,
-            FQ_UNION,
-            FQ_FOR_EACH,
-            FQ_COMMON_KEYS,
-            FQ_EXCLUDE_KEYS,
-            FQ_LIST_KEYS,
-            FQ_ALL_KEYS,
-            FQ_HAS_KEYS,
-            FQ_INCLUDE_KEYS,
-            FQ_RENAME_KEYS,
-            FQ_SHUFFLE,
-            FQ_MASK,
-            FQ_KEYS, FQ_VALUES,
-            //     FQ_LIST_APPEND,
-            FQ_LIST_INSERT_AT,
-            FQ_LIST_SUBSET,
-            FQ_LIST_COPY,
-            FQ_LIST_REVERSE,
-            FQ_LIST_STARTS_WITH,
-            FQ_IS_LIST,
-            //         FQ_TO_LIST,
-            FQ_UNIQUE_VALUES,
-            FQ_TO_JSON,
-            FQ_FROM_JSON, FQ_JSON_PATH_QUERY};
-
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames =  new String[]{
+                        DIMENSION, RANK,
+                        TRANSPOSE, TRANSPOSE2,
+                        REMAP,
+                        SIZE,
+                        JOIN,
+                        SHORT_MAKE_INDICES,
+                        HAS_VALUE,
+                        REMOVE,
+                        SET_DEFAULT,
+                        BOX,
+                        UNBOX,
+                        UNION,
+                        FOR_EACH,
+                        COMMON_KEYS,
+                        EXCLUDE_KEYS,
+                        LIST_KEYS,
+                        ALL_KEYS,
+                        HAS_KEYS,
+                        INCLUDE_KEYS,
+                        RENAME_KEYS,
+                        SHUFFLE,
+                        MASK,
+                        KEYS, VALUES,
+                        IS_LIST,
+                        UNIQUE_VALUES,
+                        TO_JSON,
+                        FROM_JSON, JSON_PATH_QUERY};
+        }
+        return fNames;
     }
 
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     @Override
     public int getType(String name) {
         switch (name) {
             case DIMENSION:
-            case FQ_DIMENSION:
                 return DIMENSION_TYPE;
             case RANK:
-            case FQ_RANK:
                 return RANK_TYPE;
             case JOIN:
-            case FQ_JOIN:
                 return JOIN_TYPE;
             case SIZE:
-            case FQ_SIZE:
                 return SIZE_TYPE;
             case SET_DEFAULT:
-            case FQ_SET_DEFAULT:
                 return SET_DEFAULT_TYPE;
             case HAS_VALUE:
-            case FQ_HAS_VALUE:
                 return HAS_VALUE_TYPE;
             case REMAP:
-            case FQ_REMAP:
                 return REMAP_TYPE;
             case MASK:
-            case FQ_MASK:
                 return MASK_TYPE;
             case COMMON_KEYS:
-            case FQ_COMMON_KEYS:
                 return COMMON_KEYS_TYPE;
             case KEYS:
-            case FQ_KEYS:
                 return KEYS_TYPE;
             case VALUES:
-            case FQ_VALUES:
                 return VALUES_TYPE;
             case LIST_KEYS:
-            case FQ_LIST_KEYS:
                 return LIST_KEYS_TYPE;
             case ALL_KEYS:
-            case FQ_ALL_KEYS:
                 return ALL_KEYS_TYPE;
-            case VAR_TYPE:
-            case FQ_VAR_TYPE:
-                return VAR_TYPE_TYPE;
             case HAS_KEYS:
-            case FQ_HAS_KEYS:
                 return HAS_KEYS_TYPE;
             case INCLUDE_KEYS:
-            case FQ_INCLUDE_KEYS:
                 return INCLUDE_KEYS_TYPE;
             case EXCLUDE_KEYS:
-            case FQ_EXCLUDE_KEYS:
                 return EXCLUDE_KEYS_TYPE;
             case RENAME_KEYS:
-            case FQ_RENAME_KEYS:
                 return RENAME_KEYS_TYPE;
             case SHUFFLE:
-            case FQ_SHUFFLE:
                 return SHUFFLE_TYPE;
             case UNIQUE_VALUES:
-            case FQ_UNIQUE_VALUES:
                 return UNIQUE_VALUES_TYPE;
             case IS_LIST:
-            case FQ_IS_LIST:
                 return IS_LIST_TYPE;
-/*            case TO_LIST:
-            case FQ_TO_LIST:
-                return TO_LIST_TYPE;*/
-/*            case LIST_APPEND:
-            case LIST_APPEND2:
-            case FQ_LIST_APPEND:
-                return LIST_APPEND_TYPE;*/
-            case LIST_COPY:
-            case LIST_COPY2:
-            case FQ_LIST_COPY:
-                return LIST_COPY_TYPE;
+
             case TRANSPOSE:
             case TRANSPOSE2:
                 return TRANSPOSE_TYPE;
-            case LIST_REVERSE:
-            case LIST_REVERSE2:
-            case FQ_LIST_REVERSE:
-                return LIST_REVERSE_TYPE;
-            case LIST_STARTS_WITH:
-            case LIST_STARTS_WITH2:
-            case FQ_LIST_STARTS_WITH:
-                return LIST_STARTS_WITH_TYPE;
-            case LIST_INSERT_AT:
-            case LIST_INSERT_AT2:
-            case FQ_LIST_INSERT_AT:
-                return LIST_INSERT_AT_TYPE;
-            case LIST_SUBSET:
-            case LIST_SUBSET2:
-            case FQ_LIST_SUBSET:
-                return LIST_SUBSET_TYPE;
+
             case SHORT_MAKE_INDICES:
-            case FQ_MAKE_INDICES:
                 return MAKE_INDICES_TYPE;
             case REMOVE:
-            case FQ_REMOVE:
                 return REMOVE_TYPE;
             case BOX:
-            case FQ_BOX:
                 return BOX_TYPE;
             case UNBOX:
-            case FQ_UNBOX:
                 return UNBOX_TYPE;
-            case IS_DEFINED:
-            case FQ_IS_DEFINED:
-                return IS_DEFINED_TYPE;
+
             case UNION:
-            case FQ_UNION:
                 return UNION_TYPE;
             case TO_JSON:
-            case FQ_TO_JSON:
                 return TO_JSON_TYPE;
             case FROM_JSON:
-            case FQ_FROM_JSON:
                 return FROM_JSON_TYPE;
             case JSON_PATH_QUERY:
-            case FQ_JSON_PATH_QUERY:
                 return JSON_PATH_QUERY_TYPE;
             case FOR_EACH:
-            case FQ_FOR_EACH:
                 return FOR_EACH_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
@@ -440,167 +256,97 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case DIMENSION:
-            case FQ_DIMENSION:
                 doDimension(polyad, state);
                 return true;
             case RANK:
-            case FQ_RANK:
                 doRank(polyad, state);
                 return true;
             case JOIN:
-            case FQ_JOIN:
                 doJoin(polyad, state);
                 return true;
-            case VAR_TYPE:
-            case FQ_VAR_TYPE:
-                doVarType(polyad, state);
-                return true;
             case SIZE:
-            case FQ_SIZE:
                 doSize(polyad, state);
                 return true;
             case SET_DEFAULT:
-            case FQ_SET_DEFAULT:
                 doSetDefault(polyad, state);
                 return true;
             case TRANSPOSE:
             case TRANSPOSE2:
-            case FQ_TRANSPOSE:
-            case FQ_TRANSPOSE2:
                 doTransform(polyad, state);
                 return true;
             case MASK:
-            case FQ_MASK:
                 doMask(polyad, state);
                 return true;
             case COMMON_KEYS:
-            case FQ_COMMON_KEYS:
                 doCommonKeys(polyad, state);
                 return true;
             case KEYS:
-            case FQ_KEYS:
                 doKeys(polyad, state);
                 return true;
             case VALUES:
-            case FQ_VALUES:
                 doValues(polyad, state);
                 return true;
             case LIST_KEYS:
-            case FQ_LIST_KEYS:
                 doListKeys(polyad, state);
                 return true;
             case ALL_KEYS:
-            case FQ_ALL_KEYS:
                 doIndices(polyad, state);
                 return true;
             case HAS_KEYS:
-            case FQ_HAS_KEYS:
                 doHasKeys(polyad, state);
                 return true;
             case INCLUDE_KEYS:
-            case FQ_INCLUDE_KEYS:
                 doIncludeKeys(polyad, state);
                 return true;
             case HAS_VALUE:
-            case FQ_HAS_VALUE:
                 doIsMemberOf(polyad, state);
                 return true;
             case EXCLUDE_KEYS:
-            case FQ_EXCLUDE_KEYS:
                 doExcludeKeys(polyad, state);
                 return true;
             case RENAME_KEYS:
-            case FQ_RENAME_KEYS:
                 doRenameKeys(polyad, state);
                 return true;
             case SHUFFLE:
-            case FQ_SHUFFLE:
                 shuffleKeys(polyad, state);
                 return true;
             case UNIQUE_VALUES:
-            case FQ_UNIQUE_VALUES:
                 doUniqueValues(polyad, state);
                 return true;
             case IS_LIST:
-            case FQ_IS_LIST:
                 doIsList(polyad, state);
                 return true;
-/*            case TO_LIST:
-            case FQ_TO_LIST:
-                doToList(polyad, state);
-                return true;*/
-/*            case LIST_APPEND:
-            case LIST_APPEND2:
-            case FQ_LIST_APPEND:
-                doListAppend(polyad, state);
-                return true;*/
-            case LIST_COPY:
-            case LIST_COPY2:
-            case FQ_LIST_COPY:
-                doListCopyOrInsert(polyad, state, false);
-                return true;
-            case LIST_INSERT_AT:
-            case LIST_INSERT_AT2:
-            case FQ_LIST_INSERT_AT:
-                doListCopyOrInsert(polyad, state, true);
-                return true;
-            case LIST_SUBSET:
-            case LIST_SUBSET2:
-            case FQ_LIST_SUBSET:
-                doListSubset(polyad, state);
-                return true;
+
             case REMAP:
-            case FQ_REMAP:
                 doRemap(polyad, state);
                 return true;
-            case LIST_REVERSE:
-            case LIST_REVERSE2:
-            case FQ_LIST_REVERSE:
-                doListReverse(polyad, state);
-                return true;
-            case LIST_STARTS_WITH:
-            case LIST_STARTS_WITH2:
-            case FQ_LIST_STARTS_WITH:
-                doListStartsWith(polyad, state);
-                return true;
+
             case SHORT_MAKE_INDICES:
-            case FQ_MAKE_INDICES:
                 doMakeIndex(polyad, state);
                 return true;
             case REMOVE:
-            case FQ_REMOVE:
                 doRemove(polyad, state);
                 return true;
             case BOX:
-            case FQ_BOX:
                 doBox(polyad, state);
                 return true;
             case UNBOX:
-            case FQ_UNBOX:
                 doUnBox(polyad, state);
                 return true;
-            case IS_DEFINED:
-            case FQ_IS_DEFINED:
-                isDefined(polyad, state);
-                return true;
+
             case UNION:
-            case FQ_UNION:
                 doUnion(polyad, state);
                 return true;
             case TO_JSON:
-            case FQ_TO_JSON:
                 doToJSON(polyad, state);
                 return true;
             case FOR_EACH:
-            case FQ_FOR_EACH:
                 doForEach(polyad, state);
                 return true;
             case FROM_JSON:
-            case FQ_FROM_JSON:
                 doFromJSON(polyad, state);
                 return true;
             case JSON_PATH_QUERY:
-            case FQ_JSON_PATH_QUERY:
                 doJPathQuery(polyad, state);
                 return true;
         }
@@ -1086,60 +832,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
-    protected void doListReverse(Polyad polyad, State state) {
-        Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArgAt(0));
-
-        if (!isStem(arg1)) {
-            throw new IllegalArgumentException( LIST_REVERSE + " requires a stem as its argument.");
-        }
-        int axis = 0;
-        if (polyad.getArgCount() == 2) {
-            Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArgAt(1));
-
-            if (!isLong(arg2)) {
-                throw new IllegalArgumentException( LIST_REVERSE + " an integer as its axis.");
-            }
-            axis = ((Long) arg2).intValue();
-        }
-
-        StemVariable input = (StemVariable) arg1;
-
-        DoReverse reverse = this.new DoReverse();
-
-        Object result = axisWalker(input, axis, reverse);
-        polyad.setResult(result);
-        polyad.setResultType(Constant.getType(result));
-        polyad.setEvaluated(true);
-
-
-/*
-        StemVariable output = new StemVariable();
-        Iterator<StemEntry> iterator = input.getStemList().descendingIterator();
-        while (iterator.hasNext()) {
-            StemEntry s = iterator.next();
-            output.listAppend(s.entry);
-        }
-        polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-*/
-    }
-
-    protected class DoReverse implements StemUtility.StemAxisWalkerAction1 {
-        @Override
-        public Object action(StemVariable inStem) {
-            StemVariable output = new StemVariable();
-            Iterator<StemEntry> iterator = inStem.getStemList().descendingIterator();
-            while (iterator.hasNext()) {
-                StemEntry s = iterator.next();
-                output.listAppend(s.entry);
-            }
-            return output;
-        }
-    }
-
     private void doUniqueValues(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
@@ -1162,73 +854,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-    /**
-     * Returns a list of indices. The results is conformable to the left argument and the values in it
-     * are the indices of the right argument.
-     *
-     * @param polyad
-     * @param state
-     */
-    // list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
-    protected void doListStartsWith(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException(LIST_STARTS_WITH + " requires 2 arguments.");
-        }
-        Object leftArg = polyad.evalArg(0, state);
-        checkNull(leftArg, polyad.getArgAt(0));
-
-        StemVariable leftStem = null;
-        if (isString(leftArg)) {
-            leftStem = new StemVariable();
-            leftStem.put(0L, leftArg);
-        }
-        if (leftStem == null) {
-            if (isStem(leftArg)) {
-                leftStem = (StemVariable) leftArg;
-            } else {
-                throw new IllegalArgumentException(LIST_STARTS_WITH + " requires a stem for the left argument.");
-            }
-        }
-
-        Object rightArg = polyad.evalArg(1, state);
-        checkNull(rightArg, polyad.getArgAt(1));
-
-        StemVariable rightStem = null;
-        if (isString(rightArg)) {
-            rightStem = new StemVariable();
-            rightStem.put(0L, rightArg);
-        }
-        if (rightStem == null) {
-            if (isStem(rightArg)) {
-                rightStem = (StemVariable) rightArg;
-
-            } else {
-                throw new IllegalArgumentException( LIST_STARTS_WITH + " requires a stem for the right argument.");
-            }
-        }
-       /*
-         g. := ['wlcg.groups', 'wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/ALARM','wlcg.groups:/cms/users']
-  w := 'wlcg.groups'
-  s. := 'openid' ~ 'email' ~ 'profile' ~ g.
-        */
-        StemVariable output = new StemVariable();
-        for (long i = 0; i < leftStem.size(); i++) {
-            boolean gotOne = false;
-            for (long j = 0; j < rightStem.size(); j++) {
-                if (leftStem.get(i).toString().startsWith(rightStem.get(j).toString())) {
-                    output.put(i, j);
-                    gotOne = true;
-                    break;
-                }
-            }
-            if (!gotOne) {
-                output.put(i, -1L);
-            }
-        }
-        polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-    }
 
     /**
      * Compute if the left argument is a member of the right argument. result is always conformable to the left argument.
@@ -1293,36 +918,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-    /**
-     * Get the type of the argument.
-     *
-     * @param polyad
-     * @param state
-     */
-    public void doVarType(Polyad polyad, State state) {
-        if (polyad.getArgCount() == 0) {
-            polyad.setResult(Constant.NULL_TYPE);
-            polyad.setResultType(Constant.NULL_TYPE);
-            polyad.setEvaluated(true);
-            return;
-        }
-        polyad.evalArg(0, state);
-        if (polyad.getArgCount() == 1) {
-            polyad.setResult(new Long(Constant.getType(polyad.getArgAt(0).getResult())));
-            polyad.setResultType(Constant.LONG_TYPE);
-            polyad.setEvaluated(true);
-            return;
-        }
-        StemVariable output = new StemVariable();
-        output.put(0L, new Long(Constant.getType(polyad.getArgAt(0).getResult())));
-        for (int i = 1; i < polyad.getArgCount(); i++) {
-            Object r = polyad.evalArg(i, state);
-            output.put(new Long(i), new Long(Constant.getType(r)));
-        }
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setResult(output);
-        polyad.setEvaluated(true);
-    }
+
 
     protected void doFromJSON(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
@@ -2045,116 +1641,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return;
     }
 
-    protected void doListCopyOrInsert(Polyad polyad, State state, boolean doInsert) {
-        if (5 != polyad.getArgCount()) {
-            throw new IllegalArgumentException("the " + (doInsert?LIST_INSERT_AT:LIST_COPY) + " function requires 5 arguments");
-        }
-        Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArgAt(0));
 
-        if (!isStem(arg1)) {
-            throw new IllegalArgumentException((doInsert?LIST_INSERT_AT:LIST_COPY) + " requires a stem as its first argument");
-        }
-        StemVariable souorceStem = (StemVariable) arg1;
-
-        Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArgAt(1));
-        if (!isLong(arg2)) {
-            throw new IllegalArgumentException((doInsert?LIST_INSERT_AT:LIST_COPY) + " requires an integer as its second argument");
-        }
-        Long startIndex = (Long) arg2;
-
-        Object arg3 = polyad.evalArg(2, state);
-        checkNull(arg3, polyad.getArgAt(2));
-
-        if (!isLong(arg3)) {
-            throw new IllegalArgumentException((doInsert?LIST_INSERT_AT:LIST_COPY) + " requires an integer as its third argument");
-        }
-        Long length = (Long) arg3;
-
-        // need to handle case that the target does not exist.
-        StemVariable targetStem;
-        if (polyad.getArgAt(3) instanceof VariableNode) {
-            targetStem = getOrCreateStem(polyad.getArgAt(3),
-                    state, (doInsert?LIST_INSERT_AT:LIST_COPY) + " requires a stem as its fourth argument"
-            );
-        } else {
-            Object obj = polyad.evalArg(3, state);
-            checkNull(obj, polyad.getArgAt(3));
-
-            if (!isStem(obj)) {
-                throw new IllegalArgumentException((doInsert?LIST_INSERT_AT:LIST_COPY) + " requires an integer as its fifth argument");
-
-            }
-            targetStem = (StemVariable) obj;
-        }
-
-        Object arg5 = polyad.evalArg(4, state);
-        checkNull(arg5, polyad.getArgAt(4));
-
-        if (!isLong(arg5)) {
-            throw new IllegalArgumentException((doInsert?LIST_INSERT_AT:LIST_COPY) + " requires an integer as its fifth argument");
-        }
-        Long targetIndex = (Long) arg5;
-
-        if (doInsert) {
-            souorceStem.listInsertAt(startIndex, length, targetStem, targetIndex);
-        } else {
-            souorceStem.listCopy(startIndex, length, targetStem, targetIndex);
-        }
-        polyad.setResult(targetStem);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-        return;
-
-    }
-
-    /*
-        subset(3*[;15], {'foo':3,'bar':5,'baz':7})
-        subset(3*[;15], 2*[;5]+1)
-        a. := n(3,4,n(12))
-        subset(a., [[0,1],[1,1],[2,3]])
-     [1,5,11]
-        subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
-    {bar:5, foo:1, baz:11}
-     */
-    protected void doListSubset(Polyad polyad, State state) {
-        if (polyad.getArgCount() < 2 || 3 < polyad.getArgCount()) {
-            throw new IllegalArgumentException("the " + LIST_SUBSET + " function requires  two or three arguments");
-        }
-        Object arg1 = polyad.evalArg(0, state);
-        checkNull(arg1, polyad.getArgAt(0));
-        if (!isStem(arg1)) {
-            throw new IllegalArgumentException(LIST_SUBSET + " requires stem as its first argument");
-        }
-        StemVariable stem = (StemVariable) arg1;
-        Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArgAt(1));
-        if (!isLong(arg2)) {
-            throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its second argument");
-        }
-        Long startIndex = (Long) arg2;
-        Long endIndex = (long) stem.getStemList().size();
-        if (startIndex < 0) {
-            startIndex = startIndex + endIndex;
-        }
-        if (polyad.getArgCount() == 3) {
-            Object arg3 = polyad.evalArg(2, state);
-            checkNull(arg3, polyad.getArgAt(2));
-
-            if (!isLong(arg3)) {
-                throw new IllegalArgumentException(LIST_SUBSET + " requires an integer as its third argument");
-            }
-            endIndex = (Long) arg3;
-        }
-
-        StemVariable outStem = stem.listSubset(startIndex, endIndex);
-        polyad.setResult(outStem);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-        return;
-
-    }
 
 
     /**
@@ -2337,46 +1824,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-    protected void isDefined(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("the " + IS_DEFINED + " function requires 1 argument");
-        }
-        boolean isDef = false;
-        try {
-            polyad.evalArg(0, state);
-        } catch (IndexError | UnknownSymbolException exception) {
-            polyad.setResult(isDef);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
-            polyad.setEvaluated(true);
-            return;
-        }
-        if (polyad.getArgAt(0) instanceof VariableNode) {
-            VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
-            // Don't evaluate this because it might not exist (that's what we are testing for). Just check
-            // if the name is defined.
-            isDef = state.isDefined(variableNode.getVariableReference());
-        }
-        if (polyad.getArgAt(0) instanceof ConstantNode) {
-            ConstantNode variableNode = (ConstantNode) polyad.getArgAt(0);
-            Object x = variableNode.getResult();
-            if (x == null) {
-                isDef = false;
-            } else {
-                isDef = state.isDefined(x.toString());
-            }
-        }
-        if (polyad.getArgAt(0) instanceof ESN2) {
-            Object object = polyad.getArgAt(0).getResult();
-            if (object == null) {
-                isDef = false;
-            } else {
-                isDef = true;
-            }
-        }
-        polyad.setResult(isDef);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
-        polyad.setEvaluated(true);
-    }
 
     /**
      * <code>include_keys(stem., var | list.);</code><br/<br/> include keys on the right in the resulting stem
@@ -2648,14 +2095,18 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 "the " + SET_DEFAULT + " command accepts   only a stem variable as its first argument.");
 
         polyad.evalArg(1, state);
+        Object oldDefault = stemVariable.getDefaultValue();
 
         Object defaultValue = polyad.getArgAt(1).getResult();
-        if (isStem(defaultValue)) {
-            throw new IllegalArgumentException("the " + SET_DEFAULT + " command accepts only a scalar as its second argument.");
-        }
         stemVariable.setDefaultValue(defaultValue);
-        polyad.setResult(defaultValue);
-        polyad.setResultType(polyad.getArgAt(1).getResultType());
+        // now return the previous result or null if there was none
+        if(oldDefault == null){
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+        }else{
+            polyad.setResult(oldDefault);
+            polyad.setResultType(Constant.getType(oldDefault));
+        }
         polyad.setEvaluated(true);
     }
 
@@ -2979,7 +2430,7 @@ z. :=  join3(q.,w.)
             pStem0 = (StemVariable) dyadicTilde.getResult();
         } else {
             // default is to use reverse([;rank]) as the second argument
-            Polyad reverse = new Polyad(LIST_REVERSE);
+            Polyad reverse = new Polyad(ListEvaluator.LIST_REVERSE);
             reverse.addArgument(sliceNode);
             ;
             reverse.evaluate(state);

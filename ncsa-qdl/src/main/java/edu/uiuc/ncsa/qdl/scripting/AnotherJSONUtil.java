@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.scripting;
 
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -175,9 +175,9 @@ public class AnotherJSONUtil {
             }*/
             String cmd;
             if (StringUtils.isTrivial(rawArgs)) {
-                cmd = ControlEvaluator.LOAD_COMMAND + "(" + scriptName + ");";
+                cmd = SystemEvaluator.LOAD_COMMAND + "(" + scriptName + ");";
             } else {
-                cmd = ControlEvaluator.LOAD_COMMAND + "(" + scriptName + ", " + rawArgs + ");";
+                cmd = SystemEvaluator.LOAD_COMMAND + "(" + scriptName + ", " + rawArgs + ");";
                 //qdlScript.setScriptArglist(argList);
             }
             lines.add(cmd);

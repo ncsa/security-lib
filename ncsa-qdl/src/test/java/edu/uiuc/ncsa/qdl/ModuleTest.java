@@ -226,16 +226,11 @@ public class ModuleTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        Long p = getLongValue("p", state);
-        Long q = getLongValue("q", state);
-        Long r = getLongValue("r", state);
-        Long s = getLongValue("s", state);
-        Long i = getLongValue("i", state);
-        assert q.equals(-10L);
-        assert s.equals(-20l);
-        assert p.equals(2L);
-        assert r.equals(4L);
-        assert i.equals(5L);
+        assert getLongValue("p", state).equals(2L);
+        assert getLongValue("q", state).equals(-10L);
+        assert getLongValue("r", state).equals(4L);
+        assert getLongValue("s", state).equals(-20l);
+        assert getLongValue("i", state).equals(5L);
     }
 
     /**
@@ -265,10 +260,8 @@ public class ModuleTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        Long d = getLongValue("d", state);
-        Long e = getLongValue("e", state);
-        assert d.equals(1L);
-        assert e.equals(-19l);
+        assert getLongValue("d", state).equals(1L);
+        assert getLongValue("e", state).equals(-19L);
     }
 
     /**
@@ -559,6 +552,7 @@ public class ModuleTest extends AbstractQDLTester {
             assert true;
         }
     }
+
     /*
       Intrinsic variable tests
      */
@@ -572,10 +566,11 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic function.";
-        }catch(UndefinedFunctionException iv){
+        } catch (UndefinedFunctionException iv) {
             assert true;
         }
     }
+
     public void testIntrinsicFunction2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -586,10 +581,11 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic function.";
-        }catch(IntrinsicViolation iv){
+        } catch (IntrinsicViolation iv) {
             assert true;
         }
     }
+
     public void testIntrinsicFunctionDefine() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -600,7 +596,7 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic function.";
-        }catch(IntrinsicViolation iv){
+        } catch (IntrinsicViolation iv) {
             assert true;
         }
     }
@@ -615,7 +611,7 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic variable.";
-        }catch(IntrinsicViolation iv){
+        } catch (IntrinsicViolation iv) {
             assert true;
         }
     }
@@ -630,7 +626,7 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic variable.";
-        }catch(IntrinsicViolation iv){
+        } catch (IntrinsicViolation iv) {
             assert true;
         }
     }
@@ -645,7 +641,7 @@ public class ModuleTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
             assert false : "was able to access an intrinsic variable.";
-        }catch(IntrinsicViolation iv){
+        } catch (IntrinsicViolation iv) {
             assert true;
         }
     }
@@ -657,10 +653,30 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "module_import('a:/b','X');");
         addLine(script, "ok := 1 == X#get_a();");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            assert getBooleanValue("ok", state):"Could not access getter for private variable.";
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not access getter for private variable.";
     }
+
+
+    /**
+     * Tests that setting a variable on module import from the ambient state works.
+     * @throws Throwable
+     */
+    public void testSetVariableFromGlobal() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "zzz := -2;");
+        addLine(script, "module['a:/b','X'][__a:=zzz;get_a()->__a;];");
+        addLine(script, "module_import('a:/b','X');");
+        addLine(script, "ok := zzz == X#get_a();");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not set variable from global state on module import";
+    }
+
     /*
+            zzz := -1;
+             module['a:/b','X'][__a:=zzz;get_a()->__a;]
              module['a:/b','X'][__a:=1;get_a()->__a;]
   module_import('a:/b','X')
     X#__a  X
@@ -675,94 +691,114 @@ cannot access '__a'
     guard against a change that breaks this. Simple, basic and essentail regression checks.
      */
     protected String testModulePath = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl";
+
     // ML = module_load
     public void testMLIntrinsicFunction() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "__f(2,2);");
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic function.";
-          }catch(UndefinedFunctionException iv){
-              assert true;
-          }
-      }
-      public void testMLIntrinsicFunction2() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "X#__f(2,2);");
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic function.";
-          }catch(IntrinsicViolation iv){
-              assert true;
-          }
-      }
-      public void testMLIntrinsicFunctionDefine() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "X#__f(x,y)->x*y;");
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic function.";
-          }catch(IntrinsicViolation iv){
-              assert true;
-          }
-      }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "__f(2,2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        } catch (UndefinedFunctionException iv) {
+            assert true;
+        }
+    }
 
-      public void testMLIntrinsicVariable() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "say(X#__a);"); // FQ
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic variable.";
-          }catch(IntrinsicViolation iv){
-              assert true;
-          }
-      }
+    public void testMLIntrinsicFunction2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "X#__f(2,2);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        } catch (IntrinsicViolation iv) {
+            assert true;
+        }
+    }
 
-      public void testMLIntrinsicVariable1() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "say(__a);"); // unqualified
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic variable.";
-          }catch(IntrinsicViolation iv){
-              assert true;
-          }
-      }
 
-      public void testMLIntrinsicVariableSet() throws Throwable {
-          State state = testUtils.getNewState();
-          StringBuffer script = new StringBuffer();
-          addLine(script, "module_load('" + testModulePath + "') =: q;");
-          addLine(script, "module_import(q,'X');");
-          addLine(script, "X#__a := 42;");
-          QDLInterpreter interpreter = new QDLInterpreter(null, state);
-          try {
-              interpreter.execute(script.toString());
-              assert false : "was able to access an intrinsic variable.";
-          }catch(IntrinsicViolation iv){
-              assert true;
-          }
-      }
+    /**
+     * Similar to {@link #testSetVariableFromGlobal()} but loading the module from a file.
+     * @throws Throwable
+     */
+    public void testMLSetVariableFromGlobal() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "zz := -1;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "ok := zz == X#get_private();");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state): "Could not set variable from global state on module import";
+    }
+
+    public void testMLIntrinsicFunctionDefine() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "X#__f(x,y)->x*y;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic function.";
+        } catch (IntrinsicViolation iv) {
+            assert true;
+        }
+    }
+
+    public void testMLIntrinsicVariable() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "say(X#__a);"); // FQ
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        } catch (IntrinsicViolation iv) {
+            assert true;
+        }
+    }
+
+    public void testMLIntrinsicVariable1() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "say(__a);"); // unqualified
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        } catch (IntrinsicViolation iv) {
+            assert true;
+        }
+    }
+
+    public void testMLIntrinsicVariableSet() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "X#__a := 42;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "was able to access an intrinsic variable.";
+        } catch (IntrinsicViolation iv) {
+            assert true;
+        }
+    }
 
     public void testMLIntrinsicGetter() throws Throwable {
         State state = testUtils.getNewState();
@@ -770,8 +806,11 @@ cannot access '__a'
         addLine(script, "module_load('" + testModulePath + "') =: q;");
         addLine(script, "module_import(q,'X');");
         addLine(script, "ok := 4 == X#get_private();");
+        addLine(script, "X#set_private(-10);");
+        addLine(script, "ok1 := -10 == X#get_private();");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
-            assert getBooleanValue("ok", state):"Could not access getter for private variable.";
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not access getter for private variable.";
+        assert getBooleanValue("ok1", state) : "Could not access getter for private variable.";
     }
 }

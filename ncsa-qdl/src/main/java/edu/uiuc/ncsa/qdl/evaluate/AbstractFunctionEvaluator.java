@@ -22,17 +22,38 @@ import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/16/20 at  10:59 AM
  */
 public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
-    public static final String SYS_NAMESPACE = "sys";
-    public static final String SYS_FQ = SYS_NAMESPACE + ImportManager.NS_DELIMITER;
+    protected String[] fNames = null;
 
     public abstract String[] getFunctionNames();
 
+    String[] fqNames = null;
+    public String[] getFQFunctionNames(){
+        if(fqNames == null){
+            fqNames = new String[getFunctionNames().length];
+            for(int i = 0; i < fqNames.length; i++){
+                fqNames[i]= getNamespace() + ImportManager.NS_DELIMITER + getFunctionNames()[i];
+            }
+        }
+
+        return fqNames;
+    }
+    @Override
+    public TreeSet<String> listFunctions(boolean listFQ) {
+        TreeSet<String> names = new TreeSet<>();
+        String[] fnames = listFQ ? getFQFunctionNames() : getFunctionNames();
+
+        for (String key : fnames) {
+            names.add(key + "()");
+        }
+        return names;
+    }
     public boolean isBuiltInFunction(String name) {
         for (String x : getFunctionNames()) {
             if (x.equals(name)) return true;
@@ -47,6 +68,13 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
 
     public abstract boolean evaluate(Polyad polyad, State state);
+
+    public boolean evaluate(String alias, Polyad polyad, State state) {
+        if (alias.equals(getNamespace())) {
+            return evaluate(polyad, state);
+        }
+        return false;
+    }
 
     protected boolean isStem(Object obj) {
         return StemUtility.isStem(obj);
@@ -72,11 +100,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     protected boolean areAllStems(Object... objects) {
-      return StemUtility.areAllStems(objects);
+        return StemUtility.areAllStems(objects);
     }
 
     protected boolean areNoneStems(Object... objects) {
-return StemUtility.areNoneStems(objects);    }
+        return StemUtility.areNoneStems(objects);
+    }
 
     protected boolean isString(Object obj) {
         return obj instanceof String;
@@ -152,6 +181,7 @@ return StemUtility.areNoneStems(objects);    }
         return out;
     }
 
+
     /**
      * Function pointer class since this ishow youdo that in Java.
      */
@@ -178,7 +208,7 @@ return StemUtility.areNoneStems(objects);    }
                             String name,
                             State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException( name + " requires 1 argument");
+            throw new IllegalArgumentException(name + " requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
@@ -208,7 +238,7 @@ return StemUtility.areNoneStems(objects);    }
             if (object instanceof StemVariable) {
                 StemVariable newOut = new StemVariable();
                 processStem1(newOut, (StemVariable) object, pointer);
-                if(!newOut.isEmpty()) {
+                if (!newOut.isEmpty()) {
                     outStem.put(key, newOut);
                 }
             } else {
@@ -248,9 +278,9 @@ return StemUtility.areNoneStems(objects);    }
         checkNull(arg1, polyad.getArgAt(0), state);
 
         // Short circuit dyadic logical && ||
-        if(arg1 instanceof Boolean){
-            if(polyad.getOperatorType() == OpEvaluator.OR_VALUE){
-                if((Boolean)arg1){
+        if (arg1 instanceof Boolean) {
+            if (polyad.getOperatorType() == OpEvaluator.OR_VALUE) {
+                if ((Boolean) arg1) {
                     polyad.setResult(Boolean.TRUE);
                     polyad.setResultType(Constant.BOOLEAN_TYPE);
                     polyad.setEvaluated(true);
@@ -258,8 +288,8 @@ return StemUtility.areNoneStems(objects);    }
                     return;
                 }
             }
-            if(polyad.getOperatorType() == OpEvaluator.AND_VALUE){
-                if(!((Boolean)arg1)){
+            if (polyad.getOperatorType() == OpEvaluator.AND_VALUE) {
+                if (!((Boolean) arg1)) {
                     polyad.setResult(Boolean.FALSE);
                     polyad.setResultType(Constant.BOOLEAN_TYPE);
                     polyad.setEvaluated(true);
@@ -380,8 +410,6 @@ return StemUtility.areNoneStems(objects);    }
     }
 
 
-
-
     protected void processStem3(StemVariable outStem,
                                 StemVariable stem1,
                                 StemVariable stem2,
@@ -416,7 +444,7 @@ return StemUtility.areNoneStems(objects);    }
                         toStem(objects[1]),
                         toStem(objects[2]),
                         pointer, polyad, optionalArgs);
-                if(!newOut.isEmpty()) {
+                if (!newOut.isEmpty()) {
                     outStem.put(key, newOut);
                 }
                 //r = pointer.process(objects);
@@ -458,7 +486,7 @@ return StemUtility.areNoneStems(objects);    }
         }
         Set<String> foundKeys = new HashSet<>();
         // now look for common keys.
-        if(keys == null){
+        if (keys == null) {
             // no common keys found
             return foundKeys;
         }
@@ -549,6 +577,7 @@ return StemUtility.areNoneStems(objects);    }
     /**
      * get a polyad or dyad (for the operator) from the {@link FunctionReferenceNode}.
      * You must still set any arguments, but the type and name should be correctly set.
+     *
      * @param state
      * @param frNode
      * @return
@@ -559,13 +588,13 @@ return StemUtility.areNoneStems(objects);    }
         if (state.getOpEvaluator().isMathOperator(operatorName)) {
             operator = new Dyad(state.getOperatorType(operatorName));
         } else {
-            if(state.getMetaEvaluator().isBuiltInFunction(operatorName)){
-                operator  = new Polyad(operatorName);
-            }else{
+            if (state.getMetaEvaluator().isBuiltInFunction(operatorName)) {
+                operator = new Polyad(operatorName);
+            } else {
                 //FunctionRecord functionRecord = state.getFTStack().get(operatorName, nAry); // It's a dyad!
                 FR_WithState fr_withState = state.resolveFunction(operatorName, nAry, true); // It's a dyad!
 
-                if(fr_withState == null || fr_withState.functionRecord == null){
+                if (fr_withState == null || fr_withState.functionRecord == null) {
                     throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined with " + nAry + " arguments");
                 }
                 Polyad polyad1 = new Polyad(operatorName);
@@ -575,6 +604,7 @@ return StemUtility.areNoneStems(objects);    }
         }
         return operator;
     }
+
     public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
@@ -584,20 +614,21 @@ return StemUtility.areNoneStems(objects);    }
      * produce a legal function name since the base 32 encoding slaps on trailing
      * "=". This assures there will never be a collision with the ambient
      * state.
+     *
      * @param state
      * @return
      */
-    protected String tempFname(State state){
-        Base32 base32 = new Base32((byte)'=');
+    protected String tempFname(State state) {
+        Base32 base32 = new Base32((byte) '=');
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[8];
         random.nextBytes(bytes);
-        String tempName =  base32.encodeToString(bytes);
-        for(int i = 0; i < 10; i++){
-            if(state.getFTStack().getSomeFunction(tempName) == null){
+        String tempName = base32.encodeToString(bytes);
+        for (int i = 0; i < 10; i++) {
+            if (state.getFTStack().getSomeFunction(tempName) == null) {
                 return tempName;
             }
-            tempName =  base32.encodeToString(bytes);
+            tempName = base32.encodeToString(bytes);
 
         }
         throw new IllegalStateException("cannot create anonymous function");
@@ -610,6 +641,7 @@ return StemUtility.areNoneStems(objects);    }
      * It will also throw an exception if the argument is not of the right type.<p/><p/>
      * Any place you want to use a function as an argument, pass it to this and let
      * it do the work.
+     *
      * @param state
      * @param arg0
      * @return
@@ -618,14 +650,14 @@ return StemUtility.areNoneStems(objects);    }
         FunctionReferenceNode frn = null;
         if (arg0 instanceof LambdaDefinitionNode) {
             LambdaDefinitionNode lds = (LambdaDefinitionNode) arg0;
-            if(!lds.hasName()){
-                lds.getFunctionRecord().name =tempFname(state);
+            if (!lds.hasName()) {
+                lds.getFunctionRecord().name = tempFname(state);
             }
-            if(pushNewState) {
+            if (pushNewState) {
                 FunctionTableImpl ft = new FunctionTableImpl();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
-            }else{
+            } else {
                 lds.evaluate(state);
             }
             frn = new FunctionReferenceNode();
@@ -634,14 +666,14 @@ return StemUtility.areNoneStems(objects);    }
 
         if ((arg0 instanceof FunctionDefinitionStatement)) {
             LambdaDefinitionNode lds = new LambdaDefinitionNode(((FunctionDefinitionStatement) arg0));
-            if(!lds.hasName()){
-                lds.getFunctionRecord().name =tempFname(state);
+            if (!lds.hasName()) {
+                lds.getFunctionRecord().name = tempFname(state);
             }
-            if(pushNewState) {
+            if (pushNewState) {
                 FunctionTableImpl ft = new FunctionTableImpl();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
-            }else{
+            } else {
                 lds.evaluate(state);
             }
             frn = new FunctionReferenceNode();
@@ -661,18 +693,21 @@ return StemUtility.areNoneStems(objects);    }
 
 
     protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0) {
-        return getFunctionReferenceNode(state,arg0,false);
+        return getFunctionReferenceNode(state, arg0, false);
     }
 
     /**
      * If a function gets an argument whichs should not be a Java null, then this will
      * try to track down the variable reference.
+     *
      * @param arg
      * @param swri
      */
-    public static void checkNull(Object arg, StatementWithResultInterface swri){
-        if(arg != null){return;}
-        if(swri instanceof VariableNode){
+    public static void checkNull(Object arg, StatementWithResultInterface swri) {
+        if (arg != null) {
+            return;
+        }
+        if (swri instanceof VariableNode) {
             VariableNode vNode = (VariableNode) swri;
             throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'");
         }
@@ -681,21 +716,22 @@ return StemUtility.areNoneStems(objects);    }
 
     /**
      * Check for nulls but log any error
+     *
      * @param arg1
      * @param swri
      * @param state
      */
-    public static void checkNull(Object arg1, StatementWithResultInterface swri, State state ) {
-        if(arg1 == null){
+    public static void checkNull(Object arg1, StatementWithResultInterface swri, State state) {
+        if (arg1 == null) {
             UnknownSymbolException unknownSymbolException;
-            String message  = "unknown symbol";
-            if(swri instanceof VariableNode){
-                message = message + " '" + ((VariableNode)swri).getVariableReference() + "'";
-                unknownSymbolException =  new UnknownSymbolException(message);
-            }else {
+            String message = "unknown symbol";
+            if (swri instanceof VariableNode) {
+                message = message + " '" + ((VariableNode) swri).getVariableReference() + "'";
+                unknownSymbolException = new UnknownSymbolException(message);
+            } else {
                 unknownSymbolException = new UnknownSymbolException(message);
             }
-            if(state.getLogger() != null) {
+            if (state.getLogger() != null) {
                 // Check they have logging in the first place before writing to it.
                 state.getLogger().error(message);
             }

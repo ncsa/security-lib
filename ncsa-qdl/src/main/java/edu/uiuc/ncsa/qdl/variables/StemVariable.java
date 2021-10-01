@@ -1631,7 +1631,11 @@ public class StemVariable extends HashMap<String, Object> {
             }
             obj = currentStem.get(indexList.get(i));
             if (obj == null) {
-                throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                if(hasDefaultValue()){
+                    obj = getDefaultValue();
+                }else {
+                    throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                }
             }
 
             if (obj instanceof StemVariable) {

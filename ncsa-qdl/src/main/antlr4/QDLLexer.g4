@@ -111,8 +111,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
            StemDot : '.' ;
         UnaryMinus : '¯'; // unicode 00af raised unary minus.
          UnaryPlus : '⁺' ;// unicode 207a raised unary plus.
-             Floor : '⌊';
-           Ceiling : '⌈';
+             Floor : '⌊'; // unicode 230a 
+           Ceiling : '⌈'; // unicode 2308
      FunctionMarker: '@' | '⊗';  // unicode 2297
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
@@ -123,19 +123,6 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 // NOTE: ORDER MATTERS!! You can easily break the parser if you change the order of these
 // so if you add a rule, you must re-run the tests and look for regression and be prepared
 // to move the new rule around to the right spot.
-/*
-   Parsing variables separate from stems. Unless the marker for the stem is
-   changed to something other than a period (!!!), it is impossible to get
-   a separate parser rule for stems -- The integer indices always get picked up
-   as integers first then are flagged as bad expressions.
-   However, changing the stem marker is a fundamental change driven not by
-   the notation -- which is simple and good -- but by my lack of parser
-   writing skills. Probably means a parser rewrite, not just tweaks.
-   Ultimate decision therefore is to keep it as is
-   and someday, maybe rewrite the parser to have it identify stems as first
-   class objects (rather than just have "variable" and teasing it out in Java).
-*/
-//   Stem_ref : Identifier '.';
 
 // § 8 Identifiers
    /*

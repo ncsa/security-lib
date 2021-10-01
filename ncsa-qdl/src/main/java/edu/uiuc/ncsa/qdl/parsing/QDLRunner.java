@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
-import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
@@ -16,6 +15,9 @@ import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.PRINT_FUNCTION;
+import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.SAY_FUNCTION;
 
 /**
  * /**
@@ -114,17 +116,17 @@ public class QDLRunner implements Serializable {
                             ExpressionNode expression = (ExpressionNode) stmt;
                             if (expression instanceof Polyad) {
                                 // so if this is already a print statement, don't wrap it in one
-                                boolean isPrint = ((Polyad) expression).getName().equals(IOEvaluator.SAY_FUNCTION) ||
-                                        ((Polyad) expression).getName().equals(IOEvaluator.PRINT_FUNCTION);
+                                boolean isPrint = ((Polyad) expression).getName().equals(SAY_FUNCTION) ||
+                                        ((Polyad) expression).getName().equals(PRINT_FUNCTION);
                                 if (!isPrint) {
-                                    Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
+                                    Polyad p = new Polyad(SAY_FUNCTION);
                                     p.addArgument(expression);
                                     p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                                     stmt = p;
 
                                 }
                             } else {
-                                Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
+                                Polyad p = new Polyad(SAY_FUNCTION);
                                 p.addArgument(expression);
                                 p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                                 stmt = p;
@@ -133,7 +135,7 @@ public class QDLRunner implements Serializable {
                         if (stmt instanceof StemVariableNode || stmt instanceof StemListNode || stmt instanceof ExpressionStemNode) {
                             stmt.evaluate(state);
                             ConstantNode cNode = new ConstantNode(((StatementWithResultInterface) stmt).getResult(), Constant.STEM_TYPE);
-                            Polyad p = new Polyad(IOEvaluator.SAY_FUNCTION);
+                            Polyad p = new Polyad(SAY_FUNCTION);
                             p.addArgument(cNode);
                             p.addArgument(new ConstantNode(prettyPrint, Constant.BOOLEAN_TYPE));
                             stmt = p;

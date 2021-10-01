@@ -17,7 +17,6 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.util.List;
-import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER;
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER2;
@@ -28,41 +27,41 @@ import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER2;
  */
 public class FunctionEvaluator extends AbstractFunctionEvaluator {
     public static long serialVersionUID = 0xcafed00d2L;
+    public static final String FUNCTION_NAMESPACE = "function";
+
+    @Override
+    public String getNamespace() {
+        return FUNCTION_NAMESPACE;
+    }
+
     public static final int BASE_FUNCTION_VALUE = 6000;
     public static final String IS_FUNCTION = "is_function";
-    public static final String FQ_IS_FUNCTION = SYS_FQ + "is_function";
     public static final int IS_FUNCTION_TYPE = 1 + BASE_FUNCTION_VALUE;
 
     @Override
     public int getType(String name) {
-        if (name.equals(IS_FUNCTION) || name.equals(FQ_IS_FUNCTION)) return IS_FUNCTION_TYPE;
+        if (name.equals(IS_FUNCTION)) return IS_FUNCTION_TYPE;
         // At parsing time, the function definition class sets the value manually,
         // so call to this should ever get anything other than unknown value.
         return UNKNOWN_VALUE;
     }
 
-    public static String FUNC_NAMES[] = new String[]{IS_FUNCTION};
-    public static String FQ_FUNC_NAMES[] = new String[]{FQ_IS_FUNCTION};
+
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames = new String[]{IS_FUNCTION};
+        }
+        return fNames;
     }
 
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
+
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case IS_FUNCTION:
-            case FQ_IS_FUNCTION:
                 if (polyad.getArgCount() == 0) {
                     throw new IllegalArgumentException("You must supply at least one argument.");
                 }
@@ -143,14 +142,14 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             return false;
         }
         String scriptName = polyad.getName() + QDLVersion.DEFAULT_FILE_EXTENSION;
-        Polyad tryScript = new Polyad(ControlEvaluator.RUN_COMMAND);
+        Polyad tryScript = new Polyad(SystemEvaluator.RUN_COMMAND);
         ConstantNode constantNode = new ConstantNode(scriptName, Constant.STRING_TYPE);
         tryScript.getArguments().add(constantNode);
         for (int i = 0; i < polyad.getArgCount(); i++) {
             tryScript.getArguments().add(polyad.getArguments().get(i));
         }
         try {
-            ControlEvaluator.runnit(tryScript, state, ControlEvaluator.RUN_COMMAND, state.getLibPath(), true);
+            SystemEvaluator.runnit(tryScript, state, SystemEvaluator.RUN_COMMAND, state.getLibPath(), true);
             tryScript.evaluate(state);
             polyad.setResult(tryScript.getResult());
             polyad.setResultType(tryScript.getResultType());

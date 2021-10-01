@@ -5,9 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -18,15 +16,12 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils.setupMySQLDatabase;
-import static edu.uiuc.ncsa.qdl.evaluate.StemEvaluator.STEM_FUNCTION_BASE_VALUE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -35,144 +30,79 @@ import static edu.uiuc.ncsa.qdl.evaluate.StemEvaluator.STEM_FUNCTION_BASE_VALUE;
 public class IOEvaluator extends AbstractFunctionEvaluator {
 
     public static final String IO_NAMESPACE = "io";
-    public static final String IO_FQ = IO_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int IO_FUNCTION_BASE_VALUE = 4000;
 
-    public static final String SAY_FUNCTION = "say";
-    public static final String IO_SAY_FUNCTION = IO_FQ + SAY_FUNCTION;
-    public static final String PRINT_FUNCTION = "print";
-    public static final String IO_PRINT_FUNCTION = IO_FQ + PRINT_FUNCTION;
-    public static final int SAY_TYPE = 1 + IO_FUNCTION_BASE_VALUE;
+
     public static final String SCAN_FUNCTION = "scan";
-    public static final String IO_SCAN_FUNCTION = IO_FQ + SCAN_FUNCTION;
     public static final int SCAN_TYPE = 2 + IO_FUNCTION_BASE_VALUE;
 
     public static final String READ_FILE = "file_read";
-    public static final String IO_READ_FILE = IO_FQ + "read";
     public static final int READ_FILE_TYPE = 3 + IO_FUNCTION_BASE_VALUE;
 
     public static final String WRITE_FILE = "file_write";
-    public static final String IO_WRITE_FILE = IO_FQ + "write";
     public static final int WRITE_FILE_TYPE = 4 + IO_FUNCTION_BASE_VALUE;
 
     public static final String DIR = "dir";
-    public static final String IO_DIR = IO_FQ + DIR;
     public static final int DIR_TYPE = 5 + IO_FUNCTION_BASE_VALUE;
 
     public static final String MKDIR = "mkdir";
-    public static final String IO_MKDIR = IO_FQ + MKDIR;
     public static final int MKDIR_TYPE = 6 + IO_FUNCTION_BASE_VALUE;
 
     public static final String RMDIR = "rmdir";
-    public static final String IO_RMDIR = IO_FQ + RMDIR;
     public static final int RMDIR_TYPE = 7 + IO_FUNCTION_BASE_VALUE;
 
     public static final String RM_FILE = "rm";
-    public static final String IO_RM_FILE = IO_FQ + RM_FILE;
     public static final int RM_FILE_TYPE = 8 + IO_FUNCTION_BASE_VALUE;
 
-    public static final String TO_STRING = "to_string";
-    public static final String FQ_TO_STRING = SYS_FQ + TO_STRING;
-    public static final int TO_STRING_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
-
-    public static final String TO_NUMBER = "to_number";
-    public static final String FQ_TO_NUMBER = SYS_FQ + TO_NUMBER;
-    public static final int TO_NUMBER_TYPE = 20 + STEM_FUNCTION_BASE_VALUE;
-
-    public static final String TO_BOOLEAN = "to_boolean";
-    public static final String FQ_TO_BOOLEAN = SYS_FQ + TO_BOOLEAN;
-    public static final int TO_BOOLEAN_TYPE = 21 + STEM_FUNCTION_BASE_VALUE;
-
     public static final String VFS_MOUNT = "vfs_mount";
-    public static final String IO_VFS_MOUNT = IO_FQ + "mount";
     public static final int VFS_MOUNT_TYPE = 100 + IO_FUNCTION_BASE_VALUE;
 
 
     public static final String VFS_UNMOUNT = "vfs_unmount";
-    public static final String IO_VFS_UNMOUNT = IO_FQ + "unmount";
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
-    public static String[] FUNC_NAMES = new String[]{
-            TO_NUMBER,
-            TO_STRING,
-            TO_BOOLEAN,
-            SAY_FUNCTION,
-            PRINT_FUNCTION,
-            SCAN_FUNCTION,
-            READ_FILE,
-            WRITE_FILE,
-            DIR,
-            VFS_MOUNT,
-            VFS_UNMOUNT};
+    @Override
+     public String getNamespace() {
+         return IO_NAMESPACE;
+     }
 
-    public static String[] FQ_FUNC_NAMES = new String[]{
-            FQ_TO_NUMBER,
-            FQ_TO_STRING,
-            FQ_TO_BOOLEAN,
-            IO_SAY_FUNCTION,
-            IO_PRINT_FUNCTION,
-            IO_SCAN_FUNCTION,
-            IO_READ_FILE,
-            IO_WRITE_FILE,
-            IO_DIR,
-            IO_VFS_MOUNT,
-            IO_VFS_UNMOUNT};
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+
+        if(fNames == null){
+            fNames = new String[]{
+                        SCAN_FUNCTION,
+                        READ_FILE,
+                        WRITE_FILE,
+                        DIR,
+                        VFS_MOUNT,
+                        VFS_UNMOUNT};
+        }
+        return fNames;
     }
 
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     @Override
     public int getType(String name) {
         switch (name) {
-            case TO_NUMBER:
-            case FQ_TO_NUMBER:
-                return TO_NUMBER_TYPE;
-            case TO_STRING:
-            case FQ_TO_STRING:
-                return TO_STRING_TYPE;
-            case TO_BOOLEAN:
-            case FQ_TO_BOOLEAN:
-                return TO_BOOLEAN_TYPE;
-            case PRINT_FUNCTION:
-            case IO_PRINT_FUNCTION:
-            case IO_SAY_FUNCTION:
-            case SAY_FUNCTION:
-                return SAY_TYPE;
+
             case SCAN_FUNCTION:
-            case IO_SCAN_FUNCTION:
                 return SCAN_TYPE;
-            case IO_DIR:
+            case DIR:
                 return DIR_TYPE;
-            case IO_MKDIR:
             case MKDIR:
                 return MKDIR_TYPE;
-            case IO_RM_FILE:
             case RM_FILE:
                 return RM_FILE_TYPE;
-            case IO_RMDIR:
             case RMDIR:
                 return RMDIR_TYPE;
-            case IO_READ_FILE:
             case READ_FILE:
                 return READ_FILE_TYPE;
-            case IO_WRITE_FILE:
             case WRITE_FILE:
                 return WRITE_FILE_TYPE;
-            case IO_VFS_MOUNT:
             case VFS_MOUNT:
                 return VFS_MOUNT_TYPE;
-            case IO_VFS_UNMOUNT:
             case VFS_UNMOUNT:
                 return VFS_UNMOUNT_TYPE;
         }
@@ -182,59 +112,32 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        boolean printIt = false;
         switch (polyad.getName()) {
-            case TO_NUMBER:
-            case FQ_TO_NUMBER:
-                doToNumber(polyad, state);
-                return true;
-            case TO_BOOLEAN:
-            case FQ_TO_BOOLEAN:
-                doToBoolean(polyad, state);
-                return true;
-            case PRINT_FUNCTION:
-            case IO_PRINT_FUNCTION:
-            case IO_SAY_FUNCTION:
-            case SAY_FUNCTION:
-                printIt = true;
-            case TO_STRING:
-            case FQ_TO_STRING:
 
-                doPrint(polyad, state, printIt);
-                return true;
             case SCAN_FUNCTION:
-            case IO_SCAN_FUNCTION:
                 doScan(polyad, state);
                 return true;
-            case IO_DIR:
             case DIR:
                 doDir(polyad, state);
                 return true;
-            case IO_MKDIR:
             case MKDIR:
                 doMkDir(polyad, state);
                 return true;
-            case IO_RM_FILE:
             case RM_FILE:
                 doRMFile(polyad, state);
                 return true;
-            case IO_RMDIR:
             case RMDIR:
                 doRMDir(polyad, state);
                 return true;
-            case IO_READ_FILE:
             case READ_FILE:
                 doReadFile(polyad, state);
                 return true;
-            case IO_WRITE_FILE:
             case WRITE_FILE:
                 doWriteFile(polyad, state);
                 return true;
-            case IO_VFS_MOUNT:
             case VFS_MOUNT:
                 vfsMount(polyad, state);
                 return true;
-            case IO_VFS_UNMOUNT:
             case VFS_UNMOUNT:
                 vfsUnmount(polyad, state);
                 return true;
@@ -242,101 +145,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
-    // Convert a wide variety of inputs to boolean. This is useful in scripts where the arguments might
-    // be string from external sources, e.g.
-    private void doToBoolean(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException(TO_BOOLEAN_TYPE + " requires an argument");
-        }
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
-            @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                switch (Constant.getType(objects[0])) {
-                    case Constant.BOOLEAN_TYPE:
-                        r.result = ((Boolean) objects[0]);
-                        r.resultType = Constant.BOOLEAN_TYPE;
-                        break;
-                    case Constant.STRING_TYPE:
-                        String x = (String) objects[0];
-                        r.result = x.equals("true");
-                        r.resultType = Constant.BOOLEAN_TYPE;
-                        break;
-                    case Constant.LONG_TYPE:
-                        Long y = (Long) objects[0];
-                        r.result = y.equals(1L);
-                        r.resultType = Constant.BOOLEAN_TYPE;
-                        break;
-                    case Constant.DECIMAL_TYPE:
-                        BigDecimal bd = (BigDecimal) objects[0];
-
-                        r.result = bd.longValue() == 1;
-                        r.resultType = Constant.BOOLEAN_TYPE;
-                        break;
-                    case Constant.NULL_TYPE:
-                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert null.");
-                    case Constant.STEM_TYPE:
-                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert a stem.");
-                    case Constant.UNKNOWN_TYPE:
-                        throw new IllegalArgumentException("" + TO_BOOLEAN + " unknown argument type.");
-                }
-                return r;
-            }
-        };
-        process1(polyad, pointer, TO_BOOLEAN, state);
-
-
-    }
-
-    //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
-    private void doToNumber(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("" + TO_NUMBER + " requires an argument");
-        }
-        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
-            @Override
-            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                switch (Constant.getType(objects[0])) {
-                    case Constant.BOOLEAN_TYPE:
-                        r.result = ((Boolean) objects[0]) ? 1L : 0L;
-                        r.resultType = Constant.LONG_TYPE;
-                        break;
-                    case Constant.STRING_TYPE:
-                        String x = (String) objects[0];
-                        try {
-                            r.result = Long.parseLong(x);
-                            r.resultType = Constant.LONG_TYPE;
-                        } catch (NumberFormatException nfx0) {
-                            try {
-                                r.result = new BigDecimal(x);
-                                r.resultType = Constant.DECIMAL_TYPE;
-                            } catch (NumberFormatException nfx2) {
-                                // ok, kill it here.
-                                throw new IllegalArgumentException(("" + objects[0] + " is not a number."));
-                            }
-                        }
-                        break;
-                    case Constant.LONG_TYPE:
-                        r.result = objects[0];
-                        r.resultType = Constant.LONG_TYPE;
-                        break;
-                    case Constant.DECIMAL_TYPE:
-                        r.result = objects[0];
-                        r.resultType = Constant.DECIMAL_TYPE;
-                        break;
-                    case Constant.NULL_TYPE:
-                        throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert null.");
-                    case Constant.STEM_TYPE:
-                        throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert a stem.");
-                    case Constant.UNKNOWN_TYPE:
-                        throw new IllegalArgumentException("" + TO_NUMBER + " unknown argument type.");
-                }
-                return r;
-            }
-        };
-        process1(polyad, pointer, TO_NUMBER, state);
-    }
 
     protected void doScan(Polyad polyad, State state) {
         if (state.isServerMode()) {
@@ -369,86 +177,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
     }
 
-    /**
-     * Does print, say and to_string commands.
-     *
-     * @param polyad
-     * @param state
-     * @param printIt
-     */
-    protected void doPrint(Polyad polyad, State state, boolean printIt) {
-        if (printIt && state.isRestrictedIO()) {
-            polyad.setResult(QDLNull.getInstance());
-            polyad.setResultType(Constant.NULL_TYPE);
-            polyad.setEvaluated(true);
-            return;
-        }
-        String result = "";
-        boolean prettyPrintForStems = false;
-        if (polyad.getArgCount() != 0) {
-            Object temp = null;
-            temp = polyad.evalArg(0, state);
-            checkNull(temp, polyad.getArgAt(0));
-
-            // null ok here. Means undefined variable
-            if (polyad.getArgCount() == 2) {
-                // assume pretty print for stems.
-                Object flag = polyad.evalArg(1, state);
-                checkNull(flag, polyad.getArgAt(1));
-                if (flag instanceof Boolean) {
-                    prettyPrintForStems = (Boolean) flag;
-                }
-            }
-            if (temp == null || temp instanceof QDLNull) {
-                if (State.isPrintUnicode()) {
-                    result = "∅";
-                } else {
-                    result = "null";
-                }
-
-            } else {
-                if (temp instanceof StemVariable) {
-                    StemVariable s = ((StemVariable) temp);
-                    if (prettyPrintForStems) {
-
-                        result = ((StemVariable) temp).toString(1);
-                    } else {
-                        result = temp.toString();
-                    }
-                } else {
-                    if (temp instanceof BigDecimal) {
-                        result = InputFormUtil.inputForm((BigDecimal) temp);
-
-                    } else {
-                        if (State.isPrintUnicode() && temp instanceof Boolean) {
-                            result = ((Boolean) temp) ? "⊤" : "⊥";
-                        } else {
-                            result = temp.toString();
-                        }
-                    }
-                }
-            }
-        }
-
-        if (printIt) {
-            state.getIoInterface().println(result);
-            //System.out.println(result);
-        }
-        if (polyad.getArgCount() == 0) {
-            polyad.setResult(QDLNull.getInstance());
-            polyad.setResultType(Constant.NULL_TYPE);
-        } else {
-            if (printIt) {
-                polyad.setResult(polyad.getArgAt(0).getResult());
-                polyad.setResultType(polyad.getArgAt(0).getResultType());
-
-            } else {
-                polyad.setResult(result);
-                polyad.setResultType(Constant.STRING_TYPE);
-            }
-        }
-        polyad.setEvaluated(true);
-    }
 
     protected void doRMDir(Polyad polyad, State state) {
         if (0 == polyad.getArgCount()) {

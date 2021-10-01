@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.config;
 
-import edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -198,7 +198,7 @@ public class QDLConfigurationLoaderUtils {
                             if (qmc.isImportOnStart()) {
 //                                try {
                                     // also easy is to have QDL do the import rather than doing brain surgery on its state.
-                                    interpreter.execute(ControlEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
+                                    interpreter.execute(SystemEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
   //                              }catch (Throwable t){
     //                                  failedModules = failedModules + (failedModules.length()==0?"":",") + uri.toString();
       //                          }

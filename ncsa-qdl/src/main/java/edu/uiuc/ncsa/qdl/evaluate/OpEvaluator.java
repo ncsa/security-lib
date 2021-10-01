@@ -114,6 +114,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             NOT, NOT2,
             REGEX_MATCH, REGEX_MATCH2};
 
+    @Override
+    public String getNamespace() {
+        throw new NotImplementedException("namespaces for operators not supported");
+    }
 
     public boolean isMathOperator(String x) {
         for (String op : ALL_MATH_OPS) {

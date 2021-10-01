@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.evaluate.ControlEvaluator.*;
+import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>

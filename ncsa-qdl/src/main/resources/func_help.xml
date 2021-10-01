@@ -56,7 +56,7 @@ See also: decode_b64
     <entry id="head">
         <body>
             <![CDATA[
-head(target, delim[,is_regex]) - Return up to delim in the
+head(target, delim{,is_regex}) - Return up to delim in the
                  target. Both of the first arguments
                  may be conformable stems. The result is always conformable to
                  target.
@@ -75,7 +75,7 @@ See also: tail
     <entry id="tail">
         <body>
             <![CDATA[
-tail(target, delim[,is_regex]) - Return from after the last
+tail(target, delim{,is_regex}) - Return from after the last
                  delim in the target to the end of the string.
                  Both of the first arguments may be conformable stems.
                  The result is always conformable to target.
@@ -272,8 +272,8 @@ See also: exclude_keys
     <entry id="n">
         <body>
             <![CDATA[
-n(n0,n1,...[, values.]) - make a stem list whose values are 0,..., n-1
-n(dim.[,value | values.]) - make a list with dimension dim.
+n(n0,n1,...{, values.}) - make a stem list whose values are 0,..., n-1
+n(dim.{,value | values.}) - make a list with dimension dim.
 Note: This is extremely useful in certain looping constructs.
 See also: shuffle(n) which also creates the same list of integers, but in
           random order.
@@ -595,11 +595,24 @@ See also: remap
     <entry id="set_default">
         <body>
             <![CDATA[
-set_default(stem., scalar) - sets the default value for this stem to the value
-                             of scalar.
+set_default(arg., scalar | stem.) - sets the default value for arg. to the value
+                             of scalar or stem.
 Note: The default value is not returned in any key operations, so setting the
       default for a new stem and using the keys() function on it returns an
       empty list, for instance.
+Returns the old default value (if any) or null.
+
+E.g.
+The following are equivalent
+  b. := {*:[2,4]};
+
+Or
+
+  set_default(c., [2,4])
+null
+
+The first creates the variable b., the second creates the variable c. and
+tells you there was no previous default set.
                 ]]>
         </body>
     </entry>
@@ -640,7 +653,7 @@ Note: This does not remove the arguments from the symbol table.
     <entry id="unbox">
         <body>
             <![CDATA[
-unbox(arg. [, safeModeOn]) - takes the argument (a stem) and turns each element
+unbox(arg.{, safeModeOn}) - takes the argument (a stem) and turns each element
                              by (non-integer) key into a variable.
                              safeModeOn (default is true) will NOT overwrite
                              any variables in the current workspace, AND it will
@@ -1175,7 +1188,7 @@ parameters with integers, the second lets you use any list and iterate
 over the values
 Meth0d #1:
 ----------
-for_next(var, stop_value [,start_value, increment])
+for_next(var, stop_value {,start_value, increment})
         var - the variable to be used. As the loop is executed, this value will
               change.
  stop_value - the final value for the loop. When the variable acquires this value,
@@ -1390,7 +1403,7 @@ tokenize(arg, delimiter) - tokenize a string or stem of strings using
        arg - the string to tokenize
        delimiter - either the delimiter or if the last argument is true,
 
-tokenize(target, arg[, use_regex]) - tokenize a string or stem of strings
+tokenize(target, arg{, use_regex}) - tokenize a string or stem of strings
                            using the given regex
     target - the string to tokenize
        arg - either the delimiter (use_regex == false) or a regular expression
@@ -1906,7 +1919,7 @@ See also: Reference manual on ^
     <entry id="join">
             <body>
                 <![CDATA[
-join(x., y.[, axis]) - join two stems together along a given axis.
+join(x., y.{, axis}) - join two stems together along a given axis.
 See also: union or the ~ operator. Those are special cases of
 join(x., y., 0 ) == x.~y. == join(x., y.)
 Omitting axis means use axis 0,
@@ -1962,7 +1975,7 @@ This means there are three separate indices.
     <entry id="query">
             <body>
                 <![CDATA[
-query(arg., query_string [, return_indices]) -- do a query on a stem using
+query(arg., query_string{,return_indices}) -- do a query on a stem using
             JSON Path syntax.
           arg. - the stem to search
   query_string - a valid JSON Path query string as per
@@ -1972,9 +1985,9 @@ Returns a list.
 
 This allows you to query stems using the standard query language in JSON.
 You supply a stem and a query. Note that the query is a string since 
-  In section 2 of the above specification is a JSON object. If you import
-  this into the workspace as the stem variable my_json., then here are
-  a few examples:
+In section 2 of the above specification is a JSON object. If you import
+this into the workspace as the stem variable my_json., then here are
+a few examples:
 
 E.g. 1: getting a result set
    query(test., '$..book[?(@.isbn)]'); // get books with an isbn number

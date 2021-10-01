@@ -318,7 +318,7 @@ public abstract class VariableState extends NamespaceAwareState {
             v = st.resolveValue(variableName, startIndex);
             //v = st.resolveValue(variableName, ((SymbolStack)st).getParentTables().size()-1);
             if(0<startIndex  && v == null){
-                throw new IntrinsicViolation("cannot access '" + variableName+"'");
+                throw new IntrinsicViolation("no value for '" + variableName+"'");
             }
         } else {
             st = getSymbolStack().getRightST(variableName);
@@ -346,6 +346,9 @@ public abstract class VariableState extends NamespaceAwareState {
 
         switch (op) {
             case OP_GET:
+                if(v==null && hasSuperState()){
+                    v = getSuperState().getValue(variableName);
+                }
                 return v;
             case OP_SET:
                 st.setValue(variableName, value);

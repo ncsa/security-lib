@@ -24,6 +24,32 @@ import java.util.*;
  * on 2/2/20 at  6:37 AM
  */
 public abstract class AbstractState implements StateInterface, Logable {
+
+    public State getSuperState() {
+        return superState;
+    }
+
+    public void setSuperState(State superState) {
+        this.superState = superState;
+    }
+
+    State superState = null;
+
+    public boolean hasSuperState(){
+        return superState != null;
+    }
+
+    public boolean isSuperStateReadOnly() {
+        return superStateReadOnly;
+    }
+
+    public void setSuperStateReadOnly(boolean superStateReadOnly) {
+        this.superStateReadOnly = superStateReadOnly;
+    }
+
+    boolean superStateReadOnly = true;
+
+
     public static final String  PRIVATE_PREFIX ="__";
 
     public static boolean isPrivate(String x){

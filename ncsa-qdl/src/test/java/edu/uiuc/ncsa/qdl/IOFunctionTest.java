@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -29,7 +30,7 @@ public class IOFunctionTest extends AbstractQDLTester {
      
     public void testSay() throws Exception {
         State state = testUtils.getNewState();
-        Polyad polyad = new Polyad(IOEvaluator.SAY_FUNCTION);
+        Polyad polyad = new Polyad(SystemEvaluator.SAY_FUNCTION);
         String testString = "These are not the droids you are looking for";
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
         polyad.getArguments().add(prompt);

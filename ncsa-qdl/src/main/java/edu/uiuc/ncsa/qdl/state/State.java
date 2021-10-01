@@ -258,12 +258,12 @@ public class State extends FunctionState implements QDLConstants {
         systemConstants.put(URI_FIELDS, uriFields);
 
         StemVariable logLevels = new StemVariable();
-        logLevels.put(SYS_LOG_NONE, ControlEvaluator.LOG_LEVEL_NONE);
-        logLevels.put(SYS_LOG_TRACE, ControlEvaluator.LOG_LEVEL_TRACE);
-        logLevels.put(SYS_LOG_INFO, ControlEvaluator.LOG_LEVEL_INFO);
-        logLevels.put(SYS_LOG_WARN, ControlEvaluator.LOG_LEVEL_WARN);
-        logLevels.put(SYS_LOG_ERROR, ControlEvaluator.LOG_LEVEL_ERROR);
-        logLevels.put(SYS_LOG_SEVERE, ControlEvaluator.LOG_LEVEL_SEVERE);
+        logLevels.put(SYS_LOG_NONE, SystemEvaluator.LOG_LEVEL_NONE);
+        logLevels.put(SYS_LOG_TRACE, SystemEvaluator.LOG_LEVEL_TRACE);
+        logLevels.put(SYS_LOG_INFO, SystemEvaluator.LOG_LEVEL_INFO);
+        logLevels.put(SYS_LOG_WARN, SystemEvaluator.LOG_LEVEL_WARN);
+        logLevels.put(SYS_LOG_ERROR, SystemEvaluator.LOG_LEVEL_ERROR);
+        logLevels.put(SYS_LOG_SEVERE, SystemEvaluator.LOG_LEVEL_SEVERE);
         systemConstants.put(SYS_LOG_LEVELS, logLevels);
 
     }

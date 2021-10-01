@@ -9,9 +9,6 @@ import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.util.TreeSet;
-
-import static edu.uiuc.ncsa.qdl.evaluate.MathEvaluator.MATH_FQ;
 
 /**
  * Class for transcendental functions, like log, exponentiation etc.
@@ -19,103 +16,86 @@ import static edu.uiuc.ncsa.qdl.evaluate.MathEvaluator.MATH_FQ;
  * on 3/18/21 at  6:27 AM
  */
 public class TMathEvaluator extends AbstractFunctionEvaluator {
+    public static final String TMATH_NAMESPACE = "tmath";
+    @Override
+    public String getNamespace() {
+        return TMATH_NAMESPACE;
+    }
+
     public static final int TMATH_FUNCTION_BASE_VALUE = 7000;
 
     public static final String PI = "pi";
     public static final String PI2 = "π";
-    public static final String FQ_PI = MATH_FQ + PI;
-    public static final String FQ_PI2 = MATH_FQ + PI2;
     public static final int PI_TYPE = 1 + TMATH_FUNCTION_BASE_VALUE;
 
 
     public static final String COSINE = "cos";
-    public static final String FQ_COSINE = MATH_FQ + COSINE;
     public static final int COSINE_TYPE = 2 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_COSINE = "acos";
-    public static final String FQ_ARC_COSINE = MATH_FQ + ARC_COSINE;
     public static final int ARC_COSINE_TYPE = 3 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String SINE = "sin";
-    public static final String FQ_SINE = MATH_FQ + SINE;
     public static final int SINE_TYPE = 4 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_SINE = "asin";
-    public static final String FQ_ARC_SINE = MATH_FQ + ARC_SINE;
     public static final int ARC_SINE_TYPE = 5 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String TANGENT = "tan";
-    public static final String FQ_TANGENT = MATH_FQ + TANGENT;
     public static final int TANGENT_TYPE = 6 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_TANGENT = "atan";
-    public static final String FQ_ARC_TANGENT = MATH_FQ + ARC_TANGENT;
     public static final int ARC_TANGENT_TYPE = 7 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String SINH = "sinh";
-    public static final String FQ_SINH = MATH_FQ + SINH;
     public static final int SINH_TYPE = 8 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_SINH = "asinh";
-    public static final String FQ_ARC_SINH = MATH_FQ + ARC_SINH;
     public static final int ARC_SINH_TYPE = 9 + TMATH_FUNCTION_BASE_VALUE;
 
 
     public static final String COSH = "cosh";
-    public static final String FQ_COSH = MATH_FQ + COSH;
     public static final int COSH_TYPE = 10 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_COSH = "acosh";
-    public static final String FQ_ARC_COSH = MATH_FQ + ARC_COSH;
     public static final int ARC_COSH_TYPE = 11 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String TANH = "tanh";
-    public static final String FQ_TANH = MATH_FQ + TANH;
     public static final int TANH_TYPE = 12 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String ARC_TANH = "atanh";
-    public static final String FQ_ARC_TANH = MATH_FQ + ARC_TANH;
     public static final int ARC_TANH_TYPE = 14 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String LOG_E = "ln";
-    public static final String FQ_LOG_E = MATH_FQ + LOG_E;
     public static final int LOG_E_TYPE = 15 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String LOG_10 = "log";
-    public static final String FQ_LOG_10 = MATH_FQ + LOG_10;
     public static final int LOG_10__TYPE = 16 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String EXP = "exp";
-    public static final String FQ_EXP = MATH_FQ + EXP;
     public static final int EXP_TYPE = 17 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String N_ROOT = "nroot";
-    public static final String FQ_N_ROOT = MATH_FQ + N_ROOT;
     public static final int N_ROOT_TYPE = 18 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String FLOOR = "floor";
-    public static final String FQ_FLOOR = MATH_FQ + FLOOR;
     public static final int FLOOR_TYPE = 19 + TMATH_FUNCTION_BASE_VALUE;
 
     public static final String CEILING = "ceiling";
-    public static final String FQ_CEILING = MATH_FQ + CEILING;
     public static final int CEILING_TYPE = 20 + TMATH_FUNCTION_BASE_VALUE;
 
-    public static String FUNC_NAMES[] = new String[]{
-            COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
-            ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
-            N_ROOT,  FLOOR, CEILING
-    };
-    public static String FQ_FUNC_NAMES[] = new String[]{
-            FQ_COSINE, FQ_SINE, FQ_TANGENT, FQ_LOG_10, FQ_LOG_E, FQ_EXP,
-            FQ_SINH, FQ_COSH, FQ_TANH,
-            FQ_ARC_COSINE, FQ_ARC_SINE, FQ_ARC_TANGENT, FQ_ARC_COSH, FQ_ARC_SINH, FQ_ARC_TANH, FQ_PI, FQ_PI2,
-            FQ_N_ROOT, FQ_FLOOR,  FQ_CEILING
-    };
+
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames =  new String[]{
+                        COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
+                        ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
+                        N_ROOT,  FLOOR, CEILING
+                };
+        }
+        return fNames;
     }
 
     public static BigDecimal getPi(MathContext mathContext) {
@@ -154,73 +134,55 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case SINE:
-            case FQ_SINE:
                 doTranscendentalMath(polyad, SINE, state);
                 return true;
             case ARC_SINE:
-            case FQ_ARC_SINE:
                 doTranscendentalMath(polyad, ARC_SINE, state);
                 return true;
             case COSINE:
-            case FQ_COSINE:
                 doTranscendentalMath(polyad, COSINE, state);
                 return true;
             case ARC_COSINE:
-            case FQ_ARC_COSINE:
                 doTranscendentalMath(polyad, ARC_COSINE, state);
                 return true;
             case TANGENT:
-            case FQ_TANGENT:
                 doTranscendentalMath(polyad, TANGENT, state);
                 return true;
             case ARC_TANGENT:
-            case FQ_ARC_TANGENT:
                 doTranscendentalMath(polyad, ARC_TANGENT, state);
                 return true;
             case SINH:
-            case FQ_SINH:
                 doTranscendentalMath(polyad, SINH, state);
                 return true;
             case ARC_SINH:
-            case FQ_ARC_SINH:
                 doTranscendentalMath(polyad, ARC_SINH, state);
                 return true;
             case COSH:
-            case FQ_COSH:
                 doTranscendentalMath(polyad, COSH, state);
                 return true;
             case ARC_COSH:
-            case FQ_ARC_COSH:
                 doTranscendentalMath(polyad, ARC_COSH, state);
                 return true;
             case TANH:
-            case FQ_TANH:
                 doTranscendentalMath(polyad, TANH, state);
                 return true;
             case ARC_TANH:
-            case FQ_ARC_TANH:
                 doTranscendentalMath(polyad, ARC_TANH, state);
                 return true;
             case LOG_10:
-            case FQ_LOG_10:
                 doTranscendentalMath(polyad, LOG_10, state);
                 return true;
             case LOG_E:
-            case FQ_LOG_E:
                 doTranscendentalMath(polyad, LOG_E, state);
                 return true;
             case EXP:
-            case FQ_EXP:
                 doTranscendentalMath(polyad, EXP, true, state);
                 return true;
             case PI:
             case PI2:
-            case FQ_PI:
-            case FQ_PI2:
                 computePi(polyad, state);
                 return true;
             case N_ROOT:
-            case FQ_N_ROOT:
                 doNRoot(polyad, state);
                 return true;
             case FLOOR:
@@ -372,73 +334,46 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     public int getType(String name) {
         switch (name) {
             case COSINE:
-            case FQ_COSINE:
                 return COSINE_TYPE;
             case ARC_COSINE:
-            case FQ_ARC_COSINE:
                 return ARC_COSINE_TYPE;
             case SINE:
-            case FQ_SINE:
                 return SINE_TYPE;
             case ARC_SINE:
-            case FQ_ARC_SINE:
                 return ARC_SINE_TYPE;
             case TANGENT:
-            case FQ_TANGENT:
                 return TANGENT_TYPE;
             case ARC_TANGENT:
-            case FQ_ARC_TANGENT:
                 return ARC_TANGENT_TYPE;
             case LOG_10:
-            case FQ_LOG_10:
                 return LOG_10__TYPE;
             case LOG_E:
-            case FQ_LOG_E:
                 return LOG_E_TYPE;
             case EXP:
-            case FQ_EXP:
                 return EXP_TYPE;
             case SINH:
-            case FQ_SINH:
                 return SINH_TYPE;
             case ARC_SINH:
-            case FQ_ARC_SINH:
                 return ARC_SINH_TYPE;
             case COSH:
-            case FQ_COSH:
                 return COSH_TYPE;
             case ARC_COSH:
-            case FQ_ARC_COSH:
                 return ARC_COSH_TYPE;
             case TANH:
-            case FQ_TANH:
                 return TANH_TYPE;
             case ARC_TANH:
-            case FQ_ARC_TANH:
                 return ARC_TANH_TYPE;
             case N_ROOT:
-            case FQ_N_ROOT:
                 return N_ROOT_TYPE;
             case FLOOR:
-            case FQ_FLOOR:
                 return FLOOR_TYPE;
             case CEILING:
-            case FQ_CEILING:
                 return CEILING_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
 
-    @Override
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] fnames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
 
-        for (String key : fnames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     private BigDecimal evaluateBD(BigDecimal x, MathContext mathContext, String op) {
         return evaluateBD(x, mathContext, false, op);

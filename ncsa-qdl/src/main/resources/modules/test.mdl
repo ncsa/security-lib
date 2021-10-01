@@ -1,16 +1,18 @@
 module[
    'a:/b','X'
    ][
-   >> Test module with two public variables and three functions.
+   >> Test module with public variables and three functions.
    u := 2;
    v := 3;
-   __private := 4;
+   __private := is_defined(zz)?zz:4;
    __w. := [;5];
+   matrix. := n(3,4,[;12]);
    times(x,y)->x*y;
    f(x,y)->times(x,u)+times(y,v);
    __f(x,y)->__w.*f(x,y)/__private;
    g()->u+v;
    get_private()->__private;
+   set_private(x)->[__private := x;];
    h(x,y)->__f(x,y);
   ];
   /*

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.ListEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
@@ -363,7 +364,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : StemEvaluator.LIST_SUBSET + " did not create matrix transpose.";
+        assert getBooleanValue("ok", state) : ListEvaluator.LIST_SUBSET + " did not create matrix transpose.";
     }
     /*
      b.OA2_foo := 'a'; b.OA2_woof := 'b'; b.OA2_arf := 'c';  b.fnord := 'd';
@@ -377,7 +378,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
            QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
            interpreter.execute(script.toString());
-           assert getBooleanValue("ok", state) : StemEvaluator.LIST_SUBSET + " did not create matrix transpose.";
+           assert getBooleanValue("ok", state) : ListEvaluator.LIST_SUBSET + " did not create matrix transpose.";
        }
 
     public void testExcludeKeys() throws Exception {
@@ -662,8 +663,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        Long defaultValue = (Long) polyad.getResult();
-        assert defaultValue.equals(expectedResult);
+        assert polyad.getResult() == QDLNull.getInstance();
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
     }
@@ -686,16 +686,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.addArgument(arg); // set second to be a stem so it fails
-        boolean bad = true;
-        try {
-            polyad.evaluate(state);
-        } catch (IllegalArgumentException x) {
-            bad = false;
-        }
-        if(bad){
-            assert false : "Could set second argument in " + StemEvaluator.SET_DEFAULT;
-        }
-
+       polyad.evaluate(state); // Should work.
+        assert polyad.getResult() == QDLNull.getInstance();
     }
 
 
@@ -710,14 +702,43 @@ public class StemFunctionsTest extends AbstractQDLTester {
         polyad.addArgument(arg2);
         polyad.evaluate(state);
         StemVariable sourceStem = (StemVariable) state.getSymbolStack().resolveValue("sourceStem.");
-        Long defaultValue = (Long) polyad.getResult();
-        assert defaultValue.equals(expectedResult);
+        assert polyad.getResult() == QDLNull.getInstance();
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
         assert !sourceStem.containsKey("foo");
 
     }
 
+    public void testSetDefault() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "ok := null == set_default(ϱ., [1,2]);"); // old value is null
+         addLine(script, "ok1 := reduce(⊗∧, [1,2]== set_default(ϱ., [3,4]));");
+         addLine(script, "ok2 := reduce(⊗∧, [3,4]== ϱ.7.8);");// random element returns default
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "set_default did not return null";
+         assert getBooleanValue("ok1", state) : "set_default did not return previous default";
+         assert getBooleanValue("ok2", state) : "set_default did not set default for stem";
+     }
+
+    /**
+     * Sets a default and shows that for a complex stem it works on each element
+     * @throws Throwable
+     */
+    public void testEvaluteSetDefault() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "set_default(ϱ., [2,3]);"); // set default
+         addLine(script, "a. := [[0,0],[0,1],[0,2],[2,0],[2,1],[2,2]];"); // target of operation
+         addLine(script, "result. := [[2,3],[2,4],[2,5],[4,3],[4,4],[4,5]];"); // expected result
+         addLine(script, "ok := reduce(⊗∧,reduce(⊗∧, result.== a. + ϱ.));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "set_default did not propagte on addition";
+     }
     /**
      * Regression test for converting stems to JSON where there is a stem list of stems.
      * Extra elements were being added.
@@ -1825,7 +1846,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : StemEvaluator.LIST_SUBSET + " did not create matrix transpose.";
+        assert getBooleanValue("ok", state) : ListEvaluator.LIST_SUBSET + " did not create matrix transpose.";
     }
 
     /*

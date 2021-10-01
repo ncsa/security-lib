@@ -11,7 +11,6 @@ import edu.uiuc.ncsa.security.core.util.StringUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
 
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.*;
 
@@ -28,180 +27,128 @@ functions rather than a massive single class. So the inheritence is just encapsu
  */
 public class StringEvaluator extends AbstractFunctionEvaluator {
     public static final String STRING_NAMESPACE = "string";
+
+    @Override
+    public String getNamespace() {
+        return STRING_NAMESPACE;
+    }
+
     public static final String STRING_FQ = STRING_NAMESPACE + ImportManager.NS_DELIMITER;
     public static final int STRING_FUNCTION_BASE_VALUE = 3000;
+
     public static final String CONTAINS = "contains";
-    public static final String SYS_CONTAINS = STRING_FQ + CONTAINS;
     public static final int CONTAINS_TYPE = 1 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_LOWER = "to_lower";
-    public static final String SYS_TO_LOWER = STRING_FQ + TO_LOWER;
     public static final int TO_LOWER_TYPE = 2 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_UPPER = "to_upper";
-    public static final String SYS_TO_UPPER = STRING_FQ + TO_UPPER;
     public static final int TO_UPPER_TYPE = 3 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TRIM = "trim";
-    public static final String SYS_TRIM = STRING_FQ + TRIM;
     public static final int TRIM_TYPE = 4 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INSERT = "insert";
-    public static final String SYS_INSERT = STRING_FQ + INSERT;
     public static final int INSERT_TYPE = 5 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String SUBSTRING = "substring";
-    public static final String SYS_SUBSTRING = STRING_FQ + SUBSTRING;
     public static final int SUBSTRING_TYPE = 6 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String REPLACE = "replace";
-    public static final String SYS_REPLACE = STRING_FQ + REPLACE;
     public static final int REPLACE_TYPE = 7 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String INDEX_OF = "index_of";
-    public static final String SYS_INDEX_OF = STRING_FQ + INDEX_OF;
     public static final int INDEX_OF_TYPE = 8 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TOKENIZE = "tokenize";
-    public static final String SYS_TOKENIZE = STRING_FQ + TOKENIZE;
     public static final int TOKENIZE_TYPE = 9 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String ENCODE = "vencode";
-    public static final String SYS_ENCODE = STRING_FQ + ENCODE;
     public static final int ENCODE_TYPE = 10 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DECODE = "vdecode";
-    public static final String SYS_DECODE = STRING_FQ + DECODE;
     public static final int DECODE_TYPE = 11 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DETOKENIZE = "detokenize";
-    public static final String SYS_DETOKENIZE = STRING_FQ + DETOKENIZE;
     public static final int DETOKENIZE_TYPE = 12 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TO_URI = "to_uri";
-    public static final String SYS_TO_URI = STRING_FQ + TO_URI;
     public static final int TO_URI_TYPE = 13 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String FROM_URI = "from_uri";
-    public static final String SYS_FROM_URI = STRING_FQ + FROM_URI;
     public static final int FROM_URI_TYPE = 14 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String CAPUT = "head";
-    public static final String SYS_CAPUT = STRING_FQ + CAPUT;
     public static final int CAPUT_TYPE = 15 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String DIFF = "differ_at";
-    public static final String SYS_DIFF = STRING_FQ + DIFF;
     public static final int DIFF_TYPE = 16 + STRING_FUNCTION_BASE_VALUE;
 
     public static final String TAIL = "tail";
-    public static final String SYS_TAIL = STRING_FQ + TAIL;
     public static final int TAIL_TYPE = 17 + STRING_FUNCTION_BASE_VALUE;
 
-    public static String FUNC_NAMES[] = new String[]{
-            CONTAINS,
-            TAIL,
-            DIFF,
-            TO_LOWER,
-            TO_UPPER,
-            TRIM,
-            INSERT,
-            SUBSTRING,
-            REPLACE,
-            INDEX_OF,
-            CAPUT,
-            TOKENIZE,
-            DETOKENIZE,
-            ENCODE,
-            DECODE,
-            TO_URI,
-            FROM_URI};
-    public static String FQ_FUNC_NAMES[] = new String[]{
-            SYS_CONTAINS,
-            SYS_DIFF,
-            SYS_TAIL,
-            SYS_TO_LOWER,
-            SYS_TO_UPPER,
-            SYS_TRIM,
-            SYS_INSERT,
-            SYS_SUBSTRING,
-            SYS_REPLACE,
-            SYS_INDEX_OF,
-            SYS_CAPUT,
-            SYS_TOKENIZE,
-            SYS_DETOKENIZE,
-            SYS_ENCODE,
-            SYS_DECODE,
-            SYS_TO_URI,
-            SYS_FROM_URI};
-
-    public TreeSet<String> listFunctions(boolean listFQ) {
-        TreeSet<String> names = new TreeSet<>();
-        String[] funcNames = listFQ ? FQ_FUNC_NAMES : FUNC_NAMES;
-        for (String key : funcNames) {
-            names.add(key + "()");
-        }
-        return names;
-    }
 
     @Override
     public String[] getFunctionNames() {
-        return FUNC_NAMES;
+        if(fNames == null){
+            fNames = new String[]{
+                        CONTAINS,
+                        TAIL,
+                        DIFF,
+                        TO_LOWER,
+                        TO_UPPER,
+                        TRIM,
+                        INSERT,
+                        SUBSTRING,
+                        REPLACE,
+                        INDEX_OF,
+                        CAPUT,
+                        TOKENIZE,
+                        DETOKENIZE,
+                        ENCODE,
+                        DECODE,
+                        TO_URI,
+                        FROM_URI};
+        }
+        return fNames;
     }
 
     @Override
     public int getType(String name) {
         switch (name) {
             case CONTAINS:
-            case SYS_CONTAINS:
                 return CONTAINS_TYPE;
             case TO_LOWER:
-            case SYS_TO_LOWER:
                 return TO_LOWER_TYPE;
             case TO_UPPER:
-            case SYS_TO_UPPER:
                 return TO_UPPER_TYPE;
             case SUBSTRING:
-            case SYS_SUBSTRING:
                 return SUBSTRING_TYPE;
             case REPLACE:
-            case SYS_REPLACE:
                 return REPLACE_TYPE;
             case TRIM:
-            case SYS_TRIM:
                 return TRIM_TYPE;
             case INSERT:
-            case SYS_INSERT:
                 return INSERT_TYPE;
             case INDEX_OF:
-            case SYS_INDEX_OF:
                 return INDEX_OF_TYPE;
             case CAPUT:
-            case SYS_CAPUT:
                 return CAPUT_TYPE;
             case TAIL:
-            case SYS_TAIL:
                 return TAIL_TYPE;
             case TOKENIZE:
-            case SYS_TOKENIZE:
                 return TOKENIZE_TYPE;
             case DETOKENIZE:
-            case SYS_DETOKENIZE:
                 return DETOKENIZE_TYPE;
             case ENCODE:
-            case SYS_ENCODE:
                 return ENCODE_TYPE;
             case DECODE:
-            case SYS_DECODE:
                 return DECODE_TYPE;
             case TO_URI:
-            case SYS_TO_URI:
                 return TO_URI_TYPE;
             case FROM_URI:
-            case SYS_FROM_URI:
                 return FROM_URI_TYPE;
             case DIFF:
-            case SYS_DIFF:
                 return DIFF_TYPE;
         }
         return UNKNOWN_VALUE;
@@ -211,71 +158,54 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case CONTAINS:
-            case SYS_CONTAINS:
                 doContains(polyad, state);
                 return true;
             case TRIM:
-            case SYS_TRIM:
                 doTrim(polyad, state);
                 return true;
             case CAPUT:
-            case SYS_CAPUT:
                 doCaput(polyad, state);
                 return true;
             case TAIL:
-            case SYS_TAIL:
                 doTail(polyad, state);
                 return true;
             case INDEX_OF:
-            case SYS_INDEX_OF:
                 doIndexOf(polyad, state);
                 return true;
             case TO_LOWER:
-            case SYS_TO_LOWER:
                 doSwapCase(polyad, state, true);
                 return true;
             case TO_UPPER:
-            case SYS_TO_UPPER:
                 doSwapCase(polyad, state, false);
                 return true;
             case REPLACE:
-            case SYS_REPLACE:
                 doReplace(polyad, state);
                 return true;
             case INSERT:
-            case SYS_INSERT:
                 doInsert(polyad, state);
                 return true;
             case TOKENIZE:
-            case SYS_TOKENIZE:
                 doTokenize(polyad, state);
                 return true;
             case DETOKENIZE:
-            case SYS_DETOKENIZE:
                 doDetokeninze(polyad, state);
                 return true;
             case SUBSTRING:
-            case SYS_SUBSTRING:
                 doSubstring(polyad, state);
                 return true;
             case ENCODE:
-            case SYS_ENCODE:
                 doEncode(polyad, state);
                 return true;
             case DECODE:
-            case SYS_DECODE:
                 doDecode(polyad, state);
                 return true;
             case TO_URI:
-            case SYS_TO_URI:
                 doToURI(polyad, state);
                 return true;
             case FROM_URI:
-            case SYS_FROM_URI:
                 doFromURI(polyad, state);
                 return true;
             case DIFF:
-            case SYS_DIFF:
                 doDiff(polyad, state);
                 return true;
         }

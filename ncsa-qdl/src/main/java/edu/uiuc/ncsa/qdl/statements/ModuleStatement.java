@@ -38,6 +38,10 @@ public class ModuleStatement implements Statement {
     public Object evaluate(State state) {
         // Only use local state at this point.
         State localState = state.newModuleState();
+        if(state.hasSuperState()){
+            localState.setSuperState(state);
+            localState.setSuperStateReadOnly(state.isSuperStateReadOnly());
+        }
         boolean restrictedio = state.isRestrictedIO();
         // don't print stuff when creating the module.
         state.setRestrictedIO(true);
@@ -49,6 +53,7 @@ public class ModuleStatement implements Statement {
         QDLModule module = new QDLModule();
         module.setNamespace(getNamespace());
         module.setAlias(getAlias());
+        localState.setSuperState(null); // back out of it
         module.setState(localState);
         module.setTemplate(true);
         module.setModuleStatement(this);

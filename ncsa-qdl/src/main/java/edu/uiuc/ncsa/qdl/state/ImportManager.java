@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.MathEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 
 import java.io.Serializable;
@@ -20,9 +17,12 @@ import java.util.List;
 public class ImportManager implements Serializable {
     public static String[] RESERVED_ALIAS = new String[]{
             MathEvaluator.MATH_NAMESPACE,
-            AbstractFunctionEvaluator.SYS_NAMESPACE,
+            TMathEvaluator.TMATH_NAMESPACE,
+            SystemEvaluator.SYS_NAMESPACE,
             IOEvaluator.IO_NAMESPACE,
-            StemEvaluator.STEM_NAMESPACE
+            StemEvaluator.STEM_NAMESPACE,
+            StringEvaluator.STRING_NAMESPACE,
+            ListEvaluator.LIST_NAMESPACE
     };
 
     protected void checkAlias(String alias) {

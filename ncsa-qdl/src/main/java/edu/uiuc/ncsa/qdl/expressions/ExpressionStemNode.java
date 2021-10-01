@@ -234,7 +234,7 @@ The following are working:
                                 targetKey = v.getResult().toString();
                             }
                         } else {
-                            throw new IllegalArgumentException("error: could not determine key for stem");
+                            throw new IllegalArgumentException("could not determine key for stem");
                         }
 
                     } else {
@@ -256,7 +256,7 @@ The following are working:
 
             // This means the user passed in something as the left most argument that
             // cannot be a stem, e.g. (1).(2).
-            throw new IllegalStateException("Error: left hand argument not a valid stem.");
+            throw new IllegalStateException("left hand argument not a valid stem.");
         }
         StatementWithResultInterface swri = getLeftArg();
 

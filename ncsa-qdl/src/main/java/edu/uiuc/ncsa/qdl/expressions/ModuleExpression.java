@@ -35,6 +35,28 @@ public class ModuleExpression extends ExpressionImpl {
 
     @Override
     public Object evaluate(State state) {
+        if (state.getMetaEvaluator().isSystemNS(getAlias())) {
+            // In this case, it is a built in function and there are no constants
+            // or variables defined in those modules.
+            if (getExpression() instanceof ConstantNode) {
+                throw new IllegalArgumentException("constant not found");
+            }
+            if (getExpression() instanceof VariableNode) {
+                throw new IllegalArgumentException("variable not found");
+            }
+            if (getExpression() instanceof Polyad) {
+                state.getMetaEvaluator().evaluate(getAlias(), (Polyad) getExpression(), state);
+            } else {
+                // Since this should not happen if the parser is working right, it implies
+                // that something in the parser changed and non-expressions are not
+                // being sent along.
+                throw new IllegalArgumentException("cannot evaluate expression '" + getExpression().getSourceCode() + "' in this module");
+            }
+            setResult(getExpression().getResult());
+            setResultType(getExpression().getResultType());
+            setEvaluated(true);
+            return getResult();
+        }
         if (!state.getImportManager().hasImports()) {
             throw new IllegalArgumentException("no modules have been imported");
         }
@@ -115,14 +137,14 @@ public class ModuleExpression extends ExpressionImpl {
         if (getExpression() instanceof VariableNode) {
             VariableNode vNode = (VariableNode) getExpression();
             String variableName = vNode.getVariableReference();
-            if(state.isPrivate(variableName) && !getModuleState(state).isDefined(variableName)){
+            if (state.isPrivate(variableName) && !getModuleState(state).isDefined(variableName)) {
                 // check that if this is private
                 throw new IntrinsicViolation("cannot set an intrinsic variable");
             }
-            if(getModuleState(state).isDefined(variableName)) {
+            if (getModuleState(state).isDefined(variableName)) {
                 State localState = getLocalState(state);
                 localState.setValue(variableName, newValue);
-            }else{
+            } else {
                 throw new IllegalArgumentException("Cannot define new variables in a module.");
             }
             return;
