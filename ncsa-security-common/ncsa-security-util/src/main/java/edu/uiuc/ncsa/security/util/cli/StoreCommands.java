@@ -330,6 +330,21 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     Identifier id = null;
+    public boolean hasID(){
+        return id != null;
+    }
+
+    /**
+     * Mutators for sub classes
+     * @return
+     */
+    public Identifier getID(){
+        return id;
+    }
+
+    public void setID(Identifier id){
+        this.id = id;
+    }
 
     public void clear_id(InputLine inputLine) {
         if (showHelp(inputLine)) {

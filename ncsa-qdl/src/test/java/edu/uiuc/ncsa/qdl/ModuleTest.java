@@ -813,4 +813,26 @@ cannot access '__a'
         assert getBooleanValue("ok", state) : "Could not access getter for private variable.";
         assert getBooleanValue("ok1", state) : "Could not access getter for private variable.";
     }
+    String javaTestModule = "edu.uiuc.ncsa.qdl.extensions.example.MyModule";
+    // Java module tests
+
+    /**
+     * Test that in the supplied sample class a fully qualified call to the method and
+     * variable works.
+      * @throws Throwable
+     */
+    public void testJavaFQAccessTest() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + javaTestModule + "', 'java') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "ok := 'ab' == X#concat('a','b');");
+        addLine(script, "ok1 := var_type(X#eg.)==constants().var_type.stem;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not access FQ java module function.";
+        assert getBooleanValue("ok1", state) : "Could not access FQ Java moduel variable.";
+    }
+
 }

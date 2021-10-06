@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.functions;
 
+import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.state.AbstractState;
 
 /**
@@ -11,7 +12,9 @@ public class FR_WithState {
     public AbstractState state;
     public boolean isExternalModule = false;
     public boolean isModule = false;
-
+    public boolean isJavaFunction(){
+        return functionRecord instanceof QDLFunctionRecord;
+    }
     @Override
     public String toString() {
         return "FR_WithState{" +

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -81,6 +82,12 @@ public class ESN2 extends ExpressionImpl {
         whittleIndices(indexList);
 
         Object r0 = leftArgs.get(leftArgs.size() - 1).evaluate(state);
+        if(r0 == null){
+            if(leftArgs.get(leftArgs.size() - 1) instanceof VariableNode){
+                throw new UnknownSymbolException("variable '"+  ((VariableNode)leftArgs.get(leftArgs.size() - 1)).getVariableReference()+ "' is undefined");
+            }
+            throw new IndexError("left argument is undefined");
+        }
         if (!(r0 instanceof StemVariable)) {
             throw new IllegalStateException("error: left argument must evaluate to be a stem ");
         }

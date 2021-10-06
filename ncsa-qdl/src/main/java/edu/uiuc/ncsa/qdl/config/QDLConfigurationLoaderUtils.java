@@ -233,9 +233,9 @@ public class QDLConfigurationLoaderUtils {
         for (Module m : loader.load()) {
             m.setTemplate(true);
             state.addModule(m); // done!
+            importedFQNames.add(m.getNamespace().toString());
             if (importASAP) {
                 state.getImportManager().addImport(m.getNamespace(), m.getAlias());
-                importedFQNames.add(m.getNamespace().toString());
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);

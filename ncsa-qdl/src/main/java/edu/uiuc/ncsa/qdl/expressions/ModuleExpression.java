@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -39,10 +41,14 @@ public class ModuleExpression extends ExpressionImpl {
             // In this case, it is a built in function and there are no constants
             // or variables defined in those modules.
             if (getExpression() instanceof ConstantNode) {
-                throw new IllegalArgumentException("constant not found");
+                ConstantNode cNode = (ConstantNode)getExpression();
+                setResult(cNode.getResult());
+                setResultType(cNode.getResultType());
+                setEvaluated(true);
+                return getResult();
             }
             if (getExpression() instanceof VariableNode) {
-                throw new IllegalArgumentException("variable not found");
+                throw new UnknownSymbolException("variable not found");
             }
             if (getExpression() instanceof Polyad) {
                 state.getMetaEvaluator().evaluate(getAlias(), (Polyad) getExpression(), state);
@@ -58,7 +64,7 @@ public class ModuleExpression extends ExpressionImpl {
             return getResult();
         }
         if (!state.getImportManager().hasImports()) {
-            throw new IllegalArgumentException("no modules have been imported");
+            throw new ImportException("module '" + getAlias() + "' not found");
         }
         // no module state means to look at global state to find the module state.
         if (getExpression() instanceof ModuleExpression) {

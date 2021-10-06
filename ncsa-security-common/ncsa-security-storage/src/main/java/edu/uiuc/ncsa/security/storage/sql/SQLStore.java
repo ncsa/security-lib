@@ -374,7 +374,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             } else {
                 searchString = "select " + attributes +
                         " from " + getTable().getFQTablename() +
-                        " where " + key + " regexp = ?";
+                        " where " + key + " regexp  ?";
             }
 
         } else {

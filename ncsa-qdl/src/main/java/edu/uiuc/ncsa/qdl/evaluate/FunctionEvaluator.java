@@ -120,7 +120,11 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         // arguments that are needed to unpack this.
         Object[] argList = new Object[polyad.getArgCount()];
         for (int i = 0; i < polyad.getArgCount(); i++) {
-            argList[i] = polyad.getArguments().get(i).evaluate(state);
+            if(polyad.getArguments().get(i) instanceof FunctionReferenceNode){
+                argList[i] = polyad.getArguments().get(i);
+            }else {
+                argList[i] = polyad.getArguments().get(i).evaluate(state);
+            }
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
@@ -183,7 +187,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             }
             return; // if it gets here, then the script worked, exit gracefully.
         }
-        if (frs.isExternalModule) {
+        if (frs.isJavaFunction()) {
             doJavaFunction(polyad, state, frs);
         } else {
             doFunctionEvaluation(polyad, state, frs);

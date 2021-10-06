@@ -1911,6 +1911,7 @@ public class WorkspaceCommands implements Logable {
                 sayi("     help - this menu");
                 sayi("     list - list all known functions. Allows display options.");
                 sayi("   system - list all known system functions. Allows display options.");
+                sayi("  -system - same as system.");
                 return RC_NO_OP;
             case "drop":
                 return _funcsDrop(inputLine);
@@ -1919,6 +1920,7 @@ public class WorkspaceCommands implements Logable {
             case "list":
                 return _funcsList(inputLine);
             case "system":
+            case "-system":
                 return _funcsListSystem(inputLine);
             case "edit":
                 return _doFuncEdit(inputLine);

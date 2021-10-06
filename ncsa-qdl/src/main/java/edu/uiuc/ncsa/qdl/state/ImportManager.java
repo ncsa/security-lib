@@ -27,11 +27,11 @@ public class ImportManager implements Serializable {
 
     protected void checkAlias(String alias) {
         if (alias == null || alias.isEmpty()) {
-            throw new ImportException("Error: the alias is empty or null.");
+            throw new ImportException("the alias is empty or null.");
         }
         for (String x : RESERVED_ALIAS) {
             if (alias.equals(x)) {
-                throw new ImportException("Error: the alias \"" + alias + "\" is reserved for system use.");
+                throw new ImportException("the alias \"" + alias + "\" is reserved for system use.");
             }
         }
     }

@@ -165,7 +165,7 @@ public class StemVariable extends HashMap<String, Object> {
             // a.b. := a.
             // This can work if the indices are accessed directly but attempting to access the whole
             // things (such as printing it out with "say" is going to fail).
-            throw new VariableState.CyclicalError("Error: recursive overflow at index '" + key + "'");
+            throw new VariableState.CyclicalError("recursive overflow at index '" + key + "'");
         }
     }
 
@@ -230,7 +230,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
+                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
             }
             currentStem = nextStem;
         }
@@ -279,7 +279,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
+                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
             }
             currentStem = nextStem;
         }
@@ -349,12 +349,12 @@ public class StemVariable extends HashMap<String, Object> {
 
         for (String key : stem2.keySet()) {
             if (!containsKey(key)) {
-                throw new IllegalArgumentException("Error: \"" + key + "\" is not a key in the first stem. " +
+                throw new IllegalArgumentException("'" + key + "' is not a key in the first stem. " +
                         "Every key in the second argument must be a key in the first.");
             }
             Object rawBit = stem2.get(key);
             if (!(rawBit instanceof Boolean)) {
-                throw new IllegalArgumentException("Error: Every value of the second argument must be boolean");
+                throw new IllegalArgumentException("every value of the second argument must be boolean");
             }
             Boolean b = (Boolean) rawBit;
             if (b) {
@@ -420,7 +420,7 @@ public class StemVariable extends HashMap<String, Object> {
             // for loop to be sure that everything is done in order.
             String index = Integer.toString(i);
             if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
+                throw new IllegalArgumentException("the set of supplied keys is not a list");
             }
             String currentKey = keyList.getString(index);
             if (containsKey(currentKey)) {
@@ -438,7 +438,7 @@ public class StemVariable extends HashMap<String, Object> {
             // for loop to be sure that everything is done in order.
             String index = Integer.toString(i);
             if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
+                throw new IllegalArgumentException("the set of supplied keys is not a list");
             }
             String currentKey = keyList.getString(index);
             if (retain && containsKey(currentKey)) {
@@ -464,7 +464,7 @@ public class StemVariable extends HashMap<String, Object> {
             // for loop to be sure that everything is done in order.
             String index = Integer.toString(i);
             if (!keyList.containsKey(index)) {
-                throw new IllegalArgumentException("Error: the set of supplied keys is not a list");
+                throw new IllegalArgumentException("the set of supplied keys is not a list");
             }
             result.put(index, containsKey(keyList.get(index).toString()));
         }
@@ -543,8 +543,8 @@ public class StemVariable extends HashMap<String, Object> {
                         stemEntry.entry = x;
                         localSL.add(stemEntry);
                     } else {
-                        throw new IndexError("Error: The stem contains a list element \"" + newKey + "\" " +
-                                "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
+                        throw new IndexError("The stem contains a list element '" + newKey + "' " +
+                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object");
                     }
                 } else {
                     json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
@@ -616,8 +616,8 @@ public class StemVariable extends HashMap<String, Object> {
                         stemEntry.entry = x;
                         localSL.add(stemEntry);
                     } else {
-                        throw new IndexError("Error: The stem contains a list element \"" + newKey + "\" " +
-                                "and a stem entry \"" + key + "\". This is not convertible to a JSON Object");
+                        throw new IndexError("the stem contains a list element '" + newKey + "' " +
+                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object");
                     }
                 } else {
                     json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
@@ -780,7 +780,7 @@ public class StemVariable extends HashMap<String, Object> {
             key = key.substring(0, key.length() - 1);
         }
         if (StringUtils.isTrivial(key)) {
-            throw new IllegalArgumentException("error: Cannot have a trivial stem key");
+            throw new IllegalArgumentException("cannot have a trivial stem key");
         }
 
         if (isIntVar(key)) {
@@ -1121,7 +1121,7 @@ public class StemVariable extends HashMap<String, Object> {
                 if (index == s.index) return 0;
                 if (index > s.index) return 1;
             }
-            throw new ClassCastException("Error: the object \"" + o.getClass().getSimpleName() + "\" is not comparable.");
+            throw new ClassCastException("the object '" + o.getClass().getSimpleName() + "' is not comparable.");
         }
 
         @Override
@@ -1301,11 +1301,11 @@ public class StemVariable extends HashMap<String, Object> {
     public void listCopy(long startIndex, long length, StemVariable target, long insertIndex) {
         if (length == 0L) return; // do nothing.
         if (!target.getStemList().contains(new StemEntry(insertIndex))) {
-            throw new IllegalArgumentException("Error: The insertion index for the target of this copy does not exist.");
+            throw new IllegalArgumentException("the insertion index for the target of this copy does not exist.");
         }
 
         if (length + startIndex > getStemList().size()) {
-            throw new IllegalArgumentException("Error: the source does not have enough elements to copy.");
+            throw new IllegalArgumentException("the source does not have enough elements to copy.");
         }
         SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), true, new StemEntry(startIndex + length), true);
         long newIndex = 0L;
@@ -1364,7 +1364,7 @@ public class StemVariable extends HashMap<String, Object> {
      */
     public void oldListInsertAt(StemVariable arg, long startIndex, long length) {
         if (arg.getStemList().size() < length) {
-            throw new IllegalArgumentException("Error: the given list is not long enough. It has length " +
+            throw new IllegalArgumentException("the given list is not long enough. It has length " +
                     arg.getStemList().size() + " and you requested to copy " + length + " elements.");
         }
         StemList<StemEntry> currentSL = getStemList();
@@ -1540,7 +1540,7 @@ public class StemVariable extends HashMap<String, Object> {
             }
             obj = currentStem.get(indexList.get(i));
             if (obj == null) {
-                throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
             }
 
             if (obj instanceof StemVariable) {
@@ -1563,7 +1563,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = indexList.get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("Error: Could not find the given index \"" + name + "\" in this stem \"");
+                throw new IndexError("could not find the given index '" + name + "' in this stem");
             }
             currentStem = nextStem;
         }
@@ -1597,7 +1597,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (indexList.get(indexList.size() - 1) instanceof StemVariable) {
             StemVariable ndx = (StemVariable) indexList.get(indexList.size() - 1);
             if (!ndx.isList()) {
-                throw new IllegalArgumentException("error: stem index list must be a list");
+                throw new IllegalArgumentException("stem index list must be a list");
             }
             Object obj = null;
             StemList stemList = ndx.getStemList();
@@ -1605,13 +1605,13 @@ public class StemVariable extends HashMap<String, Object> {
             for (int i = 0; i < stemList.size(); i++) {
                 obj = lastStem.get(ndx.get(i));
                 if (obj == null) {
-                    throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
                 }
                 if (obj instanceof StemVariable) {
                     lastStem = (StemVariable) obj;
                 } else {
                     if (i != stemList.size() - 1) {
-                        throw new IndexError("error:  index depth error \"" + obj + "\" is not a stem.");
+                        throw new IndexError(" index depth error '" + obj + "' is not a stem.");
 
                     }
                 }
@@ -1634,7 +1634,7 @@ public class StemVariable extends HashMap<String, Object> {
                 if(hasDefaultValue()){
                     obj = getDefaultValue();
                 }else {
-                    throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
                 }
             }
 
@@ -1667,7 +1667,7 @@ public class StemVariable extends HashMap<String, Object> {
                 return obj;
             }
             if (!(obj instanceof StemVariable)) {
-                throw new IndexError("error: the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
             }
             currentStem = (StemVariable) obj;
         }

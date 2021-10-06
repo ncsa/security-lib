@@ -2187,7 +2187,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
          boolean isDef = false;
          try {
              polyad.evalArg(0, state);
-         } catch (IndexError | UnknownSymbolException exception) {
+         } catch (IndexError | UnknownSymbolException  | IllegalStateException exception) { // ESN's can throw illegal arg exception
              polyad.setResult(isDef);
              polyad.setResultType(Constant.BOOLEAN_TYPE);
              polyad.setEvaluated(true);
