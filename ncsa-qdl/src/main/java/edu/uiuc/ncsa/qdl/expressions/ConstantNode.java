@@ -1,6 +1,10 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLNull;
+
+import java.math.BigDecimal;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -12,6 +16,28 @@ public class ConstantNode extends ExpressionImpl {
         return result;
     }
 
+    public ConstantNode(String  result) {
+        this(result, Constant.STRING_TYPE);
+    }
+    public ConstantNode(Long  result) {
+        this(result, Constant.LONG_TYPE);
+    }
+
+    public ConstantNode(BigDecimal result) {
+        this(result, Constant.DECIMAL_TYPE);
+    }
+
+    public ConstantNode(Boolean result) {
+            this(result, Constant.BOOLEAN_TYPE);
+        }
+
+    public ConstantNode(QDLNull result) {
+            this(result, Constant.NULL_TYPE);
+        }
+
+    public ConstantNode(Object result) {
+            this(result, Constant.getType(result));
+        }
     public ConstantNode(Object result, int resultType) {
         valence = 0;
         this.result = result;

@@ -3,10 +3,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
-import edu.uiuc.ncsa.qdl.functions.LambdaDefinitionNode;
+import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolTable;
 import edu.uiuc.ncsa.qdl.statements.Statement;
@@ -114,15 +111,19 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         return false;
     }
-
+     protected boolean isFDef(Statement statement){
+        return (statement instanceof LambdaDefinitionNode) || (statement instanceof FunctionDefinitionStatement) || (statement instanceof FunctionReferenceNode);
+     }
     protected void doJavaFunction(Polyad polyad, State state, FR_WithState frs) {
         // Contains a java function that is wrapped in a QDLFunction. The polyad here contains the
         // arguments that are needed to unpack this.
         Object[] argList = new Object[polyad.getArgCount()];
         for (int i = 0; i < polyad.getArgCount(); i++) {
-            if(polyad.getArguments().get(i) instanceof FunctionReferenceNode){
-                argList[i] = polyad.getArguments().get(i);
-            }else {
+            if(isFDef(polyad.getArguments().get(i))){
+                // Can't do getOperator since we do not know how many other arguments
+                // are functions or constants.
+                argList[i] = getFunctionReferenceNode(state, polyad.getArguments().get(i));
+            }else{
                 argList[i] = polyad.getArguments().get(i).evaluate(state);
             }
         }

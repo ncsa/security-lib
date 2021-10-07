@@ -29,6 +29,7 @@ public class MyModule extends JavaModule {
         // Step 2: create a list of functions and populate it
         ArrayList<QDLFunction> funcs = new ArrayList<>();
         funcs.add(new Concat());
+        funcs.add(new FunctionReferenceExample());
         // Once the list of functions is populated, add the functions to the module
         myModule.addFunctions(funcs);
 

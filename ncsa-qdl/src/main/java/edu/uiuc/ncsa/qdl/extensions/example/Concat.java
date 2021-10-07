@@ -23,7 +23,7 @@ public class Concat implements QDLFunction {
 
     @Override
     public Object evaluate(Object[] objects, State state) {
-        return objects[0].toString() + objects[1].toString();
+      return objects[0].toString() + objects[1].toString();
     }
 
     @Override

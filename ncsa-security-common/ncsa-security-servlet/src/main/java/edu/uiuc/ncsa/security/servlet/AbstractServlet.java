@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.servlet;
 
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.AbstractEnvironment;
 import edu.uiuc.ncsa.security.core.util.ConfigurationLoader;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -120,7 +121,9 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
      * @throws ServletException
      */
     protected void handleException(Throwable t, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()),t); // log it appropriately
+        if(t instanceof NFWException) {
+            error("INTERNAL ERROR: " + (t.getMessage() == null ? "(no message)" : t.getMessage()), t); // log it appropriately
+        }
         // ok, if it is a strange error, print a stack if you need to.
         getExceptionHandler().handleException(t, request, response);
 

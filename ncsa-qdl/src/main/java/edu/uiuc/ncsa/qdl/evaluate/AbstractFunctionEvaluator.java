@@ -582,7 +582,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param frNode
      * @return
      */
-    protected ExpressionImpl getOperator(State state, FunctionReferenceNode frNode, int nAry) {
+    public static ExpressionImpl getOperator(State state, FunctionReferenceNode frNode, int nAry) {
         ExpressionImpl operator;
         String operatorName = frNode.getFunctionName();
         if (state.getOpEvaluator().isMathOperator(operatorName)) {
@@ -646,7 +646,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param arg0
      * @return
      */
-    protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0, boolean pushNewState) {
+    public FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0, boolean pushNewState) {
         FunctionReferenceNode frn = null;
         if (arg0 instanceof LambdaDefinitionNode) {
             LambdaDefinitionNode lds = (LambdaDefinitionNode) arg0;

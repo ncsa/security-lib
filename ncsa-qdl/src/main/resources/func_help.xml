@@ -2220,15 +2220,15 @@ null           ∅       n    \u2205         null
 ==             ≡       =    \u2261         logical equality
 <=             ≤       <    \u2264         less than or equals
 =>             ≥       >    \u2265         greater than or equals
+~|             ≁       ~    \u2241         last axis join
+@              ⊗       @    \u2297         function reference
 true           ⊤       T    \u22a4         logical true
 false          ⊥       F    \u22a5         logical false
 assert[][]     ⊨       A    \u22a8         assert
-ceiling        ⌈       k    \u2308         ceiling
-floor          ⌊       l    \u230a         floor
-~|             ≁       ~    \u2241         last axis join
-@              ⊗       @    \u2297         function reference
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
+ceiling        ⌈       k    \u2308         ceiling
+floor          ⌊       l    \u230a         floor
 transpose      τ       t    \u03c4         alias for the transpose function.
 pi             π       p    \u03c0         Greek letter pi.
 

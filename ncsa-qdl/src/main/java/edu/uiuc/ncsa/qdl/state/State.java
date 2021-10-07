@@ -206,17 +206,33 @@ public class State extends FunctionState implements QDLConstants {
 
         StemVariable characters = new StemVariable();
         characters.put("00ac", OpEvaluator.NOT2);
-        characters.put("00f7", OpEvaluator.DIVIDE2);
+        characters.put("00af", OpEvaluator.MINUS2);
+        characters.put("00b7", QDLConstants.STEM_PATH_MARKER2);
         characters.put("00d7", OpEvaluator.TIMES2);
+        characters.put("00f7", OpEvaluator.DIVIDE2);
+        characters.put("207a", OpEvaluator.PLUS2);
         characters.put("2192", "→");
         characters.put("2205", "∅");
         characters.put("2227", OpEvaluator.AND3);
         characters.put("2228", OpEvaluator.OR3);
+        characters.put("2248", "≈");
         characters.put("2254", "≔");
+        characters.put("2255", "≕");
         characters.put("2260", OpEvaluator.NOT_EQUAL2);
         characters.put("2261", OpEvaluator.EQUALS2);
         characters.put("2264", OpEvaluator.LESS_THAN_EQUAL3);
         characters.put("2265", OpEvaluator.MORE_THAN_EQUAL3);
+        characters.put("22a4", "⊤");
+        characters.put("22a5", "⊥");
+        characters.put("22a8", "⊨");
+        characters.put("2241", "≁");
+        characters.put("2297", "⊗");
+        characters.put("2308", "⌈");
+        characters.put("230a", "⌊");
+        characters.put("27e6", "⟦");
+        characters.put("27e7", "⟧");
+        characters.put("03c4", StemEvaluator.TRANSPOSE2);
+        characters.put("03c0", TMathEvaluator.PI2);
         characters.put("22c0", OpEvaluator.AND2);
         characters.put("22c1", OpEvaluator.OR2);
 
