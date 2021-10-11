@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.parsing.IniParserDriver;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -517,48 +518,55 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("The first argument to '" + WRITE_FILE + "' must be a string that is the file name.");
         }
         String fileName = obj.toString();
-        boolean isBase64 = false;
+        //boolean isBase64 = false;
+        int fileType = FILE_OP_TEXT_STRING;
         if (polyad.getArgCount() == 3) {
             Object obj3 = polyad.evalArg(2, state);
             checkNull(obj3, polyad.getArgAt(2));
-            if (!isBoolean(obj3)) {
-                throw new IllegalArgumentException("The third argument to '" + WRITE_FILE + "' must be a boolean.");
+            if (!isLong(obj3)) {
+                throw new IllegalArgumentException("The third argument to '" + WRITE_FILE + "' must be an integer.");
             }
-            isBase64 = (Boolean) obj3;
+            fileType = ((Long) obj3).intValue();
         }
-        boolean didIt = false;
         if (state.isVFSFile(fileName)) {
             try {
                 VFSFileProvider vfs = state.getVFS(fileName);
                 XProperties xProperties = new XProperties();
                 ArrayList<String> lines = new ArrayList<>();
-                if (isStem(obj2)) {
-                    StemVariable contents = (StemVariable) obj2;
 
-                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
-                    // allow for writing empty files. Edge case but happens.
-                    if (!contents.containsKey("0") && !contents.isEmpty()) {
-                        throw new IllegalArgumentException("The given stem is not a list. It must be a list to use this function.");
-                    }
-                    for (int i = 0; i < contents.size(); i++) {
-                        lines.add(contents.getString(Integer.toString(i)));
-                    }
+                switch (fileType) {
+                    case FILE_OP_TEXT_INI:
+                        if (!isStem(obj2)) {
+                            throw new IllegalArgumentException(WRITE_FILE + " requires a stem for ini output");
+                        }
+                        xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
+                        lines.add(convertToIni((StemVariable) obj2));
+                        ;
+                        break;
+                    case FILE_OP_BINARY:
+                        xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.BINARY_TYPE);
+                        lines.add(obj2.toString());  // in VFS stores we store a binary string
+                        break;
+                    case FILE_OP_TEXT_STRING:
+                    case FILE_OP_TEXT_STEM:
+                        if (isStem(obj2)) {
+                            StemVariable contents = (StemVariable) obj2;
 
-                    didIt = true;
-
-                }
-                if (isString(obj2)) {
-                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
-                    lines.add(obj2.toString());
-                    didIt = true;
-
-                }
-
-                if (isBase64) {
-                    xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.BINARY_TYPE);
-                    lines.add(obj2.toString());  // in VFS stores we store a binary string
-                    didIt = true;
-
+                            xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
+                            // allow for writing empty files. Edge case but happens.
+                            if (!contents.containsKey("0") && !contents.isEmpty()) {
+                                throw new IllegalArgumentException("The given stem is not a list. It must be a list to use this function.");
+                            }
+                            for (int i = 0; i < contents.size(); i++) {
+                                lines.add(contents.getString(Integer.toString(i)));
+                            }
+                        }
+                        if (isString(obj2)) {
+                            xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
+                            lines.add(obj2.toString());
+                        }
+                    default:
+                        throw new IllegalArgumentException("unknown file type '" + fileType + "'");
                 }
 
                 VFSEntry entry = new FileEntry(lines, xProperties);
@@ -568,17 +576,27 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             }
         } else {
             try {
-                if (isStem(obj2)) {
-                    QDLFileUtil.writeStemToFile(fileName, (StemVariable) obj2);
-                    didIt = true;
-                }
-                if (isString(obj2)) {
-                    QDLFileUtil.writeStringToFile(fileName, (String) obj2);
-                    didIt = true;
-                }
-                if (isBase64) {
-                    QDLFileUtil.writeFileAsBinary(fileName, (String) obj2);
-                    didIt = true;
+                switch (fileType) {
+                    case FILE_OP_BINARY:
+                        QDLFileUtil.writeFileAsBinary(fileName, (String) obj2);
+                        break;
+                    case FILE_OP_TEXT_INI:
+                        if (!isStem(obj2)) {
+                            throw new IllegalArgumentException(WRITE_FILE + " requires a stem for ini output");
+                        }
+                        QDLFileUtil.writeStringToFile(fileName, convertToIni((StemVariable) obj2));
+                        break;
+                    case FILE_OP_TEXT_STEM:
+                    case FILE_OP_TEXT_STRING:
+                        if (isStem(obj2)) {
+                            QDLFileUtil.writeStemToFile(fileName, (StemVariable) obj2);
+                        }
+                        if (isString(obj2)) {
+                            QDLFileUtil.writeStringToFile(fileName, (String) obj2);
+                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("unknown file type '" + fileType + "'");
                 }
             } catch (Throwable t) {
                 if (t instanceof QDLException) {
@@ -588,14 +606,44 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             }
         }
 
-
-        if (!didIt) {
-            throw new IllegalArgumentException("The argument to " + WRITE_FILE + " is an unecognized type");
-        }
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
 
+    }
+
+    private String convertToIni(StemVariable obj2) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String key0 : obj2.keySet()) {
+            stringBuilder.append("[" + key0 + "]\n");
+            Object obj = obj2.get(key0);
+            if (!(obj instanceof StemVariable)) {
+                throw new IllegalArgumentException("ini files must have stems as entries.");
+            }
+            StemVariable innerStem = (StemVariable) obj;
+            for (String key1 : innerStem.keySet()) {
+                Object innerObject = innerStem.get(key1);
+                if(!isStem(innerObject)){
+                    stringBuilder.append(key1 + " := " + InputFormUtil.inputForm(innerObject) + "\n");
+                }else {
+                    StemVariable  innerInnerObject = (StemVariable)innerObject;
+                    String out = "";
+                    boolean isFirst = true;
+                    for(String key2:innerInnerObject.keySet()){
+                           Object object2 = innerInnerObject.get(key2);
+                           if(isStem(object2)){
+                               throw new IllegalArgumentException("Ini files do not support nexted stems");
+                           }
+                           out = out + (isFirst?"":",") + InputFormUtil.inputForm(object2);
+                           if(isFirst) isFirst = false;
+                    }
+
+                    stringBuilder.append(key1 + " := " + out + "\n");
+                }
+            }
+            stringBuilder.append("\n"); // helps with readability.
+        }
+        return stringBuilder.toString();
     }
 
     protected void doReadFile(Polyad polyad, State state) {
@@ -662,14 +710,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     } else {
                         content = QDLFileUtil.readFileAsString(fileName);
                     }
-                    if(StringUtils.isTrivial(content)){
+                    if (StringUtils.isTrivial(content)) {
                         polyad.setResult(new StemVariable());
                         polyad.setResultType(Constant.STEM_TYPE);
                         polyad.setEvaluated(true);
                         return;
                     }
                     IniParserDriver iniParserDriver = new IniParserDriver();
-                    StringReader stringReader= new StringReader(content);
+                    StringReader stringReader = new StringReader(content);
                     StemVariable out = iniParserDriver.parse(stringReader);
 
                     polyad.setResult(out);

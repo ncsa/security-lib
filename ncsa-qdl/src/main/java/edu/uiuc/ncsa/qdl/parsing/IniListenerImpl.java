@@ -72,6 +72,9 @@ public class IniListenerImpl implements iniListener {
 
     @Override
     public void exitLine(iniParser.LineContext ctx) {
+        if(ctx.Identifier() == null){
+            return; // means there was a blank line
+        }
         currentLineID = ctx.Identifier().getText(); // don't know if this is scalar or stem at this point
         currentStem.put(currentLineID, currentLineValue);
     }
@@ -101,7 +104,12 @@ public class IniListenerImpl implements iniListener {
 
     protected Object convertEntryToValue(iniParser.EntryContext entryContext) {
         if (entryContext.String() != null) {
-            return entryContext.String().getText();
+            String outString = entryContext.String().getText().trim();
+            // returned text will have the '' included, so string them off
+            if(outString.startsWith("'") && outString.endsWith("'")){
+                outString = outString.substring(1, outString.length()-1);
+            }
+            return outString;
         }
         if (entryContext.ConstantKeywords() != null) {
             if (entryContext.ConstantKeywords().equals("true")) {

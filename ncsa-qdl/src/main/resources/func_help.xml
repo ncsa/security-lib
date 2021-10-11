@@ -799,7 +799,8 @@ file_read(file_name, type) - type is an integer that determines the result:
  0 = binary. This reads the file and hands back a single base 64 encoded
      string of the contents.
  1 = stem. A stem list whose entries are each line in the file.
-See also: decode_64
+ 2 = ini(tialization) file format. See the entry under 'ini' in help
+See also: decode_64, ini
 ]]>
         </body>
     </entry>
@@ -3054,6 +3055,39 @@ See also: module.
                 <![CDATA[
 Double underscore. Prefix for intrinsic variables and functions in a module
 See also: module, intrinsic.
+                ]]>
+            </body>
+        </entry>
+    <entry id="ini">
+            <body>
+                <![CDATA[
+QDL supports its own initialization file format. This is quite simple:
+[section]
+   line: name =|:= entry (,entry)*
+  entry: boolean | integer | decimal | scientific number | ‘string’;
+comment: // | # anything
+
+So such a file has sections enclosed in []'s, and each line is an entry.
+Comments are restricted to a single line (though you can have as many together
+as you like, just not a comment block like /* ...*/). Entries are standard
+scalars (so booleans, integer, decimal, scientific notation or string in
+single quotes).
+Lists are just entries separated by commas.
+
+The aim of such a file is for building a possibly sizeable application with
+several sections that have their own configurations. Since bootstrapping such
+an application can be hard, you can put the critical information in an ini
+file, which can then be read (e.g., by the __init() method of a workspace).
+The format is easily edited with any text editor and simple enough that a
+user with little to no coding experience and fill in useful information.
+
+Note that while the syntax is sort of like QDL (single quotes around strings)
+it is not QDL and you cannot embed code in it.
+
+On reading, this structured is turned into a stem with sections as keys
+and the individuals lines and their contents entered accordingly.
+
+See also: file_read
                 ]]>
             </body>
         </entry>

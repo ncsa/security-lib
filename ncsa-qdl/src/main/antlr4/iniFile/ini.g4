@@ -24,74 +24,47 @@
    would be the stem entry [345, -3.14159, foo]
 */
 grammar ini;
-
-  ConstantKeywords: BOOL_TRUE | BOOL_FALSE ;
-
-
-ini
-   : (section | EOL)*
-   ;
-
-section
-   : sectionheader line*
-   ;
-
-sectionheader
-   : '[' Identifier ']' EOL
-   ;
-
-line
-   : Identifier (Assign entries) EOL
-   ;
-
-entries
-   : entry (',' entry?)*
-   ;
+          ini : (section | EOL)*;
+      section : sectionheader line* ;
+sectionheader : '[' Identifier ']' EOL;
+         line : (Identifier (Assign entries) EOL) | EOL;
+       entries: entry (',' entry?)*;
+        entry : ConstantKeywords | Number | String;
 
 /*
     We want to be consistent with QDL for much of the syntax, so we have boiler-plated these
     to ensure this.
 */
-       entry : ConstantKeywords | Number | String;
 
-
-        UnaryMinus : '¯'; // unicode 00af raised unary minus.
-         UnaryPlus : '⁺' ;// unicode 207a raised unary plus.
-              Plus : '+';
-             Minus : '-';
+           ConstantKeywords: BOOL_TRUE | BOOL_FALSE ;
+                UnaryMinus : '¯'; // unicode 00af raised unary minus.
+                 UnaryPlus : '⁺' ;// unicode 207a raised unary plus.
+                      Plus : '+';
+                     Minus : '-';
              
-  Assign : '=' | ':=' | '≔';
-                                  String : '\'' StringCharacters? '\'';
-                            fragment ESC : '\\' [btnfr'\\] | UnicodeEscape;
-                  fragment UnicodeEscape :  '\\' 'u'+  HexDigit HexDigit HexDigit HexDigit;
-                       fragment HexDigit : [0-9a-fA-F];
+                    Assign : '=' | ':=' | '≔';
+                    String : '\'' StringCharacters? '\'';
+              fragment ESC : '\\' [btnfr'\\] | UnicodeEscape;
+    fragment UnicodeEscape :  '\\' 'u'+  HexDigit HexDigit HexDigit HexDigit;
+         fragment HexDigit : [0-9a-fA-F];
  fragment StringCharacters : StringCharacter+;
    fragment StringCharacter : ~['\\\r\n] | ESC;
 
     Identifier :  [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
-     BOOL_FALSE : 'false'  | '⊥';
-      BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
-           Bool : BOOL_TRUE | BOOL_FALSE;
-         Number : SIGN? Integer | Decimal |  SCIENTIFIC_NUMBER;
+      BOOL_FALSE : 'false'  | '⊥';
+       BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
+            Bool : BOOL_TRUE | BOOL_FALSE;
+          Number : SIGN? Integer | Decimal |  SCIENTIFIC_NUMBER;
 
-            Integer : [0-9]+;
-      Decimal : Integer? '.' Integer;
-SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
+         Integer : [0-9]+;
+          Decimal : Integer? '.' Integer;
+SCIENTIFIC_NUMBER : SIGN? Decimal (E SIGN? Integer)?;
        fragment E : 'E' | 'e';
     fragment SIGN : (Plus | UnaryPlus | Minus | UnaryMinus);
 
 
-COMMENT
-   : ('#' | '//') ~ [\r\n]* EOL -> skip
-   ;
-
-
-EOL
-   : [\r\n]
-   ;
-
-
-WS
-   : [ \t] + -> skip
-   ;
+LINE_COMMENT : ('//') ~ [\r\n]* EOL -> skip;
+     COMMENT : '/*' .*? '*/' -> skip;
+         EOL : [\r\n];
+          WS : [ \t\u000C]+ -> skip;

@@ -1,15 +1,13 @@
 // Generated from ini.g4 by ANTLR 4.9.1
 package edu.uiuc.ncsa.qdl.ini_generated;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.ATN;
-import org.antlr.v4.runtime.atn.ATNDeserializer;
-import org.antlr.v4.runtime.atn.ParserATNSimulator;
-import org.antlr.v4.runtime.atn.PredictionContextCache;
+import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.*;
+import org.antlr.v4.runtime.tree.*;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class iniParser extends Parser {
@@ -21,8 +19,8 @@ public class iniParser extends Parser {
 	public static final int
 		T__0=1, T__1=2, T__2=3, ConstantKeywords=4, UnaryMinus=5, UnaryPlus=6, 
 		Plus=7, Minus=8, Assign=9, String=10, Identifier=11, BOOL_FALSE=12, BOOL_TRUE=13, 
-		Bool=14, Number=15, Integer=16, Decimal=17, SCIENTIFIC_NUMBER=18, COMMENT=19, 
-		EOL=20, WS=21;
+		Bool=14, Number=15, Integer=16, Decimal=17, SCIENTIFIC_NUMBER=18, LINE_COMMENT=19, 
+		COMMENT=20, EOL=21, WS=22;
 	public static final int
 		RULE_ini = 0, RULE_section = 1, RULE_sectionheader = 2, RULE_line = 3, 
 		RULE_entries = 4, RULE_entry = 5;
@@ -43,8 +41,8 @@ public class iniParser extends Parser {
 		return new String[] {
 			null, null, null, null, "ConstantKeywords", "UnaryMinus", "UnaryPlus", 
 			"Plus", "Minus", "Assign", "String", "Identifier", "BOOL_FALSE", "BOOL_TRUE", 
-			"Bool", "Number", "Integer", "Decimal", "SCIENTIFIC_NUMBER", "COMMENT", 
-			"EOL", "WS"
+			"Bool", "Number", "Integer", "Decimal", "SCIENTIFIC_NUMBER", "LINE_COMMENT", 
+			"COMMENT", "EOL", "WS"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -198,25 +196,27 @@ public class iniParser extends Parser {
 	public final SectionContext section() throws RecognitionException {
 		SectionContext _localctx = new SectionContext(_ctx, getState());
 		enterRule(_localctx, 2, RULE_section);
-		int _la;
 		try {
+			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(19);
 			sectionheader();
 			setState(23);
 			_errHandler.sync(this);
-			_la = _input.LA(1);
-			while (_la==Identifier) {
-				{
-				{
-				setState(20);
-				line();
-				}
+			_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
+			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
+					{
+					{
+					setState(20);
+					line();
+					}
+					} 
 				}
 				setState(25);
 				_errHandler.sync(this);
-				_la = _input.LA(1);
+				_alt = getInterpreter().adaptivePredict(_input,2,_ctx);
 			}
 			}
 		}
@@ -300,18 +300,35 @@ public class iniParser extends Parser {
 		LineContext _localctx = new LineContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_line);
 		try {
-			enterOuterAlt(_localctx, 1);
-			{
-			setState(31);
-			match(Identifier);
-			{
-			setState(32);
-			match(Assign);
-			setState(33);
-			entries();
-			}
-			setState(35);
-			match(EOL);
+			setState(38);
+			_errHandler.sync(this);
+			switch (_input.LA(1)) {
+			case Identifier:
+				enterOuterAlt(_localctx, 1);
+				{
+				{
+				setState(31);
+				match(Identifier);
+				{
+				setState(32);
+				match(Assign);
+				setState(33);
+				entries();
+				}
+				setState(35);
+				match(EOL);
+				}
+				}
+				break;
+			case EOL:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(37);
+				match(EOL);
+				}
+				break;
+			default:
+				throw new NoViableAltException(this);
 			}
 		}
 		catch (RecognitionException re) {
@@ -353,29 +370,29 @@ public class iniParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(37);
+			setState(40);
 			entry();
-			setState(44);
+			setState(47);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==T__2) {
 				{
 				{
-				setState(38);
+				setState(41);
 				match(T__2);
-				setState(40);
+				setState(43);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << ConstantKeywords) | (1L << String) | (1L << Number))) != 0)) {
 					{
-					setState(39);
+					setState(42);
 					entry();
 					}
 				}
 
 				}
 				}
-				setState(46);
+				setState(49);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -417,7 +434,7 @@ public class iniParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(47);
+			setState(50);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << ConstantKeywords) | (1L << String) | (1L << Number))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -441,20 +458,21 @@ public class iniParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\27\64\4\2\t\2\4\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\30\67\4\2\t\2\4\3"+
 		"\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\3\2\3\2\7\2\21\n\2\f\2\16\2\24\13"+
 		"\2\3\3\3\3\7\3\30\n\3\f\3\16\3\33\13\3\3\4\3\4\3\4\3\4\3\4\3\5\3\5\3\5"+
-		"\3\5\3\5\3\5\3\6\3\6\3\6\5\6+\n\6\7\6-\n\6\f\6\16\6\60\13\6\3\7\3\7\3"+
-		"\7\2\2\b\2\4\6\b\n\f\2\3\5\2\6\6\f\f\21\21\2\62\2\22\3\2\2\2\4\25\3\2"+
-		"\2\2\6\34\3\2\2\2\b!\3\2\2\2\n\'\3\2\2\2\f\61\3\2\2\2\16\21\5\4\3\2\17"+
-		"\21\7\26\2\2\20\16\3\2\2\2\20\17\3\2\2\2\21\24\3\2\2\2\22\20\3\2\2\2\22"+
-		"\23\3\2\2\2\23\3\3\2\2\2\24\22\3\2\2\2\25\31\5\6\4\2\26\30\5\b\5\2\27"+
-		"\26\3\2\2\2\30\33\3\2\2\2\31\27\3\2\2\2\31\32\3\2\2\2\32\5\3\2\2\2\33"+
-		"\31\3\2\2\2\34\35\7\3\2\2\35\36\7\r\2\2\36\37\7\4\2\2\37 \7\26\2\2 \7"+
-		"\3\2\2\2!\"\7\r\2\2\"#\7\13\2\2#$\5\n\6\2$%\3\2\2\2%&\7\26\2\2&\t\3\2"+
-		"\2\2\'.\5\f\7\2(*\7\5\2\2)+\5\f\7\2*)\3\2\2\2*+\3\2\2\2+-\3\2\2\2,(\3"+
-		"\2\2\2-\60\3\2\2\2.,\3\2\2\2./\3\2\2\2/\13\3\2\2\2\60.\3\2\2\2\61\62\t"+
-		"\2\2\2\62\r\3\2\2\2\7\20\22\31*.";
+		"\3\5\3\5\3\5\3\5\5\5)\n\5\3\6\3\6\3\6\5\6.\n\6\7\6\60\n\6\f\6\16\6\63"+
+		"\13\6\3\7\3\7\3\7\2\2\b\2\4\6\b\n\f\2\3\5\2\6\6\f\f\21\21\2\66\2\22\3"+
+		"\2\2\2\4\25\3\2\2\2\6\34\3\2\2\2\b(\3\2\2\2\n*\3\2\2\2\f\64\3\2\2\2\16"+
+		"\21\5\4\3\2\17\21\7\27\2\2\20\16\3\2\2\2\20\17\3\2\2\2\21\24\3\2\2\2\22"+
+		"\20\3\2\2\2\22\23\3\2\2\2\23\3\3\2\2\2\24\22\3\2\2\2\25\31\5\6\4\2\26"+
+		"\30\5\b\5\2\27\26\3\2\2\2\30\33\3\2\2\2\31\27\3\2\2\2\31\32\3\2\2\2\32"+
+		"\5\3\2\2\2\33\31\3\2\2\2\34\35\7\3\2\2\35\36\7\r\2\2\36\37\7\4\2\2\37"+
+		" \7\27\2\2 \7\3\2\2\2!\"\7\r\2\2\"#\7\13\2\2#$\5\n\6\2$%\3\2\2\2%&\7\27"+
+		"\2\2&)\3\2\2\2\')\7\27\2\2(!\3\2\2\2(\'\3\2\2\2)\t\3\2\2\2*\61\5\f\7\2"+
+		"+-\7\5\2\2,.\5\f\7\2-,\3\2\2\2-.\3\2\2\2.\60\3\2\2\2/+\3\2\2\2\60\63\3"+
+		"\2\2\2\61/\3\2\2\2\61\62\3\2\2\2\62\13\3\2\2\2\63\61\3\2\2\2\64\65\t\2"+
+		"\2\2\65\r\3\2\2\2\b\20\22\31(-\61";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
