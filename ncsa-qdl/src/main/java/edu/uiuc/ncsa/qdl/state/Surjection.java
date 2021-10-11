@@ -7,7 +7,9 @@ import java.util.Map;
 
 /**
  * This is a map that tracks a surjection (many values map to a single one) between
- * aliases and the namespace uri.
+ * the namespace uri its aliases, allowing reverse lookups. Aliases and module ids
+ *  are unique in the workspace, <b>but</b> there may be many imports for a given uri,
+ *  hence this class.
  * <p>Created by Jeff Gaynor<br>
  * on 4/1/20 at  9:13 AM
  */

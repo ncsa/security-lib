@@ -70,7 +70,7 @@ public class QDLInterpreter implements Serializable {
     }
 
 
-    public void execute(Reader r) throws Throwable {
+    public QDLRunner execute(Reader r) throws Throwable {
         QDLParserDriver driver = new QDLParserDriver(environment, state);
         driver.setDebugOn(isDebugOn());
         QDLRunner runner = new QDLRunner(driver.parse(r));
@@ -79,7 +79,7 @@ public class QDLInterpreter implements Serializable {
         runner.setPrettyPrint(isPrettyPrint());
         runner.setInterpreter(this); // needed for state indicator operations.
         runner.run();
-
+        return runner;
     }
 
     public boolean isPrettyPrint() {

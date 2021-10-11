@@ -68,27 +68,25 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     public static final int IDENTITY_FUNCTION_TYPE = 14 + MATH_FUNCTION_BASE_VALUE;
 
 
-
-
     @Override
     public String[] getFunctionNames() {
-        if(fNames == null){
+        if (fNames == null) {
             fNames = new String[]{
-                        IDENTITY_FUNCTION,
-                        LONG_IDENTITY_FUNCTION,
-                        ABS_VALUE,
-                        RANDOM,
-                        RANDOM_STRING,
-                        HASH,
-                        TO_HEX,
-                        FROM_HEX,
-                        DATE_MS,
-                        DATE_ISO,
-                        NUMERIC_DIGITS,
-                        DECODE_B64,
-                        ENCODE_B64,
-                        MOD,
-                        DATE_ISO};
+                    IDENTITY_FUNCTION,
+                    LONG_IDENTITY_FUNCTION,
+                    ABS_VALUE,
+                    RANDOM,
+                    RANDOM_STRING,
+                    HASH,
+                    TO_HEX,
+                    FROM_HEX,
+                    DATE_MS,
+                    DATE_ISO,
+                    NUMERIC_DIGITS,
+                    DECODE_B64,
+                    ENCODE_B64,
+                    MOD,
+                    DATE_ISO};
         }
         return fNames;
     }
@@ -177,7 +175,6 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-
     /**
      * The identity function returns its argument. Simple as that.
      *
@@ -233,7 +230,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if(1 < polyad.getArgCount()){
+        if (1 < polyad.getArgCount()) {
             throw new IllegalArgumentException("unknown argument. " + RANDOM + " requires zero or 1 argument.");
         }
         Object result;
@@ -421,13 +418,47 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             @Override
             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                if (areAllLongs(objects)) {
-                    r.result = ((Long) objects[0]) % ((Long) objects[1]);
-                    r.resultType = Constant.LONG_TYPE;
-                } else {
+                if (!areAllNumbers(objects)) {
+                    // Contract is that if there are not numbers, just return the
+                    // first argument unaltered.
                     r.result = objects[0];
                     r.resultType = polyad.getArguments().get(0).getResultType();
+                    return r;
                 }
+                if (areAllLongs(objects)) {
+                    long second = (Long) objects[1];
+                    if (second == 0L) {
+                        throw new IllegalArgumentException(MOD + " requires non-zero second argument");
+
+                    }
+                    r.result = ((Long) objects[0]) % second;
+                    r.resultType = Constant.LONG_TYPE;
+                    return r;
+                }
+                // so one of these is a big decimal at least
+                boolean b0 = isBigDecimal(objects[0]);
+                boolean b1 = isBigDecimal(objects[1]);
+                BigDecimal bd0 = b0 ? (BigDecimal) objects[0] : new BigDecimal((Long) objects[0]);
+                BigDecimal bd1 = b1 ? (BigDecimal) objects[1] : new BigDecimal((Long) objects[1]);
+                if (bd1.equals(BigDecimal.ZERO)) {
+                    throw new IllegalArgumentException(MOD + " requires non-zero second argument");
+                }
+                BigDecimal bdr = null;
+                try {
+                    bdr = bd0.remainder(bd1, OpEvaluator.getMathContext());
+                } catch (ArithmeticException ax1) {
+                    // if the remainder is less than the rounding error, then this is thrown. Report it.
+                    throw new IllegalStateException("There is insufficient numeric precision to compute this. Please adjust " + MathEvaluator.NUMERIC_DIGITS);
+                }
+                try {
+                    r.result = bdr.longValueExact();
+                    r.resultType = Constant.LONG_TYPE;
+                    return r;
+                } catch (ArithmeticException ax) {
+                }
+
+                r.result = bdr; // won't fit in a long, so this is really a BigInteger, which we don't support directly.
+                r.resultType = Constant.DECIMAL_TYPE;
                 return r;
             }
         };

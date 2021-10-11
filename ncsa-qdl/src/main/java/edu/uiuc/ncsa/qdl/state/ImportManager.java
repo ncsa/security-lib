@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Keeps imported namespaces and their aliases. It is assumed that both of these are unique.
  * Modules are kept elsewhere and a module must be imported before it ends up here.
+ * This relates the imports of a module (identified by its uri) to its imported aliases
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:13 AM
  */
@@ -95,5 +96,12 @@ public class ImportManager implements Serializable {
 
     public Collection<URI> keySet() {
         return surjection.values();
+    }
+
+    public void removeAlias(Object alias) {
+        if(surjection.isEmpty()){
+            return;
+        }
+        surjection.remove(alias);
     }
 }

@@ -976,7 +976,7 @@ public class XProperties extends Properties {
             // this serializes a string, since this is serializable, an object and has a non-trivial equals method
             boolean ok = false;
             xp.setSerializable("ser.test", b64Test);
-            xp.store(new java.io.FileOutputStream(args[0]), "test header");
+            xp.store(new java.io.FileOutputStream(args[0]), "test header, note that the names here are prepended with their type");
             xp = new XProperties();
             xp.load(new java.io.FileInputStream(args[0]));
             xp.list(System.out);

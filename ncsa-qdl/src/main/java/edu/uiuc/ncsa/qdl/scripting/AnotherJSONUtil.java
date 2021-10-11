@@ -23,7 +23,6 @@ import java.util.List;
 public class AnotherJSONUtil {
     public static final String XMD_TAG = "xmd";
     public static final String ARGS_TAG = "args";
-    public static final String ARG_NAME_TAG = "arg_name";
 
 
     /**
@@ -118,8 +117,6 @@ public class AnotherJSONUtil {
                     xp.put(key.toString(), object.toString());
                 }
             }
-            //xp.add(jsonObject.getJSONObject(XMD_TAG), true);
-
         }
         return xp;
     }
@@ -149,36 +146,16 @@ public class AnotherJSONUtil {
             if (!scriptName.endsWith("'")) {
                 scriptName = scriptName + "'";
             }
-      //      StemVariable argList = new StemVariable();
             String rawArgs="";
             if (jsonObject.containsKey(ARGS_TAG)) {
                 rawArgs = buildArgList((JSON)jsonObject.get(ARGS_TAG));
-      //          argList.addList(toScriptArgs((JSON) jsonObject.get(ARGS_TAG)));
             }
-            String argName = QDLScript.DEFAULT_ARG_NAME;
-            /*
-            TODO -- Maybe allow passing in of arg lists if the entries are scalars
-            The problem is if stem arguments (especially multiple ones) are passed in
-            because there is no canonical way to make a stem on the fly, except
-            to invoke the from_json method on a string.
-            So if the args for my_script.qdl
-               ["a",true,4,{"x":"y"}]
-             pass along
-               script_load('my_script.qdl",'a',true,4,from_json('{"x":"y"}'));
-             This has a bunch of edge cases though. At this point, it is all rolled into a single
-             argument which is a lot simpler than slogging through all the various values.
 
-             */
-/*            if (jsonObject.containsKey(ARG_NAME_TAG)) {
-                argName = jsonObject.getString(ARG_NAME_TAG);
-                qdlScript.setScriptArgName(argName);
-            }*/
             String cmd;
             if (StringUtils.isTrivial(rawArgs)) {
                 cmd = SystemEvaluator.LOAD_COMMAND + "(" + scriptName + ");";
             } else {
                 cmd = SystemEvaluator.LOAD_COMMAND + "(" + scriptName + ", " + rawArgs + ");";
-                //qdlScript.setScriptArglist(argList);
             }
             lines.add(cmd);
             qdlScript.setLines(lines);

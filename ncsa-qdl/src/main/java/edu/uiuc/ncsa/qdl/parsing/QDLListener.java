@@ -180,89 +180,8 @@ public class QDLListener implements QDLParserListener {
         currentA.setRightArg(rightArg);
     }
 
-    public void exitAssignment2(QDLParserParser.AssignmentContext assignmentContext) {
-        Assignment currentA = (Assignment) parsingMap.getStatementFromContext(assignmentContext);
-        currentA.setSourceCode(getSource(assignmentContext));
-        StatementWithResultInterface leftArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(0));
-        if (leftArg instanceof QDLParserParser.KeywordsContext) {
-            throw new IllegalArgumentException("error: cannot assign constant a value");
 
-        }
-        if (leftArg instanceof ConstantNode) {
-            throw new IllegalArgumentException("error: cannot assign constant a value");
 
-        }
-        String op = assignmentContext.ASSIGN().getText();
-        StatementWithResultInterface rightArg = (StatementWithResultInterface) resolveChild(assignmentContext.getChild(2));
-        if (op.equals("=:") | op.equals("≕")) {
-            // This is the only place for sure we know what the operator is.
-            currentA.setFlippedAssignment(true);
-            StatementWithResultInterface x = leftArg;
-            leftArg = rightArg;
-            rightArg = x;
-        }
-        if (leftArg instanceof VariableNode) {
-            currentA.setVariableReference(((VariableNode) leftArg).getVariableReference());
-        } else {
-            currentA.setLeftArg(leftArg);
-        }
-        if (op.equals(":=") || op.equals("≔") | op.equals("=:") | op.equals("≕")) {   // Allows unicode 2254, 2255 as assignment too.
-            currentA.setRightArg(rightArg);
-        } else {
-
-            Dyad d = new Dyad(getAssignmentType(op));
-            if (leftArg instanceof Assignment) {
-                Assignment assignment = (Assignment) leftArg;
-                if (assignment.getRightArg() instanceof VariableNode) {
-                    VariableNode variableNode = (VariableNode) assignment.getRightArg();
-                    d.setLeftArgument(new VariableNode(variableNode.getVariableReference()));
-
-                } else {
-                    if (assignment.getRightArg() instanceof Dyad) {
-                        Dyad dyad = (Dyad) assignment.getRightArg();
-                        d.setLeftArgument(dyad.getRightArgument());
-                    } else {
-                        System.out.println("oops");
-                    }
-                }
-
-            } else {
-                d.setLeftArgument(new VariableNode(currentA.getVariableReference()));
-            }
-            d.setRightArgument(rightArg);
-            currentA.setRightArg(d);
-        }
-    }
-
-    protected int getAssignmentType(String op) {
-        switch (op) {
-            case "+=":
-                return OpEvaluator.PLUS_VALUE;
-            case "-=":
-                return OpEvaluator.MINUS_VALUE;
-            case "×=":
-            case "*=":
-                return OpEvaluator.TIMES_VALUE;
-            case "÷=":
-            case "/=":
-                return OpEvaluator.DIVIDE_VALUE;
-            case "%=":
-                return OpEvaluator.INTEGER_DIVIDE_VALUE;
-            case "^=":
-                return OpEvaluator.POWER_VALUE;
-        }
-        return OpEvaluator.UNKNOWN_VALUE;
-    }
-
-/*    @Override
-    public void enterArgList(QDLParserParser*//**//*.ArgListContext ctx) {
-
-    }
-
-    @Override
-    public void exitArgList(QDLParserParser.ArgListContext ctx) {
-
-    }*/
 
     @Override
     public void enterFunction(QDLParserParser.FunctionContext ctx) {
@@ -1372,8 +1291,15 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitInteger(QDLParserParser.IntegerContext ctx) {
-        Long value = Long.parseLong(ctx.getChild(0).getText());
-        ConstantNode constantNode = new ConstantNode(value, Constant.LONG_TYPE);
+        ConstantNode constantNode = null;
+        Object value;
+        try {
+            value = Long.parseLong(ctx.getChild(0).getText());
+        }catch(NumberFormatException nfx){
+            // it is possible the user is entering a simply huge number, try plan B
+             value = new BigDecimal(ctx.getChild(0).getText());
+        }
+        constantNode = new ConstantNode(value);
         stash(ctx, constantNode);
     }
 

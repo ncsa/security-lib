@@ -114,7 +114,7 @@ public class QDLParserDriver {
             QDLListener qdlListener = new QDLListener(parsingMap, state);
             if(DEBUG_LISTENER_ON) {
                 // This will spit out the inner workings of the parser so it may be a TON of output.
-                // Only uncommen for really low level debugging! E.g. debugging the actual parser.
+                // Only uncomment for really low level debugging! E.g. debugging the actual parser.
                 /***** DebugListener *****/
  
                 QDLDebugListener debugListener = new QDLDebugListener();

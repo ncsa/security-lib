@@ -1243,6 +1243,15 @@ Returns:
 ]]>
         </body>
     </entry>
+    <entry id="module_remove">
+            <body>
+                <![CDATA[
+module_remove(string | stem.) - remove the alias for the module from the
+    workspace. Attempts to access it later will result in an error.
+                ]]>
+            </body>
+        </entry>
+
     <entry id="module_load">
         <body>
             <![CDATA[

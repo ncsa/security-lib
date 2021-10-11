@@ -14,10 +14,12 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
+ * (Old assignments, use {@link ANode2}.
  * All the logic for various left/right assignments.
  * Once evaluated, this will return its value as the result.
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  5:08 PM
+ * @deprecated
  */
 public class Assignment implements StatementWithResultInterface {
     @Override
@@ -30,24 +32,7 @@ public class Assignment implements StatementWithResultInterface {
         return assignment;
     }
 
-    /*    Module module = null;
 
-        @Override
-        public Module getModule() {
-            return module;
-        }
-
-        @Override
-        public void setModule(Module newModule) {
-             this.module = newModule;
-             getLeftArg().setModule(newModule );
-             getRightArg().setModule(newModule );
-        }
-
-        @Override
-        public boolean hasModule() {
-            return module!=null;
-        }*/
     boolean inModule = false;
 
     @Override

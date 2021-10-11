@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 public class MathFunctionsTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-     
+
     public void testAbsoluteValue() throws Exception {
         State state = testUtils.getNewState();
 
@@ -30,7 +30,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert (Long) polyad.getResult() == 5L;
     }
 
-     
+
     public void testAbsoluteValueStem() throws Exception {
 
         State state = testUtils.getNewState();
@@ -55,7 +55,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert r.getLong("3").equals(987654321L);
     }
 
-     
+
     public void testRandomValue() throws Exception {
         State state = testUtils.getNewState();
 
@@ -64,7 +64,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult() instanceof Long;
     }
 
-     
+
     public void testRandomValueWithArg() throws Exception {
         long count = 5L;
         State state = testUtils.getNewState();
@@ -77,7 +77,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert r.size() == count;
     }
 
-     
+
     public void testRandomString() throws Exception {
         State state = testUtils.getNewState();
 
@@ -86,7 +86,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult() instanceof String;
     }
 
-     
+
     public void testRandomStringWithArg() throws Exception {
         State state = testUtils.getNewState();
 
@@ -99,7 +99,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().toString().length() == 43;
     }
 
-     
+
     public void testHash() throws Exception {
         State state = testUtils.getNewState();
 
@@ -111,7 +111,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-     
+
     public void testHashStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -139,7 +139,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         }
     }
 
-     
+
     public void testB64Encode() throws Exception {
         State state = testUtils.getNewState();
 
@@ -152,7 +152,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-     
+
     public void testB64Decode() throws Exception {
         State state = testUtils.getNewState();
 
@@ -165,7 +165,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-     
+
     public void testToHex() throws Exception {
         State state = testUtils.getNewState();
 
@@ -178,7 +178,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert polyad.getResult().equals(expectedResult);
     }
 
-     
+
     public void testFromHex() throws Exception {
         State state = testUtils.getNewState();
 
@@ -200,7 +200,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-     
+
     public void testSignedNumbers() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -259,11 +259,11 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert areEqual(getBDValue("a.16", state), new BigDecimal("-.12"));
         assert areEqual(getBDValue("a.17", state), new BigDecimal(".12"));
 
-        assert areEqual(getStemValue("b.",state), arrayToStem(new int[]{-3, -2, -1, 0, 1, 2}));
-        assert areEqual(getStemValue("c.",state), arrayToStem(new int[] {3, 2, 1, 0, -1, -2}));
-        assert areEqual(getStemValue("d.",state), arrayToStem(new int[] {-9, -4, -1, 0, -1, -4}));
-        assert areEqual(getStemValue("e.",state), arrayToStem(new int[] {27, 8, 1, 0, -1, -8}));
-        assert areEqual(getStemValue("f.",state), arrayToStem(new int[] {9, 6, 3, 0, -3, -6}));
+        assert areEqual(getStemValue("b.", state), arrayToStem(new int[]{-3, -2, -1, 0, 1, 2}));
+        assert areEqual(getStemValue("c.", state), arrayToStem(new int[]{3, 2, 1, 0, -1, -2}));
+        assert areEqual(getStemValue("d.", state), arrayToStem(new int[]{-9, -4, -1, 0, -1, -4}));
+        assert areEqual(getStemValue("e.", state), arrayToStem(new int[]{27, 8, 1, 0, -1, -8}));
+        assert areEqual(getStemValue("f.", state), arrayToStem(new int[]{9, 6, 3, 0, -3, -6}));
         StemVariable gStem = new StemVariable();
         // Caveat: Bigdecimal from double always induces rounding, so use string constructor for exact tests.
         gStem.listAppend(new BigDecimal(".9"));
@@ -272,10 +272,10 @@ public class MathFunctionsTest extends AbstractQDLTester {
         gStem.listAppend(new Long(0L));
         gStem.listAppend(new BigDecimal("-0.3"));
         gStem.listAppend(new BigDecimal("-0.6"));
-        assert areEqual(getStemValue("g.",state), gStem);
+        assert areEqual(getStemValue("g.", state), gStem);
         //assert areEqual(getStemValue("g.",state), arrayToStem(new double[] {.9, .6, .3, 0, -.3, -.6}));
-        assert areEqual(getStemValue("h.",state), arrayToStem(new double[] {-3.3, -2.3, -1.3, -0.3, .7, 1.7}));
-        assert areEqual(getStemValue("i.",state), arrayToStem(new double[] {2.7, 1.7, .7, -.3, -1.3, -2.3}));
+        assert areEqual(getStemValue("h.", state), arrayToStem(new double[]{-3.3, -2.3, -1.3, -0.3, .7, 1.7}));
+        assert areEqual(getStemValue("i.", state), arrayToStem(new double[]{2.7, 1.7, .7, -.3, -1.3, -2.3}));
 
     }
 
@@ -310,6 +310,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert areEqual(getBDValue("a.10", state), new BigDecimal("1000"));
 
     }
+
     /**
      * Define a recursive function and invoke it. This will compute the Fibonacci numbers
      * 1,1,2,3,5,8,13,21,34,55,... It tests a single value.<br/><br/>
@@ -327,19 +328,19 @@ public class MathFunctionsTest extends AbstractQDLTester {
      * has to keep straight or the result is wrong. Therefore, this is a version of Knuth's
      * "man or boy" test.
      * <p>
-     *     If you really want to compute the nth Fibonacci number fast, use Binet's formula:
-     *  <pre>
+     * If you really want to compute the nth Fibonacci number fast, use Binet's formula:
+     * <pre>
      *      γ := (1+sqrt(5))/2
      *     γ1 := (1-sqrt(5))/2
      *      ρ := (γ^n -γ1^n)/sqrt(5)
      *     floor(ρ+0.1); // compensate for rounding errors
      *  </pre>
-     *  This would calculate the 1000th (n = 1000) Fibonacci number almost instantly
-     *  as <br/><br/>
-     *  4.346655768694153E208
+     * This would calculate the 1000th (n = 1000) Fibonacci number almost instantly
+     * as <br/><br/>
+     * 4.346655768694153E208
      * </p>
      * <p>Here is a simple lambda for this. It shows fib(20) takes 1564 ms.</p>
-     *  <pre>
+     * <pre>
      *     fib(n)->n<=2?1:fib(n-1)+fib(n-2)
      *       date_ms();fib(20);date_ms()
      * 1627617295780
@@ -348,10 +349,10 @@ public class MathFunctionsTest extends AbstractQDLTester {
      *   97344-95780
      * 1564
      * </pre>
-
+     *
      * @throws Throwable
      */
-     
+
     public void testRecursion() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -367,31 +368,32 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 6765L;
     }
 
-     public void testSignedIndex() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "y := n(10).(-1);"); // should return last one, 9
-         addLine(script, "z := n(9).(-4);"); // should return 5
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         assert getLongValue("y", state) == 9L;
-         assert getLongValue("z", state) == 5L;
-     }
-   /*
-        This tests that arguments to functions are executed in the function scope, not
-        in the ambient scope.
-    */
-   public void testFunctionArgumentScope() throws Throwable {
-       State state = testUtils.getNewState();
-       StringBuffer script = new StringBuffer();
-       addLine(script, "f(x)->a*x^2;"); // define a function that does not have a set.
-       addLine(script, "ok := f(a:=3) == 27;"); // should return 27
-       addLine(script, "ok2 := !is_defined(a);"); // should return 27
-       QDLInterpreter interpreter = new QDLInterpreter(null, state);
-       interpreter.execute(script.toString());
-       assert getBooleanValue("ok", state);
-       assert getBooleanValue("ok2", state);
-   }
+    public void testSignedIndex() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "y := n(10).(-1);"); // should return last one, 9
+        addLine(script, "z := n(9).(-4);"); // should return 5
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("y", state) == 9L;
+        assert getLongValue("z", state) == 5L;
+    }
+
+    /*
+         This tests that arguments to functions are executed in the function scope, not
+         in the ambient scope.
+     */
+    public void testFunctionArgumentScope() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "f(x)->a*x^2;"); // define a function that does not have a set.
+        addLine(script, "ok := f(a:=3) == 27;"); // should return 27
+        addLine(script, "ok2 := !is_defined(a);"); // should return 27
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok2", state);
+    }
 
     /**
      * Test nroot and sqrt. this computes the closed form solution of
@@ -403,17 +405,37 @@ public class MathFunctionsTest extends AbstractQDLTester {
      *      r := (nroot((27+3*sqrt(69))/2,3) + nroot((27-3*sqrt(69))/2,3))/3
      * </pre>
      * and verify that indeed it works up to comparison tolerances.
+     *
      * @throws Throwable
      */
     public void testRoots() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "sqrt(x)->nroot(x,2);") ;
+        addLine(script, "sqrt(x)->nroot(x,2);");
         addLine(script, "r := (nroot((27+3*sqrt(69))/2,3) + nroot((27-3*sqrt(69))/2,3))/3;"); //
         addLine(script, "s := r^3 - r - 1;"); // should return zero
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert areEqual(getBDValue("s", state), BigDecimal.ZERO);
+    }
+
+    /**
+     * If the modulus operation would get lost in rounding, then {@link BigDecimal} throws
+     * and {@link ArithmeticException}. This test sets the digits high enough and computes
+     * it. This tests one with two huge numbers (easy case) then sets the precision high enough.
+     *
+     * @throws Throwable
+     */
+    public void testBigMod() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := mod(494590348974597684,394874589745) == 53454241559;");
+        addLine(script, "numeric_digits(100);");
+        addLine(script, "ok1 := mod(498723987945689378498579456, 1009) == 556;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not find modulus of two huge integers.";
+        assert getBooleanValue("ok1", state) : "Could not find modulus of one huge, one small integer.";
     }
 
 }

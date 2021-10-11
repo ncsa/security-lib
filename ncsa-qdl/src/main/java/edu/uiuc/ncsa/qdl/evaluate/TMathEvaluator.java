@@ -395,7 +395,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 bd = ch.obermuhlner.math.big.BigDecimalMath.asin(x, mathContext);
                 break;
             case TANGENT:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
+                try {
+                    bd = ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
+                }catch(ArithmeticException ax){
+                    throw new IllegalArgumentException("you do not have enough precision to compute " + TANGENT + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
+                }
                 break;
             case ARC_TANGENT:
                 bd = ch.obermuhlner.math.big.BigDecimalMath.atan(x, mathContext);
@@ -422,7 +426,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 bd = ch.obermuhlner.math.big.BigDecimalMath.acosh(x, mathContext);
                 break;
             case TANH:
-                bd = ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
+                try {
+                    bd = ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
+                }catch(ArithmeticException ax){
+                    throw new IllegalArgumentException("you do not have enough precision to compute " + TANH + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
+                }
                 break;
             case ARC_TANH:
                 bd = ch.obermuhlner.math.big.BigDecimalMath.atanh(x, mathContext);

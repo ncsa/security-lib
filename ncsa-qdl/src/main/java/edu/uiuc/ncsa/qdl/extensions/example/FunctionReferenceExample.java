@@ -36,7 +36,11 @@ public class FunctionReferenceExample implements QDLFunction {
     @Override
     public List<String> getDocumentation(int argCount) {
         List<String> doxx = new ArrayList<>();
-        doxx.add(getName() + "(@f, x) - simple example to show how to write a Java extension to process f(x).");
+
+        doxx.add(getName() + "(@f, x) - simple example for a Java extension that processes f(x) using a function reference.");
+        doxx.add("E.g.");
+        doxx.add("    " + getName() + "(@cos, pi()/7)");
+        doxx.add("0.900968867902419");
         return doxx;
     }
 }

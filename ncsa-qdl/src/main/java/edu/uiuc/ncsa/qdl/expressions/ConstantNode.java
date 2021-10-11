@@ -16,10 +16,11 @@ public class ConstantNode extends ExpressionImpl {
         return result;
     }
 
-    public ConstantNode(String  result) {
+    public ConstantNode(String result) {
         this(result, Constant.STRING_TYPE);
     }
-    public ConstantNode(Long  result) {
+
+    public ConstantNode(Long result) {
         this(result, Constant.LONG_TYPE);
     }
 
@@ -28,28 +29,29 @@ public class ConstantNode extends ExpressionImpl {
     }
 
     public ConstantNode(Boolean result) {
-            this(result, Constant.BOOLEAN_TYPE);
-        }
+        this(result, Constant.BOOLEAN_TYPE);
+    }
 
     public ConstantNode(QDLNull result) {
-            this(result, Constant.NULL_TYPE);
-        }
+        this(result, Constant.NULL_TYPE);
+    }
 
     public ConstantNode(Object result) {
-            this(result, Constant.getType(result));
-        }
+        this(result, Constant.getType(result));
+    }
+
     public ConstantNode(Object result, int resultType) {
         valence = 0;
         this.result = result;
         this.resultType = resultType;
         evaluated = true; //trivally
 
-        getSourceCode().add(result == null?"null":result.toString());
+        getSourceCode().add(result == null ? "null" : result.toString());
     }
 
     @Override
     public ExpressionNode makeCopy() {
-        ConstantNode constantNode = new ConstantNode(result,resultType);
+        ConstantNode constantNode = new ConstantNode(result, resultType);
         return constantNode;
     }
 }

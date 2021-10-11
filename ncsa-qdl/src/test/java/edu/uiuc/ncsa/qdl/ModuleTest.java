@@ -739,6 +739,18 @@ cannot access '__a'
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state): "Could not set variable from global state on module import";
     }
+    public void testMLRemove() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "zz := -1;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "ok := zz == X#get_private();");
+        addLine(script, "module_remove('X');");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state): "Could not set variable from global state on module import";
+    }
 
     public void testMLIntrinsicFunctionDefine() throws Throwable {
         State state = testUtils.getNewState();

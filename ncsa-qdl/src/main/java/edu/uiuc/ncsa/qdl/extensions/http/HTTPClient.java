@@ -5,22 +5,24 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.*;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
@@ -30,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -54,6 +57,10 @@ public class HTTPClient implements QDLModuleMetaClass {
     public String CLOSE_METHOD = "close";
     public String OPEN_METHOD = "open";
     public String IS_OPEN_METHOD = "is_open";
+    public static final String CONTENT_FORM = "application/x-www-form-urlencoded";
+    public static final String CONTENT_JSON = "application/json";
+    public static final String CONTENT_HTML = "text/html";
+
 
     public class Host implements QDLFunction {
         @Override
@@ -440,4 +447,132 @@ public class HTTPClient implements QDLModuleMetaClass {
             return doxx;
         }
     }
+
+    public class Post implements QDLFunction {
+        @Override
+        public String getName() {
+            return POST_METHOD;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1,2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            return doPostOrPut(objects, state, true);
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "({uri_path,} payload.) do a post with the payload. ");
+            return doxx;
+        }
+    }
+
+    public class Put implements QDLFunction {
+        @Override
+        public String getName() {
+            return PUT_METHOD;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1, 2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            return doPostOrPut(objects, state, false);
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "({uri_path,} payload.) do a put with the payload. ");
+            return doxx;
+        }
+    }
+
+    public Object doPostOrPut(Object[] objects, State state, boolean isPost) {
+        // if the type is form encoded, escape each element in the payload.
+        // If JSON, send the payload as a JSON blob.
+        String uriPath = "";
+        StemVariable payload = null;
+        switch (objects.length) {
+            case 1:
+                if (objects[0] instanceof StemVariable) {
+                    payload = (StemVariable) objects[0];
+                } else {
+                    throw new IllegalArgumentException("monadic " + (isPost ? POST_METHOD : PUT_METHOD) + " must have a stem as its second argument");
+                }
+
+                break;
+            case 2:
+                if (objects[0] instanceof String) {
+                    uriPath = (String) objects[0];
+                } else {
+                    throw new IllegalArgumentException("dyadic " + (isPost ? POST_METHOD : PUT_METHOD) + " must have a string as it first argument");
+                }
+                if (objects[1] instanceof StemVariable) {
+                    payload = (StemVariable) objects[1];
+                } else {
+                    throw new IllegalArgumentException("dyadic " + (isPost ? POST_METHOD : PUT_METHOD) + " must have a stem as its second argument");
+                }
+                break;
+            default:
+                throw new IllegalArgumentException((isPost ? POST_METHOD : PUT_METHOD) + " requires one or two arguments");
+        }
+        String contentType = "Content-Type";
+        String body = "";
+        String actualHost = host;
+        if (0 < uriPath.length()) {
+            actualHost = (actualHost.endsWith("/") ? "" : "/");
+        }
+        if (headers.containsKey(contentType)) {
+            switch (headers.getString(contentType)) {
+                case CONTENT_JSON:
+                    body = payload.toJSON().toString();
+                    break;
+                case CONTENT_FORM:
+                    boolean isFirst = true;
+                    for (String key : payload.keySet()) {
+                        body = body + (isFirst ? "" : "&") + key + "=" + payload.getString(key);
+                        if (isFirst) isFirst = false;
+                    }
+                    break;
+            }
+        }
+        HttpEntityEnclosingRequest request;
+        if (isPost) {
+            request = new HttpPost(actualHost);
+        } else {
+            request = new HttpPut(actualHost);
+
+        }
+        HttpEntity httpEntity = null;
+        try {
+            httpEntity = new ByteArrayEntity(body.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException unsupportedEncodingException) {
+            throw new NFWException("UTF-8is, apparently buested in Java:" + unsupportedEncodingException.getMessage());
+        }
+        request.setEntity(httpEntity);
+
+        if ((headers != null) && !headers.isEmpty()) {
+            for (Object key : headers.keySet()) {
+                request.addHeader(key.toString(), headers.getString(key.toString()));
+            }
+        }
+        try {
+            CloseableHttpResponse response = httpClient.execute((HttpUriRequest) request);
+            return getResponseStem(response);
+        } catch (ClientProtocolException e) {
+            throw new QDLException("could not do " + (isPost ? POST_METHOD : PUT_METHOD) + " because of protocol error:'" + e.getMessage() + "'");
+        } catch (IOException e) {
+            throw new QDLException("could not do " + (isPost ? POST_METHOD : PUT_METHOD) + " because of I/O error:'" + e.getMessage() + "'");
+        }
+    }
+ //   public class Delete implements QDLFunction
 }

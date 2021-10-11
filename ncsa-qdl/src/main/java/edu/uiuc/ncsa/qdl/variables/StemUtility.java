@@ -326,4 +326,36 @@ public class StemUtility {
         }
                 formatList(outerStem);
     }
+
+    /**
+     * Convert a stem list to a string, separated by line feeds.
+     * If <code>forceToString</code> is true, then every elements toString is
+     * called, otherwise, if the element is not a string, an exception is thrown.
+     * @param contents
+     * @param forceToString
+     * @return
+     */
+    public static String stemListToString(StemVariable contents, boolean forceToString){
+        if(contents.isEmpty()){
+            return "";
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        if (!contents.containsKey("0") && !contents.isEmpty()) {
+            throw new IllegalArgumentException("Error: The given stem is not a list.");
+        }
+        for (int i = 0; i < contents.size(); i++) {
+            Object object = contents.get(Integer.toString(i));
+            if(forceToString){
+                stringBuilder.append(contents.get(Integer.toString(i)) + "\n");
+
+            }else {
+                if(object instanceof String) {
+                    stringBuilder.append((String)object + "\n");
+                }else{
+                    throw new IllegalArgumentException("object '" + object + "' is not a string");
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
 }

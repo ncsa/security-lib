@@ -9,6 +9,7 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**
+ * Very much improved way to handle assignments. Use this
  * <p>Created by Jeff Gaynor<br>
  * on 6/3/21 at  5:10 AM
  */
@@ -179,27 +180,6 @@ public class ANode2 extends ExpressionImpl {
 
     protected Object setExpValue(State state, ExpressionStemNode esn, int resultType, Object result) {
         return esn.setValue(state, result);
-/*
-        Object target = getLeftArg().evaluate(state);
-        getLeftArg().setEvaluated(true);
-        getLeftArg().setResultType(Constant.getType(target));
-
-        switch (resultType) {
-            case STEM_TYPE:
-                break;
-            case NULL_TYPE:
-                break;
-            case STRING_TYPE:
-            case BOOLEAN_TYPE:
-            case LONG_TYPE:
-            case DECIMAL_TYPE:
-                break;
-            default:
-                throw new IllegalArgumentException("error, the type of the value \"" + result + "\" is unknown");
-
-        }
-        return result;
-*/
     }
 
     protected Object setVariableValue(State state, String variableReference, int resultType, Object result) {

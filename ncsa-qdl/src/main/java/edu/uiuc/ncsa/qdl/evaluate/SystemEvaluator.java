@@ -19,6 +19,7 @@ import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
+import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
@@ -124,6 +125,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String MODULE_PATH = "module_path";
     public static final int MODULE_PATH_TYPE = 211 + SYSTEM_BASE_VALUE;
 
+    public static final String MODULE_REMOVE = "module_remove";
+    public static final int MODULE_REMOVE_TYPE = 212 + SYSTEM_BASE_VALUE;
+
 
     // For system constants
     public static final String CONSTANTS = "constants";
@@ -165,45 +169,42 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final int SCRIPT_PATH_COMMAND_TYPE = 403 + SYSTEM_BASE_VALUE;
 
 
-
-
-
-
     @Override
     public String[] getFunctionNames() {
-        if(fNames == null){
+        if (fNames == null) {
             fNames = new String[]{
-                        IS_DEFINED,
-                        VAR_TYPE,
-                        TO_NUMBER,
-                        TO_STRING,
-                        TO_BOOLEAN,
-                        SAY_FUNCTION,
-                        PRINT_FUNCTION,
-                        REDUCE, EXPAND,
-                        SCRIPT_PATH_COMMAND,
-                        SCRIPT_ARGS_COMMAND,
-                        SYS_INFO,
-                        OS_ENV,
-                        SYSTEM_LOG,
-                        DEBUG,
-                        CONSTANTS,
-                        CONTINUE,
-                        INTERRUPT,
-                        BREAK,
-                        EXECUTE,
-                        CHECK_SYNTAX,
-                        INPUT_FORM,
-                        FOR_KEYS,
-                        FOR_NEXT,
-                        CHECK_AFTER,
-                        RETURN,
-                        MODULE_IMPORT,
-                        MODULE_LOAD,
-                        MODULE_PATH,
-                        RAISE_ERROR,
-                        RUN_COMMAND,
-                        LOAD_COMMAND};
+                    IS_DEFINED,
+                    VAR_TYPE,
+                    TO_NUMBER,
+                    TO_STRING,
+                    TO_BOOLEAN,
+                    SAY_FUNCTION,
+                    PRINT_FUNCTION,
+                    REDUCE, EXPAND,
+                    SCRIPT_PATH_COMMAND,
+                    SCRIPT_ARGS_COMMAND,
+                    SYS_INFO,
+                    OS_ENV,
+                    SYSTEM_LOG,
+                    DEBUG,
+                    CONSTANTS,
+                    CONTINUE,
+                    INTERRUPT,
+                    BREAK,
+                    EXECUTE,
+                    CHECK_SYNTAX,
+                    INPUT_FORM,
+                    FOR_KEYS,
+                    FOR_NEXT,
+                    CHECK_AFTER,
+                    RETURN,
+                    MODULE_IMPORT,
+                    MODULE_REMOVE,
+                    MODULE_LOAD,
+                    MODULE_PATH,
+                    RAISE_ERROR,
+                    RUN_COMMAND,
+                    LOAD_COMMAND};
         }
         return fNames;
     }
@@ -270,6 +271,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return LOAD_MODULE_TYPE;
             case MODULE_PATH:
                 return MODULE_PATH_TYPE;
+            case MODULE_REMOVE:
+                return MODULE_REMOVE_TYPE;
             case RAISE_ERROR:
                 return RAISE_ERROR_TYPE;
             case RUN_COMMAND:
@@ -366,6 +369,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             case MODULE_PATH:
                 doModulePaths(polyad, state);
                 return true;
+            case MODULE_REMOVE:
+                doModuleRemove(polyad, state);
+                return true;
             case RAISE_ERROR:
                 doRaiseError(polyad, state);
                 return true;
@@ -380,6 +386,37 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doModuleRemove(Polyad polyad, State state) {
+        if(polyad.getArgCount() != 1){
+            throw new IllegalArgumentException(MODULE_REMOVE + " requires one argument");
+        }
+
+        Object result = polyad.evalArg(0,state);
+        StemVariable aliases = null;
+        // normalize argument
+        if(result instanceof StemVariable){
+            aliases = (StemVariable) result;
+        }
+        if(result instanceof String){
+            aliases = new StemVariable();
+            aliases.put(0L, (String)result);
+        }
+        if(aliases == null){
+            throw new IllegalArgumentException("unknown argument type '" + result + "' for " + MODULE_REMOVE);
+        }
+        for(String key : aliases.keySet()){
+            Object object2 = aliases.get(key);
+            if(!isString(object2)){
+                throw new IllegalArgumentException("'" + object2 + "' for " + MODULE_REMOVE + " is not a string.");
+            }
+            state.getImportedModules().remove(object2);
+            state.getImportManager().removeAlias(object2);
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     /*
@@ -1581,7 +1618,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             List<String> afterLoad = new ArrayList<>();
             for (URI uri : state.getModuleMap().getChangeList()) {
-                    afterLoad.add(uri.toString());
+                afterLoad.add(uri.toString());
             }
             state.getModuleMap().clearChangeList();
             return afterLoad;
@@ -1830,9 +1867,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }
 
-          State newModuleState = state.newModuleState();
-          newModuleState.setSuperState(state);
-          newModuleState.setSuperStateReadOnly(true);
+            State newModuleState = state.newModuleState();
+            newModuleState.setSuperState(state);
+            newModuleState.setSuperStateReadOnly(true);
 
             Module newInstance = m.newInstance(newModuleState);
             if (newInstance instanceof JavaModule) {
@@ -1943,6 +1980,81 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         Object result = polyad.evalArg(0, state);
         checkNull(result, polyad.getArgAt(0), state);
+        StringReader stringReader = null;
+
+        if (isString(result)) {
+            String string = ((String) result).trim();
+            // if its interested, don't let the machinery rumble to life, just return
+            if (string.length() == 0) {
+                polyad.setResultType(Constant.STRING_TYPE);
+                polyad.setResult(string);
+                polyad.setEvaluated(true);
+                return;
+            }
+            if (!string.endsWith(";")) {
+                string = string + ";";
+            }
+            stringReader = new StringReader(string);
+        }
+        if (isStemList(result)) {
+            stringReader = new StringReader(StemUtility.stemListToString((StemVariable) result, false));
+        }
+        if (stringReader == null) {
+            throw new IllegalArgumentException("No executable argument found.");
+        }
+        QDLRunner runner;
+        QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
+        try {
+            runner = p.execute(stringReader);
+        } catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
+            throw new QDLException(EXECUTE + " failed:'" + t.getMessage() + "'", t);
+        }
+        List<Element> elements = runner.getElements();
+        if (elements.size() == 0) {
+            // nothing done, for whateve reason, e.g. they sent in a list of comments
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setEvaluated(true);
+            return;
+        }
+        Element lastElement = elements.get(elements.size() - 1);
+        if (lastElement.getStatement() instanceof StatementWithResultInterface) {
+            StatementWithResultInterface swri = (StatementWithResultInterface) lastElement.getStatement();
+            if (swri instanceof ANode2) {
+                polyad.setResult("");
+                polyad.setResultType(Constant.STRING_TYPE);
+                polyad.setEvaluated(true);
+                return;
+            }
+            polyad.setResult(swri.getResult());
+            polyad.setResultType(swri.getResultType());
+            polyad.setEvaluated(true);
+            return;
+        }
+        // QDLParserDriver driver = new QDLParserDriver(null, state);
+        polyad.setResultType(Constant.NULL_TYPE);
+        polyad.setResult(QDLNull.getInstance());
+        polyad.setEvaluated(true);
+
+    }
+       /*
+           my_stem.0 :='var';
+  my_stem.1 :=':= \'abc\'';
+  my_stem.2 := '+';
+  my_stem.3 := '\'def\';';
+      execute(my_stem.)
+        */
+    protected void OLDdoExecute(Polyad polyad, State state) {
+        // execute a string.
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("Error. Wrong number of arguments. " +
+                    "This requires a single argument that is a string or a list of them.");
+        }
+        Object result = polyad.evalArg(0, state);
+        checkNull(result, polyad.getArgAt(0), state);
         StemVariable stem = null;
 
         if (isString(result)) {
@@ -1956,8 +2068,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("No executable argument found.");
         }
 
-
         QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
+        // QDLParserDriver driver = new QDLParserDriver(null, state);
         for (int i = 0; i < stem.size(); i++) {
             String currentIndex = Integer.toString(i);
             if (!stem.containsKey(currentIndex)) {
@@ -1965,6 +2077,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             try {
                 p.execute(stem.getString(Integer.toString(i)));
+
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
                 throw new GeneralException("Error during execution at index " + i + ".", throwable);
@@ -1975,181 +2088,184 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
 
     }
+
     // Convert a wide variety of inputs to boolean. This is useful in scripts where the arguments might
-     // be string from external sources, e.g.
-     private void doToBoolean(Polyad polyad, State state) {
-         if (polyad.getArgCount() != 1) {
-             throw new IllegalArgumentException(TO_BOOLEAN_TYPE + " requires an argument");
-         }
-         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
-             @Override
-             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                 switch (Constant.getType(objects[0])) {
-                     case Constant.BOOLEAN_TYPE:
-                         r.result = ((Boolean) objects[0]);
-                         r.resultType = Constant.BOOLEAN_TYPE;
-                         break;
-                     case Constant.STRING_TYPE:
-                         String x = (String) objects[0];
-                         r.result = x.equals("true");
-                         r.resultType = Constant.BOOLEAN_TYPE;
-                         break;
-                     case Constant.LONG_TYPE:
-                         Long y = (Long) objects[0];
-                         r.result = y.equals(1L);
-                         r.resultType = Constant.BOOLEAN_TYPE;
-                         break;
-                     case Constant.DECIMAL_TYPE:
-                         BigDecimal bd = (BigDecimal) objects[0];
+    // be string from external sources, e.g.
+    private void doToBoolean(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException(TO_BOOLEAN_TYPE + " requires an argument");
+        }
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                switch (Constant.getType(objects[0])) {
+                    case Constant.BOOLEAN_TYPE:
+                        r.result = ((Boolean) objects[0]);
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.STRING_TYPE:
+                        String x = (String) objects[0];
+                        r.result = x.equals("true");
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.LONG_TYPE:
+                        Long y = (Long) objects[0];
+                        r.result = y.equals(1L);
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        BigDecimal bd = (BigDecimal) objects[0];
 
-                         r.result = bd.longValue() == 1;
-                         r.resultType = Constant.BOOLEAN_TYPE;
-                         break;
-                     case Constant.NULL_TYPE:
-                         throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert null.");
-                     case Constant.STEM_TYPE:
-                         throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert a stem.");
-                     case Constant.UNKNOWN_TYPE:
-                         throw new IllegalArgumentException("" + TO_BOOLEAN + " unknown argument type.");
-                 }
-                 return r;
-             }
-         };
-         process1(polyad, pointer, TO_BOOLEAN, state);
+                        r.result = bd.longValue() == 1;
+                        r.resultType = Constant.BOOLEAN_TYPE;
+                        break;
+                    case Constant.NULL_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert null.");
+                    case Constant.STEM_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " cannot convert a stem.");
+                    case Constant.UNKNOWN_TYPE:
+                        throw new IllegalArgumentException("" + TO_BOOLEAN + " unknown argument type.");
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TO_BOOLEAN, state);
 
 
-     }
+    }
 
-     //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
-     private void doToNumber(Polyad polyad, State state) {
-         if (polyad.getArgCount() != 1) {
-             throw new IllegalArgumentException("" + TO_NUMBER + " requires an argument");
-         }
-         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
-             @Override
-             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
-                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                 switch (Constant.getType(objects[0])) {
-                     case Constant.BOOLEAN_TYPE:
-                         r.result = ((Boolean) objects[0]) ? 1L : 0L;
-                         r.resultType = Constant.LONG_TYPE;
-                         break;
-                     case Constant.STRING_TYPE:
-                         String x = (String) objects[0];
-                         try {
-                             r.result = Long.parseLong(x);
-                             r.resultType = Constant.LONG_TYPE;
-                         } catch (NumberFormatException nfx0) {
-                             try {
-                                 r.result = new BigDecimal(x);
-                                 r.resultType = Constant.DECIMAL_TYPE;
-                             } catch (NumberFormatException nfx2) {
-                                 // ok, kill it here.
-                                 throw new IllegalArgumentException(("" + objects[0] + " is not a number."));
-                             }
-                         }
-                         break;
-                     case Constant.LONG_TYPE:
-                         r.result = objects[0];
-                         r.resultType = Constant.LONG_TYPE;
-                         break;
-                     case Constant.DECIMAL_TYPE:
-                         r.result = objects[0];
-                         r.resultType = Constant.DECIMAL_TYPE;
-                         break;
-                     case Constant.NULL_TYPE:
-                         throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert null.");
-                     case Constant.STEM_TYPE:
-                         throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert a stem.");
-                     case Constant.UNKNOWN_TYPE:
-                         throw new IllegalArgumentException("" + TO_NUMBER + " unknown argument type.");
-                 }
-                 return r;
-             }
-         };
-         process1(polyad, pointer, TO_NUMBER, state);
-     }
+    //   s.0 := '123';s.1 := '-3.14159'; s.2 := true; s.3:=365;
+    private void doToNumber(Polyad polyad, State state) {
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("" + TO_NUMBER + " requires an argument");
+        }
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                switch (Constant.getType(objects[0])) {
+                    case Constant.BOOLEAN_TYPE:
+                        r.result = ((Boolean) objects[0]) ? 1L : 0L;
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.STRING_TYPE:
+                        String x = (String) objects[0];
+                        try {
+                            r.result = Long.parseLong(x);
+                            r.resultType = Constant.LONG_TYPE;
+                        } catch (NumberFormatException nfx0) {
+                            try {
+                                r.result = new BigDecimal(x);
+                                r.resultType = Constant.DECIMAL_TYPE;
+                            } catch (NumberFormatException nfx2) {
+                                // ok, kill it here.
+                                throw new IllegalArgumentException(("" + objects[0] + " is not a number."));
+                            }
+                        }
+                        break;
+                    case Constant.LONG_TYPE:
+                        r.result = objects[0];
+                        r.resultType = Constant.LONG_TYPE;
+                        break;
+                    case Constant.DECIMAL_TYPE:
+                        r.result = objects[0];
+                        r.resultType = Constant.DECIMAL_TYPE;
+                        break;
+                    case Constant.NULL_TYPE:
+                        throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert null.");
+                    case Constant.STEM_TYPE:
+                        throw new IllegalArgumentException("" + TO_NUMBER + " cannot convert a stem.");
+                    case Constant.UNKNOWN_TYPE:
+                        throw new IllegalArgumentException("" + TO_NUMBER + " unknown argument type.");
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, TO_NUMBER, state);
+    }
+
     /**
-       * Does print, say and to_string commands.
-       *
-       * @param polyad
-       * @param state
-       * @param printIt
-       */
-      protected void doPrint(Polyad polyad, State state, boolean printIt) {
-          if (printIt && state.isRestrictedIO()) {
-              polyad.setResult(QDLNull.getInstance());
-              polyad.setResultType(Constant.NULL_TYPE);
-              polyad.setEvaluated(true);
-              return;
-          }
-          String result = "";
-          boolean prettyPrintForStems = false;
-          if (polyad.getArgCount() != 0) {
-              Object temp = null;
-              temp = polyad.evalArg(0, state);
-              checkNull(temp, polyad.getArgAt(0));
+     * Does print, say and to_string commands.
+     *
+     * @param polyad
+     * @param state
+     * @param printIt
+     */
+    protected void doPrint(Polyad polyad, State state, boolean printIt) {
+        if (printIt && state.isRestrictedIO()) {
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        String result = "";
+        boolean prettyPrintForStems = false;
+        if (polyad.getArgCount() != 0) {
+            Object temp = null;
+            temp = polyad.evalArg(0, state);
+            checkNull(temp, polyad.getArgAt(0));
 
-              // null ok here. Means undefined variable
-              if (polyad.getArgCount() == 2) {
-                  // assume pretty print for stems.
-                  Object flag = polyad.evalArg(1, state);
-                  checkNull(flag, polyad.getArgAt(1));
-                  if (flag instanceof Boolean) {
-                      prettyPrintForStems = (Boolean) flag;
-                  }
-              }
-              if (temp == null || temp instanceof QDLNull) {
-                  if (State.isPrintUnicode()) {
-                      result = "∅";
-                  } else {
-                      result = "null";
-                  }
+            // null ok here. Means undefined variable
+            if (polyad.getArgCount() == 2) {
+                // assume pretty print for stems.
+                Object flag = polyad.evalArg(1, state);
+                checkNull(flag, polyad.getArgAt(1));
+                if (flag instanceof Boolean) {
+                    prettyPrintForStems = (Boolean) flag;
+                }
+            }
+            if (temp == null || temp instanceof QDLNull) {
+                if (State.isPrintUnicode()) {
+                    result = "∅";
+                } else {
+                    result = "null";
+                }
 
-              } else {
-                  if (temp instanceof StemVariable) {
-                      StemVariable s = ((StemVariable) temp);
-                      if (prettyPrintForStems) {
+            } else {
+                if (temp instanceof StemVariable) {
+                    StemVariable s = ((StemVariable) temp);
+                    if (prettyPrintForStems) {
 
-                          result = ((StemVariable) temp).toString(1);
-                      } else {
-                          result = temp.toString();
-                      }
-                  } else {
-                      if (temp instanceof BigDecimal) {
-                          result = InputFormUtil.inputForm((BigDecimal) temp);
+                        result = ((StemVariable) temp).toString(1);
+                    } else {
+                        result = temp.toString();
+                    }
+                } else {
+                    if (temp instanceof BigDecimal) {
+                        result = InputFormUtil.inputForm((BigDecimal) temp);
 
-                      } else {
-                          if (State.isPrintUnicode() && temp instanceof Boolean) {
-                              result = ((Boolean) temp) ? "⊤" : "⊥";
-                          } else {
-                              result = temp.toString();
-                          }
-                      }
-                  }
-              }
-          }
+                    } else {
+                        if (State.isPrintUnicode() && temp instanceof Boolean) {
+                            result = ((Boolean) temp) ? "⊤" : "⊥";
+                        } else {
+                            result = temp.toString();
+                        }
+                    }
+                }
+            }
+        }
 
-          if (printIt) {
-              state.getIoInterface().println(result);
-              //System.out.println(result);
-          }
-          if (polyad.getArgCount() == 0) {
-              polyad.setResult(QDLNull.getInstance());
-              polyad.setResultType(Constant.NULL_TYPE);
-          } else {
-              if (printIt) {
-                  polyad.setResult(polyad.getArgAt(0).getResult());
-                  polyad.setResultType(polyad.getArgAt(0).getResultType());
+        if (printIt) {
+            state.getIoInterface().println(result);
+            //System.out.println(result);
+        }
+        if (polyad.getArgCount() == 0) {
+            polyad.setResult(QDLNull.getInstance());
+            polyad.setResultType(Constant.NULL_TYPE);
+        } else {
+            if (printIt) {
+                polyad.setResult(polyad.getArgAt(0).getResult());
+                polyad.setResultType(polyad.getArgAt(0).getResultType());
 
-              } else {
-                  polyad.setResult(result);
-                  polyad.setResultType(Constant.STRING_TYPE);
-              }
-          }
-          polyad.setEvaluated(true);
-      }
+            } else {
+                polyad.setResult(result);
+                polyad.setResultType(Constant.STRING_TYPE);
+            }
+        }
+        polyad.setEvaluated(true);
+    }
+
     /**
      * Get the type of the argument.
      *
@@ -2180,45 +2296,46 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(output);
         polyad.setEvaluated(true);
     }
+
     protected void isDefined(Polyad polyad, State state) {
-         if (polyad.getArgCount() != 1) {
-             throw new IllegalArgumentException("the " + IS_DEFINED + " function requires 1 argument");
-         }
-         boolean isDef = false;
-         try {
-             polyad.evalArg(0, state);
-         } catch (IndexError | UnknownSymbolException  | IllegalStateException exception) { // ESN's can throw illegal arg exception
-             polyad.setResult(isDef);
-             polyad.setResultType(Constant.BOOLEAN_TYPE);
-             polyad.setEvaluated(true);
-             return;
-         }
-         if (polyad.getArgAt(0) instanceof VariableNode) {
-             VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
-             // Don't evaluate this because it might not exist (that's what we are testing for). Just check
-             // if the name is defined.
-             isDef = state.isDefined(variableNode.getVariableReference());
-         }
-         if (polyad.getArgAt(0) instanceof ConstantNode) {
-             ConstantNode variableNode = (ConstantNode) polyad.getArgAt(0);
-             Object x = variableNode.getResult();
-             if (x == null) {
-                 isDef = false;
-             } else {
-                 isDef = state.isDefined(x.toString());
-             }
-         }
-         if (polyad.getArgAt(0) instanceof ESN2) {
-             Object object = polyad.getArgAt(0).getResult();
-             if (object == null) {
-                 isDef = false;
-             } else {
-                 isDef = true;
-             }
-         }
-         polyad.setResult(isDef);
-         polyad.setResultType(Constant.BOOLEAN_TYPE);
-         polyad.setEvaluated(true);
-     }
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException("the " + IS_DEFINED + " function requires 1 argument");
+        }
+        boolean isDef = false;
+        try {
+            polyad.evalArg(0, state);
+        } catch (IndexError | UnknownSymbolException | IllegalStateException exception) { // ESN's can throw illegal arg exception
+            polyad.setResult(isDef);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgAt(0) instanceof VariableNode) {
+            VariableNode variableNode = (VariableNode) polyad.getArgAt(0);
+            // Don't evaluate this because it might not exist (that's what we are testing for). Just check
+            // if the name is defined.
+            isDef = state.isDefined(variableNode.getVariableReference());
+        }
+        if (polyad.getArgAt(0) instanceof ConstantNode) {
+            ConstantNode variableNode = (ConstantNode) polyad.getArgAt(0);
+            Object x = variableNode.getResult();
+            if (x == null) {
+                isDef = false;
+            } else {
+                isDef = state.isDefined(x.toString());
+            }
+        }
+        if (polyad.getArgAt(0) instanceof ESN2) {
+            Object object = polyad.getArgAt(0).getResult();
+            if (object == null) {
+                isDef = false;
+            } else {
+                isDef = true;
+            }
+        }
+        polyad.setResult(isDef);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
+    }
 
 }

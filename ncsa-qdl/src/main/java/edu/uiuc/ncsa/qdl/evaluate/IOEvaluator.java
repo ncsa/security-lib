@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.parsing.IniParserDriver;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -13,11 +14,14 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
@@ -62,22 +66,22 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     public static final int VFS_UNMOUNT_TYPE = 101 + IO_FUNCTION_BASE_VALUE;
 
     @Override
-     public String getNamespace() {
-         return IO_NAMESPACE;
-     }
+    public String getNamespace() {
+        return IO_NAMESPACE;
+    }
 
 
     @Override
     public String[] getFunctionNames() {
 
-        if(fNames == null){
+        if (fNames == null) {
             fNames = new String[]{
-                        SCAN_FUNCTION,
-                        READ_FILE,
-                        WRITE_FILE,
-                        DIR,
-                        VFS_MOUNT,
-                        VFS_UNMOUNT};
+                    SCAN_FUNCTION,
+                    READ_FILE,
+                    WRITE_FILE,
+                    DIR,
+                    VFS_MOUNT,
+                    VFS_UNMOUNT};
         }
         return fNames;
     }
@@ -650,6 +654,28 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     polyad.setResultType(Constant.STEM_TYPE);
                     polyad.setEvaluated(true);
                     return;
+                case FILE_OP_TEXT_INI:
+                    // read it as a stem and start parsing
+                    String content;
+                    if (hasVF) {
+                        content = vfsEntry.getText();
+                    } else {
+                        content = QDLFileUtil.readFileAsString(fileName);
+                    }
+                    if(StringUtils.isTrivial(content)){
+                        polyad.setResult(new StemVariable());
+                        polyad.setResultType(Constant.STEM_TYPE);
+                        polyad.setEvaluated(true);
+                        return;
+                    }
+                    IniParserDriver iniParserDriver = new IniParserDriver();
+                    StringReader stringReader= new StringReader(content);
+                    StemVariable out = iniParserDriver.parse(stringReader);
+
+                    polyad.setResult(out);
+                    polyad.setResultType(Constant.STEM_TYPE);
+                    polyad.setEvaluated(true);
+                    return;
                 default:
                 case FILE_OP_TEXT_STRING:
                     // read it as a long string.
@@ -670,5 +696,23 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new QDLException("Error reading file '" + fileName + "'" + t.getMessage());
         }
 
+    }
+
+    protected StemVariable fromIniFile(List<String> content) {
+        StemVariable out = new StemVariable();
+        StemVariable current = null;
+
+        for (String line : content) {
+            line = line.trim();
+            if (line.startsWith("[")) {
+                if (line.endsWith("]")) {
+                    current = new StemVariable();
+
+                } else {
+                    throw new IllegalArgumentException("ini file sections must be enclosed in brackets");
+                }
+            }
+        }
+        return out;
     }
 }

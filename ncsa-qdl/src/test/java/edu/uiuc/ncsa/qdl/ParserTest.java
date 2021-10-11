@@ -656,10 +656,6 @@ public class ParserTest extends AbstractQDLTester {
      */
 
 
-
-
-
-
     /**
      * We test the Fibonacci continued (partial) fraction
      * f(x):=1+(1/(1+1/(1+1/(1+1/(x^2+1)))))
@@ -712,7 +708,6 @@ public class ParserTest extends AbstractQDLTester {
     }
 
 
-
     /**
      * very, very basic compact stem notation test.
      *
@@ -751,9 +746,6 @@ public class ParserTest extends AbstractQDLTester {
         assert innnerStem.containsKey("t");
         assert innnerStem.getLong("t").equals(42L);
     }
-
-
-
 
 
     /**
@@ -1299,6 +1291,47 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getStringValue("var", state).equals("abcdef");
 
+    }
+
+    /**
+     * Same as other test, but is a single string with no terminating semi-colon.
+     * System should add it as of revision on 10/10/2021
+     *
+     * @throws Throwable
+     */
+    public void testExecuteNoSemiColon() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "execute('var := \\'abc\\' + \\'def\\';');");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("var", state).equals("abcdef");
+    }
+
+    /**
+     * Simple test of a stem of lines that is run
+     * @throws Throwable
+     */
+    public void testExecuteStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "my_stem.0 :='var';");
+        addLine(script, "my_stem.1 :=':= \\'abc\\'';");
+        addLine(script, "my_stem.2 := '+';");
+        addLine(script, "my_stem.3 := '\\'def\\';';");
+        addLine(script, "execute(my_stem.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getStringValue("var", state).equals("abcdef");
+    }
+    public void testExecuteStem2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "my_stem. :=['3','*','5',';'];");
+        addLine(script, "ok := 15 == execute(my_stem.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
     }
 
     /**
@@ -2062,10 +2095,6 @@ public class ParserTest extends AbstractQDLTester {
         assert !getBooleanValue("z", state);
         assert getLongValue("w", state).equals(4L);
     }
-
-
-
-
 
 
     /**

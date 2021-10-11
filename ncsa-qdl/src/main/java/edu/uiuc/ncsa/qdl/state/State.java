@@ -259,6 +259,7 @@ public class State extends FunctionState implements QDLConstants {
         fileTypes.put(SYS_FILE_TYPE_BINARY, new Long(IOEvaluator.FILE_OP_BINARY));
         fileTypes.put(SYS_FILE_TYPE_STEM, new Long(IOEvaluator.FILE_OP_TEXT_STEM));
         fileTypes.put(SYS_FILE_TYPE_STRING, new Long(IOEvaluator.FILE_OP_TEXT_STRING));
+        fileTypes.put(SYS_FILE_TYPE_INIT, new Long(IOEvaluator.FILE_OP_TEXT_INI));
         systemConstants.put(SYS_FILE_TYPES, fileTypes);
 
         StemVariable uriFields = new StemVariable();

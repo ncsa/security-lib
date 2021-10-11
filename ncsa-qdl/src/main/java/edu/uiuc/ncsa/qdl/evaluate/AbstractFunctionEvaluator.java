@@ -607,6 +607,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
     public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
+    public static final int FILE_OP_TEXT_INI = 2; //File is treated as an initialization file
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
 
     /**

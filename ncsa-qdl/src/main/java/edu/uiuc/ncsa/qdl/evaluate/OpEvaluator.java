@@ -371,8 +371,21 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 } else {
                     BigDecimal left = toBD(objects[0]);
                     BigDecimal right = toBD(objects[1]);
-                    r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN).longValue();
-                    r.resultType = Constant.LONG_TYPE;
+                    BigDecimal rr = null;
+                    try {
+                        rr = left.divideToIntegralValue(right, OpEvaluator.getMathContext());
+                    }catch (ArithmeticException ax0){
+                        throw new IllegalArgumentException("Insufficient precision to divide. Please increase " + MathEvaluator.NUMERIC_DIGITS);
+                    }
+                    try{
+                        r.result = rr.longValueExact();
+                        r.resultType = Constant.LONG_TYPE;
+                        return r;
+                    }catch(ArithmeticException ax){
+
+                    }
+                    r.result = rr;
+                    r.resultType = Constant.DECIMAL_TYPE;
                 }
                 return r;
             }
