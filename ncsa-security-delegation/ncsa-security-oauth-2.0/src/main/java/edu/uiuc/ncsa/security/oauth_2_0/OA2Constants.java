@@ -45,6 +45,11 @@ public interface OA2Constants {
      */
     public static String GRANT_TYPE_IMPLICIT = "implicit";
 
+    // CIL-1101
+    public static String GRANT_TYPE_DEVICE_FLOW = "urn:ietf:params:oauth:grant-type:device_code";
+
+
+
     public static String NONCE = "nonce";
     public static String PROMPT = "prompt";
     public static String MAX_AGE = "max_age";

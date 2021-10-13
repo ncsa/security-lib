@@ -14,6 +14,7 @@ module[
    get_private()->__private;
    set_private(x)->[__private := x;];
    h(x,y)->__f(x,y);
+   size()->42;
   ];
   /*
       Regression test for module scope

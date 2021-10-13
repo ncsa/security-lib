@@ -73,7 +73,7 @@ public class ModuleExpression extends ExpressionImpl {
                 nextME.setModuleState(getModuleState(state).getImportedModules().get(nextME.getAlias()).getState());
             }
         }
-        getExpression().setInModule(true);
+        getExpression().setAlias(getAlias());
         Object result = getExpression().evaluate(getLocalState(state));
         setResult(result);
         setResultType(Constant.getType(result));

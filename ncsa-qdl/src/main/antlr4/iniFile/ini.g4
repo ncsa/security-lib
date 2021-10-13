@@ -27,7 +27,7 @@ grammar ini;
           ini : (section | EOL)*;
       section : sectionheader line* ;
 sectionheader : '[' Identifier ']' EOL;
-         line : (Identifier (Assign entries) EOL) | EOL;
+         line : (Identifier (Assign entries) EOL) | EOL ;
        entries: entry (',' entry?)*;
         entry : ConstantKeywords | Number | String;
 

@@ -112,7 +112,8 @@ public class IniListenerImpl implements iniListener {
             return outString;
         }
         if (entryContext.ConstantKeywords() != null) {
-            if (entryContext.ConstantKeywords().equals("true")) {
+            System.out.println(entryContext.ConstantKeywords().getClass());
+            if (entryContext.ConstantKeywords().getText().equals("true")) {
                 return Boolean.TRUE;
             } else {
                 return Boolean.FALSE;
@@ -126,7 +127,6 @@ public class IniListenerImpl implements iniListener {
             }
             return new Long(entryContext.Number().getText());
         }
-        System.out.println("Got Type " + entryContext);
         throw new IllegalArgumentException("unkown type");
     }
 

@@ -520,8 +520,8 @@ So to get the transpose,
     <entry id="subset">
         <body>
             <![CDATA[
-Function to extract a subset. Note that the result is *always*
-a rank 1 stem and it operates only on the zeroth axis.
+Function to extract a subset from a list. Note that the result is
+*always* a rank 1 stem and this operates only on the zeroth axis.
 
 subset(source_list., start_index) -
           return a subset of the source_list starting at the given index.
@@ -532,7 +532,15 @@ Note: If n is omitted, then the rest of the list is returned from the start
       index on. The source is not altered and the resulting list has 0 as
       its first index.
 
-See also: n()
+For general stems, consider remap.
+
+E.g.
+    subset([10;20],4); // get rest of list from index 4 on
+[14,15,16,17,18,19]
+    subset([10;20],4,2); // start at index 4, give next 2 elements
+[14,15]
+
+See also: n(), remap
 ]]>
         </body>
     </entry>
@@ -3061,31 +3069,46 @@ See also: module, intrinsic.
     <entry id="ini">
             <body>
                 <![CDATA[
-QDL supports its own initialization file format. This is quite simple:
-[section]
-   line: name =|:= entry (,entry)*
-  entry: boolean | integer | decimal | scientific number | ‘string’;
-comment: // | # anything
+QDL supports its own initialization file format.
+Note that this file format is most emphatically not QDL!
+It is quite simple:
 
-So such a file has sections enclosed in []'s, and each line is an entry.
-Comments are restricted to a single line (though you can have as many together
-as you like, just not a comment block like /* ...*/). Entries are standard
-scalars (so booleans, integer, decimal, scientific notation or string in
-single quotes).
-Lists are just entries separated by commas.
+section: [section_name]
+   line: name (= | :=) entry (,entry)*
+  entry: boolean | number | 'string';
+comment: (// to end of line ) | (/* anything */)
 
-The aim of such a file is for building a possibly sizeable application with
-several sections that have their own configurations. Since bootstrapping such
-an application can be hard, you can put the critical information in an ini
-file, which can then be read (e.g., by the __init() method of a workspace).
-The format is easily edited with any text editor and simple enough that a
-user with little to no coding experience and fill in useful information.
+So such a file has sections enclosed in []'s, (these are not
+QDL lists) and each line is an entry, so lines cannot be split.
+Entries are standard scalars (so booleans, integer,
+decimal, scientific notation or strings in single quotes).
+Lists are just entries separated by commas. This means that
+the entries are typed.
 
-Note that while the syntax is sort of like QDL (single quotes around strings)
-it is not QDL and you cannot embed code in it.
+The aim of such a file is for building a possibly sizeable
+application with several sections that have their own
+configurations. Since bootstrapping such an application can be
+hard, you can put the critical information in an ini file,
+which can then be read (e.g., by the __init() method of a
+workspace). "The bootstrapping problem" refers to how to
+start up a system and the easiest way to do it is with
+information from outside the system. QDL's ini files are one
+way to do this.
 
-On reading, this structured is turned into a stem with sections as keys
-and the individuals lines and their contents entered accordingly.
+The format is easily edited with any text editor
+and simple enough that a user with little to no coding
+experience and fill in useful information.
+
+Note that while the syntax is sort of like QDL (single quotes
+around strings) it is not QDL and you cannot embed code in it.
+Also, null is not an allowed value and missing values are
+ignored.
+
+On reading, the contents are turned into a stem with sections
+as keys and the individuals lines and their contents entered
+accordingly, as scalars or lists.
+
+Please see the full documentation either on the website or in the distro
 
 See also: file_read
                 ]]>

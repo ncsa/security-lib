@@ -8,5 +8,6 @@ package edu.uiuc.ncsa.qdl.statements;
 public interface StatementWithResultInterface extends Statement, HasResultInterface {
     public StatementWithResultInterface makeCopy(); // would prefer clone, but there is a conflict in packages because it has protected access
     boolean isInModule();
-    void setInModule(boolean inModule);
+    String getAlias();
+    void setAlias(String alias);
 }

@@ -37,20 +37,33 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return module!=null;
     }*/
 
-    boolean inModule = false;
+ //   boolean inModule = false;
 
     @Override
     public boolean isInModule() {
-        return inModule;
+        return alias!=null;
     }
 
-    @Override
+    /*@Override
     public void setInModule(boolean inModule) {
         this.inModule = inModule;
-    }
+    }*/
+
     public ExpressionImpl(int operatorType) {
         this.operatorType = operatorType;
     }
+
+    @Override
+    public String getAlias() {
+        return alias;
+    }
+
+    @Override
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    String alias = null;
 
     @Override
     public int getArgCount() {
@@ -75,25 +88,28 @@ public abstract class ExpressionImpl implements ExpressionNode {
 
     @Override
     public StatementWithResultInterface getArgAt(int index) {
-        if((index <0 ) || (getArgCount() <= index)) {
+        if ((index < 0) || (getArgCount() <= index)) {
             return null;
         }
-         return getArguments().get(index);
+        return getArguments().get(index);
     }
 
-    public Object evalArg(int index, State state){
+    public Object evalArg(int index, State state) {
         return getArguments().get(index).evaluate(state);
     }
+
     @Override
     public void setArguments(ArrayList<StatementWithResultInterface> arguments) {
         this.arguments = arguments;
     }
 
     protected Object result;
+
     @Override
     public boolean isEvaluated() {
         return evaluated;
     }
+
     @Override
     public void setEvaluated(boolean evaluated) {
         this.evaluated = evaluated;
@@ -102,7 +118,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
     @Override
     public Object getResult() {
         if (!evaluated) {
-            throw new UnevaluatedExpressionException("source='" + (getSourceCode()==null?"(none)":getSourceCode()) + "'");
+            throw new UnevaluatedExpressionException("source='" + (getSourceCode() == null ? "(none)" : getSourceCode()) + "'");
         }
         return result;
     }
@@ -139,7 +155,7 @@ public abstract class ExpressionImpl implements ExpressionNode {
 
     @Override
     public List<String> getSourceCode() {
-        if(sourceCode == null){
+        if (sourceCode == null) {
             sourceCode = new ArrayList<>();
         }
         return sourceCode;

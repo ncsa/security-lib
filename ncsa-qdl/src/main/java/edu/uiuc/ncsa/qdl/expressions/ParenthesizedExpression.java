@@ -13,19 +13,32 @@ import java.util.List;
  */
 public class ParenthesizedExpression implements ExpressionNode {
 
-    boolean inModule = false;
+//    boolean inModule = false;
 
     @Override
     public boolean isInModule() {
-        return inModule;
+        return alias != null;
+    }
+
+    String alias = null;
+
+    @Override
+    public String getAlias() {
+        return alias;
     }
 
     @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
+
+    /*   @Override
+        public void setInModule(boolean inModule) {
+                         this.inModule = inModule;
+        }
+     */
     public StatementWithResultInterface getExpression() {
-        if(getArgCount() == 0){
+        if (getArgCount() == 0) {
             return null;
         }
         return getArguments().get(0);
@@ -33,17 +46,17 @@ public class ParenthesizedExpression implements ExpressionNode {
 
     @Override
     public StatementWithResultInterface getArgAt(int index) {
-        if((index < 0)||(getArgCount() <= index)){
+        if ((index < 0) || (getArgCount() <= index)) {
             return null;
         }
         return getArguments().get(index);
     }
 
     public void setExpression(StatementWithResultInterface expression) {
-        if(getArgCount() == 0){
+        if (getArgCount() == 0) {
             getArguments().add(expression);
-        }else{
-            getArguments().set(0,expression);
+        } else {
+            getArguments().set(0, expression);
         }
     }
 
@@ -106,6 +119,7 @@ public class ParenthesizedExpression implements ExpressionNode {
     }
 
     ArrayList<StatementWithResultInterface> args = new ArrayList<>();
+
     @Override
     public ArrayList<StatementWithResultInterface> getArguments() {
         return args;
@@ -113,7 +127,7 @@ public class ParenthesizedExpression implements ExpressionNode {
 
     @Override
     public void setArguments(ArrayList<StatementWithResultInterface> arguments) {
-                  args =arguments;
+        args = arguments;
     }
 
     @Override

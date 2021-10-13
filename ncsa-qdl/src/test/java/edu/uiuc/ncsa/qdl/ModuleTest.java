@@ -674,6 +674,8 @@ public class ModuleTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "Could not set variable from global state on module import";
     }
 
+
+
     /*
             zzz := -1;
              module['a:/b','X'][__a:=zzz;get_a()->__a;]
@@ -825,6 +827,36 @@ cannot access '__a'
         assert getBooleanValue("ok", state) : "Could not access getter for private variable.";
         assert getBooleanValue("ok1", state) : "Could not access getter for private variable.";
     }
+
+    /**
+     * Test that defining a function with the same name as a built-in function
+     * (here size()) works at teh module level.
+     * @throws Throwable
+     */
+    public void testMLBuiltinOverride() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module_load('" + testModulePath + "') =: q;");
+        addLine(script, "module_import(q,'X');");
+        addLine(script, "ok := 42 == X#size();"); // FQ size is a constant
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not override built in funciton locally.";
+    }
+
+    public void testMLOverrideBuiltin() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][size()->42;];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "ok := 42 == A#size();");
+        addLine(script, "ok1 := 3 == size([;3]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state): "Could not locally override built in function";
+        assert getBooleanValue("ok1", state): "Could not disambiguate override built in function";
+    }
+
     String javaTestModule = "edu.uiuc.ncsa.qdl.extensions.example.MyModule";
     // Java module tests
 

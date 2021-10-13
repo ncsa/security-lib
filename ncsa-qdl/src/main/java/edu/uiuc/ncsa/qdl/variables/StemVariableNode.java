@@ -17,17 +17,31 @@ import java.util.List;
  * on 9/28/20 at  10:57 AM
  */
 public class StemVariableNode implements StatementWithResultInterface {
-    boolean inModule = false;
+   // boolean inModule = false;
 
     @Override
     public boolean isInModule() {
-        return inModule;
+        return alias!=null;
+    }
+    String alias = null;
+
+    @Override
+    public String getAlias() {
+        return alias;
     }
 
+    @Override
+    public void setAlias(String alias) {
+         this.alias = alias;
+    }
+
+/*
     @Override
     public void setInModule(boolean inModule) {
                      this.inModule = inModule;
     }
+*/
+
     public String getVariableReference() {
         return variableReference;
     }

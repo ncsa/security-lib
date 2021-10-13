@@ -179,3 +179,4 @@ color brightgreen "//.*"
 color brightgreen start="^\s*/\*" end="\*/"
 # Function and module documentation
 color brightblue ">>.*"
+

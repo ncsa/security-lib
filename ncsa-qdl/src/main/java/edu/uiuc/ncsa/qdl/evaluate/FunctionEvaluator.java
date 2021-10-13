@@ -53,63 +53,73 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         return fNames;
     }
 
+    @Override
+    public boolean evaluate(String alias, Polyad polyad, State state) {
+        switch (polyad.getName()) {
+               case IS_FUNCTION:
+                   if (polyad.getArgCount() == 0) {
+                       throw new IllegalArgumentException("You must supply at least one argument.");
+                   }
+                   if (polyad.getArguments().get(0) instanceof VariableNode) {
+                       // they either are asking about a variable or it does not exist and by default, the parser thinks
+                       // it was one
+                       polyad.setEvaluated(true);
+                       polyad.setResultType(Constant.BOOLEAN_TYPE);
+                       polyad.setResult(false);
+                       return true;
+                   }
+                   Object object = polyad.evalArg(0, state);
 
+                   if (object == null) {
+                       throw new MissingArgumentException(" You must supply an argument for the " + IS_FUNCTION + " command.");
+                   }
+                   if (!isString(object)) {
+                       throw new IllegalArgumentException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
+                   }
+                   String name = object.toString();
+                   int argCount = -1; // default -- get any
+                   if (polyad.getArgCount() == 2) {
+                       Object object2 = polyad.evalArg(1, state);
+                       ;
+                       if (!isLong(object2)) {
+                           throw new IllegalArgumentException(" The argument count must be a number.");
+                       }
+                       argCount = ((Long) object2).intValue();
+                   }
 
+                   polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
+                   polyad.setResultType(Constant.BOOLEAN_TYPE);
+                   polyad.setEvaluated(true);
+                   return true;
+           }
+           if (polyad.isInModule() || !polyad.isBuiltIn()) {
+               try {
+                   figureOutEvaluation(polyad, state, !polyad.isInModule());
+               } catch (Throwable t) {
+                   if (t instanceof RuntimeException) {
+                       throw (RuntimeException) t;
+                   }
+                   if (t instanceof StackOverflowError) {
+                       throw new QDLException("stack overflow", t);
+                   }
+                   QDLException q = new QDLException("error evaluating function", t);
+                   throw q;
+               }
+               return true;
+           }
+           return false;
+    }
+    /*
+      m := '/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl'
+  q :=module_load(m)
+  )ws set debug on
+   module_import(q)
+     X#get_private()
+
+     */
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        switch (polyad.getName()) {
-            case IS_FUNCTION:
-                if (polyad.getArgCount() == 0) {
-                    throw new IllegalArgumentException("You must supply at least one argument.");
-                }
-                if (polyad.getArguments().get(0) instanceof VariableNode) {
-                    // they either are asking about a variable or it does not exist and by default, the parser thinks
-                    // it was one
-                    polyad.setEvaluated(true);
-                    polyad.setResultType(Constant.BOOLEAN_TYPE);
-                    polyad.setResult(false);
-                    return true;
-                }
-                Object object = polyad.evalArg(0, state);
-
-                if (object == null) {
-                    throw new MissingArgumentException(" You must supply an argument for the " + IS_FUNCTION + " command.");
-                }
-                if (!isString(object)) {
-                    throw new IllegalArgumentException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
-                }
-                String name = object.toString();
-                int argCount = -1; // default -- get any
-                if (polyad.getArgCount() == 2) {
-                    Object object2 = polyad.evalArg(1, state);
-                    ;
-                    if (!isLong(object2)) {
-                        throw new IllegalArgumentException(" The argument count must be a number.");
-                    }
-                    argCount = ((Long) object2).intValue();
-                }
-
-                polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
-                polyad.setResultType(Constant.BOOLEAN_TYPE);
-                polyad.setEvaluated(true);
-                return true;
-        }
-        if (!polyad.isBuiltIn()) {
-            try {
-                figureOutEvaluation(polyad, state, !polyad.isInModule());
-            } catch (Throwable t) {
-                if (t instanceof RuntimeException) {
-                    throw (RuntimeException) t;
-                }
-                if (t instanceof StackOverflowError) {
-                    throw new QDLException("stack overflow", t);
-                }
-                QDLException q = new QDLException("error evaluating function", t);
-                throw q;
-            }
-            return true;
-        }
-        return false;
+          return evaluate(null, polyad, state);
     }
      protected boolean isFDef(Statement statement){
         return (statement instanceof LambdaDefinitionNode) || (statement instanceof FunctionDefinitionStatement) || (statement instanceof FunctionReferenceNode);
@@ -364,7 +374,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         for (Statement statement : functionRecord.statements) {
             if(statement instanceof StatementWithResultInterface){
-                ((StatementWithResultInterface)statement).setInModule(polyad.isInModule());
+                ((StatementWithResultInterface)statement).setAlias(polyad.getAlias());
             }
             try {
                 statement.evaluate(localState);

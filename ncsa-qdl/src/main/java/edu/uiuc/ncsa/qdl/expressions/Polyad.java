@@ -46,7 +46,18 @@ public class Polyad extends ExpressionImpl {
 
     @Override
     public Object evaluate(State state) {
-         state.getMetaEvaluator().evaluate(this, state);
+        // Some finagling. If this is being evaluated in a module, check that
+        // there is an override in place. If not, kick it up to the main system
+        // (so evalute with no alias).
+        if(isInModule()){
+            if(state.getFTStack().isDefined(getName(), getArgCount())) {
+                state.getMetaEvaluator().evaluate(getAlias(), this, state);
+            }else{
+                state.getMetaEvaluator().evaluate(this, state);
+            }
+        }else {
+            state.getMetaEvaluator().evaluate(this, state);
+        }
          return getResult();
     }
     public void addArgument(StatementWithResultInterface expr){
