@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class TryCatch implements Statement {
     public static final Long RESERVED_ERROR_CODE = -1L;
+    public static final Long RESERVED_USER_ERROR_CODE = 0L;
 
     @Override
     public Object evaluate(State state) {
@@ -23,7 +24,11 @@ public class TryCatch implements Statement {
         } catch (RaiseErrorException t) {
             // custom error handling
             localState.getSymbolStack().getLocalST().setStringValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
-            localState.getSymbolStack().getLocalST().setLongValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
+            if(t.getPolyad().getArgCount() ==2) {
+                localState.getSymbolStack().getLocalST().setLongValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
+            }else{
+                localState.getSymbolStack().getLocalST().setLongValue("error_code", RESERVED_USER_ERROR_CODE);
+            }
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }

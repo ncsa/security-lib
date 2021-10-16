@@ -33,10 +33,13 @@ import org.apache.http.util.EntityUtils;
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 /**
@@ -61,6 +64,52 @@ public class HTTPClient implements QDLModuleMetaClass {
     public static final String CONTENT_JSON = "application/json";
     public static final String CONTENT_HTML = "text/html";
 
+    protected void checkInit() {
+        if (StringUtils.isTrivial(host)) {
+            throw new IllegalStateException("you must set the host before doing a get");
+        }
+        if (httpClient == null) {
+            throw new IllegalStateException("The connection has been closed. Please open a new one if you need to.");
+        }
+    }
+
+    /**
+     * Takes the array of objects for an evaluate method and creates the right url
+     * This is used in get and delete. Options are
+     * 0 args - return current host
+     * 1 arg - stem, parameters
+     * 2 args - uri path + stem of parameters
+     *
+     * @param objects
+     * @return a valid get/delete string of host+uri_path+?key0=value0&key1=value1...
+     */
+    protected String paramsToRequest(Object[] objects) {
+        String actualHost = host;
+        StemVariable parameters = null;
+        if (objects.length == 2) {
+            actualHost = actualHost + (actualHost.endsWith("/") ? "" : "/") + objects[0];
+            parameters = (StemVariable) objects[1];
+        }
+        if (objects.length == 0) {
+            parameters = new StemVariable(); // empty
+        }
+        if (objects.length == 1) {
+            parameters = (StemVariable) objects[0];
+        }
+        // make the parameters.
+        String p = parameters.size() == 0 ? "" : "?";
+        boolean isFirst = true;
+        for (String key : parameters.keySet()) {
+            if (isFirst) {
+                p = p + key + "=" + parameters.get(key);
+                isFirst = false;
+            } else {
+                p = p + "&" + key + "=" + parameters.get(key);
+
+            }
+        }
+        return actualHost + p;
+    }
 
     public class Host implements QDLFunction {
         @Override
@@ -105,39 +154,10 @@ public class HTTPClient implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if (StringUtils.isTrivial(host)) {
-                throw new IllegalStateException("you must set the host before doing a get");
-            }
-            if (httpClient == null) {
-                throw new IllegalStateException("The connection has been closed. Please open a new one if you need to.");
-            }
-            String actualHost = host;
-            StemVariable parameters = null;
-
-            if (objects.length == 2) {
-                actualHost = actualHost + (actualHost.endsWith("/") ? "" : "/") + objects[0];
-                parameters = (StemVariable) objects[1];
-            }
-            if (objects.length == 0) {
-                parameters = new StemVariable(); // empty
-            }
-            if (objects.length == 1) {
-                parameters = (StemVariable) objects[0];
-            }
-            // make the parameters.
-            String p = parameters.size() == 0 ? "" : "?";
-            boolean isFirst = true;
-            for (String key : parameters.keySet()) {
-                if (isFirst) {
-                    p = p + key + "=" + parameters.get(key);
-                    isFirst = false;
-                } else {
-                    p = p + "&" + key + "=" + parameters.get(key);
-
-                }
-            }
-            DebugUtil.trace(this, "getting from address " + actualHost + p);
-            HttpGet request = new HttpGet(actualHost + p);
+            checkInit();
+            String r = paramsToRequest(objects);
+            DebugUtil.trace(this, "getting from address " + r);
+            HttpGet request = new HttpGet(r);
             if ((headers != null) && !headers.isEmpty()) {
                 for (Object key : headers.keySet()) {
                     request.addHeader(key.toString(), headers.getString(key.toString()));
@@ -278,11 +298,12 @@ public class HTTPClient implements QDLModuleMetaClass {
                     doxx.add("The argument is the new headers. Previous headers are returned.");
             }
             doxx.add("The keys are the names of the headers, the value is its value");
-            doxx.add("E.g.s");
+            doxx.add("E.g.s of various random headers you can set");
             doxx.add("header.'Content-Type':= 'application/json;charset=UTF-8';");
             doxx.add("header.'Content-Type':= 'text/html;charset=UTF-8';");
             doxx.add("header.'Content-Type':= 'application/x-www-form-urlencoded';//mostly used in POST");
-            doxx.add("header.'X-Frame-Options':= 'DENY';");
+            doxx.add("header.'Authorization':= 'Bearer ' + bearer_token; // note the space!");
+            doxx.add("header.'Authorization':= 'Basic ' + " + CREATE_CREDENTIALS_METHOD + "('bob','my_password'); // note the space"); // note the space");
             return doxx;
         }
     }
@@ -375,16 +396,16 @@ public class HTTPClient implements QDLModuleMetaClass {
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
-            doxx.add(getName() + "({unverified}) - open a new connection.");
             switch (argCount) {
                 case 0:
-                    doxx.add("opens a connection with standard ssl certs. If the protocol is");
+                    doxx.add(getName() + "() - opens a connection with standard ssl certs.");
+                    doxx.add(" If the protocol is");
                     doxx.add("ssl, cert and hostname verification are done automatically.");
                     doxx.add("You should use this unless you have an explicit reason not to.");
                     break;
                 case 1:
-                    doxx.add("unverified - flag that if present and true will allow for connecting");
-                    doxx.add("to endpoints without any SSL verification. Unless you have a very specific");
+                    doxx.add(getName() + "(unverified) - if unverified is true will allow for connecting without SSL verfication");
+                    doxx.add("Unless you have a very specific");
                     doxx.add("reason for this (such as you are testing a server with a self-signed cert");
                     doxx.add("you should not use this feature.");
                     doxx.add("This neither boost speed nor performance.");
@@ -456,7 +477,7 @@ public class HTTPClient implements QDLModuleMetaClass {
 
         @Override
         public int[] getArgCount() {
-            return new int[]{1,2};
+            return new int[]{1, 2};
         }
 
         @Override
@@ -492,6 +513,8 @@ public class HTTPClient implements QDLModuleMetaClass {
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();
             doxx.add(getName() + "({uri_path,} payload.) do a put with the payload. ");
+            doxx.add("Note that the payload will be the body of the post.");
+            doxx.add("If you need to add authorization headers, set them in the header() function first.");
             return doxx;
         }
     }
@@ -501,12 +524,13 @@ public class HTTPClient implements QDLModuleMetaClass {
         // If JSON, send the payload as a JSON blob.
         String uriPath = "";
         StemVariable payload = null;
+        checkInit();
         switch (objects.length) {
             case 1:
                 if (objects[0] instanceof StemVariable) {
                     payload = (StemVariable) objects[0];
                 } else {
-                    throw new IllegalArgumentException("monadic " + (isPost ? POST_METHOD : PUT_METHOD) + " must have a stem as its second argument");
+                    throw new IllegalArgumentException("monadic " + (isPost ? POST_METHOD : PUT_METHOD) + " must have a stem as its argument");
                 }
 
                 break;
@@ -574,5 +598,90 @@ public class HTTPClient implements QDLModuleMetaClass {
             throw new QDLException("could not do " + (isPost ? POST_METHOD : PUT_METHOD) + " because of I/O error:'" + e.getMessage() + "'");
         }
     }
- //   public class Delete implements QDLFunction
+
+    public class Delete implements QDLFunction {
+        @Override
+        public String getName() {
+            return DELETE_METHOD;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{0, 1, 2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            checkInit();
+            String r = paramsToRequest(objects);
+            DebugUtil.trace(this, "delete from address " + r);
+            HttpDelete request = new HttpDelete(r);
+            if ((headers != null) && !headers.isEmpty()) {
+                for (Object key : headers.keySet()) {
+                    request.addHeader(key.toString(), headers.getString(key.toString()));
+                }
+            }
+            try {
+                CloseableHttpResponse response = httpClient.execute(request);
+                return getResponseStem(response);
+            } catch (ClientProtocolException e) {
+                throw new QDLException("could not do " + getName() + " because of protocol error:'" + e.getMessage() + "'");
+            } catch (IOException e) {
+                throw new QDLException("could not do " + getName() + " because of I/O error:'" + e.getMessage() + "'");
+            }
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "({uri_path}, parameters) - delete something from the server");
+            doxx.add("This uses the current host and headers.");
+            switch (argCount) {
+                case 0:
+                    doxx.add(getName() + "() - use only the current host ");
+                    break;
+                case 1:
+                    doxx.add(getName() + "(parameters.) - use only the current host and append the parameters to the request uri ");
+                    break;
+                case 2:
+                    doxx.add(getName() + "(uri_path, parameters.)  - use  current host + uri_path, then append the parameters to the request uri ");
+                    break;
+            }
+            doxx.add("This returns a response stem if the operation worked and throws an error if it did not.");
+            return doxx;
+        }
+    }
+
+    public static String CREATE_CREDENTIALS_METHOD = "credentials";
+    public class CreateCredentials implements QDLFunction{
+        @Override
+        public String getName() {
+            return CREATE_CREDENTIALS_METHOD;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            try {
+                String username = URLEncoder.encode(objects[0].toString(), "UTF-8");
+                String password = URLEncoder.encode(objects[1].toString(), "UTF-8");
+                String raw = username + ":" + password;
+                return Base64.getEncoder().encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+            }catch(UnsupportedEncodingException unsupportedEncodingException){
+                throw new NFWException("Encoding failed:'" + unsupportedEncodingException.getMessage() + "'");
+            }
+        }
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            List<String> doxx = new ArrayList<>();
+            doxx.add(getName() + "(username, password) - create the correct credential for the basic auth header");
+            doxx.add("The standard is to return encode_b64(url_escape(username) + ':' + url_escape(password))");
+            return doxx;
+        }
+    }
 }

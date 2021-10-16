@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TryCatch;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -1381,7 +1382,6 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
 
     }
-
     protected void doRaiseError(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException(RAISE_ERROR + " requires at least a single argument");
@@ -1398,7 +1398,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
             }
-
+        }else{
+            state.getSymbolStack().setLongValue("error_code", TryCatch.RESERVED_USER_ERROR_CODE);
         }
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);

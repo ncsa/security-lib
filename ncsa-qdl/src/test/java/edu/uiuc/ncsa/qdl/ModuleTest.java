@@ -660,6 +660,7 @@ public class ModuleTest extends AbstractQDLTester {
 
     /**
      * Tests that setting a variable on module import from the ambient state works.
+     *
      * @throws Throwable
      */
     public void testSetVariableFromGlobal() throws Throwable {
@@ -673,7 +674,6 @@ public class ModuleTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Could not set variable from global state on module import";
     }
-
 
 
     /*
@@ -728,6 +728,7 @@ cannot access '__a'
 
     /**
      * Similar to {@link #testSetVariableFromGlobal()} but loading the module from a file.
+     *
      * @throws Throwable
      */
     public void testMLSetVariableFromGlobal() throws Throwable {
@@ -739,8 +740,9 @@ cannot access '__a'
         addLine(script, "ok := zz == X#get_private();");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state): "Could not set variable from global state on module import";
+        assert getBooleanValue("ok", state) : "Could not set variable from global state on module import";
     }
+
     public void testMLRemove() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -751,7 +753,7 @@ cannot access '__a'
         addLine(script, "module_remove('X');");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state): "Could not set variable from global state on module import";
+        assert getBooleanValue("ok", state) : "Could not set variable from global state on module import";
     }
 
     public void testMLIntrinsicFunctionDefine() throws Throwable {
@@ -831,6 +833,7 @@ cannot access '__a'
     /**
      * Test that defining a function with the same name as a built-in function
      * (here size()) works at teh module level.
+     *
      * @throws Throwable
      */
     public void testMLBuiltinOverride() throws Throwable {
@@ -853,9 +856,27 @@ cannot access '__a'
         addLine(script, "ok1 := 3 == size([;3]);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state): "Could not locally override built in function";
-        assert getBooleanValue("ok1", state): "Could not disambiguate override built in function";
+        assert getBooleanValue("ok", state) : "Could not locally override built in function";
+        assert getBooleanValue("ok1", state) : "Could not disambiguate override built in function";
     }
+
+    /**
+     * In this test, a like-named module function overrides and uses the system function.
+     *
+     * @throws Throwable
+     */
+    public void testMLOverrideBuiltin2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // same signature as system function
+        addLine(script, "module['a:a','A'][size(x)->stem#size(x)+1;];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "ok := 6 == A#size([;5]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not locally override built in function";
+    }
+
 
     String javaTestModule = "edu.uiuc.ncsa.qdl.extensions.example.MyModule";
     // Java module tests
@@ -863,7 +884,8 @@ cannot access '__a'
     /**
      * Test that in the supplied sample class a fully qualified call to the method and
      * variable works.
-      * @throws Throwable
+     *
+     * @throws Throwable
      */
     public void testJavaFQAccessTest() throws Throwable {
 

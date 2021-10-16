@@ -2240,7 +2240,7 @@ z. :=  join3(q.,w.)
         if (axis == LAST_AXIS_ARGUMENT_VALUE) {
             doJoinOnLastAxis = true;
         }
-        if (axis == 0) {
+        if (leftStem.dim().size() == 1 || axis == 0) {
             StemVariable outStem = leftStem.union(rightStem);
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
@@ -2264,13 +2264,6 @@ z. :=  join3(q.,w.)
             }
         };
         StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis ? 1000000 : (axis - 1), doJoinOnLastAxis, joinAction);
-/*
-        if (doJoinOnLastAxis) {
-            StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, 1000000, doJoinOnLastAxis, joinAction);
-        } else {
-            StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, axis - 1, doJoinOnLastAxis, joinAction);
-        }
-*/
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);

@@ -254,6 +254,7 @@ public class State extends FunctionState implements QDLConstants {
 
         StemVariable errorCodes = new StemVariable();
         errorCodes.put(SYS_ERROR_CODE_SYSTEM_ERROR, TryCatch.RESERVED_ERROR_CODE);
+        errorCodes.put(SYS_ERROR_CODE_DEFAULT_USER_ERROR, TryCatch.RESERVED_USER_ERROR_CODE);
         systemConstants.put(SYS_ERROR_CODES, errorCodes);
         StemVariable fileTypes = new StemVariable();
         fileTypes.put(SYS_FILE_TYPE_BINARY, new Long(IOEvaluator.FILE_OP_BINARY));

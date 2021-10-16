@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
+import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
@@ -276,6 +277,9 @@ public class WSXMLSerializer {
                 xer.next(); // advance cursor
             }
         } catch (Throwable t) {
+            if(t instanceof DeserializationException){
+                throw (DeserializationException)t;
+            }
             String message = t.getMessage();
             if (t.getCause() != null) {
                 message = t.getCause().getMessage();

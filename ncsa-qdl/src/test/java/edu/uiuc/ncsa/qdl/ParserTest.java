@@ -2125,7 +2125,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "q. := [[n(4), 4+n(4)],[8+n(4),12+n(4)], [16+n(5),21+n(5)]];");
         addLine(script, "w. := 100 + q.;");
-        addLine(script, "a. := join(q., w., 3);");
+        addLine(script, "a. := join(q., w., 2);");
         addLine(script, "b. := q.~|w.;");
         addLine(script, "out := to_string(b. == a.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);

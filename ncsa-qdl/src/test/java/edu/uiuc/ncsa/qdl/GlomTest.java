@@ -124,7 +124,8 @@ public class GlomTest extends AbstractQDLTester {
          State state = testUtils.getNewState();
          StringBuffer script = new StringBuffer();
          addLine(script, "a. := ['a','b']≁['c','d'];");
-         addLine(script, "ok := reduce(@&&,reduce(@&&,[['a','c'],['b','d']] == a.));");
+         addLine(script, "ok := reduce(@&&,['a','b','c','d'] == a.);");
+         //addLine(script, "ok := reduce(@&&,reduce(@&&,[['a','c'],['b','d']] == a.));");
 
          QDLInterpreter interpreter = new QDLInterpreter(null, state);
          interpreter.execute(script.toString());

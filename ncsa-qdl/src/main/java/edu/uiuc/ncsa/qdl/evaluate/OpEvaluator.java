@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
@@ -315,7 +314,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         Polyad joinPolyad = new Polyad(StemEvaluator.JOIN);
         joinPolyad.getArguments().add(dyad.getLeftArgument());
         joinPolyad.getArguments().add(dyad.getRightArgument());
-        joinPolyad.getArguments().add(new ConstantNode(StemUtility.LAST_AXIS_ARGUMENT_VALUE, Constant.LONG_TYPE));
+        joinPolyad.getArguments().add(new ConstantNode(-1L, Constant.LONG_TYPE));
         state.getMetaEvaluator().evaluate(joinPolyad, state);
         dyad.setResult(joinPolyad.getResult());
         dyad.setResultType(joinPolyad.getResultType());
@@ -346,7 +345,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         }
 
         // NOTE this is done so we don't end up shlepping around references to things and modifying them
-        // wihout warning.
+        // without warning.
         //       stem0 = (StemVariable) stem0.clone();
         //       stem1 = (StemVariable)stem1.clone();
         StemVariable newStem = stem0.union(stem1);

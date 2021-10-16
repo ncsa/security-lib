@@ -7,10 +7,7 @@ import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.InterruptException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
@@ -3951,7 +3948,12 @@ public class WorkspaceCommands implements Logable {
                 return true;
             } catch (Throwable t) {
                 // First attempt can fail for, e.g., the default is compression but the file is not compressed.
-                // So this is benign.
+                // So this might be benign.
+                // A derserialization exception though means the structure of the file was
+                // bad (e.g. missing java classes)
+                if(t instanceof DeserializationException){
+                    throw (DeserializationException)t;
+                }
             }
         }
 
@@ -4170,7 +4172,12 @@ public class WorkspaceCommands implements Logable {
         }
         loadOK = _realLoad(target);
         if (!loadOK) {
-            loadOK = _xmlLoad(target);
+            try {
+                loadOK = _xmlLoad(target);
+            }catch(DeserializationException deserializationException){
+                say("Could not deserialize workspace: " + deserializationException.getMessage());
+                return RC_NO_OP;
+            }
         }
         if (loadOK) {
             say(target.getAbsolutePath() + " loaded " + target.length() + " bytes. Last saved on " +
@@ -4925,7 +4932,8 @@ public class WorkspaceCommands implements Logable {
         } catch (Throwable t) {
             // This should return a nice message to display.
             getState().getLogger().error("Could not deserialize file", t);
-            return false;
+            //return false;
+            throw t;
         }
 
     }

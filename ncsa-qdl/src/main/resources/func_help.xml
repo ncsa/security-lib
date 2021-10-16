@@ -3033,7 +3033,7 @@ E.g.
     insert('abcd', 'foo', 2)
 abfoocd
 
-  insert('abcd', '....', differ_at('abc','abq'))
+  insert('abcd', '....', differ_at('abcd','abq'))
 ab....cd
                 ]]>
             </body>
@@ -3078,9 +3078,9 @@ section: [section_name]
   entry: boolean | number | 'string';
 comment: (// to end of line ) | (/* anything */)
 
-So such a file has sections enclosed in []'s, (these are not
+Such a file has sections enclosed in []'s, (these are not
 QDL lists) and each line is an entry, so lines cannot be split.
-Entries are standard scalars (so booleans, integer,
+Entries are standard scalars (booleans, integer,
 decimal, scientific notation or strings in single quotes).
 Lists are just entries separated by commas. This means that
 the entries are typed.
@@ -3110,11 +3110,113 @@ accordingly, as scalars or lists.
 
 Please see the full documentation either on the website or in the distro
 
+E.g.
+[my_app]
+/* Example comment */
+username := 'bob'
+password := 'εΖζΗηΘθϑΙιΚκ'
+
+would be turned into the stem
+
+ini. :=  {'my_app':{'username':'bob', 'password':'εΖζΗηΘθϑΙιΚκ'}}
+
+
 See also: file_read
                 ]]>
             </body>
         </entry>
+    <entry id="laminate">
+            <body>
+                <![CDATA[
+(extensions)
+laminate(x,y{,axis}) - paste together two conformable stems along the axis.
+If axis is omitted, then the operation occurs on the zeroth axis
+x - stem or scalar. If a scalar, it will be extended
+y - stem or scalar. If a scalar, it will be extended
+axis - (option) 0 ≤ axis ≤ max(dim(x),dim(y))
+Note: join increases the size of each dimension. laminate increases
+      the rank. So if you join a pair of 2x3 arrays you may get back
+      a 4x3 or 2x6 (axis 0, 1 resp.)
+      Laminate returns the following:
+      axis    dim
+      0       2x2x3
+      1       2x3x3
+      2       2x3x2
+The rank increases by 1.
+axis refers to the new axis. So axis == 0 means to a new axis of zero.
+If axis == dim(x.) (e.g. x. is rank 2, axis == 2), then a new last axis
+is created.
 
+This function can also augment a smaller stem and paste it to a large (by
+rank 1 only) one.
+
+E.g.
+paste together a 2x3 stem to a 2x4x3 along their 1st axis. This means
+to treat x. as a 2x1x3 stem and join. Result is a 2x5x3 stem.
+   laminate(n(2,3,[;6]),n(2,4,3,[;24]),1);
+(output omitted)
+
+E.g.
+paste together the following
+  x. := n(2,3,[;6]);
+  y. := n(2,3,[10;16]);
+// paste together along zero-th axis, result is 2x2x3
+  laminate(x.,y.); // same as laminate(x.,y.,0)
+[
+  [
+    [0,1,2],
+    [3,4,5]
+  ],
+  [
+    [10,11,12],
+    [13,14,15]
+  ]
+ ]
+
+// paste along 1st axis, result is 2x2x3
+  laminate(x.,y.,1)
+[
+  [
+    [0,1,2],
+    [10,11,12]
+  ],
+  [
+    [3,4,5],
+    [13,14,15]
+  ]
+ ]
+
+// paste along 2nd (last here) axis, result is 2x3x2
+  laminate(x.,y.,2)
+[
+  [
+    [0,10],
+    [1,11],
+    [2,12]
+  ],
+  [
+    [3,13],
+    [4,14],
+    [5,15]
+  ]
+ ]
+
+// paste a bunch of zeros on to x. Note that the scalar is extended
+// to the same shape as x. beforehand.
+laminate(x.,0)
+[
+  [
+    [0,1,2],
+    [3,4,5]
+  ],
+  [
+    [0,0,0],
+    [0,0,0]
+  ]
+ ]
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

@@ -3,11 +3,14 @@ module[
 ]body[
    >> This module defines several additional functions for mathematics
    >> These include sec(), sech() etc.
-   >>    clone(arg.) - make a complete copy of a stem
-   >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
-   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
-   >>    n_copy(s,n) - make a stem with n copies of the argument s
-   >>    to_csv(arg.)- export a stem to comma separated format.
+   >>    clone(arg.) - make a complete copy of a stem
+   >>    for_each(@monad, arg.) -- apply the monad to each individual element of arg.
+   >>    fork(@monad0, @dyad, @monad1, arg) - evaluate dyad(monad0(arg),monad1(arg))
+   >>    n_copy(s,n) - make a stem with n copies of the argument s
+   >>    to_csv(arg.)- export a stem to comma separated format.
+   >>    
+   >> Mostly this is for very useful functions (like ravel) that are way easier
+   >> to write in QDL than anything else.
 
     define[clone(arg)][
         >> clone(arg.) - Returns a completely new copy of the stem.
@@ -63,6 +66,73 @@ module[
    ]; //end to_cvs
 
    define[
+       ravel(q)
+   ][
+      >> ravel(q) - turn any stem (of any dimension) into a list of values.
+      >> This always returns a simple list. If you supply a scalar, that will be
+      >> returned in a list too.
+      >> One use is 'pouring' one set of values into another shape
+      >> E.g.
+      >>     q. := n(2,6,[;12]);
+      >>     n(3,2,2, ravel(q.))
+      >> [
+      >>    [[0,1],[2,3]],
+      >>    [[4,5],[6,7]],
+      >>    [[8,9],[10,11]]
+      >>  ]
+      >>
+      >> E.g.
+      >>     ravel(n(2,3,2,3,[;2*3*2*3]))
+      >>    [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+      >>        21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
+      if[var_type(q) != constants().var_type.stem][return([q]);];
+      return(remap(q, indices(q)));
+   ]; // end ravel
+
+  define[
+      laminate(x, y)
+   ][
+     >> Laminate along zero-th axis. See help for laminate(x,y,axis).
+      return(laminate(x,y,0));
+   ];
+    //  laminate(n(2,3,[;6]),n(2,3,[10;16]),0)
+  /*
+      laminate should be a base function, but is an example of something QDL
+      should do that is darned near impossible to write in Java.
+  */
+  define[
+      laminate(x, y, axis)
+   ][
+     >> laminate(x, y, axis) - paste two stems together along an axis
+     >> At least one of x and y is a stem.
+      types ≔ (var_type(x) ≡ 4?1:0) + (var_type(y) ≡ 4?2:0);
+      // 0 - both scalars, 1 - x only stem, 2 - y only stem 3 - both stems
+      if[types ≡ 0][return([x,y]);]; // trivial case
+      left. ≔ ∅; right. ≔ ∅;
+      l_dim. ≔ ∅; r_dim.≔ ∅;
+      switch[
+          if[types ≡ 1][left.≔x; l_dim.≔ dim(x);r_dim.≔clone(l_dim.);right.≔n(r_dim., [y]);];
+          if[types ≡ 2][right.≔y;r_dim.≔dim(y);l_dim.≔clone(r_dim.);left.≔n(l_dim., [x]);];
+          if[types ≡ 3][left.≔x;right.≔y;l_dim.≔dim(x);r_dim.≔dim(y);];
+      ]; // end switch
+      // one may be one rank high if they are conformable
+      l_rank ≔ size(l_dim.); r_rank ≔ size(r_dim.);
+      ⊨ abs(l_rank - r_rank) ≤ 1; 'rank error';
+      ⊨ (0 ≤ axis) ∧ (axis ≤ min(l_rank, r_rank));
+      // Next function augments the rank of the argument(s)
+      aug(δ., α)->(size(δ.) ≡ α)?δ.~1:insert_at([1],0,1,δ., α);
+      if[r_rank ≡ l_rank][l_dim. ≔ aug(l_dim., axis);r_dim. ≔ aug(r_dim., axis);];
+      if[l_rank < r_rank][l_dim. ≔ aug(l_dim., axis);];
+      if[r_rank < l_rank][r_dim. ≔ aug(r_dim., axis);];
+      // Final conformability check
+      v. ≔ l_dim. ≡ r_dim.;
+      v.axis ≔ true;
+      ⊨ reduce(⊗∧, v.) : 'ranks not conformable';
+      return(join(n(l_dim., ravel(left.)), n(r_dim., ravel(right.)), axis));
+   ]; // end laminate
+
+
+   define[
       inner_product(⊗f, x., ⊗g, y.)
    ][
      >> inner_product(⊗f, x., ⊗g, y.) - compute the inner product of x. and y.
@@ -70,6 +140,8 @@ module[
      >> the first axis of x. and the last axis of y.,
      >> then reduces along the last axis. It is a common idiom.
      >> The result is conformable to x.
+     >> In the simple case of two matrices and f is addtion, g is multiplication
+     >> this is exactly the matrix product.
      >>
      >> E.g.
      >> Given a long list of elements probably in random order, find which are included.
@@ -78,6 +150,7 @@ module[
      >> [true,true,false,true,true,true,true]
           return(reduce(⊗f, τ(for_each(⊗g, x., τ(y.,-1)) ,-1)));
    ];
+
     define[
        reduce_all(⊗f, arg.)
     ][

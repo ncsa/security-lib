@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.xml;
 
+import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FunctionTableImpl;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -441,7 +442,7 @@ public class XMLUtils implements XMLConstants {
                 Class klasse = state.getClass().forName(moduleAttributes.className);
                 module = ((JavaModule) klasse.newInstance()).newInstance(moduleState); // this populates the functions and variables!!
             } catch (Throwable t) {
-                throw new IllegalStateException("Error: cannot deserialize class \"" + moduleAttributes.className + "\".");
+                throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
             }
 
         } else {

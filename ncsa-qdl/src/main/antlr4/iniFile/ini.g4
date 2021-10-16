@@ -22,6 +22,30 @@
    key5 = 345,-3.14159,'foo'
 
    would be the stem entry [345, -3.14159, foo]
+
+   Grammar itself is really short -- 6 statements. Rest of this is boiler-plated from
+   QDL lexer for consistent behavior. Changes there need to be reflected
+   here if applicable
+
+   Major difference with QDL
+   - only left-hand assignments
+   - := and = both works as assignments
+   - decimals do not need a lead 0, so ¯.123 is fine here
+   - lists do not need []'s. Those go around section headings.
+   - EOL (end of line) ends a statement not a ;.
+
+   Differences with python/windows
+   - entries are typed as boolen, number, string or aggregate
+   - lines and sections may have valid QDL identifiers, including some unicode
+   - strings allow for escaped unicode
+   - comments are line or block, not ; or #
+
+   Improvement?
+   - Let final , on a line denote continuation?
+     Problem now is that ,,, is intepreted as missing values, so
+     how to tell if the line continues or is just missing values?
+     Alternate is to allow for a special character like \ or \\
+     to be continuation
 */
 grammar ini;
           ini : (section | EOL)*;
