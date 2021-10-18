@@ -1485,33 +1485,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 hasFill = true;
             }
         }
+
         // Special case is a simple list. n(3) should yield [0,1,2] rather than a 1x3
         // array (recursion automatically boxes it into at least a 2 rank array).
         if (isLongArg && (polyad.getArgCount() == 1 || (polyad.getArgCount() == 2 && hasFill))) {
             long size = (Long) arg;
-            if (size == 0) {
-                polyad.setResult(new StemVariable());
-                polyad.setResultType(Constant.STEM_TYPE);
-                polyad.setEvaluated(true);
-                return;
-            }
-            if (size < 0L) {
-                throw new IndexError("negative index encountered");
-            }
-            StemList stemList;
-            if (hasFill) {
-                stemList = new StemList(size, cyclicArgList.next((int) size));
-            } else {
-                stemList = new StemList(size);
-            }
-            StemVariable out = new StemVariable();
-            out.setStemList(stemList);
+            StemVariable out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
+            if (out == null) return; // special case where zero length requested
 
 
             polyad.setResult(out);
             polyad.setResultType(Constant.STEM_TYPE);
             polyad.setEvaluated(true);
             return;
+        }
+        // so the left arg is a stem Check simple case
+        if(isStemArg){
+            StemVariable argStem = (StemVariable) arg;
+            if(argStem.size() == 1){
+                long size = (Long) argStem.get(0L);
+                StemVariable out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
+                if (out == null) return; // special case where zero length requested
+
+
+                polyad.setResult(out);
+                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setEvaluated(true);
+                return;
+
+            }
         }
 
         int lastArgIndex = polyad.getArgCount() - 1;
@@ -1546,6 +1548,27 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
         return;
+    }
+
+    private StemVariable createSimpleStemVariable(Polyad polyad, CyclicArgList cyclicArgList, boolean hasFill, long size) {
+        if (size == 0) {
+            polyad.setResult(new StemVariable());
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return null;
+        }
+        if (size < 0L) {
+            throw new IndexError("negative index encountered");
+        }
+        StemList stemList;
+        if (hasFill) {
+            stemList = new StemList(size, cyclicArgList.next((int) size));
+        } else {
+            stemList = new StemList(size);
+        }
+        StemVariable out = new StemVariable();
+        out.setStemList(stemList);
+        return out;
     }
 
     /**

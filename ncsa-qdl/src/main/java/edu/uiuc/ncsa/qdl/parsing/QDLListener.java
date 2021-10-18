@@ -1624,7 +1624,6 @@ public class QDLListener implements QDLParserListener {
 
             }
         }
-
     }
 
     @Override

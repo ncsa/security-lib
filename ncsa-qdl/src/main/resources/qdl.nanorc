@@ -2,7 +2,7 @@
 # To enable, edit ~/.nanorc (create it if it does not exist) and make sure it has the line
 # include /path/to/this/file/qdl.nanorc
 #  
-syntax "QDL" "\.qdl$"
+syntax "QDL" "\.[mq]dl$"
 magic "QDL "
 comment "//"
 

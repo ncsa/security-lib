@@ -20,7 +20,13 @@ module[
 
   // Here starts definitions using the full syntax, so we can include some
   // online help.
-
+   /*
+   The rather curious ceiling(frac(x.))*frac(x.) converts decimals
+   that are zero -- 0.0 -- to actual zeros. Otherwise the operation to
+   compute max or min always returns decimals no matter what the input
+   Since these are used in various functions for computing indices, that
+   would cause Index errors left and right.
+   */
    define[
        max(a,b)
     ][
@@ -29,8 +35,16 @@ module[
        >> E.g. on stems -- corresponding entries are compared
        >>    max([;5],([;5]-2)*3)
        >> [0,1,2,3,6]
-       return((a + b + abs(a-b))/2);
+       if[
+          var_type(a)==2 && var_type(b)==2
+        ][
+          out := (a + b + abs(a-b))/2;
+         return(out%1);
+       ];
+       out. := (a + b + abs(a-b))/2;
+       return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
     ];
+
 
    define[
        min(a,b)
@@ -40,7 +54,14 @@ module[
        >> E.g. on stems -- corresponding entries are compared
        >>    min([;5],([;5]-2)*3)
        >> [-6,-3,0,3,4]
-       return((a + b - abs(a-b))/2);
+       if[
+          var_type(a)==2 && var_type(b)==2
+        ][
+          out := (a + b - abs(a-b))/2;
+         return(out%1);
+       ];
+       out. := (a + b - abs(a-b))/2;
+       return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
     ];
 
    define[
@@ -160,7 +181,7 @@ module[
         >> pplot(@sin,@cos,  [|0; pi()/2; 10|])
          x. := x(t.);
          y. := y(t.);
-         return(x.~|y.);
+         return(laminate(x.,y.,1));
       ];
        define[
           splot(@x(), @y(), @z(), t., s.)

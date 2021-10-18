@@ -1466,7 +1466,8 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Long getRank() {
-        return Math.max(getStemList().getRank(), size());
+        return Long.valueOf(dim().size());
+        //return Math.max(getStemList().getRank(), size());
     }
 
     public Object get(StemPath<StemPathEntry> stemPath) {
@@ -1716,6 +1717,11 @@ public class StemVariable extends HashMap<String, Object> {
             StemVariable s = (StemVariable) index;
             IndexList indexList = new IndexList(s);
             set(indexList, value);
+            return;
+        }
+        if(index instanceof BigDecimal){
+            BigDecimal bd = (BigDecimal) index;
+            put(bd.longValueExact(), value);
             return;
         }
         throw new IndexError("Unknown index type for \"" + index + "\"");

@@ -40,8 +40,12 @@ public class AssertStatement implements Statement{
         if(obj instanceof Boolean){
              Boolean b = (Boolean) obj;
              if(!b){
-                 Object m = getMesssge().evaluate(state);
-                  throw new AssertionException(m.toString());
+                 if(getMesssge() != null) {
+                     Object m = getMesssge().evaluate(state);
+                     throw new AssertionException(m.toString());
+                 }else{
+                     throw new AssertionException(""); // no message implies empty message
+                 }
              }else{
                  return Boolean.TRUE;
              }

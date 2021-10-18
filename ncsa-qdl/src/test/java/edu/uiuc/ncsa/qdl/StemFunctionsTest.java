@@ -1424,6 +1424,45 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getLongValue("x", state) == 6L;
     }
 
+    public void testRank() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " ok := 1 == rank([;5]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testDimension() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " v. := dim([;5]) == [5];");
+        addLine(script, " ok := (size(v.)==1) && v.0;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testDimension3() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " v. := dim(n(3,4,5)) == [3,4,5];");
+        addLine(script, " ok := reduce(@&&, v.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+
+    public void testRank2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, " ok := 3 == rank(n(2,3,4));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
     /**
      * In the manual, the example given is
      * <pre>

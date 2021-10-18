@@ -86,6 +86,7 @@ module[
       >>    [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
       >>        21,22,23,24,25,26,27,28,29,30,31,32,33,34,35]
       if[var_type(q) != constants().var_type.stem][return([q]);];
+      if[rank(q)==1][return(q);];
       return(remap(q, indices(q)));
    ]; // end ravel
 
@@ -117,16 +118,17 @@ module[
       ]; // end switch
       // one may be one rank high if they are conformable
       l_rank ≔ size(l_dim.); r_rank ≔ size(r_dim.);
-      ⊨ abs(l_rank - r_rank) ≤ 1; 'rank error';
-      ⊨ (0 ≤ axis) ∧ (axis ≤ min(l_rank, r_rank));
+      ⊨ abs(l_rank - r_rank) ≤ 1 : 'rank error';
+      axis ≔ axis<0?axis+min(l_rank, r_rank)+1:axis; // axis <0 ok, but count against l_rank
+      ⊨ (0 ≤ axis) ∧ (axis ≤ min(l_rank, r_rank)) : 'axis error';
       // Next function augments the rank of the argument(s)
       aug(δ., α)->(size(δ.) ≡ α)?δ.~1:insert_at([1],0,1,δ., α);
       if[r_rank ≡ l_rank][l_dim. ≔ aug(l_dim., axis);r_dim. ≔ aug(r_dim., axis);];
       if[l_rank < r_rank][l_dim. ≔ aug(l_dim., axis);];
       if[r_rank < l_rank][r_dim. ≔ aug(r_dim., axis);];
-      // Final conformability check
+      // Final conformability check. All but the axis of the join must match
       v. ≔ l_dim. ≡ r_dim.;
-      v.axis ≔ true;
+      v.axis ≔ true; // set test for axis of join true so this passes if the others match
       ⊨ reduce(⊗∧, v.) : 'ranks not conformable';
       return(join(n(l_dim., ravel(left.)), n(r_dim., ravel(right.)), axis));
    ]; // end laminate

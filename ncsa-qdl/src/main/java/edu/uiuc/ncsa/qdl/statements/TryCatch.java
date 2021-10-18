@@ -42,7 +42,10 @@ public class TryCatch implements Statement {
         }
         return null;
     }
-
+   /*
+   g(x)->[raise_error('oops');];
+   try[g(1);]catch[return(0);];
+    */
     List<Statement> catchStatements = new ArrayList<>();
     List<Statement> tryStatements = new ArrayList<>();
 

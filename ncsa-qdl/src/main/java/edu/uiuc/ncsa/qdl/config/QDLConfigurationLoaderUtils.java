@@ -15,6 +15,9 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.*;
 
@@ -136,6 +139,10 @@ public class QDLConfigurationLoaderUtils {
 
     public static String[] setupModules(QDLEnvironment config, State state) throws Throwable {
         String[] x = new String[MODULE_LOAD_MESSAGES_SIZE];
+         // At some point, start putting in ResourceModules that are automatically loaded.
+        // This will slightly change the logic here, since there will always be something to load.
+        // the big question though is this: Do we let users load modules that are in the distro
+        // this way, or is that a 'system thing' which we control?
 
         if (!config.getModuleConfigs().isEmpty()) {
             String foundClasses = "";
@@ -173,8 +180,27 @@ public class QDLConfigurationLoaderUtils {
                     }// end try
                 }// end if for java modules
                 if (moduleConfig.getType().equals(MODULE_TYPE_QDL)) {
-                    QDLModuleConfig qmc = (QDLModuleConfig) moduleConfig;
-                    String module = QDLFileUtil.readFileAsString(qmc.getPath());
+                    QDLModuleConfig qmc = null;
+                    String module = null; // actual code in the module
+                    if(moduleConfig instanceof QDLModuleConfig){
+                         qmc = (QDLModuleConfig) moduleConfig;
+                         module = QDLFileUtil.readFileAsString(qmc.getPath());
+                    }
+                    if(moduleConfig instanceof ResourceModule){
+                        // read it from a resource in the distro, not from a file.
+                        qmc = (ResourceModule)moduleConfig;
+                        InputStream textStream = QDLModuleConfig.class.getResourceAsStream(qmc.getPath());
+                        InputStreamReader reader = new InputStreamReader(textStream);
+                        BufferedReader br = new BufferedReader(reader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String inputLine = br.readLine();
+                        while(inputLine != null){
+                          stringBuilder.append(inputLine + "\n");
+                          inputLine = br.readLine();
+                        }
+                        br.close();
+                        module = stringBuilder.toString();
+                    }
                     // only (easy) way to tell to compare before and after
                     Set<URI> oldImports = new HashSet<>();
                     oldImports.addAll(interpreter.getState().getModuleMap().keySet());
