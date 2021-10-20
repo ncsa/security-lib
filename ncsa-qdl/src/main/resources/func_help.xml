@@ -3217,6 +3217,22 @@ laminate(x.,0)
                 ]]>
             </body>
         </entry>
+    <entry id="min">
+            <body>
+                <![CDATA[
+min(a,b) - compute the minimum of two numbers or set of stems
+See also: max
+                ]]>
+            </body>
+        </entry>
+    <entry id="max">
+            <body>
+                <![CDATA[
+max(a,b) - compute the minimum of two numbers or set of stems
+See also: min
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

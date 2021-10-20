@@ -793,8 +793,9 @@ public class ParserTest extends AbstractQDLTester {
         assert getLongValue("a.1", state) == -2L;
         assert getLongValue("a.2", state) == 6L;
         assert getLongValue("a.12", state) == 36L;
-        assert areEqual(getBDValue("a.3", state), new BigDecimal("1.0"));
-        assert areEqual(getBDValue("a.15", state), new BigDecimal("5.0"));
+        assert getLongValue("a.3", state) == 1L;
+        assert getLongValue("a.15", state) == 5L;
+        //assert areEqual(getBDValue("a.15", state), new BigDecimal("5.0"));
 
 //        assert getLongValue("a.15", state) == 5L;
         assert getLongValue("a.4", state) == 1L;
@@ -1961,10 +1962,12 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "sum(x.)->reduce(@+,x.);");
         addLine(script, "fork(@a(),@b(),@c(),x.)->b(a(x.),c(x.));");
         addLine(script, "y := fork(@sum(), @/, @size(), 1+2*n(5));");
+        addLine(script, "ok := y == 5;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        assert areEqual(getBDValue("y", state), new BigDecimal("5.0")) : "passing multiple function references failed.";
+        assert getBooleanValue("ok", state): "passing multiple function references failed.";
+//        assert areEqual(getBDValue("y", state), new BigDecimal("5.0")) : "passing multiple function references failed.";
 
     }
 

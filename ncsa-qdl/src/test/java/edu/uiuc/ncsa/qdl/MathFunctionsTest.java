@@ -437,6 +437,21 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "Could not find modulus of two huge integers.";
         assert getBooleanValue("ok1", state) : "Could not find modulus of one huge, one small integer.";
     }
-
+    public void testMinMax() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x := min(2,3.4) ;");
+        addLine(script, "okx := var_type(x)==" + Constant.LONG_TYPE + ";"); // must be an integer
+        addLine(script, "okx0 := x==2;");
+        addLine(script, "y := max(2,3.4) ;");
+        addLine(script, "oky := var_type(y)==" + Constant.DECIMAL_TYPE + ";"); // must be a decimal
+        addLine(script, "oky0 := y==3.4;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("okx", state) : MathEvaluator.MIN + " returns wrong numeric type, should be a long";
+        assert getBooleanValue("okx0", state) : MathEvaluator.MIN +" returns wrong value.";
+        assert getBooleanValue("oky", state) : MathEvaluator.MAX +" returns wrong numeric type, should be a decimal.";
+        assert getBooleanValue("oky0", state) : MathEvaluator.MAX  + " returns wrong value";
+    }
 }
 

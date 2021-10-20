@@ -665,7 +665,18 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     } else {
                         BigDecimal left = toBD(objects[0]);
                         BigDecimal right = toBD(objects[1]);
-                        r.result = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
+                        BigDecimal res = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
+                        if(MathEvaluator.isIntegerValue(res)){
+                            // try to turn it into an integer
+                            try{
+                                r.result = res.longValueExact();
+                                r.resultType = Constant.LONG_TYPE;
+                                return r;
+                            }catch(ArithmeticException arithmeticException){
+                                // so it cannot eb turned into a long value for whatever reason
+                            }
+                        }
+                        r.result = res;
                     }
 
                     r.resultType = Constant.DECIMAL_TYPE;

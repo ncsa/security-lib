@@ -63,7 +63,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     public static final int UNION_TYPE = 10 + STEM_FUNCTION_BASE_VALUE;
 
 
-
     public static final String HAS_VALUE = "has_value";
     public static final int HAS_VALUE_TYPE = 12 + STEM_FUNCTION_BASE_VALUE;
 
@@ -146,35 +145,35 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public String[] getFunctionNames() {
-        if(fNames == null){
-            fNames =  new String[]{
-                        DIMENSION, RANK,
-                        TRANSPOSE, TRANSPOSE2,
-                        REMAP,
-                        SIZE,
-                        JOIN,
-                        SHORT_MAKE_INDICES,
-                        HAS_VALUE,
-                        REMOVE,
-                        SET_DEFAULT,
-                        BOX,
-                        UNBOX,
-                        UNION,
-                        FOR_EACH,
-                        COMMON_KEYS,
-                        EXCLUDE_KEYS,
-                        LIST_KEYS,
-                        ALL_KEYS,
-                        HAS_KEYS,
-                        INCLUDE_KEYS,
-                        RENAME_KEYS,
-                        SHUFFLE,
-                        MASK,
-                        KEYS, VALUES,
-                        IS_LIST,
-                        UNIQUE_VALUES,
-                        TO_JSON,
-                        FROM_JSON, JSON_PATH_QUERY};
+        if (fNames == null) {
+            fNames = new String[]{
+                    DIMENSION, RANK,
+                    TRANSPOSE, TRANSPOSE2,
+                    REMAP,
+                    SIZE,
+                    JOIN,
+                    SHORT_MAKE_INDICES,
+                    HAS_VALUE,
+                    REMOVE,
+                    SET_DEFAULT,
+                    BOX,
+                    UNBOX,
+                    UNION,
+                    FOR_EACH,
+                    COMMON_KEYS,
+                    EXCLUDE_KEYS,
+                    LIST_KEYS,
+                    ALL_KEYS,
+                    HAS_KEYS,
+                    INCLUDE_KEYS,
+                    RENAME_KEYS,
+                    SHUFFLE,
+                    MASK,
+                    KEYS, VALUES,
+                    IS_LIST,
+                    UNIQUE_VALUES,
+                    TO_JSON,
+                    FROM_JSON, JSON_PATH_QUERY};
         }
         return fNames;
     }
@@ -863,7 +862,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doIsMemberOf(Polyad polyad, State state) {
         if (polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException( HAS_VALUE + " requires 2 arguments.");
+            throw new IllegalArgumentException(HAS_VALUE + " requires 2 arguments.");
         }
         Object leftArg = polyad.evalArg(0, state);
         checkNull(leftArg, polyad.getArgAt(0));
@@ -916,8 +915,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.setEvaluated(true);
     }
-
-
 
 
     protected void doFromJSON(Polyad polyad, State state) {
@@ -1500,9 +1497,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         // so the left arg is a stem Check simple case
-        if(isStemArg){
+        if (isStemArg) {
             StemVariable argStem = (StemVariable) arg;
-            if(argStem.size() == 1){
+            if (argStem.size() == 1) {
                 long size = (Long) argStem.get(0L);
                 StemVariable out = createSimpleStemVariable(polyad, cyclicArgList, hasFill, size);
                 if (out == null) return; // special case where zero length requested
@@ -1521,25 +1518,25 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             lastArgIndex--; // last arg is the fill pattern
         }
 
-        if(lengths == null){
+        if (lengths == null) {
             lengths = new int[lastArgIndex + 1];
-           for (int i = 0; i < lastArgIndex + 1; i++) {
-               Object obj = polyad.evalArg(i, state);
-               if (!isLong(obj)) {
-                   throw new IndexError("argument " + i + " is not an integer. All dimensions must be positive integers.");
-               }
-               lengths[i] = ((Long) obj).intValue();
-               // Any dimension of 0 returns an empty list
-               if (lengths[i] == 0) {
-                   polyad.setResult(new StemVariable());
-                   polyad.setResultType(Constant.STEM_TYPE);
-                   polyad.setEvaluated(true);
-                   return;
-               }
-               if (lengths[i] < 0L) {
-                   throw new IndexError("argument " + i + " is negative. All dimensions must be positive integers.");
-               }
-           }
+            for (int i = 0; i < lastArgIndex + 1; i++) {
+                Object obj = polyad.evalArg(i, state);
+                if (!isLong(obj)) {
+                    throw new IndexError("argument " + i + " is not an integer. All dimensions must be positive integers.");
+                }
+                lengths[i] = ((Long) obj).intValue();
+                // Any dimension of 0 returns an empty list
+                if (lengths[i] == 0) {
+                    polyad.setResult(new StemVariable());
+                    polyad.setResultType(Constant.STEM_TYPE);
+                    polyad.setEvaluated(true);
+                    return;
+                }
+                if (lengths[i] < 0L) {
+                    throw new IndexError("argument " + i + " is negative. All dimensions must be positive integers.");
+                }
+            }
 
         }
         StemVariable out = new StemVariable();
@@ -1663,8 +1660,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
         return;
     }
-
-
 
 
     /**
@@ -2123,10 +2118,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         Object defaultValue = polyad.getArgAt(1).getResult();
         stemVariable.setDefaultValue(defaultValue);
         // now return the previous result or null if there was none
-        if(oldDefault == null){
+        if (oldDefault == null) {
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
-        }else{
+        } else {
             polyad.setResult(oldDefault);
             polyad.setResultType(Constant.getType(oldDefault));
         }
@@ -2263,12 +2258,22 @@ z. :=  join3(q.,w.)
         if (axis == LAST_AXIS_ARGUMENT_VALUE) {
             doJoinOnLastAxis = true;
         }
-        if (leftStem.dim().size() == 1 || axis == 0) {
+        if (axis == 0) {
             StemVariable outStem = leftStem.union(rightStem);
             polyad.setEvaluated(true);
             polyad.setResultType(Constant.STEM_TYPE);
             polyad.setResult(outStem);
             return;
+        }
+        if (leftStem.dim().size() == 1) {
+            if (axis == -1) {
+                StemVariable outStem = leftStem.union(rightStem);
+                polyad.setEvaluated(true);
+                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setResult(outStem);
+                return;
+            }
+            throw new RankException("axis of " + axis + " exceeds rank");
         }
         StemVariable outStem = new StemVariable();
 
@@ -2286,6 +2291,9 @@ z. :=  join3(q.,w.)
 
             }
         };
+        if (Math.max(leftStem.getRank(), rightStem.getRank()) <= axis) {
+            throw new RankException("axis of " + axis + " exceeds rank");
+        }
         StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis ? 1000000 : (axis - 1), doJoinOnLastAxis, joinAction);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);

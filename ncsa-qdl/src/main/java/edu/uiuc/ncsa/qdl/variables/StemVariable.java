@@ -91,7 +91,14 @@ public class StemVariable extends HashMap<String, Object> {
         // try to convert it.
         return new BigDecimal(obj.toString());
     }
-
+    public String getString(Long key){
+        Object obj = get(key);
+        if (obj == null) {
+            return null;
+        }
+        return obj.toString();
+    }
+    
     public String getString(String key) {
         Object obj = get(key);
         if (obj == null) {
@@ -991,13 +998,18 @@ public class StemVariable extends HashMap<String, Object> {
                 output = output + ", ";
             }
             Object vv = get(key);
-            String ss;
-            if (vv instanceof BigDecimal) {
-                ss = InputFormUtil.inputForm((BigDecimal) vv);
-            } else {
-                ss = vv.toString();
-            }
-            output = output + key + STEM_ENTRY_CONNECTOR + ss;
+/*            if(vv == null) {
+                output = output + key + STEM_ENTRY_CONNECTOR + "null";
+
+            }else{*/
+                String ss;
+                if (vv instanceof BigDecimal) {
+                    ss = InputFormUtil.inputForm((BigDecimal) vv);
+                } else {
+                    ss = vv.toString();
+                }
+                output = output + key + STEM_ENTRY_CONNECTOR + ss;
+            //}
         }
 
         return output + "}";

@@ -27,7 +27,7 @@ module[
    Since these are used in various functions for computing indices, that
    would cause Index errors left and right.
    */
-   define[
+/*   define[
        max(a,b)
     ][
        >> max(a,b) - return the maximum of a or b.
@@ -43,10 +43,10 @@ module[
        ];
        out. := (a + b + abs(a-b))/2;
        return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
-    ];
+    ];*/
 
 
-   define[
+/*   define[
        min(a,b)
     ][
        >> min(a,b) - return the minimum of a or b.
@@ -62,7 +62,7 @@ module[
        ];
        out. := (a + b - abs(a-b))/2;
        return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
-    ];
+    ];*/
 
    define[
       int(x)

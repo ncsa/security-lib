@@ -67,6 +67,12 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     public static final String LONG_IDENTITY_FUNCTION = "identity";
     public static final int IDENTITY_FUNCTION_TYPE = 14 + MATH_FUNCTION_BASE_VALUE;
 
+    public static final String MIN = "min";
+    public static final int MIND_TYPE = 15 + MATH_FUNCTION_BASE_VALUE;
+
+    public static final String MAX = "max";
+    public static final int MAX_TYPE = 16 + MATH_FUNCTION_BASE_VALUE;
+
 
     @Override
     public String[] getFunctionNames() {
@@ -86,6 +92,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     DECODE_B64,
                     ENCODE_B64,
                     MOD,
+                    MAX, MIN,
                     DATE_ISO};
         }
         return fNames;
@@ -121,6 +128,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return DATE_ISO_TYPE;
             case MOD:
                 return MOD_TYPE;
+            case MAX:
+                return MAX_TYPE;
+            case MIN:
+                return MIND_TYPE;
         }
         return EvaluatorInterface.UNKNOWN_VALUE;
     }
@@ -169,6 +180,12 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case MOD:
                 doModulus(polyad, state);
+                return true;
+            case MAX:
+                doMax(polyad, state);
+                return true;
+            case MIN:
+                doMin(polyad, state);
                 return true;
         }
         return false;
@@ -521,5 +538,73 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         };
         process1(polyad, pointer, isInMillis ? DATE_MS : DATE_ISO, state);
 
+    }
+
+    protected void doMin(Polyad polyad, State state) {
+        doMinOrMax(polyad, state, false);
+    }
+
+    protected void doMax(Polyad polyad, State state) {
+        doMinOrMax(polyad, state, true);
+    }
+
+    protected void doMinOrMax(Polyad polyad, State state, boolean isMax) {
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                if (!areAllNumbers(objects)) {
+                    // Contract is that if there are not numbers, just return the
+                    // first argument unaltered.
+                    throw new IllegalArgumentException((isMax ? MAX : MIN) + " requires numeric arguments");
+                }
+                if (areAllLongs(objects)) {
+                    long first = (Long) objects[0];
+                    long second = (Long) objects[1];
+                    r.result = isMax ? Math.max(first, second) : Math.min(first, second);
+                    r.resultType = Constant.LONG_TYPE;
+                    return r;
+                }
+                // so one of these is a big decimal at least
+                int longValues = ((objects[0] instanceof Long) ? 1 : 0) + ((objects[1] instanceof Long) ? 2 : 0);
+                // 0 = no longs, 1 = left long, 2 = right long 3 = both long
+
+                boolean b0 = isBigDecimal(objects[0]);
+                boolean b1 = isBigDecimal(objects[1]);
+                BigDecimal bd0 = b0 ? (BigDecimal) objects[0] : new BigDecimal((Long) objects[0]);
+                BigDecimal bd1 = b1 ? (BigDecimal) objects[1] : new BigDecimal((Long) objects[1]);
+
+                BigDecimal bdr = null;
+                try {
+                    bdr = isMax ? bd0.max(bd1) : bd0.min(bd1);
+                } catch (ArithmeticException ax1) {
+                    throw new IllegalStateException("Could not compute " + (isMax ? MAX : MIN));
+                }
+                try {
+                    if (longValues == 1 && bdr.equals(bd0)) {
+                        r.result = bdr.longValueExact();
+                        r.resultType = Constant.LONG_TYPE;
+                        return r;
+                    }
+                    if (longValues == 2 && bdr.equals(bd1)) {
+                        r.result = bdr.longValueExact();
+                        r.resultType = Constant.LONG_TYPE;
+                        return r;
+                    }
+                    r.result = bdr;
+                    r.resultType = Constant.DECIMAL_TYPE;
+                    return r;
+                } catch (ArithmeticException ax) {
+                }
+
+                r.result = bdr; // won't fit in a long, so this is really a BigInteger, which we don't support directly.
+                r.resultType = Constant.DECIMAL_TYPE;
+                return r;
+            }
+        };
+        process2(polyad, pointer, isMax ? MAX : MIN, state);
+    }
+    public static  boolean isIntegerValue(BigDecimal bd){
+      return bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0;
     }
 }
