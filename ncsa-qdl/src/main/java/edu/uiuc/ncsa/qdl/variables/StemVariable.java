@@ -91,14 +91,15 @@ public class StemVariable extends HashMap<String, Object> {
         // try to convert it.
         return new BigDecimal(obj.toString());
     }
-    public String getString(Long key){
+
+    public String getString(Long key) {
         Object obj = get(key);
         if (obj == null) {
             return null;
         }
         return obj.toString();
     }
-    
+
     public String getString(String key) {
         Object obj = get(key);
         if (obj == null) {
@@ -998,18 +999,14 @@ public class StemVariable extends HashMap<String, Object> {
                 output = output + ", ";
             }
             Object vv = get(key);
-/*            if(vv == null) {
-                output = output + key + STEM_ENTRY_CONNECTOR + "null";
 
-            }else{*/
-                String ss;
-                if (vv instanceof BigDecimal) {
-                    ss = InputFormUtil.inputForm((BigDecimal) vv);
-                } else {
-                    ss = vv.toString();
-                }
-                output = output + key + STEM_ENTRY_CONNECTOR + ss;
-            //}
+            String ss;
+            if (vv instanceof BigDecimal) {
+                ss = InputFormUtil.inputForm((BigDecimal) vv);
+            } else {
+                ss = vv.toString();
+            }
+            output = output + key + STEM_ENTRY_CONNECTOR + ss;
         }
 
         return output + "}";
@@ -1215,7 +1212,6 @@ public class StemVariable extends HashMap<String, Object> {
         return sortedSet;
 
     }*/
-
     @Override
     public Set<String> keySet() {
         return orderedkeySet();
@@ -1439,6 +1435,7 @@ public class StemVariable extends HashMap<String, Object> {
      * nested stems, then do not entirely get made unique before getting added to the result,
      * hence the simplest fix is that in that case is to call this twice. Someday this can
      * be fixed with a careful rewrite of the recursion in stel lists.
+     *
      * @return
      */
     public StemVariable almostUnique() {
@@ -1644,9 +1641,9 @@ public class StemVariable extends HashMap<String, Object> {
             }
             obj = currentStem.get(indexList.get(i));
             if (obj == null) {
-                if(hasDefaultValue()){
+                if (hasDefaultValue()) {
                     obj = getDefaultValue();
-                }else {
+                } else {
                     throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
                 }
             }
@@ -1731,7 +1728,7 @@ public class StemVariable extends HashMap<String, Object> {
             set(indexList, value);
             return;
         }
-        if(index instanceof BigDecimal){
+        if (index instanceof BigDecimal) {
             BigDecimal bd = (BigDecimal) index;
             put(bd.longValueExact(), value);
             return;

@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import edu.uiuc.ncsa.security.core.util.TokenUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -38,11 +39,18 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
     public static final String HASH = "hash";
     public static final int HASH_TYPE = 4 + MATH_FUNCTION_BASE_VALUE;
 
-    public static final String TO_HEX = "to_hex";
-    public static final int TO_HEX_TYPE = 5 + MATH_FUNCTION_BASE_VALUE;
+    public static final String ENCODE_B16 = "encode_b16";
+    public static final int ENCODE_B16_TYPE = 5 + MATH_FUNCTION_BASE_VALUE;
 
-    public static final String FROM_HEX = "from_hex";
-    public static final int FROM_HEX_TYPE = 6 + MATH_FUNCTION_BASE_VALUE;
+    public static final String DECODE_B16 = "decode_b16";
+    public static final int DECODE_B16_TYPE = 6 + MATH_FUNCTION_BASE_VALUE;
+
+    public static final String ENCODE_B32 = "encode_b32";
+    public static final int ENCODE_B32_TYPE = 17 + MATH_FUNCTION_BASE_VALUE;
+
+    public static final String DECODE_B32 = "decode_b32";
+    public static final int DECODE_B32_TYPE = 18 + MATH_FUNCTION_BASE_VALUE;
+
 
     public static final String DATE_MS = "date_ms";
     public static final int DATE_MS_TYPE = 7 + MATH_FUNCTION_BASE_VALUE;
@@ -84,13 +92,15 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     RANDOM,
                     RANDOM_STRING,
                     HASH,
-                    TO_HEX,
-                    FROM_HEX,
+                    ENCODE_B16,
+                    DECODE_B16,
                     DATE_MS,
                     DATE_ISO,
                     NUMERIC_DIGITS,
                     DECODE_B64,
                     ENCODE_B64,
+                    DECODE_B32,
+                    ENCODE_B32,
                     MOD,
                     MAX, MIN,
                     DATE_ISO};
@@ -112,16 +122,20 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return RANDOM_STRING_TYPE;
             case HASH:
                 return HASH_TYPE;
-            case TO_HEX:
-                return TO_HEX_TYPE;
+            case ENCODE_B16:
+                return ENCODE_B16_TYPE;
             case NUMERIC_DIGITS:
                 return NUMERIC_DIGITS_TYPE;
-            case FROM_HEX:
-                return FROM_HEX_TYPE;
+            case DECODE_B16:
+                return DECODE_B16_TYPE;
             case ENCODE_B64:
                 return ENCODE_B64_TYPE;
             case DECODE_B64:
                 return DECODE_B64_TYPE;
+            case ENCODE_B32:
+                return ENCODE_B32_TYPE;
+            case DECODE_B32:
+                return DECODE_B32_TYPE;
             case DATE_MS:
                 return DATE_MS_TYPE;
             case DATE_ISO:
@@ -157,10 +171,10 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             case HASH:
                 doHash(polyad, state);
                 return true;
-            case TO_HEX:
+            case ENCODE_B16:
                 toFromhex(polyad, state, true);
                 return true;
-            case FROM_HEX:
+            case DECODE_B16:
                 toFromhex(polyad, state, false);
                 return true;
             case NUMERIC_DIGITS:
@@ -171,6 +185,12 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return true;
             case DECODE_B64:
                 doB64(polyad, state, false);
+                return true;
+            case ENCODE_B32:
+                doB32(polyad, state, true);
+                return true;
+            case DECODE_B32:
+                doB32(polyad, state, false);
                 return true;
             case DATE_MS:
                 doDates(polyad, state, true);
@@ -189,6 +209,29 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    protected void doB32(Polyad polyad, State state, boolean isEncode) {
+        AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
+            @Override
+            public AbstractFunctionEvaluator.fpResult process(Object... objects) {
+                AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
+                if (objects[0] instanceof String) {
+                    if (isEncode) {
+                        r.result = TokenUtil.b32EncodeToken(objects[0].toString());
+                    } else {
+                        r.result = TokenUtil.b32DecodeToken(objects[0].toString());
+                    }
+                    r.resultType = Constant.STRING_TYPE;
+                } else {
+                    r.result = objects[0];
+                    r.resultType = polyad.getArguments().get(0).getResultType();
+                }
+                return r;
+            }
+        };
+        process1(polyad, pointer, isEncode ? ENCODE_B64 : DECODE_B64, state);
+
     }
 
 
@@ -377,8 +420,6 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             @Override
             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
-                Long ll = null;
-
                 if (objects[0] instanceof String) {
                     if (isEncode) {
                         r.result = Base64.encodeBase64URLSafeString(objects[0].toString().getBytes());
@@ -422,7 +463,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process1(polyad, pointer, toHex ? TO_HEX : FROM_HEX, state);
+        process1(polyad, pointer, toHex ? ENCODE_B16 : DECODE_B16, state);
     }
 
     /**
@@ -604,7 +645,8 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         };
         process2(polyad, pointer, isMax ? MAX : MIN, state);
     }
-    public static  boolean isIntegerValue(BigDecimal bd){
-      return bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0;
+
+    public static boolean isIntegerValue(BigDecimal bd) {
+        return bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0;
     }
 }

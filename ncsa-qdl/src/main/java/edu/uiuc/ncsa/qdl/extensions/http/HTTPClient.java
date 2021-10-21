@@ -47,6 +47,18 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/21 at  7:02 AM
  */
+
+/*
+q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java') ;
+     module_import(q) ;
+       http#host('https://localhost:9443/oauth2/.well-known/openid-configuration/')
+         http#host('https://localhost:9443/oauth2/.well-known/openid-confzzz')
+
+       http#host('https://didact-patto.dev.umccr.org/api/visa') ;
+       http#open();
+        z. := http#get({'sub':'https://nagim.dev/p/wjaha-ppqrg-10000'});
+
+  */
 public class HTTPClient implements QDLModuleMetaClass {
     CloseableHttpClient httpClient = null;
     String host = null;
@@ -173,17 +185,7 @@ public class HTTPClient implements QDLModuleMetaClass {
             }
         }
 
-        /*
-       q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java') ;
-            module_import(q) ;
-              http#host('https://localhost:9443/oauth2/.well-known/openid-configuration/')
-                http#host('https://localhost:9443/oauth2/.well-known/openid-confzzz')
 
-              http#host('https://didact-patto.dev.umccr.org/api/visa') ;
-              http#open();
-               z. := http#get({'sub':'https://nagim.dev/p/wjaha-ppqrg-10000'});
-
-         */
         @Override
         public List<String> getDocumentation(int argCount) {
             List<String> doxx = new ArrayList<>();

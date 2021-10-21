@@ -171,7 +171,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
         String original = "The quick brown fox jumps over the lazy dog";
         String expectedResult = "54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67";
-        Polyad polyad = new Polyad(MathEvaluator.TO_HEX);
+        Polyad polyad = new Polyad(MathEvaluator.ENCODE_B16);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);
@@ -184,7 +184,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
         String expectedResult = "The quick brown fox jumps over the lazy dog";
         String original = "54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67";
-        Polyad polyad = new Polyad(MathEvaluator.FROM_HEX);
+        Polyad polyad = new Polyad(MathEvaluator.DECODE_B16);
         ConstantNode arg = new ConstantNode(original, Constant.STRING_TYPE);
         polyad.addArgument(arg);
         polyad.evaluate(state);

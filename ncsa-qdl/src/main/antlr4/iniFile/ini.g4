@@ -16,7 +16,7 @@
 
    my_ini.section0.key0
 
-   lines allow for boolean, initeger, decimal, scientific or string (in quotes), also
+   lines allow for boolean, integer, decimal, scientific or string (in quotes), also
          lists if commas between elements, so
 
    key5 = 345,-3.14159,'foo'
@@ -31,7 +31,7 @@
    - only left-hand assignments
    - := and = both works as assignments
    - decimals do not need a lead 0, so ¯.123 is fine here
-   - lists do not need []'s. Those go around section headings.
+   - lists do not use []'s. Those go around section headings.
    - EOL (end of line) ends a statement not a ;.
 
    Differences with python/windows

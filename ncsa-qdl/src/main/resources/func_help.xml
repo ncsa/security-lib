@@ -48,10 +48,72 @@ We follow RFC 4648, meaning that the result is not padded with
 things like ='s, and the character set is a-zA-Z0-9-_.
 This makes the result always URL safe.
 Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
+E.g.
+  encode_b64('foobar')
+Zm9vYmFy
+
 See also: decode_b64
                 ]]>
         </body>
     </entry>
+
+
+    <entry id="decode_b32">
+        <body>
+            <![CDATA[
+decode_b32(arg) - decode a base 32 encoded string or stem of strings to string(s).
+                  Note that if the arg is encoded binary, you will get
+                  gibberish back.
+See also: encode_b32
+            ]]>
+        </body>
+    </entry>
+
+    <entry id="encode_b32">
+        <body>
+            <![CDATA[
+encode_b32(arg) - encode a string or stem of string into base 32.
+We follow RFC 4648, meaning that the result is not padded with
+things like ='s, and the character set is a-zA-Z0-9-_.
+This makes the result always URL safe.
+Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
+E.g.
+  encode_b32('foobar')
+MZXW6YTBOI
+
+See also: decode_b32
+                ]]>
+        </body>
+    </entry>
+
+    <entry id="decode_b16">
+        <body>
+            <![CDATA[
+decode_b16(arg) - decode a base 16 encoded string or stem of strings to string(s).
+                  Note that if the arg is encoded binary, you will get
+                  gibberish back.
+See also: encode_b16
+            ]]>
+        </body>
+    </entry>
+
+    <entry id="encode_b16">
+        <body>
+            <![CDATA[
+encode_b16(arg) - encode a string or stem of string into base 16.
+We follow RFC 4648, meaning that the result is not padded with
+things like ='s, and the character set is a-f0-9
+This makes the result always URL safe.
+Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
+E.g.
+  encode_b16('foobar')
+666f6f626172
+
+See also: decode_b16
+                ]]>
+        </body>
+    </entry>
+
 
     <entry id="head">
         <body>
@@ -97,14 +159,7 @@ See also: head
         </body>
     </entry>
 
-    <entry id="from_hex">
-        <body>
-            <![CDATA[
-from_hex(arg) - convert a hexadecimal string or stem of strings to a string.
-See also: to_hex
-                ]]>
-        </body>
-    </entry>
+
     <entry id="check_syntax">
         <body>
             <![CDATA[
@@ -180,17 +235,7 @@ See also: encode_b64, decode_b64
                 ]]>
         </body>
     </entry>
-    <entry id="to_hex">
-        <body>
-            <![CDATA[
-to_hex(arg) - convert a string or stem of strings to hexadecimal numbers.
-              Note: Since the representation relies on the underlying character
-              set, this is of less use generally than encoding a string in
-              base 64. However, from_hex is guaranteed to be its inverse.
-See also: encode_b64, decode_b64, from_hex
-                ]]>
-        </body>
-    </entry>
+
     <entry id="box">
         <body>
             <![CDATA[
