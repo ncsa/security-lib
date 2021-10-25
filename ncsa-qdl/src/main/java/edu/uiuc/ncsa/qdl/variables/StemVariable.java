@@ -494,7 +494,7 @@ public class StemVariable extends HashMap<String, Object> {
      * @return
      */
     public JSON toJSON() {
-        return toJSON(true); //
+        return toJSON(false); //
     }
 
     /**
@@ -514,7 +514,7 @@ public class StemVariable extends HashMap<String, Object> {
             return new JSONObject();
         }
         if (getStemList().size() == size()) {
-            return getStemList().toJSON(); // handles case of simple list of simple elements
+            return getStemList().toJSON(escapeNames); // handles case of simple list of simple elements
         }
         JSONObject json = new JSONObject();
         //edge case. empty stem list should return a JSON object
@@ -525,7 +525,7 @@ public class StemVariable extends HashMap<String, Object> {
             // super.size counts the number of non-stem entries. This means there are
             // list elements and nothing else.
             // if it is just a list, return it asap.
-            return getStemList().toJSON();
+            return getStemList().toJSON(escapeNames);
         }
         StemList<StemEntry> localSL = new StemList<>();
         localSL.addAll(getStemList());
@@ -555,7 +555,7 @@ public class StemVariable extends HashMap<String, Object> {
                                 "and a stem entry '" + key + "'. This is not convertible to a JSON Object");
                     }
                 } else {
-                    json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
+                    json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON(escapeNames));
                 }
 
             } else {

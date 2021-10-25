@@ -14,7 +14,7 @@
     <artifactId>ncsa-qdl</artifactId>
     <name>The QD Language</name>
     <packaging>jar</packaging>
-    <version>1.3-QDL-SNAPSHOT</version>
+    <version>1.4-QDL-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <additionalparam>-Xdoclint:none</additionalparam>

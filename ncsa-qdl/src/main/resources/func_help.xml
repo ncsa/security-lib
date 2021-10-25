@@ -690,19 +690,12 @@ args is a scalar - zero, since scalars (such as integers) have no size.
 to_json(stem., convert, indent) - (requires convert), indent is an integer
                                   giving the number ofspaces to indent the
                                   JSON string
+The default for convert is false.
+
 See also: from_json
                 ]]>
         </body>
     </entry>
-<!--    <entry id="to_list">
-        <body>
-            <![CDATA[
-to_list(arg0, arg1, ...) - takes any set of arguments (including stems) and
-                  converts to a list, whose elements are the arguments.
-Note: This does not remove the arguments from the symbol table.
-                ]]>
-        </body>
-    </entry>-->
     <entry id="unbox">
         <body>
             <![CDATA[
@@ -2465,7 +2458,7 @@ E.g.
     <entry id="version">
             <body>
                 <![CDATA[
-The current version of QDL is 1.3-QDL-SNAPSHOT
+The current version of QDL is 1.4-QDL-SNAPSHOT
                 ]]>
             </body>
         </entry>
@@ -3173,7 +3166,7 @@ See also: file_read
     <entry id="laminate">
             <body>
                 <![CDATA[
-(extensions)
+(extensions module)
 laminate(x,y{,axis}) - paste together two conformable stems along the axis.
 If axis is omitted, then the operation occurs on the zeroth axis
 x - stem or scalar. If a scalar, it will be extended

@@ -590,37 +590,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert indices.getLong("3").equals(3L);
     }
 
-/*   Formerly to test to_list, but since we have slices and bracket notation
-     this is never used and should be disposed of.
-     
-    public void testToStem() throws Exception {
-        State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-
-        StemVariable sourceStem = new StemVariable();
-        sourceStem.put("rule", "One Ring to rule them all");
-        sourceStem.put("find", "One Ring to find them");
-        sourceStem.put("bring", "One Ring to bring them all");
-        sourceStem.put("bind", "and in the darkness bind them");
-
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setLongValue("int", new Long(5L));
-
-        Polyad polyad = new Polyad(StemEvaluator.TO_LIST);
-        polyad.addArgument(new VariableNode("sourceStem."));
-        polyad.addArgument(new VariableNode("int"));
-        polyad.addArgument(new ConstantNode("foo", Constant.STRING_TYPE));
-        polyad.addArgument(new ConstantNode("bar", Constant.STRING_TYPE));
-        polyad.addArgument(new ConstantNode("baz", Constant.STRING_TYPE));
-        polyad.evaluate(state);
-        StemVariable result = (StemVariable) polyad.getResult();
-        assert result.size() == 5;
-        assert result.get("0") instanceof StemVariable;
-        assert result.getLong("1") == 5L;
-        assert result.getString("2").equals("foo");
-        assert result.getString("3").equals("bar");
-        assert result.getString("4").equals("baz");
-    }*/
 
 
     public void testRemoveStem() throws Exception {

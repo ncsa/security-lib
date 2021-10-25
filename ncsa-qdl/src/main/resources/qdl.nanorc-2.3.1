@@ -2,10 +2,8 @@
 # To enable, edit ~/.nanorc (create it if it does not exist) and make sure it has the line
 # include /path/to/this/file/qdl.nanorc
 #
-syntax "QDL" "\.qdl$"
-magic "QDL "
+syntax "QDL" "\.[mq]dl$"
 # comment "//"
-
 
 # built functions
 
@@ -95,6 +93,7 @@ color brightyellow "random"
 color brightyellow "random_string"
 color brightyellow "rank"
 color brightyellow "reduce"
+color brightyellow "remap"
 color brightyellow "remove"
 color brightyellow "rename_keys"
 color brightyellow "replace"
@@ -167,11 +166,11 @@ color brightred "⁺"
 color brightred "⊗"
 
 # keywords
-color red "\<(module|block|assert|define|body|[|]|catch|continue|do|else|if|return|switch|try|while)\>"
+color red "\<(module|block|assert|define|body|[|]|catch|continue|do|else|if|then|return|switch|try|while)\>"
 color red "\<(true|false|null)\>"
 # Strings and numbers
 color brightcyan "'[^']*'"
-icolor yellow "\b(([1-9][0-9]+)|0+)\.[0-9]+\b" "\b[1-9][0-9]*\b" "\b0[0-7]*\b" "\b0x[1-9a-f][0-9a-f]*\b"
+color yellow "\b(([1-9][0-9]+)|0+)\.[0-9]+\b" "\b[1-9][0-9]*\b" "\b0[0-7]*\b" "\b0x[1-9a-f][0-9a-f]*\b"
 # comments:
 color brightgreen "//.*"
 color brightgreen start="^\s*/\*" end="\*/"

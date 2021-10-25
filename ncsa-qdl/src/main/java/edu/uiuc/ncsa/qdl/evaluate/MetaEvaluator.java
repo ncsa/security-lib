@@ -22,7 +22,9 @@ This inherits from all the other built in functions and does very little except 
 public class MetaEvaluator extends AbstractFunctionEvaluator {
     /**
      * Factory method. You should not override this class to add more of your own evaluators. Just
-     * get the instance and {@link #addEvaluator(AbstractFunctionEvaluator)} to it. It will snoop
+     * get the instance and {@link #addEvaluator(int, AbstractFunctionEvaluator)} to it at
+     * index 0 (or it will get missed -- last index is for functions and throws and
+     * exception if no function found. It will snoop
      * through your evaluator too. If you are writing your own evaluator, your type numbers
      * should be negative.
      *
@@ -31,13 +33,13 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     public static MetaEvaluator getInstance() {
         if (metaEvaluator == null) {
             metaEvaluator = new MetaEvaluator();                // NS base value. Must be distinct for new evaluators
-            metaEvaluator.addEvaluator(new StringEvaluator());  //  3000
-            metaEvaluator.addEvaluator(new StemEvaluator());    //  2000
-            metaEvaluator.addEvaluator(new ListEvaluator());    // 10000
-            metaEvaluator.addEvaluator(new IOEvaluator());      //  4000
-            metaEvaluator.addEvaluator(new SystemEvaluator());  //  5000
-            metaEvaluator.addEvaluator(new MathEvaluator());    //  1000
-            metaEvaluator.addEvaluator(new TMathEvaluator());   //  7000
+            metaEvaluator.addEvaluator(0, new StringEvaluator());  //  3000
+            metaEvaluator.addEvaluator(0, new StemEvaluator());    //  2000
+            metaEvaluator.addEvaluator(0, new ListEvaluator());    // 10000
+            metaEvaluator.addEvaluator(0, new IOEvaluator());      //  4000
+            metaEvaluator.addEvaluator(0, new SystemEvaluator());  //  5000
+            metaEvaluator.addEvaluator(0, new MathEvaluator());    //  1000
+            metaEvaluator.addEvaluator(0, new TMathEvaluator());   //  7000
             // must be last always to resolve user defined functions.
             metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000
             systemNamespaces.add(StringEvaluator.STRING_NAMESPACE);
@@ -51,9 +53,10 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         return metaEvaluator;
     }
 
-    public static boolean isSystemNS(String name){
+    public static boolean isSystemNS(String name) {
         return getSystemNamespaces().contains(name);
     }
+
     @Override
     public String getNamespace() {
         // not implemented at this level.
@@ -71,6 +74,10 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
     public void addEvaluator(AbstractFunctionEvaluator evaluator) {
         evaluators.add(evaluator);
+    }
+
+    public void addEvaluator(int index ,AbstractFunctionEvaluator evaluator) {
+        evaluators.add(index,evaluator);
     }
 
 
@@ -126,8 +133,10 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         }
         return allNames;
     }
+
     static protected List<String> systemNamespaces = new ArrayList<>();
-     public static List<String> getSystemNamespaces(){
-                return systemNamespaces;
-     }
+
+    public static List<String> getSystemNamespaces() {
+        return systemNamespaces;
+    }
 }

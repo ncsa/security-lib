@@ -636,7 +636,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         if (returnAsPaths) {
             try {
-                output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+                output = JsonPath.using(conf).parse(stemVariable.toJSON(false).toString()).read(query).toString();
             } catch (JsonPathException jpe) {
                 throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
             }
@@ -649,7 +649,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 // we just have to convert it to a stem and return that. Handles the couple cases
                 // of a JSON array vs object. The JsonPath generally tends to return arrays so we
                 // test for that first.
-                output = JsonPath.using(conf).parse(stemVariable.toJSON().toString()).read(query).toString();
+                output = JsonPath.using(conf).parse(stemVariable.toJSON(false).toString()).read(query).toString();
                 outStem = new StemVariable();
                 try {
                     JSONArray array = JSONArray.fromObject(output);

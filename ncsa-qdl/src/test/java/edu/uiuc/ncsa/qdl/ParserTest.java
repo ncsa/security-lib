@@ -1477,7 +1477,45 @@ public class ParserTest extends AbstractQDLTester {
         }
     }
 
+    /**
+     * Checks that using to_jon(x., flag) propagates the flag. This has a bunch
+     * of illegal escape sequences buried in it and if the flag does not
+     * propagate, then codec exceptions are thrown. So this either evaluates or
+     * fails
+     * @throws Throwable
+     */
+     public void testJSONEscape() throws Throwable{
+       String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "j. := " + rawJSON + ";");
+         addLine(script, "jj := to_json(j., false);");
+         addLine(script, "j2. := from_json(jj, false);");
 
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+         interpreter.execute(script.toString());
+         assert true;
+     }
+
+    /**
+     * tests that messy stems with illegal vencode names (like $if) are handled
+     * correctly in query.
+     * @throws Throwable
+     */
+    public void testJSONQueryEscape() throws Throwable{
+      String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j. := " + rawJSON + ";");
+        addLine(script, "jj. := query(j., '$..cfg', true);");
+        addLine(script, "ok := size(jj.)==1 && jj.0.0 == 'cfg';");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
     /*
     Possible switch test?

@@ -204,11 +204,14 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
      * @return
      */
     public JSONArray toJSON() {
+        return toJSON(false);
+    }
+    public JSONArray toJSON(boolean escapeNames) {
         JSONArray array = new JSONArray();
         for (StemEntry s : this) {
             Object v = s.entry;
             if (v instanceof StemVariable) {
-                array.add(((StemVariable) v).toJSON());
+                array.add(((StemVariable) v).toJSON(escapeNames));
             } else {
                 array.add(v);
             }

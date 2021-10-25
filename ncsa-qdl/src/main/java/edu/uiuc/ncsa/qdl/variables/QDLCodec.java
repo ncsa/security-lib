@@ -38,29 +38,30 @@ public class QDLCodec {
         return encoded;
     }
 
-    public String decode(String encoded){
-        if(encoded == null || encoded.isEmpty()) return encoded;
+    public String decode(String encoded) {
+        if (encoded == null || encoded.isEmpty()) return encoded;
         URLCodec codec = new URLCodec();
         String token = null;
-                     try{
-                         token = encoded.replace("$", "%");
+        try {
+            token = encoded.replace("$", "%");
 
-                   token = codec.decode(token);
-                     }catch (DecoderException e) {
-                                 throw new QDLException("Error: Could not decode string:Invalid escape sequence" , e);
-                             }
+            token = codec.decode(token);
+        } catch (DecoderException e) {
+            throw new QDLException("invalid escape sequence for'" + encoded + "'" , e);
+        }
         return token;
     }
-    public  static void main(String[] args){
-        try{
-             String a = "abc$%^.*_-";
-             QDLCodec c = new QDLCodec();
-             String encoded = c.encode(a);
-             String decoded = c.decode(encoded);
-             System.out.println(a + " -> " + encoded);
-             System.out.println(a + " =? " + (a.equals(decoded)) + ": " + decoded);
 
-        }catch(Throwable t){
+    public static void main(String[] args) {
+        try {
+            String a = "abc$%^.*_-";
+            QDLCodec c = new QDLCodec();
+            String encoded = c.encode(a);
+            String decoded = c.decode(encoded);
+            System.out.println(a + " -> " + encoded);
+            System.out.println(a + " =? " + (a.equals(decoded)) + ": " + decoded);
+
+        } catch (Throwable t) {
             t.printStackTrace();
         }
     }

@@ -1,0 +1,210 @@
+It would be nice to restructure the modules in QDL. The idea is to be able
+to only load parts of it (rather than have 131 functions just show up every time
+which is a bit overwhelming.)
+
+Also, allows for loading supplied system modules like
+module_import(http)
+without a load
+
+There should be a bare bones system module that contains exactly what is needed
+to write the rest of QDL. This would include
+
+say - or WS does not work right. Only actual required one
+return
+continue
+break
+raise_error
+module_import
+halt
+scan?
+
+Top-level NS for all QDL system modules is qdl:/lang
+So qdl:/lang/math -> math
+And option for loading is basic system (always) and, say
+
+module#import('math')
+
+Modules are
+     sys - system most barebones set of things to load. Required.
+    stem - stem specific for structural operations,
+           join, mask, reduce,...
+  struct - need stem specific module for interrogation,
+           has_value dim, rank
+           Maybe this is stem/struct?
+    list - list specific (structural) is_a, size? (of list only)
+  module - manage modules
+    keys - relating to working with keys?
+    file - manage file system, incl VFS
+    math - basic math abs, min, max
+   tmath - transcendatal math cos, log, ...
+  string - functions for string structure
+           insert_at
+    text - Things that operate on text?
+           trim, to_upper
+    util - utilities to do common things
+    tool - tools to accomplish tasks,
+           query
+ convert - convert one thing to another. to/from, codecs
+
+Allow for hierarchy, so qdl:/lang/string/text load as
+   module#import('string/text') -- alias is text
+Don't allow for remapping aliases of system??? If we do that, then
+a user can just replace all of QDL aside from basic syntax. That may
+be a truly terrible idea or a really cool one. Not sure.
+
+Have a version 1-> 2 in config flag that maps old names to new ones
+to make transition easier. No old code breaks unless you tell it to.
+Need to now check for collisions in system modules, so
+stem#keys
+list#keys
+can collide if keys() is called. Now, in effect, every built-in function
+is uniquely named but cannot count on that.
+
+Have a master hash table of unq system names with counts, so every time
+an evaluator is added, the counter gets updated. Resolving an unq name
+then can be done easily without having to snoop through every loaded
+extension.
+
+Allow for same type of overrides of build-ins at top level, so
+defining
+   dir(x)->file#dir('foo/+x)';
+Would replace the build in function. Maybe have a config file option to
+disallow that (so the user has to state they want to do such a thing,
+otherwise have an error raised on system function overwrite).
+
+
++--------------------------------+--------------+-----------------------------+
+| current                        | module       | new name                    |
++--------------------------------+--------------+-----------------------------+
+| function#is_function()         |  sys         |                             |
+| io#dir()                       |  file        |                             |
+| io#file_read()                 |  file        | read                        |
+| io#file_write()                |  file        | write                       |
+| io#scan()                      |  sys         |                             |
+| io#vfs_mount()                 |  file        | mount                       |
+| io#vfs_unmount()               |  file        | unmount                     |
+| list#insert_at()               |  list        | insert                      |
+| list#list_copy()               |  list        | copy                        |
+| list#reverse()                 |  list        | reverse                     |
+| list#starts_with()             |  list        | head? better name?          |
+| list#subset()                  |  list        | subset                      |
+| math#abs()                     |  math        |                             |
+| math#date_iso()                |  util        |                             |
+| math#date_ms()                 |  util        |                             |
+| math#decode_b16()              |  convert     |                             |
+| math#decode_b32()              |  convert     |                             |
+| math#decode_b64()              |  convert     |                             |
+| math#encode_b16()              |  convert     |                             |
+| math#encode_b32()              |  convert     |                             |
+| math#encode_b64()              |  convert     |                             |
+| math#hash()                    |  convert     |                             |
+| math#i()                       |  math        |                             |
+| math#identity()                |  math        |                             |
+| math#max()                     |  math        |                             |
+| math#min()                     |  math        |                             |
+| math#mod()                     |  math        |                             |
+| math#numeric_digits()          |  sys?        |                             |
+| math#random()                  |  math        |                             |
+| math#random_string()           |  string      | random                      |
+| stem#box()                     |  struct      |                             |
+| stem#common_keys()             |  keys        | common                      |
+| stem#dim()                     |  struct      |                             |
+| stem#exclude_keys()            |  keys        | exclude                     |
+| stem#for_each()                |  struct      |                             |
+| stem#from_json()               |  convert     |                             |
+| stem#has_keys()                |  keys        | has                         |
+| stem#has_value()               |  stem        |                             |
+| stem#include_keys()            |  keys        | include                     |
+| stem#indices()                 |  keys        |                             |
+| stem#is_list()                 |  list        | is_a                        |
+| stem#join()                    |  struct      |                             |
+| stem#keys()                    |  stem        | keys                        |
+| stem#list_keys()               |  list        | keys                        |
+| stem#mask()                    |  struct      |                             |
+| stem#n()                       |  struct      | n, reshape                  |
+| stem#query()                   |  util        |                             |
+| stem#rank()                    |  struct      |                             |
+| stem#remap()                   |  keys        |                             |
+| stem#remove()                  |  sys         |                             |
+| stem#rename_keys()             |  keys        | rename                      |
+| stem#set_default()             |  stem        | default (get/set)           |
+| stem#shuffle()                 |  util?       |                             |
+| stem#size()                    |  struct      |                             |
+| stem#to_json()                 |  util        |                             |
+| stem#transpose()               |  struct      |                             |
+| stem#unbox()                   |  struct      |                             |
+| stem#union()                   |  stem        |                             |
+| stem#unique()                  |  stem        |                             |
+| stem#values()                  |  stem        |                             |
+| stem#τ()                       |  struct      |                             |
+| string#contains()              |  text        |                             |
+| string#detokenize()            |  text        |                             |
+| string#differ_at()             |  string      |                             |
+| string#from_uri()              |  convert     |                             |
+| string#head()                  |  text        |                             |
+| string#index_of()              |  text        |                             |
+| string#insert()                |  string      |                             |
+| string#replace()               |  string      |                             |
+| string#substring()             |  string      |                             |
+| string#tail()                  |  text        |                             |
+| string#to_lower()              |  text        |                             |
+| string#to_upper()              |  text        |                             |
+| string#to_uri()                |  convert     |                             |
+| string#tokenize()              |  text        |                             |
+| string#trim()                  |  text        |                             |
+| string#vdecode()               |  convert     |                             |
+| string#vencode()               |  convert     |                             |
+| sys#break()                    |              |                             |
+| sys#check_after()              |              |                             |
+| sys#check_syntax()             |              |                             |
+| sys#constants()                |              |                             |
+| sys#continue()                 |              |                             |
+| sys#debug()                    |  util        | debug                       |
+| sys#execute()                  |              |                             |
+| sys#expand()                   |              |                             |
+| sys#for_keys()                 |              |                             |
+| sys#for_next()                 |              |                             |
+| sys#halt()                     | tool?        |                             |
+| sys#info()                     |              |                             |
+| sys#input_form()               |              |                             |
+| sys#is_defined()               |              |                             |
+| sys#log_entry()                |  tool        | log                         |
+| sys#module_import()            |  module      | import                      |
+| sys#module_load()              |  module      | load                        |
+| sys#module_path()              |  module      | path                        |
+| sys#module_remove()            |  module      | remove                      |
+| sys#os_env()                   |              |                             |
+| sys#print()                    |  sys         |                             |
+| sys#raise_error()              |  sys         |                             |
+| sys#reduce()                   |              |                             |
+| sys#return()                   |  sys         |                             |
+| sys#say()                      |              |                             |
+| sys#script_args()              |  script      | args                        |
+| sys#script_load()              |  script      | load                        |
+| sys#script_path()              |  script      | path                        |
+| sys#script_run()               |  script      | run                         |
+| sys#to_boolean()               |              |                             |
+| sys#to_number()                |              |                             |
+| sys#to_string()                |              |                             |
+| sys#var_type()                 |              |                             |
+| tmath#acos()                   |  tmath       |                             |
+| tmath#acosh()                  |    "         |                             |
+| tmath#asin()                   |    "         |                             |
+| tmath#asinh()                  |    "         |                             |
+| tmath#atan()                   |    "         |                             |
+| tmath#atanh()                  |    "         |                             |
+| tmath#ceiling()                |  math        |                             |
+| tmath#cos()                    |    "         |                             |
+| tmath#cosh()                   |    "         |                             |
+| tmath#exp()                    |    "         |                             |
+| tmath#floor()                  |   math       |                             |
+| tmath#ln()                     |    "         |                             |
+| tmath#log()                    |    "         |                             |
+| tmath#nroot()                  |    "         |                             |
+| tmath#pi()                     |    "         |                             |
+| tmath#sin()                    |    "         |                             |
+| tmath#sinh()                   |    "         |                             |
+| tmath#tan()                    |    "         |                             |
+| tmath#tanh()                   |    "         |                             |
+| tmath#π()                      |    "         |                             |
+131 total functions
