@@ -224,6 +224,29 @@ public class ExpressionTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("q_ok", state);
     }
+
+    /**
+     * Tests input_form for basic expressions and types. 
+     * @throws Throwable
+     */
+    public void testInputForm() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        addLine(script, "numeric_digits(15);"); // so decimal test is consistent
+        addLine(script, "s := input_form('abc' + substring('pqr',0,10,'.') + ' foo');"); // test that stem keys with embedded periods are handled right
+        addLine(script, "b := input_form(2<3&&4<7);"); // test that stem keys with embedded periods are handled right
+        addLine(script, "i := input_form((23+17)^5 - 11*2 +3);"); // test that stem keys with embedded periods are handled right
+        addLine(script, "d := input_form((432/17)^8);");
+        addLine(script, "slice := input_form(2*[;5]-1);");
+        interpreter.execute(script.toString());
+        assert getStringValue("s", state).equals("'abcpqr....... foo'");
+        assert getStringValue("b", state).equals("true");
+        assert getStringValue("i", state).equals("102399981");
+        assert getStringValue("d", state).equals("1.73891599997554E11");
+        assert getStringValue("slice", state).equals("[-1,1,3,5,7]");
+    }
+
     public void testStemAssignments5() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -234,5 +257,4 @@ public class ExpressionTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert !getBooleanValue("x_not_ok", state);
     }
-
 }

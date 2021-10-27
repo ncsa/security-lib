@@ -13,6 +13,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -220,7 +221,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                     if (isEncode) {
                         r.result = TokenUtil.b32EncodeToken(objects[0].toString());
                     } else {
-                        r.result = TokenUtil.b32DecodeToken(objects[0].toString());
+                        r.result = TokenUtil.b32DecodeToken(objects[0].toString().toUpperCase(Locale.ROOT));
                     }
                     r.resultType = Constant.STRING_TYPE;
                 } else {

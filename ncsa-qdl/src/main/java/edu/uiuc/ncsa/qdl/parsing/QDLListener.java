@@ -396,7 +396,8 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterEqExpression(QDLParserParser.EqExpressionContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
+            stash(ctx, new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE));
+          //  stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
     }
 
     @Override
@@ -501,7 +502,6 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
-
     @Override
     public void enterCompExpression(QDLParserParser.CompExpressionContext ctx) {
     }
@@ -509,7 +509,8 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitCompExpression(QDLParserParser.CompExpressionContext ctx) {
         // only now can we determine the comparison type
-        stash(ctx, new Dyad(state.getOperatorType(ctx.getChild(1).getText())));
+        //  stash(ctx, new Dyad(state.getOperatorType(ctx.getChild(1).getText())));
+        stash(ctx, new ComparisonDyad(state.getOperatorType(ctx.getChild(1).getText())));
         Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
         finish(dyad, ctx);
     }
@@ -1367,7 +1368,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterRegexMatches(QDLParserParser.RegexMatchesContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
+        stash(ctx, new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE));
 
     }
 

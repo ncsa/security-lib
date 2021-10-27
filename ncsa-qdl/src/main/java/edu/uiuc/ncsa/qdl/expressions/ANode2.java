@@ -76,7 +76,6 @@ public class ANode2 extends ExpressionImpl {
             // Do other assignments like +=
             d = new Dyad(getAssignmentType());
             if (getLeftArg() instanceof ANode2) {
-
                 d.setLeftArgument(((ANode2) getLeftArg()).getRightArg());
             } else {
                 d.setLeftArgument(getLeftArg());

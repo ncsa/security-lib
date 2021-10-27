@@ -568,14 +568,25 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (0 == polyad.getArgCount()) {
             throw new IllegalArgumentException(INPUT_FORM + " requires at least one argument");
         }
+
+        if (2 < polyad.getArgCount()) {
+            throw new IllegalArgumentException(INPUT_FORM + " accepts at most two arguments");
+        }
+        // easy cases (var, prettyPrint) or (func, argCount)
+/*        if(polyad.getArgCount() == 2){
+            if (!(polyad.getArguments().get(0) instanceof VariableNode)) {
+                throw new IllegalArgumentException(INPUT_FORM + " cannot resolve first argument");
+            }
+            String argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
+            Object r = polyad.evalArg(1,state);
+            polyad.setResult(doTwoArgInputForm(argName, r, state));
+            polyad.setResultType(Constant.STRING_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }*/
         if (polyad.getArguments().get(0) instanceof ConstantNode) {
             Object arg = polyad.evalArg(0, state);
-
-            // Looking for a module, so this must be a string
-            if (!isString(arg)) {
-                throw new IllegalArgumentException(INPUT_FORM + " requires a module name (as a string)");
-            }
-            String out = InputFormUtil.inputFormModule(arg.toString(), state);
+            String out = InputFormUtil.inputForm(arg);
             if (out == null) {
                 out = "";
             }
@@ -586,10 +597,11 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         boolean gotOne = false;
         String argName = null;
-        Module module = null;
+        // This ferrets out the input form for something inside a module, so the argument
+        // is a#b, and the input form of b will be returned.
         if (polyad.getArguments().get(0) instanceof ModuleExpression) {
             ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
-            module = state.getImportedModules().get(moduleExpression.getAlias());
+           Module module = state.getImportedModules().get(moduleExpression.getAlias());
             if (module == null) {
                 throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
             }
@@ -606,6 +618,17 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArguments().get(0) instanceof VariableNode) {
             argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
             gotOne = true;
+        }else{
+            if((!gotOne)&&polyad.getArguments().get(0) instanceof ExpressionImpl){
+                String out = InputFormUtil.inputForm(polyad.evalArg(0,state));
+                if (out == null) {
+                    out = "";
+                }
+                polyad.setEvaluated(true);
+                polyad.setResultType(Constant.STRING_TYPE);
+                polyad.setResult(out);
+                return;
+            }
         }
 
         if (!gotOne) {
@@ -619,8 +642,21 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
 
         }
+        // So a single argument is resolved first to see if it is a module. If so that
+        // is returned. If not, then check to see if the argument is a variable.
+        // If there is a name conflict (such as an alias is the same as a variable name)
+        // the module is returned. In that case, the user should use the dyadic version
+        // of this function to disambiguate.
         if (polyad.getArgCount() == 1) {
+            String out = InputFormUtil.inputFormModule(argName, state);
+               if (out != null) {
+                   polyad.setResult(out);
+                   polyad.setResultType(Constant.STRING_TYPE);
+                   polyad.setEvaluated(true);
+                   return;
+               }
             // simple variable case, no indent
+
             String output = InputFormUtil.inputFormVar(argName, state);
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
@@ -644,7 +680,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 doIndent = (Boolean) arg2;
                 break;
             default:
-                throw new IllegalArgumentException(INPUT_FORM + " requires an argument count for functions of a boolean ");
+                throw new IllegalArgumentException(INPUT_FORM + " requires an argument count for functions or a boolean ");
         }
         if (polyad.getArgCount() == 2 && isBoolean(arg2)) {
             // process as variable with indent factor
@@ -682,9 +718,53 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(output);
         polyad.setResultType(Constant.STRING_TYPE);
         polyad.setEvaluated(true);
+
+
     }
 
+    protected String doTwoArgInputForm(String left, Object right, State state){
+        boolean doIndent = false;
+        int argCount = -1;
 
+        switch (Constant.getType(right)) {
+            case Constant.LONG_TYPE:
+                argCount = ((Long) right).intValue();
+                break;
+            case Constant.BOOLEAN_TYPE:
+                doIndent = (Boolean) right;
+                break;
+            default:
+                throw new IllegalArgumentException(INPUT_FORM + " requires an argument count for functions or a boolean ");
+        }
+        if (isBoolean(right)) {
+            // process as variable with indent factor
+            String output = InputFormUtil.inputFormVar(left, doIndent?2:0, state);
+            return output;
+        }
+        // case here is that second arg is not a boolean (==> must be arg count) OR there is more than one arg.
+        if (!isLong(right)) {
+            throw new IllegalArgumentException(INPUT_FORM + " second argument must be an integer");
+        }
+
+        FR_WithState fr_withState = state.resolveFunction(left, argCount, true);
+        if (fr_withState == null) {
+            // no such critter
+            return "";
+        }
+        FunctionRecord fr = fr_withState.functionRecord;
+        String output = "";
+        if (fr != null) {
+            if (fr instanceof QDLFunctionRecord) {
+                QDLFunction qf = ((QDLFunctionRecord) fr).qdlFunction;
+                if (qf != null) {
+                    output = "java:" + qf.getClass().getCanonicalName();
+                }
+            } else {
+                output = StringUtils.listToString(fr.sourceCode);
+            }
+        }
+        return output;
+    }
     private void doCheckSyntax(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("argument to " + CHECK_SYNTAX + " requires a single argument.");

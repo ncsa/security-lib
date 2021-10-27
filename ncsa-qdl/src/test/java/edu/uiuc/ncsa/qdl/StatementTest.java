@@ -1,15 +1,9 @@
 package edu.uiuc.ncsa.qdl;
 
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
-import edu.uiuc.ncsa.qdl.expressions.Assignment;
-import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
-import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.variables.Constant;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -18,27 +12,7 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 public class StatementTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
-    /**
-     * Basic regression test that the assignment resolves its variable and places the result in to the state
-     * as it should.
-     *
-     * @throws Exception
-     */
-     
-    public void testAssignment() throws Exception {
-        State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
 
-        ConstantNode left = new ConstantNode(1L, Constant.LONG_TYPE);
-        ConstantNode right = new ConstantNode(2L, Constant.LONG_TYPE);
-        OpEvaluator opEvaluator = new OpEvaluator();
-
-        Dyad dyad = new Dyad(OpEvaluator.PLUS_VALUE, left, right);
-        Assignment assignmentNode = new Assignment("A", dyad);
-        assignmentNode.evaluate(state);
-        assert st.isDefined("A");
-        assert st.resolveValue("A").equals(3L);
-    }
 
     /**
      * Test that a malformed loop (conditional statement is not a conditional) fails reasonably.

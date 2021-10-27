@@ -3090,12 +3090,21 @@ E.g.
 __my_password := 'foo';
 __f(x)->x^2;
 
-Attempts to access __my_password or __f(x) will fail.
+Attempts to access __my_password or __f(x) outside of the module will fail.
+Many languages do something similar and refer to these are private elements.
 See also: module.
                  ]]>
              </body>
          </entry>
 
+    <entry id="private">
+             <body>
+                 <![CDATA[
+See intrinsic.
+                 ]]>
+             </body>
+         </entry>
+    
     <entry id="__">
             <body>
                 <![CDATA[
@@ -3271,6 +3280,33 @@ See also: min
                 ]]>
             </body>
         </entry>
+    <entry id="chaining">
+             <body>
+                 <![CDATA[
+Refers to the chaining of comparisons like
+   a<b<=c
+which is the same as
+  (a<b)&&(b<=c)
+
+You may chain any of <, <=, =<, >, >=, =>, ==, != or =~.
+
+
+E.g.
+   k := 0
+   while[0<=k<=3][say(k++);]
+0
+1
+2
+3
+
+E.g.
+   if[2!=x<5][say(sqrt(5-x)/(x-2));];
+Meaning that (x!=2)&&(x<5), and if true, say what the value is
+
+See intrinsic.
+                 ]]>
+             </body>
+         </entry>
     <!--
         entry template
     -->

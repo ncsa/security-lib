@@ -460,10 +460,13 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)/times(y,v);g()->u+v;];");
         addLine(script, "module_import('a:/b','Y');");
         addLine(script, "Y#u :=-7;");
+        // show that getting input form of things inside modules works
         addLine(script, "yf :=input_form(Y#f,2);");
         addLine(script, "yu :=input_form(Y#u);");
         addLine(script, "xf :=input_form(X#f,2);");
         addLine(script, "xu :=input_form(X#u);");
+        // shows getting input form of entire module works
+        addLine(script, "all :=input_form(X);");
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -471,6 +474,7 @@ public class ModuleTest extends AbstractQDLTester {
         assert getStringValue("xf", state).contains("times(x,u)+times(y,v)");
         assert getStringValue("xu", state).contains("42");
         assert getStringValue("yu", state).contains("-7");
+        assert getStringValue("all", state).contains("module['a:/b','X']");
 
     }
 
