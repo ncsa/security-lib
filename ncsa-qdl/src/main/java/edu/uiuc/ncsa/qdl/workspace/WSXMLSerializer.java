@@ -39,7 +39,7 @@ public class WSXMLSerializer {
 
 
     public void toXML(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
-
+        xsw.writeStartDocument();
         xsw.writeStartElement(WORKSPACE_TAG);
         String comment = "";
         String indent = "     ";
@@ -184,10 +184,7 @@ public class WSXMLSerializer {
         return fromXML(xer, false);
 
     }
-    /*
-       sin(n(2,3,4,interval([0,pi()/2, 24])))^2 + cos(n(2,3,4,interval([0,pi()/2, 24])))^2
-       nroot(n(4,3,2,interval([-1,1,24])), 3)
-     */
+
     public WorkspaceCommands fromXML(XMLEventReader xer, boolean workspaceAttributesOnly) throws XMLStreamException {
         if (!xer.hasNext()) {
             say("Error! no XML found to deserialize");

@@ -21,7 +21,15 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_SOURCE_TAG;
  * on 4/1/20 at  11:30 AM
  */
 public class QDLModule extends Module {
+    public String getFilePath() {
+        return filePath;
+    }
 
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    String filePath;
     public ModuleStatement getModuleStatement() {
         return moduleStatement;
     }

@@ -355,6 +355,10 @@ public class WorkspaceCommands implements Logable {
         Date startTimestamp;
         String id;
         String description;
+        boolean echoOn;
+        boolean prettyPrint;
+        String saveDir = null;
+        boolean debugOn;
 
         public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
 
@@ -2961,7 +2965,7 @@ public class WorkspaceCommands implements Logable {
         }
         currentFile = _resolveLibFile(inputLine);
         if (currentFile == null) {
-            say("Sorry no root or save dir specified and no argument. Nothing to show.");
+            say("Sorry could not determine what the current library directory is. Did you set the " + SAVE_DIR + "?");
             return RC_NO_OP;
         }
         // That's been resolved.
@@ -3073,6 +3077,9 @@ public class WorkspaceCommands implements Logable {
         if (!currentFile.isAbsolute()) {
             if (saveDir == null) {
                 if (rootDir == null) {
+                    return null;
+                }
+                if(fileName == null){
                     return null;
                 }
                 currentFile = new File(rootDir, fileName);
@@ -3648,11 +3655,17 @@ public class WorkspaceCommands implements Logable {
 
     private void clearWS() {
         State oldState = state;
+        // Must preserve the IOInterface since whatever it is has hold of the system input stream
+        // and that cannot be really transferred between instances -- attempts to do so will
+        // result in the stream malfunctioning or simply throwing Exceptions on every use.
+        // The most common sign is an almost silent JVM exit.
+        IOInterface currentIOI = getIoInterface();
         // Get rid of everything.
         state = null;
         ImportManager.setResolver(null); // zero this out or we have bogus entries.
         state = getState();
-
+        state.setIoInterface(currentIOI);
+        setIoInterface(currentIOI);
         state.createSystemConstants();
         state.setSystemInfo(oldState.getSystemInfo());
         commandHistory = new ArrayList<>();
@@ -3921,6 +3934,12 @@ public class WorkspaceCommands implements Logable {
         wsInternals.startTimestamp = startTimeStamp;
         wsInternals.id = wsID;
         wsInternals.description = description;
+        wsInternals.echoOn = echoModeOn;
+        wsInternals.prettyPrint = prettyPrint;
+        wsInternals.debugOn = debugOn;
+        if(saveDir != null) {
+            wsInternals.saveDir = saveDir.getAbsolutePath();
+        }
         StateUtils.saveObject(wsInternals, fos);
     }
 
@@ -3988,9 +4007,9 @@ public class WorkspaceCommands implements Logable {
     }
 
     /*
-    Does the actual work of loading a file once the logic for what to do has been done.
+    Does the actual work of loading a serialized file once the logic for what to do has been done.
      */
-    private boolean _realLoad(File f) {
+    private boolean _javaLoad(File f) {
         try {
             FileInputStream fis = new FileInputStream(f);
             WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
@@ -4003,11 +4022,18 @@ public class WorkspaceCommands implements Logable {
             startTimeStamp = wsInternals.startTimestamp;
             wsID = wsInternals.id;
             description = wsInternals.description;
+            echoModeOn = wsInternals.echoOn;
+            prettyPrint = wsInternals.prettyPrint;
+            debugOn = wsInternals.debugOn;
+            if(wsInternals.saveDir != null) {
+                saveDir = new File(wsInternals.saveDir);
+            }
             /*
             Now set the stuff that cannot be serialized.
              */
             newState.injectTransientFields(getState());
-            defaultState.injectTransientFields(getState());
+            //defaultState.injectTransientFields(getState());
+            defaultState = newState;
             for (Integer key : siEntries.keySet()) {
                 SIEntry sie = siEntries.get(key);
                 sie.state.injectTransientFields(getState());
@@ -4023,6 +4049,9 @@ public class WorkspaceCommands implements Logable {
             }
             return true;
         } catch (Throwable t) {
+            if(DebugUtil.isEnabled()){
+                t.printStackTrace();
+            }
         }
         return false;
     }
@@ -4097,9 +4126,9 @@ public class WorkspaceCommands implements Logable {
             } else {
                 if (isJava) {
                     target = new File(parentDir, fName + DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION);
-                    if (!target.exists()) {
+            /*        if (!target.exists()) {
                         target = new File(fName + ALTERNATE_JAVA_SERIALIZATION_FILE_EXTENSION);
-                    }
+                    }*/
 
                 } else {
                     target = new File(parentDir, fName + DEFAULT_XML_SAVE_FILE_EXTENSION);
@@ -4148,6 +4177,8 @@ public class WorkspaceCommands implements Logable {
             // it should remain so, since QDL does not save WS state.
             boolean echo = isEchoModeOn();
             boolean pp = isPrettyPrint();
+            boolean debugOn = isDebugOn();
+            File saveDir = this.saveDir;
             clearWS();
             String command = SystemEvaluator.LOAD_COMMAND + "('" + target.getAbsolutePath() + "');";
             try {
@@ -4157,8 +4188,11 @@ public class WorkspaceCommands implements Logable {
                 getInterpreter().execute(command);
                 setPrettyPrint(pp);
                 setEchoModeOn(echo);
+                setDebugOn(debugOn);
                 getInterpreter().setEchoModeOn(echo);
                 getInterpreter().setPrettyPrint(pp);
+                getInterpreter().setDebugOn(debugOn);
+                this.saveDir = saveDir;
 
                 say(target.getAbsolutePath() + " loaded (" + target.length() + " bytes)");
                 return RC_CONTINUE;
@@ -4170,7 +4204,7 @@ public class WorkspaceCommands implements Logable {
                 return RC_NO_OP;
             }
         }
-        loadOK = _realLoad(target);
+        loadOK = _javaLoad(target);
         if (!loadOK) {
             try {
                 loadOK = _xmlLoad(target);
@@ -4835,12 +4869,12 @@ public class WorkspaceCommands implements Logable {
             if(DebugUtil.isEnabled()) {
                 iox.printStackTrace();
             }
-            throw new QDLException("Error reading input.");
+            throw new QDLException("Error reading input:" + iox.getMessage());
         } catch(ArrayIndexOutOfBoundsException ax){
             if(DebugUtil.isEnabled()) {
                 ax.printStackTrace();
             }
-            throw new QDLException("Error reading input.");
+            throw new QDLException("Error reading input:" + ax.getMessage());
         }
     }
 
@@ -4884,12 +4918,14 @@ public class WorkspaceCommands implements Logable {
         WSXMLSerializer serializer = new WSXMLSerializer();
         WorkspaceCommands newCommands = null;
         try {
+            IOInterface ioInterface = getIoInterface();
             newCommands = serializer.fromXML(xer);
             State oldState = getState();
             newCommands.getState().injectTransientFields(oldState);
             // later this is injected into the state. Set it here or custom IO fails later.
-            newCommands.setIoInterface(getIoInterface());
+            newCommands.setIoInterface(ioInterface);
             state = newCommands.getState();
+            state.setIoInterface(ioInterface);
             // now setup the workspace constants
             setDebugOn(newCommands.isDebugOn());
             setEchoModeOn(newCommands.isEchoModeOn());

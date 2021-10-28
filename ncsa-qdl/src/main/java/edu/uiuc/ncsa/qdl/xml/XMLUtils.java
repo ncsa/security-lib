@@ -202,14 +202,28 @@ public class XMLUtils implements XMLConstants {
             if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(NULL_TAG)) {
                 output = QDLNull.getInstance();
             } else if (xe.isEndElement() && xe.asEndElement().getName().getLocalPart().equals(STRING_TAG)) {
-                // A string may be emoty and of the form <string/> so there is never any character data too.
+                // A string may be empty and of the form <string/> so there is never any character data too.
                 output = ""; // case of empty string tag
             } else {
 
                 if (xe.getEventType() != XMLEvent.CHARACTERS) {
                     throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
                 }
+
+                while(xe.asCharacters().isWhiteSpace()){
+                    xe = xer.nextEvent();
+                }
+
+             //   System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: is CDATA = " + xe.asCharacters().isCData());
                 String raw = xe.asCharacters().getData();
+           //     System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: raw(" + raw.length() + " chars) = " + raw);
+              /*  if(xe.asCharacters().isCharacters()){
+                    System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: chars of chars " + xe.asCharacters().asCharacters().getData());
+                }*/
+                XMLEvent zz = xer.peek();
+               /* if(zz.isCharacters()){
+                    System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: nmext chars " + zz.asCharacters().getData());
+                }*/
                 // several of these strip out the whitespace (which may include line feeds and other cruft.
                 switch (tagName) {
                     case INTEGER_TAG:
@@ -230,6 +244,7 @@ public class XMLUtils implements XMLConstants {
         while (xer.hasNext()) {
             if (xe.getEventType() == XMLEvent.END_ELEMENT) {
                 if (xe.asEndElement().getName().getLocalPart().equals(tagName)) {
+                   // System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: returning output = " + output);
                     return output;
                 }
             }
@@ -258,8 +273,9 @@ public class XMLUtils implements XMLConstants {
                             xer.nextEvent();
                             xe1 = xer.peek();
                         }
-                        stem.put(key, resolveConstant(xer));
-
+                        Object value = resolveConstant(xer);
+                        stem.put(key,value);
+                 //       System.err.println(XMLUtils.class.getSimpleName() + ".resolveStem: key=" + key + ", value='" + value + "'");
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

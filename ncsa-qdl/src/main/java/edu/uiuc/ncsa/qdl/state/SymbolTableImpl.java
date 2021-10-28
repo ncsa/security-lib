@@ -60,16 +60,13 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
             map.put(variableName, value);
             return;
         }
-        // from here down is, it seems, only used in low-level tests where the values of things
-        // are set directly.
-        // TODO -- figure out where this is used and remove it.
         if(isTotalStem(variableName)){
             // Simplest case of setting a. := stem. No resolution. 
             map.put(variableName, value);
             return;
         }
         // So the stem is compound, like a.b.c and requires resolving variable values from the right to
-        // see what the actual indix for this is. Then the stem will be set to that index.
+        // see what the actual index for this is. Then the stem will be set to that index.
         // So if a.b.c resolves to a.2, then a.2 is set to the value (which may be a stem).
         String head = getStemHead(variableName);
         String tail = getStemTail(variableName);
