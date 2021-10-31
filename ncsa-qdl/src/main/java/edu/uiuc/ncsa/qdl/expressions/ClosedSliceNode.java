@@ -12,8 +12,8 @@ import java.math.BigDecimal;
  * <p>Created by Jeff Gaynor<br>
  * on 6/1/21 at  9:25 AM
  */
-public class RealIntervalNode extends ExpressionImpl{
-    public RealIntervalNode() {
+public class ClosedSliceNode extends ExpressionImpl{
+    public ClosedSliceNode() {
     }
 
     protected BigDecimal argToDB(Object arg){
@@ -32,11 +32,16 @@ public class RealIntervalNode extends ExpressionImpl{
     public Object evaluate(State state) {
         BigDecimal bd0 = argToDB(evalArg(0, state));
         BigDecimal bd1 = argToDB(evalArg(1, state));
-        Object obj2 = evalArg(2, state);
-        if(!(obj2 instanceof Long)){
-            throw new IllegalArgumentException("error: the last argument must be an integer" );
+        Long arg2 = null;
+        if(getArgCount() ==2){
+                    arg2 = 2L; // default
+        }else {
+            Object obj2 = evalArg(2, state);
+            if (!(obj2 instanceof Long)) {
+                throw new IllegalArgumentException("error: the last argument must be an integer");
+            }
+            arg2 = (Long) obj2;
         }
-        Long arg2 = (Long)obj2;
         if(arg2 < 2){
             throw new IllegalArgumentException("error: the last argument must be greater than 1" );
         }
@@ -57,7 +62,7 @@ public class RealIntervalNode extends ExpressionImpl{
 
     @Override
     public StatementWithResultInterface makeCopy() {
-        RealIntervalNode r = new RealIntervalNode();
+        ClosedSliceNode r = new ClosedSliceNode();
         r.setArguments(getArguments());
         return r;
     }

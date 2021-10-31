@@ -1,5 +1,5 @@
 /*
-   Attempt at making an ini (initialization) file grammar for QDL. This should
+   This is the ini (initialization) file grammar for QDL. This should
    be sort of like a Windows or python ini file in that it has sections and
    key/value pairs. The intent is to make a plain text representation of a
    very simple stem. So
@@ -48,6 +48,9 @@
      to be continuation
 */
 grammar ini;
+/*
+        The entire grammar is the next 6 lines
+*/
           ini : (section | EOL)*;
       section : sectionheader line* ;
 sectionheader : '[' Identifier ']' EOL;

@@ -50,16 +50,18 @@ module[
    ];
 
    define[
-      to_csv(a.)
+      to_csv(arg.)
     ][
-      >> to_csv(arg.) - Convert a stem., a., to csv (comma separated values) format.
+      >> to_csv(arg.) - Convert a stem., arg., to csv (comma separated values) format.
       >> arg. is the stem to be converted. Each element is a list and will be a line
-      >> in the output. A typical use is
+      >> in the output. The zero-th element of arg. should be the headers you want.
+      >> A typical use is
       >>     file_write(my_file, to_csv(data.));
-      >> E.g. here is the start of one
-      >>     a.0 := ['t', 'x', 'y']; // header
-      >>     a.1 := [0, .5, .345723445]; // first line of data
-      >> tip:  [['t', 'x','y']]~a. would stick in the headers.
+      >> E.g. here is the start of one.
+      >>
+      >>     arg.0 := ['t', 'x', 'y']; // header
+      >>     arg.1 := [12.3, -0.3, 2.2]; // first line of data, etc.
+      >> tip:  [['t', 'x','y']]~arg. would add the headers to arg..
       // convert each entry and remove the [] so its just numbers
       z. := for_each(@to_string(), a.) - ']' - '[';
       return(z.);
@@ -98,8 +100,9 @@ module[
    ];
     //  laminate(n(2,3,[;6]),n(2,3,[10;16]),0)
   /*
-      laminate should be a base function, but is an example of something QDL
-      should do that is darned near impossible to write in Java.
+      laminate should be a base function, however it's an example of something
+      straightforward to write in QDL
+      and darned near impossible to write in Java.
   */
   define[
       laminate(x, y, axis)
@@ -163,7 +166,7 @@ module[
     >>     reduce_all(⊗∧, a. < 1000)
     >> true
     >>
-    >> So every elements of a. is elss than 1000.
+    >> So every elements of a. is less than 1000.
        rank := rank(arg.);
        foo. := arg.;
        while[1 < rank--][
@@ -179,7 +182,64 @@ module[
        return(module_import(module_load(path)));
     ];
 
+    define[
+      m_indices(x,y)
+      ][
+       >> m_indices(x,y) creates a multi-index.
+       >> x - a scalar or simple list of indices
+       >> y - a scalar or simple list of indices
+       >> output is the list of indices consisting of all pairs
+       >> from x and y.
+       >> E.g.
+       >>     m_indices([2;5],'id')
+       >> [[2,id],[3,id],[4,id]]
+       >> This is immensely useful with functions like remap.
+       >> E.g. Extract a 2x2 array from a. with elements
+       >> [
+       >>    [a.2.3, a.2.5],
+       >>    [a.4.3, a.4.5]
+       >> ]
+       >> using remap and m_indices.
+       >>     a. := n(5,7,[;35]); //populate a.
+       >>     remap(a.,m_indices([2,4],[3,5]),m_indices([;2],[;2]));
+       >> [
+       >>   [17,19],
+       >>   [31,33]
+       >>  ]
+       xx. := var_type(x)==4?x:[x];
+       yy. := (var_type(y)==4)?y:[y];
+       return(reduce(@~, for_each(@~,xx.,yy.)));
+      ]; // end m_indices
 
+   define[
+      m_indices(x.)
+      ][
+       >> m_indices(x.) create a multi-index using each element in x.
+       >> x. - a stem of either simple lists or scalars
+       >> output is the multi-index. Note size(x.) determines the rank
+       >> of the resulting multi-index.
+       >> This is equivalent to
+       >> m_indices(x.n,m_indices(x.(n-1),...,m_indices(x.0,x.1)))
+       >> E.g.
+       >>     m_indices([[;3],'foo',[4,7]])
+       >> [
+       >>    [0,foo,4],
+       >>    [0,foo,7],
+       >>    [1,foo,4],
+       >>    [1,foo,7],
+       >>    [2,foo,4],
+       >>    [2,foo,7]
+       >>  ]
+       >> Since x. had size 3, these are 3-indices.
+       ⊨ 1<size(x.) : 'm_indices requires its argument to have at least 2 elements.';
+       r. :=m_indices(x.0,x.1);
+       while[
+            for_next(k, size(x.),2)
+        ][
+           r.:=m_indices(r., x.k);
+        ];
+        return(r.);
+      ]; // end m_indices
     /*
      a. := n(3,4,5,6,[;3*4*5*6])
      reduce_all(@&&, a. < 1000)

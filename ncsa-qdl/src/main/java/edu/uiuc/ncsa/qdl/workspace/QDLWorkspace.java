@@ -1,15 +1,15 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
 import edu.uiuc.ncsa.qdl.exceptions.*;
+import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
 
@@ -113,7 +113,11 @@ public class QDLWorkspace {
             boolean storeLine = true;
             String out = null;
             if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
-                out = doHistory(input);
+                try {
+                    out = doHistory(input);
+                } catch (Throwable t) {
+                    workspaceCommands.say("could not not do history command:" + t.getMessage());
+                }
                 if (out == null) {
                     // nothing in the buffer
                     continue;
@@ -192,16 +196,24 @@ public class QDLWorkspace {
 
     public static String HISTORY_CLEAR_SWITCH = "-clear";
     public static String HISTORY_TRUNCATE_SWITCH = "-keep";
+    public static String HISTORY_SAVE_SWITCH = "-save";
+    public static String HISTORY_REVERSE_SWITCH = "-reverse";
+    public static String SHORT_HISTORY_REVERSE_SWITCH = "-r";
 
     protected String doHistory(String cmdLine) {
         if (cmdLine.contains("--help")) {
             workspaceCommands.say(HISTORY_COMMAND + " [int | " + HISTORY_CLEAR_SWITCH + " | " + HISTORY_TRUNCATE_SWITCH + " n]");
 
-            workspaceCommands.say("(no args)" + " show complete history, executing nothing");
+            workspaceCommands.say("(no args) {" + HISTORY_REVERSE_SWITCH + "|" + SHORT_HISTORY_REVERSE_SWITCH + "}" + " show complete history, executing nothing");
+            workspaceCommands.say("    The normal order is from most recent. Including the switch reverses the order");
             // Funny spaces below make it all line up when printed.
             workspaceCommands.say("    int = the command at the given index.");
             workspaceCommands.say(" " + HISTORY_CLEAR_SWITCH + " = clear the entire history.");
             workspaceCommands.say(HISTORY_TRUNCATE_SWITCH + " n = keep n elements in the history, dropping the rest.");
+            workspaceCommands.say(HISTORY_SAVE_SWITCH + " file_name {" + HISTORY_REVERSE_SWITCH + "|" + SHORT_HISTORY_REVERSE_SWITCH + "} - write entire history to a file. Remember that the order");
+            workspaceCommands.say("    is from most recent to first entered. If the " + HISTORY_REVERSE_SWITCH + " is present the order is ");
+            workspaceCommands.say("    original entry order");
+
             workspaceCommands.say("See also:" + REPEAT_COMMAND);
             return null; // do nothing
         }
@@ -212,9 +224,40 @@ public class QDLWorkspace {
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
         st.nextToken(); // This is the "/h" which we already know about
         boolean truncate = inputLine.hasArg(HISTORY_TRUNCATE_SWITCH);
-
+        boolean isSave = inputLine.hasArg(HISTORY_SAVE_SWITCH);
+        boolean isReverse = inputLine.hasArg(HISTORY_REVERSE_SWITCH) || inputLine.hasArg(SHORT_HISTORY_REVERSE_SWITCH);
+        // in case they sent one in the wrong place, remove and ignore.
+        inputLine.removeSwitch(HISTORY_REVERSE_SWITCH);
+        inputLine.removeSwitch(SHORT_HISTORY_REVERSE_SWITCH);
+        String saveFile = null;
+        if (isSave) {
+            saveFile = inputLine.getNextArgFor(HISTORY_SAVE_SWITCH);
+            inputLine.removeSwitchAndValue(HISTORY_SAVE_SWITCH);
+        }
         int truncateIndex = -1;
-        if(truncate){
+        if (isSave) {
+            List<String> newList;
+            if (isReverse) {
+                newList = new ArrayList<>();
+                newList.addAll(workspaceCommands.commandHistory);
+                Collections.reverse(newList);
+
+            } else {
+                newList = workspaceCommands.commandHistory;
+            }
+            StemVariable stemVariable = new StemVariable();
+            stemVariable.addList(newList);
+            try {
+                QDLFileUtil.writeStemToFile(saveFile, stemVariable);
+            } catch (Throwable t) {
+                if (t instanceof RuntimeException) {
+                    throw (RuntimeException) t;
+                }
+                throw new QDLException("Could not save command history", t);
+            }
+            return null;
+        }
+        if (truncate) {
             String truncateIndexString = inputLine.getNextArgFor(HISTORY_TRUNCATE_SWITCH);
 
             try {
@@ -226,12 +269,12 @@ public class QDLWorkspace {
             }
             inputLine.removeSwitchAndValue(HISTORY_TRUNCATE_SWITCH);
         }
-        if(truncate){
-            if(truncateIndex < 0 ){
+        if (truncate) {
+            if (truncateIndex < 0) {
                 workspaceCommands.say("negative index. skipping...");
                 return null;
             }
-            if(truncateIndex<workspaceCommands.commandHistory.size()) {
+            if (truncateIndex < workspaceCommands.commandHistory.size()) {
                 // next is an idiom, to clear this range from the history. It uses the fact that
                 // sublist is view of the list, not another object.
                 int numberRemoved = workspaceCommands.commandHistory.size() - truncateIndex;
@@ -253,7 +296,7 @@ public class QDLWorkspace {
         if (st.hasMoreTokens()) {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
-                lineNo = (lineNo <0)?(workspaceCommands.commandHistory.size() + lineNo):lineNo;
+                lineNo = (lineNo < 0) ? (workspaceCommands.commandHistory.size() + lineNo) : lineNo;
                 if (0 <= lineNo && lineNo < workspaceCommands.commandHistory.size()) {
                     return workspaceCommands.commandHistory.get(lineNo);
                 }
@@ -262,9 +305,17 @@ public class QDLWorkspace {
             }
         }
         if (printIt) {
-            for (int i = 0; i < workspaceCommands.commandHistory.size(); i++) {
+            List<String> h;
+            if (isReverse) {
+                h = new ArrayList<>();
+                h.addAll(workspaceCommands.commandHistory);
+                Collections.reverse(h);
+            } else {
+                h = workspaceCommands.commandHistory;
+            }
+            for (int i = 0; i < h.size(); i++) {
                 // an iterator actually prints these in reverse order. Print them in order.
-                workspaceCommands.say(i + ": " + workspaceCommands.commandHistory.get(i));
+                workspaceCommands.say(i + ": " + h.get(i));
             }
         }
         return null;

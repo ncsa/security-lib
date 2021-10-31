@@ -197,19 +197,20 @@ public class WorkspaceCommands implements Logable {
         say("Generally these start with a right parenthesis, e.g., ')off' (no quotes) exits this program.");
         say("Here is a quick summary of what they are and do.");
         int length = 8;
-        sayi(RJustify(BUFFER2_COMMAND, length) + "- commands relating to using buffers. Alias is " + SHORT_BUFFER2_COMMAND);
-        sayi(RJustify(CLEAR_COMMAND, length) + "- clear the state of the workspace. All variables, functions etc. will be lost.");
-        sayi(RJustify(EDIT_COMMAND, length) + "- commands relating to running the line editor.");
-        sayi(RJustify(ENV_COMMAND, length) + "- commands relating to environment variables in this workspace.");
-        sayi(RJustify(EXECUTE_COMMAND, length) + "- short hand to execute whatever is in the current buffer.");
-        sayi(RJustify(RESUME_COMMAND, length) + "- short hand to resume execution for a halted process. Note the argument is the process id (pid), not the buffer number. ");
-        sayi(RJustify(FUNCS_COMMAND, length) + "- list all of the imported and user defined functions this workspace knows about.");
-        sayi(RJustify(HELP_COMMAND, length) + "- this message.");
-        sayi(RJustify(MODULES_COMMAND, length) + "- lists all the loaded modules this workspace knows about.");
-        sayi(RJustify(OFF_COMMAND, length) + "- exit the workspace.");
-        sayi(RJustify(LOAD_COMMAND, length) + "- Load a file of QDL commands and execute it immediately in the current workspace.");
-        sayi(RJustify(VARS_COMMAND, length) + "- lists all of the variables this workspace knows about.");
-        sayi(RJustify(WS_COMMAND, length) + "- commands relating to this workspace.");
+        sayi(RJustify(BUFFER2_COMMAND, length) + " - commands relating to using buffers. Alias is " + SHORT_BUFFER2_COMMAND);
+        sayi(RJustify(CLEAR_COMMAND, length) + " - clear the state of the workspace. All variables, functions etc. will be lost.");
+        sayi(RJustify(ENV_COMMAND, length) + " - commands relating to environment variables in this workspace.");
+        sayi(RJustify(FUNCS_COMMAND, length) + " - list all of the imported and user defined functions this workspace knows about.");
+        sayi(RJustify(RESUME_COMMAND, length) + " - short hand to resume execution for a halted process. Note the argument is the process id (pid), not the buffer number. ");
+        sayi(RJustify(HELP_COMMAND, length) + " - this message.");
+        sayi(RJustify(MODULES_COMMAND, length) + " - lists all the loaded modules this workspace knows about.");
+        sayi(RJustify(OFF_COMMAND, length) + " - exit the workspace.");
+        sayi(RJustify(LOAD_COMMAND, length) + " - Load a file of QDL commands and execute it immediately in the current workspace.");
+        sayi(RJustify(STATE_INDICATOR_COMMAND, length) + " - commands relating to teh state indicator.");
+        sayi(RJustify(VARS_COMMAND, length) + " - lists all of the variables this workspace knows about.");
+        sayi(RJustify(WS_COMMAND, length) + " - commands relating to this workspace.");
+        sayi(RJustify(EDIT_COMMAND, length) + " - commands relating to running the line editor.");
+        sayi(RJustify(EXECUTE_COMMAND, length) + " - short hand to execute whatever is in the current buffer.");
         say("Generally, supplying --help as a parameter to a command will print out something useful.");
         say("Full documentation is available in the docs directory of the distro or at https://cilogon.github.io/qdl/docs/qdl_workspace.pdf");
 
@@ -1902,17 +1903,20 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doFuncs(InputLine inputLine) {
-        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
+        if ((!inputLine.hasArg(HELP_SWITCH)) &&(!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
             return _funcsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "--help":
                 say("Function commands:");
-                sayi("drop name - Remove the (user defined) function from the system");
-                sayi("     help - this menu");
-                sayi("     list - list all known functions. Allows display options.");
-                sayi("   system - list all known system functions. Allows display options.");
-                sayi("  -system - same as system.");
+                sayi("  drop name - Remove the (user defined) function from the system");
+                sayi("edit {args} - edit the function with args (an integer) arguments");
+                sayi("              No arg means it defaults to 0.");
+                sayi("              You can, of course, redefine the function as you wish.");
+                sayi("       help - this menu");
+                sayi("       list - list all known functions. Allows display options.");
+                sayi("     system - list all known system functions. Allows display options.");
+                sayi("    -system - same as system.");
                 return RC_NO_OP;
             case "drop":
                 return _funcsDrop(inputLine);
@@ -1932,13 +1936,22 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doFuncEdit(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+              say("edit {arg_count} - edit the function with arg_count arguments");
+              say("arg_count - a zero or positive integer. If omitted, the default is 0");
+              say("You may use this to define functions as well. Since the function");
+              say("definition is re-interpreted on editor exit, you can change the signature");
+              say("such as adding/removing arguments or even rename the function. All this does");
+              say("is tell the editor where to start editing.");
+              return RC_NO_OP;
+          }
         String fName = inputLine.getArg(inputLine.getArgCount() - 1);
-        int argCount = -1;
+        int argCount = 0;
         try {
             argCount = Integer.parseInt(inputLine.getLastArg());
         } catch (Throwable t) {
-            say("Could not parse argument count of \"" + inputLine.getLastArg() + "\"");
-            return RC_NO_OP;
+//            say("Could not parse argument count of \"" + inputLine.getLastArg() + "\"");
+//            return RC_NO_OP;
         }
         FR_WithState fr_withState = null;
         try {
@@ -2216,7 +2229,7 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doVars(InputLine inputLine) {
-        if (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH)) {
+        if (!inputLine.hasArg(HELP_SWITCH) &&(!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
             return _varsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {

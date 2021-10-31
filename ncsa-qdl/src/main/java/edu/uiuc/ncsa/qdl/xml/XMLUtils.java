@@ -335,7 +335,11 @@ public class XMLUtils implements XMLConstants {
                 write(xsw, (QDLNull) obj);
                 break;
             case Constant.UNKNOWN_TYPE:
-                throw new IllegalArgumentException("Error:Unknown constants type for \"" + obj + "\"");
+                IllegalArgumentException iax = new IllegalArgumentException("Error:Unknown constants type for \"" + obj + "\"");
+                if(DebugUtil.isEnabled()){
+                    iax.printStackTrace();
+                }
+                throw iax;
         }
 
     }

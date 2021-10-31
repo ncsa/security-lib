@@ -1390,8 +1390,8 @@ public class QDLListener implements QDLParserListener {
         AltIfExpressionNode altIfExpressionNode = (AltIfExpressionNode) parsingMap.getStatementFromContext(ctx);
         //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
         altIfExpressionNode.setIF((ExpressionNode) resolveChild(ctx.getChild(0)));
-        altIfExpressionNode.setTHEN((ExpressionNode) resolveChild(ctx.getChild(2)));
-        altIfExpressionNode.setELSE((ExpressionNode) resolveChild(ctx.getChild(4)));
+        altIfExpressionNode.setTHEN((StatementWithResultInterface) resolveChild(ctx.getChild(2)));
+        altIfExpressionNode.setELSE((StatementWithResultInterface) resolveChild(ctx.getChild(4)));
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
         altIfExpressionNode.setSourceCode(source);
@@ -1490,12 +1490,12 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterIInterval(QDLParserParser.IIntervalContext ctx) {
-        stash(ctx, new SliceNode());
+        stash(ctx, new OpenSliceNode());
     }
 
     @Override
     public void exitIInterval(QDLParserParser.IIntervalContext ctx) {
-        SliceNode sliceNode = (SliceNode) parsingMap.getStatementFromContext(ctx);
+        OpenSliceNode sliceNode = (OpenSliceNode) parsingMap.getStatementFromContext(ctx);
         // Missing zero-th argument
         if (ctx.getChild(1) instanceof TerminalNodeImpl) {
             // Missing first argument, supply it
@@ -1511,12 +1511,12 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterRInterval(QDLParserParser.RIntervalContext ctx) {
-        stash(ctx, new RealIntervalNode());
+        stash(ctx, new ClosedSliceNode());
     }
 
     @Override
     public void exitRInterval(QDLParserParser.RIntervalContext ctx) {
-        RealIntervalNode realIntervalNode = (RealIntervalNode) parsingMap.getStatementFromContext(ctx);
+        ClosedSliceNode realIntervalNode = (ClosedSliceNode) parsingMap.getStatementFromContext(ctx);
         if (ctx.getChild(1) instanceof TerminalNodeImpl) {
             // Missing first argument, supply it
             realIntervalNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));

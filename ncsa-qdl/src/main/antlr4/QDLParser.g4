@@ -68,8 +68,8 @@ assertStatement2:
   //loopBlock : LeftBracket (variable '∈')? expression RightBracket;
    fdoc : FDOC;
 
-   iInterval : LeftBracket expression? ';' expression (';' expression)? RightBracket;
-   rInterval : LDoubleBracket expression? ';' expression ';' expression RDoubleBracket;
+   iInterval : LeftBracket expression? ';' expression (';' | (';' expression))? RightBracket;
+   rInterval : LDoubleBracket expression? ';' expression (';' | (';' expression))? RDoubleBracket;
 
 
  stemVariable : '{' stemEntry (',' stemEntry)* '}'

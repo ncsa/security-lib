@@ -637,10 +637,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (returnAsPaths) {
             try {
                 output = JsonPath.using(conf).parse(stemVariable.toJSON(false).toString()).read(query).toString();
+                outStem = stemPathConverter(output);
             } catch (JsonPathException jpe) {
-                throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+                if(jpe.getMessage().contains("No results")){
+                    // A "feature" of this API is to return an empty list if there are no values
+                    // but throw a path exception if you want the results as paths.
+                    // Only way to check is to look at the message. 
+                    outStem = new StemVariable();
+                }else {
+                    throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+                }
             }
-            outStem = stemPathConverter(output);
         } else {
             try {
                 conf = Configuration.builder()
@@ -2399,7 +2406,7 @@ z. :=  join3(q.,w.)
 
         StemVariable pStem0;
         // Start QDL. sliceNode is [;rank]
-        SliceNode sliceNode = new SliceNode();
+        OpenSliceNode sliceNode = new OpenSliceNode();
         sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
         sliceNode.getArguments().add(new ConstantNode(Integer.toUnsignedLong(rank), Constant.LONG_TYPE));
 

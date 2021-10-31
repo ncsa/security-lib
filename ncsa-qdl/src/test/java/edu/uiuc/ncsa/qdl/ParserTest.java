@@ -1311,6 +1311,7 @@ public class ParserTest extends AbstractQDLTester {
 
     /**
      * Simple test of a stem of lines that is run
+     *
      * @throws Throwable
      */
     public void testExecuteStem() throws Throwable {
@@ -1325,6 +1326,7 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getStringValue("var", state).equals("abcdef");
     }
+
     public void testExecuteStem2() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -1482,29 +1484,31 @@ public class ParserTest extends AbstractQDLTester {
      * of illegal escape sequences buried in it and if the flag does not
      * propagate, then codec exceptions are thrown. So this either evaluates or
      * fails
+     *
      * @throws Throwable
      */
-     public void testJSONEscape() throws Throwable{
-       String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "j. := " + rawJSON + ";");
-         addLine(script, "jj := to_json(j., false);");
-         addLine(script, "j2. := from_json(jj, false);");
+    public void testJSONEscape() throws Throwable {
+        String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j. := " + rawJSON + ";");
+        addLine(script, "jj := to_json(j., false);");
+        addLine(script, "j2. := from_json(jj, false);");
 
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-         interpreter.execute(script.toString());
-         assert true;
-     }
+        interpreter.execute(script.toString());
+        assert true;
+    }
 
     /**
      * tests that messy stems with illegal vencode names (like $if) are handled
      * correctly in query.
+     *
      * @throws Throwable
      */
-    public void testJSONQueryEscape() throws Throwable{
-      String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
+    public void testJSONQueryEscape() throws Throwable {
+        String rawJSON = "{'public_key':'4693d5d48c9523a7bc9d9faaeea78d7ae4fc', 'at_lifetime':-1, 'last_modified_ts':1601934406000, 'rt_lifetime':0, 'home_url':'https://internal.ncsa.illinois.edu', 'proxy_limited':false, 'cfg':{'isSaved':true, 'claims':{'sourceConfig':[{'ldap':{'contextName':'', 'address':'ldap4.ncsa.illinois.edu', 'searchBase':'ou=People,dc=ncsa,dc=illinois,dc=edu', 'searchAttributes':[{'name':'cn', 'returnName':'name', 'returnAsList':false},{'name':'memberOf', 'returnName':'isMemberOf', 'returnAsList':false, 'isGroup':true},{'name':'uid', 'returnName':'uid', 'returnAsList':false},{'name':'uidNumber', 'returnName':'uidNumber', 'returnAsList':false}], 'failOnError':false, 'ssl':{'tlsVersion':'TLS', 'useJavaTrustStore':true}, 'enabled':true, 'postProcessing':[{'$then':[{'$exclude':['foo']}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}]}], 'preProcessing':[{'$then':[{'$set':['foo',{'$drop':['@ncsa.illinois.edu','${eppn}']}]}], '$if':[{'$match':['${idp}','https://idp.ncsa.illinois.edu/idp/shibboleth']}], '$else':[{'$get_claims':['$false']}]}], 'port':636, 'searchName':'foo', 'name':'2f98a0298b27c2d8', 'authorizationType':'none', 'notifyOnFail':false}}], 'preProcessing':[{'$then':[{'$set_claim_source':['LDAP','2f98a0298b27c2d8']}], '$if':['$true']}]}, 'config':'created_by_Terry_Fleury_2020-10-05'}, 'sign_tokens':true, 'client_id':'cilogon:/client_id/12b77745770e646765d4ec35427bd6c6', 'strict_scopes':true, 'public_client':false, 'callback_uri':['https://internal.ncsa.illinois.edu/oidc/redirect','https://internal-test.ncsa.illinois.edu/oidc/redirect'], 'name':'NCSA Internal (Savannah)', 'creation_ts':1601916179000, 'df_lifetime':0, 'scopes':['org.cilogon.userinfo','profile','email','openid'], 'email':'web@ncsa.illinois.edu', 'df_interval':0}";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "j. := " + rawJSON + ";");
@@ -2004,7 +2008,7 @@ public class ParserTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
-        assert getBooleanValue("ok", state): "passing multiple function references failed.";
+        assert getBooleanValue("ok", state) : "passing multiple function references failed.";
 //        assert areEqual(getBDValue("y", state), new BigDecimal("5.0")) : "passing multiple function references failed.";
 
     }
@@ -2259,14 +2263,89 @@ public class ParserTest extends AbstractQDLTester {
     public void testSlicesDefaultValues() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "x := reduce(@∧, [;6]==[0,1,2,3,4,5]);");
-        addLine(script, "x := reduce(@∧, [;11;2]==[0,2,4,6,8,10]);");
-        addLine(script, "y := reduce(@∧, ⟦-1;2;6⟧ == [-1,-0.4,0.2,0.8,1.4,2]);");
-        addLine(script, "y := reduce(@∧, ⟦;2;6⟧ == [0,0.4,0.8,1.2,1.6,2]);");
+        addLine(script, "numeric_digits(15);");
+        // open_ok = open slices like [;3]
+        addLine(script, "open_ok0 := reduce(@∧, [;6]==[0,1,2,3,4,5]);");
+        addLine(script, "open_ok1 := reduce(@∧, [;11;2]==[0,2,4,6,8,10]);");
+        addLine(script, "open_ok2 := reduce(@∧, [3;1;-2/5]==[3,2.6,2.2,1.8,1.4]);");
+        addLine(script, "open_ok3 := reduce(@∧, [5;0;-1]==[5,4,3,2,1]);");
+        // closed_ok = closed slices like ⟦;3⟧
+        addLine(script, "closed_ok0 := reduce(@∧, ⟦-1;2;6⟧ == [-1,-0.4,0.2,0.8,1.4,2]);");
+        addLine(script, "closed_ok1 := reduce(@∧, ⟦;2;6⟧ == [0,0.4,0.8,1.2,1.6,2]);");
+        addLine(script, "closed_ok2 := reduce(@∧, ⟦;3⟧ == [0,3]);");
+        addLine(script, "closed_ok3 := reduce(@∧, ⟦5;1;5⟧ == [5,4,3,2,1]);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("x", state);
-        assert getBooleanValue("y", state);
+        assert getBooleanValue("open_ok0", state);
+        assert getBooleanValue("open_ok1", state);
+        assert getBooleanValue("open_ok2", state);
+        assert getBooleanValue("open_ok3", state);
+        assert getBooleanValue("closed_ok0", state);
+        assert getBooleanValue("closed_ok1", state);
+        assert getBooleanValue("closed_ok2", state);
+        assert getBooleanValue("closed_ok3", state);
+    }
+
+    public void testOpenSliceIllegalArg() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // negative increment for ascending sequence won't work. Should throw exception.
+        addLine(script, "[0;5;-1];"); 
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean ok;
+        try {
+            interpreter.execute(script.toString());
+            ok = false;
+        } catch (IllegalArgumentException iax) {
+            ok = true;
+        }
+        assert ok : "Was able to request an illegal slice";
+    }
+
+    public void testOpenSliceZeroStep() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "[0;5;0];"); // zero increment won't work. Should throw exception.
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean ok;
+        try {
+            interpreter.execute(script.toString());
+            ok = false;
+        } catch (IllegalArgumentException iax) {
+            ok = true;
+        }
+        assert ok : "Was able to request an slice with increment of zero";
+    }
+
+    public void testOpenSliceIllegalArg2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // positive increment for descending sequence won't work. Should throw exception.
+        addLine(script, "[5;0;2/3];");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean ok;
+        try {
+            interpreter.execute(script.toString());
+            ok = false;
+        } catch (IllegalArgumentException iax) {
+            ok = true;
+        }
+        assert ok : "Was able to request an slice with increment of zero";
+    }
+
+    public void testClosedSliceIllegalArg() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "[|5;0;-1|];");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean ok;
+        try {
+            interpreter.execute(script.toString());
+            ok = false;
+        } catch (IllegalArgumentException iax) {
+            ok = true;
+        }
+        assert ok : "Was able to request closed slice with illegal increment";
     }
 
     /**
