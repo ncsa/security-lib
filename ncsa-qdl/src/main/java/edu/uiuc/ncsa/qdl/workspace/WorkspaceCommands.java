@@ -3,10 +3,10 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
-import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -115,7 +115,7 @@ public class WorkspaceCommands implements Logable {
         env = xp;
     }
 
-    CommandLineTokenizer CLT = new CommandLineTokenizer();
+    CommandLineTokenizer CLT = new CommandLineTokenizer('\'');
     protected static final String FUNCS_COMMAND = ")funcs";
     protected static final String HELP_COMMAND = ")help"; // show various types of help
     protected static final String OFF_COMMAND = ")off";
@@ -674,16 +674,16 @@ public class WorkspaceCommands implements Logable {
             case "--help":
                 say("buffer commands:");
                 say("# refers to the buffer number");
-                sayi("create [" + BUFFER_IN_MEMORY_ONLY_SWITCH + "] - create a new buffer.");
+                sayi("create {" + BUFFER_IN_MEMORY_ONLY_SWITCH + "} - create a new buffer.");
                 sayi("check # - run the buffer through the parser and check for syntax errors. Do not execute.");
                 sayi("delete or rm #- delete the buffer. This does not delete the file.");
                 sayi("edit # - Start the built-in line editor and load the given buffer ");
                 sayi("link source target - create a link for given source to the target. The target will be copied to source on save.");
                 sayi("ls or list - display all the active buffers and their numbers");
-                sayi("path [new_path] - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
+                sayi("path {new_path} - (no arg) means to displa y current default save path, otherwise set it. Default is qdl temp dir.");
                 say("reload # - reload the buffer from disk.");
                 sayi("reset - deletes all buffers and sets the start number to zero. This clears the buffer state.");
-                sayi("run # [&] -  Run the buffer. If & is there, do it in its own environment");
+                sayi("run # {&} -  Run the buffer. If & is there, do it in its own environment");
                 sayi("show # - identical to ls. ");
                 sayi("write or save # - save the buffer. If linked, source is copied to target.");
                 return RC_NO_OP;
@@ -816,15 +816,28 @@ public class WorkspaceCommands implements Logable {
     }
 
     private int _doBufferCheck(InputLine inputLine) {
+        if (_doHelp(inputLine)) {
+            say("check n {-st} {-src} -- check the syntax of buffer n");
+            say("-st - will print whole stack track if present, otherwise just the error message");
+            say("-src - if the buffer is a link, will syntax check the source. Ignored otherwise.");
+            return RC_NO_OP;
+        }
         boolean showStackTrace = inputLine.hasArg("-st");
-        BufferManager.BufferRecord br = getBR(inputLine);
         List<String> content;
+        boolean useSource = inputLine.hasArg("-src");
+        inputLine.removeSwitch("-src");
+        inputLine.removeSwitch("-st");
+        BufferManager.BufferRecord br = getBR(inputLine);
         if (br.hasContent()) {
             content = br.getContent();
         } else {
             try {
                 if (br.isLink()) {
-                    content = bufferManager.readFile(br.link);
+                    if (useSource) {
+                        content = bufferManager.read(inputLine.getIntArg(FIRST_ARG_INDEX), useSource);
+                    } else {
+                        content = bufferManager.readFile(br.link);
+                    }
                 } else {
                     content = bufferManager.readFile(br.src);
                 }
@@ -892,6 +905,10 @@ public class WorkspaceCommands implements Logable {
             sayi("   )) pid -- resume a suspended process by process if (pid)");
             return RC_NO_OP;
         }
+       if(inputLine.getArgCount() == 0){
+             say("you must supply either a buffer index or name to run");
+            return RC_NO_OP;
+        }
         BufferManager.BufferRecord br = getBR(inputLine);
         List<String> content = null;
 
@@ -934,7 +951,6 @@ public class WorkspaceCommands implements Logable {
         boolean origEchoMode = getInterpreter().isEchoModeOn();
         QDLInterpreter interpreter = null;
         switch (flag) {
-
             case 0:
                 interpreter = getInterpreter();
                 break;
@@ -968,9 +984,9 @@ public class WorkspaceCommands implements Logable {
             interpreter.setEchoModeOn(origEchoMode);
             interpreter.setPrettyPrint(ppOn);
         } catch (Throwable t) {
+            interpreter.setEchoModeOn(origEchoMode);
+            interpreter.setPrettyPrint(ppOn);
             if (!isSI) {
-                interpreter.setEchoModeOn(origEchoMode);
-                interpreter.setPrettyPrint(ppOn);
                 boolean isHalt = t instanceof InterruptException;
                 if (isHalt) {
                     getState().getLogger().error("interrupt in main workspace " + stringBuffer, t);
@@ -987,6 +1003,8 @@ public class WorkspaceCommands implements Logable {
                     // ie.getSiEntry().interpreter = interpreter;
                     siEntries.put(nextPID, ie.getSiEntry());
                     say(Integer.toString(nextPID));
+                } else {
+                    say("could not interpret buffer:" + t.getMessage());
                 }
             }
         }
@@ -1055,7 +1073,10 @@ public class WorkspaceCommands implements Logable {
             sayi("-use name - use this as the default. Implicitly enables using external editors if needed.");
             return RC_NO_OP;
         }
-
+        if(inputLine.getArgCount() == 0){
+            say("you must supply either an buffer index or name to edit.");
+            return RC_NO_OP;
+        }
         if (inputLine.hasArg("-add")) {
             if (inputLine.getArgCount() != 3) {
                 say("Sorry, wrong number of arguments for -add");
@@ -1554,7 +1575,13 @@ public class WorkspaceCommands implements Logable {
         int ndx = bufferManager.create(source);
         BufferManager.BufferRecord br = bufferManager.getBufferRecord(ndx);
         br.memoryOnly = inMemoryOnly;
-        br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+        if (!inMemoryOnly) {
+            if (getTempDir() == null) {
+                say("You must set the buffer save path");
+                return RC_NO_OP;
+            }
+            br.srcSavePath = bufferManager.figureOutSavePath(getBufferDefaultSavePath(), br.src);
+        }
         say(formatBufferRecord(ndx, br));
         return RC_CONTINUE;
     }
@@ -1903,7 +1930,7 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doFuncs(InputLine inputLine) {
-        if ((!inputLine.hasArg(HELP_SWITCH)) &&(!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
+        if ((!inputLine.hasArg(HELP_SWITCH)) && (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
             return _funcsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
@@ -1937,14 +1964,14 @@ public class WorkspaceCommands implements Logable {
 
     private int _doFuncEdit(InputLine inputLine) {
         if (_doHelp(inputLine)) {
-              say("edit {arg_count} - edit the function with arg_count arguments");
-              say("arg_count - a zero or positive integer. If omitted, the default is 0");
-              say("You may use this to define functions as well. Since the function");
-              say("definition is re-interpreted on editor exit, you can change the signature");
-              say("such as adding/removing arguments or even rename the function. All this does");
-              say("is tell the editor where to start editing.");
-              return RC_NO_OP;
-          }
+            say("edit {arg_count} - edit the function with arg_count arguments");
+            say("arg_count - a zero or positive integer. If omitted, the default is 0");
+            say("You may use this to define functions as well. Since the function");
+            say("definition is re-interpreted on editor exit, you can change the signature");
+            say("such as adding/removing arguments or even rename the function. All this does");
+            say("is tell the editor where to start editing.");
+            return RC_NO_OP;
+        }
         String fName = inputLine.getArg(inputLine.getArgCount() - 1);
         int argCount = 0;
         try {
@@ -2189,7 +2216,7 @@ public class WorkspaceCommands implements Logable {
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             sayi(LIST_MODULES_SWITCH + " List modules as well. Default is just what you've defined.");
             sayi(LIST_INTRINSIC_SWITCH + " List modules as well. Default is not to show them.");
-            sayi( "    Note that you cannot modify or query them, simply see what they are named.");
+            sayi("    Note that you cannot modify or query them, simply see what they are named.");
             return RC_NO_OP;
         }
         boolean listFQ = inputLine.hasArg(FQ_SWITCH);
@@ -2229,7 +2256,7 @@ public class WorkspaceCommands implements Logable {
      * @return
      */
     private int doVars(InputLine inputLine) {
-        if (!inputLine.hasArg(HELP_SWITCH) &&(!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
+        if (!inputLine.hasArg(HELP_SWITCH) && (!inputLine.hasArgs() || inputLine.getArg(ACTION_INDEX).startsWith(SWITCH))) {
             return _varsList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
@@ -3092,7 +3119,7 @@ public class WorkspaceCommands implements Logable {
                 if (rootDir == null) {
                     return null;
                 }
-                if(fileName == null){
+                if (fileName == null) {
                     return null;
                 }
                 currentFile = new File(rootDir, fileName);
@@ -3950,7 +3977,7 @@ public class WorkspaceCommands implements Logable {
         wsInternals.echoOn = echoModeOn;
         wsInternals.prettyPrint = prettyPrint;
         wsInternals.debugOn = debugOn;
-        if(saveDir != null) {
+        if (saveDir != null) {
             wsInternals.saveDir = saveDir.getAbsolutePath();
         }
         StateUtils.saveObject(wsInternals, fos);
@@ -3983,8 +4010,8 @@ public class WorkspaceCommands implements Logable {
                 // So this might be benign.
                 // A derserialization exception though means the structure of the file was
                 // bad (e.g. missing java classes)
-                if(t instanceof DeserializationException){
-                    throw (DeserializationException)t;
+                if (t instanceof DeserializationException) {
+                    throw (DeserializationException) t;
                 }
             }
         }
@@ -4038,7 +4065,7 @@ public class WorkspaceCommands implements Logable {
             echoModeOn = wsInternals.echoOn;
             prettyPrint = wsInternals.prettyPrint;
             debugOn = wsInternals.debugOn;
-            if(wsInternals.saveDir != null) {
+            if (wsInternals.saveDir != null) {
                 saveDir = new File(wsInternals.saveDir);
             }
             /*
@@ -4062,7 +4089,7 @@ public class WorkspaceCommands implements Logable {
             }
             return true;
         } catch (Throwable t) {
-            if(DebugUtil.isEnabled()){
+            if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
             }
         }
@@ -4221,7 +4248,7 @@ public class WorkspaceCommands implements Logable {
         if (!loadOK) {
             try {
                 loadOK = _xmlLoad(target);
-            }catch(DeserializationException deserializationException){
+            } catch (DeserializationException deserializationException) {
                 say("Could not deserialize workspace: " + deserializationException.getMessage());
                 return RC_NO_OP;
             }
@@ -4879,12 +4906,12 @@ public class WorkspaceCommands implements Logable {
         try {
             return getIoInterface().readline(prompt);
         } catch (IOException iox) {
-            if(DebugUtil.isEnabled()) {
+            if (DebugUtil.isEnabled()) {
                 iox.printStackTrace();
             }
             throw new QDLException("Error reading input:" + iox.getMessage());
-        } catch(ArrayIndexOutOfBoundsException ax){
-            if(DebugUtil.isEnabled()) {
+        } catch (ArrayIndexOutOfBoundsException ax) {
+            if (DebugUtil.isEnabled()) {
                 ax.printStackTrace();
             }
             throw new QDLException("Error reading input:" + ax.getMessage());

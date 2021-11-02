@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.util.cli.BasicIO;
+import edu.uiuc.ncsa.security.util.cli.CommandLineTokenizer;
 import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -197,6 +198,7 @@ public class QDLWorkspace {
     public static String HISTORY_CLEAR_SWITCH = "-clear";
     public static String HISTORY_TRUNCATE_SWITCH = "-keep";
     public static String HISTORY_SAVE_SWITCH = "-save";
+    public static String HISTORY_SIZE_SWITCH = "-size";
     public static String HISTORY_REVERSE_SWITCH = "-reverse";
     public static String SHORT_HISTORY_REVERSE_SWITCH = "-r";
 
@@ -210,22 +212,32 @@ public class QDLWorkspace {
             workspaceCommands.say("    int = the command at the given index.");
             workspaceCommands.say(" " + HISTORY_CLEAR_SWITCH + " = clear the entire history.");
             workspaceCommands.say(HISTORY_TRUNCATE_SWITCH + " n = keep n elements in the history, dropping the rest.");
-            workspaceCommands.say(HISTORY_SAVE_SWITCH + " file_name {" + HISTORY_REVERSE_SWITCH + "|" + SHORT_HISTORY_REVERSE_SWITCH + "} - write entire history to a file. Remember that the order");
+            workspaceCommands.say(HISTORY_SAVE_SWITCH + " file_name {" + HISTORY_REVERSE_SWITCH + "|" + SHORT_HISTORY_REVERSE_SWITCH + "} {-m message} - write entire history to a file. Remember that the order");
             workspaceCommands.say("    is from most recent to first entered. If the " + HISTORY_REVERSE_SWITCH + " is present the order is ");
             workspaceCommands.say("    original entry order");
+            workspaceCommands.say(HISTORY_SIZE_SWITCH + "  - returns the number of commands in the current history.");
 
             workspaceCommands.say("See also:" + REPEAT_COMMAND);
             return null; // do nothing
         }
-        // Either of the following work:             getNamedConfig(
-        // /h == print history with line numbers
-        // /h int = execute line # int, or print history if that fails
-        InputLine inputLine = new InputLine(cmdLine);
-        StringTokenizer st = new StringTokenizer(cmdLine, " ");
-        st.nextToken(); // This is the "/h" which we already know about
+
+        CommandLineTokenizer CLT = workspaceCommands.CLT;
+        Vector v = CLT.tokenize(cmdLine);
+        InputLine inputLine = new InputLine(v);
+        if(inputLine.hasArg(HISTORY_SIZE_SWITCH)){
+            workspaceCommands.say(workspaceCommands.commandHistory.size() + " entries");
+            return null;
+        }
         boolean truncate = inputLine.hasArg(HISTORY_TRUNCATE_SWITCH);
         boolean isSave = inputLine.hasArg(HISTORY_SAVE_SWITCH);
         boolean isReverse = inputLine.hasArg(HISTORY_REVERSE_SWITCH) || inputLine.hasArg(SHORT_HISTORY_REVERSE_SWITCH);
+        boolean hasMessage = inputLine.hasArg("-m");
+        String message=null;
+        if(hasMessage){
+
+            message = inputLine.getNextArgFor("-m");
+        }
+        inputLine.removeSwitchAndValue("-m");
         // in case they sent one in the wrong place, remove and ignore.
         inputLine.removeSwitch(HISTORY_REVERSE_SWITCH);
         inputLine.removeSwitch(SHORT_HISTORY_REVERSE_SWITCH);
@@ -246,6 +258,9 @@ public class QDLWorkspace {
                 newList = workspaceCommands.commandHistory;
             }
             StemVariable stemVariable = new StemVariable();
+            if(hasMessage){
+                stemVariable.put(0, message);
+            }
             stemVariable.addList(newList);
             try {
                 QDLFileUtil.writeStemToFile(saveFile, stemVariable);
@@ -293,6 +308,9 @@ public class QDLWorkspace {
         }
 
         boolean printIt = true;
+        StringTokenizer st = new StringTokenizer(cmdLine, " ");
+        st.nextToken(); // This is the "/h" which we already know about
+
         if (st.hasMoreTokens()) {
             try {
                 int lineNo = Integer.parseInt(st.nextToken());
