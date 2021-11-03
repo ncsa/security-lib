@@ -4,12 +4,12 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 
-import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * ISO 6429 (cursor addressing spec) compliant implementation of the {@link IOInterface}.
@@ -67,6 +67,16 @@ public class ISO6429IO implements IOInterface {
     public ISO6429IO(boolean noBanner) throws IOException {
         this((MyLoggingFacade) null, noBanner);
     }
+
+    public void clearCommandBuffer(){
+        commandBuffer = new ArrayList<>();
+    }
+   public void addCommandHistory(List<String> commands){
+        for(String c : commands){
+              StringBuilder stringBuilder = new StringBuilder(c);
+              commandBuffer.add(stringBuilder);
+        }
+   }
 
     ArrayList<StringBuilder> commandBuffer = new ArrayList<>();
     int commandBufferMaxWidth = 0;
@@ -341,7 +351,7 @@ public class ISO6429IO implements IOInterface {
                     debug("Got paste, pasting");
 
                     try {
-                        Toolkit toolKit = Toolkit.getDefaultToolkit();
+                        java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
                         Clipboard clipboard = toolKit.getSystemClipboard();
                         String result = (String) clipboard.getData(DataFlavor.stringFlavor);
 
@@ -453,7 +463,7 @@ public class ISO6429IO implements IOInterface {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                System.out.println("\nexiting...\n");
+                System.out.println("\njvm exiting...\n");
             }
         });
 

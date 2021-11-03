@@ -150,13 +150,12 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     // logging
     public static final String DEBUG = "debug";
     public static final int DEBUG_TYPE = 210 + SYSTEM_BASE_VALUE;
-    // try ... catch
 
+    // try ... catch
     public static final String RAISE_ERROR = "raise_error";
     public static final int RAISE_ERROR_TYPE = 300 + SYSTEM_BASE_VALUE;
 
     // For external programs
-
     public static final String RUN_COMMAND = "script_run";
     public static final int RUN_COMMAND_TYPE = 400 + SYSTEM_BASE_VALUE;
 
@@ -169,11 +168,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String SCRIPT_PATH_COMMAND = "script_path";
     public static final int SCRIPT_PATH_COMMAND_TYPE = 403 + SYSTEM_BASE_VALUE;
 
+    // WS macro
+    public static final String WS_MACRO = "ws_macro";
+    public static final int WS_MACRO_COMMAND_TYPE = 404 + SYSTEM_BASE_VALUE;
 
     @Override
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
+                    WS_MACRO,
                     IS_DEFINED,
                     VAR_TYPE,
                     TO_NUMBER,
@@ -214,6 +217,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case WS_MACRO:
+                return WS_MACRO_COMMAND_TYPE;
             case VAR_TYPE:
                 return VAR_TYPE_TYPE;
             case IS_DEFINED:
@@ -293,6 +298,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case WS_MACRO:
+                doWSMacro(polyad, state);
+                return true;
             case VAR_TYPE:
                 doVarType(polyad, state);
                 return true;
@@ -389,27 +397,80 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+    private void doWSMacro(Polyad polyad, State state) {
+        if (state.getWorkspaceCommands() == null) {
+            throw new IllegalStateException("no workspace active");
+        }
+        if (polyad.getArgCount() != 1) {
+            throw new IllegalArgumentException(WS_MACRO + " requires one argument");
+        }
+        Object obj = polyad.evalArg(0,state);
+        List<String> commands = null;
+        // options are a string of commands, separated by CR/LF or a stem of them
+        if (obj instanceof String) {
+            commands = new ArrayList<>();
+            StringTokenizer stringTokenizer = new StringTokenizer(obj.toString(), "\n");
+            while (stringTokenizer.hasMoreTokens()) {
+                String line = stringTokenizer.nextToken();
+                if (isMarcoLineAComment(line)) {
+                    continue;
+                }
+                commands.add(line);
+            }
+        }
+        if (obj instanceof StemVariable) {
+            StemVariable stemVariable = (StemVariable) obj;
+            if (!stemVariable.isList()) {
+                throw new IllegalArgumentException(WS_MACRO + " requires a list");
+            }
+            commands = new ArrayList<>();
+
+            for (String key : stemVariable.keySet()) {
+                Object line = stemVariable.get(key);
+                if (!(line instanceof String)) {
+                    throw new IllegalArgumentException(WS_MACRO + " the argument '" + line + "' is not a string");
+                }
+
+                if (isMarcoLineAComment((String) line)) {
+                    continue;
+                }
+                commands.add((String) line);
+            }
+        }
+        if (obj == null) {
+            throw new IllegalArgumentException(WS_MACRO + " must have either a string of commands or a stem of them");
+        }
+            state.getWorkspaceCommands().runMacro(commands);
+        polyad.setResult(Boolean.TRUE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setEvaluated(true);
+    }
+
+    private boolean isMarcoLineAComment(String line) {
+        return line.trim().startsWith(QDLWorkspace.MACRO_COMMENT_DELIMITER);
+    }
+
     private void doModuleRemove(Polyad polyad, State state) {
-        if(polyad.getArgCount() != 1){
+        if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException(MODULE_REMOVE + " requires one argument");
         }
 
-        Object result = polyad.evalArg(0,state);
+        Object result = polyad.evalArg(0, state);
         StemVariable aliases = null;
         // normalize argument
-        if(result instanceof StemVariable){
+        if (result instanceof StemVariable) {
             aliases = (StemVariable) result;
         }
-        if(result instanceof String){
+        if (result instanceof String) {
             aliases = new StemVariable();
-            aliases.put(0L, (String)result);
+            aliases.put(0L, (String) result);
         }
-        if(aliases == null){
+        if (aliases == null) {
             throw new IllegalArgumentException("unknown argument type '" + result + "' for " + MODULE_REMOVE);
         }
-        for(String key : aliases.keySet()){
+        for (String key : aliases.keySet()) {
             Object object2 = aliases.get(key);
-            if(!isString(object2)){
+            if (!isString(object2)) {
                 throw new IllegalArgumentException("'" + object2 + "' for " + MODULE_REMOVE + " is not a string.");
             }
             state.getImportedModules().remove(object2);
@@ -601,7 +662,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // is a#b, and the input form of b will be returned.
         if (polyad.getArguments().get(0) instanceof ModuleExpression) {
             ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
-           Module module = state.getImportedModules().get(moduleExpression.getAlias());
+            Module module = state.getImportedModules().get(moduleExpression.getAlias());
             if (module == null) {
                 throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
             }
@@ -618,9 +679,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArguments().get(0) instanceof VariableNode) {
             argName = ((VariableNode) polyad.getArguments().get(0)).getVariableReference();
             gotOne = true;
-        }else{
-            if((!gotOne)&&polyad.getArguments().get(0) instanceof ExpressionImpl){
-                String out = InputFormUtil.inputForm(polyad.evalArg(0,state));
+        } else {
+            if ((!gotOne) && polyad.getArguments().get(0) instanceof ExpressionImpl) {
+                String out = InputFormUtil.inputForm(polyad.evalArg(0, state));
                 if (out == null) {
                     out = "";
                 }
@@ -649,12 +710,12 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // of this function to disambiguate.
         if (polyad.getArgCount() == 1) {
             String out = InputFormUtil.inputFormModule(argName, state);
-               if (out != null) {
-                   polyad.setResult(out);
-                   polyad.setResultType(Constant.STRING_TYPE);
-                   polyad.setEvaluated(true);
-                   return;
-               }
+            if (out != null) {
+                polyad.setResult(out);
+                polyad.setResultType(Constant.STRING_TYPE);
+                polyad.setEvaluated(true);
+                return;
+            }
             // simple variable case, no indent
 
             String output = InputFormUtil.inputFormVar(argName, state);
@@ -722,7 +783,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
     }
 
-    protected String doTwoArgInputForm(String left, Object right, State state){
+    protected String doTwoArgInputForm(String left, Object right, State state) {
         boolean doIndent = false;
         int argCount = -1;
 
@@ -738,7 +799,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         if (isBoolean(right)) {
             // process as variable with indent factor
-            String output = InputFormUtil.inputFormVar(left, doIndent?2:0, state);
+            String output = InputFormUtil.inputFormVar(left, doIndent ? 2 : 0, state);
             return output;
         }
         // case here is that second arg is not a boolean (==> must be arg count) OR there is more than one arg.
@@ -765,6 +826,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         return output;
     }
+
     private void doCheckSyntax(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException("argument to " + CHECK_SYNTAX + " requires a single argument.");
@@ -1462,6 +1524,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
 
     }
+
     protected void doRaiseError(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0) {
             throw new IllegalArgumentException(RAISE_ERROR + " requires at least a single argument");
@@ -1478,7 +1541,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (isLong(arg2)) {
                 state.getSymbolStack().setLongValue("error_code", (Long) arg2);
             }
-        }else{
+        } else {
             state.getSymbolStack().setLongValue("error_code", TryCatch.RESERVED_USER_ERROR_CODE);
         }
         polyad.setResult(Boolean.TRUE);
@@ -1626,11 +1689,12 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return null;
             }
             return names;
+        } catch (RuntimeException rx) {
+            throw rx;
+        } catch (ClassNotFoundException cnf) {
+            throw new QDLException("could not find Java class '" + resourceName + "' in the current classpath.");
         } catch (Throwable t) {
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-            throw new QDLException("could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
+            throw new QDLException("could not load Java class " + resourceName + ": '" + t.getMessage() + "'.", t);
         }
     }
 
@@ -2121,13 +2185,14 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
 
     }
-       /*
-           my_stem.0 :='var';
-  my_stem.1 :=':= \'abc\'';
-  my_stem.2 := '+';
-  my_stem.3 := '\'def\';';
-      execute(my_stem.)
-        */
+
+    /*
+        my_stem.0 :='var';
+my_stem.1 :=':= \'abc\'';
+my_stem.2 := '+';
+my_stem.3 := '\'def\';';
+   execute(my_stem.)
+     */
     protected void OLDdoExecute(Polyad polyad, State state) {
         // execute a string.
         if (polyad.getArgCount() != 1) {

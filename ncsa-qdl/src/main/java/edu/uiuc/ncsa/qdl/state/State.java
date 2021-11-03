@@ -15,6 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
+import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -854,4 +855,18 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     boolean assertionsOn = true;
+
+    /**
+     * Allows back reference to workspace to run macros.
+     * @return
+     */
+    public WorkspaceCommands getWorkspaceCommands() {
+        return workspaceCommands;
+    }
+
+    public void setWorkspaceCommands(WorkspaceCommands workspaceCommands) {
+        this.workspaceCommands = workspaceCommands;
+    }
+
+    WorkspaceCommands workspaceCommands;
 }

@@ -270,6 +270,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }else{
             localState = state.newStateWithImports(moduleState);
         }
+         localState.setWorkspaceCommands(state.getWorkspaceCommands());
        // State localState = state.newStateWithImports();
 
    //     localState.getSymbolStack().addParent((SymbolTableImpl) moduleState.getSymbolStack().getLocalST());

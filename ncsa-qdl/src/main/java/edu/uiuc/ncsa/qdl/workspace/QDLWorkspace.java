@@ -92,50 +92,51 @@ public class QDLWorkspace {
         }
     }
 
-    public void run(InputLine inputLine) throws Throwable {
-        boolean isExit = false;
-        String lastCommand = "";
 
+
+    protected void run(InputLine inputLine) throws Throwable {
+        boolean isExit = false;
 
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
+            String input;
+                input = workspaceCommands.readline(INDENT);
+                if (input == null) {
+                    // about the only way to get a null here is if the user is piping in
+                    // something via std in and it hits the end of the stream.
+                    if (workspaceCommands.isDebugOn()) {
+                        workspaceCommands.say("exiting");
+                    }
+                    return;
+                }
+                input = input.trim();
+                boolean storeLine = true;
+                String out = null;
+                if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
+                    try {
+                        out = doHistory(input);
+                    } catch (Throwable t) {
+                        workspaceCommands.say("could not not do history command:" + t.getMessage());
+                    }
+                    if (out == null) {
+                        // nothing in the buffer
+                        continue;
+                    }
+                    storeLine = false;
+                }
+                if (input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")) {
+                    out = doRepeatCommand(input);
+                    storeLine = out == null;
+                }
 
-            String input = workspaceCommands.readline(INDENT);
-            if (input == null) {
-                // about the only way to get a null here is if the user is piping in
-                // something via std in and it hits the end of the stream.
-                if (workspaceCommands.isDebugOn()) {
-                    workspaceCommands.say("exiting");
+                if (storeLine) {
+                    // Store it if it was not retrieved from the command history.
+                    workspaceCommands.commandHistory.add(0, input);
+                } else {
+                    input = out; // repeat the command
                 }
-                return;
-            }
-            input = input.trim();
-            boolean storeLine = true;
-            String out = null;
-            if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
-                try {
-                    out = doHistory(input);
-                } catch (Throwable t) {
-                    workspaceCommands.say("could not not do history command:" + t.getMessage());
-                }
-                if (out == null) {
-                    // nothing in the buffer
-                    continue;
-                }
-                storeLine = false;
-            }
-            if (input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")) {
-                out = doRepeatCommand(input);
-                storeLine = out == null;
-            }
 
-            if (storeLine) {
-                // Store it if it was not retrieved from the command history.
-                workspaceCommands.commandHistory.add(0, input);
-            } else {
-                input = out; // repeat the command
-            }
             // Good idea to strip off comments in parser, but the regex here needs to be
             // quite clever to match ' and // within them (e.g. any url fails at the command line).
             //    input = input.split("//")[0]; // if there is a line comment, strip it.
@@ -182,7 +183,44 @@ public class QDLWorkspace {
         }
     }
 
+    public void runMacro(List<String> commands) throws Throwable {
+     //   boolean isExit = false;
+        for(String command : commands){
+            if (command.startsWith(")")) {
+                switch (workspaceCommands.execute(command)) {
+                    case RC_EXIT_NOW:
+                       // isExit = true;
+                        return; // exit now, darnit.
+                    case RC_NO_OP:
+                    case RC_CONTINUE:
+                        continue;
+                    case RC_RELOAD:
+                        workspaceCommands.say("not quite ready for prime time. Check back later");
+                }
+            }
+            boolean echoMode = workspaceCommands.isEchoModeOn();
+            boolean prettyPrint = workspaceCommands.isPrettyPrint();
 
+            try {
+                if (command != null && !command.isEmpty()) {
+                    // if you try to evaluate only a ";" then you will get a syntax exception from
+                    // the parser for an empty statement.
+                    if (workspaceCommands.isEchoModeOn() && !command.endsWith(";")) {
+                        command = command + ";"; // add it since they forgot
+                    }
+                    workspaceCommands.getInterpreter().execute(command);
+                }
+            } catch (Throwable t) {
+
+                // If there is an exception while local mode is running, we don't want to trash the user's
+                // echo mode, since that causes every subsequent command to fail at least until they
+                // figure it `out and turn it back on.
+                workspaceCommands.setEchoModeOn(echoMode);
+                workspaceCommands.setPrettyPrint(prettyPrint);
+                handleException(t);
+            }
+        }
+    }
     protected String doRepeatCommand(String cmdLine) {
         if (cmdLine.contains("--help")) {
             workspaceCommands.say(REPEAT_COMMAND + " = repeat the last command. Identical to " + HISTORY_COMMAND + " 0");
@@ -361,7 +399,6 @@ public class QDLWorkspace {
             workspaceCommands = new WorkspaceCommands(new BasicIO());
         }
         workspaceCommands.init(argLine);
-
         if (workspaceCommands.isRunScript()) {
             return;
         }
@@ -370,6 +407,8 @@ public class QDLWorkspace {
             System.out.println("ISO 6429 terminal");
         }
         QDLWorkspace qc = new QDLWorkspace(workspaceCommands);
+        workspaceCommands.setWorkspace(qc);
+
         ArrayList<String> functions = new ArrayList<>();
         functions.addAll(qc.workspaceCommands.getState().getMetaEvaluator().listFunctions(false));
         functions.addAll(qc.workspaceCommands.getState().listFunctions(true,
@@ -384,5 +423,6 @@ public class QDLWorkspace {
         qc.run(new InputLine(new Vector()));
 
     }
+    public static final String MACRO_COMMENT_DELIMITER = "//";
 
 }

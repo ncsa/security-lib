@@ -347,7 +347,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         // remaps [0,2,4,6,8] to having odd numbers .
-        addLine(script, "ξ.  := remap(2*[;5], [;5], 1+3*[;5]);");
+        addLine(script, "ξ.  := remap(2*[;5], [;5],  1+3*[;5]);");
         addLine(script, "ok := reduce(@&&, ξ.== {1:0, 4:2, 7:4, 10:6, 13:8});");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
@@ -1847,9 +1847,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "ξ. := n(3,5,n(15));"); // matrix
-        addLine(script, "ω. := indices(ξ.-1);"); // old indices
+        addLine(script, "ω. := indices(ξ.,-1);"); // old indices
         addLine(script, "ϖ. := for_each(@reverse,  ω.);"); // new indices
-        addLine(script, "η. := " + StemEvaluator.REMAP + "(ξ., ω., ϖ.);"); // axis 1
+        // Correspondence is that η.ϖ..k := ξ.ω.k
+        addLine(script, "η. := " + StemEvaluator.REMAP + "(ξ.,   ω., ϖ.);"); // axis 1
         addLine(script, "ok := reduce(@∧,reduce(@∧, [[0,5,10],[1,6,11],[2,7,12],[3,8,13],[4,9,14]] ≡ η.)); ");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 

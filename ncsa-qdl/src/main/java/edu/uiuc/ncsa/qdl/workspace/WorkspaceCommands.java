@@ -40,6 +40,7 @@ import edu.uiuc.ncsa.security.util.cli.editing.Editors;
 import edu.uiuc.ncsa.security.util.cli.editing.LineEditor;
 import edu.uiuc.ncsa.security.util.configuration.ConfigUtil;
 import edu.uiuc.ncsa.security.util.configuration.TemplateUtil;
+import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import net.sf.json.JSONArray;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.apache.commons.configuration.tree.ConfigurationNode;
@@ -235,6 +236,15 @@ public class WorkspaceCommands implements Logable {
         return inputLine;
     }
 
+    public QDLWorkspace getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(QDLWorkspace workspace) {
+        this.workspace = workspace;
+    }
+
+    QDLWorkspace workspace;
     /**
      * The workspace commands are here so they can be serialized with the rest of the workspace.
      * However, since the mechanism has to intercept every command before it gets forwarded
@@ -666,8 +676,7 @@ public class WorkspaceCommands implements Logable {
 
     private int _doNewBufferCommand(InputLine inputLine) {
         if (inputLine.size() <= ACTION_INDEX) {
-            say("Sorry, you need an argument, (e.g. --help)");
-            return RC_NO_OP;
+            return _doBufferList(inputLine);
         }
         switch (inputLine.getArg(ACTION_INDEX)) {
             case "help":
@@ -905,8 +914,8 @@ public class WorkspaceCommands implements Logable {
             sayi("   )) pid -- resume a suspended process by process if (pid)");
             return RC_NO_OP;
         }
-       if(inputLine.getArgCount() == 0){
-             say("you must supply either a buffer index or name to run");
+        if (inputLine.getArgCount() == 0) {
+            say("you must supply either a buffer index or name to run");
             return RC_NO_OP;
         }
         BufferManager.BufferRecord br = getBR(inputLine);
@@ -1073,7 +1082,7 @@ public class WorkspaceCommands implements Logable {
             sayi("-use name - use this as the default. Implicitly enables using external editors if needed.");
             return RC_NO_OP;
         }
-        if(inputLine.getArgCount() == 0){
+        if (inputLine.getArgCount() == 0) {
             say("you must supply either an buffer index or name to edit.");
             return RC_NO_OP;
         }
@@ -3988,7 +3997,7 @@ public class WorkspaceCommands implements Logable {
         // zipped and binary.
         // First attempt is to assume no compression
         XMLEventReader xer = null;
-
+        QDLWorkspace qdlWorkspace = getWorkspace(); // for later
         if (isCompressXML()) {
             xer = XMLUtils.getZippedReader(f);
             // user is dictating to use compress.
@@ -4000,6 +4009,7 @@ public class WorkspaceCommands implements Logable {
                 fromXML(xer);
                 xer.close();
                 currentWorkspace = f;
+                getState().setWorkspaceCommands(this);
                 if (runInitOnLoad && state.getFTStack().isDefined(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
                     String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                     getInterpreter().execute(runnit);
@@ -4362,9 +4372,18 @@ public class WorkspaceCommands implements Logable {
                     isAssertionsOn()
             );// workspace is never in server mode, nor restricted IO
             state.setPID(0);
+            state.setWorkspaceCommands(this);
         }
         return state;
 
+    }
+
+    public void runMacro(List<String> commands) {
+        try {
+            getWorkspace().runMacro(commands);
+        } catch (Throwable t) {
+            say("could not execute macro");
+        }
     }
 
     protected void setupJavaModule(State state, QDLLoader loader, boolean importASAP) {
@@ -5004,6 +5023,11 @@ public class WorkspaceCommands implements Logable {
             bufferManager = newCommands.bufferManager;
             bufferManager.state = state;
             bufferDefaultSavePath = newCommands.bufferDefaultSavePath;
+            if (ioInterface instanceof ISO6429IO) {
+                ISO6429IO iso6429IO = (ISO6429IO) ioInterface;
+                iso6429IO.clearCommandBuffer();
+                iso6429IO.addCommandHistory(newCommands.commandHistory);
+            }
             return true;
         } catch (Throwable t) {
             // This should return a nice message to display.
@@ -5064,4 +5088,5 @@ public class WorkspaceCommands implements Logable {
     }
 
     boolean ansiModeOn = false;
+
 }

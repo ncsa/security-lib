@@ -3307,6 +3307,31 @@ See intrinsic.
                  ]]>
              </body>
          </entry>
+    <entry id="ws_macro">
+              <body>
+                  <![CDATA[
+ws_macro(arg | arg.) - run a set of workspace commands.
+arg - a string (possibly with line feeds to separate commands)
+arg. - a list of strings to be executed one at a time
+output - true if it succeeded, an error if it did not.
+
+This is to be a bridge between QDL and its workspace, if
+there is one active. The intent is not to let you write massive
+programs (use scripts) but to allow for customization of the
+workspace from inside QDL, e.g. in an __init() function,
+so the workspace can be initialized etc.
+As such, it should be used minimally and with discretion.
+
+E.g.
+  ws_macro(')ws get');
+... prints all current variables
+true
+
+   ws_macro([')ws set pp on', ')ws set echo on', ')ws set external_editor nano'])
+true
+                  ]]>
+              </body>
+          </entry>
     <!--
         entry template
     -->

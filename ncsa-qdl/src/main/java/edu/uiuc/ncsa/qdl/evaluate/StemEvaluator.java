@@ -368,7 +368,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (!isStem(arg2)) {
             throw new IllegalArgumentException(REMAP + " requires an stem or integer as its second argument");
         }
-        StemVariable stem3 = null;
+        StemVariable newIndices = null;
         if (polyad.getArgCount() == 3) {
             Object arg3 = polyad.evalArg(2, state);
             checkNull(arg3, polyad.getArgAt(2), state);
@@ -376,8 +376,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalArgumentException(REMAP + " requires an stem or integer as its third argument");
             }
 
-            stem3 = (StemVariable) arg3;
-            threeArgRemap(polyad, stem, (StemVariable) arg2, stem3);
+            newIndices = (StemVariable) arg3;
+            threeArgRemap(polyad, stem, (StemVariable) arg2, newIndices);
             return;
         }
         twoArgRemap(polyad, stem, (StemVariable) arg2);
@@ -1641,33 +1641,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
     }
-
-    /**
-     * Takes a list of arguments (possible stem variables) and creates a new stem from it.
-     * The scalars are added with cardinal indexes and stems will have their values added as well in this fashion.
-     * (Their keys are not added because you could have just added to the existing stem variable).
-     *
-     * @param polyad
-     */
-    protected void doToList(Polyad polyad, State state) {
-        StemVariable out = new StemVariable();
-        StemList<StemEntry> stemList = new StemList<>();
-
-        Long index = 0L;
-
-        for (StatementWithResultInterface arg : polyad.getArguments()) {
-            Object r = arg.evaluate(state);
-            checkNull(r, arg);
-            stemList.add(new StemEntry(index++, r));
-
-        }
-        out.setStemList(stemList);
-        polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
-        polyad.setEvaluated(true);
-        return;
-    }
-
 
     /**
      * Processs case subset(arg., list.) so that

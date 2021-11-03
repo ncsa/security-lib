@@ -10,6 +10,23 @@ import java.util.Vector;
  *
  */
 public final class CommandLineTokenizer {
+	public char getQuoteDelimiter() {
+		return quoteDelimiter;
+	}
+
+	public void setQuoteDelimiter(char quoteDelimiter) {
+		this.quoteDelimiter = quoteDelimiter;
+	}
+
+	protected char quoteDelimiter = '"';
+
+	public CommandLineTokenizer(char quoteDelimiter) {
+		this.quoteDelimiter = quoteDelimiter;
+	}
+
+	public CommandLineTokenizer() {
+	}
+
 	public static void main(String[] args) {
 		CommandLineTokenizer clt = new CommandLineTokenizer();
 		String[] test = { "a [2,5] \"foo\" \"asd  baz\"", "     ", "hash 1024k", "GEt blarf.txt warf.txt", "put \"wo of\" \"blar g\"" };
@@ -27,7 +44,21 @@ public final class CommandLineTokenizer {
 			e.printStackTrace();
 		}
 	} // end main (for debugging)
+
+	/**
+	 * tokenize with whatever the current quote delimiter is. Default is double quotes.
+	 * @param cl
+	 * @return
+	 * @throws MalformedCommandException
+	 */
 	public Vector tokenize(String cl) throws MalformedCommandException {
+		return tokenize(cl, getQuoteDelimiter());
+	}
+
+	public Vector tokenize(String cl, String quoteDelimiter) throws MalformedCommandException {
+		          return tokenize(cl, quoteDelimiter.charAt(0));
+	}
+	public Vector tokenize(String cl, char quoteDelimiter) throws MalformedCommandException {
 		boolean isQuotePending = false;
 		String cl2 = cl.trim();
 		Vector outV = new Vector();
@@ -36,7 +67,7 @@ public final class CommandLineTokenizer {
 		for (int i = 0; i < c.length; i++) {
 			if (isQuotePending) {
 				// look for the next quote
-				if (c[i] == '"') {
+				if (c[i] == quoteDelimiter) {
 					// close off the current arg, start on the next.
 					outV.addElement(currentArg.toString());
 					currentArg = new StringBuffer();
@@ -46,11 +77,11 @@ public final class CommandLineTokenizer {
 				}
 			} else {
 				// so no quote is pending.
-				if (c[i] == ' ' || c[i] == '"') {
+				if (c[i] == ' ' || c[i] == quoteDelimiter) {
 					// we have no quote and have a blank, so tokenize on that
 					outV.addElement(currentArg.toString());
 					currentArg = new StringBuffer();
-					isQuotePending = (c[i] == '"');
+					isQuotePending = (c[i] == quoteDelimiter);
 				} else {
 					currentArg.append(c[i]);
 				}
