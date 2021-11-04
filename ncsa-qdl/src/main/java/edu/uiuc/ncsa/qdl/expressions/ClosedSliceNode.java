@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
@@ -14,6 +15,10 @@ import java.math.BigDecimal;
  */
 public class ClosedSliceNode extends ExpressionImpl{
     public ClosedSliceNode() {
+    }
+
+    public ClosedSliceNode(TokenPosition tokenPosition) {
+        super(tokenPosition);
     }
 
     protected BigDecimal argToDB(Object arg){
@@ -62,7 +67,7 @@ public class ClosedSliceNode extends ExpressionImpl{
 
     @Override
     public StatementWithResultInterface makeCopy() {
-        ClosedSliceNode r = new ClosedSliceNode();
+        ClosedSliceNode r = new ClosedSliceNode(getTokenPosition());
         r.setArguments(getArguments());
         return r;
     }

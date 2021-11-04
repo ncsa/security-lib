@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -211,6 +208,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw new IllegalArgumentException(name + " requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
+
         checkNull(arg1, polyad.getArgAt(0), state);
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
@@ -595,7 +593,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 FR_WithState fr_withState = state.resolveFunction(operatorName, nAry, true); // It's a dyad!
 
                 if (fr_withState == null || fr_withState.functionRecord == null) {
-                    throw new UndefinedFunctionException("error \"" + operatorName + "\" is not defined with " + nAry + " arguments");
+                    throw new UndefinedFunctionException("'" + operatorName + "' is not defined with " + nAry + " arguments");
                 }
                 Polyad polyad1 = new Polyad(operatorName);
                 polyad1.setBuiltIn(false); // or it will not execute!

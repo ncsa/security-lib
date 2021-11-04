@@ -11,6 +11,19 @@ import java.util.List;
  * on 1/17/20 at  3:34 PM
  */
 public class ConditionalStatement implements Statement {
+    public ConditionalStatement(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
+
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     ExpressionNode conditional;
 
     public ExpressionNode getConditional() {

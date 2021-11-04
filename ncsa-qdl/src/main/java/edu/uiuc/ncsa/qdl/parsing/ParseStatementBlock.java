@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
@@ -20,9 +21,15 @@ import java.util.List;
  * on 6/1/21 at  6:37 AM
  */
 public class ParseStatementBlock implements StatementWithResultInterface {
-   // boolean inModule = false;
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}    @Override
     public boolean isInModule() {
         return alias!=null;
     }
@@ -38,11 +45,6 @@ public class ParseStatementBlock implements StatementWithResultInterface {
          this.alias = alias;
     }
 
-  /*  @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
-    }
-  */
     @Override
     public Object getResult() {
         return null;

@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
-import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
@@ -21,6 +21,7 @@ import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -79,9 +80,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterVariable(QDLParserParser.VariableContext ctx) {
-        stash(ctx, new VariableNode(null));
-        //       StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
-
+        stash(ctx, new VariableNode(tp(ctx)));
     }
 
     @Override
@@ -149,7 +148,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAssignment(QDLParserParser.AssignmentContext ctx) {
-        stash(ctx, new ANode2());
+        stash(ctx, new ANode2(tp(ctx)));
     }
 
     @Override
@@ -185,7 +184,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterFunction(QDLParserParser.FunctionContext ctx) {
-        stash(ctx, new Polyad());
+        stash(ctx, new Polyad(tp(ctx)));
     }
 
     @Override
@@ -219,6 +218,7 @@ public class QDLListener implements QDLParserListener {
                 }
                 if (s instanceof FunctionDefinitionStatement) {
                     LambdaDefinitionNode lambdaDefinitionNode = new LambdaDefinitionNode((FunctionDefinitionStatement) s);
+                    lambdaDefinitionNode.setTokenPosition(tp(ctx));
                     polyad.getArguments().add(lambdaDefinitionNode);
                 }
             }
@@ -251,6 +251,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitPrefix(QDLParserParser.PrefixContext ctx) {
         Monad monad = new Monad(false);
+        monad.setTokenPosition(tp(ctx));
         stash(ctx, monad);
 
         // in the context, the operator is the 0th child since it is prefixed.
@@ -306,6 +307,8 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitAssociation(QDLParserParser.AssociationContext ctx) {
         ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression();
+        parenthesizedExpression.setTokenPosition(tp(ctx));
+        parenthesizedExpression.setSourceCode(getSource(ctx));
         ParseTree p = ctx.expression();
         StatementWithResultInterface v = (StatementWithResultInterface) parsingMap.getStatementFromContext(p);
         if (v == null) {
@@ -325,6 +328,7 @@ public class QDLListener implements QDLParserListener {
         // For some weird reason, entering the NOT expression does not always happen, but exiting it does.
         stash(ctx, new Monad(OpEvaluator.NOT_VALUE, false));// automatically prefix
         Monad monad = (Monad) parsingMap.getStatementFromContext(ctx);
+        monad.setTokenPosition(tp(ctx));
         finish(monad, ctx);
     }
 /*
@@ -351,7 +355,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterOrExpression(QDLParserParser.OrExpressionContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.OR_VALUE));
+        Dyad dyad = new Dyad(OpEvaluator.OR_VALUE);
+        dyad.setTokenPosition(tp(ctx));
+        stash(ctx, dyad);
     }
 
     protected void finish(Dyad dyad, ParseTree parseTree) {
@@ -390,14 +396,16 @@ public class QDLListener implements QDLParserListener {
         boolean isMinus = ctx.children.get(0).getText().equals(OpEvaluator.MINUS) || ctx.children.get(0).getText().equals(OpEvaluator.MINUS2);
         Monad monad = new Monad(isMinus ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE, false);
         monad.setSourceCode(getSource(ctx));
+        monad.setTokenPosition(tp(ctx));
         stash(ctx, monad);
         finish(monad, ctx);
     }
 
     @Override
     public void enterEqExpression(QDLParserParser.EqExpressionContext ctx) {
-            stash(ctx, new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE));
-          //  stash(ctx, new Dyad(OpEvaluator.UNKNOWN_VALUE));
+        ComparisonDyad c = new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE);
+                c.setTokenPosition(tp(ctx));
+            stash(ctx, c);
     }
 
     @Override
@@ -409,7 +417,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAndExpression(QDLParserParser.AndExpressionContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.AND_VALUE));
+        stash(ctx, new Dyad(OpEvaluator.AND_VALUE,tp(ctx)));
     }
 
     @Override
@@ -426,6 +434,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitPowerExpression(QDLParserParser.PowerExpressionContext ctx) {
         Dyad dyad = new Dyad(OpEvaluator.POWER_VALUE);
+        dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
@@ -438,6 +447,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitMultiplyExpression(QDLParserParser.MultiplyExpressionContext ctx) {
         Dyad dyad = new Dyad(state.getOperatorType(ctx.op.getText()));
+        dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
@@ -449,6 +459,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitNull(QDLParserParser.NullContext ctx) {
         ConstantNode constantNode = new ConstantNode(QDLNull.getInstance(), Constant.NULL_TYPE);
+        constantNode.setTokenPosition(tp(ctx));
         stash(ctx, constantNode);
     }
 
@@ -479,6 +490,7 @@ public class QDLListener implements QDLParserListener {
         ConstantNode node = new ConstantNode(value, Constant.STRING_TYPE);
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
+        node.setTokenPosition(tp(ctx));
         node.setSourceCode(source);
         stash(ctx, node);
         // that's it. set the value and we're done.
@@ -492,12 +504,13 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitAddExpression(QDLParserParser.AddExpressionContext ctx) {
         Dyad dyad;
+         Token token = ctx.getStart();
 
         // Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
         if (ctx.Minus() != null) {
-            dyad = new Dyad(OpEvaluator.MINUS_VALUE);
+            dyad = new Dyad(OpEvaluator.MINUS_VALUE, tp(ctx));
         } else {
-            dyad = new Dyad(OpEvaluator.PLUS_VALUE);
+            dyad = new Dyad(OpEvaluator.PLUS_VALUE, tp(ctx));
         }
         stash(ctx, dyad);
         finish(dyad, ctx);
@@ -505,19 +518,23 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterCompExpression(QDLParserParser.CompExpressionContext ctx) {
     }
-
+    protected TokenPosition tp(ParserRuleContext ctx){
+        if(ctx == null || ctx.getStart() == null){
+            return null;
+        }
+        return new TokenPosition(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
+    }
     @Override
     public void exitCompExpression(QDLParserParser.CompExpressionContext ctx) {
         // only now can we determine the comparison type
-        //  stash(ctx, new Dyad(state.getOperatorType(ctx.getChild(1).getText())));
-        stash(ctx, new ComparisonDyad(state.getOperatorType(ctx.getChild(1).getText())));
+        stash(ctx, new ComparisonDyad(state.getOperatorType(ctx.getChild(1).getText()), tp(ctx)));
         Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
         finish(dyad, ctx);
     }
 
     @Override
     public void enterPostfix(QDLParserParser.PostfixContext ctx) {
-        stash(ctx, new Monad(true));
+        stash(ctx, new Monad(true, tp(ctx)));
     }
 
     @Override
@@ -569,7 +586,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterIfStatement(QDLParserParser.IfStatementContext ctx) {
-        stash(ctx, new ConditionalStatement());
+        stash(ctx, new ConditionalStatement(tp(ctx)));
     }
 
     protected ConditionalStatement doConditional(ParseTree ctx) {
@@ -600,38 +617,6 @@ public class QDLListener implements QDLParserListener {
         return conditionalStatement;
     }
 
-    protected ConditionalStatement doConditionalOLD(ParseTree ctx) {
-        ConditionalStatement conditionalStatement = (ConditionalStatement) parsingMap.getStatementFromContext(ctx);
-        //#0 is if[ // #1 is conditional, #2 is ]then[. #3 starts the statements
-        conditionalStatement.setConditional((ExpressionNode) resolveChild(ctx.getChild(1)));
-        List<String> source = new ArrayList<>();
-        source.add(ctx.getText());
-        conditionalStatement.setSourceCode(source);
-        boolean addToIf = true;
-        try {
-            for (int i = 3; i < ctx.getChildCount(); i++) {
-                ParseTree p = ctx.getChild(i);
-                if (p.getText().equals("]else[")) {
-                    addToIf = false;
-                    continue;
-                }
-                if (p.getText().equals(";") || p.getText().equals("]")) {
-                    continue;
-                }
-
-                if (addToIf) {
-                    Statement s = resolveChild(p);
-                    conditionalStatement.getIfArguments().add(s);
-                } else {
-                    conditionalStatement.getElseArguments().add(resolveChild(p));
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
-        return conditionalStatement;
-    }
 
     @Override
     public void exitIfStatement(QDLParserParser.IfStatementContext ctx) {
@@ -640,7 +625,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterIfElseStatement(QDLParserParser.IfElseStatementContext ctx) {
-        stash(ctx, new ConditionalStatement());
+        stash(ctx, new ConditionalStatement(tp(ctx)));
 
     }
 
@@ -661,6 +646,8 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterLoopStatement(QDLParserParser.LoopStatementContext ctx) {
+        WhileLoop w= new WhileLoop();
+        w.setTokenPosition(tp(ctx));
         stash(ctx, new WhileLoop());
     }
 
@@ -687,7 +674,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterSwitchStatement(QDLParserParser.SwitchStatementContext ctx) {
-        stash(ctx, new SwitchStatement());
+        SwitchStatement s = new SwitchStatement();
+        s.setTokenPosition(tp(ctx));
+        stash(ctx, s);
     }
 
     @Override
@@ -712,12 +701,14 @@ public class QDLListener implements QDLParserListener {
     public void enterDefineStatement(QDLParserParser.DefineStatementContext ctx) {
         //     parsingMap.startMark();
         FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setTokenPosition(tp(ctx));
         fds.setLambda(false);
         stash(ctx, fds);
     }
 
     protected void doDefine2(QDLParserParser.DefineStatementContext defineContext) {
         FunctionRecord functionRecord = new FunctionRecord();
+        functionRecord.setTokenPosition(tp(defineContext));
         FunctionDefinitionStatement fds = (FunctionDefinitionStatement) parsingMap.getStatementFromContext(defineContext);
         fds.setFunctionRecord(functionRecord);
         //FunctionDefinitionStatement fds =
@@ -790,6 +781,7 @@ public class QDLListener implements QDLParserListener {
         // get errors.
         //   parsingMap.startMark(false);
         FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setTokenPosition(tp(ctx));
         fds.setLambda(true);
 
         stash(ctx, fds);
@@ -810,6 +802,8 @@ public class QDLListener implements QDLParserListener {
             return; // do nothing.
         }
         FunctionRecord functionRecord = new FunctionRecord();
+        functionRecord.setTokenPosition(tp(lambdaContext));
+
         // not quite the original source... The issue is that this comes parsed and stripped of any original
         // end of line markers, so we cannot tell what was there. Since it may include documentation lines
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
@@ -936,7 +930,7 @@ public class QDLListener implements QDLParserListener {
             throw new QDLException("Error: Modules cannot be nested");
         }
         moduleStatement = new ModuleStatement();
-
+        moduleStatement.setTokenPosition(tp(ctx));
         stash(ctx, moduleStatement);
 
     }
@@ -1019,6 +1013,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx) {
         TryCatch tryCatch = new TryCatch();
+        tryCatch.setTokenPosition(tp(ctx));
         stash(ctx, tryCatch);
     }
 
@@ -1044,6 +1039,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterStemVariable(QDLParserParser.StemVariableContext ctx) {
         StemVariableNode stemVariableNode = new StemVariableNode();
+        stemVariableNode.setTokenPosition(tp(ctx));
         stash(ctx, stemVariableNode);
     }
 
@@ -1063,6 +1059,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterStemEntry(QDLParserParser.StemEntryContext ctx) {
         StemEntryNode sen = new StemEntryNode();
+        sen.setTokenPosition(tp(ctx));
         stash(ctx, sen);
     }
 
@@ -1086,6 +1083,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterStemList(QDLParserParser.StemListContext ctx) {
         StemListNode sln = new StemListNode();
+        sln.setTokenPosition(tp(ctx));
         stash(ctx, sln);
     }
 
@@ -1145,6 +1143,7 @@ public class QDLListener implements QDLParserListener {
             dyad = new Dyad(OpEvaluator.TILDE_VALUE);
 
         }
+        dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
@@ -1154,7 +1153,6 @@ public class QDLListener implements QDLParserListener {
     public void enterDotOp(QDLParserParser.DotOpContext ctx) {
     }
 
-    boolean OLD_ESN = false;
     /*
          x. := [-5/8, -5/7, -5/6, -1, -5/4]
          y. := [-2/3, 2, -4/7, 3, -3/2]
@@ -1195,6 +1193,7 @@ public class QDLListener implements QDLParserListener {
         if (dotOpContext.getChild(2) instanceof QDLParserParser.UnaryTildeExpressionContext) {
             QDLParserParser.UnaryTildeExpressionContext um = (QDLParserParser.UnaryTildeExpressionContext) dotOpContext.getChild(2);
             Dyad d = new Dyad(OpEvaluator.TILDE_VALUE);
+            d.setTokenPosition(tp(dotOpContext));
             d.setRightArgument((StatementWithResultInterface) resolveChild(um.getChild(1)));
             ESN2 leftArg = new ESN2();
             Statement s = resolveChild(dotOpContext.getChild(0));
@@ -1217,8 +1216,10 @@ public class QDLListener implements QDLParserListener {
             // value. Pass it along. The problem is the - is ambiguous as an monadic or dyadic operator in some contexts.
             if ((!um.getChild(0).getText().equals(OpEvaluator.MINUS2)) && !um.getChild(0).getText().equals(OpEvaluator.PLUS2)) {
                 Dyad d = new Dyad(um.Plus() == null ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE);
+                d.setTokenPosition(tp(ctx));
                 d.setRightArgument((StatementWithResultInterface) resolveChild(um.getChild(1)));
                 ESN2 leftArg = new ESN2();
+                leftArg.setTokenPosition(tp(ctx)); // This is not right, it is the start of the expression,, best we can do
                 Statement s = resolveChild(dotOpContext.getChild(0));
                 if (s instanceof VariableNode) {
                     VariableNode vNode = (VariableNode) s;
@@ -1234,6 +1235,7 @@ public class QDLListener implements QDLParserListener {
             }
         }
         ESN2 expressionStemNode = new ESN2();
+        expressionStemNode.setTokenPosition(tp(dotOpContext));
         stash(dotOpContext, expressionStemNode);
 
         expressionStemNode.setSourceCode(getSource(dotOpContext));
@@ -1261,6 +1263,7 @@ public class QDLListener implements QDLParserListener {
                 String a = expressionStemNode.getRightArg().getResult().toString();
                 String[] lr = a.split("\\.");
                 ESN2 childESN = new ESN2();
+                childESN.setTokenPosition(tp(ctx));
                 childESN.setLeftArg(expressionStemNode.getLeftArg());
                 childESN.setRightArg(new ConstantNode(Long.parseLong(lr[0]), Constant.LONG_TYPE));
                 expressionStemNode.setLeftArg(childESN);
@@ -1301,6 +1304,7 @@ public class QDLListener implements QDLParserListener {
              value = new BigDecimal(ctx.getChild(0).getText());
         }
         constantNode = new ConstantNode(value);
+        constantNode.setTokenPosition(tp(ctx));
         stash(ctx, constantNode);
     }
 
@@ -1317,8 +1321,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterF_ref(QDLParserParser.F_refContext ctx) {
-        //  System.out.println("enter F_REF");
-        stash(ctx, new FunctionReferenceNode());
+        FunctionReferenceNode frn = new FunctionReferenceNode();
+        frn.setTokenPosition(tp(ctx));
+        stash(ctx, frn);
 
     }
 
@@ -1368,7 +1373,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterRegexMatches(QDLParserParser.RegexMatchesContext ctx) {
-        stash(ctx, new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE));
+        stash(ctx, new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE, tp(ctx)));
 
     }
 
@@ -1381,7 +1386,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAltIFExpression(QDLParserParser.AltIFExpressionContext ctx) {
-        stash(ctx, new AltIfExpressionNode());
+        AltIfExpressionNode a = new AltIfExpressionNode();
+        a.setTokenPosition(tp(ctx));
+        stash(ctx, a);
 
     }
 
@@ -1490,7 +1497,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterIInterval(QDLParserParser.IIntervalContext ctx) {
-        stash(ctx, new OpenSliceNode());
+        stash(ctx, new OpenSliceNode(tp(ctx)));
     }
 
     @Override
@@ -1511,7 +1518,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterRInterval(QDLParserParser.RIntervalContext ctx) {
-        stash(ctx, new ClosedSliceNode());
+        stash(ctx, new ClosedSliceNode(tp(ctx)));
     }
 
     @Override
@@ -1531,7 +1538,6 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterKeywords(QDLParserParser.KeywordsContext ctx) {
-        System.out.println("entering keywordS:" + ctx.getText());
     }
 
     @Override
@@ -1542,6 +1548,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterKeyword(QDLParserParser.KeywordContext ctx) {
         ConstantNode constantNode = new ConstantNode(null, Constant.STRING_TYPE);
+        constantNode.setTokenPosition(tp(ctx));
         stash(ctx, constantNode);
 
     }
@@ -1582,7 +1589,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAssertStatement(QDLParserParser.AssertStatementContext ctx) {
-        stash(ctx, new AssertStatement());
+        stash(ctx, new AssertStatement(tp(ctx)));
     }
 
     @Override
@@ -1605,7 +1612,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAssertStatement2(QDLParserParser.AssertStatement2Context ctx) {
-        stash(ctx, new AssertStatement());
+        stash(ctx, new AssertStatement(tp(ctx)));
 
     }
 
@@ -1659,6 +1666,7 @@ public class QDLListener implements QDLParserListener {
         if (expressionContext instanceof QDLParserParser.VariablesContext) {
             VariableNode vn = new VariableNode();
             vn.setSourceCode(getSource(ctx));
+            vn.setTokenPosition(tp(ctx));
             //ExpressionStemNode esn = new ExpressionStemNode();
             stash(ctx, vn);
             QDLParserParser.VariablesContext variablesContext = (QDLParserParser.VariablesContext) ctx.expression();
@@ -1668,6 +1676,7 @@ public class QDLListener implements QDLParserListener {
             //ExpressionStemNode esn = new ExpressionStemNode();
             ESN2 esn = new ESN2();
             esn.setSourceCode(getSource(ctx));
+            esn.setTokenPosition(tp(ctx));
             stash(ctx, esn);
             esn.setLeftArg((StatementWithResultInterface) resolveChild(expressionContext));
         }
@@ -1699,11 +1708,13 @@ public class QDLListener implements QDLParserListener {
         }
 
         FunctionRecord functionRecord = new FunctionRecord();
+        functionRecord.setTokenPosition(tp(lambdaContext));
         // not quite the original source... The issue is that this comes parsed and stripped of any original
         // end of line markers, so we cannot tell what was there. Since it may include documentation lines
         // we have to add back in EOLs at the end of every statement so the comments don't get lost.
         // Best we can do with ANTLR...
         FunctionDefinitionStatement fds = new FunctionDefinitionStatement();
+        fds.setTokenPosition(tp(ctx));
         fds.setLambda(true);
         fds.setFunctionRecord(functionRecord);
 
@@ -1755,6 +1766,7 @@ public class QDLListener implements QDLParserListener {
                     ExpressionImpl expr = (ExpressionImpl) stmt;
                     if (expr.getOperatorType() != SystemEvaluator.RETURN_TYPE) {
                         Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                        expr1.setTokenPosition(tp(lambdaContext)); // best we can do
                         expr1.setName(SystemEvaluator.RETURN);
                         expr1.addArgument(expr);
                         functionRecord.statements.add(expr1); // wrapped in a return
@@ -1763,6 +1775,8 @@ public class QDLListener implements QDLParserListener {
                     }
                 } else {
                     Polyad expr1 = new Polyad(SystemEvaluator.RETURN_TYPE);
+                    expr1.setTokenPosition(tp(lambdaContext)); // best we can do
+
                     expr1.setName(SystemEvaluator.RETURN);
                     expr1.addArgument((StatementWithResultInterface) stmt);
                     functionRecord.statements.add(expr1); // wrapped in a return
@@ -1776,7 +1790,9 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterBlockStatement(QDLParserParser.BlockStatementContext ctx) {
-        stash(ctx, new BlockStatement());
+        BlockStatement b = new BlockStatement();
+        b.setTokenPosition(tp(ctx));
+        stash(ctx, b);
     }
 
     @Override
@@ -1810,6 +1826,7 @@ public class QDLListener implements QDLParserListener {
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
         polyad.setSourceCode(source);
+        polyad.setTokenPosition(tp(ctx));
         stash(ctx, polyad);
     }
 
@@ -1828,6 +1845,7 @@ public class QDLListener implements QDLParserListener {
     public void exitUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx) {
         Dyad dyad;
         dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+        dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
         dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
@@ -1850,6 +1868,7 @@ public class QDLListener implements QDLParserListener {
             return;
         }
         ModuleExpression moduleExpression = new ModuleExpression();
+        moduleExpression.setTokenPosition(tp(ctx));
         stash(ctx, moduleExpression);
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());

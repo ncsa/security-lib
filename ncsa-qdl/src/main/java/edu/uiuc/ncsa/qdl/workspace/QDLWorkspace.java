@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.workspace;
 
 import edu.uiuc.ncsa.qdl.exceptions.*;
+import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -39,12 +40,24 @@ public class QDLWorkspace {
         if (getLogger() != null) {
             getLogger().error(t);
         }
+        int lineNumber = -1;
+        int colNumber = -1;
+        String errorStatement = "";
+        if (t instanceof QDLStatementExecutionException) {
+            QDLStatementExecutionException qq = (QDLStatementExecutionException) t;
+            if (qq.getStatement().hasTokenPosition()) {
+                errorStatement = getErrorCoordinates(qq);
+            }
+            if (t.getCause() != null) {
+                t = qq.getCause();
+            }
+        }
         if (t instanceof StackOverflowError) {
-            workspaceCommands.say("Error: Stack overflow.");
+            workspaceCommands.say("Error: Stack overflow" + errorStatement);
             return;
         }
         if (t instanceof UndefinedFunctionException) {
-            workspaceCommands.say("Error: No such function.");
+            workspaceCommands.say(t.getMessage()  + errorStatement);
             return;
         }
         if (t instanceof InterruptException) {
@@ -61,11 +74,11 @@ public class QDLWorkspace {
             return;
         }
         if (t instanceof IllegalStateException) {
-            workspaceCommands.say("illegal state:" + t.getMessage());
+            workspaceCommands.say("illegal state:" + t.getMessage() + errorStatement);
             return;
         }
         if (t instanceof IllegalArgumentException) {
-            workspaceCommands.say("illegal argument:" + t.getMessage());
+            workspaceCommands.say("illegal argument:" + t.getMessage() + errorStatement);
             return;
         }
         if (t instanceof AssertionException) {
@@ -74,7 +87,7 @@ public class QDLWorkspace {
         }
 
         if (t instanceof QDLException) {
-            workspaceCommands.say(t.getMessage());
+            workspaceCommands.say(t.getMessage() + errorStatement);
             return;
         }
         // In case a jar is corrupted (e.g. maven builds it wrong, partial upgrade failed, so missing dependency)
@@ -88,54 +101,64 @@ public class QDLWorkspace {
         if (t.getMessage() == null) {
             workspaceCommands.say("error!");
         } else {
-            workspaceCommands.say("error: " + t.getMessage());
+            workspaceCommands.say("error: " + t.getMessage() + errorStatement);
         }
     }
 
+    protected String getErrorCoordinates(QDLStatementExecutionException qq) {
+      Statement statement = qq.getStatement();
+        if (!statement.hasTokenPosition()) {
+            return "";
+        }
+        String out = " at (" + statement.getTokenPosition().line + ", " + statement.getTokenPosition().col + ")";
+        if(qq.isScript()){
+            out = out + " in script '" + qq.getScriptName() + "'";
+        }
+        return out;
+    }
 
-
-    protected void run(InputLine inputLine) throws Throwable {
+    protected void run() throws Throwable {
         boolean isExit = false;
 
         // Main loop. The default is to be running QDL commands and if there is a
         // command to the workspace, then it gets forwarded. 
         while (!isExit) {
             String input;
-                input = workspaceCommands.readline(INDENT);
-                if (input == null) {
-                    // about the only way to get a null here is if the user is piping in
-                    // something via std in and it hits the end of the stream.
-                    if (workspaceCommands.isDebugOn()) {
-                        workspaceCommands.say("exiting");
-                    }
-                    return;
+            input = workspaceCommands.readline(INDENT);
+            if (input == null) {
+                // about the only way to get a null here is if the user is piping in
+                // something via std in and it hits the end of the stream.
+                if (workspaceCommands.isDebugOn()) {
+                    workspaceCommands.say("exiting");
                 }
-                input = input.trim();
-                boolean storeLine = true;
-                String out = null;
-                if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
-                    try {
-                        out = doHistory(input);
-                    } catch (Throwable t) {
-                        workspaceCommands.say("could not not do history command:" + t.getMessage());
-                    }
-                    if (out == null) {
-                        // nothing in the buffer
-                        continue;
-                    }
-                    storeLine = false;
+                return;
+            }
+            input = input.trim();
+            boolean storeLine = true;
+            String out = null;
+            if (input.equals(HISTORY_COMMAND) || input.startsWith(HISTORY_COMMAND + " ")) {
+                try {
+                    out = doHistory(input);
+                } catch (Throwable t) {
+                    workspaceCommands.say("could not not do history command:" + t.getMessage());
                 }
-                if (input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")) {
-                    out = doRepeatCommand(input);
-                    storeLine = out == null;
+                if (out == null) {
+                    // nothing in the buffer
+                    continue;
                 }
+                storeLine = false;
+            }
+            if (input.equals(REPEAT_COMMAND) || input.startsWith(REPEAT_COMMAND + " ")) {
+                out = doRepeatCommand(input);
+                storeLine = out == null;
+            }
 
-                if (storeLine) {
-                    // Store it if it was not retrieved from the command history.
-                    workspaceCommands.commandHistory.add(0, input);
-                } else {
-                    input = out; // repeat the command
-                }
+            if (storeLine) {
+                // Store it if it was not retrieved from the command history.
+                workspaceCommands.commandHistory.add(0, input);
+            } else {
+                input = out; // repeat the command
+            }
 
             // Good idea to strip off comments in parser, but the regex here needs to be
             // quite clever to match ' and // within them (e.g. any url fails at the command line).
@@ -184,12 +207,12 @@ public class QDLWorkspace {
     }
 
     public void runMacro(List<String> commands) throws Throwable {
-     //   boolean isExit = false;
-        for(String command : commands){
+        //   boolean isExit = false;
+        for (String command : commands) {
             if (command.startsWith(")")) {
                 switch (workspaceCommands.execute(command)) {
                     case RC_EXIT_NOW:
-                       // isExit = true;
+                        // isExit = true;
                         return; // exit now, darnit.
                     case RC_NO_OP:
                     case RC_CONTINUE:
@@ -221,6 +244,7 @@ public class QDLWorkspace {
             }
         }
     }
+
     protected String doRepeatCommand(String cmdLine) {
         if (cmdLine.contains("--help")) {
             workspaceCommands.say(REPEAT_COMMAND + " = repeat the last command. Identical to " + HISTORY_COMMAND + " 0");
@@ -262,7 +286,7 @@ public class QDLWorkspace {
         CommandLineTokenizer CLT = workspaceCommands.CLT;
         Vector v = CLT.tokenize(cmdLine);
         InputLine inputLine = new InputLine(v);
-        if(inputLine.hasArg(HISTORY_SIZE_SWITCH)){
+        if (inputLine.hasArg(HISTORY_SIZE_SWITCH)) {
             workspaceCommands.say(workspaceCommands.commandHistory.size() + " entries");
             return null;
         }
@@ -270,8 +294,8 @@ public class QDLWorkspace {
         boolean isSave = inputLine.hasArg(HISTORY_SAVE_SWITCH);
         boolean isReverse = inputLine.hasArg(HISTORY_REVERSE_SWITCH) || inputLine.hasArg(SHORT_HISTORY_REVERSE_SWITCH);
         boolean hasMessage = inputLine.hasArg("-m");
-        String message=null;
-        if(hasMessage){
+        String message = null;
+        if (hasMessage) {
 
             message = inputLine.getNextArgFor("-m");
         }
@@ -296,7 +320,7 @@ public class QDLWorkspace {
                 newList = workspaceCommands.commandHistory;
             }
             StemVariable stemVariable = new StemVariable();
-            if(hasMessage){
+            if (hasMessage) {
                 stemVariable.put(0, message);
             }
             stemVariable.addList(newList);
@@ -419,10 +443,9 @@ public class QDLWorkspace {
             iso6429IO.getScreenSize(); // Figure this out.
             iso6429IO.setLoggingFacade(workspaceCommands.logger);
         }
-
-        qc.run(new InputLine(new Vector()));
-
+        qc.run();
     }
+
     public static final String MACRO_COMMENT_DELIMITER = "//";
 
 }

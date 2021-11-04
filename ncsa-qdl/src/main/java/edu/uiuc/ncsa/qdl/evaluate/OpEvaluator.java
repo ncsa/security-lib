@@ -1,6 +1,8 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
 
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -238,6 +240,17 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     }
 
     public void evaluate(Dyad dyad, State state) {
+        try {
+            evaluate2(dyad, state);
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, dyad);
+            throw qq;
+        }
+    }
+
+    public void evaluate2(Dyad dyad, State state) {
         switch (dyad.getOperatorType()) {
             case POWER_VALUE:
                 doPower(dyad, state);
@@ -373,14 +386,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     BigDecimal rr = null;
                     try {
                         rr = left.divideToIntegralValue(right, OpEvaluator.getMathContext());
-                    }catch (ArithmeticException ax0){
+                    } catch (ArithmeticException ax0) {
                         throw new IllegalArgumentException("Insufficient precision to divide. Please increase " + MathEvaluator.NUMERIC_DIGITS);
                     }
-                    try{
+                    try {
                         r.result = rr.longValueExact();
                         r.resultType = Constant.LONG_TYPE;
                         return r;
-                    }catch(ArithmeticException ax){
+                    } catch (ArithmeticException ax) {
 
                     }
                     r.result = rr;
@@ -666,13 +679,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         BigDecimal left = toBD(objects[0]);
                         BigDecimal right = toBD(objects[1]);
                         BigDecimal res = left.divide(right, getNumericDigits(), BigDecimal.ROUND_DOWN);
-                        if(MathEvaluator.isIntegerValue(res)){
+                        if (MathEvaluator.isIntegerValue(res)) {
                             // try to turn it into an integer
-                            try{
+                            try {
                                 r.result = res.longValueExact();
                                 r.resultType = Constant.LONG_TYPE;
                                 return r;
-                            }catch(ArithmeticException arithmeticException){
+                            } catch (ArithmeticException arithmeticException) {
                                 // so it cannot eb turned into a long value for whatever reason
                             }
                         }
@@ -754,6 +767,17 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
 
     public void evaluate(Monad monad, State state) {
+        try {
+            evaluate2(monad, state);
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, monad);
+            throw qq;
+        }
+    }
+
+    public void evaluate2(Monad monad, State state) {
 
         switch (monad.getOperatorType()) {
             case NOT_VALUE:

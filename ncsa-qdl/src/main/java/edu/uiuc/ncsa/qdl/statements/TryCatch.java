@@ -11,6 +11,15 @@ import java.util.List;
  * on 1/22/20 at  10:36 AM
  */
 public class TryCatch implements Statement {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     public static final Long RESERVED_ERROR_CODE = -1L;
     public static final Long RESERVED_USER_ERROR_CODE = 0L;
 

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +13,15 @@ import java.util.List;
  * on 6/13/21 at  3:44 PM
  */
 public class ParenthesizedExpression implements ExpressionNode {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
-//    boolean inModule = false;
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
 
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     @Override
     public boolean isInModule() {
         return alias != null;
@@ -32,11 +39,6 @@ public class ParenthesizedExpression implements ExpressionNode {
         this.alias = alias;
     }
 
-    /*   @Override
-        public void setInModule(boolean inModule) {
-                         this.inModule = inModule;
-        }
-     */
     public StatementWithResultInterface getExpression() {
         if (getArgCount() == 0) {
             return null;

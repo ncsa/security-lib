@@ -1,0 +1,23 @@
+/*
+   Test that an error inside a loop causes an exit from the loop.  Invoke script_run on this file.
+   This should end loop processing so the
+   expected output is 0,1,2 then an error, which includes the location in this file and the name of the
+   script.
+   Jeff Gaynor
+   1/28/2020
+*/
+
+while[
+     for_next(j,5)
+   ]do[
+     if[
+        j==3
+     ]then[
+        if[2 <3][q:=3;];
+        if[3 <5][q:=7;];
+        if[3 <7][q:=7/acos(1);];
+        break();
+     ]else[
+        say('j='+j);
+   ]; // end if
+]; // end loop

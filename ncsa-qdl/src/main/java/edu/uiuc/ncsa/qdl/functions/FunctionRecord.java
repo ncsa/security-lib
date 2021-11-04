@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,6 +15,11 @@ import java.util.List;
  * on 1/22/20 at  10:48 AM
  */
 public class FunctionRecord implements Serializable, Cloneable {
+    TokenPosition tokenPosition = null;
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+    public TokenPosition getTokenPositiion() {return tokenPosition;}
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
+    
     public static int FREF_ARG_COUNT = -10;
     public String name;
     public List<String> sourceCode = new ArrayList<>();

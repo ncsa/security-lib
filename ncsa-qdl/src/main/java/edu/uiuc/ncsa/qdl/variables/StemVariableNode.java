@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.variables;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.HasResultInterface;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSONObject;
@@ -17,8 +18,15 @@ import java.util.List;
  * on 9/28/20 at  10:57 AM
  */
 public class StemVariableNode implements StatementWithResultInterface {
-   // boolean inModule = false;
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     @Override
     public boolean isInModule() {
         return alias!=null;
@@ -34,13 +42,6 @@ public class StemVariableNode implements StatementWithResultInterface {
     public void setAlias(String alias) {
          this.alias = alias;
     }
-
-/*
-    @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
-    }
-*/
 
     public String getVariableReference() {
         return variableReference;

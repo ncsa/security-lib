@@ -10,6 +10,15 @@ import java.util.List;
  * on 6/22/21 at  6:34 AM
  */
 public class BlockStatement implements Statement{
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     public List<Statement> getStatements() {
         return statements;
     }

@@ -11,6 +11,20 @@ import java.util.List;
  * on 6/1/21 at  12:53 PM
  */
 public class AssertStatement implements Statement{
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
+
+    public AssertStatement(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
+
     StatementWithResultInterface conditional;
 
     public StatementWithResultInterface getConditional() {

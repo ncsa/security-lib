@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;
@@ -13,6 +14,10 @@ import java.util.List;
  * on 10/26/21 at  12:34 PM
  */
 public class ComparisonDyad extends Dyad {
+    public ComparisonDyad(int operatorType, TokenPosition tokenPosition) {
+        super(operatorType, tokenPosition);
+    }
+
     public ComparisonDyad(int operatorType) {
         super(operatorType);
     }

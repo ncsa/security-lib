@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 import java.util.ArrayList;
 
@@ -10,7 +11,9 @@ import java.util.ArrayList;
  * on 1/13/20 at  3:47 PM
  */
 public class Dyad extends ExpressionImpl {
-
+    public Dyad(int operatorType, TokenPosition tokenPosition) {
+        super(operatorType, tokenPosition);
+    }
 
     public Dyad(int operatorType) {
         super(operatorType);

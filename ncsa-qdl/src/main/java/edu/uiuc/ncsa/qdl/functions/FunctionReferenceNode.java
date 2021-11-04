@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.List;
@@ -12,8 +13,15 @@ import java.util.List;
  * on 3/14/21 at  3:26 PM
  */
 public class FunctionReferenceNode implements StatementWithResultInterface {
-  //  boolean inModule = false;
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     @Override
     public boolean isInModule() {
         return alias!=null;
@@ -29,12 +37,6 @@ String alias = null;;
     public void setAlias(String alias) {
         this.alias = alias;
     }
-/*
-    @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
-    }
-*/
 
     public String getFunctionName() {
         return functionName;

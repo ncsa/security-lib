@@ -124,7 +124,7 @@ public abstract class FunctionState extends VariableState {
             fr.functionRecord = getFTStack().getFunctionReference(name);
             //fr.isExternalModule = false; // just to be sure.
             if (fr.functionRecord == null) {
-                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "." : "s."));
+                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "" : "s"));
             }
         }
         return fr;

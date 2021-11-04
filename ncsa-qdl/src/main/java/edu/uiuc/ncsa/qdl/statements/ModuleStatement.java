@@ -14,6 +14,15 @@ import java.util.List;
  * on 1/22/20 at  10:35 AM
  */
 public class ModuleStatement implements Statement {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     URI namespace;
     String alias;
 

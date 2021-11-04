@@ -291,6 +291,17 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+        try {
+            return evaluate2(polyad, state);
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            throw qq;
+        }
+    }
+
+    public boolean evaluate2(Polyad polyad, State state) {
         // NOTE NOTE NOTE!!! The for_next, has_keys, check_after functions are NOT evaluated here. In
         // the WhileLoop class they are picked apart for their contents and the correct looping strategy is
         // done. Look at the WhileLoop's evaluate method. All this evaluator
@@ -404,7 +415,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() != 1) {
             throw new IllegalArgumentException(WS_MACRO + " requires one argument");
         }
-        Object obj = polyad.evalArg(0,state);
+        Object obj = polyad.evalArg(0, state);
         List<String> commands = null;
         // options are a string of commands, separated by CR/LF or a stem of them
         if (obj instanceof String) {
@@ -440,7 +451,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (obj == null) {
             throw new IllegalArgumentException(WS_MACRO + " must have either a string of commands or a stem of them");
         }
-            state.getWorkspaceCommands().runMacro(commands);
+        state.getWorkspaceCommands().runMacro(commands);
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
@@ -1459,22 +1470,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
         Object[] argList = new Object[0];
-/*        if (2 == polyad.getArgCount()) {
-            Object arg2 = polyad.evalArg(1, state);
-            if (arg2 instanceof StemVariable) {
-                StemList stemList = ((StemVariable) arg2).getStemList();
-                ArrayList<Object> aa = new ArrayList<>();
-                for (int i = 0; i < stemList.size(); i++) {
-                    Object object = stemList.get(i);
-                    if (object != null && !(object instanceof QDLNull)) {
-                        aa.add(object);
-                    }
-                }
-                argList = aa.toArray(new Object[0]);
-            } else {
-                argList = new Object[]{arg2}; // pass back single non-stem argument
-            }
-        }*/
+
         if (2 <= polyad.getArgCount()) {
             ArrayList<Object> aa = new ArrayList<>();
             // zero-th argument is the name of the script, so start with element 1.
@@ -1504,18 +1500,19 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 localState.setScriptArgs(argList);
                 script.execute(localState);
                 localState.setScriptArgs(oldArgs);
+            } catch (QDLException qe) {
+                if (qe instanceof QDLStatementExecutionException) {
+                    QDLStatementExecutionException qq = (QDLStatementExecutionException) qe;
+                    qq.setScriptName(resourceName);
+                    qq.setScript(true);
+                    throw qq;
+                }
+                throw qe;
             } catch (Throwable t) {
-                if (t instanceof ReturnException) {
-                    ReturnException rx = (ReturnException) t;
-                    polyad.setEvaluated(true);
-                    polyad.setResultType(rx.resultType);
-                    polyad.setResult(rx.result);
-                    return;
-                }
-                if (t instanceof RuntimeException) {
-                    throw (RuntimeException) t;
-                }
-                throw new QDLRuntimeException("Error running script '" + arg1 + "'", t);
+                QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+                qq.setScript(true);
+                qq.setScriptName(resourceName);
+                throw qq;
             }
         }
         polyad.setEvaluated(true);

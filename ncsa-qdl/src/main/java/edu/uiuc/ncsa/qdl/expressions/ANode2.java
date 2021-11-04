@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.*;
@@ -14,6 +15,20 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 6/3/21 at  5:10 AM
  */
 public class ANode2 extends ExpressionImpl {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
+
+    public ANode2(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
+
     public String getOp() {
         return op;
     }
@@ -97,7 +112,7 @@ public class ANode2 extends ExpressionImpl {
         boolean chained = false;
         while (realLeftArg instanceof ANode2) {
             ANode2 rla = (ANode2)realLeftArg;
-            ANode2 xNode = new ANode2();
+            ANode2 xNode = new ANode2(rla.getTokenPosition());
             xNode.setLeftArg(rla.getRightArg());
             xNode.setRightArg(lastAnode.getRightArg());
             xNode.setOp(lastAnode.getOp());
@@ -141,7 +156,7 @@ public class ANode2 extends ExpressionImpl {
 
     @Override
     public StatementWithResultInterface makeCopy() {
-        ANode2 aNode2 = new ANode2();
+        ANode2 aNode2 = new ANode2(getTokenPosition());
         aNode2.setOp(getOp());
         aNode2.setLeftArg(getLeftArg().makeCopy());
         aNode2.setRightArg(getRightArg().makeCopy());

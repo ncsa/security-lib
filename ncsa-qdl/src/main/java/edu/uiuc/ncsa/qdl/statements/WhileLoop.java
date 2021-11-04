@@ -20,7 +20,15 @@ import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.*;
  * on 1/17/20 at  4:44 PM
  */
 public class WhileLoop implements Statement {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     ExpressionNode conditional;
 
     public List<Statement> getStatements() {

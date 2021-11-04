@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
@@ -18,7 +19,15 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 3/5/21 at  5:58 AM
  */
 public class ExpressionStemNode implements StatementWithResultInterface {
-//    boolean inModule = false;
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
 
     @Override
     public boolean isInModule() {
@@ -36,12 +45,6 @@ public class ExpressionStemNode implements StatementWithResultInterface {
     this.alias = alias;
     }
 
-/*
-    @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
-    }
-*/
 
     public ArrayList<StatementWithResultInterface> getArguments() {
         return arguments;

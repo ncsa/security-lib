@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
@@ -11,6 +12,10 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 public class VariableNode extends ExpressionImpl {
     public VariableNode() {
            super();
+    }
+
+    public VariableNode(TokenPosition tokenPosition) {
+        super(tokenPosition);
     }
 
     public String getVariableReference() {

@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.util.ArrayList;
@@ -14,40 +16,31 @@ import java.util.List;
  */
 public abstract class ExpressionImpl implements ExpressionNode {
     public ExpressionImpl() {
-    }
-
-/*    Module module = null;
-
-    @Override
-    public Module getModule() {
-        return module;
-    }
-
-    @Override
-    public void setModule(Module newModule) {
-         this.module = newModule;
-        for(int i = 0; i < getArgCount(); i++){
-            getArguments().get(i).setModule(newModule);
-        }
 
     }
+    public ExpressionImpl(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
-    public boolean hasModule() {
-        return module!=null;
-    }*/
+    public TokenPosition getTokenPosition() {return tokenPosition;}
 
- //   boolean inModule = false;
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
+
+    public ExpressionImpl(int operatorType, TokenPosition tokenPosition) {
+        this(operatorType);
+        this.tokenPosition = tokenPosition;
+    }
 
     @Override
     public boolean isInModule() {
         return alias!=null;
     }
 
-    /*@Override
-    public void setInModule(boolean inModule) {
-        this.inModule = inModule;
-    }*/
 
     public ExpressionImpl(int operatorType) {
         this.operatorType = operatorType;
@@ -95,7 +88,18 @@ public abstract class ExpressionImpl implements ExpressionNode {
     }
 
     public Object evalArg(int index, State state) {
-        return getArguments().get(index).evaluate(state);
+        try {
+            return getArguments().get(index).evaluate(state);
+        }catch(QDLStatementExecutionException qq){
+            throw qq;
+        }catch(QDLException returnException){
+            // These should be passed back, since they are needed for the internal operation of QDL
+            // E.g. IndexError, NamespaceError, ReturnException,...
+             throw returnException;
+        }catch(Throwable t){
+            // Generate a bonafide error if there is a non-QDL one.
+            throw new QDLStatementExecutionException(t, this);
+        }
     }
 
     @Override

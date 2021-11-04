@@ -10,7 +10,15 @@ import java.util.List;
  * on 1/17/20 at  3:42 PM
  */
 public class SwitchStatement implements Statement {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
 
     public List<ConditionalStatement> getArguments() {
         return arguments;

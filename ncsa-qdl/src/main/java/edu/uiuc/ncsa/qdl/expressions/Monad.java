@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
 import java.math.BigDecimal;
@@ -14,16 +15,23 @@ import java.util.ArrayList;
  * on 1/13/20 at  3:43 PM
  */
 public class Monad extends ExpressionImpl {
+
     public Monad(boolean postFix) {
         this.postFix = postFix;
     }
 
-
+    public Monad(boolean postFix, TokenPosition tokenPosition) {
+        super(tokenPosition);
+           this.postFix = postFix;
+       }
     public Monad( int operatorType, boolean isPostFix) {
         this(isPostFix);
         this.operatorType = operatorType;
     }
-
+    public Monad( int operatorType, boolean isPostFix, TokenPosition tokenPosition) {
+         this(isPostFix, tokenPosition);
+         this.operatorType = operatorType;
+     }
 
     /**
      * Constructor for making a post fix monad.

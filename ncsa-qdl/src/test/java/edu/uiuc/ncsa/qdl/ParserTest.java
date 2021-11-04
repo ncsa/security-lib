@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -1156,7 +1157,7 @@ public class ParserTest extends AbstractQDLTester {
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (IllegalArgumentException ix) {
+        } catch (QDLStatementExecutionException ix) {
             bad = false;
         }
         if (bad) {
@@ -1176,7 +1177,7 @@ public class ParserTest extends AbstractQDLTester {
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (IllegalArgumentException ix) {
+        } catch (QDLStatementExecutionException ix) {
             bad = false;
         }
         if (bad) {

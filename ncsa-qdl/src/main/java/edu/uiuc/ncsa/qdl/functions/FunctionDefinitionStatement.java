@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 
 import java.util.List;
@@ -11,6 +12,15 @@ import java.util.List;
  * on 3/20/21 at  8:46 AM
  */
 public class FunctionDefinitionStatement implements Statement {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     public boolean isLambda() {
         return lambda;
     }

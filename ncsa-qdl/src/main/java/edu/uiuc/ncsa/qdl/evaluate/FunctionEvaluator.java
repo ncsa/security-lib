@@ -95,15 +95,15 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
            if (polyad.isInModule() || !polyad.isBuiltIn()) {
                try {
                    figureOutEvaluation(polyad, state, !polyad.isInModule());
-               } catch (Throwable t) {
-                   if (t instanceof RuntimeException) {
-                       throw (RuntimeException) t;
-                   }
-                   if (t instanceof StackOverflowError) {
-                       throw new QDLException("stack overflow", t);
-                   }
-                   QDLException q = new QDLException("error evaluating function", t);
-                   throw q;
+               } catch(UndefinedFunctionException ufe){
+                   // special case this one QDLException so it gives usedful user feedback.
+                   QDLStatementExecutionException qq = new QDLStatementExecutionException(ufe, polyad);
+                   throw qq;
+               }catch(QDLException qe){
+                   throw qe;
+               }catch (Throwable t) {
+                   QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+                   throw qq;
                }
                return true;
            }
@@ -119,6 +119,16 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
      */
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+        try{
+            return evaluate2(polyad, state);
+        }catch(QDLException q){
+              throw q;
+        }catch(Throwable t){
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            throw qq;
+        }
+    }
+    public boolean evaluate2(Polyad polyad, State state) {
           return evaluate(null, polyad, state);
     }
      protected boolean isFDef(Statement statement){
@@ -139,7 +149,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
         //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
-        // Direct analog of func(polyad, state):
+        // This is the direct analog of func(polyad, state):
         if (qfr == null) {
             throw new UndefinedFunctionException("this function is not defined");
         }
@@ -148,8 +158,6 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
         polyad.setResultType(Constant.getType(result));
         return;
-
-
     }
 
     protected boolean tryScript(Polyad polyad, State state) {
@@ -205,7 +213,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
     }
 
-    /*
+    /*   f(x)->ln(x-2); f(sin(pi()/4))
       module['a:/b','X'][__f(x,y)->x*y;]
   module_import('a:/b', 'A')
          A#__f(2,3)

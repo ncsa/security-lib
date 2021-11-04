@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,15 @@ import java.util.List;
  * on 6/1/21 at  6:43 AM
  */
 public class ParseExpressionBlock implements StatementWithResultInterface {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     public List<ExpressionNode> getExpressionNodes() {
         return expressionNodes;
     }
@@ -19,8 +29,6 @@ public class ParseExpressionBlock implements StatementWithResultInterface {
     public void setExpressionNodes(List<ExpressionNode> expressionNodes) {
         this.expressionNodes = expressionNodes;
     }
-
-    //boolean inModule = false;
 
     @Override
     public boolean isInModule() {
@@ -39,11 +47,6 @@ public class ParseExpressionBlock implements StatementWithResultInterface {
          this.alias = alias;
     }
 
-    /*  @Override
-        public void setInModule(boolean inModule) {
-            this.inModule = inModule;
-        }
-    */
     List<ExpressionNode> expressionNodes = new ArrayList<>();
 
     @Override

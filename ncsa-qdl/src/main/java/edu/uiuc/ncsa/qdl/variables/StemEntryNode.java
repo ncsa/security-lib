@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.variables;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,17 @@ import java.util.List;
  * on 9/28/20 at  1:47 PM
  */
 public class StemEntryNode implements StatementWithResultInterface {
+    TokenPosition tokenPosition = null;
+    @Override
+    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
+
+    @Override
+    public TokenPosition getTokenPosition() {return tokenPosition;}
+
+    @Override
+    public boolean hasTokenPosition() {return tokenPosition!=null;}
     StatementWithResultInterface key;
     StatementWithResultInterface value;
-//    boolean inModule = false;
 
     @Override
     public boolean isInModule() {
@@ -36,11 +45,6 @@ public class StemEntryNode implements StatementWithResultInterface {
          this.alias = alias;
     }
 
-  /*  @Override
-    public void setInModule(boolean inModule) {
-                     this.inModule = inModule;
-    }
-*/
     public boolean isDefaultValue() {
         return isDefaultValue;
     }

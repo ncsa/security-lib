@@ -5,6 +5,8 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
@@ -253,6 +255,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+        try{
+            return evaluate2(polyad, state);
+        }catch(QDLException q){
+              throw q;
+        }catch(Throwable t){
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            throw qq;
+        }
+    }
+    public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case DIMENSION:
                 doDimension(polyad, state);
@@ -2379,7 +2391,7 @@ z. :=  join3(q.,w.)
 
         StemVariable pStem0;
         // Start QDL. sliceNode is [;rank]
-        OpenSliceNode sliceNode = new OpenSliceNode();
+        OpenSliceNode sliceNode = new OpenSliceNode(polyad.getTokenPosition());
         sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
         sliceNode.getArguments().add(new ConstantNode(Integer.toUnsignedLong(rank), Constant.LONG_TYPE));
 

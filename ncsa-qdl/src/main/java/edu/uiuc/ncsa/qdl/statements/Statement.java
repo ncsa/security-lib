@@ -17,9 +17,12 @@ public interface Statement extends Serializable {
 
     void setSourceCode(List<String> sourceCode);
 
-/*    Module getModule();
-
-    void setModule(Module newModule);
-
-    boolean hasModule();*/
+    /**
+     * Set the location of this token from the parser. This is used
+     * for error notifications later.
+     * @param tokenPosition
+     */
+    void setTokenPosition(TokenPosition tokenPosition);
+    TokenPosition getTokenPosition();
+    boolean hasTokenPosition();
 }

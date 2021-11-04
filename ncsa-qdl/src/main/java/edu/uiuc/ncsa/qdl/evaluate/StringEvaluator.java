@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.ImportManager;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -156,6 +158,16 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+        try{
+            return evaluate2(polyad, state);
+        }catch(QDLException q){
+              throw q;
+        }catch(Throwable t){
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            throw qq;
+        }
+    }
+    public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case CONTAINS:
                 doContains(polyad, state);

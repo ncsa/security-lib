@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.expressions;
 
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
+import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
 /**
  * For multiple arguments. This is used, e.g., for all functions.
@@ -10,6 +11,10 @@ import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
  */
 public class Polyad extends ExpressionImpl {
     public Polyad() {
+    }
+
+    public Polyad(TokenPosition tokenPosition) {
+        super(tokenPosition);
     }
 
     /**
