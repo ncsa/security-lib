@@ -14,7 +14,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:48 AM
  */
-public class FunctionRecord implements Serializable, Cloneable {
+public class FunctionRecord implements QDLStateThing {
     TokenPosition tokenPosition = null;
     public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
     public TokenPosition getTokenPositiion() {return tokenPosition;}

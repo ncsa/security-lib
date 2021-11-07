@@ -3,7 +3,7 @@
 */
 
 module[
-  'qdl:/math','mm'
+  'qdl:/ex/math','mm'
   ]body[
    define[sqrt(x)]body[
    >> A function to compute the sqrt of a positive number x

@@ -1158,7 +1158,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
         } catch (QDLStatementExecutionException ix) {
-            bad = false;
+            bad = !(ix.getCause() instanceof IllegalArgumentException);
         }
         if (bad) {
             assert false : "Was able to unbox a variable with a name clash in safe mode.";
@@ -1178,7 +1178,7 @@ public class ParserTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
         } catch (QDLStatementExecutionException ix) {
-            bad = false;
+            bad = !(ix.getCause() instanceof IllegalArgumentException);
         }
         if (bad) {
             assert false : "Was able to unbox a variable with a name clash in safe mode.";

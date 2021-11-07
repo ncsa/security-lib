@@ -12,25 +12,13 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
- * The interface for access to symboles (a.a variables) in QDL. Note that this is not assumed
+ * The interface for access to symbols (aka variables) in QDL. Note that this is not assumed
  * to be namespace aware at all. It is not the task of this component to understand or resolve
  * namespaces.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  5:04 PM
  */
 public abstract class AbstractSymbolTable implements SymbolTable {
-    protected int getType(String raw) {
-        if (raw.equals("null")) return SymbolTableImpl.NULL_TYPE;
-        if (raw.equals("true") || raw.equals("false")) return SymbolTableImpl.BOOLEAN_TYPE;
-        if (raw.startsWith("'") && raw.endsWith("'")) return SymbolTableImpl.STRING_TYPE;
-        try {
-            Integer.parseInt(raw);
-            return SymbolTableImpl.INTEGER_TYPE;
-        } catch (Throwable t) {
-            // do nothing.
-        }
-        return SymbolTableImpl.VARIABLE_TYPE;
-    }
 
     protected String getStemHead(String stem) {
         return getHead(stem, STEM_INDEX_MARKER);
@@ -53,7 +41,6 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     protected boolean isStem(String variable) {
         return variable.contains(STEM_INDEX_MARKER);
     }
-
 
 
     /**

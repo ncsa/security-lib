@@ -924,6 +924,36 @@ public class QDLListener implements QDLParserListener {
     QDLModule currentModule = null;
     ModuleStatement moduleStatement = null;
 
+    /*
+      The conditional in the enterModuleStatement(QDLParserParser.ModuleStatementContext)
+      method prevents defining a module inside another. Note that in ModuleTest#testNestedFunctionImport
+      a module defined outside of the module can be imported and used successfully, so this
+      issue relates to handling of module[] statements inside of module statements.
+      This is mostly seems to be an annoyance, but at some point all the state issues need to be
+      tracked down.
+      @param ctx the parse tree
+     */
+    /*
+    Comment out conditional in the enterModuleStatement method to use this example of
+    how nested module[] statement fails. Nesting of modules parses fine, just the state
+    does not seem coherent afterwards. Issue is that modules are all global.
+    To do this right will need local module stack (like functions and variables).
+   FAILS -- want to work:
+   //Cannot have the definition and the import inside the same module.
+   module['a:a','a'][module['b:b','b'][f(x)->x;];module_import('b:b');g(x)->b#f(x^2);];
+   module_import('a:a')
+a
+   a#g(2)
+illegal argument:no module named "b" was  imported at (1, 67)
+
+   WORKS:
+   module['b:b','b'][f(x)->(x);]
+   module_import('b:b'); //<-- key is that this has to be imported  outside of module first.
+   module['a:a','a'][module_import('b:b');g(x)->b#f(x^2);]; // <- actually, the import does nothing...
+   module_import('a:a')
+   a#g(2)
+
+*/
     @Override
     public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
         if (isModule) {
@@ -973,6 +1003,7 @@ public class QDLListener implements QDLParserListener {
         }
         return text;
     }
+
 
     @Override
     public void exitModuleStatement(QDLParserParser.ModuleStatementContext moduleContext) {

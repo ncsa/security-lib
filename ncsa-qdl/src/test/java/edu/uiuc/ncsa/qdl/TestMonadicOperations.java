@@ -23,7 +23,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = 1L + initialValue;
-        st.setLongValue("i", initialValue);
+        st.setValue("i", initialValue);
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad(OpEvaluator.PLUS_PLUS_VALUE, var);
         myMonad.evaluate(state);
@@ -43,7 +43,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = initialValue - 1L;
-        st.setLongValue("i", initialValue);
+        st.setValue("i", initialValue);
         OpEvaluator opEvaluator = new OpEvaluator();
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad( OpEvaluator.MINUS_MINUS_VALUE, var);
@@ -60,7 +60,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = 1L + initialValue;
-        st.setLongValue("i", initialValue);
+        st.setValue("i", initialValue);
         OpEvaluator opEvaluator = new OpEvaluator();
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad(OpEvaluator.PLUS_PLUS_VALUE, var, false);
@@ -77,7 +77,7 @@ public class TestMonadicOperations extends AbstractQDLTester {
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = initialValue - 1L;
-        st.setLongValue("i", initialValue);
+        st.setValue("i", initialValue);
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad( OpEvaluator.MINUS_MINUS_VALUE, var, false);
         myMonad.evaluate(state);

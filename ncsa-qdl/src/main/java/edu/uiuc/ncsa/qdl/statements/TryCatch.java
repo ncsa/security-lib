@@ -32,19 +32,19 @@ public class TryCatch implements Statement {
             }
         } catch (RaiseErrorException t) {
             // custom error handling
-            localState.getSymbolStack().getLocalST().setStringValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
+            localState.getSymbolStack().getLocalST().setValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
             if(t.getPolyad().getArgCount() ==2) {
-                localState.getSymbolStack().getLocalST().setLongValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
+                localState.getSymbolStack().getLocalST().setValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
             }else{
-                localState.getSymbolStack().getLocalST().setLongValue("error_code", RESERVED_USER_ERROR_CODE);
+                localState.getSymbolStack().getLocalST().setValue("error_code", RESERVED_USER_ERROR_CODE);
             }
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }
         } catch (Throwable otherT) {
             // everything else.
-            localState.getSymbolStack().getLocalST().setStringValue("error_message", otherT.getMessage());
-            localState.getSymbolStack().getLocalST().setLongValue("error_code", RESERVED_ERROR_CODE);
+            localState.getSymbolStack().getLocalST().setValue("error_message", otherT.getMessage());
+            localState.getSymbolStack().getLocalST().setValue("error_code", RESERVED_ERROR_CODE);
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }

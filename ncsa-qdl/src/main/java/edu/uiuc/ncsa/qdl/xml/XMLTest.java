@@ -202,9 +202,9 @@ public class XMLTest {
     protected static void testSymbols(XMLStreamWriter xsw) throws XMLStreamException {
         SymbolStack stack = new SymbolStack();
         SymbolTableImpl st0 = new SymbolTableImpl();
-        st0.setLongValue("my_long", 42L);
-        st0.setStringValue("my_string", "abcd goldfish");
-        st0.setDecimalValue("my_decimal", new BigDecimal("-432.456"));
+        st0.setValue("my_long", 42L);
+        st0.setValue("my_string", "abcd goldfish");
+        st0.setValue("my_decimal", new BigDecimal("-432.456"));
         stack.addParent(st0);
         st0.toXML(xsw);
     }

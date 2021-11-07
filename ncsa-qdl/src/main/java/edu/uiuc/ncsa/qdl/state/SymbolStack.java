@@ -11,13 +11,10 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STACKS_TAG;
 
 /**
@@ -32,10 +29,6 @@ public class SymbolStack extends AbstractSymbolTable {
         addParent(new SymbolTableImpl());
     }
 
-    @Override
-    public void setDecimalValue(String variableName, BigDecimal value) {
-        setValue(variableName, value);
-    }
 
     /**
      * This constructor takes all of the parents and then pushes a new {@link SymbolTableImpl}
@@ -102,21 +95,11 @@ public class SymbolStack extends AbstractSymbolTable {
      */
     protected Object findValueInATable(String var, int startIndex) {
         for(int i = startIndex; i < getParentTables().size(); i++){
-       // for(int i = 0; i < startIndex; i++){
             Object obj = getParentTables().get(i).resolveValue(var);
             if (obj != null) {
                 return obj;
             }
-
         }
-/*
-        for (SymbolTable s : getParentTables()) {
-            Object obj = s.resolveValue(var);
-            if (obj != null) {
-                return obj;
-            }
-        }
-*/
         return null;
     }
 
@@ -128,63 +111,6 @@ public class SymbolStack extends AbstractSymbolTable {
         return findValueInATable(variableName, 0); // to keep current code working
     }
 
-    /**
-     * Returns the value for a variable. This used to do this for a stem variable but the
-     * algorithm it used was too simple-minded ultimately. Since it requres access to
-     * namespaces. it was moved to the {@link State} object.
-     *
-     * @param variableName
-     * @return
-     * @deprecated
-     */
-    public Object oldResolveValue(String variableName) {
-        if (isStem(variableName)) {
-
-            String head = getStemHead(variableName);
-
-            if (null == findValueInATable(head)) {
-                // this is not defined any place, so it gets a null.
-                return null;
-            }
-            if (variableName.endsWith(STEM_INDEX_MARKER)) {
-                return findValueInATable(variableName);
-            }
-
-            String tail = getStemTail(variableName);
-            // the real issue is that a stem like a.b.c.d.e may have each of the variables in
-            // a different and effectively random symbol table. 
-            StringTokenizer tokenizer = new StringTokenizer(tail, STEM_INDEX_MARKER);
-            String[] vars = new String[tokenizer.countTokens()];
-            for (int i = tokenizer.countTokens() - 1; i >= 0; i--) {
-                vars[i] = tokenizer.nextToken();
-            }
-            // These are reversed. Now we start the lookup  and this means
-            // we start working our way backwards
-
-            String currentVariable = "";
-            boolean isFirstPass = true;
-            Object returnedValue = null;
-            for (int i = 0; i < vars.length; i++) {
-                if (isFirstPass) {
-                    isFirstPass = false;
-                    currentVariable = vars[i];
-                } else {
-                    currentVariable = vars[i] + STEM_INDEX_MARKER + returnedValue.toString();
-                }
-                Object obj = findValueInATable(currentVariable);
-                if (obj != null) {
-                    returnedValue = obj;
-                } else {
-                    returnedValue = currentVariable;
-                }
-
-            }
-            return findValueInATable(head + returnedValue); // head include final .
-        }
-
-        Object obj = findValueInATable(variableName);
-        return obj;
-    }
 
     public void setStringValue(String variableName, String value) {
         setValue(variableName, value);
@@ -198,24 +124,6 @@ public class SymbolStack extends AbstractSymbolTable {
             st = getLocalST();
         }
         st.setValue(variableName, value);
-/*
-        if (!isStem(variableName)) {
-               st.setValue(variableName, value);
-               return;
-           }
-        if (isTotalStem(variableName)) {
-            // case is setting something like a. := ...
-            // Just set it. No tail resolution needed.
-            st.setValue(variableName, value);
-            return;
-        }
-
-
-        String t = getStemTail(variableName);
-        Object resolvedTail = resolveValue(t);
-        st.setValue(getStemHead(variableName) + (resolvedTail==null?t:resolvedTail), value);
-        return;
-*/
     }
 
     /**
@@ -250,12 +158,6 @@ public class SymbolStack extends AbstractSymbolTable {
         setValue(variableName, value);
     }
 
-    public void setRawValue(String rawName, String rawValue) {
-        if (isDefined(rawName)) {
-            getRightST(rawName).setRawValue(rawName, rawValue);
-        }
-        getLocalST().setRawValue(rawName, rawValue);
-    }
 
     public void clear() {
         // clear only applies to the current state.

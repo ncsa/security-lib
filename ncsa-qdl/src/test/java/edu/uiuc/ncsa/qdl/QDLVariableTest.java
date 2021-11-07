@@ -25,16 +25,14 @@ public class QDLVariableTest extends AbstractQDLTester {
      
     public void testVariables() throws Exception {
         SymbolTable st = new SymbolTableImpl();
-        st.setRawValue("a", "12345");
+        st.setValue("a", 12345L);
         assert st.resolveValue("a").equals(new Long(12345));
-        st.setRawValue("b", "true");
+        st.setValue("b", Boolean.TRUE);
         assert st.resolveValue("b") == Boolean.TRUE;
-        st.setRawValue("c", "false");
+        st.setValue("c", Boolean.FALSE);
         assert st.resolveValue("c") == Boolean.FALSE;
-        st.setRawValue("d", "null");
-        assert !st.isDefined("d");
         String value = "mairzy((%^998e98nfg98u";
-        st.setRawValue("e", "'" + value + "'"); // how it comes out of the parser
+        st.setValue("e",  value );
         assert st.resolveValue("e").equals(value);
     }
 
@@ -181,15 +179,15 @@ public class QDLVariableTest extends AbstractQDLTester {
         SymbolTableImpl st4 = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
 
-        st4.setRawValue("z", "1");
+        st4.setValue("z", 1L);
         stack.addParent(st4);
-        st3.setRawValue("y.1", "2");
+        st3.setValue("y.1", 2L);
         stack.addParent(st3);
-        st2.setRawValue("x.2", "3");
+        st2.setValue("x.2", 3L);
         stack.addParent(st2);
-        st1.setRawValue("w.3", "4");
+        st1.setValue("w.3", 4L);
         stack.addParent(st0);
-        st0.setRawValue("A.4", "5");
+        st0.setValue("A.4", 5L);
         stack.addParent(st1);
         // first test, i = 0, so foo.i should resolve to foo.0
         String stem = "A.w.x.y.z";

@@ -19,11 +19,12 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
     FunctionRecord get(String key, int argCount);
 
     boolean isDefined(String var, int argCount);
+
     boolean isDefined(String var, int argCount, int startTableIndex);
 
     FunctionRecord getSomeFunction(String name);
 
- FunctionRecord getFunctionReference(String name);
+    FunctionRecord getFunctionReference(String name);
 
 
     /**
@@ -33,6 +34,7 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
      * @return
      */
     List<FunctionRecord> getByAllName(String name);
+
     List<FunctionRecord> getAll();
 
 

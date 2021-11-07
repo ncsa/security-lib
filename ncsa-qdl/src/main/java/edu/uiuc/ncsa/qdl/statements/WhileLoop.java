@@ -240,7 +240,7 @@ public class WhileLoop implements Statement {
         // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
         //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
         for (String key : stemVariable.keySet()) {
-            localST.setStringValue(loopVar, key);
+            localST.setValue(loopVar, key);
             for (Statement statement : getStatements()) {
                 try {
                     statement.evaluate(localState);

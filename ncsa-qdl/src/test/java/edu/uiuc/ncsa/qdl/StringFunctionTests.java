@@ -45,7 +45,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         snippets.put("ago", "woof");
         snippets.put("7", "seven");
         symbolTable.setStemVariable("snippets.", snippets);
-        symbolTable.setStringValue("source", source);
+        symbolTable.setValue("source", source);
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("source");
@@ -87,7 +87,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         String targetString = "One";
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setValue("targetString", targetString);
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
@@ -120,7 +120,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         String targetString = "One";
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setValue("targetString", targetString);
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
@@ -183,7 +183,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         SymbolTable symbolTable = state.getSymbolStack();
 
         String arg = "   my   my   my    ";
-        symbolTable.setStringValue("arg", arg);
+        symbolTable.setValue("arg", arg);
         String result = arg.trim();
         Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
@@ -200,7 +200,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         SymbolTable symbolTable = state.getSymbolStack();
 
         Long arg = System.currentTimeMillis();
-        symbolTable.setLongValue("arg", arg);
+        symbolTable.setValue("arg", arg);
         Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
 
@@ -261,7 +261,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         snippets.put("ago", "woof");
         snippets.put("7", "seven");
         symbolTable.setStemVariable("snippets.", snippets);
-        symbolTable.setStringValue("source", source);
+        symbolTable.setValue("source", source);
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("source");
@@ -290,7 +290,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         String targetString = "One";
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setValue("targetString", targetString);
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         polyad.setName(StringEvaluator.INDEX_OF);
@@ -321,7 +321,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         String targetString = "ONE";
 
         symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStringValue("targetString", targetString);
+        symbolTable.setValue("targetString", targetString);
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
@@ -379,7 +379,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
         String arg = "mairzy doats";
-        symbolTable.setStringValue("arg", arg);
+        symbolTable.setValue("arg", arg);
         String result = "MAIRZY DOATS";
         Polyad polyad = new Polyad(StringEvaluator.TO_UPPER);
         VariableNode left = new VariableNode("arg");
@@ -395,7 +395,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
         String arg = "MAIRZY DOATS";
-        symbolTable.setStringValue("arg", arg);
+        symbolTable.setValue("arg", arg);
         String result = "mairzy doats";
         Polyad polyad = new Polyad(StringEvaluator.TO_LOWER);
         VariableNode left = new VariableNode("arg");

@@ -19,8 +19,8 @@ public class ExpressionTest extends AbstractQDLTester {
         // test !(a+2)<(b-3) for a = 10, b = 4. Should be TRUE
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
-        symbolTable.setLongValue("a", 10L);
-        symbolTable.setLongValue("b", 4L);
+        symbolTable.setValue("a", 10L);
+        symbolTable.setValue("b", 4L);
         ConstantNode twoNode = new ConstantNode(2L, Constant.LONG_TYPE);
         ConstantNode threeNode = new ConstantNode(3L, Constant.LONG_TYPE);
         VariableNode aNode = new VariableNode("a");
@@ -70,8 +70,8 @@ public class ExpressionTest extends AbstractQDLTester {
         // Should be TRUE
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
-        symbolTable.setLongValue("a", 10L);
-        symbolTable.setLongValue("b", 4L);
+        symbolTable.setValue("a", 10L);
+        symbolTable.setValue("b", 4L);
         ConstantNode twoNode = new ConstantNode(2L, Constant.LONG_TYPE);
         ConstantNode threeNode = new ConstantNode(3L, Constant.LONG_TYPE);
         VariableNode aNode = new VariableNode("a");
@@ -87,8 +87,8 @@ public class ExpressionTest extends AbstractQDLTester {
         // This is the same as the previous test to show that state is kept straight.
         // now redo it. This time a = 0, b = 5 and the value should be false.
         State state2 = testUtils.getNewState();
-        state2.getSymbolStack().setLongValue("a", 0L);
-        state2.getSymbolStack().setLongValue("b", 10L);
+        state2.getSymbolStack().setValue("a", 0L);
+        state2.getSymbolStack().setValue("b", 10L);
 
         ExpressionNode notNode2 = notNode.makeCopy();
         notNode2.evaluate(state2);

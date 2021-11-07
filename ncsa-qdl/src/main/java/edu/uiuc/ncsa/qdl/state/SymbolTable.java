@@ -1,10 +1,9 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.xml.XMLSerializable;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializable;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,14 +14,6 @@ import java.util.Set;
 public interface SymbolTable extends Serializable, XMLSerializable {
 
     void setValue(String variableName, Object value);
-    void setStringValue(String variableName, String value);
-
-    void setDecimalValue(String variableName, BigDecimal value);
-    void setLongValue(String variableName, Long value);
-
-    void setBooleanValue(String variableName, Boolean value);
-
-    void setRawValue(String rawName, String rawValue);
 
     void clear();
 

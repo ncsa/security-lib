@@ -1536,10 +1536,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             arg2 = polyad.evalArg(1, state);
             checkNull(arg2, polyad.getArgAt(1), state);
             if (isLong(arg2)) {
-                state.getSymbolStack().setLongValue("error_code", (Long) arg2);
+                state.getSymbolStack().setValue("error_code", (Long) arg2);
             }
         } else {
-            state.getSymbolStack().setLongValue("error_code", TryCatch.RESERVED_USER_ERROR_CODE);
+            state.getSymbolStack().setValue("error_code", TryCatch.RESERVED_USER_ERROR_CODE);
         }
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -305,7 +306,7 @@ public class ModuleTest extends AbstractQDLTester {
 
     /*
     Define a function then define variants in modules.  Values are checked to track whether the state
-    gets corrupted. This can be put into a QDL workspace to check manually:
+    gets corrupted. Nesting module_import does nto work right: -- this fails
 
         define[f(x)]body[return(x+100);];
         module['a:/t','a']body[define[f(x)]body[return(x+1);];];
@@ -319,6 +320,11 @@ public class ModuleTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "define[f(x)]body[return(x+100);];");
         addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
+        
+        // Bug -- the import runs, but does nothing. This test actually shows that referring to a#f works
+        //        after the external import. Next line would fail
+        // addLine(script, "module['q:/z','w']body[module_import('a:/t','z');define[g(x)]body[return(z#f(x)+3);];];");
+
         addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
         addLine(script, "test_f:=f(1);");
         addLine(script, "module_import('a:/t');");
@@ -567,11 +573,14 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "module_import('a:/b','X');");
         addLine(script, "__f(2,2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
+        } catch (QDLStatementExecutionException iv) {
+            bad = !(iv.getCause() instanceof UndefinedFunctionException);
+        }
+        if (bad) {
             assert false : "was able to access an intrinsic function.";
-        } catch (UndefinedFunctionException iv) {
-            assert true;
         }
     }
 
@@ -706,11 +715,14 @@ cannot access '__a'
         addLine(script, "module_import(q,'X');");
         addLine(script, "__f(2,2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean bad = true;
         try {
             interpreter.execute(script.toString());
+        } catch (QDLStatementExecutionException iv) {
+            bad = !(iv.getCause() instanceof UndefinedFunctionException);
+        }
+        if (bad) {
             assert false : "was able to access an intrinsic function.";
-        } catch (UndefinedFunctionException iv) {
-            assert true;
         }
     }
 
