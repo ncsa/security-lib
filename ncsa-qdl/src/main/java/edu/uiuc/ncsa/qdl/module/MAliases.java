@@ -1,7 +1,8 @@
-package edu.uiuc.ncsa.qdl.state;
+package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
+import edu.uiuc.ncsa.qdl.state.Surjection;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -15,7 +16,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:13 AM
  */
-public class ImportManager implements Serializable {
+public class MAliases implements Serializable {
     public static String[] RESERVED_ALIAS = new String[]{
             MathEvaluator.MATH_NAMESPACE,
             TMathEvaluator.TMATH_NAMESPACE,
@@ -49,7 +50,7 @@ public class ImportManager implements Serializable {
         surjection.put(alias,moduleName);
     }
 
-    public ImportManager() {
+    public MAliases() {
     }
 
     /**
@@ -58,18 +59,18 @@ public class ImportManager implements Serializable {
      *
      * @return
      */
-    public static ImportManager getResolver() {
-        if (resolver == null) {
-            resolver = new ImportManager();
+    public static MAliases newMInstances() {
+        if (mAliases == null) {
+            mAliases = new MAliases();
         }
-        return resolver;
+        return mAliases;
     }
 
-    public static void setResolver(ImportManager resolver) {
-        ImportManager.resolver = resolver;
+    public static void setmInstances(MAliases mAliases) {
+        MAliases.mAliases = mAliases;
     }
 
-    static ImportManager resolver;
+    static MAliases mAliases;
 
     public boolean hasImports() {
         return !surjection.isEmpty();

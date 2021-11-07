@@ -4,8 +4,9 @@ import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -41,7 +42,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
  * This is a facade for the various stateful components we have to track.
- * Represents the internal state of the system. It has the {@link ImportManager},
+ * Represents the internal state of the system. It has the {@link edu.uiuc.ncsa.qdl.module.MAliases},
  * {@link SymbolTable}, {@link edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator} and such.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
@@ -79,39 +80,39 @@ public class State extends FunctionState implements QDLConstants {
      * @param opEvaluator
      * @param metaEvaluator
      * @param ftStack
-     * @param moduleMap
+     * @param MTemplates
      * @param myLoggingFacade
      * @param isServerMode
      * @param assertionsOn
      * @return
      */
-    public State newInstance(ImportManager resolver,
-                     SymbolStack symbolStack,
-                     OpEvaluator opEvaluator,
-                     MetaEvaluator metaEvaluator,
-                     FTStack ftStack,
-                     ModuleMap moduleMap,
-                     MyLoggingFacade myLoggingFacade,
-                     boolean isServerMode,
-                     boolean isRestrictedIO,
-                     boolean assertionsOn){
+    public State newInstance(MAliases resolver,
+                             SymbolStack symbolStack,
+                             OpEvaluator opEvaluator,
+                             MetaEvaluator metaEvaluator,
+                             FTStack ftStack,
+                             MTemplates MTemplates,
+                             MyLoggingFacade myLoggingFacade,
+                             boolean isServerMode,
+                             boolean isRestrictedIO,
+                             boolean assertionsOn){
         return new State(resolver,
                           symbolStack,
                           opEvaluator,
                           metaEvaluator,
                           ftStack,
-                          moduleMap,
+                MTemplates,
                           myLoggingFacade,
                           isServerMode,
                          isRestrictedIO,
                          assertionsOn);
     }
-    public State(ImportManager resolver,
+    public State(MAliases resolver,
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
                  FTStack ftStack,
-                 ModuleMap moduleMap,
+                 MTemplates MTemplates,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
                  boolean isRestrictedIO,
@@ -121,7 +122,7 @@ public class State extends FunctionState implements QDLConstants {
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
-                moduleMap,
+                MTemplates,
                 myLoggingFacade);
         this.serverMode = isServerMode;
         this.assertionsOn = assertionsOn;
@@ -482,7 +483,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public State newStateNoImports() {
-        ImportManager nr = new ImportManager();
+        MAliases nr = new MAliases();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
         State newState = newInstance(nr,
                 newStack,
@@ -510,7 +511,7 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newStateWithImports() {
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = newInstance(importManager,
+        State newState = newInstance(MAliases,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -520,7 +521,7 @@ public class State extends FunctionState implements QDLConstants {
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        newState.setImportedModules(getImportedModules());
+        newState.setmInstances(getmInstances());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
@@ -546,7 +547,7 @@ public class State extends FunctionState implements QDLConstants {
         }
 
 */
-        State newState = newInstance(importManager,
+        State newState = newInstance(MAliases,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
@@ -556,7 +557,7 @@ public class State extends FunctionState implements QDLConstants {
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        newState.setImportedModules(getImportedModules());
+        newState.setmInstances(getmInstances());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
@@ -589,8 +590,8 @@ public class State extends FunctionState implements QDLConstants {
         // Each imported module has its state serialized too. Hence each has to have current
         // transient fields updated. This will act recursively (so imports in imports in imports etc.)
 
-        for (String mod : getImportedModules().keySet()) {
-            getImportedModules().get(mod).getState().injectTransientFields(oldState);
+        for (String mod : getmInstances().keySet()) {
+            getmInstances().get(mod).getState().injectTransientFields(oldState);
         }
         setIoInterface(oldState.getIoInterface());
     }
@@ -603,7 +604,7 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newModuleState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        ImportManager r = new ImportManager();
+        MAliases r = new MAliases();
         SymbolStack newStack = new SymbolStack();
         //      newStack.addParent(new SymbolTableImpl());
         State newState = newInstance(r,
@@ -633,7 +634,7 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newDebugState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        ImportManager r = new ImportManager();
+        MAliases r = new MAliases();
         SymbolStack newStack = new SymbolStack();
         //       newStack.addParent(new SymbolTableImpl());
         State newState = newInstance(r,
@@ -641,7 +642,7 @@ public class State extends FunctionState implements QDLConstants {
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FTStack(),
-                new ModuleMap(), // so no modules
+                new MTemplates(), // so no modules
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -675,11 +676,11 @@ public class State extends FunctionState implements QDLConstants {
         xsw.writeAttribute(STATE_ID_TAG, getInternalID());
         writeExtraXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
-        if (!getImportedModules().isEmpty()) {
+        if (!getmInstances().isEmpty()) {
             xsw.writeStartElement(IMPORTED_MODULES);
             xsw.writeComment("The imported modules with their state and alias.");
-            for (String alias : getImportedModules().keySet()) {
-                Module module = getImportedModules().get(alias);
+            for (String alias : getmInstances().keySet()) {
+                Module module = getmInstances().get(alias);
                 module.toXML(xsw, alias);
             }
             xsw.writeEndElement(); //end imports

@@ -63,14 +63,14 @@ public class ModuleExpression extends ExpressionImpl {
             setEvaluated(true);
             return getResult();
         }
-        if (!state.getImportManager().hasImports()) {
+        if (!state.getMAliases().hasImports()) {
             throw new ImportException("module '" + getAlias() + "' not found");
         }
         // no module state means to look at global state to find the module state.
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getImportedModules().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getImportedModules().get(nextME.getAlias()).getState());
+            if (getModuleState(state).getmInstances().containsKey(nextME.getAlias())) {
+                nextME.setModuleState(getModuleState(state).getmInstances().get(nextME.getAlias()).getState());
             }
         }
         getExpression().setAlias(getAlias());
@@ -115,10 +115,10 @@ public class ModuleExpression extends ExpressionImpl {
             return null;
         }
         if (moduleState == null) {
-            if (!state.getImportedModules().containsKey(getAlias())) {
+            if (!state.getmInstances().containsKey(getAlias())) {
                 throw new IllegalArgumentException("no module named \"" + getAlias() + "\" was  imported");
             }
-            Module module = state.getImportedModules().get(getAlias());
+            Module module = state.getmInstances().get(getAlias());
             setModuleState(module.getState());
         }
         return moduleState;
@@ -160,8 +160,8 @@ public class ModuleExpression extends ExpressionImpl {
         }
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getImportedModules().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getImportedModules().get(nextME.getAlias()).getState());
+            if (getModuleState(state).getmInstances().containsKey(nextME.getAlias())) {
+                nextME.setModuleState(getModuleState(state).getmInstances().get(nextME.getAlias()).getState());
             }
             ((ModuleExpression) getExpression()).set(state, newValue);
             return;

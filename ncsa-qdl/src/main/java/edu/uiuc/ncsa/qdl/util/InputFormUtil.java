@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -194,10 +194,10 @@ public class InputFormUtil {
     public static String inputFormModule(String moduleName, State state) {
         URI moduleNS;
 
-        if (moduleName.endsWith(ImportManager.NS_DELIMITER)) {
+        if (moduleName.endsWith(MAliases.NS_DELIMITER)) {
             moduleName = moduleName.substring(0, moduleName.length() - 1);
         }
-        moduleNS = state.getImportManager().getByAlias(moduleName);
+        moduleNS = state.getMAliases().getByAlias(moduleName);
         if (moduleNS == null) {
             try {
                 moduleNS = URI.create(moduleName);

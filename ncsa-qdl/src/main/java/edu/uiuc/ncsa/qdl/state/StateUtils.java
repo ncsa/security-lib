@@ -3,7 +3,8 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import org.apache.commons.codec.binary.Base64;
@@ -152,12 +153,12 @@ public abstract class StateUtils {
             factory = new StateUtils() {
                 @Override
                 public State create() {
-                    return new State(new ImportManager(),
+                    return new State(new MAliases(),
                             new SymbolStack(),
                             new OpEvaluator(),
                             MetaEvaluator.getInstance(),
                             new FTStack(),
-                            new ModuleMap(),
+                            new MTemplates(),
                             new MyLoggingFacade("foo"),
                             false,
                             false,

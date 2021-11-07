@@ -28,7 +28,7 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
 
 
     /**
-     * Finds every {@link FunctionRecord} in all stacks for a given name. Note that
+     * Finds every {@link FunctionRecord} in all stacks for a given name.
      *
      * @param name
      * @return

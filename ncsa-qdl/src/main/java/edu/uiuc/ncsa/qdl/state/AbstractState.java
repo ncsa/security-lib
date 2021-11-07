@@ -3,8 +3,9 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -80,46 +81,42 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     private static final long serialVersionUID = 0xcafed00d3L;
 
-    public AbstractState(ImportManager importManager,
+    public AbstractState(edu.uiuc.ncsa.qdl.module.MAliases MAliases,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         ModuleMap moduleMap,
+                         MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
-        this.importManager = importManager;
+        this.MAliases = MAliases;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
-        this.moduleMap = moduleMap;
+        this.MTemplates = MTemplates;
         this.logger = myLoggingFacade;
     }
 
      public abstract FTStack getFTStack();
 
-    public ModuleMap getModuleMap() {
-        return moduleMap;
+    public MTemplates getModuleMap() {
+        return MTemplates;
     }
 
     /*
     How's it work?
-    ModuleMap has the templates keyed by uri.
-    ImportedModules has instances from the ModuleMap with their own state, keyed by alias
-    ImportManager lets us look up which alias goes with which MS without having to slog through all the modules
+    MTemplates - has the templates keyed by uri.
+    MInstances - has (lcaol) instances from the MTemplates with their own state,
+                 keyed by alias
+      MAliases - lets us look up which alias goes with which MS without having
+                 to slog through all the modules
      */
-    public void setModuleMap(ModuleMap moduleMap) {
-        this.moduleMap = moduleMap;
+
+    protected MTemplates MTemplates;
+    MAliases MAliases;
+
+    public MAliases getMAliases() {
+        return MAliases;
     }
 
-    protected ModuleMap moduleMap;
-    ImportManager importManager;
-
-    public ImportManager getImportManager() {
-        return importManager;
-    }
-
-    public void setImportManager(ImportManager importManager) {
-        this.importManager = importManager;
-    }
 
     public SymbolStack getSymbolStack() {
         return symbolStack;
@@ -131,15 +128,15 @@ public abstract class AbstractState implements StateInterface, Logable {
      *
      * @return
      */
-    public Map<String, Module> getImportedModules() {
-        return importedModules;
+    public Map<String, Module> getmInstances() {
+        return mInstances;
     }
 
-    public void setImportedModules(Map<String, Module> importedModules) {
-        this.importedModules = importedModules;
+    public void setmInstances(Map<String, Module> mInstances) {
+        this.mInstances = mInstances;
     }
 
-    Map<String, Module> importedModules = new HashMap<>();
+    Map<String, Module> mInstances = new HashMap<>();
 
     /**
      * Get a single imported module by alias or null if there is no such module.
@@ -150,7 +147,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         if(alias == null){
             return null;
         }
-        return getImportedModules().get(alias);
+        return getmInstances().get(alias);
     }
 
     public void setSymbolStack(SymbolStack symbolStack) {

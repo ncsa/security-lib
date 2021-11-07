@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.functions.*;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -35,7 +35,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if(fqNames == null){
             fqNames = new String[getFunctionNames().length];
             for(int i = 0; i < fqNames.length; i++){
-                fqNames[i]= getNamespace() + ImportManager.NS_DELIMITER + getFunctionNames()[i];
+                fqNames[i]= getNamespace() + MAliases.NS_DELIMITER + getFunctionNames()[i];
             }
         }
 

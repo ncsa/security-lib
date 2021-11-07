@@ -13,8 +13,9 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
@@ -1839,14 +1840,14 @@ public class WorkspaceCommands implements Logable {
             String arg = inputLine.getArg(i);
             Module module = null;
             String importedString = "";
-            if (arg.endsWith(ImportManager.NS_DELIMITER)) {
+            if (arg.endsWith(MAliases.NS_DELIMITER)) {
                 arg = arg.substring(0, arg.length() - 1);
             }
             if (StringUtils.isTrivial(arg)) {
                 // They are asking for documentation for the default module, and there is none.
             } else {
-                if (state.getImportedModules().containsKey(arg)) {
-                    module = state.getImportedModules().get(arg);
+                if (state.getmInstances().containsKey(arg)) {
+                    module = state.getmInstances().get(arg);
                     importedString = getImportString(module.getNamespace());
                 }
             }
@@ -1881,13 +1882,13 @@ public class WorkspaceCommands implements Logable {
             return RC_NO_OP;
         }
 
-        if (!state.getImportManager().hasImports()) {
+        if (!state.getMAliases().hasImports()) {
             say("(no imports)");
             return RC_CONTINUE;
         }
         TreeSet<String> aliases = new TreeSet<>();
-        for (URI uri : state.getImportManager().keySet()) {
-            aliases.add(uri + "->" + state.getImportManager().getAlias(uri));
+        for (URI uri : state.getMAliases().keySet()) {
+            aliases.add(uri + "->" + state.getMAliases().getAlias(uri));
         }
         return printList(inputLine, aliases);
     }
@@ -1919,8 +1920,8 @@ public class WorkspaceCommands implements Logable {
      */
     private String getImportString(URI key) {
         String out = key.toString();
-        if (state.getImportManager().hasImports()) {
-            out = out + " " + state.getImportManager().getAlias(key);
+        if (state.getMAliases().hasImports()) {
+            out = out + " " + state.getMAliases().getAlias(key);
         } else {
             out = out + " -";
         }
@@ -2457,7 +2458,7 @@ public class WorkspaceCommands implements Logable {
             say(onlineHelp.get(name));
             return RC_CONTINUE;
         }
-        if (name.endsWith(ImportManager.NS_DELIMITER)) {
+        if (name.endsWith(MAliases.NS_DELIMITER)) {
             List<String> doxx = getState().listModuleDoc(name);
             if (doxx.isEmpty()) {
                 say("Sorry, no help for '" + name + "'");
@@ -3711,7 +3712,7 @@ public class WorkspaceCommands implements Logable {
         IOInterface currentIOI = getIoInterface();
         // Get rid of everything.
         state = null;
-        ImportManager.setResolver(null); // zero this out or we have bogus entries.
+        MAliases.setmInstances(null); // zero this out or we have bogus entries.
         state = getState();
         state.setIoInterface(currentIOI);
         setIoInterface(currentIOI);
@@ -3890,7 +3891,7 @@ public class WorkspaceCommands implements Logable {
         fileWriter.write("\n/* ** module imports ** */\n");
 
         for (URI key : getState().getModuleMap().keySet()) {
-            List<String> aliases = getState().getImportManager().getAlias(key);
+            List<String> aliases = getState().getMAliases().getAlias(key);
             for (String alias : aliases) {
                 String output = SystemEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
                 fileWriter.write(output + "\n");
@@ -4360,12 +4361,12 @@ public class WorkspaceCommands implements Logable {
     protected State getState() {
         if (state == null) {
             SymbolStack stack = new SymbolStack();
-            state = new State(ImportManager.getResolver(),
+            state = new State(MAliases.newMInstances(),
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
                     new FTStack(),
-                    new ModuleMap(),
+                    new MTemplates(),
                     logger,
                     false,
                     false,
@@ -4391,8 +4392,8 @@ public class WorkspaceCommands implements Logable {
             state.addModule(m); // done!  Add it to the templates
             if (importASAP) {
                 // Add it to the imported modules, i.e., create an instance.
-                state.getImportManager().addImport(m.getNamespace(), m.getAlias());
-                state.getImportedModules().put(m.getAlias(), m);
+                state.getMAliases().addImport(m.getNamespace(), m.getAlias());
+                state.getmInstances().put(m.getAlias(), m);
             }
         }
     }

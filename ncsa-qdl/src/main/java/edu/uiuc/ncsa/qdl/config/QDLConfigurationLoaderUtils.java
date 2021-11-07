@@ -261,11 +261,11 @@ public class QDLConfigurationLoaderUtils {
             state.addModule(m); // done!
             importedFQNames.add(m.getNamespace().toString());
             if (importASAP) {
-                state.getImportManager().addImport(m.getNamespace(), m.getAlias());
+                state.getMAliases().addImport(m.getNamespace(), m.getAlias());
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
-                state.getImportedModules().put(m.getAlias(), mm);
+                state.getmInstances().put(m.getAlias(), mm);
             }
         }
         return importedFQNames;

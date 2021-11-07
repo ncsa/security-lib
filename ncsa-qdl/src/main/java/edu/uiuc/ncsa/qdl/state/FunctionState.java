@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -18,25 +18,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.module.MAliases.NS_DELIMITER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:48 AM
  */
 public abstract class FunctionState extends VariableState {
-    public FunctionState(ImportManager resolver,
+    public FunctionState(edu.uiuc.ncsa.qdl.module.MAliases resolver,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FTStack ftStack,
-                         ModuleMap moduleMap,
+                         MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                moduleMap,
+                MTemplates,
                 myLoggingFacade);
         this.ftStack = ftStack;
     }
@@ -69,7 +69,7 @@ public abstract class FunctionState extends VariableState {
             throw new NFWException(("Internal error: The function has not been named"));
         }
 
-        if (!getImportManager().hasImports()) {
+        if (!getMAliases().hasImports()) {
             FR_WithState frs = new FR_WithState();
 
             // Nothing imported, so nothing to look through.
@@ -98,20 +98,20 @@ public abstract class FunctionState extends VariableState {
         }
         // No UNQ function, so try to find one, but check that it is actually unique.
         if (!isPrivate(name)) {
-            for (String alias : getImportedModules().keySet()) {
+            for (String alias : getmInstances().keySet()) {
                 if (fr.functionRecord == null) {
                     FunctionRecord tempFR = getImportedModule(alias).getState().getFTStack().get(name, argCount);
                     if (tempFR != null) {
                         fr.functionRecord = tempFR;
-                        fr.state = getImportedModules().get(alias).getState();
-                        fr.isExternalModule = getImportedModules().get(alias).isExternal();
+                        fr.state = getmInstances().get(alias).getState();
+                        fr.isExternalModule = getmInstances().get(alias).isExternal();
                         fr.isModule = true;
                         if (!checkForDuplicates) {
                             return fr;
                         }
                     }
                 } else {
-                    FunctionRecord tempFR = importedModules.get(alias).getState().getFTStack().get(name, argCount);
+                    FunctionRecord tempFR = mInstances.get(alias).getState().getFTStack().get(name, argCount);
                     if ((checkForDuplicates) && tempFR != null) {
                         throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                     }
@@ -157,7 +157,7 @@ public abstract class FunctionState extends VariableState {
         if ((!includeModules) || getModuleMap().isEmpty()) {
             return out;
         }
-        for (URI key : getImportManager().keySet()) {
+        for (URI key : getMAliases().keySet()) {
             Module mm = getModuleMap().get(key);
             TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
             for (String x : uqVars) {
@@ -165,9 +165,9 @@ public abstract class FunctionState extends VariableState {
                     continue;
                 }
                 if (useCompactNotation) {
-                    out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
                 } else {
-                    for (String alias : getImportManager().getAlias(key)) {
+                    for (String alias : getMAliases().getAlias(key)) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }
@@ -178,15 +178,15 @@ public abstract class FunctionState extends VariableState {
 
     public List<String> listAllDocumentation() {
         List<String> out = getFTStack().listAllDocs();
-        for (URI key : getImportManager().keySet()) {
+        for (URI key : getMAliases().keySet()) {
             List<String> uqVars = getModuleMap().get(key).getState().getFTStack().listAllDocs();
             for (String x : uqVars) {
-                List<String> aliases = getImportManager().getAlias(key);
+                List<String> aliases = getMAliases().getAlias(key);
                 if (aliases.size() == 1) {
                     // don't put list notation in if there is no list.
-                    out.add(getImportManager().getAlias(key).get(0) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAlias(key).get(0) + NS_DELIMITER + x);
                 } else {
-                    out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
                 }
             }
         }
@@ -227,11 +227,11 @@ public abstract class FunctionState extends VariableState {
                 }
                 return out;
             }
-            if (!importManager.hasAlias(alias)) {
+            if (!MAliases.hasAlias(alias)) {
                 // so they asked for something that didn't exist
                 return new ArrayList<>();
             }
-            URI ns = importManager.getByAlias(alias);
+            URI ns = MAliases.getByAlias(alias);
             List<String> docs;
             if (argCount == -1) {
                 docs = getModuleMap().get(ns).getState().getFTStack().listAllDocs(realName);
@@ -246,7 +246,7 @@ public abstract class FunctionState extends VariableState {
 
         }
         // No imports, not qualified, hand back whatever we have
-        if (!importManager.hasImports()) {
+        if (!MAliases.hasImports()) {
             List<String> out;
             if (argCount == -1) {
                 out = getFTStack().listAllDocs(fname);
@@ -270,7 +270,7 @@ public abstract class FunctionState extends VariableState {
         if (out == null) {
             out = new ArrayList<>();
         }
-        for (URI key : getImportManager().keySet()) {
+        for (URI key : getMAliases().keySet()) {
             if (getModuleMap().get(key).getState().getFTStack().isDefined(fname, argCount)) {
                 List<String> doxx;
                 if (argCount == -1) {
@@ -279,7 +279,7 @@ public abstract class FunctionState extends VariableState {
                     doxx = getModuleMap().get(key).getState().getFTStack().getDocumentation(fname, argCount);
                 }
                 if (doxx == null) {
-                    String caput = getImportManager().getAlias(key) + NS_DELIMITER + fname;
+                    String caput = getMAliases().getAlias(key) + NS_DELIMITER + fname;
                     if (0 <= argCount) {
                         caput = caput + "(" + argCount + "):";
                     }

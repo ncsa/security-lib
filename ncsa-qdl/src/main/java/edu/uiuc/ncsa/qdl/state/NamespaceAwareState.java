@@ -2,10 +2,10 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.module.MAliases.NS_DELIMITER;
 
 /**
  * This adds the namespace resolution awareness to the state object.
@@ -13,23 +13,23 @@ import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
  * on 2/2/20 at  6:40 AM
  */
 public abstract class NamespaceAwareState extends AbstractState {
-    public NamespaceAwareState(ImportManager resolver,
+    public NamespaceAwareState(edu.uiuc.ncsa.qdl.module.MAliases resolver,
                                SymbolStack symbolStack,
                                OpEvaluator opEvaluator,
                                MetaEvaluator metaEvaluator,
-                               ModuleMap moduleMap,
+                               MTemplates MTemplates,
                                MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                moduleMap,
+                MTemplates,
                 myLoggingFacade);
     }
     private static final long serialVersionUID = 0xcafed00d6L;
 
     public boolean isNSQname(String x) {
-        return x.contains(ImportManager.NS_DELIMITER) && !x.startsWith(NS_DELIMITER);
+        return x.contains(MAliases.NS_DELIMITER) && !x.startsWith(NS_DELIMITER);
     }
 
     /**
@@ -39,7 +39,7 @@ public abstract class NamespaceAwareState extends AbstractState {
      * @return
      */
     public boolean isNSQLocalName(String x) {
-        return x.startsWith(ImportManager.NS_DELIMITER);
+        return x.startsWith(MAliases.NS_DELIMITER);
     }
 
 

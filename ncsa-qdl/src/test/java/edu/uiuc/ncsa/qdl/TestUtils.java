@@ -3,8 +3,8 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
@@ -29,23 +29,23 @@ public class TestUtils {
         return _instance;
     }
 
-    ImportManager namespaceResolver = ImportManager.getResolver();
+    MAliases mAliases = MAliases.newMInstances();
 
-    public State createStateObject(ImportManager resolver,
+    public State createStateObject(MAliases resolver,
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
                                    FTStack ftStack,
-                                   ModuleMap moduleMap,
+                                   MTemplates MTemplates,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
                                    boolean assertionsOn) {
-        return new State(new ImportManager(),
+        return new State(new MAliases(),
                 symbolStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FTStack(),
-                new ModuleMap(),
+                new MTemplates(),
                 null,
                 false,
                 false,
@@ -56,12 +56,12 @@ public class TestUtils {
         SymbolTableImpl st = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(st);
-        State state = createStateObject(new ImportManager(),
+        State state = createStateObject(new MAliases(),
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FTStack(),
-                new ModuleMap(),
+                new MTemplates(),
                 null,
                 false,
                 true);
@@ -75,12 +75,12 @@ public class TestUtils {
      */
     public State getTestState() {
 
-        State state = createStateObject(namespaceResolver,
+        State state = createStateObject(mAliases,
                 getTestSymbolStack(),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FTStack(),
-                new ModuleMap(),
+                new MTemplates(),
                 null,
                 false,
                 true);

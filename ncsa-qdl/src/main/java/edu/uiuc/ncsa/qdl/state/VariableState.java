@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.module.Module;
-import edu.uiuc.ncsa.qdl.module.ModuleMap;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import static edu.uiuc.ncsa.qdl.state.ImportManager.NS_DELIMITER;
+import static edu.uiuc.ncsa.qdl.module.MAliases.NS_DELIMITER;
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.int_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -25,17 +25,17 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 2/2/20 at  6:42 AM
  */
 public abstract class VariableState extends NamespaceAwareState {
-    public VariableState(ImportManager resolver,
+    public VariableState(edu.uiuc.ncsa.qdl.module.MAliases resolver,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         ModuleMap moduleMap,
+                         MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
         super(resolver,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                moduleMap,
+                MTemplates,
                 myLoggingFacade);
     }
 
@@ -210,8 +210,8 @@ public abstract class VariableState extends NamespaceAwareState {
             // most likely place for it was in the main symbol table. But since there is
             // no name clash, look for it in the modules.
             if (stem == null && !isQDLNull) {
-                if (importManager.hasImports()) {
-                    for (URI key : importManager.keySet()) {
+                if (MAliases.hasImports()) {
+                    for (URI key : MAliases.keySet()) {
                         Module m = getModuleMap().get(key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
@@ -324,8 +324,8 @@ public abstract class VariableState extends NamespaceAwareState {
             st = getSymbolStack().getRightST(variableName);
             v = st.resolveValue(variableName);
             if (v == null) {
-                if (!getImportedModules().isEmpty()) {
-                    for (String key : getImportedModules().keySet()) {
+                if (!getmInstances().isEmpty()) {
+                    for (String key : getmInstances().keySet()) {
                         Module m = getImportedModule(key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
@@ -409,7 +409,7 @@ public abstract class VariableState extends NamespaceAwareState {
         if (!includeModules) {
             return out;
         }
-        for (URI key : getImportManager().keySet()) {
+        for (URI key : getMAliases().keySet()) {
             Module m = getModuleMap().get(key);
             if (m == null) {
                 continue; // the user specified a non-existent module.
@@ -421,9 +421,9 @@ public abstract class VariableState extends NamespaceAwareState {
                     continue;
                 }
                 if (useCompactNotation) {
-                    out.add(getImportManager().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
                 } else {
-                    for (String alias : getImportManager().getAlias(key)) {
+                    for (String alias : getMAliases().getAlias(key)) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }

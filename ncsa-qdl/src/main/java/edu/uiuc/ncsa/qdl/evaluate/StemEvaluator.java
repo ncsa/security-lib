@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.exceptions.RankException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.QDLConstants;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -39,7 +39,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return STEM_NAMESPACE;
     }
 
-    public static final String STEM_FQ = STEM_NAMESPACE + ImportManager.NS_DELIMITER;
+    public static final String STEM_FQ = STEM_NAMESPACE + MAliases.NS_DELIMITER;
     public static final int STEM_FUNCTION_BASE_VALUE = 2000;
 
     public static final String SIZE = "size";

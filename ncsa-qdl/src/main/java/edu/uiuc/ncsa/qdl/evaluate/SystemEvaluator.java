@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
-import edu.uiuc.ncsa.qdl.state.ImportManager;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
@@ -52,7 +52,7 @@ import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
  */
 public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String SYS_NAMESPACE = "sys";
-    public static final String SYS_FQ = SYS_NAMESPACE + ImportManager.NS_DELIMITER;
+    public static final String SYS_FQ = SYS_NAMESPACE + MAliases.NS_DELIMITER;
     public static final int SYSTEM_BASE_VALUE = 5000;
 
     @Override
@@ -484,8 +484,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (!isString(object2)) {
                 throw new IllegalArgumentException("'" + object2 + "' for " + MODULE_REMOVE + " is not a string.");
             }
-            state.getImportedModules().remove(object2);
-            state.getImportManager().removeAlias(object2);
+            state.getmInstances().remove(object2);
+            state.getMAliases().removeAlias(object2);
         }
         polyad.setEvaluated(true);
         polyad.setResult(Boolean.TRUE);
@@ -673,7 +673,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // is a#b, and the input form of b will be returned.
         if (polyad.getArguments().get(0) instanceof ModuleExpression) {
             ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
-            Module module = state.getImportedModules().get(moduleExpression.getAlias());
+            Module module = state.getmInstances().get(moduleExpression.getAlias());
             if (module == null) {
                 throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
             }
@@ -2022,9 +2022,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 alias = m.getAlias();
             }
             newModuleState.setSuperState(null); // get rid of it now.
-            ImportManager resolver = state.getImportManager();
+            MAliases resolver = state.getMAliases();
             resolver.addImport(moduleNS, alias);
-            state.getImportedModules().put(alias, newInstance);
+            state.getmInstances().put(alias, newInstance);
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);
             } else {

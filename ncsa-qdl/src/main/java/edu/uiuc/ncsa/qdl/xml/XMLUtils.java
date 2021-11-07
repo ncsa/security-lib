@@ -396,8 +396,8 @@ public class XMLUtils implements XMLConstants {
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
                         Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        state.getImportedModules().put(moduleAttributes.alias, module);
-                        state.getImportManager().addImport(moduleAttributes.ns, moduleAttributes.alias);
+                        state.getmInstances().put(moduleAttributes.alias, module);
+                        state.getMAliases().addImport(moduleAttributes.ns, moduleAttributes.alias);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

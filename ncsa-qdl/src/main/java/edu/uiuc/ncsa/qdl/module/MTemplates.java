@@ -12,7 +12,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  11:04 AM
  */
-public class ModuleMap extends HashMap<URI, Module> {
+public class MTemplates extends HashMap<URI, Module> {
     public void clearChangeList(){
         changeList = new ArrayList<>();
     }
