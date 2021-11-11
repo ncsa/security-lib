@@ -2022,8 +2022,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 alias = m.getAlias();
             }
             newModuleState.setSuperState(null); // get rid of it now.
-            MAliases resolver = state.getMAliases();
-            resolver.addImport(moduleNS, alias);
+            MAliases mAliases = state.getMAliases();
+            mAliases.addImport(moduleNS, alias);
             state.getmInstances().put(alias, newInstance);
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);

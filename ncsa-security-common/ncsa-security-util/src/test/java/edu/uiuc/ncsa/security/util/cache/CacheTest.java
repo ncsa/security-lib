@@ -49,7 +49,7 @@ public class CacheTest extends TestBase {
             lastCO = co;
 
         }
-        Cleanup<Identifier, CachedObject> cacheAger = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade("test cleanup", true));
+        Cleanup<Identifier, CachedObject> cacheAger = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade("test cleanup", true), "test cleanup");
         cacheAger.setMap(cache);
         cacheAger.addRetentionPolicy(maxCacheSizePolicy);
         cacheAger.age();

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.cache;
 
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.*;
@@ -25,20 +26,25 @@ import java.util.*;
  * on 7/12/11 at  11:39 AM
  */
 public class Cleanup<K, V> extends Thread {
-    public Cleanup(MyLoggingFacade logger) {
+    public Cleanup(MyLoggingFacade logger, String name) {
+        super(name);
         this.logger = logger;
     }
+
+    // only enable this if there is a very serious issue since the amount of output will skyrocket.
+    boolean deepDebug = true;
 
     /**
      * Clean out old entries by aging the elements, i.e., apply the retention policies.
      * Returns a list of the entries removed
      */
-
     public List<V> age() {
         LinkedList<V> linkedList = new LinkedList<V>();
         if (getMap().size() == 0) {
+            debug("empty map for " + getName());
             return linkedList;
         }
+        debug("map has  " + getMap().size() + " elements for "+ getName());
 
 
         // copy the object's sorted list or we will get a concurrent modification exception
@@ -48,6 +54,7 @@ public class Cleanup<K, V> extends Thread {
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
+                        debug("removing " + key);
                         getMap().remove(key);
                         linkedList.add(co);
                     }
@@ -155,6 +162,12 @@ public class Cleanup<K, V> extends Thread {
         log("removed:" + removed.size() + ", remaining:" + getMap().size());
     }
 
+    protected void debug(String x){
+        DebugUtil.trace(deepDebug, this, x);
+    }
+
+
+
     @Override
     public void run() {
         log("starting cleanup thread for " + getMap());
@@ -191,7 +204,7 @@ public class Cleanup<K, V> extends Thread {
                 }
             } catch (InterruptedException e) {
                 setStopThread(true); // just in case.
-                logger.warn("Cleanup interrupted, stopping thread...");
+                logger.warn("Cleanup for " + getName() + " interrupted, stopping thread...");
             }
         }
     }

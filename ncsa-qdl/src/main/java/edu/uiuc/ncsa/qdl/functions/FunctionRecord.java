@@ -15,6 +15,11 @@ import java.util.List;
  * on 1/22/20 at  10:48 AM
  */
 public class FunctionRecord implements QDLStateThing {
+    @Override
+    public String getName() {
+        return name;
+    }
+
     TokenPosition tokenPosition = null;
     public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
     public TokenPosition getTokenPositiion() {return tokenPosition;}

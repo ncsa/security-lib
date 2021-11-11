@@ -16,11 +16,8 @@ import java.util.List;
 public interface XTable<V extends QDLStateThing> extends Cloneable, Serializable, Documentable {
     V put(V value);
 
-    V getSomeFunction(String name);
+    V get(String key);
 
-    V getFunctionReference(String name);
-
-    List<V> getByAllName(String name);
 
     List<V> getAll();
 
@@ -31,4 +28,7 @@ public interface XTable<V extends QDLStateThing> extends Cloneable, Serializable
     boolean isEmpty();
 
     int size();
+
+    boolean isDefined(String key);
+    boolean isDefined(String key, int startTableIndex);
 }

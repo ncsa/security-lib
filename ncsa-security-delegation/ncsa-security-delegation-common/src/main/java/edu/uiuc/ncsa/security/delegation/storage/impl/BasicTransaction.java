@@ -68,8 +68,8 @@ public class BasicTransaction extends IdentifiableImpl implements Cacheable {
     }
 
    protected AuthorizationGrant authorizationGrant;
-    AccessToken accessToken;
-    Verifier verifier;
+    AccessToken accessToken = null;
+    Verifier verifier = null;
     ProtectedAsset protectedAsset;
 
 

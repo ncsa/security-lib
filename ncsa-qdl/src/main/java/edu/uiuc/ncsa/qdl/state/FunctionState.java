@@ -8,8 +8,8 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FTStack;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -25,14 +25,14 @@ import static edu.uiuc.ncsa.qdl.module.MAliases.NS_DELIMITER;
  * on 2/2/20 at  6:48 AM
  */
 public abstract class FunctionState extends VariableState {
-    public FunctionState(edu.uiuc.ncsa.qdl.module.MAliases resolver,
+    public FunctionState(edu.uiuc.ncsa.qdl.module.MAliases mAliases,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FTStack ftStack,
                          MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
-        super(resolver,
+        super(mAliases,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,

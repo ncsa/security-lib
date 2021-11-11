@@ -1264,7 +1264,10 @@ public class WorkspaceCommands implements Logable {
             fw.flush();
             fw.close();
         } catch (IOException iox) {
-            say("could not create the temp file");
+            say("could not create the temp file:'" + iox.getMessage() +"'");
+            if(isDebugOn()){
+                iox.printStackTrace();
+            }
             return null;
         }
         return _doExternalEdit(tempFile);

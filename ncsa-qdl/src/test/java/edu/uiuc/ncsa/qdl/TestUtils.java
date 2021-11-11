@@ -31,12 +31,12 @@ public class TestUtils {
 
     MAliases mAliases = MAliases.newMInstances();
 
-    public State createStateObject(MAliases resolver,
+    public State createStateObject(MAliases mAliases,
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
                                    FTStack ftStack,
-                                   MTemplates MTemplates,
+                                   MTemplates mTemplates,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
                                    boolean assertionsOn) {

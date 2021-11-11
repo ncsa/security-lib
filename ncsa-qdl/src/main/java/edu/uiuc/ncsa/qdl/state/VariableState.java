@@ -25,13 +25,13 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 2/2/20 at  6:42 AM
  */
 public abstract class VariableState extends NamespaceAwareState {
-    public VariableState(edu.uiuc.ncsa.qdl.module.MAliases resolver,
+    public VariableState(edu.uiuc.ncsa.qdl.module.MAliases mAliases,
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
-        super(resolver,
+        super(mAliases,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
@@ -66,7 +66,7 @@ public abstract class VariableState extends NamespaceAwareState {
      */
     public Object getValue(String variableName) {
         if (isStem(variableName)) {
-            /*
+            /* KEEP for future use.
             If we want to have system variables this is how to do it. A long as nothing is put there
             this won't get evaluated.
              */
@@ -147,14 +147,6 @@ public abstract class VariableState extends NamespaceAwareState {
                 ArrayList<String> newIndices = new ArrayList<>();
                 while (st.hasMoreTokens()) {
                     String nt = st.nextToken();
-/*
-                    if(isFirst){
-                        isFirst = false;
-                        w.getComponents().set(i, nt);
-                    }else{
-                        w.getComponents().add(i++, nt);
-                    }
-*/
                     newIndices.add(nt);
                 }
                 w.getComponents().remove(i); // replace the element at i with whatever was found.

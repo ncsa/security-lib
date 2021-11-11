@@ -60,7 +60,7 @@ public class TransactionCacheTest extends BaseTransactionStoreTest {
     @Test
     public void testCleanup() throws Exception {
         int maxCacheSize = 10;
-        Cleanup<Identifier, CachedObject> cc = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade(getClass().getSimpleName()+".testCleanup", true));
+        Cleanup<Identifier, CachedObject> cc = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade(getClass().getSimpleName()+".testCleanup", true), "test cleanup");
         cc.addRetentionPolicy(new MaxCacheSizePolicy(getTransactionCache().getCache(), maxCacheSize));
         cc.setMap(getTransactionCache().getCache());
         HashMap<Identifier, Identifiable> hashMap = new HashMap<Identifier, Identifiable>();

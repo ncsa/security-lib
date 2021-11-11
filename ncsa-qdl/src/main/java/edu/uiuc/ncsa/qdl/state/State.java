@@ -75,54 +75,54 @@ public class State extends FunctionState implements QDLConstants {
     /**
      * If you extend this class, you must override this method to return a new instance
      * of your state with everything in it you want or need.
-     * @param resolver
+     * @param mAliases
      * @param symbolStack
      * @param opEvaluator
      * @param metaEvaluator
      * @param ftStack
-     * @param MTemplates
+     * @param mTemplates
      * @param myLoggingFacade
      * @param isServerMode
      * @param assertionsOn
      * @return
      */
-    public State newInstance(MAliases resolver,
+    public State newInstance(MAliases mAliases,
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
                              FTStack ftStack,
-                             MTemplates MTemplates,
+                             MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
                              boolean isRestrictedIO,
                              boolean assertionsOn){
-        return new State(resolver,
+        return new State(mAliases,
                           symbolStack,
                           opEvaluator,
                           metaEvaluator,
                           ftStack,
-                MTemplates,
+                mTemplates,
                           myLoggingFacade,
                           isServerMode,
                          isRestrictedIO,
                          assertionsOn);
     }
-    public State(MAliases resolver,
+    public State(MAliases mAliases,
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
                  FTStack ftStack,
-                 MTemplates MTemplates,
+                 MTemplates mTemplates,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
                  boolean isRestrictedIO,
                  boolean assertionsOn) {
-        super(resolver,
+        super(mAliases,
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
-                MTemplates,
+                mTemplates,
                 myLoggingFacade);
         this.serverMode = isServerMode;
         this.assertionsOn = assertionsOn;
