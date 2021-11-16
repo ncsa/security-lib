@@ -384,14 +384,20 @@ public class StemVariable extends HashMap<String, Object> {
         return result;
     }
 
-    public void renameKeys(StemVariable newKeys) {
-        for (String key : newKeys.keySet()) {
-            if (containsKey(key)) {
-                String newKey = newKeys.getString(key);
-                if (!containsKey(newKey)) {
-                    put(newKey, get(key));
-                    remove(key);
-
+    public void renameKeys(StemVariable newKeys, boolean overWriteKeys) {
+        for (String oldKey : newKeys.keySet()) {
+            if (containsKey(oldKey)) {
+                String newKey = newKeys.getString(oldKey);
+                if (containsKey(newKey)) {
+                    if (overWriteKeys) {
+                        put(newKey, get(oldKey));
+                        remove(oldKey);
+                    }else {
+                        throw new IllegalArgumentException("'" + newKey + "' is already a key. You  must explicitly overwrite it with he flag");
+                    }
+                } else {
+                    put(newKey, get(oldKey));
+                    remove(oldKey);
                 }
             }
         }

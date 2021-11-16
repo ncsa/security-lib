@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.storage.BaseClient;
+import edu.uiuc.ncsa.security.delegation.storage.BaseClientKeys;
 import edu.uiuc.ncsa.security.delegation.storage.ClientApprovalKeys;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -95,8 +96,14 @@ public abstract class BaseClientSQLStore<V extends BaseClient> extends SQLStore<
                   if (DebugUtil.isEnabled()) {
                       e.printStackTrace();
                   }
-                  throw new GeneralException("Error getting aprpovals for status \"" + field + "\"", e);
+                  throw new GeneralException("Error getting approvals for status \"" + field + "\"", e);
               }
               return ids;
           }
+
+    @Override
+    public String getCreationTSField() {
+        BaseClientKeys keys = (BaseClientKeys)getMapConverter().getKeys();
+        return keys.creationTS();
+    }
 }

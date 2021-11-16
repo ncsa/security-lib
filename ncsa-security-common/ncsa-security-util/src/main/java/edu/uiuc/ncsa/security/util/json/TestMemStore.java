@@ -85,4 +85,9 @@ public class TestMemStore<V extends JSONEntry> extends HashMap<Identifier, V> im
         }
         return true;
     }
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return null;
+    }
 }

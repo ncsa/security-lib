@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.server.storage;
 
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
 import edu.uiuc.ncsa.security.core.util.StatusValue;
@@ -12,7 +13,7 @@ import java.util.Date;
  * <p>Created by Jeff Gaynor<br>
  * on May 26, 2011 at  9:40:02 AM
  */
-public class ClientApproval extends IdentifiableImpl {
+public class ClientApproval extends IdentifiableImpl implements DateComparable {
 
     public ClientApproval(Identifier identifier) {
         super(identifier);
@@ -23,7 +24,10 @@ public class ClientApproval extends IdentifiableImpl {
     String approver;
     Date approvalTimestamp;
 
-
+    @Override
+    public Date getCreationTS() {
+        return getApprovalTimestamp();
+    }
 
     /**
      * This status enum has values that the elements assume. This is to control their actual internal values so that

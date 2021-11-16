@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.storage;
 
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifiable;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -100,6 +101,46 @@ public class GenericStoreUtils {
         return results;
     }
 
+    public static <V extends Identifiable> List<V> getMostRecent(Store<V> store, int n, List<String> attributes) {
+        // Some black magic in Java to cast everything in the Collection as some other type.
+        // Casts between different object types are finicky, but you can cast a collection of
+        // objects to anything. Do this so if we ever change our inheritance later it does not break
+        Collection<? extends Object> list = store.values();
+        ArrayList<V> results = new ArrayList();
+
+        if (list.isEmpty() || n == 0) {
+            return results;
+        }
+        if (!(list.iterator().next() instanceof DateComparable)) {
+            throw new UnsupportedOperationException("getting the most recent object is not supported by this store.");
+        }
+        // Can still blow up if one of the objects is not DateComparable. Best we can do in Java....
+        Collection<DateComparable> values = (Collection<DateComparable>) list;
+        SortByDate sortByDate = new SortByDate();
+        TreeSet<DateComparable> treeSet = new TreeSet<>(sortByDate);
+        treeSet.addAll(values);
+        Iterator iterator;
+        if (n < 0) {
+            iterator = treeSet.descendingSet().iterator();// creates a view, then returns iterator in it
+            n = Math.abs(n);
+        } else {
+            iterator = treeSet.iterator();
+        }
+        // We are constrained by both n and the number of elements in the store.
+        // If the store has < n elements, don't try to return extras.
+        int i = 0;
+        while (iterator.hasNext() && i < n) {
+            results.add((V) iterator.next());
+            i++;
+        }
+        return results;
+    }
 
 
+    static class SortByDate<V extends DateComparable> implements Comparator<V> {
+        @Override
+        public int compare(V a, V b) {
+            return a.getCreationTS().compareTo(b.getCreationTS());
+        }
+    }
 }

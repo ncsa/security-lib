@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -129,6 +130,10 @@ public class FileStoreTest extends BaseTransactionStoreTest {
 
 
     public static class TestFileStore extends FSTransactionStore<BasicTransaction> {
+        @Override
+        public List<BasicTransaction> getMostRecent(int n, List<String> attributes) {
+            return null;
+        }
 
         @Override
         public XMLConverter getXMLConverter() {

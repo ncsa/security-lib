@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.server.storage.ClientApprovalStore;
 import edu.uiuc.ncsa.security.delegation.server.storage.ClientStore;
 import edu.uiuc.ncsa.security.delegation.storage.Client;
 import edu.uiuc.ncsa.security.delegation.storage.impl.ClientConverter;
+import edu.uiuc.ncsa.security.storage.GenericStoreUtils;
 import edu.uiuc.ncsa.security.storage.MemoryStore;
 import edu.uiuc.ncsa.security.storage.data.MapConverter;
 
@@ -18,6 +19,11 @@ import java.util.List;
  * on 1/18/12 at  11:12 AM
  */
 public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> implements ClientStore<V> {
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return GenericStoreUtils.getMostRecent(this, n, attributes);
+    }
+
     public ClientMemoryStore(IdentifiableProvider<V> vIdentifiableProvider) {
         super(vIdentifiableProvider);
     }
@@ -30,10 +36,6 @@ public  class ClientMemoryStore<V extends Client> extends MemoryStore<V> impleme
         return new ClientConverter(this.identifiableProvider);
     }
 
-/*    @Override
-    public IdentifiableProvider getACProvider() {
-        return this.identifiableProvider;
-    }*/
 
     @Override
     public void save(V value) {

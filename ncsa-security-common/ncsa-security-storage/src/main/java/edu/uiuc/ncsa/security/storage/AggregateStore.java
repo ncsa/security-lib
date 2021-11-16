@@ -276,5 +276,10 @@ public class AggregateStore<V extends Store> implements Store {
     public boolean remove(List objects) {
         throw new NotImplementedException("Error: This is not yet implemented for aggregate stores");
     }
+
+    @Override
+    public List getMostRecent(int n, List attributes) {
+        return null;
+    }
 }
 

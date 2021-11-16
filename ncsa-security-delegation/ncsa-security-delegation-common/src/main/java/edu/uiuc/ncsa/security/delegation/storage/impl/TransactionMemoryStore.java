@@ -23,6 +23,11 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
         super(vIdentifiableProvider);
     }
 
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return null;
+    }
+
     /**
      * Used internally to track transactions by an identifier (such as a verifier).
      */

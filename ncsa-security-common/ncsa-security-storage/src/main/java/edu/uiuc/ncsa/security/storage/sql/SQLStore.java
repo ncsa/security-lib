@@ -807,4 +807,65 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
     public MapConverter getMapConverter() {
         return converter;
     }
+
+    public abstract String getCreationTSField();
+
+    @Override
+    public List<V> getMostRecent(int n, List<String> attr) {
+        if(getCreationTSField() == null){
+            throw new UnsupportedOperationException("This store does not support this operation.");
+        }
+        List<V> values = new ArrayList<>();
+        if(n==0){
+            return values;
+        }
+        String attributes;
+
+        if (attr == null || attr.isEmpty()) {
+            attributes = "*";
+        } else {
+            attributes = "";
+            boolean isFirst = true;
+            for (String a : attr) {
+                attributes = attributes + (isFirst ? "" : ",") + a;
+                if (isFirst) {
+                    isFirst = false;
+                }
+            }
+        }
+        ConnectionRecord cr = getConnection();
+        Connection c = cr.connection;
+        V t = null;
+        try {
+            PreparedStatement stmt = c.prepareStatement(getMostRecentStatement(attributes, 0<n));
+            stmt.setInt(1, Math.abs(n));
+            stmt.executeQuery();
+            ResultSet rs = stmt.getResultSet();
+            // Now we have to pull in all the values.
+            while (rs.next()) {
+                ColumnMap map = rsToMap(rs);
+                t = create();
+                populate(map, t);
+                values.add(t);
+            }
+
+            rs.close();
+            stmt.close();
+            releaseConnection(cr);
+        } catch (SQLException e) {
+            destroyConnection(cr);
+            throw new GeneralException("Error getting " + (0<n?" first ":" last ") + Math.abs(n) + " objects", e);
+        }
+        return values;
+    }
+
+    protected String getMostRecentStatement(String attributes, boolean desc){
+        if (getConnectionPool().getType() == ConnectionPool.CONNECTION_TYPE_DEBRY) {
+             return getDerbyMostRecent(attributes, desc);
+        }
+        return "select " + attributes + " from " + getTable().getFQTablename()  + " order by " + getCreationTSField() + (desc?" desc ": " asc ") + "  limit ?";
+    }
+    protected String getDerbyMostRecent(String attrbutes, boolean desc){
+        return "select " + attrbutes + " from " + getTable().getFQTablename() + " order by " +  getCreationTSField() + (desc?" desc ": " asc ") + " fetch first ? rows only";
+    }
 }

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.cache.Cacheable;
 import edu.uiuc.ncsa.security.core.util.BasicIdentifier;

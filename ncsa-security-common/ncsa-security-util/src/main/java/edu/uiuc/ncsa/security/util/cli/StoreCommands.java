@@ -330,19 +330,21 @@ public abstract class StoreCommands extends CommonCommands {
     }
 
     Identifier id = null;
-    public boolean hasID(){
+
+    public boolean hasID() {
         return id != null;
     }
 
     /**
      * Mutators for sub classes
+     *
      * @return
      */
-    public Identifier getID(){
+    public Identifier getID() {
         return id;
     }
 
-    public void setID(Identifier id){
+    public void setID(Identifier id) {
         this.id = id;
     }
 
@@ -528,6 +530,7 @@ public abstract class StoreCommands extends CommonCommands {
             showLSHelp();
             return;
         }
+
         // Any form of the all flag prints everything.
         if (inputLine.hasArg(ALL_LIST_COMMAND)) {
             if (inputLine.hasArg(LINE_LIST_COMMAND)) {
@@ -592,8 +595,10 @@ public abstract class StoreCommands extends CommonCommands {
         }
 
     }
+
     protected static String SIZE_ALL_FLAG = "-all";
     protected static String SIZE_VERSIONS_FLAG = "-versions";
+
     protected void showSizeHelp() {
         say("size [" + SIZE_ALL_FLAG + " | " + SIZE_VERSIONS_FLAG + "]");
         sayi("Usage: Prints out the number of  entries in the store ");

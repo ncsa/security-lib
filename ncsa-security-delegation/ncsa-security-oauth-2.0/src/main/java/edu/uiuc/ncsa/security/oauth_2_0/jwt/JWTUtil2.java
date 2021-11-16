@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.security.core.exceptions.InvalidSignatureException;
 import edu.uiuc.ncsa.security.core.exceptions.UnsupportedJWTTypeException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
+import edu.uiuc.ncsa.security.oauth_2_0.server.RFC9068Constants;
 import edu.uiuc.ncsa.security.servlet.ServiceClient;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKeyUtil;
@@ -46,6 +47,7 @@ public class JWTUtil2 {
     public static String TYPE = "typ";
     public static String KEY_ID = "kid";
     public static String ALGORITHM = "alg";
+    public static String DEFAULT_TYPE = "JWT";
 
     /**
      * Creates an unsigned token.
@@ -54,15 +56,23 @@ public class JWTUtil2 {
      * @return
      */
     public static String createJWT(JSONObject payload) {
+        return createJWT(payload, DEFAULT_TYPE);
+
+    }
+    public static String createJWT(JSONObject payload, String type) {
         JSONObject header = new JSONObject();
-        header.put(TYPE, "JWT");
+        header.put(TYPE, type);
         header.put(ALGORITHM, NONE_JWT);
         return concat(header, payload) + "."; // as per spec.
     }
 
     public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey) throws NoSuchAlgorithmException, SignatureException, InvalidKeySpecException, InvalidKeyException, IOException {
+         return createJWT(payload, jsonWebKey, DEFAULT_TYPE);
+    }
+
+    public static String createJWT(JSONObject payload, JSONWebKey jsonWebKey,String type) throws NoSuchAlgorithmException, SignatureException, InvalidKeySpecException, InvalidKeyException, IOException {
         JSONObject header = new JSONObject();
-        header.put(TYPE, "JWT");
+        header.put(TYPE, type);
         header.put(KEY_ID, jsonWebKey.id);
         String signature = null;
 
@@ -266,7 +276,7 @@ public class JWTUtil2 {
                 return p;
             }
         }
-        if (!h.get(TYPE).equals("JWT")) throw new UnsupportedJWTTypeException("Unsupported token type.");
+        if (!(h.get(TYPE).equals(DEFAULT_TYPE)||h.get(TYPE).equals(RFC9068Constants.HEADER_TYPE))) throw new UnsupportedJWTTypeException("Unsupported token type.");
         Object keyID = h.get(KEY_ID);
         DebugUtil.trace(JWTUtil.class, "key_id=" + keyID);
 

@@ -29,6 +29,10 @@ import java.util.*;
  * on Apr 27, 2010 at  4:27:10 PM
  */
 public class TransactionCache<V extends BasicTransaction> extends CachedMapFacade<V> implements TransactionStore<V> {
+    @Override
+    public List<V> getMostRecent(int n, List<String> attributes) {
+        return null;
+    }
 
     public TransactionStore getBackingStore() {
         return (TransactionStore) getTheStore();

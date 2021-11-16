@@ -106,8 +106,9 @@ abstract public class SQLBaseTransactionStore<V extends BasicTransaction> extend
         }
     }
 
-/*
-    protected String getToken(Token at) throws SQLException {
-        return at == null ? null : at.getToken();
-    }*/
+    @Override
+    public String getCreationTSField() {
+        getMapConverter().getKeys();
+        return null;
+    }
 }

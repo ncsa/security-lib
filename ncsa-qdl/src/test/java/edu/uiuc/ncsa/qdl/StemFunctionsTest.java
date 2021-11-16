@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.evaluate.ListEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -364,22 +365,49 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : ListEvaluator.LIST_SUBSET + " did not create matrix transpose.";
+        assert getBooleanValue("ok", state) : StemEvaluator.RENAME_KEYS + " did not rename keys correctly.";
     }
-    /*
-     b.OA2_foo := 'a'; b.OA2_woof := 'b'; b.OA2_arf := 'c';  b.fnord := 'd';
-     */
-    public void testRenameKeys2() throws Throwable {
-           State state = testUtils.getNewState();
-           StringBuffer script = new StringBuffer();
-           addLine(script, "b.OA2_foo := 'a'; b.OA2_woof := 'b'; b.OA2_arf := 'c';  b.fnord := 'd';");
-           addLine(script, "rename_keys(b., keys(b.)-'OA2_');");
-           addLine(script, "ok := reduce(@∧, values(b. == {'arf':'c', 'foo':'a', 'fnord':'d', 'woof':'b'}));");
-           QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-           interpreter.execute(script.toString());
-           assert getBooleanValue("ok", state) : ListEvaluator.LIST_SUBSET + " did not create matrix transpose.";
-       }
+    /*
+     b.'a':='X'; b.x_y := 'Y';
+     ndx. := {'x_y':'x'};
+     rename_keys(b., ndx.)
+
+     c.'x':='X'; c.x_y := 'Y';
+     ndx. := {'x_y':'x'};
+     rename_keys(c., ndx.); //fails
+     rename_keys(c., ndx., true); //works
+
+     */
+    public void testRenameKeysNoOverWrite() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "c.'x':='X'; c.x_y := 'Y';");
+        addLine(script, "ndx. := {'x_y':'x'};");
+        addLine(script, "rename_keys(c., ndx.); ");  // fails
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean passed = false;
+        try {
+            interpreter.execute(script.toString());
+        } catch (QDLStatementExecutionException qdlStatementExecutionException) {
+            passed = (qdlStatementExecutionException.getCause() instanceof IllegalArgumentException);
+        }
+        assert passed : "was able to rename keys in a destructive way";
+    }
+
+    public void testRenameKeysNoOverWrite2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "c.'x':='X'; c.x_y := 'Y';");
+        addLine(script, "ndx. := {'x_y':'x'};");
+        addLine(script, "z.:=rename_keys(c., ndx., true);");
+        addLine(script, "ok := size(z.)==1 && z.'x' == 'Y';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : StemEvaluator.RENAME_KEYS + " failed when overwrite enabled.";
+    }
+
+
 
     public void testExcludeKeys() throws Exception {
         State state = testUtils.getNewState();
@@ -591,7 +619,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
 
-
     public void testRemoveStem() throws Exception {
         State state = testUtils.getNewState();
         SymbolTable symbolTable = state.getSymbolStack();
@@ -655,7 +682,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
         polyad.addArgument(arg); // set second to be a stem so it fails
-       polyad.evaluate(state); // Should work.
+        polyad.evaluate(state); // Should work.
         assert polyad.getResult() == QDLNull.getInstance();
     }
 
@@ -679,35 +706,37 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
     public void testSetDefault() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "ok := null == set_default(ϱ., [1,2]);"); // old value is null
-         addLine(script, "ok1 := reduce(⊗∧, [1,2]== set_default(ϱ., [3,4]));");
-         addLine(script, "ok2 := reduce(⊗∧, [3,4]== ϱ.7.8);");// random element returns default
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := null == set_default(ϱ., [1,2]);"); // old value is null
+        addLine(script, "ok1 := reduce(⊗∧, [1,2]== set_default(ϱ., [3,4]));");
+        addLine(script, "ok2 := reduce(⊗∧, [3,4]== ϱ.7.8);");// random element returns default
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "set_default did not return null";
-         assert getBooleanValue("ok1", state) : "set_default did not return previous default";
-         assert getBooleanValue("ok2", state) : "set_default did not set default for stem";
-     }
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "set_default did not return null";
+        assert getBooleanValue("ok1", state) : "set_default did not return previous default";
+        assert getBooleanValue("ok2", state) : "set_default did not set default for stem";
+    }
 
     /**
      * Sets a default and shows that for a complex stem it works on each element
+     *
      * @throws Throwable
      */
     public void testEvaluteSetDefault() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "set_default(ϱ., [2,3]);"); // set default
-         addLine(script, "a. := [[0,0],[0,1],[0,2],[2,0],[2,1],[2,2]];"); // target of operation
-         addLine(script, "result. := [[2,3],[2,4],[2,5],[4,3],[4,4],[4,5]];"); // expected result
-         addLine(script, "ok := reduce(⊗∧,reduce(⊗∧, result.== a. + ϱ.));");
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "set_default(ϱ., [2,3]);"); // set default
+        addLine(script, "a. := [[0,0],[0,1],[0,2],[2,0],[2,1],[2,2]];"); // target of operation
+        addLine(script, "result. := [[2,3],[2,4],[2,5],[4,3],[4,4],[4,5]];"); // expected result
+        addLine(script, "ok := reduce(⊗∧,reduce(⊗∧, result.== a. + ϱ.));");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "set_default did not propagte on addition";
-     }
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "set_default did not propagte on addition";
+    }
+
     /**
      * Regression test for converting stems to JSON where there is a stem list of stems.
      * Extra elements were being added.
@@ -1359,10 +1388,10 @@ public class StemFunctionsTest extends AbstractQDLTester {
         } catch (Throwable t) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "bad index resolved in a stem";
         }
-        
+
     }
 
     /**
@@ -1691,9 +1720,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         try {
             interpreter.execute(script.toString());
         } catch (IndexError ie) {
-            bad =  false;
+            bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "was able to access a non-existant index in a stem";
         }
 
@@ -1710,7 +1739,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         } catch (IndexError ie) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "was able to access a non-existent index in a stem";
         }
     }

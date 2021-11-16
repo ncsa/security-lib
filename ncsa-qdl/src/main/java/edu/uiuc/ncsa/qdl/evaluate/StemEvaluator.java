@@ -2028,8 +2028,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
 
     protected void doRenameKeys(Polyad polyad, State state) {
-        if (polyad.getArgCount() != 2) {
-            throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 arguments");
+        if (!(polyad.getArgCount() == 2 || polyad.getArgCount() == 3)) {
+            throw new IllegalArgumentException("the " + RENAME_KEYS + " function requires 2 or 3 arguments");
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
@@ -2048,8 +2048,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
         }
 
+        boolean overwriteKeys = false; //default
+        if(polyad.getArgCount() == 3){
+            polyad.evalArg(2, state);
+
+            Object arg3 = polyad.getArgAt(2).getResult();
+            polyad.evalArg(2, state);
+            checkNull(arg2, polyad.getArgAt(2));
+            if(arg3 instanceof Boolean){
+                      overwriteKeys = (Boolean)arg3;
+            }else{
+                throw new IllegalArgumentException(RENAME_KEYS + " third argument, if present, must be a boolean");
+            }
+
+        }
         StemVariable target = (StemVariable) arg;
-        target.renameKeys((StemVariable) arg2);
+        target.renameKeys((StemVariable) arg2, overwriteKeys);
 
         polyad.setResult(target);
         polyad.setResultType(Constant.STEM_TYPE);

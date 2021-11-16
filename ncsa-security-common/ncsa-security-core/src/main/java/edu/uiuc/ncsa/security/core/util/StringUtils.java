@@ -80,6 +80,39 @@ public class StringUtils {
      * @param args
      */
     public static void main(String[] args) {
+        tests();
+        tableTest();
+    }
+
+
+    private static void tableTest() {
+        System.out.println("\n===== table test =====");
+        Random random = new Random();
+        int cols = 5;
+        int rows = 7;
+        int maxEntrySize = 20; // gets base 64 encoded
+        List<List<String>> table = new ArrayList<>();
+        for (int i = 0; i < rows; i++) {
+            List<String> row = new ArrayList<>();
+            for (int j = 0; j < cols; j++) {
+                int entryLength = random.nextInt(maxEntrySize);
+                if (entryLength == 0) {
+                    row.add(null);
+                    continue;
+                }
+                byte[] b = new byte[entryLength];
+                random.nextBytes(b);
+                row.add(Base64.getEncoder().encodeToString(b));
+            }
+            table.add(row);
+        }
+        List<String> output = formatTable(null, table, -1, true);
+        for (int i = 0; i < output.size(); i++) {
+            System.out.println(output.get(i));
+        }
+    }
+
+    private static void tests() {
         // Colon is so we can tell where the end of the strings are.
         System.out.println(justify("abc", 10, JUSTIFY_RIGHT) + ":");
         System.out.println(RJustify("abc", 10) + ":");
@@ -287,6 +320,12 @@ public class StringUtils {
         return formattedString;
     }
 
+    /**
+     * Convert a string with embedded line feeds to a list os strings. Inverse of {@link #fromList(List)}
+     *
+     * @param x
+     * @return
+     */
     public static List<String> toList(String x) {
         StringTokenizer st = new StringTokenizer(x, "\n");
         List<String> out = new ArrayList<>();
@@ -296,6 +335,12 @@ public class StringUtils {
         return out;
     }
 
+    /**
+     * Convert a list of strings into a single string with linefeeds. Inverse of {@link #toList(String)}.
+     *
+     * @param listOfStrings
+     * @return
+     */
     public static String fromList(List<String> listOfStrings) {
         StringBuffer sb = new StringBuffer();
         for (String x : listOfStrings) {
@@ -579,6 +624,82 @@ public class StringUtils {
         while (stringTokenizer.hasMoreTokens()) {
             output.add(stringTokenizer.nextToken());
         }
+        return output;
+    }
+
+    public static final String tableFieldDelimiter = "|";
+
+    /**
+     * Takes a table -- defined as a list of rows, each row is a separate column amd returns
+     * a list of formatted rows that can just be printed (piped through a stream or whatever)
+     * It is assumed there are no missing columns, though null columns are fine and are rendered
+     * as blank.
+     *
+     * @param table
+     * @param maxFieldWidth maximum width of a column. Output is truncated if positive.
+     * @param showDelimiter
+     */
+    public static List<String> formatTable(List<String> headers, List<List<String>> table, int maxFieldWidth, boolean showDelimiter) {
+        List<String> output = new ArrayList<>();
+        boolean truncateFields = 0 < maxFieldWidth;
+        boolean showHeaders = !(headers == null || headers.isEmpty());
+        List<Integer> columnWidths = new ArrayList<>();
+        int columnCount = -1; // number of columns. If this is not identical in all rows, throw an exception later
+        if (showHeaders) {
+            for (int i = 0; i < headers.size(); i++) {
+                columnWidths.add(headers.get(i).length());
+            }
+            columnCount = headers.size();
+        } else {
+            for (int i = 0; i < table.get(0).size(); i++) {
+                columnWidths.add(0); // fill up with initial values.
+            }
+            columnCount = table.get(0).size();
+        }
+        // To get a nicely formatted result, it will take a pass to set the sizes.
+        for (int i = 0; i < table.size(); i++) {
+            List<String> row = table.get(i);
+            if (row.size() != columnCount) {
+                throw new IllegalArgumentException("column of size " + row.size() + " found. Must be " + columnCount);
+            }
+            for (int j = 0; j < row.size(); j++) {
+                columnWidths.set(j, Math.max(columnWidths.get(j), (row.get(j) == null) ? 0 : row.get(j).length()));
+            }
+        }
+        // Now for the pass where we fill this all in.
+        if (showHeaders) {
+            boolean firstPass = true;
+            String r = "";
+            for (int i = 0; i < headers.size(); i++) {
+                r = r + (firstPass ? "" : (showDelimiter ? " " + tableFieldDelimiter + " " : "")) + justify(headers.get(i), columnWidths.get(i), false);
+                if (firstPass) {
+                    firstPass = false;
+                }
+            }
+            output.add(r);
+        }
+        for (int i = 0; i < table.size(); i++) {
+            boolean firstPass = true;
+            String r = "";
+            List<String> row = table.get(i);
+            for (int j = 0; j < row.size(); j++) {
+                String delim = showDelimiter ? (" " + tableFieldDelimiter + " ") : "";
+                String entry;
+                if(StringUtils.isTrivial(row.get(j) )) {
+                    entry = getBlanks(columnWidths.get(j));
+                }else{
+                    entry = justify(row.get(j), columnWidths.get(j), false);
+                }
+                r = r + (firstPass ? "" : delim) + entry ;
+                if (firstPass) {
+                    firstPass = false;
+                }
+
+            }
+            output.add(r);
+        }
+
+
         return output;
     }
 }

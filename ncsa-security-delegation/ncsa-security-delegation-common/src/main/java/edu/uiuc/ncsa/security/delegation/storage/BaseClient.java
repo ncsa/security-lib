@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import edu.uiuc.ncsa.security.core.DateComparable;
 import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.util.DateUtils;
 import edu.uiuc.ncsa.security.core.util.IdentifiableImpl;
@@ -12,7 +13,7 @@ import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkEquals;
  * <p>Created by Jeff Gaynor<br>
  * on 5/12/16 at  4:32 PM
  */
-public class BaseClient extends IdentifiableImpl {
+public class BaseClient extends IdentifiableImpl implements DateComparable {
 
     public BaseClient(Identifier identifier) {
         super(identifier);

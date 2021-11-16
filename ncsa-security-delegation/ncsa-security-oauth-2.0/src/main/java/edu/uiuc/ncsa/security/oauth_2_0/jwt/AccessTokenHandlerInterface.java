@@ -16,4 +16,5 @@ public interface AccessTokenHandlerInterface extends PayloadHandler {
     AccessToken getAccessToken();
     void setAccessToken(AccessToken accessToken);
     AccessToken getSignedAT(JSONWebKey key);
+    AccessToken getSignedAT(JSONWebKey key, String headerType); // CIL-1112, support for RFC9068
 }

@@ -96,4 +96,6 @@ public interface Store<V extends Identifiable> extends Map<Identifier, V> {
      */
      boolean remove(List<Identifiable> objects);
 
+     List<V> getMostRecent(int n, List<String> attributes);
+
 }
