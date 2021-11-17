@@ -1,0 +1,12 @@
+/*
+   Test that returns from a block statement work. This just echos the zeroth parameter.
+*/
+block[
+  block[
+    block[
+        return(1);
+      ];
+   return(2);
+  ];
+   return(3);
+  ];

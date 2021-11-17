@@ -28,26 +28,6 @@ public class BlockStatement implements Statement{
     }
 
     List<Statement> statements = new ArrayList<>();
-/*    Module module = null;
-
-    @Override
-    public Module getModule() {
-        return module;
-    }
-
-    @Override
-    public void setModule(Module newModule) {
-         this.module = newModule;
-        for(int i = 0; i < statements.size(); i++){
-            statements.get(i).setModule(newModule);
-        }
-
-    }
-
-    @Override
-    public boolean hasModule() {
-        return module!=null;
-    }*/
 
 
     @Override
@@ -56,7 +36,6 @@ public class BlockStatement implements Statement{
         for(Statement statement : statements){
             statement.evaluate(state1);
         }
-
         return null;
     }
 

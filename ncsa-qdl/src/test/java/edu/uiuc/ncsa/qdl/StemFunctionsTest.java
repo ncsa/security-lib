@@ -395,7 +395,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert passed : "was able to rename keys in a destructive way";
     }
 
-    public void testRenameKeysNoOverWrite2() throws Throwable {
+    public void testRenameKeysWithOverWrite() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "c.'x':='X'; c.x_y := 'Y';");
@@ -407,6 +407,24 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : StemEvaluator.RENAME_KEYS + " failed when overwrite enabled.";
     }
 
+    /**
+     * This is a direct test that a claims-like stem gets handled correctly since it is a very
+     * common use case in practice. In this case, it replaces an older sub claim and renames
+     * the isMemberOf claim. There is an extra claim (eppn) to check that <code>rename_keys</code>
+     * does not lose a claim.
+     * @throws Throwable
+     */
+    public void testRenameKeysWithOverWrite2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "claims.sub:='X';claims.vop:='Y';claims.isMemberOf:=['A','B'];claims.eppn:='Q';");
+        addLine(script, "ndx. := {'vop':'sub', 'isMemberOf':'is_member_of'};");
+        addLine(script, "rename_keys(claims., ndx., true);");
+        addLine(script, "ok := size(claims.)==3 && claims.'sub' == 'Y' && size(claims.is_member_of)==2 && claims.eppn=='Q';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : StemEvaluator.RENAME_KEYS + " failed when overwrite enabled.";
+    }
 
 
     public void testExcludeKeys() throws Exception {

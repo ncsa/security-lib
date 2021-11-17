@@ -10,12 +10,12 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
+import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
-import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
@@ -1506,6 +1506,13 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                     qq.setScriptName(resourceName);
                     qq.setScript(true);
                     throw qq;
+                }
+                if(qe instanceof ReturnException){
+                    ReturnException rx = (ReturnException)qe;
+                    polyad.setResult(rx.result);
+                    polyad.setResultType(rx.resultType);
+                    polyad.setEvaluated(true);
+                    return ;
                 }
                 throw qe;
             } catch (Throwable t) {
