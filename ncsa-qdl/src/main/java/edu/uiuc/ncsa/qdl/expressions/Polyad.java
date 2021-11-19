@@ -55,7 +55,7 @@ public class Polyad extends ExpressionImpl {
         // there is an override in place. If not, kick it up to the main system
         // (so evalute with no alias).
         if(isInModule()){
-            if(state.getFTStack().isDefined(getName(), getArgCount())) {
+            if(state.getFTStack().containsKey(getName(), getArgCount())) {
                 state.getMetaEvaluator().evaluate(getAlias(), this, state);
             }else{
                 state.getMetaEvaluator().evaluate(this, state);

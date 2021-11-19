@@ -90,7 +90,7 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     }
 
     @Override
-    public boolean isDefined(String var, int argCount) {
+    public boolean containsKey(String var, int argCount) {
         if (argCount == -1) {
             for (String k : keySet()) {
                 if (k.startsWith(var + munger)) {
@@ -103,8 +103,8 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     }
 
     @Override
-    public boolean isDefined(String var, int argCount, int startTableIndex) {
-        return isDefined(var,argCount);
+    public boolean containsKey(String var, int argCount, int startTableIndex) {
+        return containsKey(var,argCount);
     }
 
     @Override

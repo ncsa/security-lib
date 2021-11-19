@@ -18,9 +18,9 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
 
     FunctionRecord get(String key, int argCount);
 
-    boolean isDefined(String var, int argCount);
+    boolean containsKey(String var, int argCount);
 
-    boolean isDefined(String var, int argCount, int startTableIndex);
+    boolean containsKey(String var, int argCount, int startTableIndex);
 
     FunctionRecord getSomeFunction(String name);
 

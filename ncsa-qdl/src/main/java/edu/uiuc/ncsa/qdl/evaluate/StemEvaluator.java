@@ -1163,7 +1163,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     Pattern pattern = Pattern.compile(var_regex);
 
     /**
-     * Take a collection of variables and stem them up, removing them from the symbole table.
+     * Take a collection of variables and stem them up, removing them from the symbol table.
      *
      * @param polyad
      * @param state

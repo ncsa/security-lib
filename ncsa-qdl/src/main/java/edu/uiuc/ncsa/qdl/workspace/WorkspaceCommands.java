@@ -4014,7 +4014,7 @@ public class WorkspaceCommands implements Logable {
                 xer.close();
                 currentWorkspace = f;
                 getState().setWorkspaceCommands(this);
-                if (runInitOnLoad && state.getFTStack().isDefined(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+                if (runInitOnLoad && state.getFTStack().containsKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
                     String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                     getInterpreter().execute(runnit);
                 }
@@ -4097,7 +4097,7 @@ public class WorkspaceCommands implements Logable {
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
-            if (runInitOnLoad && state.getFTStack().isDefined(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+            if (runInitOnLoad && state.getFTStack().containsKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
                 String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                 getInterpreter().execute(runnit);
             }

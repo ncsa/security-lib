@@ -20,11 +20,11 @@ public class XStack<V extends XTable<? extends QDLStateThing>> {
     List<XTable<? extends QDLStateThing>> stack = new ArrayList<>();
     public boolean isEmpty(){return getStack().isEmpty();}
 
-    public void push(XTable xTable){
+    public void push(XTable<? extends QDLStateThing> xTable){
         getStack().add(0, xTable);
     }
 
-    public XTable peek(){
+    public XTable< ? extends QDLStateThing> peek(){
         return getStack().get(0);
     }
 
@@ -37,7 +37,7 @@ public class XStack<V extends XTable<? extends QDLStateThing>> {
     }
 
     public QDLStateThing get(String key){
-        for (XTable xTable : stack) {
+        for (XTable<? extends QDLStateThing> xTable : stack) {
              QDLStateThing qdlStateThing = xTable.get(key);
             if (qdlStateThing != null) {
                 return qdlStateThing;
@@ -51,7 +51,7 @@ public class XStack<V extends XTable<? extends QDLStateThing>> {
 
     public boolean isDefined(String var, int argCount, int startTableIndex) {
         for (int i = startTableIndex; i < stack.size(); i++) {
-            if (stack.get(i).isDefined(var)) {
+            if (stack.get(i).containsKey(var)) {
                 return true;
             }
         }
@@ -63,7 +63,7 @@ public class XStack<V extends XTable<? extends QDLStateThing>> {
      * the root {@link XTable}.
      * @return
      */
-    public XTable getRoot(){
+    public XTable<? extends QDLStateThing> getRoot(){
         return stack.get(stack.size()-1);
     }
 }

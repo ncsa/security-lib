@@ -93,7 +93,7 @@ public class FTStack implements FunctionTable {
     @Override
     public FunctionRecord put(FunctionRecord value) {
         for (FunctionTable functionTable : ftables) {
-            if (functionTable.isDefined(value.name, value.getArgCount())) {
+            if (functionTable.containsKey(value.name, value.getArgCount())) {
                 functionTable.put(value);
                 return value;
             }
@@ -125,13 +125,13 @@ public class FTStack implements FunctionTable {
     }
 
     @Override
-    public boolean isDefined(String var, int argCount) {
-        return isDefined(var, argCount, 0);
+    public boolean containsKey(String var, int argCount) {
+        return containsKey(var, argCount, 0);
     }
 
-    public boolean isDefined(String var, int argCount, int startTableIndex) {
+    public boolean containsKey(String var, int argCount, int startTableIndex) {
         for (int i = startTableIndex; i < ftables.size(); i++) {
-            if (ftables.get(i).isDefined(var, argCount)) {
+            if (ftables.get(i).containsKey(var, argCount)) {
                 return true;
             }
         }

@@ -271,7 +271,7 @@ public abstract class FunctionState extends VariableState {
             out = new ArrayList<>();
         }
         for (URI key : getMAliases().keySet()) {
-            if (getModuleMap().get(key).getState().getFTStack().isDefined(fname, argCount)) {
+            if (getModuleMap().get(key).getState().getFTStack().containsKey(fname, argCount)) {
                 List<String> doxx;
                 if (argCount == -1) {
                     doxx = getModuleMap().get(key).getState().getFTStack().listAllDocs(fname);

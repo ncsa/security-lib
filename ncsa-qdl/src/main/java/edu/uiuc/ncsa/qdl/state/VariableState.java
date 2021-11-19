@@ -116,7 +116,7 @@ public abstract class VariableState extends NamespaceAwareState {
      * This loops from right to left through the indices of the wrapper. The result is the fully resolved
      * indices against whatever the current state of the symbol stacks are (including modules).
      * The resulting wrapper (which may be substantially smaller than the original) may then be used
-     * against the symbole table to actually do the GSR operation.
+     * against the symbol table to actually do the GSR operation.
      *
      * @param w
      * @return

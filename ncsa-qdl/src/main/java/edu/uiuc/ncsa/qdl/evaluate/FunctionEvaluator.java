@@ -192,7 +192,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         try {
             if(state.isPrivate(polyad.getName()) && polyad.isInModule()){
                 // if it is in a module and at the top of the stack, then this is an access violation
-                if(state.getFTStack().getFtables().get(0).isDefined(polyad.getName(),polyad.getArgCount())){
+                if(state.getFTStack().getFtables().get(0).containsKey(polyad.getName(),polyad.getArgCount())){
                     throw new IntrinsicViolation("cannot access intrinsic function directly.");
                 }
             }

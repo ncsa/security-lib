@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Top-level object for a thing (object) that has a name in that is unique in a local
- * scope. These are the basic object in local state. {@link XTable}s arepopulated with
+ * scope. These are the basic object in local state. {@link XTable}s are populated with
  * these and kept in {@link XStack}s. Requests to the stack be name return the first
  * so-named thing. This allows, for instance, a local variable, <it>x</it>, to
  * override another variable <it>x</it>. It is the basis for encapsulation.
