@@ -2,9 +2,11 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.functions.FTStack2;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
 import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
@@ -35,7 +37,7 @@ public class TestUtils {
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
-                                   FTStack ftStack,
+                                   FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack,
                                    MTemplates mTemplates,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
@@ -44,7 +46,7 @@ public class TestUtils {
                 symbolStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
-                new FTStack(),
+                new FTStack2(),
                 new MTemplates(),
                 null,
                 false,
@@ -60,7 +62,7 @@ public class TestUtils {
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
-                new FTStack(),
+                new FTStack2(),
                 new MTemplates(),
                 null,
                 false,
@@ -79,7 +81,7 @@ public class TestUtils {
                 getTestSymbolStack(),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
-                new FTStack(),
+                new FTStack2(),
                 new MTemplates(),
                 null,
                 false,

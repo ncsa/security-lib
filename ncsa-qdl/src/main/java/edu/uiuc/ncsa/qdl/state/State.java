@@ -3,10 +3,12 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FTStack2;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
 import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -90,7 +92,7 @@ public class State extends FunctionState implements QDLConstants {
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
-                             FTStack ftStack,
+                             FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack,
                              MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
@@ -111,7 +113,7 @@ public class State extends FunctionState implements QDLConstants {
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
-                 FTStack ftStack,
+                 FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack,
                  MTemplates mTemplates,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
@@ -515,7 +517,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                getFTStack().clone(),
+                (FTStack2) getFTStack().clone(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode(),
@@ -533,9 +535,13 @@ public class State extends FunctionState implements QDLConstants {
         newStack.getParentTables().set(0,moduleState.symbolStack);
         newStack.getParentTables().addAll(symbolStack.getParentTables());
 
-        FTStack ftStack = new FTStack();
-        ftStack.getFtables().set(0, moduleState.getFTStack());
-        ftStack.getFtables().add(getFTStack().clone());
+        FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack = new FTStack2();
+        // put the module stack at 0 so it overrides anything else, then
+        // add a clone of the current stack.
+        ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
+        ftStack.addTables(moduleState.getFTStack());
+//        ftStack.getFtables().set(0, moduleState.getFTStack());
+//        ftStack.getFtables().add(getFTStack().clone());
 
 
 /*
@@ -611,7 +617,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FTStack(),
+                new FTStack2(),
                 getModuleMap(),
                 getLogger(),
                 isServerMode(),
@@ -641,7 +647,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FTStack(),
+                new FTStack2(),
                 new MTemplates(), // so no modules
                 getLogger(),
                 isServerMode(),

@@ -44,8 +44,8 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
      */
     public void addTables(XStack ftStack) {
         // add backwards
-        for (int i = getStack().size() - 1; 0 <= i; i--) {
-            ftStack.push(getStack().get(i));
+        for (int i = ftStack.getStack().size() - 1; 0 <= i; i--) {
+            push((XTable<? extends XThing>) ftStack.getStack().get(i));
         }
     }
 
@@ -88,6 +88,9 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         return false;
     }
 
+     public boolean containsKey(XKey key){
+        return containsKey(key, 0);
+     }
     public XThing get(XKey key) {
         for (XTable<? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
@@ -211,6 +214,5 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     abstract public void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
-
 
 }

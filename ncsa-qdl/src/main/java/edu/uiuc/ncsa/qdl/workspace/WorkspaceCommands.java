@@ -11,15 +11,19 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
+import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FTStack2;
 import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
-import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.state.SIEntry;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -2066,8 +2070,8 @@ public class WorkspaceCommands implements Logable {
             }
         }
 
-        getState().getFTStack().remove(fName, argCount);
-        if (getState().getFTStack().containsKey(fName, -1)) {
+        getState().getFTStack().remove(new FKey(fName, argCount));
+        if (getState().getFTStack().containsKey(new FKey(fName, -1))) {
             say(fName + " removed.");
         } else {
             say("Could not remove " + fName);
@@ -4014,7 +4018,7 @@ public class WorkspaceCommands implements Logable {
                 xer.close();
                 currentWorkspace = f;
                 getState().setWorkspaceCommands(this);
-                if (runInitOnLoad && state.getFTStack().containsKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+                if (runInitOnLoad && state.getFTStack().containsKey(new FKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0))) {
                     String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                     getInterpreter().execute(runnit);
                 }
@@ -4097,7 +4101,7 @@ public class WorkspaceCommands implements Logable {
             interpreter.setDebugOn(isDebugOn());
             state = newState;
             currentWorkspace = f;
-            if (runInitOnLoad && state.getFTStack().containsKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0)) {
+            if (runInitOnLoad && state.getFTStack().containsKey(new FKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0))) {
                 String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                 getInterpreter().execute(runnit);
             }
@@ -4368,7 +4372,7 @@ public class WorkspaceCommands implements Logable {
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
-                    new FTStack(),
+                    new FTStack2(),
                     new MTemplates(),
                     logger,
                     false,

@@ -617,14 +617,14 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param state
      * @return
      */
-    protected String tempFname(State state) {
+    public static String tempFname(State state) {
         Base32 base32 = new Base32((byte) '=');
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[8];
         random.nextBytes(bytes);
         String tempName = base32.encodeToString(bytes);
         for (int i = 0; i < 10; i++) {
-            if (!state.getFTStack().containsKey(tempName,-1)) {
+            if (!state.getFTStack().containsKey(new FKey(tempName,-1))) {
                 return tempName;
             }
             tempName = base32.encodeToString(bytes);
@@ -653,9 +653,15 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 lds.getFunctionRecord().name = tempFname(state);
             }
             if (pushNewState) {
+                FunctionTable2 ft = new FunctionTable2();
+                ft.put(lds.getFunctionRecord());
+                state.getFTStack().push(ft);
+
+/*
                 FunctionTableImpl ft = new FunctionTableImpl();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
+*/
             } else {
                 lds.evaluate(state);
             }
@@ -669,7 +675,8 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 lds.getFunctionRecord().name = tempFname(state);
             }
             if (pushNewState) {
-                FunctionTableImpl ft = new FunctionTableImpl();
+                //FunctionTableImpl ft = new FunctionTableImpl();
+                FunctionTable2 ft = new FunctionTable2();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
             } else {

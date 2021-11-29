@@ -274,7 +274,7 @@ public class FTStack implements FunctionTable {
                         // Legacy case -- just a single functions block, not a stack.
                         case XMLConstants.FUNCTIONS_TAG:
                             if (foundStack) break; // if a stack is being processed, skip this
-                            FunctionTable functionTable1 = qi.getState().getFTStack().peek();
+                            FunctionTable functionTable1 = (FunctionTable) qi.getState().getFTStack().peek();
                             functionTable1.fromXML(xer, qi);
                             break;
                     }

@@ -1,10 +1,12 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import java.io.Serializable;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 11/26/21 at  7:44 AM
  */
-public class XKey {
+public class XKey implements Serializable {
     public XKey() {
     }
 

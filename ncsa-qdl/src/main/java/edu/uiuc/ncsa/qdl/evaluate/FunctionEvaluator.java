@@ -192,7 +192,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         try {
             if(state.isPrivate(polyad.getName()) && polyad.isInModule()){
                 // if it is in a module and at the top of the stack, then this is an access violation
-                if(state.getFTStack().getFtables().get(0).containsKey(polyad.getName(),polyad.getArgCount())){
+                if(state.getFTStack().getStack().get(0).containsKey(new FKey(polyad.getName(),polyad.getArgCount()))){
                     throw new IntrinsicViolation("cannot access intrinsic function directly.");
                 }
             }
@@ -290,6 +290,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         for (int i = 0; i < polyad.getArgCount(); i++) {
             if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
                 LambdaDefinitionNode ldn = (LambdaDefinitionNode) polyad.getArguments().get(i);
+                if(!ldn.hasName()){
+                    ldn.getFunctionRecord().name = tempFname(state);
+                    // This is anonymous
+                }
                 ldn.evaluate(localState);
             }
         }
@@ -311,7 +315,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
             if (isFunctionReference(localName)) {
                 localName = dereferenceFunctionName(localName);
-                localState.getFTStack().pushNew();
+                localState.getFTStack().pushNewTable();
                 // This is the local name of the function.
                 FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(i), false);
 

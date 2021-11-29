@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.xml;
 
 import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
-import edu.uiuc.ncsa.qdl.functions.FunctionTableImpl;
+import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -371,7 +371,8 @@ public class XMLUtils implements XMLConstants {
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
-                        FunctionTableImpl functionTable = new FunctionTableImpl();
+                        //FunctionTableImpl functionTable = new FunctionTableImpl();
+                        FunctionTable2 functionTable = new FunctionTable2();
                         functionTable.fromXML(xer, qi);
                         state.getFTStack().push(functionTable);
                     }

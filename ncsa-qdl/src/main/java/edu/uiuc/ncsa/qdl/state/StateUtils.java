@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
+import edu.uiuc.ncsa.qdl.functions.FTStack2;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
@@ -157,7 +157,7 @@ public abstract class StateUtils {
                             new SymbolStack(),
                             new OpEvaluator(),
                             MetaEvaluator.getInstance(),
-                            new FTStack(),
+                            new FTStack2(),
                             new MTemplates(),
                             new MyLoggingFacade("foo"),
                             false,

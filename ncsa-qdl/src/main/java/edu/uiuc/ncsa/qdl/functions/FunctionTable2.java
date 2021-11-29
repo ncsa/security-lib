@@ -264,5 +264,13 @@ public class FunctionTable2<V extends FunctionRecord>  extends HashMap<XKey, V> 
     public String toString() {
         return getClass().getSimpleName() + "[size=" + size() + "]";
     }
+
+/*    public FunctionRecord getFunctionReference(String name) {
+          FKey key = new FKey(name,-1);
+            if (super.containsKey(key)) {
+                return get(key);
+            }
+            return null;
+        }*/
 }
 

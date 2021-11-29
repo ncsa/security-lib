@@ -48,6 +48,16 @@ public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extend
         return null;
     }*/
 
+    public FunctionRecord getFunctionReference(String name) {
+         for (XTable functionTable : getStack()) {
+             FunctionRecord fr = (FunctionRecord) functionTable.get(new FKey(name, -1));
+             if (fr != null) {
+                 return fr;
+             }
+         }
+         return null;
+     }
+
     /**
      * Returns all of the named functions for any arg count. This is needed
      * to populate copies of local state.
@@ -93,7 +103,7 @@ public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extend
                         // Legacy case -- just a single functions block, not a stack.
                         case XMLConstants.FUNCTIONS_TAG:
                             if (foundStack) break; // if a stack is being processed, skip this
-                            FunctionTable functionTable1 = qi.getState().getFTStack().peek();
+                            FunctionTable2 functionTable1 = (FunctionTable2) qi.getState().getFTStack().peek();
                             functionTable1.fromXML(xer, qi);
                             break;
                     }

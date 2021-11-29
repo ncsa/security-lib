@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.expressions;
 
+import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
@@ -55,7 +56,7 @@ public class Polyad extends ExpressionImpl {
         // there is an override in place. If not, kick it up to the main system
         // (so evalute with no alias).
         if(isInModule()){
-            if(state.getFTStack().containsKey(getName(), getArgCount())) {
+            if(state.getFTStack().containsKey(new FKey(getName(), getArgCount()))) {
                 state.getMetaEvaluator().evaluate(getAlias(), this, state);
             }else{
                 state.getMetaEvaluator().evaluate(this, state);

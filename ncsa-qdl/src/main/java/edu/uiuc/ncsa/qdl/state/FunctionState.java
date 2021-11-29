@@ -5,9 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FTStack;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
@@ -29,7 +27,7 @@ public abstract class FunctionState extends VariableState {
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         FTStack ftStack,
+                         FTStack2 ftStack,
                          MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
         super(mAliases,
@@ -44,15 +42,12 @@ public abstract class FunctionState extends VariableState {
     private static final long serialVersionUID = 0xcafed00d4L;
 
     @Override
-    public FTStack getFTStack() {
+    public FTStack2<? extends FunctionTable2<? extends FunctionRecord>> getFTStack() {
         return ftStack;
     }
 
-    public void setFTStack(FTStack ftStack) {
-        this.ftStack = ftStack;
-    }
 
-    FTStack ftStack = new FTStack();
+    FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack = new FTStack2();
 
     /**
      * Convenience, just looks up name and arg count
@@ -74,25 +69,19 @@ public abstract class FunctionState extends VariableState {
 
             // Nothing imported, so nothing to look through.
             frs.state = this;
-            if(getFTStack().containsKey(name, -1)){
-                frs.functionRecord = getFTStack().get(name, argCount);
+            if(getFTStack().containsKey(new FKey(name, -1))){
+                frs.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
 
             }else{
 
                 frs.functionRecord = null;
             }
-/*
-            if (argCount == -1) {
-                frs.functionRecord = getFTStack().hasA(name);
-            } else {
-                frs.functionRecord = getFTStack().get(name, argCount);
-            }
-*/
+
             return frs;
         }
         // check for unqualified names.
         FR_WithState fr = new FR_WithState();
-        fr.functionRecord = getFTStack().get(name, argCount);
+        fr.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
 
         fr.state = this;
         // if there is an unqualified named function, return it.
@@ -109,7 +98,7 @@ public abstract class FunctionState extends VariableState {
         if (!isPrivate(name)) {
             for (String alias : getmInstances().keySet()) {
                 if (fr.functionRecord == null) {
-                    FunctionRecord tempFR = getImportedModule(alias).getState().getFTStack().get(name, argCount);
+                    FunctionRecord tempFR = (FunctionRecord) getImportedModule(alias).getState().getFTStack().get(new FKey(name, argCount));
                     if (tempFR != null) {
                         fr.functionRecord = tempFR;
                         fr.state = getmInstances().get(alias).getState();
@@ -120,7 +109,7 @@ public abstract class FunctionState extends VariableState {
                         }
                     }
                 } else {
-                    FunctionRecord tempFR = mInstances.get(alias).getState().getFTStack().get(name, argCount);
+                    FunctionRecord tempFR = (FunctionRecord) mInstances.get(alias).getState().getFTStack().get(new FKey(name, argCount));
                     if ((checkForDuplicates) && tempFR != null) {
                         throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                     }
@@ -280,7 +269,7 @@ public abstract class FunctionState extends VariableState {
             out = new ArrayList<>();
         }
         for (URI key : getMAliases().keySet()) {
-            if (getModuleMap().get(key).getState().getFTStack().containsKey(fname, argCount)) {
+            if (getModuleMap().get(key).getState().getFTStack().containsKey(new FKey(fname, argCount))) {
                 List<String> doxx;
                 if (argCount == -1) {
                     doxx = getModuleMap().get(key).getState().getFTStack().listAllDocs(fname);

@@ -26,10 +26,21 @@ public class FKey extends XKey {
      * @return
      */
      public boolean hasName(String name){
+         if(name == null){
+             return false;
+         }
+         if(fName == null){
+             if(name == null) return true;
+             return false;
+         }
          return fName.equals(name);
      }
+
     public FKey(String fkey, int argCount) {
         super();
+        if(fkey == null){
+            System.out.println("FKEY null");
+        }
         this.fName = fkey;
         this.argCount = argCount;
         if (-1 < argCount) {
