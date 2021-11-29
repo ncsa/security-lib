@@ -624,7 +624,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         random.nextBytes(bytes);
         String tempName = base32.encodeToString(bytes);
         for (int i = 0; i < 10; i++) {
-            if (state.getFTStack().getSomeFunction(tempName) == null) {
+            if (!state.getFTStack().containsKey(tempName,-1)) {
                 return tempName;
             }
             tempName = base32.encodeToString(bytes);

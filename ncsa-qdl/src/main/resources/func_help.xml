@@ -74,7 +74,7 @@ See also: encode_b32
             <![CDATA[
 encode_b32(arg) - encode a string or stem of string into base 32.
 We follow RFC 4648, meaning that the result is not padded with
-things like ='s, and the character set is a-zA-Z0-9-_.
+things like ='s, and the character set is A-Z2-7
 This makes the result always URL safe.
 Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
 E.g.

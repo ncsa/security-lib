@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.functions;
+package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
@@ -15,17 +15,17 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 11/7/21 at  5:14 AM
  */
-public interface XTable<V extends QDLStateThing> extends Map<String, V>, Cloneable, Serializable, Documentable {
+public interface XTable<V extends XThing> extends Map<XKey, V>, Cloneable, Serializable, Documentable {
     /**
-     * Should add the {@link QDLStateThing} based on its {@link QDLStateThing#getName()} as the key.
+     * Should add the {@link XThing} based on its {@link XThing#getName()} as the key.
      * @param value
      * @return
      */
-    V put(QDLStateThing value);
+    V put(XThing value);
 
     void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
     void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 
-    boolean containsKey(String key, int startTableIndex);
+ //   boolean containsKey(XKey key, int startTableIndex);
 }

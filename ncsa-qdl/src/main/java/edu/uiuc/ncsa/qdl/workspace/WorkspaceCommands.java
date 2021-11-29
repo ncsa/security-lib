@@ -2067,7 +2067,7 @@ public class WorkspaceCommands implements Logable {
         }
 
         getState().getFTStack().remove(fName, argCount);
-        if (getState().getFTStack().getSomeFunction(fName) == null) {
+        if (getState().getFTStack().containsKey(fName, -1)) {
             say(fName + " removed.");
         } else {
             say("Could not remove " + fName);

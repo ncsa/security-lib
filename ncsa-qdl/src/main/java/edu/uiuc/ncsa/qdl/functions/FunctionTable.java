@@ -22,10 +22,13 @@ public interface FunctionTable extends Cloneable, Serializable, Documentable {
 
     boolean containsKey(String var, int argCount, int startTableIndex);
 
-    FunctionRecord getSomeFunction(String name);
-
+    /**
+     * Gets a function reference when there are no arguments. E.g. in a call to
+     * a function like f(@g()), this would search for g.
+     * @param name
+     * @return
+     */
     FunctionRecord getFunctionReference(String name);
-
 
     /**
      * Finds every {@link FunctionRecord} in all stacks for a given name.

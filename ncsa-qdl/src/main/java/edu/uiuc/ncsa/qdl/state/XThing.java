@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.functions;
+package edu.uiuc.ncsa.qdl.state;
 
 import java.io.Serializable;
 
@@ -11,6 +11,7 @@ import java.io.Serializable;
  * <p>Created by Jeff Gaynor<br>
  * on 11/7/21 at  5:15 AM
  */
-public interface QDLStateThing extends Serializable, Cloneable {
+public interface XThing extends Serializable, Cloneable {
     String getName();
+    XKey getKey();
 }

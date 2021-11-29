@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.XThing;
+import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -10,71 +13,50 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTIONS_TAG;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
 
 /**
  * <p>Created by Jeff Gaynor<br>
- * on 1/22/20 at  10:52 AM
+ * on 11/19/21 at  7:48 AM
  */
-public class FunctionTableImpl extends HashMap<String, FunctionRecord> implements FunctionTable {
-    String munger = "$$$";
+public class FunctionTable2<V extends FunctionRecord>  extends HashMap<XKey, V>  implements XTable<V> {
+    @Override
+    public V put(XThing value) {
+        return super.put(value.getKey(), (V) value);
+    }
 
-    public String createKey(String name, int argCount) {
-        if (argCount == FunctionRecord.FREF_ARG_COUNT) {
-            return name + munger;
+
+    /**
+     * If argCount === -1, remove all named functions, otherwise only remove the one with the
+     * exact argCount.
+     * @param key
+     * @return
+     */
+    @Override
+    public V remove(Object key) {
+        if(!(key instanceof FKey)){
+            throw new IllegalArgumentException(key + " is not an FKey");
         }
-        return name + munger + argCount;
-    }
-
-    public FunctionRecord getFunctionReference(String name) {
-        if (super.containsKey(name + munger)) {
-            return get(name + munger);
-        }
-        return null;
-    }
-
-    public String createKey(FunctionRecord fr) {
-        return createKey(fr.name, fr.getArgCount());
-    }
-
-    @Override
-    public FunctionRecord put(FunctionRecord value) {
-        return super.put(createKey(value), value);
-    }
-
-
-    @Override
-    public FunctionRecord get(String key, int argCount) {
-        return super.get(createKey(key, argCount));
-    }
-
-    @Override
-    public void remove(String fName, int argCount) {
-        if (argCount == -1) {
-            String almostMungedName = fName + munger;
-            for (String key : keySet()) {
-                if (key.startsWith(almostMungedName)) {
-                    remove(key);
+        FKey fKey = (FKey) key;
+        if (fKey.getArgCount() == -1) {
+            for (XKey key1 : keySet()) {
+                if (((FKey)key1).hasName(fKey.getfName())) {
+                    remove(key1);
                 }
             }
-
-            return;
+            return null;
         }
-        remove(createKey(fName, argCount));
+
+        return super.remove(key);
     }
 
-    @Override
-    public List<FunctionRecord> getByAllName(String name) {
-        List<FunctionRecord> fList = new ArrayList<>();
-        String almostMungedName = name + munger;
-        for (String key : keySet()) {
-            if (key.startsWith(almostMungedName)) {
+    public List<V> getByAllName(String name) {
+        List<V> fList = new ArrayList<>();
+        for (XKey key : keySet()) {
+            if (((FKey)key).hasName(name)) {
                 fList.add(get(key));
             }
         }
@@ -82,38 +64,38 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     }
 
     @Override
-    public List<FunctionRecord> getAll() {
-        List<FunctionRecord> fList = new ArrayList<>();
-        for (String key : keySet()) {
+    public Collection<V> values() {
+        List<V> fList = new ArrayList<>();
+        for (XKey key : keySet()) {
             fList.add(get(key));
         }
         return fList;
     }
 
+
     @Override
-    public boolean containsKey(String var, int argCount) {
-        if (argCount == -1) {
-            for (String k : keySet()) {
-                if (k.startsWith(var + munger)) {
+    public boolean containsKey(Object key) {
+        if(!(key instanceof FKey)){
+            throw new IllegalArgumentException(key + " is not an FKey");
+        }
+        FKey fkey = (FKey) key;
+        if(fkey.getArgCount() == -1){
+            for (XKey key0 : keySet()) {
+                if (((FKey)key0).hasName(fkey.getfName())) {
                     return true;
                 }
             }
-            return false;
-        }
-        return super.containsKey(createKey(var, argCount));
-    }
 
-    @Override
-    public boolean containsKey(String var, int argCount, int startTableIndex) {
-        return containsKey(var,argCount);
+        }
+        return super.containsKey(key);
     }
 
     @Override
     public TreeSet<String> listFunctions(String regex) {
         TreeSet<String> names = new TreeSet<>();
 
-        for (String key : keySet()) {
-            String name = key.substring(0, key.indexOf(munger)); // de-munge
+        for (XKey key : keySet()) {
+            String name = ((FKey)key).getfName(); // de-munge
             FunctionRecord fr = get(key);
             if (regex != null && !regex.isEmpty()) {
                 if (name.matches(regex)) {
@@ -136,8 +118,8 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     @Override
     public List<String> listAllDocs() {
         ArrayList<String> docs = new ArrayList<>();
-        for (String key : keySet()) {
-            String name = key.substring(0, key.lastIndexOf(munger)); // de-munge
+        for (XKey key : keySet()) {
+            String name = ((FKey)key).getfName(); // de-munge
             FunctionRecord fr = get(key);
             name = name + "(" + fr.getArgCount() + ")";
             if (0 < fr.documentation.size()) {
@@ -159,8 +141,8 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
     // Filter by fname.
     public List<String> listAllDocs(String fname) {
         ArrayList<String> docs = new ArrayList<>();
-        for (String key : keySet()) {
-            if (key.startsWith(fname + munger)) {
+        for (XKey key : keySet()) {
+            if (((FKey)key).hasName(fname)) {
                 FunctionRecord fr = get(key);
                 String name = fname + "(" + fr.getArgCount() + ")";
                 if (0 < fr.documentation.size()) {
@@ -187,16 +169,16 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
      */
     @Override
     public List<String> getDocumentation(String fName, int argCount) {
-        if (get(fName, argCount) == null) {
-            return new ArrayList<>(); // never null
-        } else {
-            return get(fName, argCount).documentation;
-        }
+        throw new NotImplementedException("not implemented in XTables");
     }
 
     @Override
     public List<String> getDocumentation(FKey key) {
-        throw new NotImplementedException("not implemented in old function tables");
+        if (get(key) == null) {
+            return new ArrayList<>(); // never null
+        } else {
+            return get(key).documentation;
+        }
     }
 
     @Override
@@ -205,13 +187,13 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
             return;
         }
         xsw.writeStartElement(FUNCTIONS_TAG);
-        for (String key : keySet()) {
+        for (XKey key : keySet()) {
             if (get(key).sourceCode.isEmpty()) {
                 // No source code usually means it is from some external function
                 // and we cannot recreate it.
                 continue;
             }
-            String name = key.substring(0, key.lastIndexOf(munger)); // de-munge
+            String name = ((FKey)key).getfName(); // de-munge
 
             xsw.writeStartElement(XMLConstants.FUNCTION_TAG);
             xsw.writeAttribute(XMLConstants.FUNCTION_NAME_TAG, name);
@@ -280,9 +262,7 @@ public class FunctionTableImpl extends HashMap<String, FunctionRecord> implement
 
     @Override
     public String toString() {
-        return "FunctionTableImpl{" +
-                "munger='" + munger + '\'' +
-                "values=" + toString() +
-                '}';
+        return getClass().getSimpleName() + "[size=" + size() + "]";
     }
 }
+

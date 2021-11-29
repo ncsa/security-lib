@@ -74,11 +74,20 @@ public abstract class FunctionState extends VariableState {
 
             // Nothing imported, so nothing to look through.
             frs.state = this;
+            if(getFTStack().containsKey(name, -1)){
+                frs.functionRecord = getFTStack().get(name, argCount);
+
+            }else{
+
+                frs.functionRecord = null;
+            }
+/*
             if (argCount == -1) {
-                frs.functionRecord = getFTStack().getSomeFunction(name);
+                frs.functionRecord = getFTStack().hasA(name);
             } else {
                 frs.functionRecord = getFTStack().get(name, argCount);
             }
+*/
             return frs;
         }
         // check for unqualified names.

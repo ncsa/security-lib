@@ -44,7 +44,7 @@ public class Cleanup<K, V> extends Thread {
             debug("empty map for " + getName());
             return linkedList;
         }
-        debug("map has  " + getMap().size() + " elements for "+ getName());
+        debug("map has  " + getMap().size() + " elements for " + getName());
 
 
         // copy the object's sorted list or we will get a concurrent modification exception
@@ -107,6 +107,7 @@ public class Cleanup<K, V> extends Thread {
 
     /**
      * Is this thread set to stop?
+     *
      * @return
      */
     public boolean isStopThread() {
@@ -116,6 +117,7 @@ public class Cleanup<K, V> extends Thread {
     /**
      * Sets the flag to stop this thread. The next time the thread wakes up after this is enabled, the thread will exit.
      * This allows for a clean shutdown of caching.
+     *
      * @param stopThread
      */
     public void setStopThread(boolean stopThread) {
@@ -162,11 +164,14 @@ public class Cleanup<K, V> extends Thread {
         log("removed:" + removed.size() + ", remaining:" + getMap().size());
     }
 
-    protected void debug(String x){
+    protected void debug(String x) {
         DebugUtil.trace(deepDebug, this, x);
     }
 
 
+    protected void debug(String x, Throwable t) {
+        DebugUtil.trace(deepDebug, this, x, t);
+    }
 
     @Override
     public void run() {
@@ -183,6 +188,7 @@ public class Cleanup<K, V> extends Thread {
                         }
 
                     } catch (Throwable throwable) {
+                        debug("error in cleanup:" + throwable.getMessage(), throwable);
                         // nix to do, really if this fails.
                         // mostly just print out something someplace so there is a record of the failure.
                         int sz = -1;

@@ -1,12 +1,13 @@
 package edu.uiuc.ncsa.qdl.functions;
 
-import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:48 AM
  */
-public class FunctionRecord implements QDLStateThing {
+public class FunctionRecord implements XThing {
     @Override
     public String getName() {
         return name;
@@ -33,6 +34,17 @@ public class FunctionRecord implements QDLStateThing {
     public List<String> argNames = new ArrayList<>();
     public boolean isFuncRef = false;
     public String fRefName = null;
+
+    @Override
+    public FKey getKey() {
+        if(key == null){
+            key = new FKey(getName(), getArgCount());
+        }
+        return key;
+    }
+
+    protected FKey key = null;
+
 
     public boolean hasName(){
         return name != null;
@@ -128,21 +140,7 @@ public class FunctionRecord implements QDLStateThing {
         return fr;
     }
 
-    /**
-     * One other way to do the {@link #newInstance()} method is to simply grab the source
-     * code and re-interpret this. This works fine, but is a lot slower than serialization
-     * since a whole new interpreter with state has to be created and all the work to get this far
-     * has to be repeated every time a reference to the function is made.
-     * @return
-     * @throws Throwable
-     */
-    protected FunctionRecord oldNewInstance() throws Throwable {
-        State state = StateUtils.newInstance();
-        QDLInterpreter interpreter = new QDLInterpreter(state);
-        interpreter.execute(sourceCode);
-        List<FunctionRecord> frs = state.getFTStack().peek().getAll();
-        return frs.get(0);
-    }
+
     /*
        a. := [[n(3),5+n(3)],[[n(4),5+n(4)],[n(5),6+n(5)]]]
        b. := 100 + a.

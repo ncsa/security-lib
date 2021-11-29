@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -31,97 +32,13 @@ public class FTStack implements FunctionTable {
         ftables.add(functionTable);
     }
 
-    public boolean isEmpty() {
-        boolean empty = true;
-        for (FunctionTable functionTable : ftables) {
-            empty = empty && functionTable.isEmpty();
-        }
-        return empty;
-    }
-
-    /**
-     * remove <b>all</b> instances of the function from the local stack
-     *
-     * @param name
-     * @param argCount
-     * @return
-     */
-    public void remove(String name, int argCount) {
-        peek().remove(name, argCount);
-    }
-
-    /**
-     * Take the FT stack and add all of the tables in this stack in the correct order.
-     * This is needed when, e.g., creating new local state for function reference resolution
-     *
-     * @param ftStack
-     */
-    public void addTables(FTStack ftStack) {
-        // add backwards
-        for (int i = ftables.size() - 1; 0 <= i; i--) {
-            ftStack.push(ftables.get(i));
-        }
-    }
-
-    ArrayList<FunctionTable> ftables = new ArrayList<>();
-
-    public FunctionTable peek() {
-        return ftables.get(0);
-    }
-
-    public List<FunctionRecord> getAll() {
-        List<FunctionRecord> all = new ArrayList<>();
+    @Override
+    public FTStack clone() {
+        FTStack cloned = new FTStack();
         for (FunctionTable ft : ftables) {
-
-            all.addAll(ft.getAll());
+            cloned.append(ft);
         }
-        return all;
-    }
-
-    public void push(FunctionTable ft) {
-        ftables.add(0, ft);
-    }
-
-    public void pushNew() {
-        push(new FunctionTableImpl());
-    }
-
-    public ArrayList<FunctionTable> getFtables() {
-        return ftables;
-    }
-
-    @Override
-    public FunctionRecord put(FunctionRecord value) {
-        for (FunctionTable functionTable : ftables) {
-            if (functionTable.containsKey(value.name, value.getArgCount())) {
-                functionTable.put(value);
-                return value;
-            }
-        }
-
-        return peek().put(value);
-    }
-
-    @Override
-    public FunctionRecord get(String key, int argCount) {
-        for (FunctionTable functionTable : ftables) {
-            FunctionRecord fr = functionTable.get(key, argCount);
-            if (fr != null) {
-                return fr;
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public FunctionRecord getFunctionReference(String name) {
-        for (FunctionTable functionTable : ftables) {
-            FunctionRecord fr = functionTable.getFunctionReference(name);
-            if (fr != null) {
-                return fr;
-            }
-        }
-        return null;
+        return cloned;
     }
 
     @Override
@@ -138,25 +55,34 @@ public class FTStack implements FunctionTable {
         return false;
     }
 
-    /**
-     * Used in the case there is a single function by this name so we don't have to know ahead
-     * of time the arg count (which might not be available).
-     *
-     * @param name
-     * @return
-     */
     @Override
-    public FunctionRecord getSomeFunction(String name) {
+    public FunctionRecord get(String key, int argCount) {
         for (FunctionTable functionTable : ftables) {
-            FunctionRecord fr = functionTable.getSomeFunction(name);
+            FunctionRecord fr = functionTable.get(key, argCount);
             if (fr != null) {
                 return fr;
             }
         }
-
         return null;
     }
 
+    public List<FunctionRecord> getAll() {
+        List<FunctionRecord> all = new ArrayList<>();
+        for (FunctionTable ft : ftables) {
+            all.addAll(ft.getAll());
+        }
+        return all;
+    }
+
+    /**
+     * Retrieve every instance of the entries in all the tables. Necessary to capture all the
+     * overrides, e.g., that a user might have made to a function. So if f(x) is defined
+     * and the user redefines it, say, inside another function, this will pick up the most recent
+     * definition. <br/><br/>
+     * See edu.uiuc.ncsa.qdl.evaluate.FunctionEvaluator#doFunctionEvaluation(Polyad, State, FR_WithState).
+     * @param name
+     * @return
+     */
     public List<FunctionRecord> getByAllName(String name) {
         List<FunctionRecord> all = new ArrayList<>();
         // Note this walks backwards through the stack.
@@ -164,8 +90,160 @@ public class FTStack implements FunctionTable {
             all.addAll(ftables.get(i).getByAllName(name));
         }
         return all;
-
     }
+
+    @Override
+    public List<String> getDocumentation(String fName, int argCount) {
+        List<String> all = new ArrayList<>();
+        // Note this walks backwards through the stack since this means that if
+        // there is local documentation it overwrites the global documentation.
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            all.addAll(ftables.get(i).getDocumentation(fName, argCount));
+        }
+        return all;
+    }
+
+    @Override
+    public List<String> getDocumentation(FKey key) {
+        throw new NotImplementedException("not implemented in old FTStack");
+    }
+
+    /**
+     * Find and return the first reference to this function, starting in the local
+     * stack.
+     * @param name
+     * @return
+     */
+    @Override
+    public FunctionRecord getFunctionReference(String name) {
+        for (FunctionTable functionTable : ftables) {
+            FunctionRecord fr = functionTable.getFunctionReference(name);
+            if (fr != null) {
+                return fr;
+            }
+        }
+        return null;
+    }
+
+
+    public boolean isEmpty() {
+        boolean empty = true;
+        for (FunctionTable functionTable : ftables) {
+            empty = empty && functionTable.isEmpty();
+        }
+        return empty;
+    }
+
+    @Override
+    public List<String> listAllDocs() {
+        List<String> all = new ArrayList<>();
+        // Note this walks backwards through the stack since this means that if
+        // there is local documentation it overwrites the global documentation.
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            all.addAll(ftables.get(i).listAllDocs());
+        }
+        return all;
+    }
+
+    @Override
+    public List<String> listAllDocs(String functionName) {
+        List<String> all = new ArrayList<>();
+        // Note this walks backwards through the stack since this means that if
+        // there is local documentation it overwrites the global documentation.
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            all.addAll(ftables.get(i).listAllDocs(functionName));
+        }
+        return all;
+    }
+
+    @Override
+    public TreeSet<String> listFunctions(String regex) {
+        TreeSet<String> all = new TreeSet<>();
+        // Note this walks backwards through the stack since this means that if
+        // there is local documentation it overwrites the global documentation.
+        for (int i = ftables.size() - 1; 0 <= i; i--) {
+            all.addAll(ftables.get(i).listFunctions(regex));
+        }
+        return all;
+    }
+
+
+    public FunctionTable peek() {
+        return ftables.get(0);
+    }
+
+    public void push(FunctionTable ft) {
+        ftables.add(0, ft);
+    }
+
+    public void pushNew() {
+        push(new FunctionTableImpl());
+    }
+
+    @Override
+    public FunctionRecord put(FunctionRecord value) {
+        for (FunctionTable functionTable : ftables) {
+            if (functionTable.containsKey(value.name, value.getArgCount())) {
+                functionTable.put(value);
+                return value;
+            }
+        }
+
+        return peek().put(value);
+    }
+    /**
+     * remove  instance of the function from the local stack
+     *
+     * @param name
+     * @param argCount
+     * @return
+     */
+    public void remove(String name, int argCount) {
+        peek().remove(name, argCount);
+    }
+
+    /**
+     * Used in the workspace mostly to tell how many of these total are
+     * used, also in this class to do {@link #toString()}.
+     * @return
+     */
+    @Override
+    public int size() {
+        int totalSymbols = 0;
+        for (FunctionTable functionTable : ftables) {
+            totalSymbols += functionTable.size();
+        }
+        return totalSymbols;
+    }
+
+    @Override
+    public String toString() {
+        String out = "[" + getClass().getSimpleName();
+        out = out + ", table#=" + ftables.size();
+        int i = 0;
+        int totalSymbols = 0;
+        boolean isFirst = true;
+        out = ", counts=[";
+        for (FunctionTable functionTable : ftables) {
+            if (isFirst) {
+                isFirst = false;
+                out = out + functionTable.size();
+            } else {
+                out = out + "," + functionTable.size();
+            }
+            totalSymbols += functionTable.size();
+        }
+        out = out + "], total=" + totalSymbols;
+        out = out + "]";
+        return out;
+    }
+
+    ArrayList<FunctionTable> ftables = new ArrayList<>();
+
+    public ArrayList<FunctionTable> getFtables() {
+        return ftables;
+    }
+
 
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
@@ -214,87 +292,4 @@ public class FTStack implements FunctionTable {
 
     }
 
-    @Override
-    public TreeSet<String> listFunctions(String regex) {
-        TreeSet<String> all = new TreeSet<>();
-        // Note this walks backwards through the stack since this means that if
-        // there is local documentation it overwrites the global documentation.
-        for (int i = ftables.size() - 1; 0 <= i; i--) {
-            all.addAll(ftables.get(i).listFunctions(regex));
-        }
-        return all;
-    }
-
-    @Override
-    public List<String> listAllDocs() {
-        List<String> all = new ArrayList<>();
-        // Note this walks backwards through the stack since this means that if
-        // there is local documentation it overwrites the global documentation.
-        for (int i = ftables.size() - 1; 0 <= i; i--) {
-            all.addAll(ftables.get(i).listAllDocs());
-        }
-        return all;
-    }
-
-    @Override
-    public List<String> listAllDocs(String functionName) {
-        List<String> all = new ArrayList<>();
-        // Note this walks backwards through the stack since this means that if
-        // there is local documentation it overwrites the global documentation.
-        for (int i = ftables.size() - 1; 0 <= i; i--) {
-            all.addAll(ftables.get(i).listAllDocs(functionName));
-        }
-        return all;
-    }
-
-    @Override
-    public List<String> getDocumentation(String fName, int argCount) {
-        List<String> all = new ArrayList<>();
-        // Note this walks backwards through the stack since this means that if
-        // there is local documentation it overwrites the global documentation.
-        for (int i = ftables.size() - 1; 0 <= i; i--) {
-            all.addAll(ftables.get(i).getDocumentation(fName, argCount));
-        }
-        return all;
-    }
-
-    @Override
-    public FTStack clone() {
-        FTStack cloned = new FTStack();
-        for (FunctionTable ft : ftables) {
-            cloned.append(ft);
-        }
-        return cloned;
-    }
-
-    @Override
-    public String toString() {
-        String out = "[" + getClass().getSimpleName();
-        out = out + ", table#=" + ftables.size();
-        int i = 0;
-        int totalSymbols = 0;
-        boolean isFirst = true;
-        out = ", counts=[";
-        for (FunctionTable functionTable : ftables) {
-            if (isFirst) {
-                isFirst = false;
-                out = out + functionTable.size();
-            } else {
-                out = out + "," + functionTable.size();
-            }
-            totalSymbols += functionTable.size();
-        }
-        out = out + "], total=" + totalSymbols;
-        out = out + "]";
-        return out;
-    }
-
-    @Override
-    public int size() {
-        int totalSymbols = 0;
-        for (FunctionTable functionTable : ftables) {
-            totalSymbols += functionTable.size();
-        }
-        return totalSymbols;
-    }
 }

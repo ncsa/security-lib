@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.functions.FKey;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.TreeSet;
@@ -36,4 +38,5 @@ public interface Documentable extends Serializable {
      * @return
      */
     List<String> getDocumentation(String fName, int argCount);
+    List<String> getDocumentation(FKey key);
 }
