@@ -10,20 +10,24 @@ import java.util.List;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
- * is preserved. The zero-th element is the current local table.
- * <h3>E.g.</h3>
+ * is preserved. The zero-th element is the current local table. It is used for functions,
+ * variables, modules etc., hence the prefix of <b>X</b> for it and things related to it.
+ * <h3>Usage</h3>
+ * <p>Create a subclass as needed for your objects. This involves an {@link XStack},
+ * {@link XTable}, {@link XKey} and an {@link XThing}.</p>
+ * <h3>How state is managed</h3>
  * If we had the following QDL:
  * <pre>
  *     f(x)-&gt;x^2;
  *     block[f(x)-&gt;x^3;...]
  * </pre>
- * Then {@link XStack} inside the block would look like
+ * Then {@link XStack} subclass for functions inside the block would look like
  * <pre>
  *     table       entry
  *     0           f(x)-&gt;x^3
  *     1           f(x)-&gt;x^2
  * </pre>
- * Calls to <@link {@link XStack#get(String)} would peek at 0 and return f(x)-&gt;x^3
+ * Calls to <@link {@link XStack#get(XKey)} would peek at 0 and return f(x)-&gt;x^3
  * inside the block. This is how local state overrides the parent state.
  * Blocks of course can be for loops, functions, conditionals etc. Were there no
  * entry for f(x) in the block, then {@link XStack} would return f(x)-&gt;x^2.
@@ -45,9 +49,10 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         }
     }
 
-    abstract public  XStack newInstance();
+    abstract public XStack newInstance();
 
-    abstract public  XTable newTableInstance();
+    abstract public XTable newTableInstance();
+
     /**
      * Append the table to the end of the stack -- this sets the root for the table.
      *
@@ -56,6 +61,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     public void append(V v) {
         getStack().add(v);
     }
+
     @Override
     public XStack clone() {
         XStack cloned = newInstance();
@@ -68,19 +74,21 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     /**
      * Check that a specific key is in a table starting at the index.
      * This lets you, e.g., skip local state if the start index is positive.
+     *
      * @param key
      * @param startTableIndex
      * @return
      */
-    public boolean containsKey(XKey key, int startTableIndex){
+    public boolean containsKey(XKey key, int startTableIndex) {
         for (int i = startTableIndex; i < getStack().size(); i++) {
-             if (getStack().get(i).containsKey(key)) {
-                 return true;
-             }
-         }
-         return false;
+            if (getStack().get(i).containsKey(key)) {
+                return true;
+            }
+        }
+        return false;
     }
-    public XThing get(String key) {
+
+    public XThing get(XKey key) {
         for (XTable<? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
             if (xThing != null) {
@@ -90,12 +98,12 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         return null;
     }
 
-    public List<? extends XThing> getAll(){
-          List<? extends XThing>list = new ArrayList<>();
-          for(XTable xTable : getStack()){
-              list.addAll(xTable.values());
-          }
-          return list;
+    public List<? extends XThing> getAll() {
+        List<? extends XThing> list = new ArrayList<>();
+        for (XTable xTable : getStack()) {
+            list.addAll(xTable.values());
+        }
+        return list;
     }
 
     /**
@@ -107,6 +115,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     public XTable<? extends XThing> getRoot() {
         return getStack().get(getStack().size() - 1);
     }
+
     public List<XTable<? extends XThing>> getStack() {
         return stack;
     }
@@ -128,18 +137,19 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     public XTable<? extends XThing> peek() {
         return getStack().get(0);
     }
+
     public void push(XTable<? extends XThing> xTable) {
         getStack().add(0, xTable);
     }
 
-    public void pushNewTable(){
+    public void pushNewTable() {
         push(newTableInstance());
     }
 
 
     public XThing put(XThing value) {
         for (XTable<? extends XThing> xTable : getStack()) {
-            if (xTable.containsKey(value.getName())) {
+            if (xTable.containsKey(value.getKey())) {
                 xTable.put(value);
                 return value;
             }
@@ -147,10 +157,25 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         return peek().put(value);
     }
 
-    public void remove(String key){peek().remove(key);}
+    /**
+     * Removes the most local entry.
+     *
+     * @param key
+     */
+    public void removeLocal(XKey key) {
+         peek().remove(key);
+    }
 
-    public void set(XThing xThing) {
-        peek().put(xThing);
+    /**
+     * Removes <i>all</i> references from all tables. This includes all overrides
+     * so at the end of this operation there are no references any place.
+     *
+     * @param key
+     */
+    public void remove(XKey key) {
+        for (XTable<? extends XThing> xTable : getStack()) {
+            xTable.remove(key);
+        }
     }
 
     public int size() {
@@ -182,11 +207,10 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         out = out + "]";
         return out;
     }
-    
+
     abstract public void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
-
 
 
 }
