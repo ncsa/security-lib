@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.xml;
 
 import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
+import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -372,7 +372,7 @@ public class XMLUtils implements XMLConstants {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
                         //FunctionTableImpl functionTable = new FunctionTableImpl();
-                        FunctionTable2 functionTable = new FunctionTable2();
+                        FTable functionTable = new FTable();
                         functionTable.fromXML(xer, qi);
                         state.getFTStack().push(functionTable);
                     }
@@ -422,7 +422,7 @@ public class XMLUtils implements XMLConstants {
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
                         Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        state.getModuleMap().put(moduleAttributes.ns, module);
+                        state.getMTemplates().put(moduleAttributes.ns, module);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

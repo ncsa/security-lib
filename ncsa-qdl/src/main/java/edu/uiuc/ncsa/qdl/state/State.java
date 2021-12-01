@@ -3,9 +3,9 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
-import edu.uiuc.ncsa.qdl.functions.FTStack2;
+import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
+import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -92,7 +92,7 @@ public class State extends FunctionState implements QDLConstants {
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
-                             FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack,
+                             FStack<? extends FTable<? extends FunctionRecord>> ftStack,
                              MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
@@ -113,7 +113,7 @@ public class State extends FunctionState implements QDLConstants {
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
-                 FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack,
+                 FStack<? extends FTable<? extends FunctionRecord>> ftStack,
                  MTemplates mTemplates,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
@@ -492,7 +492,7 @@ public class State extends FunctionState implements QDLConstants {
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 getFTStack(),
-                getModuleMap(),
+                getMTemplates(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -517,8 +517,8 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                (FTStack2) getFTStack().clone(),
-                getModuleMap(),
+                (FStack) getFTStack().clone(),
+                getMTemplates(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -535,30 +535,16 @@ public class State extends FunctionState implements QDLConstants {
         newStack.getParentTables().set(0,moduleState.symbolStack);
         newStack.getParentTables().addAll(symbolStack.getParentTables());
 
-        FTStack2<? extends FunctionTable2<? extends FunctionRecord>> ftStack = new FTStack2();
-        // put the module stack at 0 so it overrides anything else, then
-        // add a clone of the current stack.
+        FStack<? extends FTable<? extends FunctionRecord>> ftStack = new FStack();
         ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
         ftStack.addTables(moduleState.getFTStack());
-//        ftStack.getFtables().set(0, moduleState.getFTStack());
-//        ftStack.getFtables().add(getFTStack().clone());
 
-
-/*
-        SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        if(newStack.getParentTables().size() == 1){
-            newStack.getParentTables().add( moduleState.symbolStack);
-        }else {
-            newStack.getParentTables().set(1, moduleState.symbolStack);
-        }
-
-*/
         State newState = newInstance(MAliases,
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 ftStack,
-                getModuleMap(),
+                getMTemplates(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -617,8 +603,8 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FTStack2(),
-                getModuleMap(),
+                new FStack(),
+                getMTemplates(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -647,7 +633,7 @@ public class State extends FunctionState implements QDLConstants {
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
-                new FTStack2(),
+                new FStack(),
                 new MTemplates(), // so no modules
                 getLogger(),
                 isServerMode(),
@@ -670,7 +656,7 @@ public class State extends FunctionState implements QDLConstants {
         if (module instanceof JavaModule) {
             ((JavaModule) module).init(this.newModuleState());
         }
-        getModuleMap().put(module.getNamespace(), module);
+        getMTemplates().put(module.getNamespace(), module);
     }
 
     public int getStackSize() {

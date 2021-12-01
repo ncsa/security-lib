@@ -203,7 +203,7 @@ public class QDLConfigurationLoaderUtils {
                     }
                     // only (easy) way to tell to compare before and after
                     Set<URI> oldImports = new HashSet<>();
-                    oldImports.addAll(interpreter.getState().getModuleMap().keySet());
+                    oldImports.addAll(interpreter.getState().getMTemplates().keySet());
                     try {
                         interpreter.execute(module);
                     } catch (Throwable t) {
@@ -215,7 +215,7 @@ public class QDLConfigurationLoaderUtils {
                         failedModules = failedModules + (failedModules.length()==0?"":",") + qmc.getPath();
                         continue;
                     }
-                    Set<URI> newImports = interpreter.getState().getModuleMap().keySet();
+                    Set<URI> newImports = interpreter.getState().getMTemplates().keySet();
                     if (newImports.size() != oldImports.size() + 1) {
                         throw new NFWException("Error: added multiple modules unexpectedly");
                     }

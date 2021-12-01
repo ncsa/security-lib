@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
+import edu.uiuc.ncsa.qdl.statements.Documentable;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -22,7 +23,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 11/19/21 at  7:48 AM
  */
-public class FunctionTable2<V extends FunctionRecord>  extends HashMap<XKey, V>  implements XTable<V> {
+public class FTable<V extends FunctionRecord>  extends HashMap<XKey, V>  implements Documentable,XTable<V> {
     @Override
     public V put(XThing value) {
         return super.put(value.getKey(), (V) value);

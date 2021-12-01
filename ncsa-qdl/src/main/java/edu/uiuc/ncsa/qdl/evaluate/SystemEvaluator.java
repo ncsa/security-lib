@@ -1747,7 +1747,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             // in a single file, so there is no way to know what the user did except
             // to look at the state before, then after. This should return the added
             // modules fq paths.
-            state.getModuleMap().clearChangeList();
+            state.getMTemplates().clearChangeList();
 /*
             List<String> b4load = new ArrayList<>();
             for (URI uri : state.getModuleMap().keySet()) {
@@ -1766,10 +1766,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 script.execute(state);
             }
             List<String> afterLoad = new ArrayList<>();
-            for (URI uri : state.getModuleMap().getChangeList()) {
+            for (URI uri : state.getMTemplates().getChangeList()) {
                 afterLoad.add(uri.toString());
             }
-            state.getModuleMap().clearChangeList();
+            state.getMTemplates().clearChangeList();
             return afterLoad;
         } catch (Throwable t) {
             if (DebugUtil.isEnabled()) {
@@ -1898,7 +1898,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             // to look at the state before, then after. This should return the added
             // modules fq paths.
             List<String> b4load = new ArrayList<>();
-            for (URI uri : state.getModuleMap().keySet()) {
+            for (URI uri : state.getMTemplates().keySet()) {
                 b4load.add(uri.toString());
             }
             if (script == null) {
@@ -1913,7 +1913,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 script.execute(state);
             }
             List<String> afterLoad = new ArrayList<>();
-            for (URI uri : state.getModuleMap().keySet()) {
+            for (URI uri : state.getMTemplates().keySet()) {
                 String s = uri.toString();
                 if (!b4load.contains(s)) {
                     afterLoad.add(s);
@@ -2011,7 +2011,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (!gotOne) {
                 throw new IllegalArgumentException(MODULE_IMPORT + ": unknown argument type");
             }
-            Module m = state.getModuleMap().get(moduleNS);
+            Module m = state.getMTemplates().get(moduleNS);
             if (m == null) {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }

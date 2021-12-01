@@ -21,6 +21,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 1/22/20 at  10:52 AM
+ * @deprecated Use {@link FTable} instead
  */
 public class FunctionTableImpl extends HashMap<String, FunctionRecord> implements FunctionTable {
     String munger = "$$$";

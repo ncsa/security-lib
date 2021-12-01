@@ -178,7 +178,7 @@ public class InputFormUtil {
     public static String inputFormModule(URI moduleNS, State state) {
         // Cases:
 
-        Module m = state.getModuleMap().get(moduleNS);
+        Module m = state.getMTemplates().get(moduleNS);
         if (m == null) {
             return null;
         }

@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/21 at  6:18 AM
+ * @deprecated do not use. Use instance of {@link FTable}
  */
 public interface FunctionTable extends Cloneable, Serializable, Documentable {
     FunctionRecord put(FunctionRecord value);

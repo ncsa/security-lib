@@ -57,7 +57,7 @@ public class QDLWorkspace {
             return;
         }
         if (t instanceof UndefinedFunctionException) {
-            workspaceCommands.say(t.getMessage()  + errorStatement);
+            workspaceCommands.say(t.getMessage() + errorStatement);
             return;
         }
         if (t instanceof InterruptException) {
@@ -106,12 +106,12 @@ public class QDLWorkspace {
     }
 
     protected String getErrorCoordinates(QDLStatementExecutionException qq) {
-      Statement statement = qq.getStatement();
+        Statement statement = qq.getStatement();
         if (!statement.hasTokenPosition()) {
             return "";
         }
         String out = " at (" + statement.getTokenPosition().line + ", " + statement.getTokenPosition().col + ")";
-        if(qq.isScript()){
+        if (qq.isScript()) {
             out = out + " in script '" + qq.getScriptName() + "'";
         }
         return out;
@@ -162,13 +162,16 @@ public class QDLWorkspace {
 
             // Good idea to strip off comments in parser, but the regex here needs to be
             // quite clever to match ' and // within them (e.g. any url fails at the command line).
-            //    input = input.split("//")[0]; // if there is a line comment, strip it.
+            // Another option is to write a small parser in antlr for the command line...
 
+            //    input = input.split("//")[0]; // if there is a line comment, strip it.
 /*            if (input.equals("%")) {
                 input = lastCommand;
             } else {
                 lastCommand = input;
-            }*/
+            }
+
+            */
 
             if (input.startsWith(")")) {
                 switch (workspaceCommands.execute(input)) {
@@ -182,6 +185,7 @@ public class QDLWorkspace {
                         workspaceCommands.say("not quite ready for prime time. Check back later");
                 }
             }
+
             boolean echoMode = workspaceCommands.isEchoModeOn();
             boolean prettyPrint = workspaceCommands.isPrettyPrint();
 

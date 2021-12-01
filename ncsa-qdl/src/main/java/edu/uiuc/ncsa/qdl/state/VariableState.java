@@ -204,7 +204,7 @@ public abstract class VariableState extends NamespaceAwareState {
             if (stem == null && !isQDLNull) {
                 if (MAliases.hasImports()) {
                     for (URI key : MAliases.keySet()) {
-                        Module m = getModuleMap().get(key);
+                        Module m = getMTemplates().get(key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
                             if (obj != null && (obj instanceof StemVariable)) {
@@ -238,7 +238,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 if (w.isEmpty()) {
                     // set the whole stem, not a value within the stem to the new value (which is a stem)
                     if (isNSQ) {
-                        getModuleMap().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, value);
+                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, value);
                     } else {
                         //getSymbolStack().getLocalST().setValue(variableName, value);
                         st.setValue(variableName, value);
@@ -251,7 +251,7 @@ public abstract class VariableState extends NamespaceAwareState {
                     }
                     stem.set(w, value);
                     if (isNSQ) {
-                        getModuleMap().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, stem);
+                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, stem);
                     } else {
                         //getSymbolStack().getLocalST().setValue(variableName, stem);
                         st.setValue(variableName, stem);
@@ -266,7 +266,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 }
                 if (w.isEmpty()) {
                     if (isNSQ) {
-                        getModuleMap().get(uri).getState().getSymbolStack().getLocalST().remove(variableName);
+                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().remove(variableName);
                     } else {
                         //getSymbolStack().getLocalST().remove(variableName);
                         st.remove(variableName);
@@ -402,7 +402,7 @@ public abstract class VariableState extends NamespaceAwareState {
             return out;
         }
         for (URI key : getMAliases().keySet()) {
-            Module m = getModuleMap().get(key);
+            Module m = getMTemplates().get(key);
             if (m == null) {
                 continue; // the user specified a non-existent module.
             }

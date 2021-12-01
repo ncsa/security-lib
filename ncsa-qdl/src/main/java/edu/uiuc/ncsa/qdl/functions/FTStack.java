@@ -17,6 +17,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/21 at  6:22 AM
+ * @deprecated use {@link FStack}
  */
 public class FTStack implements FunctionTable {
     public FTStack() {

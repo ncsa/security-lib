@@ -53,7 +53,7 @@ public class QDLModule extends Module {
         QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
         try {
             p.execute(getModuleStatement().getSourceCode());
-            return state.getModuleMap().get(getNamespace());
+            return state.getMTemplates().get(getNamespace());
         } catch (Throwable throwable) {
             if (throwable instanceof RuntimeException) {
                 throw (RuntimeException) throwable;

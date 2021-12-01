@@ -653,7 +653,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 lds.getFunctionRecord().name = tempFname(state);
             }
             if (pushNewState) {
-                FunctionTable2 ft = new FunctionTable2();
+                FTable ft = new FTable();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
 
@@ -676,7 +676,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             }
             if (pushNewState) {
                 //FunctionTableImpl ft = new FunctionTableImpl();
-                FunctionTable2 ft = new FunctionTable2();
+                FTable ft = new FTable();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
             } else {

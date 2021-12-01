@@ -22,9 +22,9 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 3/15/21 at  6:22 AM
  */
-public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extends XStack<V> implements Serializable, Documentable {
+public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V> implements Serializable, Documentable {
 
-    public FTStack2() {
+    public FStack() {
         pushNewTable();
     }
 
@@ -68,7 +68,7 @@ public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extend
         List<FunctionRecord> all = new ArrayList<>();
         // Note this walks backwards through the stack.
         for (int i = getStack().size() - 1; 0 <= i; i--) {
-            all.addAll(((FunctionTable2)getStack().get(i)).getByAllName(name));
+            all.addAll(((FTable)getStack().get(i)).getByAllName(name));
         }
         return all;
 
@@ -103,7 +103,7 @@ public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extend
                         // Legacy case -- just a single functions block, not a stack.
                         case XMLConstants.FUNCTIONS_TAG:
                             if (foundStack) break; // if a stack is being processed, skip this
-                            FunctionTable2 functionTable1 = (FunctionTable2) qi.getState().getFTStack().peek();
+                            FTable functionTable1 = (FTable) qi.getState().getFTStack().peek();
                             functionTable1.fromXML(xer, qi);
                             break;
                     }
@@ -171,11 +171,11 @@ public class FTStack2<V extends FunctionTable2<? extends FunctionRecord>> extend
 
     @Override
     public XStack newInstance() {
-        return new FTStack2();
+        return new FStack();
     }
 
     @Override
     public XTable newTableInstance() {
-        return new FunctionTable2<>();
+        return new FTable<>();
     }
 }

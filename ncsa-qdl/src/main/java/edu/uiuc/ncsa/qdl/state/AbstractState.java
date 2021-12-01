@@ -2,9 +2,9 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FTStack2;
+import edu.uiuc.ncsa.qdl.functions.FStack;
+import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.functions.FunctionTable2;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -27,7 +27,11 @@ import java.util.*;
  * on 2/2/20 at  6:37 AM
  */
 public abstract class AbstractState implements StateInterface, Logable {
-
+    /**
+     * Superstate is used in modules. If a module is created, then its state sets the super
+     * state so that references to the state vs. local module state can be cleanly separated.
+     * @return
+     */
     public State getSuperState() {
         return superState;
     }
@@ -38,7 +42,7 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     State superState = null;
 
-    public boolean hasSuperState(){
+    public boolean hasSuperState() {
         return superState != null;
     }
 
@@ -52,12 +56,12 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     boolean superStateReadOnly = true;
 
+    public static final String PRIVATE_PREFIX = "__";
 
-    public static final String  PRIVATE_PREFIX ="__";
-
-    public static boolean isPrivate(String x){
+    public static boolean isPrivate(String x) {
         return x.startsWith(PRIVATE_PREFIX);
     }
+
     public IOInterface getIoInterface() {
         if (ioInterface == null) {
             ioInterface = new BasicIO();
@@ -97,16 +101,16 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.logger = myLoggingFacade;
     }
 
-     public abstract FTStack2<? extends FunctionTable2<? extends FunctionRecord>> getFTStack();
+    public abstract FStack<? extends FTable<? extends FunctionRecord>> getFTStack();
 
-    public MTemplates getModuleMap() {
+    public MTemplates getMTemplates() {
         return MTemplates;
     }
 
     /*
     How's it work?
     MTemplates - has the templates keyed by uri.
-    MInstances - has (lcaol) instances from the MTemplates with their own state,
+    MInstances - has (local) instances from the MTemplates with their own state,
                  keyed by alias
       MAliases - lets us look up which alias goes with which MS without having
                  to slog through all the modules
@@ -142,11 +146,12 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     /**
      * Get a single imported module by alias or null if there is no such module.
+     *
      * @param alias
      * @return
      */
-    public Module getImportedModule(String alias){
-        if(alias == null){
+    public Module getImportedModule(String alias) {
+        if (alias == null) {
             return null;
         }
         return getmInstances().get(alias);

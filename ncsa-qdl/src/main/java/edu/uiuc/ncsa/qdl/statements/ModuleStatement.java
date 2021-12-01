@@ -67,7 +67,7 @@ public class ModuleStatement implements Statement {
         module.setTemplate(true);
         module.setModuleStatement(this);
         module.setDocumentation(getDocumentation());
-        state.getModuleMap().put(getNamespace(), module);
+        state.getMTemplates().put(getNamespace(), module);
 
         return null;
     }

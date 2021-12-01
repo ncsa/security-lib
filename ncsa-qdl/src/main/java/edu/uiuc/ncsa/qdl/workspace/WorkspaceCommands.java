@@ -13,7 +13,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
-import edu.uiuc.ncsa.qdl.functions.FTStack2;
+import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -1862,7 +1862,7 @@ public class WorkspaceCommands implements Logable {
                 try {
                     URI uri = URI.create(arg);
                     importedString = getImportString(uri);
-                    module = state.getModuleMap().get(uri);
+                    module = state.getMTemplates().get(uri);
 
                 } catch (Throwable t) {
                 }
@@ -1902,11 +1902,11 @@ public class WorkspaceCommands implements Logable {
 
     private int _modulesList(InputLine inputLine) {
         TreeSet<String> m = new TreeSet<>();
-        if (getState().getModuleMap().keySet() == null || getState().getModuleMap().keySet().isEmpty()) {
+        if (getState().getMTemplates().keySet() == null || getState().getMTemplates().keySet().isEmpty()) {
             say("(no imported modules)");
             return RC_CONTINUE;
         }
-        for (URI key : getState().getModuleMap().keySet()) {
+        for (URI key : getState().getMTemplates().keySet()) {
 
             String out = getImportString(key);
             m.add(out);
@@ -3885,7 +3885,7 @@ public class WorkspaceCommands implements Logable {
         fileWriter.write("// QDL workspace " + (isTrivial(getWSID()) ? "" : getWSID()) + " dump, saved on " + (new Date()) + "\n");
         fileWriter.write("\n/* ** module definitions ** */\n");
 
-        for (URI key : getState().getModuleMap().keySet()) {
+        for (URI key : getState().getMTemplates().keySet()) {
             String output = inputFormModule(key, state);
             if (output.startsWith(JAVA_CLASS_MARKER)) {
                 output = SystemEvaluator.MODULE_LOAD + "('" + output.substring(JAVA_CLASS_MARKER.length())
@@ -3897,7 +3897,7 @@ public class WorkspaceCommands implements Logable {
         // now do the imports
         fileWriter.write("\n/* ** module imports ** */\n");
 
-        for (URI key : getState().getModuleMap().keySet()) {
+        for (URI key : getState().getMTemplates().keySet()) {
             List<String> aliases = getState().getMAliases().getAlias(key);
             for (String alias : aliases) {
                 String output = SystemEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
@@ -4372,7 +4372,7 @@ public class WorkspaceCommands implements Logable {
                     stack,
                     new OpEvaluator(),
                     MetaEvaluator.getInstance(),
-                    new FTStack2(),
+                    new FStack(),
                     new MTemplates(),
                     logger,
                     false,

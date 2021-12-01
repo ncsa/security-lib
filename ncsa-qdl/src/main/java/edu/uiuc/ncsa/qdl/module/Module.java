@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -23,7 +25,20 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STATE_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  11:03 AM
  */
-public abstract class Module implements Serializable {
+public abstract class Module implements XThing, Serializable {
+    @Override
+    public String getName() {
+        return getAlias();
+    }
+    XKey key = null;
+    @Override
+    public XKey getKey() {
+        if(key == null){
+            key = new XKey(getName());
+        }
+        return key;
+    }
+
     /**
      * This returns true only if the module is from another language than a QDL module.
      *

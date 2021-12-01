@@ -166,11 +166,11 @@ public class WSXMLSerializer {
            and is serialized here.
             */
         State state = workspaceCommands.getState();
-        if (!state.getModuleMap().isEmpty()) {
+        if (!state.getMTemplates().isEmpty()) {
             xsw.writeStartElement(MODULE_TEMPLATE_TAG);
             xsw.writeComment("Loaded modules, templates available when importing modules.");
-            for (URI uri : state.getModuleMap().keySet()) {
-                state.getModuleMap().get(uri).toXML(xsw, null);
+            for (URI uri : state.getMTemplates().keySet()) {
+                state.getMTemplates().get(uri).toXML(xsw, null);
             }
             xsw.writeEndElement(); //end templates
         }

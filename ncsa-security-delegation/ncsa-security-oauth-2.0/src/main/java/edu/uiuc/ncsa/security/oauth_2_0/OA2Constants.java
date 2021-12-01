@@ -55,7 +55,7 @@ public interface OA2Constants {
     public static String MAX_AGE = "max_age";
     public static String ID_TOKEN_HINT = "id_token_hint";
     public static String ID_TOKEN = "id_token";
-    public static String ID_TOKEN_IDENTIFIER = "token_id";
+    public static String ID_TOKEN_IDENTIFIER = "jti"; // was token_id
     public static String RAW_ID_TOKEN = "raw_id_token";
     public static String REQUEST = "request";
     public static String REQUEST_URI = "request_uri";
