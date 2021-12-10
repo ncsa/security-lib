@@ -48,14 +48,6 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
-        <!--
-         we don't user log4j, but enough other people do that we have to kill it off, hence this dependency.
-         -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
