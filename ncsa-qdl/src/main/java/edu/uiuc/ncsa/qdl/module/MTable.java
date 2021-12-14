@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 /**
+ * Table of modules keyed by alias.
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */

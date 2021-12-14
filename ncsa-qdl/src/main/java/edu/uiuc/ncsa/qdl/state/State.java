@@ -523,7 +523,7 @@ public class State extends FunctionState implements QDLConstants {
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        newState.setmInstances(getmInstances());
+        newState.setMInstances(getMInstances());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
@@ -549,7 +549,7 @@ public class State extends FunctionState implements QDLConstants {
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        newState.setmInstances(getmInstances());
+        newState.setMInstances(getMInstances());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
@@ -582,8 +582,8 @@ public class State extends FunctionState implements QDLConstants {
         // Each imported module has its state serialized too. Hence each has to have current
         // transient fields updated. This will act recursively (so imports in imports in imports etc.)
 
-        for (String mod : getmInstances().keySet()) {
-            getmInstances().get(mod).getState().injectTransientFields(oldState);
+        for (String mod : getMInstances().keySet()) {
+            getMInstances().get(mod).getState().injectTransientFields(oldState);
         }
         setIoInterface(oldState.getIoInterface());
     }
@@ -668,11 +668,11 @@ public class State extends FunctionState implements QDLConstants {
         xsw.writeAttribute(STATE_ID_TAG, getInternalID());
         writeExtraXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
-        if (!getmInstances().isEmpty()) {
+        if (!getMInstances().isEmpty()) {
             xsw.writeStartElement(IMPORTED_MODULES);
             xsw.writeComment("The imported modules with their state and alias.");
-            for (String alias : getmInstances().keySet()) {
-                Module module = getmInstances().get(alias);
+            for (String alias : getMInstances().keySet()) {
+                Module module = getMInstances().get(alias);
                 module.toXML(xsw, alias);
             }
             xsw.writeEndElement(); //end imports

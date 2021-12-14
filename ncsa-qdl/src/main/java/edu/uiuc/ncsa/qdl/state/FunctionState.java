@@ -27,7 +27,7 @@ public abstract class FunctionState extends VariableState {
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         FStack ftStack,
+                         FStack fStack,
                          MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
         super(mAliases,
@@ -36,18 +36,18 @@ public abstract class FunctionState extends VariableState {
                 metaEvaluator,
                 MTemplates,
                 myLoggingFacade);
-        this.ftStack = ftStack;
+        this.fStack = fStack;
     }
 
     private static final long serialVersionUID = 0xcafed00d4L;
 
     @Override
     public FStack<? extends FTable<? extends FunctionRecord>> getFTStack() {
-        return ftStack;
+        return fStack;
     }
 
 
-    FStack<? extends FTable<? extends FunctionRecord>> ftStack = new FStack();
+    FStack<? extends FTable<? extends FunctionRecord>> fStack = new FStack();
 
     /**
      * Convenience, just looks up name and arg count
@@ -96,13 +96,13 @@ public abstract class FunctionState extends VariableState {
         }
         // No UNQ function, so try to find one, but check that it is actually unique.
         if (!isPrivate(name)) {
-            for (String alias : getmInstances().keySet()) {
+            for (String alias : getMInstances().keySet()) {
                 if (fr.functionRecord == null) {
                     FunctionRecord tempFR = (FunctionRecord) getImportedModule(alias).getState().getFTStack().get(new FKey(name, argCount));
                     if (tempFR != null) {
                         fr.functionRecord = tempFR;
-                        fr.state = getmInstances().get(alias).getState();
-                        fr.isExternalModule = getmInstances().get(alias).isExternal();
+                        fr.state = getMInstances().get(alias).getState();
+                        fr.isExternalModule = getMInstances().get(alias).isExternal();
                         fr.isModule = true;
                         if (!checkForDuplicates) {
                             return fr;

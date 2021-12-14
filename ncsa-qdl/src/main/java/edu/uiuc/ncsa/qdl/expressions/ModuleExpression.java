@@ -69,8 +69,8 @@ public class ModuleExpression extends ExpressionImpl {
         // no module state means to look at global state to find the module state.
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getmInstances().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getmInstances().get(nextME.getAlias()).getState());
+            if (getModuleState(state).getMInstances().containsKey(nextME.getAlias())) {
+                nextME.setModuleState(getModuleState(state).getMInstances().get(nextME.getAlias()).getState());
             }
         }
         getExpression().setAlias(getAlias());
@@ -115,10 +115,10 @@ public class ModuleExpression extends ExpressionImpl {
             return null;
         }
         if (moduleState == null) {
-            if (!state.getmInstances().containsKey(getAlias())) {
-                throw new IllegalArgumentException("no module named \"" + getAlias() + "\" was  imported");
+            if (!state.getMInstances().containsKey(getAlias())) {
+                throw new IllegalArgumentException("no module named '" + getAlias() + "' was  imported");
             }
-            Module module = state.getmInstances().get(getAlias());
+            Module module = state.getMInstances().get(getAlias());
             setModuleState(module.getState());
         }
         return moduleState;
@@ -160,8 +160,8 @@ public class ModuleExpression extends ExpressionImpl {
         }
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getmInstances().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getmInstances().get(nextME.getAlias()).getState());
+            if (getModuleState(state).getMInstances().containsKey(nextME.getAlias())) {
+                nextME.setModuleState(getModuleState(state).getMInstances().get(nextME.getAlias()).getState());
             }
             ((ModuleExpression) getExpression()).set(state, newValue);
             return;

@@ -29,25 +29,6 @@ public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V
     }
 
 
-
-    /**
-     * Used in the case there is a single function by this name so we don't have to know ahead
-     * of time the arg count (which might not be available).
-     *
-     * @param name
-     * @return
-     */
-/*    public FunctionRecord getSomeFunction(String name) {
-        for (XTable<? extends XThing> xTable : getStack()) {
-            FunctionRecord fr = (FunctionRecord) xTable.get(name);
-            if (fr != null) {
-                return fr;
-            }
-        }
-
-        return null;
-    }*/
-
     public FunctionRecord getFunctionReference(String name) {
          for (XTable functionTable : getStack()) {
              FunctionRecord fr = (FunctionRecord) functionTable.get(new FKey(name, -1));
@@ -126,7 +107,7 @@ public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
         for (int i = getStack().size() - 1; 0 <= i; i--) {
-            all.addAll(getStack().get(i).listFunctions(regex));
+            all.addAll(((V)getStack().get(i)).listFunctions(regex));
         }
         return all;
     }
@@ -137,7 +118,7 @@ public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
         for (int i = getStack().size() - 1; 0 <= i; i--) {
-            all.addAll(getStack().get(i).listAllDocs());
+            all.addAll(((V)getStack().get(i)).listAllDocs());
         }
         return all;
     }
@@ -148,7 +129,7 @@ public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
         for (int i = getStack().size() - 1; 0 <= i; i--) {
-            all.addAll(getStack().get(i).listAllDocs(functionName));
+            all.addAll(((V)getStack().get(i)).listAllDocs(functionName));
         }
         return all;
     }
@@ -164,7 +145,7 @@ public class FStack<V extends FTable<? extends FunctionRecord>> extends XStack<V
         // Note this walks backwards through the stack since this means that if
         // there is local documentation it overwrites the global documentation.
         for (int i = getStack().size() - 1; 0 <= i; i--) {
-            all.addAll(getStack().get(i).getDocumentation(key));
+            all.addAll(((V)getStack().get(i)).getDocumentation(key));
         }
         return all;
     }

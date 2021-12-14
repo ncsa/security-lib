@@ -19,7 +19,7 @@ import java.util.*;
 
 /**
  * This helps us organize the functionality of the state object. There are
- * sublclasses of this that do specific tasks. The inheritance hierarchy is
+ * subclasses of this that do specific tasks. The inheritance hierarchy is
  * <pre>
  * namespaces --> variables --> functions --. total state.
  * </pre>
@@ -46,15 +46,16 @@ public abstract class AbstractState implements StateInterface, Logable {
         return superState != null;
     }
 
-    public boolean isSuperStateReadOnly() {
-        return superStateReadOnly;
+       // practically super state is always treated as read only, so this machinery does nothing.
+ /*   public boolean isSuperStateReadOnly() {
+        return true;
     }
 
     public void setSuperStateReadOnly(boolean superStateReadOnly) {
         this.superStateReadOnly = superStateReadOnly;
     }
 
-    boolean superStateReadOnly = true;
+    boolean superStateReadOnly = true;*/
 
     public static final String PRIVATE_PREFIX = "__";
 
@@ -134,11 +135,11 @@ public abstract class AbstractState implements StateInterface, Logable {
      *
      * @return
      */
-    public Map<String, Module> getmInstances() {
+    public Map<String, Module> getMInstances() {
         return mInstances;
     }
 
-    public void setmInstances(Map<String, Module> mInstances) {
+    public void setMInstances(Map<String, Module> mInstances) {
         this.mInstances = mInstances;
     }
 
@@ -154,7 +155,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         if (alias == null) {
             return null;
         }
-        return getmInstances().get(alias);
+        return getMInstances().get(alias);
     }
 
     public void setSymbolStack(SymbolStack symbolStack) {

@@ -49,7 +49,7 @@ public class ModuleStatement implements Statement {
         State localState = state.newModuleState();
         if(state.hasSuperState()){
             localState.setSuperState(state);
-            localState.setSuperStateReadOnly(state.isSuperStateReadOnly());
+        //    localState.setSuperStateReadOnly(state.isSuperStateReadOnly());
         }
         boolean restrictedio = state.isRestrictedIO();
         // don't print stuff when creating the module.

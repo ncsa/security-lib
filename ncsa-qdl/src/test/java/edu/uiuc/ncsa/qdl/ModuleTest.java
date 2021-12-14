@@ -306,7 +306,7 @@ public class ModuleTest extends AbstractQDLTester {
 
     /*
     Define a function then define variants in modules.  Values are checked to track whether the state
-    gets corrupted. Nesting module_import does nto work right: -- this fails
+    gets corrupted. Nesting module_import does not work right: -- this fails
 
         define[f(x)]body[return(x+100);];
         module['a:/t','a']body[define[f(x)]body[return(x+1);];];

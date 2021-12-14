@@ -1853,8 +1853,8 @@ public class WorkspaceCommands implements Logable {
             if (StringUtils.isTrivial(arg)) {
                 // They are asking for documentation for the default module, and there is none.
             } else {
-                if (state.getmInstances().containsKey(arg)) {
-                    module = state.getmInstances().get(arg);
+                if (state.getMInstances().containsKey(arg)) {
+                    module = state.getMInstances().get(arg);
                     importedString = getImportString(module.getNamespace());
                 }
             }
@@ -4400,7 +4400,7 @@ public class WorkspaceCommands implements Logable {
             if (importASAP) {
                 // Add it to the imported modules, i.e., create an instance.
                 state.getMAliases().addImport(m.getNamespace(), m.getAlias());
-                state.getmInstances().put(m.getAlias(), m);
+                state.getMInstances().put(m.getAlias(), m);
             }
         }
     }

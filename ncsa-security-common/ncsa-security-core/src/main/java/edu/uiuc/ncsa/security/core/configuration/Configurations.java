@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.SubnodeConfiguration;
@@ -39,11 +40,13 @@ public class Configurations {
      * It is annoying to have to add a dependency to clean up after someone else!
      */
     public static void killLog4J() {
+        DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
         List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
         loggers.add(LogManager.getRootLogger());
         for (Logger logger : loggers) {
             logger.setLevel(Level.OFF);
         }
+        DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
     }
 
     /**

@@ -484,7 +484,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (!isString(object2)) {
                 throw new IllegalArgumentException("'" + object2 + "' for " + MODULE_REMOVE + " is not a string.");
             }
-            state.getmInstances().remove(object2);
+            state.getMInstances().remove(object2);
             state.getMAliases().removeAlias(object2);
         }
         polyad.setEvaluated(true);
@@ -673,7 +673,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // is a#b, and the input form of b will be returned.
         if (polyad.getArguments().get(0) instanceof ModuleExpression) {
             ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
-            Module module = state.getmInstances().get(moduleExpression.getAlias());
+            Module module = state.getMInstances().get(moduleExpression.getAlias());
             if (module == null) {
                 throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
             }
@@ -2018,7 +2018,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
             State newModuleState = state.newModuleState();
             newModuleState.setSuperState(state);
-            newModuleState.setSuperStateReadOnly(true);
+         //   newModuleState.setSuperStateReadOnly(true);
 
             Module newInstance = m.newInstance(newModuleState);
             if (newInstance instanceof JavaModule) {
@@ -2031,7 +2031,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             newModuleState.setSuperState(null); // get rid of it now.
             MAliases mAliases = state.getMAliases();
             mAliases.addImport(moduleNS, alias);
-            state.getmInstances().put(alias, newInstance);
+            state.getMInstances().put(alias, newInstance);
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);
             } else {

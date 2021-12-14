@@ -265,7 +265,7 @@ public class QDLConfigurationLoaderUtils {
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
-                state.getmInstances().put(m.getAlias(), mm);
+                state.getMInstances().put(m.getAlias(), mm);
             }
         }
         return importedFQNames;

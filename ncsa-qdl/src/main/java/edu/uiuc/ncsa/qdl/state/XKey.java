@@ -26,7 +26,6 @@ public class XKey implements Serializable {
     }
 
     protected String key;
-
     int hashCode;
     boolean hashCodeInit = false;
 

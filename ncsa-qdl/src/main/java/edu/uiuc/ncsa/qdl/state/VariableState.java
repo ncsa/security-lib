@@ -316,8 +316,8 @@ public abstract class VariableState extends NamespaceAwareState {
             st = getSymbolStack().getRightST(variableName);
             v = st.resolveValue(variableName);
             if (v == null) {
-                if (!getmInstances().isEmpty()) {
-                    for (String key : getmInstances().keySet()) {
+                if (!getMInstances().isEmpty()) {
+                    for (String key : getMInstances().keySet()) {
                         Module m = getImportedModule(key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
@@ -338,6 +338,7 @@ public abstract class VariableState extends NamespaceAwareState {
 
         switch (op) {
             case OP_GET:
+                // For resolving intrinsic variables.
                 if(v==null && hasSuperState()){
                     v = getSuperState().getValue(variableName);
                 }
