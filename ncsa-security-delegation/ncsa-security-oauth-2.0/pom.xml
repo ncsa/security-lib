@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.15</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>4.5.13</version>
         </dependency>
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>

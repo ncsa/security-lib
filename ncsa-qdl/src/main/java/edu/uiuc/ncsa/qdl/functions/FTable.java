@@ -23,10 +23,10 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 11/19/21 at  7:48 AM
  */
-public class FTable<V extends FunctionRecord>  extends HashMap<XKey, V>  implements Documentable,XTable<V> {
+public class FTable<K extends FKey, V extends FunctionRecord>  extends HashMap<K, V>  implements Documentable,XTable<K,V> {
     @Override
     public V put(XThing value) {
-        return super.put(value.getKey(), (V) value);
+        return super.put((K) value.getKey(), (V) value);
     }
 
 

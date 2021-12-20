@@ -11,5 +11,12 @@ import java.net.URI;
 public class MTKey extends XKey {
    public MTKey(URI uri){
        super(uri.toString());
+       uriKey = uri;
    }
+
+    public URI getUriKey() {
+        return uriKey;
+    }
+
+    URI uriKey;
 }

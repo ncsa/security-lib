@@ -7,7 +7,8 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 /**
- * test utility to password protect files.
+ * Utility to password protect files. This takes a password and any text
+ * and password protects it. The longer the password, the better the protection.
  * <h2>Usage</h2>
  * encrypt - returns an encrypted text with header.
  * isEncrypted - checks if the argument has been encrypted with this utility
@@ -21,10 +22,14 @@ import java.util.Base64;
  */
 public class EncryptionUtil {
     // idea is that since this enrypts text, have a header like
-    // password_protected:(40 chars of SHA 1 hash)
+    // password_protected:(SHA 1 hash of their password)
     // encrypted text.
     // So first line has that it requires a password and there is a hash of
-    // it. 
+    // it. This allows reading off the first line and knowing if the text is
+    // encrypted with teh current password rather than trying to decode the entire
+    // contents and seeing if it bombs or if there is gobbly-gook, since it is also
+    // possible to encrypt something like a base 64 encoding of a binary file, hence
+    // no way to tell if the contents are correctly decrypted without something like this.
     public static String PASSWORD_HEADER = "password_protected:";
 
     public static void main(String[] args) throws IllegalAccessException {
@@ -41,7 +46,6 @@ public class EncryptionUtil {
         System.out.println(encrypted);
         String decrypted = decrypt(encrypted, password);
         System.out.println("ok?" + decrypted.equals(original));
-
 
     }
     public static String encrypt(String text, String password){

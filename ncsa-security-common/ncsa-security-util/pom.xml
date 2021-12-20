@@ -91,13 +91,13 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.4</version>
+            <version>4.4.15</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <version>4.5.13</version>
             <scope>compile</scope>
         </dependency>
 
@@ -107,7 +107,6 @@
             <version>1.6.2</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Inexplicably the next two entries must be in this order or maven will not resolve the dependencies. -->
         <dependency>
             <groupId>edu.uiuc.ncsa.security</groupId>
             <artifactId>ncsa-security-core</artifactId>
@@ -128,7 +127,7 @@
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4</artifactId>
-            <version>4.9.1</version>
+            <version>4.9.3</version>
         </dependency>
         <dependency>
             <groupId>org.jline</groupId>
@@ -136,6 +135,9 @@
             <version>3.14.1</version>
             <scope>compile</scope>
         </dependency>
+        <!--
+        Used for text encryption utility.
+        -->
         <dependency>
           <groupId>org.jasypt</groupId>
           <artifactId>jasypt</artifactId>

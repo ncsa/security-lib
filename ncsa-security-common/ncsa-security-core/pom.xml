@@ -45,14 +45,17 @@
         <!--
             we don't user log4j, but enough other people do that we have to kill it off, hence this dependency.
             -->
-           <dependency>
+<!--           <dependency>
                <groupId>log4j</groupId>
                <artifactId>log4j</artifactId>
                <version>1.2.17</version>
-           </dependency>
+           </dependency>-->
 
 <!--   Newer versions. Not clear on how to kill off all logging with this because
        of API changes to log4J.  Older API still seems to be working though.
+       -->
+<!--     CIL-1147 remove log 4 j. Keep this for a while in case we need it for some weird
+          reason
        <dependency>
           <groupId>org.apache.logging.log4j</groupId>
           <artifactId>log4j-api</artifactId>
@@ -62,7 +65,8 @@
           <groupId>org.apache.logging.log4j</groupId>
           <artifactId>log4j-core</artifactId>
           <version>2.16.0</version>
-        </dependency>-->
+        </dependency>
+-->
 
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -70,13 +74,13 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
             <classifier>jdk15</classifier>
             <scope>compile</scope>
-        </dependency>
+        </dependency>-->
     </dependencies>
     <build>
         <plugins>

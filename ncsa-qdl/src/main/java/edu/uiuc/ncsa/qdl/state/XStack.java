@@ -35,7 +35,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 11/8/21 at  6:27 AM
  */
-public abstract class XStack<V extends XTable<? extends XThing>> {
+public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> {
     /**
      * Take the FT stack and add all of the tables in this stack in the correct order.
      * This is needed when, e.g., creating new local state for function reference resolution
@@ -45,7 +45,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
     public void addTables(XStack ftStack) {
         // add backwards
         for (int i = ftStack.getStack().size() - 1; 0 <= i; i--) {
-            push((XTable<? extends XThing>) ftStack.getStack().get(i));
+            push((XTable) ftStack.getStack().get(i));
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
         return containsKey(key, 0);
      }
     public XThing get(XKey key) {
-        for (XTable<? extends XThing> xTable : getStack()) {
+        for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
             if (xThing != null) {
                 return xThing;
@@ -115,33 +115,33 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
      *
      * @return
      */
-    public XTable<? extends XThing> getRoot() {
+    public XTable<? extends XKey, ? extends XThing> getRoot() {
         return getStack().get(getStack().size() - 1);
     }
 
-    public List<XTable<? extends XThing>> getStack() {
+    public List<XTable<? extends XKey, ? extends XThing>> getStack() {
         return stack;
     }
 
-    public void setStack(List<XTable<? extends XThing>> stack) {
+    public void setStack(List<XTable<? extends XKey, ? extends XThing>> stack) {
         this.stack = stack;
     }
 
-    List<XTable<? extends XThing>> stack = new ArrayList<>();
+    List<XTable<? extends XKey, ? extends XThing>> stack = new ArrayList<>();
 
     public boolean isEmpty() {
         boolean empty = true;
-        for (XTable<? extends XThing> xTable : getStack()) {
+        for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             empty = empty && xTable.isEmpty();
         }
         return empty;
     }
 
-    public XTable<? extends XThing> peek() {
+    public XTable<? extends XKey, ? extends XThing> peek() {
         return getStack().get(0);
     }
 
-    public void push(XTable<? extends XThing> xTable) {
+    public void push(XTable<? extends XKey, ? extends XThing> xTable) {
         getStack().add(0, xTable);
     }
 
@@ -151,7 +151,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
 
 
     public XThing put(XThing value) {
-        for (XTable<? extends XThing> xTable : getStack()) {
+        for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             if (xTable.containsKey(value.getKey())) {
                 xTable.put(value);
                 return value;
@@ -176,7 +176,7 @@ public abstract class XStack<V extends XTable<? extends XThing>> {
      * @param key
      */
     public void remove(XKey key) {
-        for (XTable<? extends XThing> xTable : getStack()) {
+        for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             xTable.remove(key);
         }
     }

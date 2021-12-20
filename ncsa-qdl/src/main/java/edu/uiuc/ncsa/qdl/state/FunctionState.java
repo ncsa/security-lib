@@ -42,12 +42,12 @@ public abstract class FunctionState extends VariableState {
     private static final long serialVersionUID = 0xcafed00d4L;
 
     @Override
-    public FStack<? extends FTable<? extends FunctionRecord>> getFTStack() {
+    public FStack<? extends FTable> getFTStack() {
         return fStack;
     }
 
 
-    FStack<? extends FTable<? extends FunctionRecord>> fStack = new FStack();
+    FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> fStack = new FStack();
 
     /**
      * Convenience, just looks up name and arg count

@@ -14,7 +14,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 11/7/21 at  5:14 AM
  */
-public interface XTable<V extends XThing> extends Map<XKey, V>, Cloneable, Serializable {
+public interface XTable<K extends XKey, V extends XThing> extends Map<K, V>, Cloneable, Serializable {
     /**
      * Should add the {@link XThing} based on its {@link XThing#getName()} as the key.
      * @param value
@@ -25,6 +25,4 @@ public interface XTable<V extends XThing> extends Map<XKey, V>, Cloneable, Seria
     void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
     void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
-
- //   boolean containsKey(XKey key, int startTableIndex);
 }

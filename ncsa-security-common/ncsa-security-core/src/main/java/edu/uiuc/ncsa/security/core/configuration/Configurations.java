@@ -1,22 +1,17 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
-import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import org.apache.commons.configuration.AbstractConfiguration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.SubnodeConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -40,13 +35,15 @@ public class Configurations {
      * It is annoying to have to add a dependency to clean up after someone else!
      */
     public static void killLog4J() {
-        DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
-        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+     //   DebugUtil.trace(Configurations.class, "Killing off log 4 java!");
+        // CIL-1145 fix. More recent log4j versions now have a way to reset all levels.
+       // Configurator.setAllLevels(LogManager.getRootLogger().getName(), Level.OFF);
+       /* List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
         loggers.add(LogManager.getRootLogger());
         for (Logger logger : loggers) {
             logger.setLevel(Level.OFF);
-        }
-        DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
+        }*/
+   //     DebugUtil.trace(Configurations.class, "log 4 java has been dispatched!");
     }
 
     /**

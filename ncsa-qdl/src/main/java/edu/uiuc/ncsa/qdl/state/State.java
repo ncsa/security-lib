@@ -3,9 +3,10 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
+import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FTable;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -92,7 +93,7 @@ public class State extends FunctionState implements QDLConstants {
                              SymbolStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
-                             FStack<? extends FTable<? extends FunctionRecord>> ftStack,
+                             FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
                              MTemplates mTemplates,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
@@ -113,7 +114,7 @@ public class State extends FunctionState implements QDLConstants {
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
-                 FStack<? extends FTable<? extends FunctionRecord>> ftStack,
+                 FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
                  MTemplates mTemplates,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
@@ -535,7 +536,7 @@ public class State extends FunctionState implements QDLConstants {
         newStack.getParentTables().set(0,moduleState.symbolStack);
         newStack.getParentTables().addAll(symbolStack.getParentTables());
 
-        FStack<? extends FTable<? extends FunctionRecord>> ftStack = new FStack();
+        FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
         ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
         ftStack.addTables(moduleState.getFTStack());
 

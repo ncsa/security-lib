@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
@@ -19,7 +18,7 @@ import java.util.TreeSet;
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */
-public class MTable<V extends Module> extends HashMap<XKey, V> implements XTable<V>, Documentable {
+public class MTable<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V>, Documentable {
     @Override
     public V put(XThing value) {
         return null;

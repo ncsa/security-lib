@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.module.MTemplates;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 /**
@@ -37,7 +38,7 @@ public class TestUtils {
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
-                                   FStack<? extends FTable<? extends FunctionRecord>> ftStack,
+                                   FStack<? extends FTable<? extends XKey, ? extends FunctionRecord>> ftStack,
                                    MTemplates mTemplates,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
