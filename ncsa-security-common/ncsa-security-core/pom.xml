@@ -51,9 +51,7 @@
                <version>1.2.17</version>
            </dependency>-->
 
-<!--   Newer versions. Not clear on how to kill off all logging with this because
-       of API changes to log4J.  Older API still seems to be working though.
-       -->
+
 <!--     CIL-1147 remove log 4 j. Keep this for a while in case we need it for some weird
           reason
        <dependency>
