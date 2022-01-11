@@ -953,6 +953,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
    module_import('a:a')
    a#g(2)
 
+   ALSO, intrinsic functions and variables might require some substantial reworking.
 */
     @Override
     public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {

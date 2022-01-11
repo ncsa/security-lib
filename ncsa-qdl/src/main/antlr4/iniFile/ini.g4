@@ -11,7 +11,10 @@
    key4 = value4
 
    Would turn into
-   my_ini. := {'section0':{'key0':value0, 'key1':value1}, 'section1':{'key4':value3, 'key4':value4}}
+       my_ini. := file_read(...);
+       my_ini.
+   {'section0':{'key0':value0, 'key1':value1}, 'section1':{'key4':value3, 'key4':value4}}
+
    with access pattern like
 
    my_ini.section0.key0

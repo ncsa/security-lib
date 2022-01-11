@@ -3243,7 +3243,7 @@ public class WorkspaceCommands implements Logable {
 
             if (isTrivial(id)) {
                 //out = out + " " + pad2("(no id)", 10);
-                out = out + " " + pad2("    -", 10);
+                out = out + " " + pad2("    -", 15);
             } else {
                 out = out + " " + pad2(id, 15);
             }
@@ -4456,10 +4456,13 @@ public class WorkspaceCommands implements Logable {
 
     protected void fromConfigFile(InputLine inputLine) throws Throwable {
         String cfgname = inputLine.hasArg(CONFIG_NAME_FLAG) ? inputLine.getNextArgFor(CONFIG_NAME_FLAG) : "default";
+/*      Old style -- single inheritance
         ConfigurationNode node = ConfigUtil.findConfiguration(
                 inputLine.getNextArgFor(CONFIG_FILE_FLAG),
                 cfgname, CONFIG_TAG_NAME);
-
+*/
+        // New style -- multi-inheritance.
+        ConfigurationNode node = ConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
         QDLConfigurationLoader loader = new QDLConfigurationLoader(inputLine.getNextArgFor(CONFIG_FILE_FLAG), node);
 
         QDLEnvironment qe = loader.load();

@@ -2,9 +2,9 @@
      This has an alias for the over ride. This shows this feature works.
 -->
 <config>
-    <service name="A" overrides="B"/>  <!-- A C X -->
+    <service name="A" extends="B"/>  <!-- A C X -->
     <service name="B" alias="C"/>      <!-- C X-->
-    <service name="C" overrides="X"/>  <!-- C X -->
+    <service name="C" extends="X"/>  <!-- C X -->
 
     <service name="X"/>
 </config>

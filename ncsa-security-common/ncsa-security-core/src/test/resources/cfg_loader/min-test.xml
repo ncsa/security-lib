@@ -2,6 +2,6 @@
       Most minimal configuration.
 -->
 <config>
-    <service name="A"  overrides="X"/>  <!--   A X -->
+    <service name="A"  extends="X"/>  <!--   A X -->
     <service name="X"/>
 </config>

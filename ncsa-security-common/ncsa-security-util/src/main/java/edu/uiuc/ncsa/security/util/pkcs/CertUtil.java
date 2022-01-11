@@ -22,8 +22,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-//import sun.security.x509.X500Name;
-
 /**
  * Utilities for formatting certs and other things. Cert requests are handled in PKCS10 format.
  * Certificates are encoded in PEM as PKCS12 (default) or as PKCS7 if so requested.

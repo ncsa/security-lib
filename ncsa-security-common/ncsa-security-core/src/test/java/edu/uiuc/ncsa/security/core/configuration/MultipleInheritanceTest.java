@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
+import edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine;
 import edu.uiuc.ncsa.security.core.inheritance.UnresolvedReferenceException;
 import org.junit.Test;
 
@@ -21,7 +22,11 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     protected String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/";
 
 
-
+   void verbose(String x){
+       if( MultipleInheritanceEngine.DEBUG_ON){
+          System.out.println(x);
+       }
+   }
     /**
      * The huge and messy test for this that shows how everything works. This is probably the
      * first thing to break if the code is changed since there are a ton of resolutions
@@ -32,6 +37,7 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
     @Test
     public void testBig() throws Exception {
         String fileName = path + "test-big-cfg.xml";
+        verbose("testBig");
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
         //   resolvedOverrides:{A=[T, U, R, W, Q, P],   D=[T, U, R, W, Q, P], E=[T, U, R, W, Q, P],
@@ -63,6 +69,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
 
     @Test
     public void testCylces() throws Exception {
+        verbose("testCycles:");
+
         String fileName = path + "cyclic-test.xml";
         try {
             MultiConfigurations configurations2 = getConfigurations2(fileName);
@@ -75,6 +83,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
 
     @Test
     public void testOverrideInAlias() throws Exception {
+        verbose("testOverrideInAlias:");
+
         String fileName = path + "override-in-alias-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -117,7 +127,9 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
      * @throws Exception
      */
     @Test
+
     public void testMinimum() throws Exception {
+        verbose("testMinimum:");
         String fileName = path + "min-test.xml";
         String cfgName = "A";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
@@ -132,6 +144,8 @@ public class MultipleInheritanceTest extends AbstractInheritanceTest {
 
     @Test
     public void testAliasNoInherit() throws Exception {
+        verbose("testAliasNoInherit:");
+
         String fileName = path + "alias-test-no-inherit.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();

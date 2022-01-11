@@ -206,8 +206,8 @@ public class CLIDriver {
             say("See also:" + WRITE_BUFFER_COMMAND + ", " + LOAD_BUFFER_COMMAND + ", " + REPEAT_LAST_COMMAND);
             return null; // do nothing
         }
-        // Either of the following work:             getNamedConfig(
-        // /h == print history with line numbers
+        // Either of the following work:
+        //h == print history with line numbers
         // /h int = execute line # int, or print history if that fails
         StringTokenizer st = new StringTokenizer(cmdLine, " ");
         st.nextToken(); // This is the "/h" which we already know about

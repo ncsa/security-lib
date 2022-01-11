@@ -4,8 +4,128 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="Commit changes before any log 4 java vulnerability fixes.">
+    <list default="true" id="0770ca55-c43a-467b-b73e-a11ed77c6473" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/inheritance.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_8_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea/libraries/Maven__commons_collections_commons_collections_3_2_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__ch_obermuhlner_big_math_2_3_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_gitlab_klamonte_jexer_0_3_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_protobuf_protobuf_java_3_11_4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_googlecode_lanterna_lanterna_3_0_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_ibm_icu_icu4j_69_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_jayway_jsonpath_json_path_2_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_mail_javax_mail_1_6_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_typesafe_config_1_4_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_8_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_beanutils_commons_beanutils_1_9_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_cli_commons_cli_1_3_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_codec_commons_codec_1_10.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_collections_commons_collections_3_2_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_configuration_commons_configuration_1_10.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_lang_commons_lang_2_6.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_logging_commons_logging_1_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_activation_activation_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_inject_javax_inject_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_servlet_servlet_api_2_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_12.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__mysql_mysql_connector_java_8_0_26.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_java_dev_jna_jna_5_3_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_minidev_accessors_smart_2_4_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_minidev_json_smart_2_4_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_oauth_core_oauth_20100527.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_oauth_core_oauth_consumer_20100527.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_oauth_core_oauth_httpclient4_20090617.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_oauth_core_oauth_provider_20100527.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_sf_ezmorph_ezmorph_1_0_6.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_sf_json_lib_json_lib_jdk15_2_4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_abego_treelayout_org_abego_treelayout_core_1_0_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_ST4_4_3_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr4_4_9_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr4_runtime_4_9_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_antlr_antlr_runtime_3_5_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_derby_derby_10_14_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_felix_org_apache_felix_gogo_jline_1_1_4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_felix_org_apache_felix_gogo_runtime_1_1_2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpclient_4_0_beta2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpclient_4_5_13.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_httpcomponents_httpcore_4_4_15.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_ivy_ivy_2_5_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_logging_log4j_log4j_api_2_16_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_logging_log4j_log4j_core_2_16_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_sshd_sshd_common_2_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_sshd_sshd_core_2_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_sshd_sshd_scp_2_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_sshd_sshd_sftp_2_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_console_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_json_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_swing_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_templates_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_groovy_groovy_xml_3_0_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_fusesource_jansi_jansi_2_1_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_glassfish_javax_json_1_0_4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jasypt_jasypt_1_9_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_3_14_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_builtins_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_console_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_demo_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_groovy_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_reader_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_remote_ssh_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_remote_telnet_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_style_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_terminal_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_terminal_jansi_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_jline_jline_terminal_jna_3_19_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_mariadb_jdbc_mariadb_java_client_2_7_3.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_ow2_asm_asm_9_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_postgresql_postgresql_42_2_23_jre7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_21.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_api_1_7_30.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_jdk14_1_7_21.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_simple_1_7_21.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/antlr_4_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLLexer.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/build.sh" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/build.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/iniFile/ini.g4" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/iniFile/ini.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/config/QDLConfigurationLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/configuration/MultiConfigurations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/inheritance/MultipleInheritanceEngine.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/alias-override-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/alias-override-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-A.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-A.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-B.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/attrib-test-B.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test2.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/node-override-test2.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/cyclic-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/cyclic-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/diamond-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/diamond-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/min-alias-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/min-alias-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/min-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/min-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/multiple-overrides-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/multiple-overrides-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/override-in-alias-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/override-in-alias-test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/test-big-cfg.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/test-big-cfg.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/two-overrides-test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader/two-overrides-test.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Store.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/Version.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" afterDir="false" />
@@ -19,16 +139,22 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/TEST-edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/surefire-reports/edu.uiuc.ncsa.security.core.configuration.XPropertiesTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-servlet/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/AggregateStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/classes/edu/uiuc/ncsa/security/storage/sql/SQLStore.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-storage/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/CLIDriver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/CertUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/pkcs/CertUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommandLineTokenizer.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/CommandLineTokenizer.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/StoreCommands.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/cli/StoreCommands.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil$MailEnvironment.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/mail/MailUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil$MySunPKCS_CR.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil$MySunPKCS_CR.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/classes/edu/uiuc/ncsa/security/util/pkcs/CertUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/edu.uiuc.ncsa.security.util.cache.CacheTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/DelegationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/DelegationService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/classes/edu/uiuc/ncsa/security/delegation/client/request/ATRequest.class" afterDir="false" />
@@ -92,6 +218,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/UIServer2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/client/UIServer2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/AGIResponse2.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/classes/edu/uiuc/ncsa/security/oauth_2_0/server/AGIResponse2.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,70 +228,15 @@
   <component name="CodeInsightWorkspaceSettings">
     <option name="optimizeImportsOnTheFly" value="true" />
   </component>
-  <component name="CreatePatchCommitExecutor">
-    <option name="PATCH_PATH" value="" />
-  </component>
-  <component name="DatabaseView">
-    <option name="SHOW_INTERMEDIATE" value="true" />
-    <option name="GROUP_DATA_SOURCES" value="true" />
-    <option name="GROUP_SCHEMA" value="true" />
-    <option name="GROUP_CONTENTS" value="false" />
-    <option name="SORT_POSITIONED" value="false" />
-    <option name="SHOW_EMPTY_GROUPS" value="false" />
-    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
-    <option name="HIDDEN_KINDS">
-      <set />
-    </option>
-    <expand />
-    <select />
-  </component>
-  <component name="FavoritesManager">
-    <favorites_list name="security-lib" />
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="package-info" />
-        <option value="Interface" />
-        <option value="Class" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <excluded-from-favorite>
-      <branch-storage>
-        <map>
-          <entry type="LOCAL">
-            <value>
-              <list>
-                <branch-info repo="$PROJECT_DIR$" source="master" />
-              </list>
-            </value>
-          </entry>
-        </map>
-      </branch-storage>
-    </excluded-from-favorite>
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="5.1.1" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedIndex" value="1" />
-  </component>
-  <component name="ProjectId" id="1iL68yczXC5b1nt09nUevEhal73" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectId" id="23KXkWaF86sARzo2xAg9k3nN0xm" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
   </component>
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -175,214 +247,55 @@
     <option name="showModules" value="false" />
   </component>
   <component name="PropertiesComponent">
-    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="GoToClass.includeLibraries" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="GoToFile.includeJavaFiles" value="false" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="MemberChooser.sorted" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="TEXT&#10;JAVA" />
-    <property name="extract.method.default.visibility" value="protected" />
-    <property name="jdk.selected.JAVA_MODULE" value="11.0.8" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/ncsa-qdl/src/main/resources/examples" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../oa4mp" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.path.for.package.eslint" value="project" />
-    <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.44942528" />
-    <property name="settings.editor.selected.configurable" value="org.jetbrains.plugins.github.ui.GithubSettingsConfigurable" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
-  <component name="RecentsManager">
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="edu.uiuc.ncsa.qdl.config" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/resources/examples" />
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/iniFile" />
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/resources" />
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/resources/modules" />
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/ncsa-qdl/src/main/resources" />
-      <recent name="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_loader" />
-    </key>
-    <key name="ExtractSuperBase.RECENT_KEYS">
-      <recent name="edu.uiuc.ncsa.qdl.functions" />
-    </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="edu.uiuc.ncsa.qdl.functions" />
-    </key>
-  </component>
-  <component name="RunAnythingCache">
-    <option name="myCommands">
-      <command value="mvn clean" />
-    </option>
-  </component>
-  <component name="RunManager" selected="JUnit.QDL Test Suite">
-    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
-      <module name="" />
-      <option name="ACTIVITY_CLASS" value="" />
-      <option name="MODE" value="default_activity" />
-      <option name="DEPLOY" value="true" />
-      <option name="ARTIFACT_NAME" value="" />
-      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
-      <option name="PREFERRED_AVD" value="" />
-      <option name="USE_COMMAND_LINE" value="true" />
-      <option name="COMMAND_LINE" value="" />
-      <option name="WIPE_USER_DATA" value="false" />
-      <option name="DISABLE_BOOT_ANIMATION" value="false" />
-      <option name="NETWORK_SPEED" value="full" />
-      <option name="NETWORK_LATENCY" value="none" />
-      <option name="CLEAR_LOGCAT" value="false" />
-      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
-      <method />
-    </configuration>
-    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
-      <module name="" />
-      <option name="TESTING_TYPE" value="0" />
-      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
-      <option name="PREFERRED_AVD" value="" />
-      <option name="USE_COMMAND_LINE" value="true" />
-      <option name="COMMAND_LINE" value="" />
-      <option name="WIPE_USER_DATA" value="false" />
-      <option name="DISABLE_BOOT_ANIMATION" value="false" />
-      <option name="NETWORK_SPEED" value="full" />
-      <option name="NETWORK_LATENCY" value="none" />
-      <option name="CLEAR_LOGCAT" value="false" />
-      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Application.QDL default">
     <configuration default="true" type="Applet" factoryName="Applet">
-      <option name="HTML_USED" value="false" />
       <option name="WIDTH" value="400" />
       <option name="HEIGHT" value="300" />
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <module />
       <method />
     </configuration>
-    <configuration default="true" type="PyLettuceRunConfigurationType" factoryName="Lettuce">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="ADDITIONAL_ARGS" value="" />
-      <method />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Attests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method />
-    </configuration>
-    <configuration name="EncryptionUtil" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.util.pkcs.EncryptionUtil" />
-      <module name="ncsa-security-util" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.util.pkcs.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="IniParserDriver" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.parsing.IniParserDriver" />
-      <module name="ncsa-qdl" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.qdl.parsing.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="QDL GUI" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.gui.QDLGUIWorkspace" />
-      <module name="ncsa-qdl-gui" />
-      <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/qdl-cfg.xml -name default " />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
+    <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
+      <Host>localhost</Host>
+      <Port>5050</Port>
     </configuration>
     <configuration name="QDL basic" type="Application" factoryName="Application">
-      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="ALTERNATIVE_JRE_PATH" value="/usr/java/jdk1.8.0_261/jre" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.workspace.QDLWorkspace" />
       <module name="ncsa-qdl" />
-      <option name="PROGRAM_PARAMETERS" value="-log /tmp/qdl.log -trace " />
+      <option name="PROGRAM_PARAMETERS" value="-log /tmp/qdl.log -trace" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration name="QDL default" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.workspace.QDLWorkspace" />
       <module name="ncsa-qdl" />
       <option name="PROGRAM_PARAMETERS" value="-cfg $PROJECT_DIR$/../../csd/config/qdl-cfg.xml -name default" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="StringUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.util.StringUtils" />
-      <module name="ncsa-security-core" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.util.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="XProperties" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.XProperties" />
-      <module name="ncsa-security-core" />
-      <option name="PROGRAM_PARAMETERS" value="/tmp/x.xp" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -393,1056 +306,137 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="DjangoTestsConfigurationType">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="TARGET" value="" />
-      <option name="SETTINGS_FILE" value="" />
-      <option name="CUSTOM_SETTINGS" value="false" />
-      <option name="USE_OPTIONS" value="false" />
-      <option name="OPTIONS" value="" />
-      <method v="2" />
+    <configuration name="ConfigInheritanceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ncsa-security-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.core.configuration" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.ConfigInheritanceTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration default="true" type="GrailsRunConfigurationType" factoryName="Grails">
-      <setting name="vmparams" value="" />
-      <setting name="cmdLine" value="run-app" />
-      <setting name="passParentEnv" value="true" />
-      <setting name="grailsApplicationRoot" value="" />
-      <setting name="launchBrowser" value="false" />
-      <setting name="launchBrowserUrl" value="" />
-      <setting name="depsClasspath" value="false" />
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <method v="2" />
+    <configuration name="MultipleInheritanceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="ncsa-security-core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="edu.uiuc.ncsa.security.core.configuration.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.security.core.configuration" />
+      <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.security.core.configuration.MultipleInheritanceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <configuration name="QDL Test Suite" type="JUnit" factoryName="JUnit">
       <module name="ncsa-qdl" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8_261" />
       <option name="PACKAGE_NAME" value="edu.uiuc.ncsa.qdl" />
       <option name="MAIN_CLASS_NAME" value="edu.uiuc.ncsa.qdl.TestSuite" />
       <option name="METHOD_NAME" value="" />
       <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea " />
-      <option name="PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Scratch (1)" type="Java Scratch" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Scratch" />
-      <option name="SCRATCH_FILE_URL" value="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_1.java" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="PyBehaveRunConfigurationType" factoryName="Behave">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="ADDITIONAL_ARGS" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="TestNG">
-      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <properties />
-      <listeners />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType">
-      <module name="" />
-      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
-      <option name="PROGRAM_PARAMETERS" />
-      <predefined_log_file enabled="true" id="idea.log" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="js.build_tools.gulp">
-      <node-interpreter>project</node-interpreter>
-      <node-options />
-      <gulpfile />
-      <tasks />
-      <arguments />
-      <pass-parent-envs>true</pass-parent-envs>
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Doctests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Nosetests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_regexPattern" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Unittests">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="py.test">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="_new_keywords" value="&quot;&quot;" />
-      <option name="_new_parameters" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
     </configuration>
     <list>
       <item itemvalue="Application.QDL basic" />
       <item itemvalue="Application.QDL default" />
-      <item itemvalue="Application.QDL GUI" />
-      <item itemvalue="Application.XProperties" />
-      <item itemvalue="Application.IniParserDriver" />
-      <item itemvalue="Application.StringUtils" />
-      <item itemvalue="Java Scratch.Scratch (1)" />
       <item itemvalue="JUnit.QDL Test Suite" />
-      <item itemvalue="Application.EncryptionUtil" />
+      <item itemvalue="JUnit.ConfigInheritanceTest" />
+      <item itemvalue="JUnit.MultipleInheritanceTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.EncryptionUtil" />
-        <item itemvalue="Application.StringUtils" />
-        <item itemvalue="Application.IniParserDriver" />
-        <item itemvalue="Application.XProperties" />
-        <item itemvalue="Java Scratch.Scratch (1)" />
+        <item itemvalue="JUnit.ConfigInheritanceTest" />
+        <item itemvalue="JUnit.MultipleInheritanceTest" />
       </list>
     </recent_temporary>
   </component>
-  <component name="ServiceViewManager">
-    <option name="viewStates">
-      <list>
-        <serviceView>
-          <treeState>
-            <expand />
-            <select />
-          </treeState>
-        </serviceView>
-      </list>
-    </option>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="SvnConfiguration">
-    <configuration />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="true" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="8e2d8f6f-1617-4feb-a245-e9266838e8ca" name="Default" comment="" />
-      <created>1478886207979</created>
+      <changelist id="0770ca55-c43a-467b-b73e-a11ed77c6473" name="Changes" comment="" />
+      <created>1641483899198</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1478886207979</updated>
-      <workItem from="1478886188860" duration="126000" />
-      <workItem from="1478886342868" duration="65000" />
-      <workItem from="1601674370966" duration="600000" />
-      <workItem from="1601895412829" duration="120040000" />
-      <workItem from="1602936538130" duration="9533000" />
-      <workItem from="1603021511698" duration="71560000" />
-      <workItem from="1603364992558" duration="26949000" />
-      <workItem from="1603540687464" duration="5340000" />
-      <workItem from="1603654489357" duration="27558000" />
-      <workItem from="1603969307338" duration="12303000" />
-      <workItem from="1603996543000" duration="89223000" />
-      <workItem from="1604930190601" duration="52139000" />
-      <workItem from="1605486966006" duration="1176000" />
-      <workItem from="1605488802445" duration="27442000" />
-      <workItem from="1606142895843" duration="54312000" />
-      <workItem from="1606854504290" duration="16497000" />
-      <workItem from="1607342328393" duration="15794000" />
-      <workItem from="1607529773651" duration="2435000" />
-      <workItem from="1607541553397" duration="19304000" />
-      <workItem from="1607952157272" duration="53277000" />
-      <workItem from="1608813440893" duration="98031000" />
-      <workItem from="1609770779207" duration="214389000" />
-      <workItem from="1611057718927" duration="104019000" />
-      <workItem from="1612038505279" duration="52042000" />
-      <workItem from="1612279583820" duration="62786000" />
-      <workItem from="1612701421499" duration="17240000" />
-      <workItem from="1612818932380" duration="324000" />
-      <workItem from="1612819309549" duration="636000" />
-      <workItem from="1612873716766" duration="391000" />
-      <workItem from="1612874134199" duration="12008000" />
-      <workItem from="1612963619853" duration="144000" />
-      <workItem from="1612963783043" duration="653000" />
-      <workItem from="1612968017680" duration="455000" />
-      <workItem from="1612968566707" duration="197000" />
-      <workItem from="1612968834361" duration="193000" />
-      <workItem from="1612969265289" duration="720000" />
-      <workItem from="1612970150596" duration="477000" />
-      <workItem from="1612971623035" duration="696000" />
-      <workItem from="1612973235519" duration="46502000" />
-      <workItem from="1613950709149" duration="197721000" />
-      <workItem from="1615167410383" duration="201225000" />
-      <workItem from="1616065805697" duration="190202000" />
-      <workItem from="1617740452280" duration="30138000" />
-      <workItem from="1618832574087" duration="40178000" />
-      <workItem from="1619206634597" duration="43586000" />
-      <workItem from="1620040564017" duration="21724000" />
-      <workItem from="1620647392843" duration="38118000" />
-      <workItem from="1621251767820" duration="4067000" />
-      <workItem from="1621262351560" duration="189947000" />
-      <workItem from="1622807504789" duration="4953000" />
-      <workItem from="1622814789812" duration="218351000" />
-      <workItem from="1623775388443" duration="106173000" />
-      <workItem from="1624665988397" duration="59649000" />
-      <workItem from="1625569935067" duration="3809000" />
-      <workItem from="1625914499084" duration="71006000" />
-      <workItem from="1626611907400" duration="40099000" />
-      <workItem from="1627556750839" duration="210843000" />
-      <workItem from="1629545451794" duration="8433000" />
-      <workItem from="1630412191587" duration="149272000" />
-      <workItem from="1631532725842" duration="119765000" />
-      <workItem from="1632745829235" duration="103011000" />
-      <workItem from="1633444062811" duration="259000" />
-      <workItem from="1633445487806" duration="19662000" />
-      <workItem from="1633523722688" duration="6106000" />
-      <workItem from="1633548294465" duration="21000" />
-      <workItem from="1633548395478" duration="30907000" />
-      <workItem from="1633709590408" duration="3764000" />
-      <workItem from="1633724037349" duration="4320000" />
-      <workItem from="1633839895243" duration="134917000" />
-      <workItem from="1634556789850" duration="4656000" />
-      <workItem from="1634564089708" duration="37000" />
-      <workItem from="1634564290628" duration="64080000" />
-      <workItem from="1634902888345" duration="1816000" />
-      <workItem from="1634985870943" duration="14688000" />
-      <workItem from="1636469521879" duration="7975000" />
-      <workItem from="1636549980152" duration="39804000" />
-      <workItem from="1636978734429" duration="2604000" />
-      <workItem from="1636994220872" duration="395000" />
-      <workItem from="1636994743585" duration="15437000" />
-      <workItem from="1637153439538" duration="28527000" />
-      <workItem from="1637410599260" duration="4081000" />
-      <workItem from="1637584563500" duration="19561000" />
-      <workItem from="1638102742684" duration="49882000" />
-      <workItem from="1638879018387" duration="4653000" />
-      <workItem from="1639052149033" duration="2476000" />
-      <workItem from="1639313911874" duration="2172000" />
-      <workItem from="1639398493411" duration="2300000" />
-      <workItem from="1639483505837" duration="3704000" />
-      <workItem from="1639506098079" duration="3158000" />
-      <workItem from="1640004122609" duration="10515000" />
+      <updated>1641483899198</updated>
+      <workItem from="1641483910679" duration="28047000" />
     </task>
-    <task id="LOCAL-00137" summary="Cleanup since 5.2.1 is out the door. Changed how missing arguments to QDL are intercepted so user gets consistent messages. Test suites had some very old junit annotations that are no longer needed and have been removed (which also removes a ton of warnings when running tests).">
-      <created>1630596077795</created>
-      <option name="number" value="00137" />
-      <option name="presentableId" value="LOCAL-00137" />
-      <option name="project" value="LOCAL" />
-      <updated>1630596077795</updated>
-    </task>
-    <task id="LOCAL-00138" summary="More cleanup: Changed parser to use variables for operators rather than hard coding them. Better handling of missing variable messages, which should help with tracking down errors in complex expressions. Updated documentation.">
-      <created>1630673394016</created>
-      <option name="number" value="00138" />
-      <option name="presentableId" value="LOCAL-00138" />
-      <option name="project" value="LOCAL" />
-      <updated>1630673394016</updated>
-    </task>
-    <task id="LOCAL-00139" summary="Found and fixed annoyting typo in lexer.">
-      <created>1630728271577</created>
-      <option name="number" value="00139" />
-      <option name="presentableId" value="LOCAL-00139" />
-      <option name="project" value="LOCAL" />
-      <updated>1630728271577</updated>
-    </task>
-    <task id="LOCAL-00140" summary="wikked kewl enhancement to working with indices in QDL. Extends what is there, so no impact on existing code.">
-      <created>1631052505504</created>
-      <option name="number" value="00140" />
-      <option name="presentableId" value="LOCAL-00140" />
-      <option name="project" value="LOCAL" />
-      <updated>1631052505505</updated>
-    </task>
-    <task id="LOCAL-00141" summary="Added an axis operator. tests and documentation.">
-      <created>1631112372847</created>
-      <option name="number" value="00141" />
-      <option name="presentableId" value="LOCAL-00141" />
-      <option name="project" value="LOCAL" />
-      <updated>1631112372847</updated>
-    </task>
-    <task id="LOCAL-00142" summary="Few tweaks to parser and the terminal. Added query for current terminal to workspace.">
-      <created>1631226161243</created>
-      <option name="number" value="00142" />
-      <option name="presentableId" value="LOCAL-00142" />
-      <option name="project" value="LOCAL" />
-      <updated>1631226161243</updated>
-    </task>
-    <task id="LOCAL-00143" summary="Added a reserved word for QDL, but not doing anything with it. Just don't want people to start using it as, e.g. a variable.">
-      <created>1631309894391</created>
-      <option name="number" value="00143" />
-      <option name="presentableId" value="LOCAL-00143" />
-      <option name="project" value="LOCAL" />
-      <updated>1631309894391</updated>
-    </task>
-    <task id="LOCAL-00144" summary="Updating a few names of things. Refactoring.">
-      <created>1631630497311</created>
-      <option name="number" value="00144" />
-      <option name="presentableId" value="LOCAL-00144" />
-      <option name="project" value="LOCAL" />
-      <updated>1631630497312</updated>
-    </task>
-    <task id="LOCAL-00145" summary="Updating">
-      <created>1631656415822</created>
-      <option name="number" value="00145" />
-      <option name="presentableId" value="LOCAL-00145" />
-      <option name="project" value="LOCAL" />
-      <updated>1631656415823</updated>
-    </task>
-    <task id="LOCAL-00146" summary="Tiny tweaks getting ready for 5.2.2">
-      <created>1631734437048</created>
-      <option name="number" value="00146" />
-      <option name="presentableId" value="LOCAL-00146" />
-      <option name="project" value="LOCAL" />
-      <updated>1631734437048</updated>
-    </task>
-    <task id="LOCAL-00147" summary="Found a real edge case for comparing two values. Improved a function. Mostly this is cleanup running up to 5.2.2.">
-      <created>1631825311466</created>
-      <option name="number" value="00147" />
-      <option name="presentableId" value="LOCAL-00147" />
-      <option name="project" value="LOCAL" />
-      <updated>1631825311466</updated>
-    </task>
-    <task id="LOCAL-00148" summary="Found another edge case, added slew of unit tests for parsing (ongoing, long term task) in QDL.">
-      <created>1631828643838</created>
-      <option name="number" value="00148" />
-      <option name="presentableId" value="LOCAL-00148" />
-      <option name="project" value="LOCAL" />
-      <updated>1631828643838</updated>
-    </task>
-    <task id="LOCAL-00149" summary="Yikes! Upgrade to junit changed how assert was handled, effectively making a slew of my regression tests (potentially) giving false positives. QDL tests (rocking it at over 1400) amended. All was working, so no red flags and now that class of error detection has been replaced.">
-      <created>1631878823275</created>
-      <option name="number" value="00149" />
-      <option name="presentableId" value="LOCAL-00149" />
-      <option name="project" value="LOCAL" />
-      <updated>1631878823275</updated>
-    </task>
-    <task id="LOCAL-00150" summary="overdue change to parser for processign modules. Much simpler and easier now. Split tests off to their own class">
-      <created>1632434875419</created>
-      <option name="number" value="00150" />
-      <option name="presentableId" value="LOCAL-00150" />
-      <option name="project" value="LOCAL" />
-      <updated>1632434875419</updated>
-    </task>
-    <task id="LOCAL-00151" summary="Another overdue change to parser for processing modules.">
-      <created>1632499279225</created>
-      <option name="number" value="00151" />
-      <option name="presentableId" value="LOCAL-00151" />
-      <option name="project" value="LOCAL" />
-      <updated>1632499279225</updated>
-    </task>
-    <task id="LOCAL-00152" summary="Small epiphany about streamlining processing.">
-      <created>1632541601633</created>
-      <option name="number" value="00152" />
-      <option name="presentableId" value="LOCAL-00152" />
-      <option name="project" value="LOCAL" />
-      <updated>1632541601633</updated>
-    </task>
-    <task id="LOCAL-00153" summary="support for intrinsic variables. This allows better encapsulation of modules in QDL.">
-      <created>1632663779866</created>
-      <option name="number" value="00153" />
-      <option name="presentableId" value="LOCAL-00153" />
-      <option name="project" value="LOCAL" />
-      <updated>1632663779866</updated>
-    </task>
-    <task id="LOCAL-00154" summary="Added tests for intrinsic variables. Slight tweak to using for them.">
-      <created>1632690707452</created>
-      <option name="number" value="00154" />
-      <option name="presentableId" value="LOCAL-00154" />
-      <option name="project" value="LOCAL" />
-      <updated>1632690707453</updated>
-    </task>
-    <task id="LOCAL-00155" summary="Updated documentation. Changed the name of a (badly named) method that has been bugging me since May of 2012.">
-      <created>1632772714535</created>
-      <option name="number" value="00155" />
-      <option name="presentableId" value="LOCAL-00155" />
-      <option name="project" value="LOCAL" />
-      <updated>1632772714536</updated>
-    </task>
-    <task id="LOCAL-00156" summary="Systemized error messages. Corrected/updated reference manual.">
-      <created>1632927599298</created>
-      <option name="number" value="00156" />
-      <option name="presentableId" value="LOCAL-00156" />
-      <option name="project" value="LOCAL" />
-      <updated>1632927599298</updated>
-    </task>
-    <task id="LOCAL-00157" summary="More updates.">
-      <created>1632932269414</created>
-      <option name="number" value="00157" />
-      <option name="presentableId" value="LOCAL-00157" />
-      <option name="project" value="LOCAL" />
-      <updated>1632932269414</updated>
-    </task>
-    <task id="LOCAL-00158" summary="&quot;no changes&quot; This is just getting rid of cruft that parser changes rendered obsolete a couple of releases ago. Time for them to go.">
-      <created>1633091338856</created>
-      <option name="number" value="00158" />
-      <option name="presentableId" value="LOCAL-00158" />
-      <option name="project" value="LOCAL" />
-      <updated>1633091338857</updated>
-    </task>
-    <task id="LOCAL-00159" summary="Added http client support to QDL for REST">
-      <created>1633556035858</created>
-      <option name="number" value="00159" />
-      <option name="presentableId" value="LOCAL-00159" />
-      <option name="project" value="LOCAL" />
-      <updated>1633556035859</updated>
-    </task>
-    <task id="LOCAL-00160" summary="Got inspired to write a new example. Added some constructors.">
-      <created>1633643808243</created>
-      <option name="number" value="00160" />
-      <option name="presentableId" value="LOCAL-00160" />
-      <option name="project" value="LOCAL" />
-      <updated>1633643808243</updated>
-    </task>
-    <task id="LOCAL-00161" summary="Relating to CIL-1089. We don't need a separate file for passwords, but will need the machinery at some point. So I wrote a little parser in Antlr as a test to do it.">
-      <created>1633965669390</created>
-      <option name="number" value="00161" />
-      <option name="presentableId" value="LOCAL-00161" />
-      <option name="project" value="LOCAL" />
-      <updated>1633965669390</updated>
-    </task>
-    <task id="LOCAL-00162" summary="documenation">
-      <created>1633965715155</created>
-      <option name="number" value="00162" />
-      <option name="presentableId" value="LOCAL-00162" />
-      <option name="project" value="LOCAL" />
-      <updated>1633965715155</updated>
-    </task>
-    <task id="LOCAL-00163" summary="Tightening things up a bit. No changes though.">
-      <created>1633984072200</created>
-      <option name="number" value="00163" />
-      <option name="presentableId" value="LOCAL-00163" />
-      <option name="project" value="LOCAL" />
-      <updated>1633984072200</updated>
-    </task>
-    <task id="LOCAL-00164" summary="Changed how a conditional is figured.">
-      <created>1634155273422</created>
-      <option name="number" value="00164" />
-      <option name="presentableId" value="LOCAL-00164" />
-      <option name="project" value="LOCAL" />
-      <updated>1634155273423</updated>
-    </task>
-    <task id="LOCAL-00165" summary="Better handling of workspace loading failure. Improved internal error handling. Added a new function, laminate, to the extensions package.">
-      <created>1634390882150</created>
-      <option name="number" value="00165" />
-      <option name="presentableId" value="LOCAL-00165" />
-      <option name="project" value="LOCAL" />
-      <updated>1634390882150</updated>
-    </task>
-    <task id="LOCAL-00166" summary="COuple of tweak. Upgrading IDE and want to back everything up first.">
-      <created>1634564059155</created>
-      <option name="number" value="00166" />
-      <option name="presentableId" value="LOCAL-00166" />
-      <option name="project" value="LOCAL" />
-      <updated>1634564059155</updated>
-    </task>
-    <task id="LOCAL-00167" summary="Cleanup before release.">
-      <created>1634767639032</created>
-      <option name="number" value="00167" />
-      <option name="presentableId" value="LOCAL-00167" />
-      <option name="project" value="LOCAL" />
-      <updated>1634767639033</updated>
-    </task>
-    <task id="LOCAL-00168" summary="Renamed a few functions. Refactored the base 32 conversion utility.">
-      <created>1634853485792</created>
-      <option name="number" value="00168" />
-      <option name="presentableId" value="LOCAL-00168" />
-      <option name="project" value="LOCAL" />
-      <updated>1634853485792</updated>
-    </task>
-    <task id="LOCAL-00169" summary="Added chained conditionals, with tests.">
-      <created>1635367356092</created>
-      <option name="number" value="00169" />
-      <option name="presentableId" value="LOCAL-00169" />
-      <option name="project" value="LOCAL" />
-      <updated>1635367356092</updated>
-    </task>
-    <task id="LOCAL-00170" summary="Found a bug (difference) between Oracle and Corretto versions of Java in how they treat CDATA sections of XML. Since we stick things like passwords in them, this potentially could be critical. Seems to be fixed.">
-      <created>1635465140683</created>
-      <option name="number" value="00170" />
-      <option name="presentableId" value="LOCAL-00170" />
-      <option name="project" value="LOCAL" />
-      <updated>1635465140683</updated>
-    </task>
-    <task id="LOCAL-00171" summary="Migrated checks on some operators to the grammar (much snazzier), rather than doing it later in Java. Renamed a couple of classes. Moar tests for edge cases. Moar help.">
-      <created>1635682484066</created>
-      <option name="number" value="00171" />
-      <option name="presentableId" value="LOCAL-00171" />
-      <option name="project" value="LOCAL" />
-      <updated>1635682484066</updated>
-    </task>
-    <task id="LOCAL-00172" summary="Better handling of bad input by user.">
-      <created>1635851881005</created>
-      <option name="number" value="00172" />
-      <option name="presentableId" value="LOCAL-00172" />
-      <option name="project" value="LOCAL" />
-      <updated>1635851881005</updated>
-    </task>
-    <task id="LOCAL-00173" summary="More usability for WS">
-      <created>1635973493953</created>
-      <option name="number" value="00173" />
-      <option name="presentableId" value="LOCAL-00173" />
-      <option name="project" value="LOCAL" />
-      <updated>1635973493954</updated>
-    </task>
-    <task id="LOCAL-00174" summary="Added (long overdue) line number and character position for QDL errors. Scripts libraries are getting quite complex (a very good thing, since this is evolution) and better error tracking is becoming more critical. No changes to any basic functionality.">
-      <created>1636064756734</created>
-      <option name="number" value="00174" />
-      <option name="presentableId" value="LOCAL-00174" />
-      <option name="project" value="LOCAL" />
-      <updated>1636064756734</updated>
-    </task>
-    <task id="LOCAL-00175" summary="Cleanup. There was a ton of old, low-level calls that were not used any more, but still had tests that referred to them. Tests are now rewritten so these are unneeded and this deletes some very antiquated stuff.">
-      <created>1636287961873</created>
-      <option name="number" value="00175" />
-      <option name="presentableId" value="LOCAL-00175" />
-      <option name="project" value="LOCAL" />
-      <updated>1636287961874</updated>
-    </task>
-    <task id="LOCAL-00176" summary="Another refactoring -- name changes from very generic names. Lots of ripple effects, but just name changes.">
-      <created>1636293128533</created>
-      <option name="number" value="00176" />
-      <option name="presentableId" value="LOCAL-00176" />
-      <option name="project" value="LOCAL" />
-      <updated>1636293128533</updated>
-    </task>
-    <task id="LOCAL-00177" summary="CIL-1122.">
-      <created>1636638570012</created>
-      <option name="number" value="00177" />
-      <option name="presentableId" value="LOCAL-00177" />
-      <option name="project" value="LOCAL" />
-      <updated>1636638570013</updated>
-    </task>
-    <task id="LOCAL-00178" summary="Found issue with block[] statements. Fixed and a couple of regression tests.">
-      <created>1637190599195</created>
-      <option name="number" value="00178" />
-      <option name="presentableId" value="LOCAL-00178" />
-      <option name="project" value="LOCAL" />
-      <updated>1637190599195</updated>
-    </task>
-    <task id="LOCAL-00179" summary="Renaming some internal methods in advance of a refactoring.">
-      <created>1637325757213</created>
-      <option name="number" value="00179" />
-      <option name="presentableId" value="LOCAL-00179" />
-      <option name="project" value="LOCAL" />
-      <updated>1637325757213</updated>
-    </task>
-    <task id="LOCAL-00180" summary="Added XStack etc. to refactor some of QDLs internals. No changes to code yet, just adding the classes.">
-      <created>1638187347587</created>
-      <option name="number" value="00180" />
-      <option name="presentableId" value="LOCAL-00180" />
-      <option name="project" value="LOCAL" />
-      <updated>1638187347588</updated>
-    </task>
-    <task id="LOCAL-00181" summary="Small patch.">
-      <created>1638190696687</created>
-      <option name="number" value="00181" />
-      <option name="presentableId" value="LOCAL-00181" />
-      <option name="project" value="LOCAL" />
-      <updated>1638190696687</updated>
-    </task>
-    <task id="LOCAL-00182" summary="Refactor to a better stack architecture done.">
-      <created>1638228197488</created>
-      <option name="number" value="00182" />
-      <option name="presentableId" value="LOCAL-00182" />
-      <option name="project" value="LOCAL" />
-      <updated>1638228197488</updated>
-    </task>
-    <task id="LOCAL-00183" summary="Update token_id to jti as id token identifier. Renamed a couple of classes.">
-      <created>1638391384784</created>
-      <option name="number" value="00183" />
-      <option name="presentableId" value="LOCAL-00183" />
-      <option name="project" value="LOCAL" />
-      <updated>1638391384784</updated>
-    </task>
-    <task id="LOCAL-00184" summary="Commit changes before any log 4 java vulnerability fixes.">
-      <created>1639485192029</created>
-      <option name="number" value="00184" />
-      <option name="presentableId" value="LOCAL-00184" />
-      <option name="project" value="LOCAL" />
-      <updated>1639485192030</updated>
-    </task>
-    <task id="LOCAL-00185" summary="Remove Log 4 Java, update several dependencies.">
-      <created>1640041038534</created>
-      <option name="number" value="00185" />
-      <option name="presentableId" value="LOCAL-00185" />
-      <option name="project" value="LOCAL" />
-      <updated>1640041038534</updated>
-    </task>
-    <option name="localTasksCounter" value="186" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnknownFeatures">
-    <option featureType="com.intellij.fileTypeFactory" implementationName="*.ini" />
-    <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Tightening things up a bit. No changes though." />
-    <MESSAGE value="Changed how a conditional is figured." />
-    <MESSAGE value="Better handling of workspace loading failure. Improved internal error handling. Added a new function, laminate, to the extensions package." />
-    <MESSAGE value="COuple of tweak. Upgrading IDE and want to back everything up first." />
-    <MESSAGE value="Cleanup before release." />
-    <MESSAGE value="Renamed a few functions. Refactored the base 32 conversion utility." />
-    <MESSAGE value="Changed the default for a utility. Last minute tidying up before 5.2.3 release." />
-    <MESSAGE value="Added chained conditionals, with tests." />
-    <MESSAGE value="Found a bug (difference) between Oracle and Corretto versions of Java in how they treat CDATA sections of XML. Since we stick things like passwords in them, this potentially could be critical. Seems to be fixed." />
-    <MESSAGE value="Migrated checks on some operators to the grammar (much snazzier), rather than doing it later in Java. Renamed a couple of classes. Moar tests for edge cases. Moar help." />
-    <MESSAGE value="Better handling of bad input by user." />
-    <MESSAGE value="More usability for WS" />
-    <MESSAGE value="Added (long overdue) line number and character position for QDL errors. Scripts libraries are getting quite complex (a very good thing, since this is evolution) and better error tracking is becoming more critical. No changes to any basic functionality." />
-    <MESSAGE value="Cleanup. There was a ton of old, low-level calls that were not used any more, but still had tests that referred to them. Tests are now rewritten so these are unneeded and this deletes some very antiquated stuff." />
-    <MESSAGE value="Another refactoring -- name changes from very generic names. Lots of ripple effects, but just name changes." />
-    <MESSAGE value="CIL-1122." />
-    <MESSAGE value="RFC 9068 support. Improved error message on edge case where a user configures a refresh token when they are not enabled." />
-    <MESSAGE value="Found issue with block[] statements. Fixed and a couple of regression tests." />
-    <MESSAGE value="Renaming some internal methods in advance of a refactoring." />
-    <MESSAGE value="Added XStack etc. to refactor some of QDLs internals. No changes to code yet, just adding the classes." />
-    <MESSAGE value="Small patch." />
-    <MESSAGE value="Refactor to a better stack architecture done." />
-    <MESSAGE value="Update token_id to jti as id token identifier. Renamed a couple of classes." />
-    <MESSAGE value="Commit changes before any log 4 java vulnerability fixes." />
-    <MESSAGE value="Remove Log 4 Java, update several dependencies." />
-    <option name="LAST_COMMIT_MESSAGE" value="Remove Log 4 Java, update several dependencies." />
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>289</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>595</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/demo/HOCONDemo.java</url>
-          <line>17</line>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/test/java/edu/uiuc/ncsa/myproxy/oauth2/TF2Test.java</url>
-          <line>40</line>
-          <option name="timeStamp" value="40" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLUtils.java</url>
-          <line>51</line>
-          <option name="timeStamp" value="55" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLUtils.java</url>
-          <line>136</line>
-          <option name="timeStamp" value="68" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLUtils.java</url>
-          <line>252</line>
-          <option name="timeStamp" value="134" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/src/main/java/edu/uiuc/ncsa/security/oauth_2_0/client/RTServer2.java</url>
-          <line>64</line>
-          <option name="timeStamp" value="138" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/MultipleInheritanceTest.java</url>
-          <line>239</line>
-          <option name="timeStamp" value="216" />
+          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/test/java/edu/uiuc/ncsa/security/core/configuration/ConfigInheritanceTest.java</url>
+          <line>101</line>
+          <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3581</line>
-          <option name="timeStamp" value="218" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/configuration/ConfigUtil.java</url>
-          <line>92</line>
-          <option name="timeStamp" value="219" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3563</line>
-          <option name="timeStamp" value="223" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl-gui/src/main/java/edu/uiuc/ncsa/MyREPL.java</url>
-          <line>262</line>
-          <option name="timeStamp" value="224" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/token/impl/TokenImpl.java</url>
-          <line>227</line>
-          <option name="timeStamp" value="228" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>2468</line>
-          <option name="timeStamp" value="274" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FunctionReferenceNode.java</url>
-          <line>75</line>
-          <option name="timeStamp" value="366" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLDebugListener.java</url>
-          <line>631</line>
-          <option name="timeStamp" value="404" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>2591</line>
-          <option name="timeStamp" value="425" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemEntry.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="632" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemUtility.java</url>
-          <line>142</line>
-          <option name="timeStamp" value="638" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemUtility.java</url>
-          <line>153</line>
-          <option name="timeStamp" value="641" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLDebugListener.java</url>
-          <line>736</line>
-          <option name="timeStamp" value="701" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1144</line>
-          <option name="timeStamp" value="704" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/StatementTest.java</url>
-          <line>89</line>
-          <option name="timeStamp" value="724" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemPath.java</url>
-          <line>57</line>
-          <option name="timeStamp" value="811" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemPath.java</url>
-          <line>70</line>
-          <option name="timeStamp" value="812" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/state/VariableState.java</url>
-          <line>143</line>
-          <option name="timeStamp" value="814" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLListener.java</url>
-          <line>1456</line>
-          <option name="timeStamp" value="857" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ExpressionStemNode.java</url>
-          <line>304</line>
-          <option name="timeStamp" value="869" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ExpressionStemNode.java</url>
-          <line>370</line>
-          <option name="timeStamp" value="881" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ExpressionStemNode.java</url>
-          <line>350</line>
-          <option name="timeStamp" value="882" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ExpressionStemNode.java</url>
-          <line>352</line>
-          <option name="timeStamp" value="883" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemUtility.java</url>
-          <line>214</line>
-          <option name="timeStamp" value="885" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/expressions/ESN2.java</url>
-          <line>288</line>
-          <option name="timeStamp" value="905" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/SystemEvaluator.java</url>
-          <line>1007</line>
-          <option name="timeStamp" value="942" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/QDLDebugListener.java</url>
-          <line>359</line>
-          <option name="timeStamp" value="943" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>4103</line>
-          <option name="timeStamp" value="945" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/StemEvaluator.java</url>
-          <line>724</line>
-          <option name="timeStamp" value="996" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>1038</line>
-          <option name="timeStamp" value="1023" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>1262</line>
-          <option name="timeStamp" value="1036" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/Iso8601.java</url>
-          <line>226</line>
-          <option name="timeStamp" value="1039" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/src/main/java/edu/uiuc/ncsa/security/util/cli/InputLine.java</url>
-          <line>457</line>
-          <option name="timeStamp" value="1046" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/IOEvaluator.java</url>
-          <line>405</line>
-          <option name="timeStamp" value="1064" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>1464</line>
-          <option name="timeStamp" value="1095" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/SystemEvaluator.java</url>
-          <line>2204</line>
-          <option name="timeStamp" value="1115" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/parsing/IniListenerImpl.java</url>
-          <line>114</line>
-          <option name="timeStamp" value="1255" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/xml/XMLUtils.java</url>
-          <line>465</line>
-          <option name="timeStamp" value="1287" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>1484</line>
-          <option name="timeStamp" value="1289" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/StemVariable.java</url>
-          <line>1736</line>
-          <option name="timeStamp" value="1297" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/variables/QDLCodec.java</url>
-          <line>49</line>
-          <option name="timeStamp" value="1298" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/OpEvaluator.java</url>
-          <line>449</line>
-          <option name="timeStamp" value="1310" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/SystemEvaluator.java</url>
-          <line>2015</line>
-          <option name="timeStamp" value="1332" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>4474</line>
-          <option name="timeStamp" value="1340" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>3141</line>
-          <option name="timeStamp" value="1345" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>4239</line>
-          <option name="timeStamp" value="1348" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>2275</line>
-          <option name="timeStamp" value="1350" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>965</line>
-          <option name="timeStamp" value="1369" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/QDLWorkspace.java</url>
-          <line>214</line>
-          <option name="timeStamp" value="1375" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/workspace/WorkspaceCommands.java</url>
-          <line>4020</line>
-          <option name="timeStamp" value="1377" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/evaluate/SystemEvaluator.java</url>
-          <line>411</line>
-          <option name="timeStamp" value="1378" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/src/main/java/edu/uiuc/ncsa/security/core/util/StringUtils.java</url>
-          <line>686</line>
-          <option name="timeStamp" value="1391" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FKey.java</url>
-          <line>29</line>
-          <option name="timeStamp" value="1409" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/functions/FKey.java</url>
-          <line>41</line>
-          <option name="timeStamp" value="1411" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ModuleTest.java</url>
-          <line>594</line>
-          <option name="timeStamp" value="1414" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/ModuleTest.java</url>
-          <line>770</line>
-          <option name="timeStamp" value="1422" />
+          <line>4713</line>
+          <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <pin-to-top-manager>
-      <pinned-members>
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.variables.StemVariable" memberName="stemList" />
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.functions.FunctionRecord" memberName="sourceCode" />
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.expressions.ExpressionStemNode" memberName="statements" />
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.VFSTest" memberName="xp" />
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.expressions.Assignment" memberName="sourceCode" />
-        <PinnedItemInfo parentTag="edu.uiuc.ncsa.qdl.state.State" memberName="importedModules" />
-      </pinned-members>
-    </pin-to-top-manager>
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
-  </component>
-  <component name="antWorkspaceConfiguration">
-    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
-    <option name="FILTER_TARGETS" value="false" />
   </component>
 </project>

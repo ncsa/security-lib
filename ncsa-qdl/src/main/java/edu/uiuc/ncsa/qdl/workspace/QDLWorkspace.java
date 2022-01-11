@@ -92,6 +92,7 @@ public class QDLWorkspace {
         }
         // In case a jar is corrupted (e.g. maven builds it wrong, partial upgrade failed, so missing dependency)
         // since the first symptom is this. Without this case, it falls through and the user just gets a random error
+        // since the first symptom is this. Without this case, it falls through and the user just gets a random error
         // that whatever component failed, not that the component was actually missing.
         if (t instanceof NoClassDefFoundError) {
             workspaceCommands.say("internal error: Missing classes. Did you try an upgrade that failed? (" + t.getMessage() + ")");

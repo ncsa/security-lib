@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.configuration;
 
 import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
+import edu.uiuc.ncsa.security.core.inheritance.MultipleInheritanceEngine;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 import org.junit.Test;
 
@@ -13,7 +14,11 @@ import java.util.Map;
  */
 public class ConfigInheritanceTest extends AbstractInheritanceTest {
     protected String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-security-common/ncsa-security-core/src/test/resources/cfg_inheritance/";
-
+    void verbose(String x){
+        if( MultipleInheritanceEngine.DEBUG_ON){
+           System.out.println(x);
+        }
+    }
     /**
      * Shows that overriding an configuration replaces an attribute
      *
@@ -21,6 +26,7 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
      */
     @Test
     public void testAttributeInheritance() throws Exception {
+        verbose("testAttributeInheritance:");
         String fileName = path + "attrib-test-A.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -35,6 +41,8 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
      */
     @Test
     public void testAttributeInheritance2() throws Exception {
+        verbose("testAttributeInheritance2:");
+
         String fileName = path + "attrib-test-B.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -49,6 +57,7 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
      */
     @Test
     public void testNodeInheritance1() throws Exception {
+        verbose("testNodeInheritance1:");
         String fileName = path + "node-override-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -63,6 +72,8 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
      */
     @Test
     public void testNodeInheritance2() throws Exception {
+        verbose("testNodeInheritance2:");
+
         String fileName = path + "node-override-test2.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -72,6 +83,7 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
 
     @Test
     public void testAliasOverrideNode() throws Exception {
+        verbose("testAliasOverrideNode:");
         String fileName = path + "alias-override-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
@@ -85,6 +97,7 @@ public class ConfigInheritanceTest extends AbstractInheritanceTest {
 
     @Test
     public void testAliasOverrideAttribute() throws Exception {
+        verbose("testAliasOverrideAttribute:");
         String fileName = path + "alias-override-test.xml";
         MultiConfigurations configurations2 = getConfigurations2(fileName);
         Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();

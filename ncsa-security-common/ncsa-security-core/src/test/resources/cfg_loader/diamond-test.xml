@@ -4,9 +4,9 @@
      Our solution is positional. Specifying "B C" then B has preference to C.
 -->
 <config>
-    <service name="A" overrides="C"/>  <!-- A C -->
-    <service name="B" overrides="C"/>  <!-- B C -->
+    <service name="A" extends="C"/>  <!-- A C -->
+    <service name="B" extends="C"/>  <!-- B C -->
     <service name="C"/>
-    <service name="D" overrides="A B "/> <!-- D A B C -->
-    <service name="E" overrides="B A "/> <!-- E B A C -->
+    <service name="D" extends="A B "/> <!-- D A B C -->
+    <service name="E" extends="B A "/> <!-- E B A C -->
 </config>

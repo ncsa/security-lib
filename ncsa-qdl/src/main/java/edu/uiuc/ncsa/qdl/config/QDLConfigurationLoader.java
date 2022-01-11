@@ -377,6 +377,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     public static void main(String[] args) {
         String path = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/qdl-cfg.xml";
         ConfigurationNode node = ConfigUtil.findConfiguration(path, "test", QDLConfigurationConstants.CONFIG_TAG_NAME);
+
         QDLConfigurationLoader loader = new QDLConfigurationLoader(path, node);
 
         QDLEnvironment config = loader.load();

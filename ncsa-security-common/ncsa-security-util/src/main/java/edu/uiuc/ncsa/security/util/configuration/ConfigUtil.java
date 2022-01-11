@@ -1,11 +1,16 @@
 package edu.uiuc.ncsa.security.util.configuration;
 
 import edu.uiuc.ncsa.security.core.configuration.Configurations;
+import edu.uiuc.ncsa.security.core.configuration.MultiConfigurations;
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import edu.uiuc.ncsa.security.core.inheritance.InheritanceList;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -42,7 +47,25 @@ public class ConfigUtil {
 
     }
 
+    public static ConfigurationNode findMultiNode(String fileName, String cfgName, String cfgTagName) throws ConfigurationException {
+        MultiConfigurations configurations2 = getConfigurations2(fileName, cfgTagName);
+        Map<String, InheritanceList> ro = configurations2.getInheritanceEngine().getResolvedOverrides();
+        List<ConfigurationNode> nodes = configurations2.getNamedConfig(cfgName);
+        if(nodes.isEmpty()){
+            return null;
+        }
+        if(1 < nodes.size()){
+            throw new ConfigurationException("Multiple configurations named " + cfgName + " found in file " + fileName);
+        }
+        return nodes.get(0); // There is one exactly. Return it.
+    }
 
+    protected static MultiConfigurations getConfigurations2(String fileName, String cfgTagName) throws ConfigurationException {
+        XMLConfiguration xmlConfiguration = Configurations.getConfiguration(new File(fileName));
+        MultiConfigurations configurations2 = new MultiConfigurations();
+        configurations2.ingestConfig(xmlConfiguration, cfgTagName);
+        return configurations2;
+    }
     /**
      * This takes a configuration and looks in it for a given name for the tag. Called by {@link #findConfiguration(String, String, String)}.
      *

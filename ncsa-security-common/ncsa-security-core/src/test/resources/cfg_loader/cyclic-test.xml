@@ -3,8 +3,8 @@
 -->
 
 <config>
-    <service name="A" alias = "B" overrides="X"/>  <!-- X B -->
-    <service name="B" alias="C" overrides="A"/>    <!-- X B C-->
+    <service name="A" alias = "B" extends="X"/>  <!-- X B -->
+    <service name="B" alias="C" extends="A"/>    <!-- X B C-->
     <service name="C"/>  <!-- C -->
     <service name="X"/>  <!-- X -->
 </config>

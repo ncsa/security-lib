@@ -2,9 +2,9 @@
      Tests having multiple (two here) elements in overrides list.
 -->
 <config>
-    <service name="A" alias="B" overrides="X Y"/>  <!--  X Y P Q C Z-->
-    <service name="B" alias="C" overrides="P Q"/>  <!--  P Q C Z -->
-    <service name="C" overrides="Z"/>              <!-- C Z -->
+    <service name="A" alias="B" extends="X Y"/>  <!--  X Y P Q C Z-->
+    <service name="B" alias="C" extends="P Q"/>  <!--  P Q C Z -->
+    <service name="C" extends="Z"/>              <!-- C Z -->
 
     <service name="P"/>
     <service name="Q"/>

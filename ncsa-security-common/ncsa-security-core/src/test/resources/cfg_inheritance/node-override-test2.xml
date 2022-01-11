@@ -3,7 +3,7 @@
 -->
 <config>
     <service name="A"
-             overrides="X">
+             extends="X">
     </service>
     <service name="X">
         <mynode>node X</mynode>

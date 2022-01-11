@@ -1,19 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ANTLRGenerationPreferences">
-    <option name="perGrammarGenerationSettings">
-      <list>
-        <PerGrammarGenerationSettings>
-          <option name="fileName" value="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4/QDLParser.g4" />
-          <option name="autoGen" value="true" />
-          <option name="outputDir" value="$PROJECT_DIR$/ncsa-qdl/src/main/java/edu/uiuc/ncsa/qdl/generated" />
-          <option name="libDir" value="$PROJECT_DIR$/ncsa-qdl/src/main/antlr4" />
-          <option name="encoding" value="UTF-8" />
-          <option name="pkg" value="edu.uiuc.ncsa.qdl.generated" />
-          <option name="language" value="Java" />
-        </PerGrammarGenerationSettings>
-      </list>
-    </option>
+  <component name="CCaseConfig">
+    <option name="checkoutReserved" value="false" />
+    <option name="markExternalChangeAsUpToDate" value="true" />
+    <option name="checkInUseHijack" value="true" />
+    <option name="useUcmModel" value="true" />
+    <option name="synchOutside" value="false" />
+    <option name="isHistoryResticted" value="true" />
+    <option name="useIdenticalSwitch" value="true" />
+    <option name="synchActivitiesOnRefresh" value="true" />
+    <option name="lastScr" value="" />
+    <option name="scrTextFileName" value="" />
+    <option name="historyRevisionsNumber" value="4" />
+  </component>
+  <component name="ClearCaseSharedConfig">
+    <option name="myUseUcmModel" value="true" />
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="IdProvider" IDEtalkID="215A14033C971CCE717D28767B12EEA0" />
+  <component name="JavadocGenerationManager">
+    <option name="OTHER_OPTIONS" value="" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
@@ -22,5 +28,9 @@
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8_261" project-jdk-type="JavaSDK" />
+  <component name="ModuleEditorState">
+    <option name="LAST_EDITED_MODULE_NAME" />
+    <option name="LAST_EDITED_TAB_NAME" />
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8_261" project-jdk-type="JavaSDK" />
 </project>

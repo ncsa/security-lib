@@ -2,9 +2,9 @@
      A couple of overrides
 -->
 <config>
-    <service name="A" alias="B" overrides="X"/>  <!--   X Y C Z -->
-    <service name="B" alias="C" overrides="Y"/>  <!-- Y C Z -->
-    <service name="C" overrides="Z"/>            <!-- C Z -->
+    <service name="A" alias="B" extends="X"/>  <!--   X Y C Z -->
+    <service name="B" alias="C" extends="Y"/>  <!-- Y C Z -->
+    <service name="C" extends="Z"/>            <!-- C Z -->
 
     <service name="X"/>
     <service name="Y"/>

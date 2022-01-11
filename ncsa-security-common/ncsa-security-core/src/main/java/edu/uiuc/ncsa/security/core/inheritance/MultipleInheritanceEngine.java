@@ -20,6 +20,8 @@ public class MultipleInheritanceEngine {
     InheritanceMap atomicNodes; // nodes that do not have aliases.
     InheritanceMap unresolvedAliases; // alias + node
     InheritanceMap unresolvedOverrides; // name or alias
+    // Overrides means this is a list of things that overrides the current node.
+    // Probably should rename this to unresolvedExtends cf. resolvedOverrides variable
 
     /**
      * If the resolve method for this class has been run sucessfully.
@@ -31,7 +33,7 @@ public class MultipleInheritanceEngine {
 
     boolean resolutionsRun = false;
 
-    boolean DEBUG_ON = false; // This has to be set internally for deep debugging
+    public static boolean DEBUG_ON = false; // This has to be set internally for deep debugging
     public InheritanceMap getAtomicNodes() {
         return atomicNodes;
     }
@@ -96,13 +98,13 @@ public class MultipleInheritanceEngine {
     }
 
     protected void debugPrint(){
-        System.out.println("              nodes:");
-        System.out.println("        atomicNodes:" + atomicNodes);
-        System.out.println("  unresolvedAliases:" + unresolvedAliases);
-        System.out.println("            Aliases:" + unresolvedAliases.getAliases("B"));
-        System.out.println("    resolvedAliases:" + resolvedAliases);
-        System.out.println("unresolvedOverrides:" + unresolvedOverrides);
-        System.out.println("  resolvedOverrides:" + resolvedOverrides + "\n");
+        System.out.println("            nodes:");
+        System.out.println("      atomicNodes:" + atomicNodes);
+        System.out.println("unresolvedAliases:" + unresolvedAliases);
+        System.out.println("          Aliases:" + unresolvedAliases.getAliases("B"));
+        System.out.println("  resolvedAliases:" + resolvedAliases);
+        System.out.println("unresolvedExtends:" + unresolvedOverrides);
+        System.out.println("  resolvedExtends:" + resolvedOverrides + "\n");
 
     }
     protected void resolveAlias() {

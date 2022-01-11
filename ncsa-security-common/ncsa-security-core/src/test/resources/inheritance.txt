@@ -1,0 +1,45 @@
+Multiple inheritance in configurations.
+
+Configurations can support multiple inheritance. The issue with it is that there is often no
+way to resolve conflicts. The way we do it is positional if we have
+
+  A extends B C D
+
+Then A has right of way, then B, then C then D. So if there is an attribute, X, in B and C, then
+B.X will be used.
+
+The syntax uses the extends keyword and a list (default is blank delimited) of configration names.
+The engine will resolve aliases too. Here is a minimal example
+
+<config>
+    <service name="A"  extends="X"/>  <!--   A X -->
+    <service name="X"/>
+</config>
+
+ Written A:[X] meaning that A extends X. If we had
+
+<config>
+    <service name="A"
+             extends="X"
+             test_attrib="Attribute A">
+    </service>
+    <service name="X"
+             test_attrib="Attribute X">
+    </service>
+</config>
+
+Then referring to A.test_attrib would return "Attribute A" while X.test_attrib returns "Attribute X"
+
+Should hold for elements as well, so
+
+<config>
+    <service name="A"
+             extends="X">
+        <mynode>node A</mynode>
+    </service>
+    <service name="X">
+        <mynode>node X</mynode>
+    </service>
+</config>
+
+ Referencing A.mynode returns the element with contents "node A"

@@ -1,9 +1,11 @@
 <!--
       test that overriding an attribute is resolved right.
+      So X is the base and A overrides it. The test_attrib from the resolved
+      class is "Attribute A"
 -->
 <config>
     <service name="A"
-             overrides="X"
+             extends="X"
              test_attrib="Attribute A">
     </service>
     <service name="X"

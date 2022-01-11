@@ -20,7 +20,7 @@ import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
  * on 1/31/21 at  4:59 PM
  */
 public class MultiConfigurations {
-    public static final String OVERRIDES_TAG = "overrides";
+    public static final String EXTENDS_TAG = "extends";
     public static final String NAME_TAG = "name";
     public static final String ALIAS_TAG = "alias";
 
@@ -38,12 +38,12 @@ public class MultiConfigurations {
 
     /*
     One major difference between this and the old way is that inheritance means that the entire configuration
-    has to be processed rather than before where only the specific requested named configuration would ne
+    has to be processed rather than before where only the specific requested named configuration would be
     resolved (so if there were alias cycles some place else, they would not get found.
     Same with duplicate named configurations.
      */
-    protected void ingestConfig(XMLConfiguration cfg,
-                                String topNodeTag // the tag of elements to look at, e.g. service
+    public void ingestConfig(XMLConfiguration cfg,
+                             String topNodeTag // the tag of elements to look at, e.g. service
     ) {
 
         List list = cfg.configurationsAt(topNodeTag);
@@ -60,7 +60,7 @@ public class MultiConfigurations {
             }
             allNodes.put(name, cn.getRootNode());
             String alias = Configurations.getFirstAttribute(cn.getRootNode(), ALIAS_TAG);
-            String parents = Configurations.getFirstAttribute(cn.getRootNode(), OVERRIDES_TAG);
+            String parents = Configurations.getFirstAttribute(cn.getRootNode(), EXTENDS_TAG);
 
             if (alias == null) {
                 namedNodes.put(name, name, splitParentList(parents));
@@ -80,6 +80,14 @@ public class MultiConfigurations {
         inheritanceEngine.resolve();
     }
 
+    /**
+     * This being XML, it is possible to have elements with the same name -- stylistically very bad
+     * and no config should do that, but it is unavoidable. Therefore, this will return all the nodes
+     * with the given name and generally the calling program should either throw an exception if there
+     * is more than one or have some strategy for dealing with multiples.
+     * @param cfgName
+     * @return
+     */
     public List<ConfigurationNode> getNamedConfig(String cfgName) {
         // everything has been resolved.
         // Get the list of names to return

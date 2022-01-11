@@ -99,6 +99,8 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
       RegexMatches : '=~' | '≈';  // unicode 2248
         LogicalNot : '!'  | '¬';  // unicode ac
     Exponentiation : '^';
+    // Note that the extra characters for && and || are there because certain unicode aware keyboards
+    // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
                And : '&&' | '⋀' | '∧'; // unicode 22c0, 2227
                 Or : '||' | '⋁' | '∨'; // unicode 22c2, 2228
           Backtick : '`';
@@ -147,10 +149,6 @@ fragment AllOps :
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;
-
- // Note that the extra characters for && and || are there because certain unicode aware keyboards
- // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
-
 
 /*
    § 9 Comments and white space

@@ -10,7 +10,7 @@ OUT_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/java/edu/uiuc/nc
 SOURCE_DIR="/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/antlr4"
 OUT_PACKAGE="edu.uiuc.ncsa.qdl.generated"
 cd $SOURCE_DIR
-# Stupidly, the antlr tool only build from the current directory.
+# Stupidly, the antlr tool only builds from the current directory.
 # There is no option to set the source directory
 echo "switching to " $SOURCE_DIR
 echo "putting files in "$OUT_DIR

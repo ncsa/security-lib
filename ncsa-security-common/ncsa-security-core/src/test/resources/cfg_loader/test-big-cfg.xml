@@ -5,21 +5,21 @@
      ",;:\/&!"
      -->
 <config>
-    <service name = "A" alias="P" overrides="!T!U"/>  <!-- P T U R Q W-->
-    <service name = "B" alias="Q" overrides="W"/>    <!-- Q W -->
-    <service name = "C" alias="T" overrides="; W ;   Z"/>  <!-- T W Z -->
+    <service name = "A" alias="P" extends="!T!U"/>  <!-- P T U R Q W-->
+    <service name = "B" alias="Q" extends="W"/>    <!-- Q W -->
+    <service name = "C" alias="T" extends="; W ;   Z"/>  <!-- T W Z -->
     <service name = "D" alias="X"/>
-    <service name = "E" alias="D" overrides=",X,    U"/>
+    <service name = "E" alias="D" extends=",X,    U"/>
     <service name = "L" alias="M" />
     <service name = "M" alias="N" />
     <service name = "N" alias="O" />
     <service name = "O" alias="P" />
 
     <service name  = "Q"/>
-    <service name  = "R" overrides=" Y"/>            <!-- R P T  -->
+    <service name  = "R" extends=" Y"/>            <!-- R P T  -->
     <service name  = "P"/>
     <service name  = "T"/>
-    <service name  = "U" overrides="R"/>             <!-- U R W Q -->
+    <service name  = "U" extends="R"/>             <!-- U R W Q -->
     <service name  = "W"/>
     <service name = "X" alias = "A"/>
     <service name = "Y" alias = "B"/>                <!-- W Q -->

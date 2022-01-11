@@ -1,8 +1,10 @@
 <!--
       test that a sub attribute is found that is not overridden..
+      A.myattrib == "attribute X"
+      B.myattribute = "attribute C"
 -->
 <config>
-    <service name="A" alias="B" overrides="X"/>
+    <service name="A" alias="B" extends="X"/>
     <service name="B" alias="C"/>
 
     <service name="C"
