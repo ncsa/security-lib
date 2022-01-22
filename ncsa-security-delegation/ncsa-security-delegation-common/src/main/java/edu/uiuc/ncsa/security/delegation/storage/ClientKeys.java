@@ -11,8 +11,8 @@ public class ClientKeys extends BaseClientKeys {
         identifier("oauth_consumer_key");
     }
 
-    String homeURL = "home_url";
     String errorURL = "error_url";
+    String homeURL = "home_url";
     String proxyLimited = "proxy_limited";
 
     public String proxyLimited(String... x) {

@@ -958,7 +958,13 @@ To get a list of these, use mask, e.g.
                                  ['a','qrs','pqr'],
                                  ['a','p','s','t']));
 {0=a, 2=pqr}
-See also: mask
+
+
+Is there and ends_with command? No. Use =~ instead, e.g. to check if a string
+in the variable x ends in '.xml'
+  '.*xml' =~ x
+
+See also: mask, =~
                ]]>
         </body>
     </entry>

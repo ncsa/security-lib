@@ -103,8 +103,6 @@ public class LoggerProvider implements Provider<MyLoggingFacade>, LoggingConfigu
         if (logger == null) {
             if (disableLog4j) {
                 Configurations.killLog4J();
-            } else{
-                System.err.println("log4j enabled.");
             }
             if (loggerName == null) {
                 loggerName = "OAuth for MyProxy";

@@ -102,6 +102,12 @@ public abstract class FSProvider<T extends FileStore> extends TypedProvider<T> {
 
             }
         } else {
+            /*
+             Supplying the data and index paths creates nothing. This means that everything is left
+             up to the administrator. Also, you can only specify a single component (e.g clients) per path,
+             so explicit control of these is something of an edge case.
+             Since this is pretty primitive, might want to just deprecate this ability.
+             */
             dataPath = getTypeAttribute(DATA_KEY);
             if (dataPath == null) {
                 throw new MyConfigurationException("Error: file store has no dataPath configured");

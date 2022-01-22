@@ -40,6 +40,7 @@ public class ClientApproval extends IdentifiableImpl implements DateComparable {
         DENIED("denied"),
         APPROVED("approved"),
         REVOKED("revoked"),
+        TEMPLATE("template"),
         PENDING("pending");
 
         private final String status;

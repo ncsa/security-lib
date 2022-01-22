@@ -9,12 +9,12 @@ import java.util.List;
  * on 10/20/16 at  12:57 PM
  */
 public class BaseClientKeys extends SerializationKeys {
-    String secret = "oauth_client_pubkey";
     String creationTS = "creation_ts";
-    String name = "name";
+    String debugOn = "debug_on";
     String email = "email";
     String lastModifiedTS = "last_modified_ts";
-    String debugOn = "debug_on";
+    String name = "name";
+    String secret = "oauth_client_pubkey";
 
     public String name(String... x) {
         if (0 < x.length) name = x[0];
