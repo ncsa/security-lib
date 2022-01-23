@@ -178,6 +178,11 @@ E.g.
 syntax error:line 11:27 mismatched input '=' expecting {'^', '=<', '=>', ...
 
 Meaning that on line 11, position 27 there was an error in the file.
+
+Note that if you are running this on stand-alone scripts (that start with
+a she-bang directive of #!) the she-bang will cause this to fail. Simply
+comment out the first line to use the syntax check on it or otherwise
+prevent it from being checked.
 See also: execute
 ]]>
         </body>

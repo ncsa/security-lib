@@ -79,9 +79,13 @@ public class Installer {
     static protected final String DEBUG_FLAG = "-debug";
 
     private void showHelp() {
-        say("install [" + "] [-dir target_dir]");
-        say("This will install QDL to your system. Options are");
-
+        say("install [" + TARGET_DIR_FLAG + " target_dir] [" +UPGRADE_FLAG +"] [" + HELP_FLAG + "] [" + DEBUG_FLAG + "]");
+        say("This will install QDL to your system. Options are:");
+        say("(none) = prompt for install directory");
+        say(TARGET_DIR_FLAG + " = install to the given directory with no prompt.");
+        say(UPGRADE_FLAG + " = upgrade an existing install");
+        say(HELP_FLAG + " = this help message");
+        say(DEBUG_FLAG + " = debug mode -- print any message from the installer as it runs.");
     }
 
     public static void pack(final Path folder, final Path zipFilePath) throws IOException {
