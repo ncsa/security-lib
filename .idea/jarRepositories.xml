@@ -7,14 +7,14 @@
       <option name="url" value="https://oss.sonatype.org/content/repositories/snapshots" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="ncsa-oauth" />
-      <option name="name" value="NCSA OAuth Repository" />
-      <option name="url" value="http://svn.code.sf.net/p/cilogon/code/tags/repo" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="Central Repository" />
       <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ncsa-oauth" />
+      <option name="name" value="NCSA OAuth Repository" />
+      <option name="url" value="http://svn.code.sf.net/p/cilogon/code/tags/repo" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />

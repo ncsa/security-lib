@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -99,7 +100,7 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
     @Override
     public XProperties getFileInfo(String path) throws Throwable {
         checkPath(path);
-        return get(path).getProperties();
+        return get(path, AbstractFunctionEvaluator.FILE_OP_AUTO).getProperties();
     }
 
     String currentDir = null;
@@ -195,7 +196,7 @@ public abstract class AbstractVFSFileProvider implements VFSFileProvider {
     }
 
     @Override
-    public VFSEntry get(String path) throws Throwable {
+    public VFSEntry get(String path, int type) throws Throwable {
         if (!canRead()) {
             throw new QDLIOException("Error: You do not have permission to read from the virtual file system");
         }

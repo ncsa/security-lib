@@ -18,10 +18,29 @@ Documentation
 
     *{{{./docs/qdl_reference.pdf}QDL Reference Manual}}
 
-    *{{{./docs/qdl_configuration.pdf}QDL Configuration Reference Manual}}
-
     *{{{./docs/qdl_workspace.pdf}QDL Workspace Reference Manual}}
 
+    *{{{./docs/qdl_configuration.pdf}QDL Configuration Reference Manual}}
+
     *{{{./docs/qdl_extensions.pdf}Writing your own extensions to QDL}}
+
+    *{{{./docs/iso6429.pdf}How to use the (experimental) ISO 6429 terminal support.}}
+
+    *{{{./docs/qdl_scripting.pdf.pdf}General introduction to writing scripts with QDL}}
+
+    *{{{./docs/tutorial.pdf}A basic tutorial to QDL}}
+
+
+OA4MP Extensions
+
+    *{{{./docs/qdl_server_scripts.pdf}Introduction to writing server-side scripts with QDL}}
+
+    *{{{./docs/creating_claim_sources2.pdf}Creating claims in server scripting.}}
+
+    *{{{./docs/claim_source_examples.pdf}Examples for creating claim sources.}}
+
+    *{{{./docs/token_handler_configuration.pdf}Configuring token handlers.}}
+
+Javadoc for QDL
 
     *{{{./apidocs/index.html}Javadoc for the QDL implementation}}

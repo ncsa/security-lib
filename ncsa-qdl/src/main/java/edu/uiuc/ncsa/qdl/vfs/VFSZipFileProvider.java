@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants;
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class VFSZipFileProvider extends AbstractVFSFileProvider {
         public FileEntry getFE() throws Throwable {
             if (fe == null) {
                 // Don't do it unless they ask.
-                fe = FileEntries.toEntry(ze, content);
+                fe = FileEntries.toEntry(ze, content, AbstractFunctionEvaluator.FILE_OP_AUTO);
             }
             return fe;
         }
@@ -105,8 +106,8 @@ public class VFSZipFileProvider extends AbstractVFSFileProvider {
     }
 
     @Override
-    public VFSEntry get(String path) throws Throwable {
-        super.get(path);
+    public VFSEntry get(String path, int type) throws Throwable {
+        super.get(path, type);
         String rPath = getRealPath(path);
         if (map.containsKey(rPath)) {
             return map.get(getRealPath(path)).getFE();

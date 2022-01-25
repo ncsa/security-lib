@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_AUTO;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
@@ -148,7 +149,7 @@ public class VFSTest extends AbstractQDLTester {
         String p = testHeadPath + testFileName;
           boolean bad = true;
         try {
-            vfs.get(p);
+            vfs.get(p, FILE_OP_AUTO);
         } catch (QDLIOException q) {
             bad = false;
         }
@@ -263,7 +264,7 @@ bad = true;
 
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        VFSEntry entry = vfs.get(p);
+        VFSEntry entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -274,7 +275,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p);
+        entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -298,7 +299,7 @@ bad = true;
 
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        VFSEntry entry = vfs.get(p);
+        VFSEntry entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -311,7 +312,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p);
+        entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -340,7 +341,7 @@ bad = true;
 
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        VFSEntry entry = vfs.get(p);
+        VFSEntry entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -352,7 +353,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p);
+        entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -364,7 +365,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p);
+        entry = vfs.get(p,FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -564,7 +565,7 @@ bad = true;
         assert dir[0].equals("root/");
 
         assert vfs.contains(storeRoot + fileInZip);
-        VFSEntry e = vfs.get(storeRoot + fileInZip);
+        VFSEntry e = vfs.get(storeRoot + fileInZip,FILE_OP_AUTO);
 
         assert e.getText().equals("2+2 =4\n"); // contains a single line of text.
         testMkdir(vfs);

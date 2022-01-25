@@ -423,7 +423,7 @@ public class State extends FunctionState implements QDLConstants {
      * @return
      */
     public QDLScript getScriptFromVFS(String fqName) throws Throwable {
-        VFSEntry entry = getFileFromVFS(fqName);
+        VFSEntry entry = getFileFromVFS(fqName, AbstractFunctionEvaluator.FILE_OP_TEXT_STRING);
         if (entry == null) {
             return null;
         }
@@ -456,7 +456,7 @@ public class State extends FunctionState implements QDLConstants {
         return null;
     }
 
-    public VFSEntry getFileFromVFS(String fqName) throws Throwable {
+    public VFSEntry getFileFromVFS(String fqName, int type) throws Throwable {
         if (vfsFileProviders.isEmpty()) return null;
         VFSFileProvider vfsFileProvider = null;
         for (String key : vfsFileProviders.keySet()) {
@@ -470,7 +470,7 @@ public class State extends FunctionState implements QDLConstants {
         if (vfsFileProvider == null) {
             return null;
         }
-        return vfsFileProvider.get(fqName);
+        return vfsFileProvider.get(fqName, type);
     }
 
     public boolean hasVFSProviders() {

@@ -652,7 +652,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         }
         return stringBuilder.toString();
     }
-
     protected void doReadFile(Polyad polyad, State state) {
 
         if (0 == polyad.getArgCount()) {
@@ -665,8 +664,9 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException("The " + READ_FILE + " command requires a string for its first argument.");
         }
         String fileName = obj.toString();
-        int op = -1; // default
-        if (polyad.getArgCount() == 2) {
+        int op = FILE_OP_AUTO; // default
+        boolean hasSecondArg = polyad.getArgCount() == 2;
+        if (hasSecondArg) {
             Object obj2 = polyad.evalArg(1, state);
             checkNull(obj2, polyad.getArgAt(1));
 
@@ -674,14 +674,11 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalArgumentException("The " + READ_FILE + " command's second argument must be an integer.");
             }
             op = ((Long) obj2).intValue();
-      /*      if (op != 0 && op != 1) {
-                throw new IllegalArgumentException("The " + READ_FILE + " command's second argument must have value of 1 or 0.");
-            }*/
         }
         VFSEntry vfsEntry = null;
         boolean hasVF = false;
         if (state.isVFSFile(fileName)) {
-            vfsEntry = resolveResourceToFile(fileName, state);
+            vfsEntry = resolveResourceToFile(fileName,op, state);
             if (vfsEntry == null) {
                 throw new QDLException("The resource '" + fileName + "' was not found in the virtual file system");
             }
@@ -733,6 +730,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     return;
                 default:
                 case FILE_OP_TEXT_STRING:
+                case FILE_OP_AUTO:
                     // read it as a long string.
                     if (hasVF) {
                         polyad.setResult(vfsEntry.getText());

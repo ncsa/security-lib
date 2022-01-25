@@ -27,8 +27,8 @@ public class VFSMySQLProvider extends AbstractVFSFileProvider {
     }
 
     @Override
-    public VFSEntry get(String path) throws Throwable {
-        super.get(path);
+    public VFSEntry get(String path, int type) throws Throwable {
+        super.get(path, type);
         return db.get(getPrimaryKey(path));
     }
 

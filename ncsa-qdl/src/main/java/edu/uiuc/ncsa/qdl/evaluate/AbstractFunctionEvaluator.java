@@ -555,13 +555,13 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param state
      * @return
      */
-    protected VFSEntry resolveResourceToFile(String resourceName, State state) {
+    protected VFSEntry resolveResourceToFile(String resourceName, int type, State state) {
         if (state.isVFSFile(resourceName)) {
             if (!state.hasVFSProviders()) {
                 throw new QDLException("unkonwn virtual file system for resource '" + resourceName + "'");
             }
             try {
-                return state.getFileFromVFS(resourceName);
+                return state.getFileFromVFS(resourceName, type);
             } catch (Throwable t) {
                 if (t instanceof RuntimeException) {
                     throw (RuntimeException) t;
@@ -603,6 +603,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return operator;
     }
 
+    public static final int FILE_OP_AUTO = -100; // Let the system determine it.
     public static final int FILE_OP_BINARY = 0; // file is treated as b64 string
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_INI = 2; //File is treated as an initialization file

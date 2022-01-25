@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
+import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -36,7 +38,7 @@ public class FileEntries {
         return json;
     }
 
-    public static FileEntry toEntry(ZipEntry zipEntry, byte[] content) throws Throwable {
+    public static FileEntry toEntry(ZipEntry zipEntry, byte[] content, int type) throws Throwable {
         XProperties xp = new XProperties();
         Date ts = new Date();
         if (zipEntry.getLastModifiedTime() != null) {
@@ -54,7 +56,7 @@ public class FileEntries {
         File f = new File(zipEntry.getName());
         List<String> contents;
         int length = 0;
-        if (isBinary(f)) {
+        if (isBinary(f, type)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
             contents = new ArrayList<>();
             contents.add(Base64.encodeBase64String(content));  // one string
@@ -74,7 +76,7 @@ public class FileEntries {
         return new FileEntry(contents, xp);
     }
 
-    public static JSONObject toJSON(String id, File f) throws Throwable {
+    public static JSONObject toJSON(String id, File f, int type) throws Throwable {
         XProperties xp = new XProperties();
         Date ts = new Date();
         ts.setTime(f.lastModified());
@@ -83,7 +85,7 @@ public class FileEntries {
         xp.put(FileEntryConstants.LENGTH, f.length());
         xp.put(FileEntryConstants.ID, id);
         List<String> contents;
-        if (isBinary(f)) {
+        if (isBinary(f, type)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
             contents = new ArrayList<>();
             contents.add(QDLFileUtil.readFileAsBinary(f.getAbsolutePath()));  // one string
@@ -96,18 +98,18 @@ public class FileEntries {
 
     }
 
-    public static JSONObject toJSON(File f) throws Throwable {
-        return toJSON(f.getName(), f);
+    public static JSONObject toJSON(File f, int type) throws Throwable {
+        return toJSON(f.getName(), f, type);
     }
 
-    public static FileEntry fileToEntry(File file) throws Throwable {
-        return fromJSON(toJSON(file));
+    public static FileEntry fileToEntry(File file, int type) throws Throwable {
+        return fromJSON(toJSON(file, type));
 
     }
 
-    public static FileEntry fileToEntry(String path) throws Throwable {
+    public static FileEntry fileToEntry(String path, int type) throws Throwable {
         File f = new File(path);
-        return fileToEntry(f);
+        return fileToEntry(f, type);
     }
 
     /**
@@ -126,14 +128,26 @@ public class FileEntries {
         return fileEntry;
     }
 
-    public static boolean isBinary(File f) throws IOException {
+    public static boolean isBinary(File f, int type) throws IOException {
+        switch (type){
+            case AbstractFunctionEvaluator.FILE_OP_BINARY:
+                return true;
+            case AbstractFunctionEvaluator.FILE_OP_TEXT_INI:
+            case AbstractFunctionEvaluator.FILE_OP_TEXT_STRING:
+            case AbstractFunctionEvaluator.FILE_OP_TEXT_STEM:
+                return false;
+            case AbstractFunctionEvaluator.FILE_OP_AUTO:
+                    // pass through to system
+        }
         if (f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)
                 || f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_MODULE_FILE_EXTENSION)
+                || f.getCanonicalPath().endsWith(".json") // Some versions of Java 11 need this.
         ) {
             // Make sure QDL knows its own files are not binary!
             return false;
         }
         String ftype = Files.probeContentType(f.toPath());
+        DebugUtil.trace(FileEntries.class,"returned file type of '" + ftype + "' for file '" + f.getCanonicalPath() + "'");
         if (ftype == null) return true; // just in case
         if (ftype.startsWith("text") ||
                 ftype.endsWith("/xml") ||
@@ -155,8 +169,8 @@ public class FileEntries {
         return jsonObject;
     }
 
-    public static void addFile(JSONObject config, String id, File file) throws Throwable {
-        JSONObject j = toJSON(id, file);
+    public static void addFile(JSONObject config, String id, File file, int type) throws Throwable {
+        JSONObject j = toJSON(id, file, type);
         addFile(config, j);
     }
 

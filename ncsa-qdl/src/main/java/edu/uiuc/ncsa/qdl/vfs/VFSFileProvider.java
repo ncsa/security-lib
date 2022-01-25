@@ -68,10 +68,10 @@ public interface VFSFileProvider extends Serializable {
      * @param name
      * @return
      */
-    VFSEntry get(String name) throws Throwable;
+    VFSEntry get(String name, int type) throws Throwable;
 
     /**
-     * Add the using the path. If and entry exists therem it will be over-written.
+     * Add the using the path. If and entry exists there it will be over-written.
      *
      * @param newPath
      * @param entry

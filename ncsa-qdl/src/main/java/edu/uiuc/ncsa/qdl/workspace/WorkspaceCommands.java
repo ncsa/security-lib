@@ -3,10 +3,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoader;
 import edu.uiuc.ncsa.qdl.config.QDLConfigurationLoaderUtils;
 import edu.uiuc.ncsa.qdl.config.QDLEnvironment;
-import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -795,7 +792,7 @@ public class WorkspaceCommands implements Logable {
                     say("sorry but you do not have permission to write to \"" + newPath + "\".");
                     return RC_NO_OP;
                 }
-                if (vfs.get(newPath) != null) {
+                if (vfs.get(newPath, AbstractFunctionEvaluator.FILE_OP_AUTO) != null) {
                     say("sorry but \"" + newPath + "\" is a file.");
                     return RC_NO_OP;
                 }
