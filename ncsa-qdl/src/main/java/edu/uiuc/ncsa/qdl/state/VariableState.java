@@ -180,7 +180,7 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = null;
         variableName = w.name;
         Object object;
-        if (isPrivate(variableName)) {
+        if (isIntrinsic(variableName)) {
             st = getSymbolStack();
             object = st.resolveValue(variableName, 1);
             //object = st.resolveValue(variableName, ((SymbolStack) st).parentCount() - 1);
@@ -298,7 +298,7 @@ public abstract class VariableState extends NamespaceAwareState {
 
         Object v = null;
         SymbolTable st = null;
-        if (isPrivate(variableName)) {
+        if (isIntrinsic(variableName)) {
             st = getSymbolStack();
             int startIndex = 1;
             // startIndex == 0 means that there is exactly one stack, so moving up or down the
@@ -410,13 +410,13 @@ public abstract class VariableState extends NamespaceAwareState {
             TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation,
                     true, showIntrinsic);
             for (String x : uqVars) {
-                if (isPrivate(x) && !showIntrinsic) {
+                if (isIntrinsic(x) && !showIntrinsic) {
                     continue;
                 }
                 if (useCompactNotation) {
-                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
                 } else {
-                    for (String alias : getMAliases().getAlias(key)) {
+                    for (String alias : getMAliases().getAliases(key)) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }

@@ -167,7 +167,7 @@ public class WSXMLSerializer {
             */
         State state = workspaceCommands.getState();
         if (!state.getMTemplates().isEmpty()) {
-            xsw.writeStartElement(MODULE_TEMPLATE_TAG);
+            xsw.writeStartElement(OLD_MODULE_TEMPLATE_TAG);
             xsw.writeComment("Loaded modules, templates available when importing modules.");
             for (URI uri : state.getMTemplates().keySet()) {
                 state.getMTemplates().get(uri).toXML(xsw, null);
@@ -257,7 +257,7 @@ public class WSXMLSerializer {
                                     XMLUtils.deserializeImports(xer, testCommands.getEnv(), testCommands.getState());
                                 }
                                 break;
-                            case MODULE_TEMPLATE_TAG:
+                            case OLD_MODULE_TEMPLATE_TAG:
                                 if (!workspaceAttributesOnly) {
                                     XMLUtils.deserializeTemplates(xer, testCommands.getEnv(), testCommands.getState());
                                 }

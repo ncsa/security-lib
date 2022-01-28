@@ -58,10 +58,10 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     boolean superStateReadOnly = true;*/
 
-    public static final String PRIVATE_PREFIX = "__";
+    public static final String INTRINSIC_PREFIX = "__";
 
-    public static boolean isPrivate(String x) {
-        return x.startsWith(PRIVATE_PREFIX);
+    public static boolean isIntrinsic(String x) {
+        return x.startsWith(INTRINSIC_PREFIX);
     }
 
     public IOInterface getIoInterface() {
@@ -128,7 +128,6 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     public SymbolStack getSymbolStack() {
         return symbolStack;
-
     }
 
     /**

@@ -670,7 +670,7 @@ public class State extends FunctionState implements QDLConstants {
         writeExtraXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
         if (!getMInstances().isEmpty()) {
-            xsw.writeStartElement(IMPORTED_MODULES);
+            xsw.writeStartElement(OLD_IMPORTED_MODULES_TAG);
             xsw.writeComment("The imported modules with their state and alias.");
             for (String alias : getMInstances().keySet()) {
                 Module module = getMInstances().get(alias);
@@ -716,10 +716,10 @@ public class State extends FunctionState implements QDLConstants {
                         case FUNCTION_TABLE_STACK_TAG:
                             XMLUtils.deserializeFunctions(xer, xp, this);
                             break;
-                        case IMPORTED_MODULES:
+                        case OLD_IMPORTED_MODULES_TAG:
                             XMLUtils.deserializeImports(xer, xp, this);
                             break;
-                        case MODULE_TEMPLATE_TAG:
+                        case OLD_MODULE_TEMPLATE_TAG:
                             XMLUtils.deserializeTemplates(xer, xp, this);
                             break;
                         default:
@@ -771,13 +771,13 @@ public class State extends FunctionState implements QDLConstants {
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(IMPORTED_MODULES)) {
+                    if (xe.asEndElement().getName().getLocalPart().equals(OLD_IMPORTED_MODULES_TAG)) {
                         return;
                     }
             }
             xe = xer.nextEvent();
         }
-        throw new XMLMissingCloseTagException(IMPORTED_MODULES);
+        throw new XMLMissingCloseTagException(OLD_IMPORTED_MODULES_TAG);
 
     }
 

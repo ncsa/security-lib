@@ -83,7 +83,7 @@ public class MAliases implements Serializable {
         return surjection.get(alias);
     }
 
-    public List<String> getAlias(URI namespace) {
+    public List<String> getAliases(URI namespace) {
         return surjection.getByURI(namespace);
     }
 

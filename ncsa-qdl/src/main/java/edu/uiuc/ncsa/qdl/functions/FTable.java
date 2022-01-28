@@ -181,7 +181,10 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends HashMap<K
             return get(key).documentation;
         }
     }
-
+   /**
+    *  Writes every function in no particular order by its source code. Look at
+    * {@link FStack#toXML(XMLStreamWriter)} for top level of functions
+   */
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         if (isEmpty()) {

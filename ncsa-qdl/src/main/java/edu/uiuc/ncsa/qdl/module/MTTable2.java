@@ -18,7 +18,7 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/21 at  12:22 PM
  */
-public class MTTable<K extends MTKey, V extends Module>  extends HashMap<K, V> implements  XTable<K, V> {
+public class MTTable2<K extends MTKey, V extends Module>  extends HashMap<K, V> implements  XTable<K, V> {
     @Override
     public V put(XThing value) {
         return null;

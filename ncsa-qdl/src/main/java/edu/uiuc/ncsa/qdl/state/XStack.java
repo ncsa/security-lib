@@ -37,15 +37,15 @@ import java.util.List;
  */
 public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> {
     /**
-     * Take the FT stack and add all of the tables in this stack in the correct order.
+     * Take an XStack and add all of the tables in this stack in the correct order.
      * This is needed when, e.g., creating new local state for function reference resolution
      *
-     * @param ftStack
+     * @param xStack
      */
-    public void addTables(XStack ftStack) {
+    public void addTables(XStack xStack) {
         // add backwards
-        for (int i = ftStack.getStack().size() - 1; 0 <= i; i--) {
-            push((XTable) ftStack.getStack().get(i));
+        for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
+            push((XTable) xStack.getStack().get(i));
         }
     }
 
@@ -88,9 +88,23 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return false;
     }
 
-     public boolean containsKey(XKey key){
+    public boolean containsKey(XKey key) {
         return containsKey(key, 0);
-     }
+    }
+
+    /**
+     * Only returns a non-null element if it is defined in the local (index 0) table.
+     *
+     * @param key
+     * @return
+     */
+    public XThing localGet(XKey key) {
+        if (getStack().isEmpty()) {
+            return null;
+        }
+        return getStack().get(0).get(key);
+    }
+
     public XThing get(XKey key) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
@@ -101,6 +115,11 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return null;
     }
 
+    /**
+     * Get all of the values from all tables.This returns a flat list.
+     *
+     * @return
+     */
     public List<? extends XThing> getAll() {
         List<? extends XThing> list = new ArrayList<>();
         for (XTable xTable : getStack()) {
@@ -150,6 +169,18 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
 
+    /**
+     * Only add this to the local state.
+     *
+     * @param value
+     * @return
+     */
+    public XThing localPut(XThing value) {
+        XThing oldValue = getStack().get(0).get(value);
+        getStack().get(0).put(value);
+        return oldValue;
+    }
+
     public XThing put(XThing value) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             if (xTable.containsKey(value.getKey())) {
@@ -161,12 +192,12 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     /**
-     * Removes the most local entry.
+     * Removes only the most local entry.
      *
      * @param key
      */
-    public void removeLocal(XKey key) {
-         peek().remove(key);
+    public void localRemove(XKey key) {
+        peek().remove(key);
     }
 
     /**
@@ -211,7 +242,20 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return out;
     }
 
-    abstract public void toXML(XMLStreamWriter xsw) throws XMLStreamException;
+    /**
+     * Does the grunt work of writing the stack in the right order. You write the start tag,
+     * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter)}
+     * for a canonical example.
+     * @param xsw
+     * @throws XMLStreamException
+     */
+     public void toXML(XMLStreamWriter xsw) throws XMLStreamException{
+         // lay these in in reverse order so we just have to read them in the fromXML method
+         // and push them on the stack
+         for (int i = getStack().size() - 1; 0 <= i; i--) {
+             getStack().get(i).toXML(xsw);
+         }
+     }
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 

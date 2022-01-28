@@ -5,7 +5,6 @@ import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionDefinitionStatement;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
@@ -946,6 +945,9 @@ a
    a#g(2)
 illegal argument:no module named "b" was  imported at (1, 67)
 
+   NOTE that the above is in ModuleTest#testNestedModule2 and commented out. To enable this,
+   comment out the first conditional below, uncomment the test.
+
    WORKS:
    module['b:b','b'][f(x)->(x);]
    module_import('b:b'); //<-- key is that this has to be imported  outside of module first.
@@ -953,13 +955,13 @@ illegal argument:no module named "b" was  imported at (1, 67)
    module_import('a:a')
    a#g(2)
 
-   ALSO, intrinsic functions and variables might require some substantial reworking.
+   ALSO, intrinsic functions and variables require substantial(?) reworking.
 */
     @Override
     public void enterModuleStatement(QDLParserParser.ModuleStatementContext ctx) {
-        if (isModule) {
+/*        if (isModule) {
             throw new QDLException("Error: Modules cannot be nested");
-        }
+        }*/
         moduleStatement = new ModuleStatement();
         moduleStatement.setTokenPosition(tp(ctx));
         stash(ctx, moduleStatement);

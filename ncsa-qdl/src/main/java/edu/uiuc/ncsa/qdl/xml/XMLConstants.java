@@ -68,8 +68,14 @@ public interface XMLConstants {
 
     String STATE_TAG = "state";
     String STATE_ID_TAG = "internal_id";
-    String IMPORTED_MODULES = "imports";
-    String MODULE_TEMPLATE_TAG = "templates";
+    String OLD_IMPORTED_MODULES_TAG = "imports";
+    String OLD_MODULE_TEMPLATE_TAG = "templates";
+
+    String IMPORTED_MODULES_TAG = "module_imports";
+    String MODULE_TEMPLATE_TAG = "module_templates";
+
+    String MODULE_STACK_TAG = "module_stack";
+    String TEMPLATE_STACK_TAG = "template_stack";
 
     String BUFFER_MANAGER = "buffer_manager";
     String BUFFER_RECORDS = "records";

@@ -660,7 +660,12 @@ public class WorkspaceCommands implements Logable {
         } else {
 
             try {
-                List<String> content = _doLineEditor(FileUtil.readFileAsLines(f.getAbsolutePath()));
+                List<String> content;
+                if (f.exists()) {
+                    content = _doLineEditor(FileUtil.readFileAsLines(f.getAbsolutePath()));
+                } else {
+                    content = new ArrayList<>();
+                }
                 FileWriter fileWriter = new FileWriter(f);
                 for (String line : content) {
                     fileWriter.write(line + "\n");
@@ -1265,8 +1270,8 @@ public class WorkspaceCommands implements Logable {
             fw.flush();
             fw.close();
         } catch (IOException iox) {
-            say("could not create the temp file:'" + iox.getMessage() +"'");
-            if(isDebugOn()){
+            say("could not create the temp file:'" + iox.getMessage() + "'");
+            if (isDebugOn()) {
                 iox.printStackTrace();
             }
             return null;
@@ -1892,7 +1897,7 @@ public class WorkspaceCommands implements Logable {
         }
         TreeSet<String> aliases = new TreeSet<>();
         for (URI uri : state.getMAliases().keySet()) {
-            aliases.add(uri + "->" + state.getMAliases().getAlias(uri));
+            aliases.add(uri + "->" + state.getMAliases().getAliases(uri));
         }
         return printList(inputLine, aliases);
     }
@@ -1925,7 +1930,7 @@ public class WorkspaceCommands implements Logable {
     private String getImportString(URI key) {
         String out = key.toString();
         if (state.getMAliases().hasImports()) {
-            out = out + " " + state.getMAliases().getAlias(key);
+            out = out + " " + state.getMAliases().getAliases(key);
         } else {
             out = out + " -";
         }
@@ -3895,7 +3900,7 @@ public class WorkspaceCommands implements Logable {
         fileWriter.write("\n/* ** module imports ** */\n");
 
         for (URI key : getState().getMTemplates().keySet()) {
-            List<String> aliases = getState().getMAliases().getAlias(key);
+            List<String> aliases = getState().getMAliases().getAliases(key);
             for (String alias : aliases) {
                 String output = SystemEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
                 fileWriter.write(output + "\n");
@@ -4459,7 +4464,7 @@ public class WorkspaceCommands implements Logable {
                 cfgname, CONFIG_TAG_NAME);
 
         // New style -- multi-inheritance.
-   //     ConfigurationNode node = ConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
+        //     ConfigurationNode node = ConfigUtil.findMultiNode(inputLine.getNextArgFor(CONFIG_FILE_FLAG), cfgname, CONFIG_TAG_NAME );
         QDLConfigurationLoader loader = new QDLConfigurationLoader(inputLine.getNextArgFor(CONFIG_FILE_FLAG), node);
 
         QDLEnvironment qe = loader.load();

@@ -402,13 +402,13 @@ public class XMLUtils implements XMLConstants {
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(IMPORTED_MODULES)) {
+                    if (xe.asEndElement().getName().getLocalPart().equals(OLD_IMPORTED_MODULES_TAG)) {
                         return;
                     }
             }
             xer.nextEvent();
         }
-        throw new XMLMissingCloseTagException(IMPORTED_MODULES);
+        throw new XMLMissingCloseTagException(OLD_IMPORTED_MODULES_TAG);
     }
 
 
@@ -426,13 +426,13 @@ public class XMLUtils implements XMLConstants {
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(MODULE_TEMPLATE_TAG)) {
+                    if (xe.asEndElement().getName().getLocalPart().equals(OLD_MODULE_TEMPLATE_TAG)) {
                         return;
                     }
             }
             xer.nextEvent();
         }
-        throw new XMLMissingCloseTagException(MODULE_TEMPLATE_TAG);
+        throw new XMLMissingCloseTagException(OLD_MODULE_TEMPLATE_TAG);
     }
 
     /**

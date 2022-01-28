@@ -504,6 +504,26 @@ public class ModuleTest extends AbstractQDLTester {
 
     }
 
+    /*
+       module['a:a','a'][module['b:b','b'][f(x)->x;];module_import('b:b');g(x)->b#f(x^2);];
+   module_import('a:a')
+a
+   a#g(2)
+     */
+
+    public void testNestedModule2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','a'][module['b:b','b'][f(x)->x;];module_import('b:b');g(x)->b#f(x^2);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "say(a#g(2));");
+        addLine(script, "ok := 4 == a#g(2);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
+    }
+
     public void testUnqualifiedVariable() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();

@@ -190,7 +190,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void figureOutEvaluation(Polyad polyad, State state, boolean checkForDuplicates) throws Throwable {
         FR_WithState frs;
         try {
-            if(state.isPrivate(polyad.getName()) && polyad.isInModule()){
+            if(state.isIntrinsic(polyad.getName()) && polyad.isInModule()){
                 // if it is in a module and at the top of the stack, then this is an access violation
                 if(state.getFTStack().getStack().get(0).containsKey(new FKey(polyad.getName(),polyad.getArgCount()))){
                     throw new IntrinsicViolation("cannot access intrinsic function directly.");

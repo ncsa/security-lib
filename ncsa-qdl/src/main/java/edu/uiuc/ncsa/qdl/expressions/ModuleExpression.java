@@ -143,7 +143,7 @@ public class ModuleExpression extends ExpressionImpl {
         if (getExpression() instanceof VariableNode) {
             VariableNode vNode = (VariableNode) getExpression();
             String variableName = vNode.getVariableReference();
-            if (state.isPrivate(variableName) && !getModuleState(state).isDefined(variableName)) {
+            if (state.isIntrinsic(variableName) && !getModuleState(state).isDefined(variableName)) {
                 // check that if this is private
                 throw new IntrinsicViolation("cannot set an intrinsic variable");
             }

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: edu.uiuc.ncsa.security.delegation.storage.FileStoreTest
 -------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 sec
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.112 sec

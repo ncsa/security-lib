@@ -18,7 +18,8 @@ import java.util.TreeSet;
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */
-public class MTable<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V>, Documentable {
+public class MITable2<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V>, Documentable {
+    //       MTTable2<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V> {
     @Override
     public V put(XThing value) {
         return null;

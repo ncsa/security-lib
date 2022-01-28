@@ -95,7 +95,7 @@ public abstract class FunctionState extends VariableState {
             return fr;
         }
         // No UNQ function, so try to find one, but check that it is actually unique.
-        if (!isPrivate(name)) {
+        if (!isIntrinsic(name)) {
             for (String alias : getMInstances().keySet()) {
                 if (fr.functionRecord == null) {
                     FunctionRecord tempFR = (FunctionRecord) getImportedModule(alias).getState().getFTStack().get(new FKey(name, argCount));
@@ -159,13 +159,13 @@ public abstract class FunctionState extends VariableState {
             Module mm = getMTemplates().get(key);
             TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
             for (String x : uqVars) {
-                if (isPrivate(x)&& !showIntrinsic) {
+                if (isIntrinsic(x)&& !showIntrinsic) {
                     continue;
                 }
                 if (useCompactNotation) {
-                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
                 } else {
-                    for (String alias : getMAliases().getAlias(key)) {
+                    for (String alias : getMAliases().getAliases(key)) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }
@@ -179,12 +179,12 @@ public abstract class FunctionState extends VariableState {
         for (URI key : getMAliases().keySet()) {
             List<String> uqVars = getMTemplates().get(key).getState().getFTStack().listAllDocs();
             for (String x : uqVars) {
-                List<String> aliases = getMAliases().getAlias(key);
+                List<String> aliases = getMAliases().getAliases(key);
                 if (aliases.size() == 1) {
                     // don't put list notation in if there is no list.
-                    out.add(getMAliases().getAlias(key).get(0) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAliases(key).get(0) + NS_DELIMITER + x);
                 } else {
-                    out.add(getMAliases().getAlias(key) + NS_DELIMITER + x);
+                    out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
                 }
             }
         }
@@ -277,7 +277,7 @@ public abstract class FunctionState extends VariableState {
                     doxx = getMTemplates().get(key).getState().getFTStack().getDocumentation(new FKey(fname, argCount));
                 }
                 if (doxx == null) {
-                    String caput = getMAliases().getAlias(key) + NS_DELIMITER + fname;
+                    String caput = getMAliases().getAliases(key) + NS_DELIMITER + fname;
                     if (0 <= argCount) {
                         caput = caput + "(" + argCount + "):";
                     }

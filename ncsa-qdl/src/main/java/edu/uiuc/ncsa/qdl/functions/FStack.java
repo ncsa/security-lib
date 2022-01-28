@@ -55,6 +55,27 @@ public class FStack<V extends FTable<? extends FKey, ? extends FunctionRecord>> 
 
     }
 
+    /**
+     * Writes each table. Resulting serialization is
+     * <pre>
+     *  &lt;function_stack&gt;
+     *           &lt;!--The functions for this state.--&gt;
+     *           &lt;functions&gt;
+     *             &lt;func name="f" arg_count="2"&gt;&lt;![CDATA[...
+     *             &lt;func name="g" arg_count="2"&gt;&lt;![CDATA[...
+     *           &lt;/functions&gt;
+     *           &lt;functions&gt;
+     *           ...
+     *           &lt;/functions&gt;
+     *  &lt;/function_stack&gt;
+     * </pre>
+     * Each <code>functions</code> tags is a table of functions. These are serialized
+     * in reverse order n,n-1,...0 so that at deserialization they can be read in the
+     * correct order and the stack can be faithfully reconstructed. As such the serialization
+     * format is not quite XML -- order matters.
+     * @param xsw
+     * @throws XMLStreamException
+     */
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         if (isEmpty()) {
@@ -62,11 +83,7 @@ public class FStack<V extends FTable<? extends FKey, ? extends FunctionRecord>> 
         }
         xsw.writeStartElement(XMLConstants.FUNCTION_TABLE_STACK_TAG);
         xsw.writeComment("The functions for this state.");
-        // lay these in in reverse order so we just have to read them in the fromXML method
-        // and push them on the stack
-        for (int i = getStack().size() - 1; 0 <= i; i--) {
-            getStack().get(i).toXML(xsw);
-        }
+        super.toXML(xsw);
         xsw.writeEndElement(); // end of tables.
     }
 
