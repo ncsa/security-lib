@@ -26,9 +26,13 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
 public class FTable<K extends FKey, V extends FunctionRecord>  extends HashMap<K, V>  implements Documentable,XTable<K,V> {
     @Override
     public V put(XThing value) {
-        return super.put((K) value.getKey(), (V) value);
+        return put((K) value.getKey(), (V) value);
     }
 
+    @Override
+    public V put(XKey xKey, XThing xThing) {
+        return super.put((K) xKey, (V) xThing);
+    }
 
     /**
      * If argCount === -1, remove all named functions, otherwise only remove the one with the

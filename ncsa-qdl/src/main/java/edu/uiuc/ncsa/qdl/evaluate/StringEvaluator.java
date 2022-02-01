@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
@@ -35,7 +34,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         return STRING_NAMESPACE;
     }
 
-    public static final String STRING_FQ = STRING_NAMESPACE + MAliases.NS_DELIMITER;
+    public static final String STRING_FQ = STRING_NAMESPACE + State.NS_DELIMITER;
     public static final int STRING_FUNCTION_BASE_VALUE = 3000;
 
     public static final String CONTAINS = "contains";

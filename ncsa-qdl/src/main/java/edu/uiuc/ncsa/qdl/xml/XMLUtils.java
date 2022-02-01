@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
@@ -397,8 +398,8 @@ public class XMLUtils implements XMLConstants {
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
                         Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        state.getMInstances().put(moduleAttributes.alias, module);
-                        state.getMAliases().addImport(moduleAttributes.ns, moduleAttributes.alias);
+                        state.getMInstances().put(new XKey(moduleAttributes.alias), module);
+                        //state.getMAliases().addImport(moduleAttributes.ns, moduleAttributes.alias);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -422,7 +423,8 @@ public class XMLUtils implements XMLConstants {
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
                         Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        state.getMTemplates().put(moduleAttributes.ns, module);
+                        //state.getMTemplates().put(moduleAttributes.ns, module);
+                        state.getMTemplates().put(module);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:

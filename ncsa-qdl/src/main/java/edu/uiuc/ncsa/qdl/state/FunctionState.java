@@ -6,42 +6,40 @@ import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.*;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
-import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.module.*;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import static edu.uiuc.ncsa.qdl.module.MAliases.NS_DELIMITER;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:48 AM
  */
 public abstract class FunctionState extends VariableState {
-    public FunctionState(edu.uiuc.ncsa.qdl.module.MAliases mAliases,
-                         SymbolStack symbolStack,
+    public FunctionState(SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FStack fStack,
-                         MTemplates MTemplates,
+                         MTStack mtStack,
+                         MIStack miStack,
                          MyLoggingFacade myLoggingFacade) {
-        super(mAliases,
+        super(
                 symbolStack,
                 opEvaluator,
                 metaEvaluator,
-                MTemplates,
+                mtStack,
+                miStack,
                 myLoggingFacade);
         this.fStack = fStack;
     }
 
     private static final long serialVersionUID = 0xcafed00d4L;
 
-    @Override
+    //@Override
     public FStack<? extends FTable> getFTStack() {
         return fStack;
     }
@@ -64,7 +62,7 @@ public abstract class FunctionState extends VariableState {
             throw new NFWException(("Internal error: The function has not been named"));
         }
 
-        if (!getMAliases().hasImports()) {
+        if (getMInstances().isEmpty()) {
             FR_WithState frs = new FR_WithState();
 
             // Nothing imported, so nothing to look through.
@@ -96,20 +94,23 @@ public abstract class FunctionState extends VariableState {
         }
         // No UNQ function, so try to find one, but check that it is actually unique.
         if (!isIntrinsic(name)) {
-            for (String alias : getMInstances().keySet()) {
+            for (Object xx : getMInstances().keySet()) {
+                XKey xkey = (XKey)xx;
+                Module module =  getMInstances().getModule(xkey);
+
                 if (fr.functionRecord == null) {
-                    FunctionRecord tempFR = (FunctionRecord) getImportedModule(alias).getState().getFTStack().get(new FKey(name, argCount));
+                    FunctionRecord tempFR = (FunctionRecord) getImportedModule(xkey.getKey()).getState().getFTStack().get(new FKey(name, argCount));
                     if (tempFR != null) {
                         fr.functionRecord = tempFR;
-                        fr.state = getMInstances().get(alias).getState();
-                        fr.isExternalModule = getMInstances().get(alias).isExternal();
+                        fr.state = module.getState();
+                        fr.isExternalModule = module.isExternal();
                         fr.isModule = true;
                         if (!checkForDuplicates) {
                             return fr;
                         }
                     }
                 } else {
-                    FunctionRecord tempFR = (FunctionRecord) mInstances.get(alias).getState().getFTStack().get(new FKey(name, argCount));
+                    FunctionRecord tempFR = (FunctionRecord) module.getState().getFTStack().get(new FKey(name, argCount));
                     if ((checkForDuplicates) && tempFR != null) {
                         throw new NamespaceException("Error: There are multiple modules with a function named \"" + name + "\". You must fully qualify which one you want.");
                     }
@@ -143,6 +144,7 @@ public abstract class FunctionState extends VariableState {
 
 
     /**
+     * Lists the functions for various components.
      * @param useCompactNotation
      * @param regex
      * @return
@@ -155,7 +157,26 @@ public abstract class FunctionState extends VariableState {
         if ((!includeModules) || getMTemplates().isEmpty()) {
             return out;
         }
-        for (URI key : getMAliases().keySet()) {
+        // Get the functions for active (current) module instances
+        for(Object key : getMInstances().keySet()){
+            XKey xKey = (XKey)key;
+              Module mm=  ((MIWrapper)getMInstances().get(xKey)).getModule();
+            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
+            for (String x : uqVars) {
+                if (isIntrinsic(x)&& !showIntrinsic) {
+                    continue;
+                }
+                if (useCompactNotation) {
+                    out.add(getMInstances().getAliasesAsString(mm.getMTKey()) + NS_DELIMITER + x);
+                } else {
+                    for (Object alias : getMInstances().getAliasesAsString(mm.getMTKey())) {
+                        out.add(alias + NS_DELIMITER + x);
+                    }
+                }
+            }
+
+        }
+/*        for (URI key : getMAliases().keySet()) {
             Module mm = getMTemplates().get(key);
             TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
             for (String x : uqVars) {
@@ -170,13 +191,28 @@ public abstract class FunctionState extends VariableState {
                     }
                 }
             }
-        }
+        }*/
         return out;
     }
 
     public List<String> listAllDocumentation() {
         List<String> out = getFTStack().listAllDocs();
-        for (URI key : getMAliases().keySet()) {
+        for(Object key : getMTemplates().keySet()){
+            MTKey mtKey = (MTKey)key;
+            Module template= (Module) getMTemplates().get(mtKey);
+            List<String> uqVars = template.getState().getFTStack().listAllDocs();
+            for (String x : uqVars) {
+                List<String> aliases = getMInstances().getAliasesAsString(mtKey);;
+                if (aliases.size() == 1) {
+                    // don't put list notation in if there is no list.
+                    out.add(aliases.get(0) + NS_DELIMITER + x);
+                } else {
+                    out.add(aliases + NS_DELIMITER + x);
+                }
+            }
+
+        }
+/*        for (URI key : getMAliases().keySet()) {
             List<String> uqVars = getMTemplates().get(key).getState().getFTStack().listAllDocs();
             for (String x : uqVars) {
                 List<String> aliases = getMAliases().getAliases(key);
@@ -187,21 +223,33 @@ public abstract class FunctionState extends VariableState {
                     out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
                 }
             }
-        }
+        }*/
         return out;
 
     }
 
+    /**
+     * This list the documentation templates by their preferred alias
+     * @param fname
+     * @return
+     */
     public List<String> listModuleDoc(String fname) {
         if (!fname.contains(NS_DELIMITER)) {
             return new ArrayList<>(); // no help
         }
         String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
+         XKey xKey = new XKey(alias);
+         Module module = getMInstances().getModule(xKey);
+         if(module == null){
+             return new ArrayList<>();
 
-        if (!getMTemplates().containsKey(alias)) {
+         }
+/*
+        if (!getMTemplates().containsKey(xKey)) {
             return new ArrayList<>();
         }
-        Module module = getMTemplates().get(alias);
+*/
+        //Module module = getMTemplates().get(xKey);
         List<String> docs = module.getDocumentation();
         if (docs == null) {
             return new ArrayList<>();
@@ -212,6 +260,7 @@ public abstract class FunctionState extends VariableState {
     public List<String> listFunctionDoc(String fname, int argCount) {
         if (fname.contains(NS_DELIMITER)) {
             String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
+            XKey aliasKey = new XKey(alias);
             String realName = fname.substring(1 + fname.indexOf(NS_DELIMITER));
             if (alias == null || alias.isEmpty()) {
                 List<String> out;
@@ -225,16 +274,16 @@ public abstract class FunctionState extends VariableState {
                 }
                 return out;
             }
-            if (!MAliases.hasAlias(alias)) {
+            if (!getMInstances().containsKey(aliasKey)) {
                 // so they asked for something that didn't exist
                 return new ArrayList<>();
             }
-            URI ns = MAliases.getByAlias(alias);
+            Module module = (Module) getMInstances().getByAlias(aliasKey);
             List<String> docs;
             if (argCount == -1) {
-                docs = getMTemplates().get(ns).getState().getFTStack().listAllDocs(realName);
+                docs = module.getState().getFTStack().listAllDocs(realName);
             } else {
-                docs = getMTemplates().get(ns).getState().getFTStack().getDocumentation(new FKey(realName, argCount));
+                docs = module.getState().getFTStack().getDocumentation(new FKey(realName, argCount));
             }
             if (docs == null) {
                 return new ArrayList<>();
@@ -244,7 +293,7 @@ public abstract class FunctionState extends VariableState {
 
         }
         // No imports, not qualified, hand back whatever we have
-        if (!MAliases.hasImports()) {
+        if (getMInstances().isEmpty()) {
             List<String> out;
             if (argCount == -1) {
                 out = getFTStack().listAllDocs(fname);
@@ -268,16 +317,18 @@ public abstract class FunctionState extends VariableState {
         if (out == null) {
             out = new ArrayList<>();
         }
-        for (URI key : getMAliases().keySet()) {
-            if (getMTemplates().get(key).getState().getFTStack().containsKey(new FKey(fname, argCount))) {
+        for (Object key : getMInstances().keySet()) {
+            XKey xKey = (XKey) key;
+            Module m =  getMInstances().getModule(xKey);
+            if (m.getState().getFTStack().containsKey(new FKey(fname, argCount))) {
                 List<String> doxx;
                 if (argCount == -1) {
-                    doxx = getMTemplates().get(key).getState().getFTStack().listAllDocs(fname);
+                    doxx = m.getState().getFTStack().listAllDocs(fname);
                 } else {
-                    doxx = getMTemplates().get(key).getState().getFTStack().getDocumentation(new FKey(fname, argCount));
+                    doxx = m.getState().getFTStack().getDocumentation(new FKey(fname, argCount));
                 }
                 if (doxx == null) {
-                    String caput = getMAliases().getAliases(key) + NS_DELIMITER + fname;
+                    String caput = xKey.getKey() + NS_DELIMITER + fname;
                     if (0 <= argCount) {
                         caput = caput + "(" + argCount + "):";
                     }

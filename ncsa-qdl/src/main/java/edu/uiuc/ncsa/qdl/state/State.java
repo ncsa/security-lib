@@ -7,9 +7,7 @@ import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
-import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.module.*;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -78,54 +76,55 @@ public class State extends FunctionState implements QDLConstants {
     /**
      * If you extend this class, you must override this method to return a new instance
      * of your state with everything in it you want or need.
-     * @param mAliases
-     * @param symbolStack
      * @param opEvaluator
      * @param metaEvaluator
      * @param ftStack
-     * @param mTemplates
+     * @param mtStack
+     * @param miStack
      * @param myLoggingFacade
      * @param isServerMode
+     * @param isRestrictedIO
      * @param assertionsOn
      * @return
      */
-    public State newInstance(MAliases mAliases,
-                             SymbolStack symbolStack,
-                             OpEvaluator opEvaluator,
+    public State newInstance(SymbolStack symbolStack,
+            OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
                              FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
-                             MTemplates mTemplates,
+                             MTStack mtStack,
+                             MIStack miStack,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
                              boolean isRestrictedIO,
                              boolean assertionsOn){
-        return new State(mAliases,
-                          symbolStack,
+        return new State( symbolStack,
                           opEvaluator,
                           metaEvaluator,
                           ftStack,
-                mTemplates,
+                          mtStack,
+                          miStack,
                           myLoggingFacade,
                           isServerMode,
                          isRestrictedIO,
                          assertionsOn);
     }
-    public State(MAliases mAliases,
+    public State(
                  SymbolStack symbolStack,
                  OpEvaluator opEvaluator,
                  MetaEvaluator metaEvaluator,
                  FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
-                 MTemplates mTemplates,
+                 MTStack mtStack,
+                 MIStack miStack,
                  MyLoggingFacade myLoggingFacade,
                  boolean isServerMode,
                  boolean isRestrictedIO,
                  boolean assertionsOn) {
-        super(mAliases,
-                symbolStack,
+        super( symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
-                mTemplates,
+                mtStack,
+                miStack,
                 myLoggingFacade);
         this.serverMode = isServerMode;
         this.assertionsOn = assertionsOn;
@@ -486,14 +485,14 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public State newStateNoImports() {
-        MAliases nr = new MAliases();
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = newInstance(nr,
-                newStack,
+        MIStack miStack = new MIStack();
+        State newState = newInstance(newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 getFTStack(),
                 getMTemplates(),
+                miStack,
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -514,12 +513,13 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newStateWithImports() {
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = newInstance(MAliases,
+        State newState = newInstance(
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 (FStack) getFTStack().clone(),
                 getMTemplates(),
+                getMInstances(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -540,12 +540,13 @@ public class State extends FunctionState implements QDLConstants {
         ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
         ftStack.addTables(moduleState.getFTStack());
 
-        State newState = newInstance(MAliases,
+        State newState = newInstance(
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 ftStack,
                 getMTemplates(),
+                getMInstances(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -583,8 +584,9 @@ public class State extends FunctionState implements QDLConstants {
         // Each imported module has its state serialized too. Hence each has to have current
         // transient fields updated. This will act recursively (so imports in imports in imports etc.)
 
-        for (String mod : getMInstances().keySet()) {
-            getMInstances().get(mod).getState().injectTransientFields(oldState);
+        for (Object mod : getMInstances().keySet()) {
+            XKey xKey = (XKey) mod;
+            getMInstances().getModule(xKey).getState().injectTransientFields(oldState);
         }
         setIoInterface(oldState.getIoInterface());
     }
@@ -597,15 +599,22 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newModuleState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        MAliases r = new MAliases();
         SymbolStack newStack = new SymbolStack();
         //      newStack.addParent(new SymbolTableImpl());
-        State newState = newInstance(r,
+        MTStack mtStack = new MTStack();
+    //    mtStack.setStack(getMTemplates().getStack());
+        MIStack miStack = new MIStack();
+        //miStack.setStack(getMInstances().getStack());
+
+        miStack.pushNewTable();
+        mtStack.pushNewTable();
+        State newState = newInstance(
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FStack(),
-                getMTemplates(),
+                mtStack,
+                miStack, // CHECK THIS!!
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -627,15 +636,15 @@ public class State extends FunctionState implements QDLConstants {
      */
     public State newDebugState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        MAliases r = new MAliases();
         SymbolStack newStack = new SymbolStack();
         //       newStack.addParent(new SymbolTableImpl());
-        State newState = newInstance(r,
+        State newState = newInstance(
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FStack(),
-                new MTemplates(), // so no modules
+                new MTStack(), // so no modules
+                new MIStack(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
@@ -657,7 +666,7 @@ public class State extends FunctionState implements QDLConstants {
         if (module instanceof JavaModule) {
             ((JavaModule) module).init(this.newModuleState());
         }
-        getMTemplates().put(module.getNamespace(), module);
+        getMTemplates().put(module);
     }
 
     public int getStackSize() {
@@ -669,7 +678,8 @@ public class State extends FunctionState implements QDLConstants {
         xsw.writeAttribute(STATE_ID_TAG, getInternalID());
         writeExtraXMLAttributes(xsw);
         // The list of aliases and their corresponding modules
-        if (!getMInstances().isEmpty()) {
+        // NEXT BIT IS DONE IN NEW MODULE STACK, SEE BELOW
+/*        if (!getMInstances().isEmpty()) {
             xsw.writeStartElement(OLD_IMPORTED_MODULES_TAG);
             xsw.writeComment("The imported modules with their state and alias.");
             for (String alias : getMInstances().keySet()) {
@@ -677,11 +687,17 @@ public class State extends FunctionState implements QDLConstants {
                 module.toXML(xsw, alias);
             }
             xsw.writeEndElement(); //end imports
-        }
+        }*/
         // NOTE that the order in which things are serialized matters! Do module declarations first
         // then variables and functions. This means that on deserialization (which follows document order exactly)
         // any modules are prcocessed (including the setting of variables and functions) then the user's modifications
         // overwrite what is there. This way if the user has modified things, it is preserved.
+
+        // Templates
+        getMTemplates().toXML(xsw);
+
+        // imports
+        getMInstances().toXML(xsw);
 
         // Symbol stack has the variables
         getSymbolStack().toXML(xsw);

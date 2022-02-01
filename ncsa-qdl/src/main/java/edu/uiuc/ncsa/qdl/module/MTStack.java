@@ -3,12 +3,15 @@ package edu.uiuc.ncsa.qdl.module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.state.XTable;
+import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -16,24 +19,19 @@ import java.io.Serializable;
  */
 
 public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> extends XStack<V> implements Serializable {
-    public boolean isTemplates() {
-        return templates;
-    }
 
-    public void setTemplates(boolean templates) {
-        this.templates = templates;
+    public MTStack() {
+        pushNewTable();
     }
-
-    boolean templates = false;
 
     @Override
     public XStack newInstance() {
-        return null;
+        return new MTStack();
     }
 
     @Override
     public XTable newTableInstance() {
-        return null;
+        return new MTTable2();
     }
 
     @Override
@@ -41,13 +39,9 @@ public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> exte
         if (isEmpty()) {
             return;
         }
-        xsw.writeStartElement(XMLConstants.MODULE_STACK_TAG);
-        xsw.writeComment("Modules.");
-        // lay these in in reverse order so we just have to read them in the fromXML method
-        // and push them on the stack
-        for (int i = getStack().size() - 1; 0 <= i; i--) {
-            getStack().get(i).toXML(xsw);
-        }
+        xsw.writeStartElement(XMLConstants.MODULE_TEMPLATE_TAG);
+        xsw.writeComment("Templates.");
+        super.toXML(xsw);
         xsw.writeEndElement(); // end of tables.
     }
 
@@ -82,6 +76,38 @@ public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> exte
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG);
        */
     }
-    //public class MTStack<V extends XThing>  extends HashMap<XKey, V> implements XTable<V> {
+
+    public void clearChangeList() {
+        changeList = new ArrayList<>();
+    }
+
+    // On updates, the change list will track additions or replacements.
+    // clear it before updates, read it it after, then clear it again.
+    public List<MTKey> getChangeList() {
+        return changeList;
+    }
+
+    public void setChangeList(List<MTKey> changeList) {
+        this.changeList = changeList;
+    }
+
+    List<MTKey> changeList = new ArrayList<>();
+
+    @Override
+    public XThing put(XThing value) {
+        changeList.add(((Module)value).getMTKey());
+        return super.put(value);
+    }
+
+/*
+    public V put(Module value) {
+        changeList.add(value.getMTKey());
+        return (V) super.put(value);
+    }
+*/
+   public Module getModule(MTKey mtKey){
+        return (Module) get(mtKey);
+   }
+
 
 }

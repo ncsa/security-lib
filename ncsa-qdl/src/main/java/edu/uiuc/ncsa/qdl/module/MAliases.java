@@ -39,10 +39,6 @@ public class MAliases implements Serializable {
     }
 
     private static final long serialVersionUID = 0xcafed00d5L;
-    /**
-     * Delimiter for namespaces. Change this and you will probably break then entire system...
-     */
-    public static final String NS_DELIMITER = "#";
 
     public void addImport(URI moduleName, String alias) {
         checkAlias(alias);

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
@@ -9,25 +10,35 @@ import edu.uiuc.ncsa.qdl.statements.Documentable;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
 /**
- * Table of modules keyed by alias.
+ * Table of modules keyed by <b>alias</b>.
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */
-public class MITable2<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V>, Documentable {
-    //       MTTable2<K extends MTKey, V extends Module> extends HashMap<K, V> implements XTable<K, V> {
+public class MITable2<K extends XKey, V extends MIWrapper> extends HashMap<K, V> implements XTable<K, V>, Documentable {
     @Override
     public V put(XThing value) {
-        return null;
+        return put(value.getKey(), value);
+    }
+
+    @Override
+    public V put(XKey xKey, XThing xThing) {
+        return super.put( (K)xKey,  (V)xThing);
     }
 
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-
+        if (isEmpty()) {
+            return;
+        }
+        for (XKey key : keySet()) {
+            get(key).getModule().toXML(xsw, null);
+        }
     }
 
     @Override
@@ -57,6 +68,12 @@ public class MITable2<K extends MTKey, V extends Module> extends HashMap<K, V> i
 
     @Override
     public List<String> getDocumentation(FKey key) {
-        return null;
+        if (get(key) == null) {
+             return new ArrayList<>(); // never null
+         } else {
+             return get(key).getModule().getDocumentation();
+         }
     }
+
+
 }

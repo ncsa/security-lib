@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.workspace;
 
 import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLRuntimeException;
+import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
@@ -21,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
@@ -169,8 +169,8 @@ public class WSXMLSerializer {
         if (!state.getMTemplates().isEmpty()) {
             xsw.writeStartElement(OLD_MODULE_TEMPLATE_TAG);
             xsw.writeComment("Loaded modules, templates available when importing modules.");
-            for (URI uri : state.getMTemplates().keySet()) {
-                state.getMTemplates().get(uri).toXML(xsw, null);
+            for (Object mtKey : state.getMTemplates().keySet()) {
+                state.getMTemplates().getModule((MTKey)mtKey).toXML(xsw, null);
             }
             xsw.writeEndElement(); //end templates
         }

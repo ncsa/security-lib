@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
 
@@ -21,9 +22,13 @@ import java.util.Map;
 public class MTTable2<K extends MTKey, V extends Module>  extends HashMap<K, V> implements  XTable<K, V> {
     @Override
     public V put(XThing value) {
-        return null;
+        return put(((Module) value).getMTKey(),  value);
     }
 
+    @Override
+    public V put(XKey xKey, XThing xThing) {
+        return super.put( (K)xKey, (V) xThing);
+    }
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
 

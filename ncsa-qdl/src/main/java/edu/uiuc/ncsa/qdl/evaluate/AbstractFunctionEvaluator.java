@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.*;
+import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.functions.*;
-import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -35,7 +37,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         if(fqNames == null){
             fqNames = new String[getFunctionNames().length];
             for(int i = 0; i < fqNames.length; i++){
-                fqNames[i]= getNamespace() + MAliases.NS_DELIMITER + getFunctionNames()[i];
+                fqNames[i]= getNamespace() + State.NS_DELIMITER + getFunctionNames()[i];
             }
         }
 

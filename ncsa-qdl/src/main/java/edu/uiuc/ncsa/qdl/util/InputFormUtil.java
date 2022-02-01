@@ -7,10 +7,11 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
+import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
-import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.text.DecimalFormat;
+
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -178,7 +180,7 @@ public class InputFormUtil {
     public static String inputFormModule(URI moduleNS, State state) {
         // Cases:
 
-        Module m = state.getMTemplates().get(moduleNS);
+        Module m = state.getMTemplates().getModule(new MTKey(moduleNS));
         if (m == null) {
             return null;
         }
@@ -194,19 +196,15 @@ public class InputFormUtil {
     public static String inputFormModule(String moduleName, State state) {
         URI moduleNS;
 
-        if (moduleName.endsWith(MAliases.NS_DELIMITER)) {
+        if (moduleName.endsWith(State.NS_DELIMITER)) {
             moduleName = moduleName.substring(0, moduleName.length() - 1);
         }
-        moduleNS = state.getMAliases().getByAlias(moduleName);
-        if (moduleNS == null) {
-            try {
-                moduleNS = URI.create(moduleName);
-            } catch (Throwable t) {
-                // not a uri, not an alias, not a module.
-                return null;
-            }
+        Module m = state.getMInstances().getModule(new XKey(moduleName));
+        if(m == null){
+            return null;
         }
-        return inputFormModule(moduleNS, state);
+
+        return inputFormModule(m.getMTKey().getUriKey(), state);
     }
 
     /**

@@ -25,4 +25,14 @@ public interface XTable<K extends XKey, V extends XThing> extends Map<K, V>, Clo
     void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
     void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
+
+    /**
+     * This is in cases where the {@link XThing} needs to be stored under a different key, such as
+     * in the case of module instances.
+     * @param xKey
+     * @param xThing
+     * @return
+     */
+    V put(XKey xKey, XThing xThing);
+
 }

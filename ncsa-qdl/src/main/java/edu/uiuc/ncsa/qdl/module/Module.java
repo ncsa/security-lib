@@ -30,13 +30,24 @@ public abstract class Module implements XThing, Serializable {
     public String getName() {
         return getAlias();
     }
+
     XKey key = null;
+
     @Override
     public XKey getKey() {
-        if(key == null){
+        if (key == null) {
             key = new XKey(getName());
         }
         return key;
+    }
+
+    MTKey mtKey = null;
+
+    public MTKey getMTKey() {
+        if (mtKey == null) {
+            mtKey = new MTKey(getNamespace());
+        }
+        return mtKey;
     }
 
     /**
@@ -50,6 +61,7 @@ public abstract class Module implements XThing, Serializable {
 
     /**
      * The system will mark loaded modules as template.
+     *
      * @return
      */
     public boolean isTemplate() {
@@ -88,6 +100,7 @@ public abstract class Module implements XThing, Serializable {
     public void setAlias(String alias) {
         this.alias = alias;
     }
+
     String alias;
 
 
@@ -137,7 +150,7 @@ public abstract class Module implements XThing, Serializable {
         xsw.writeStartElement(MODULE_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_NS_ATTR, getNamespace().toString());
         xsw.writeAttribute(XMLConstants.MODULE_ALIAS_ATTR, StringUtils.isTrivial(alias) ? getAlias() : alias);
-        // Note there is documenation in the source code, but since we save the source,
+        // Note there is documentation in the source code, but since we save the source,
         // there is no need to serialize it (or anything else in the source for that matter).
         writeExtraXMLAttributes(xsw);
         writeExtraXMLElements(xsw); // Do this first so they get read first later on deserialization
@@ -158,6 +171,7 @@ public abstract class Module implements XThing, Serializable {
     /**
      * Write extra elements. You must control for the opening and closing tags. These are
      * inserted right after the state element.
+     *
      * @param xsw
      * @throws XMLStreamException
      */
@@ -175,7 +189,7 @@ public abstract class Module implements XThing, Serializable {
                     // *** IF *** it has a state object, process it.
                     if (xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
                         getState().fromXML(xer, xp);
-                    }else {
+                    } else {
                         readExtraXMLElements(xe, xer);  // contract is that it gets the start tag...
                     }
                     break;
@@ -194,6 +208,7 @@ public abstract class Module implements XThing, Serializable {
 
     /**
      * This is passed the current event and should only have calls to read the attributes.
+     *
      * @param xe
      * @throws XMLStreamException
      */
@@ -203,7 +218,8 @@ public abstract class Module implements XThing, Serializable {
 
     /**
      * This passes in the current start event so you can add your own event loop and cases.
-      * Note you need have only a switch on the tag names you want.
+     * Note you need have only a switch on the tag names you want.
+     *
      * @param xe
      * @param xer
      * @throws XMLStreamException

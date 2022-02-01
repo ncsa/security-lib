@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 
@@ -63,14 +64,15 @@ public class ModuleExpression extends ExpressionImpl {
             setEvaluated(true);
             return getResult();
         }
-        if (!state.getMAliases().hasImports()) {
+        if (state.getMInstances().isEmpty()) {
             throw new ImportException("module '" + getAlias() + "' not found");
         }
         // no module state means to look at global state to find the module state.
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getMInstances().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getMInstances().get(nextME.getAlias()).getState());
+            XKey xKey = new XKey(nextME.getAlias());
+            if (getModuleState(state).getMInstances().containsKey(xKey)) {
+                nextME.setModuleState(getModuleState(state).getMInstances().getModule(xKey).getState());
             }
         }
         getExpression().setAlias(getAlias());
@@ -115,10 +117,11 @@ public class ModuleExpression extends ExpressionImpl {
             return null;
         }
         if (moduleState == null) {
-            if (!state.getMInstances().containsKey(getAlias())) {
+            XKey xKey = new XKey(getAlias()) ;
+            if (!state.getMInstances().containsKey(xKey)) {
                 throw new IllegalArgumentException("no module named '" + getAlias() + "' was  imported");
             }
-            Module module = state.getMInstances().get(getAlias());
+            Module module = state.getMInstances().getModule(xKey);
             setModuleState(module.getState());
         }
         return moduleState;
@@ -160,8 +163,9 @@ public class ModuleExpression extends ExpressionImpl {
         }
         if (getExpression() instanceof ModuleExpression) {
             ModuleExpression nextME = (ModuleExpression) getExpression();
-            if (getModuleState(state).getMInstances().containsKey(nextME.getAlias())) {
-                nextME.setModuleState(getModuleState(state).getMInstances().get(nextME.getAlias()).getState());
+            XKey xKey = new XKey(nextME.getAlias());
+            if (getModuleState(state).getMInstances().containsKey(xKey)) {
+                nextME.setModuleState(getModuleState(state).getMInstances().getModule(xKey).getState());
             }
             ((ModuleExpression) getExpression()).set(state, newValue);
             return;

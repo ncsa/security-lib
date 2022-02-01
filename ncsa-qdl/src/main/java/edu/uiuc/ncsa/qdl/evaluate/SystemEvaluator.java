@@ -10,7 +10,8 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
-import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.MIWrapper;
+import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
@@ -19,6 +20,7 @@ import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.state.SIEntry;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StemMultiIndex;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -52,7 +54,7 @@ import static edu.uiuc.ncsa.security.core.util.DebugConstants.*;
  */
 public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String SYS_NAMESPACE = "sys";
-    public static final String SYS_FQ = SYS_NAMESPACE + MAliases.NS_DELIMITER;
+    public static final String SYS_FQ = SYS_NAMESPACE + State.NS_DELIMITER;
     public static final int SYSTEM_BASE_VALUE = 5000;
 
     @Override
@@ -484,8 +486,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (!isString(object2)) {
                 throw new IllegalArgumentException("'" + object2 + "' for " + MODULE_REMOVE + " is not a string.");
             }
-            state.getMInstances().remove(object2);
-            state.getMAliases().removeAlias(object2);
+            XKey xKey = new XKey(object2.toString());
+                state.getMInstances().remove(xKey);
         }
         polyad.setEvaluated(true);
         polyad.setResult(Boolean.TRUE);
@@ -673,7 +675,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // is a#b, and the input form of b will be returned.
         if (polyad.getArguments().get(0) instanceof ModuleExpression) {
             ModuleExpression moduleExpression = (ModuleExpression) polyad.getArguments().get(0);
-            Module module = state.getMInstances().get(moduleExpression.getAlias());
+            Module module = state.getMInstances().getModule(new XKey(moduleExpression.getAlias()));
             if (module == null) {
                 throw new IllegalArgumentException("no module named '" + moduleExpression.getAlias() + "' found.");
             }
@@ -1766,8 +1768,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 script.execute(state);
             }
             List<String> afterLoad = new ArrayList<>();
-            for (URI uri : state.getMTemplates().getChangeList()) {
-                afterLoad.add(uri.toString());
+            for (Object k : state.getMTemplates().getChangeList()) {
+                afterLoad.add(((MTKey)k).getKey());
             }
             state.getMTemplates().clearChangeList();
             return afterLoad;
@@ -1779,172 +1781,6 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         return null;
     }
 
-    protected void doOldLoadModule(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("reading files is not supported in server mode");
-        }
-        if (0 == polyad.getArgCount() || 3 <= polyad.getArgCount()) {
-            throw new IllegalArgumentException("Error" + MODULE_LOAD + " requires one or two arguments.");
-        }
-        int loadTarget = LOAD_FILE;
-        if (polyad.getArgCount() == 2) {
-            // Then this is probably a Java module
-            Object arg2 = polyad.evalArg(1, state);
-            checkNull(arg2, polyad.getArgAt(1), state);
-            if (isString(arg2)) {
-                loadTarget = arg2.toString().equals(MODULE_TYPE_JAVA) ? LOAD_JAVA : LOAD_FILE;
-            } else {
-                throw new IllegalArgumentException(MODULE_LOAD + " requires a string as a second argument");
-            }
-
-        }
-        Object arg = polyad.evalArg(0, state);
-        checkNull(arg, polyad.getArgAt(0), state);
-
-        if (!isString(arg)) {
-            throw new IllegalArgumentException(MODULE_LOAD + " requires a string as its argument, not '" + arg + "'");
-        }
-        String resourceName = arg.toString();
-        if (loadTarget == LOAD_JAVA) {
-            // first arg is the class name.
-            try {
-                Class klasse = state.getClass().forName(resourceName);
-                Object newThingy = klasse.newInstance();
-                QDLLoader qdlLoader;
-                if (newThingy instanceof JavaModule) {
-                    // For a single instance, just create a barebones loader on the fly.
-                    qdlLoader = new QDLLoader() {
-                        @Override
-                        public List<Module> load() {
-                            List<Module> m = new ArrayList<>();
-                            JavaModule javaModule = (JavaModule) newThingy;
-                            State newState = state.newModuleState();
-                            javaModule = (JavaModule) javaModule.newInstance(newState);
-                            javaModule.init(newState); // set it up
-                            m.add(javaModule);
-                            return m;
-                        }
-                    };
-                } else {
-                    if (!(newThingy instanceof QDLLoader)) {
-                        throw new IllegalArgumentException("'" + resourceName + "' is neither a module nor a loader.");
-                    }
-                    qdlLoader = (QDLLoader) newThingy;
-                }
-                List<String> names = QDLConfigurationLoaderUtils.setupJavaModule(state, qdlLoader, false);
-                switch (names.size()) {
-                    case 0:
-                        polyad.setResultType(Constant.NULL_TYPE);
-                        polyad.setResult(QDLNull.getInstance());
-                        break;
-                    case 1:
-                        polyad.setResultType(Constant.STRING_TYPE);
-                        polyad.setResult(names.get(0));
-                        break;
-                    default:
-                        StemVariable stemVariable = new StemVariable();
-                        stemVariable.addList(names);
-                        polyad.setResult(names);
-                        polyad.setResultType(Constant.STEM_TYPE);
-
-                }
-                polyad.setEvaluated(true);
-                return;
-            } catch (Throwable t) {
-                if (t instanceof RuntimeException) {
-                    throw (RuntimeException) t;
-                }
-                throw new QDLException("Could not load Java class " + resourceName + ":" + t.getMessage() + ". Be sure it is in the classpath.", t);
-            }
-        }
-        QDLScript script = null;
-        try {
-            script = resolveScript(resourceName, state.getModulePaths(), state);
-            if (script == null) {
-                script = resolveScript(resourceName + MODULE_DEFAULT_EXTENSION, state.getModulePaths(), state);
-            }
-        } catch (Throwable t) {
-            state.warn("Could not find module:" + t.getMessage());
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-            throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?", t);
-        }
-  /*      if (script == null) {
-            throw new QDLRuntimeException("Could not find  '" + resourceName + "'. Is your module path set?");
-        }*/
-
-        File file = null;
-
-        if (script == null) {
-            file = new File(resourceName);
-            if (!file.exists()) {
-                throw new IllegalArgumentException("file, '" + arg + "' does not exist");
-            }
-            if (!file.isFile()) {
-                throw new IllegalArgumentException("'" + arg + "' is not a file");
-            }
-
-            if (!file.canRead()) {
-                throw new IllegalArgumentException("You do not have permission to read '" + arg + "'.");
-            }
-
-        }
-        try {
-            QDLParserDriver parserDriver = new QDLParserDriver(new XProperties(), state);
-            // Exceptional case where we just run it directly.
-            // note that since this is QDL ther emay be multiple modules, etc.
-            // in a single file, so there is no way to know what the user did except
-            // to look at the state before, then after. This should return the added
-            // modules fq paths.
-            List<String> b4load = new ArrayList<>();
-            for (URI uri : state.getMTemplates().keySet()) {
-                b4load.add(uri.toString());
-            }
-            if (script == null) {
-                if (state.isServerMode()) {
-                    throw new QDLServerModeException("File operations are not permitted in server mode");
-                }
-                FileReader fileReader = new FileReader(file);
-                QDLRunner runner = new QDLRunner(parserDriver.parse(fileReader));
-                runner.setState(state);
-                runner.run();
-            } else {
-                script.execute(state);
-            }
-            List<String> afterLoad = new ArrayList<>();
-            for (URI uri : state.getMTemplates().keySet()) {
-                String s = uri.toString();
-                if (!b4load.contains(s)) {
-                    afterLoad.add(s);
-                }
-            }
-            switch (afterLoad.size()) {
-                case 0:
-                    polyad.setResultType(Constant.NULL_TYPE);
-                    polyad.setResult(QDLNull.getInstance());
-                    break;
-                case 1:
-                    polyad.setResultType(Constant.STRING_TYPE);
-                    polyad.setResult(afterLoad.get(0));
-                    break;
-                default:
-                    StemVariable stemVariable = new StemVariable();
-                    stemVariable.addList(afterLoad);
-                    polyad.setResult(afterLoad);
-                    polyad.setResultType(Constant.STEM_TYPE);
-
-            }
-            polyad.setEvaluated(true);
-        } catch (Throwable t) {
-            if (DebugUtil.isEnabled()) {
-                t.printStackTrace();
-            }
-            polyad.setResultType(Constant.NULL_TYPE);
-            polyad.setResult(QDLNull.getInstance());
-            polyad.setEvaluated(true);
-        }
-    }
 
     /**
      * The general contract for import. You may import everything in a module by using the uri.
@@ -1987,7 +1823,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             URI moduleNS = null;
             String alias = null;
             if (isString(value)) {
-                moduleNS = URI.create((String) value); // if this bombs it throws an illega argument exception, which is ok.
+                moduleNS = URI.create((String) value); // if this bombs it throws an illegal argument exception, which is ok.
                 gotOne = true;
             }
             if (isStem(value)) {
@@ -2011,14 +1847,13 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (!gotOne) {
                 throw new IllegalArgumentException(MODULE_IMPORT + ": unknown argument type");
             }
-            Module m = state.getMTemplates().get(moduleNS);
+            Module m = state.getMTemplates().getModule(new MTKey(moduleNS));
             if (m == null) {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }
 
             State newModuleState = state.newModuleState();
             newModuleState.setSuperState(state);
-         //   newModuleState.setSuperStateReadOnly(true);
 
             Module newInstance = m.newInstance(newModuleState);
             if (newInstance instanceof JavaModule) {
@@ -2029,9 +1864,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 alias = m.getAlias();
             }
             newModuleState.setSuperState(null); // get rid of it now.
-            MAliases mAliases = state.getMAliases();
-            mAliases.addImport(moduleNS, alias);
-            state.getMInstances().put(alias, newInstance);
+          //  MAliases mAliases = state.getMAliases();
+           // mAliases.addImport(moduleNS, alias);
+            state.getMInstances().put(new MIWrapper(new XKey(alias), newInstance));
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);
             } else {

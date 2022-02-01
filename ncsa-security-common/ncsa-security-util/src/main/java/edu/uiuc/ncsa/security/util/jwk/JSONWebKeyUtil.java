@@ -109,9 +109,17 @@ public class JSONWebKeyUtil {
             // have to figure out what is in this entry.
             if (!skipIt && key.containsKey(MODULUS) && key.containsKey(PUBLIC_EXPONENT)) {
                 byte[] mod = Base64.decodeBase64(key.getString(MODULUS));
-                BigInteger modulus = new BigInteger(mod);
+                // CIL-1166 The modulus is always positive, so force the issue since some
+                // python libraries might not send along quite the right sequence of bytes.
+                // In particular, a positive number would be of the form [0,b0,b1,...] as a byte array.
+                // Since the spec says that the modulus must be positive, some python libraries omit the
+                // first byte and would send [b0,b1,...] which would yield a negative modulus which in turn
+                // causes an exception. This next call forces the bytes to be interpreted as positive (so it basically
+                // just adds an initial byte of 0 if its missing):
+                BigInteger modulus = new BigInteger(1,mod);
                 byte[] pubExp = Base64.decodeBase64(key.getString(PUBLIC_EXPONENT));
-                BigInteger publicExponent = new BigInteger(pubExp);
+                // Same note as per above. Force the public exponent to be positive no matter what.
+                BigInteger publicExponent = new BigInteger(1,pubExp);
                 RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, publicExponent);
                 KeyFactory factory = KeyFactory.getInstance("RSA");
                 PublicKey pub = factory.generatePublic(spec);
@@ -254,4 +262,16 @@ public class JSONWebKeyUtil {
         throw new IllegalArgumentException("Error: missing closing tag for element " + JSON_WEB_KEYS_TAG);
     }
 
+    public static void main(String[] args) throws Throwable{
+        File f = new File("/tmp/pub.jwk");
+        JSONWebKeys jwks = fromJSON(f);
+        System.out.println(jwks);
+        byte[] pos = new byte[]{0,53,107,-113};
+        byte[]  neg = new byte[]{53,107,-113};
+        BigInteger bdpos = new BigInteger(pos);
+
+        BigInteger bdneg = new BigInteger(1, neg);
+        System.out.println(bdpos);
+        System.out.println(bdneg);
+    }
 }

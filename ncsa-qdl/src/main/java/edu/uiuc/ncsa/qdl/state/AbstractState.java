@@ -2,13 +2,6 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.functions.FKey;
-import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.functions.FTable;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
-import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -16,7 +9,9 @@ import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * This helps us organize the functionality of the state object. There are
@@ -47,16 +42,6 @@ public abstract class AbstractState implements StateInterface, Logable {
         return superState != null;
     }
 
-       // practically super state is always treated as read only, so this machinery does nothing.
- /*   public boolean isSuperStateReadOnly() {
-        return true;
-    }
-
-    public void setSuperStateReadOnly(boolean superStateReadOnly) {
-        this.superStateReadOnly = superStateReadOnly;
-    }
-
-    boolean superStateReadOnly = true;*/
 
     public static final String INTRINSIC_PREFIX = "__";
 
@@ -89,74 +74,24 @@ public abstract class AbstractState implements StateInterface, Logable {
 
     private static final long serialVersionUID = 0xcafed00d3L;
 
-    public AbstractState(edu.uiuc.ncsa.qdl.module.MAliases MAliases,
+    public AbstractState(
                          SymbolStack symbolStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
-                         MTemplates MTemplates,
                          MyLoggingFacade myLoggingFacade) {
-        this.MAliases = MAliases;
         this.symbolStack = symbolStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
-        this.MTemplates = MTemplates;
         this.logger = myLoggingFacade;
     }
 
-    public abstract FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> getFTStack();
-
-    public MTemplates getMTemplates() {
-        return MTemplates;
-    }
-
-    /*
-    How's it work?
-    MTemplates - has the templates keyed by uri.
-    MInstances - has (local) instances from the MTemplates with their own state,
-                 keyed by alias
-      MAliases - lets us look up which alias goes with which MS without having
-                 to slog through all the modules
-     */
-
-    protected MTemplates MTemplates;
-    MAliases MAliases;
-
-    public MAliases getMAliases() {
-        return MAliases;
-    }
-
+   // public abstract FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> getFTStack();
 
     public SymbolStack getSymbolStack() {
         return symbolStack;
     }
 
-    /**
-     * Modules (with their state) that have been imported and are keyed by alias.
-     *
-     * @return
-     */
-    public Map<String, Module> getMInstances() {
-        return mInstances;
-    }
 
-    public void setMInstances(Map<String, Module> mInstances) {
-        this.mInstances = mInstances;
-    }
-
-    Map<String, Module> mInstances = new HashMap<>();
-
-    /**
-     * Get a single imported module by alias or null if there is no such module.
-     *
-     * @param alias
-     * @return
-     */
-    public Module getImportedModule(String alias) {
-        if (alias == null) {
-            return null;
-        }
-        return getMInstances().get(alias);
-    }
 
     public void setSymbolStack(SymbolStack symbolStack) {
         this.symbolStack = symbolStack;
@@ -171,7 +106,6 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
     public MetaEvaluator getMetaEvaluator() {
-
         return metaEvaluator;
     }
 

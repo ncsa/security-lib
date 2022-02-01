@@ -3,10 +3,11 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FTable;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.MAliases;
-import edu.uiuc.ncsa.qdl.module.MTemplates;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.SymbolStack;
 import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
@@ -34,21 +35,23 @@ public class TestUtils {
 
     MAliases mAliases = MAliases.newMInstances();
 
-    public State createStateObject(MAliases mAliases,
+    public State createStateObject(
                                    SymbolStack symbolStack,
                                    OpEvaluator opEvaluator,
                                    MetaEvaluator metaEvaluator,
                                    FStack<? extends FTable<? extends XKey, ? extends FunctionRecord>> ftStack,
-                                   MTemplates mTemplates,
+                                   MTStack mTemplates,
+                                   MIStack mInstances,
                                    MyLoggingFacade myLoggingFacade,
                                    boolean isServerMode,
                                    boolean assertionsOn) {
-        return new State(new MAliases(),
+        return new State(
                 symbolStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FStack(),
-                new MTemplates(),
+                new MTStack(),
+                new MIStack(),
                 null,
                 false,
                 false,
@@ -59,12 +62,13 @@ public class TestUtils {
         SymbolTableImpl st = new SymbolTableImpl();
         SymbolStack stack = new SymbolStack();
         stack.addParent(st);
-        State state = createStateObject(new MAliases(),
+        State state = createStateObject(
                 stack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FStack(),
-                new MTemplates(),
+                new MTStack(),
+                new MIStack(),
                 null,
                 false,
                 true);
@@ -78,12 +82,13 @@ public class TestUtils {
      */
     public State getTestState() {
 
-        State state = createStateObject(mAliases,
+        State state = createStateObject(
                 getTestSymbolStack(),
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FStack(),
-                new MTemplates(),
+                new MTStack(),
+                new MIStack(),
                 null,
                 false,
                 true);

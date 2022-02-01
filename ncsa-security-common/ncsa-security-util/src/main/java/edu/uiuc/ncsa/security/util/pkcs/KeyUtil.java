@@ -234,4 +234,5 @@ public class KeyUtil {
     public static PublicKey fromX509PEM(Reader reader) throws IOException {
         return fromX509PEM(PEMFormatUtil.readerToString(reader));
     }
+
 }

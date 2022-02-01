@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
-import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
@@ -13,6 +12,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import java.util.Iterator;
 
+import static edu.uiuc.ncsa.qdl.state.NamespaceAwareState.NS_DELIMITER;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
 
 /**
@@ -21,7 +21,7 @@ import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
  */
 public class ListEvaluator extends AbstractFunctionEvaluator{
     public static final String LIST_NAMESPACE = "list";
-    public static final String LIST_FQ = LIST_NAMESPACE + MAliases.NS_DELIMITER;
+    public static final String LIST_FQ = LIST_NAMESPACE + NS_DELIMITER;
    public static final int LIST_BASE_VALUE = 10000;
     public static final String LIST_INSERT_AT = "insert_at";
     public static final String LIST_INSERT_AT2 = "list_insert_at";

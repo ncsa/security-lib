@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.config;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
+import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -215,16 +216,16 @@ public class QDLConfigurationLoaderUtils {
                         failedModules = failedModules + (failedModules.length()==0?"":",") + qmc.getPath();
                         continue;
                     }
-                    Set<URI> newImports = interpreter.getState().getMTemplates().keySet();
+                    Set<MTKey> newImports = interpreter.getState().getMTemplates().keySet();
                     if (newImports.size() != oldImports.size() + 1) {
                         throw new NFWException("Error: added multiple modules unexpectedly");
                     }
-                    for (URI uri : newImports) {
+                    for (MTKey uri : newImports) {
                         if (!oldImports.contains(uri)) {
                             if (qmc.isImportOnStart()) {
 //                                try {
                                     // also easy is to have QDL do the import rather than doing brain surgery on its state.
-                                    interpreter.execute(SystemEvaluator.MODULE_IMPORT + "('" + uri.toString() + "');");
+                                    interpreter.execute(SystemEvaluator.MODULE_IMPORT + "('" + uri.getKey() + "');");
   //                              }catch (Throwable t){
     //                                  failedModules = failedModules + (failedModules.length()==0?"":",") + uri.toString();
       //                          }
@@ -261,11 +262,11 @@ public class QDLConfigurationLoaderUtils {
             state.addModule(m); // done!
             importedFQNames.add(m.getNamespace().toString());
             if (importASAP) {
-                state.getMAliases().addImport(m.getNamespace(), m.getAlias());
+                state.getMInstances().put(m);
                 State state1 = state.newModuleState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
-                state.getMInstances().put(m.getAlias(), mm);
+                state.getMInstances().put(mm);
             }
         }
         return importedFQNames;

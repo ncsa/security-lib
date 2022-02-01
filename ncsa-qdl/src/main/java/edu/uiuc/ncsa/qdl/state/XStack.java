@@ -6,7 +6,9 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
@@ -109,7 +111,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
             if (xThing != null) {
-                return xThing;
+                return  xThing;
             }
         }
         return null;
@@ -139,6 +141,9 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     public List<XTable<? extends XKey, ? extends XThing>> getStack() {
+        if(stack == null){
+            stack = new  ArrayList();
+        }
         return stack;
     }
 
@@ -181,6 +186,16 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return oldValue;
     }
 
+    public XThing put(XKey xKey, XThing xThing){
+        for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
+            if (xTable.containsKey(xKey)) {
+                xTable.put(xThing);
+                return xThing;
+            }
+        }
+        return peek().put(xKey, xThing);
+
+    }
     public XThing put(XThing value) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             if (xTable.containsKey(value.getKey())) {
@@ -246,17 +261,45 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
      * Does the grunt work of writing the stack in the right order. You write the start tag,
      * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter)}
      * for a canonical example.
+     *
      * @param xsw
      * @throws XMLStreamException
      */
-     public void toXML(XMLStreamWriter xsw) throws XMLStreamException{
-         // lay these in in reverse order so we just have to read them in the fromXML method
-         // and push them on the stack
-         for (int i = getStack().size() - 1; 0 <= i; i--) {
-             getStack().get(i).toXML(xsw);
-         }
-     }
+    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+        // lay these in in reverse order so we just have to read them in the fromXML method
+        // and push them on the stack
+        for (int i = getStack().size() - 1; 0 <= i; i--) {
+            getStack().get(i).toXML(xsw);
+        }
+    }
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
+
+    /**
+     * Returns the <b><i>unique</i></b> set of keys over the tables.
+     *
+     * @return
+     */
+    public Set<XKey> keySet() {
+        HashSet<XKey> uniqueKeys = new HashSet<>();
+        for (XTable<? extends XKey, ? extends XThing> table : getStack()) {
+            uniqueKeys.addAll(table.keySet());
+        }
+        return uniqueKeys;
+    }
+
+    /**
+     * Returns the a list of keys (including redundancies) for this stack.
+     *
+     * @return
+     */
+    public List<XKey> allKeys() {
+        ArrayList arrayList = new ArrayList();
+        for (XTable<? extends XKey, ? extends XThing> table : getStack()) {
+            arrayList.addAll(table.keySet());
+        }
+        return arrayList;
+    }
+
 
 }

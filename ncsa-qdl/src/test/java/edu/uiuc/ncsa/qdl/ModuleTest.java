@@ -272,29 +272,7 @@ public class ModuleTest extends AbstractQDLTester {
      * @throws Throwable
      */
 
-    public void testNestedVariableImport() throws Throwable {
-        StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:/a','a']body[q:=1;];");
-        addLine(script, "module_import('a:/a');");
-        addLine(script, "module_import('a:/a','b');");
-        addLine(script, "module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];");
-        addLine(script, "a#q:=10;");
-        addLine(script, "b#q:=11;");
-        // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "module_import('q:/q');");
-        addLine(script, "w#a#q:=3;");
-        addLine(script, "okw := w#a#q==3;");
-        addLine(script, "okaq := a#q==10;");
-        addLine(script, "okbq := b#q==11;");
 
-        State state = testUtils.getNewState();
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getBooleanValue("okw", state);
-        assert getBooleanValue("okaq", state);
-        assert getBooleanValue("okbq", state);
-    }
   /*
      module['a:/a','a']body[q:=1;];module_import('a:/a');module_import('a:/a','b')
      module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];
@@ -316,33 +294,7 @@ public class ModuleTest extends AbstractQDLTester {
         w#g(2)
      */
 
-    public void testNestedFunctionImport() throws Throwable {
-        StringBuffer script = new StringBuffer();
-        addLine(script, "define[f(x)]body[return(x+100);];");
-        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
-        
-        // Bug -- the import runs, but does nothing. This test actually shows that referring to a#f works
-        //        after the external import. Next line would fail
-        // addLine(script, "module['q:/z','w']body[module_import('a:/t','z');define[g(x)]body[return(z#f(x)+3);];];");
 
-        addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
-        addLine(script, "test_f:=f(1);");
-        addLine(script, "module_import('a:/t');");
-        addLine(script, "test_a:=a#f(1);");
-        // Make sure that some of the state has changed to detect state management issues.
-        addLine(script, "module_import('q:/z');");
-        addLine(script, "test_waf := w#a#f(2);");
-        addLine(script, "test_wg := w#g(2);");
-        State state = testUtils.getNewState();
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        assert getLongValue("test_f", state) == 101L;
-        assert getLongValue("test_a", state) == 2L;
-        assert getLongValue("test_waf", state) == 3L;
-        assert getLongValue("test_wg", state) == 6L;
-
-    }
 
     /**
      * Case of a simple module. The point is that a function f, is defined in the module and that
@@ -483,7 +435,6 @@ public class ModuleTest extends AbstractQDLTester {
         assert getStringValue("all", state).contains("module['a:/b','X']");
 
     }
-
     /**
      * Test that creating a module inside another module works completely locally.
      * <pre>
@@ -503,7 +454,64 @@ public class ModuleTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
 
     }
+    boolean testImports = false;
 
+    public void testNestedVariableImport() throws Throwable {
+        if(!testImports){
+            return;
+        }
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:/a','a']body[q:=1;];");
+        addLine(script, "module_import('a:/a');");
+        addLine(script, "module_import('a:/a','b');");
+        addLine(script, "module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];");
+        addLine(script, "a#q:=10;");
+        addLine(script, "b#q:=11;");
+        // Make sure that some of the state has changed to detect state management issues.
+        addLine(script, "module_import('q:/q');");
+        addLine(script, "w#a#q:=3;");
+        addLine(script, "okw := w#a#q==3;");
+        addLine(script, "okaq := a#q==10;");
+        addLine(script, "okbq := b#q==11;");
+
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("okw", state);
+        assert getBooleanValue("okaq", state);
+        assert getBooleanValue("okbq", state);
+    }
+
+    public void testNestedFunctionImport() throws Throwable {
+        if(!testImports){
+            return;
+        }
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[f(x)]body[return(x+100);];");
+        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
+
+        // Bug -- the import runs, but does nothing. This test actually shows that referring to a#f works
+        //        after the external import. Next line would fail
+        // addLine(script, "module['q:/z','w']body[module_import('a:/t','z');define[g(x)]body[return(z#f(x)+3);];];");
+
+        addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
+        addLine(script, "test_f:=f(1);");
+        addLine(script, "module_import('a:/t');");
+        addLine(script, "test_a:=a#f(1);");
+        // Make sure that some of the state has changed to detect state management issues.
+        addLine(script, "module_import('q:/z');");
+        addLine(script, "test_waf := w#a#f(2);");
+        addLine(script, "test_wg := w#g(2);");
+        State state = testUtils.getNewState();
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getLongValue("test_f", state) == 101L;
+        assert getLongValue("test_a", state) == 2L;
+        assert getLongValue("test_waf", state) == 3L;
+        assert getLongValue("test_wg", state) == 6L;
+    }
     /*
        module['a:a','a'][module['b:b','b'][f(x)->x;];module_import('b:b');g(x)->b#f(x^2);];
    module_import('a:a')
@@ -512,6 +520,9 @@ a
      */
 
     public void testNestedModule2() throws Throwable {
+        if(!testImports){
+            return;
+        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:a','a'][module['b:b','b'][f(x)->x;];module_import('b:b');g(x)->b#f(x^2);];");
@@ -523,6 +534,7 @@ a
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
     }
+
 
     public void testUnqualifiedVariable() throws Throwable {
         State state = testUtils.getNewState();

@@ -12,7 +12,6 @@ public class XKey implements Serializable {
 
     public XKey(String key) {
         setKey(key);
-        setKey(key);
     }
 
     public String getKey() {

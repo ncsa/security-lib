@@ -75,7 +75,6 @@ public interface XMLConstants {
     String MODULE_TEMPLATE_TAG = "module_templates";
 
     String MODULE_STACK_TAG = "module_stack";
-    String TEMPLATE_STACK_TAG = "template_stack";
 
     String BUFFER_MANAGER = "buffer_manager";
     String BUFFER_RECORDS = "records";
