@@ -25,7 +25,7 @@ public class TryCatch implements Statement {
 
     @Override
     public Object evaluate(State state) {
-        State localState = state.newStateWithImports();
+        State localState = state.newLocalState();
         try {
             for (Statement s : tryStatements) {
                 s.evaluate(localState);

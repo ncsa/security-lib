@@ -315,6 +315,12 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = null;
         if (isIntrinsic(variableName)) {
             st = getSymbolStack();
+           v = getSymbolStack().resolveValue(variableName);
+     /*       if (v == null) {
+                throw new IntrinsicViolation("no value for '" + variableName + "'");
+            }*/
+
+/*
             int startIndex = 1;
             // startIndex == 0 means that there is exactly one stack, so moving up or down the
             // stack does not work. This is the case of, e.g., a module being loaded the first time
@@ -326,7 +332,8 @@ public abstract class VariableState extends NamespaceAwareState {
             //v = st.resolveValue(variableName, ((SymbolStack)st).getParentTables().size()-1);
             if (0 < startIndex && v == null) {
                 throw new IntrinsicViolation("no value for '" + variableName + "'");
-            }
+            }*/
+
         } else {
             st = getSymbolStack().getRightST(variableName);
             v = st.resolveValue(variableName);
@@ -334,7 +341,6 @@ public abstract class VariableState extends NamespaceAwareState {
 
                 if (!getMInstances().isEmpty()) {
                     for (Object key : getMInstances().keySet()) {
-                        //Module m = getImportedModule((XKey)key);
                         Module m = getMInstances().getModule((XKey) key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
@@ -357,7 +363,7 @@ public abstract class VariableState extends NamespaceAwareState {
             case OP_GET:
                 // For resolving intrinsic variables.
                 if (v == null && hasSuperState()) {
-                    v = getSuperState().getValue(variableName);
+              //      v = getSuperState().getValue(variableName);
                 }
                 return v;
             case OP_SET:

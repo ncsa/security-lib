@@ -263,7 +263,7 @@ public class QDLConfigurationLoaderUtils {
             importedFQNames.add(m.getNamespace().toString());
             if (importASAP) {
                 state.getMInstances().put(m);
-                State state1 = state.newModuleState();
+                State state1 = state.newCleanState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
                 state.getMInstances().put(mm);

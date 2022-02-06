@@ -32,7 +32,7 @@ public class BlockStatement implements Statement{
 
     @Override
     public Object evaluate(State state) {
-        State state1 = state.newStateWithImports();
+        State state1 = state.newLocalState();
         for(Statement statement : statements){
             statement.evaluate(state1);
         }

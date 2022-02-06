@@ -454,7 +454,7 @@ public class XMLUtils implements XMLConstants {
         // Cursor management: The stream points to the module tag or we would not be here, but we need to
         // create the
         Module module = null;
-        State moduleState = state.newModuleState();
+        State moduleState = state.newCleanState();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
 
         if (moduleAttributes.isJavaModule()) {

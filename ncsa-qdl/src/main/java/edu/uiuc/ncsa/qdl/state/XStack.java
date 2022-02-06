@@ -39,15 +39,36 @@ import java.util.Set;
  */
 public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> {
     /**
-     * Take an XStack and add all of the tables in this stack in the correct order.
+     * Take an XStack and add all of the tables in this stack in the correct order
+     * to the front of the stack. If XStack is [A,B,C,...] And the existing stack is
+     * [P,Q,...] the result is [A,B,C,...,P,Q,...]
      * This is needed when, e.g., creating new local state for function reference resolution
      *
      * @param xStack
      */
     public void addTables(XStack xStack) {
-        // add backwards
+        // add backwards from stack
         for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
-            push((XTable) xStack.getStack().get(i));
+            XTable xt = (XTable)xStack.getStack().get(i);
+            if(!xt.isEmpty()) {
+                push((XTable) xStack.getStack().get(i)); // puts at 0th elements each time
+            }
+        }
+    }
+
+    /**
+     * Similar to {@link #addTables(XStack)}, but this appends them to the existing
+     * set of tables. If XStack is [A,B,C,...] And the existing stack is
+     *      * [P,Q,...] the result is [P,Q,...,A,B,C,...,]
+     * @param xStack
+     */
+    public void appendTables(XStack xStack) {
+        // add backwards from stack
+        for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
+            XTable xt = (XTable)xStack.getStack().get(i);
+            if(!xt.isEmpty()) {
+                append((V) xStack.getStack().get(i)); // puts at 0th elements each time
+            }
         }
     }
 
@@ -107,6 +128,13 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return getStack().get(0).get(key);
     }
 
+    public boolean localHas(XKey xkey){
+        if (getStack().isEmpty()) {
+            return false;
+        }
+        return getStack().get(0).get(xkey)!= null;
+
+    }
     public XThing get(XKey key) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);

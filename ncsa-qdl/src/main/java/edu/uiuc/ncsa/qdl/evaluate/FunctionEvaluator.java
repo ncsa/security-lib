@@ -192,7 +192,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         try {
             if(state.isIntrinsic(polyad.getName()) && polyad.isInModule()){
                 // if it is in a module and at the top of the stack, then this is an access violation
-                if(state.getFTStack().getStack().get(0).containsKey(new FKey(polyad.getName(),polyad.getArgCount()))){
+                //if(state.getFTStack().getStack().get(0).containsKey(new FKey(polyad.getName(),polyad.getArgCount()))){
+                if(state.getFTStack().localHas(new FKey(polyad.getName(),polyad.getArgCount()))){
                     throw new IntrinsicViolation("cannot access intrinsic function directly.");
                 }
             }
@@ -273,10 +274,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         State localState;
          if(moduleState == null){
-            localState = state.newStateWithImports();
+            localState = state.newLocalState();
 
         }else{
-            localState = state.newStateWithImports(moduleState);
+            localState = state.newLocalState(moduleState);
         }
          localState.setWorkspaceCommands(state.getWorkspaceCommands());
        // State localState = state.newStateWithImports();

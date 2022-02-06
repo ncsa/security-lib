@@ -187,7 +187,7 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "list. := n(10);");
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
-        addLine(script, "d := a#list.b#i;");// Should resolve index og b#i to 1.
+        addLine(script, "d := a#list.b#i;");// Should resolve index of b#i to 1.
         addLine(script, "e := b#list.i;");// should resolve i to 1 since it is in the module.
         addLine(script, "okd := d == -9;");
         addLine(script, "oke := e == -19;");
@@ -245,7 +245,7 @@ public class ModuleTest extends AbstractQDLTester {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);];");
+        addLine(script, "module['a:a','a']body[i:=2;j:=3;list. := -10 + n(5);f(x)->x^2;];");
         addLine(script, "module['b:b','b']body[i:=1;j:=4;list. := -20 + n(5);];");
         addLine(script, "module['a:b','b']body[i:=1;j:=4;list. := n(5);];");
         addLine(script, "i:=0;");
@@ -256,6 +256,8 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "module_import('a:b', 'd');");
         addLine(script, "d := d#list.b#i;");
         addLine(script, "e := b#list.d#i;");
+        addLine(script, "e := b#list.d#i;");
+        addLine(script, "q := b#list.a#f(1);");
 
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -263,6 +265,7 @@ public class ModuleTest extends AbstractQDLTester {
 
         assert getLongValue("d", state).equals(1L);
         assert getLongValue("e", state).equals(-19L);
+        assert getLongValue("q", state).equals(-19L);
     }
 
     /**
@@ -454,7 +457,7 @@ public class ModuleTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
 
     }
-    boolean testImports = false;
+    boolean testImports = true;
 
     public void testNestedVariableImport() throws Throwable {
         if(!testImports){

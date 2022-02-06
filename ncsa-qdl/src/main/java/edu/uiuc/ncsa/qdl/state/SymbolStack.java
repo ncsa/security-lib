@@ -29,7 +29,15 @@ public class SymbolStack extends AbstractSymbolTable {
         addParent(new SymbolTableImpl());
     }
 
-
+      public boolean isEmpty(){
+          for (SymbolTable s : parentTables) {
+              // use this and not addParent, since that reverses their order, inserting a the front of the list
+              if(!getParentTables().isEmpty()){
+                  return false;
+              }
+          }
+        return true;
+      }
     /**
      * This constructor takes all of the parents and then pushes a new {@link SymbolTableImpl}
      * on to the stack.
@@ -101,6 +109,33 @@ public class SymbolStack extends AbstractSymbolTable {
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the value from the most local table. Used mostly for intrinsic values.
+     * @param variableName
+     * @return
+     */
+    public Object getLocalValue(String variableName){
+        return getParentTables().get(0).resolveValue(variableName);
+    }
+
+    /**
+     * Sets the value in the most local table. Used mostly for intrinsic values.
+     * @param variableName
+     * @param value
+     */
+    public void setLocalValue(String variableName, Object value){
+          getParentTables().get(0).setValue(variableName, value);
+    }
+
+    /**
+     * Checks if the most local table contains the value. Used mostly for intrinsic values.
+     * @param variableName
+     * @return
+     */
+    public boolean hasLocalValue(String variableName){
+        return null!= getParentTables().get(0).resolveValue(variableName);
     }
 
     public Object resolveValue(String variableName, int startIndex) {
@@ -277,5 +312,27 @@ public class SymbolStack extends AbstractSymbolTable {
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STACKS_TAG );
 
+    }
+
+    @Override
+    public String toString() {
+        String out = "[" + getClass().getSimpleName();
+        out = out + ", table#=" + getParentTables().size();
+        int i = 0;
+        int totalSymbols = 0;
+        boolean isFirst = true;
+        out = ", counts=[";
+        for (SymbolTable symbolTable : getParentTables()) {
+            if (isFirst) {
+                isFirst = false;
+                out = out + symbolTable.getMap().size();
+            } else {
+                out = out + "," + symbolTable.getMap().size();
+            }
+            totalSymbols += symbolTable.getMap().size();
+        }
+        out = out + "], total=" + totalSymbols;
+        out = out + "]";
+        return out;
     }
 }

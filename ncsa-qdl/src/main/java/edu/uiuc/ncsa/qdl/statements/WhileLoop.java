@@ -51,7 +51,7 @@ public class WhileLoop implements Statement {
 
     @Override
     public Object evaluate(State state) {
-        State localState = state.newStateWithImports();
+        State localState = state.newLocalState();
         //State localState = state.new;
         if (conditional instanceof Polyad) {
             Polyad p = (Polyad) conditional;

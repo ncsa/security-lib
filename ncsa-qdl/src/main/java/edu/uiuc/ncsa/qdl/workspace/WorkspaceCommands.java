@@ -866,7 +866,7 @@ public class WorkspaceCommands implements Logable {
             stringBuffer.append(x + "\n");
         }
         StringReader r = new StringReader(stringBuffer.toString());
-        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newDebugState());
+        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newCleanState());
         try {
             QDLRunner runner = new QDLRunner(driver.parse(r));
         } catch (ParseCancellationException pc) {
@@ -970,7 +970,7 @@ public class WorkspaceCommands implements Logable {
                 break;
 
             case 2:
-                State newState = state.newDebugState();
+                State newState = state.newCleanState();
                 newState.setPID(state.getPID() + 1); // anything other than zero
                 newState.setIoInterface(getIoInterface()); // Or IO fails
                 interpreter = new QDLInterpreter(newState);

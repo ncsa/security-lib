@@ -1123,7 +1123,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         // Make a safe copy of the state to unpack this in case something bombs
         List<String> keys = new ArrayList<>();
-        State localState = state.newModuleState();
+        State localState = state.newCleanState();
         QDLCodec codec = new QDLCodec();
 
         for (String key : stem.keySet()) {

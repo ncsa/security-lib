@@ -9,9 +9,7 @@ import edu.uiuc.ncsa.security.util.cli.BasicIO;
 import edu.uiuc.ncsa.security.util.cli.IOInterface;
 import edu.uiuc.ncsa.security.util.scripting.StateInterface;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * This helps us organize the functionality of the state object. There are
@@ -23,9 +21,23 @@ import java.util.StringTokenizer;
  * on 2/2/20 at  6:37 AM
  */
 public abstract class AbstractState implements StateInterface, Logable {
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    UUID uuid = UUID.randomUUID();
+    UUID antecessor;
+
+    public Map<UUID, AbstractState> getStateRegistry() {
+        return stateRegistry;
+    }
+
+    Map<UUID, AbstractState> stateRegistry = new HashMap<>();
+
     /**
      * Superstate is used in modules. If a module is created, then its state sets the super
      * state so that references to the state vs. local module state can be cleanly separated.
+     * This is what allows for intrinsic variables and functions.
      * @return
      */
     public State getSuperState() {
@@ -46,7 +58,8 @@ public abstract class AbstractState implements StateInterface, Logable {
     public static final String INTRINSIC_PREFIX = "__";
 
     public static boolean isIntrinsic(String x) {
-        return x.startsWith(INTRINSIC_PREFIX);
+        // Exactly the first two characters are '__' A name of __ is not allowed.
+        return x.startsWith(INTRINSIC_PREFIX) && 2 < x.length() && !x.substring(2).startsWith("_");
     }
 
     public IOInterface getIoInterface() {
@@ -83,15 +96,12 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.logger = myLoggingFacade;
+        stateRegistry.put(getUuid(), this);
     }
-
-   // public abstract FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> getFTStack();
 
     public SymbolStack getSymbolStack() {
         return symbolStack;
     }
-
-
 
     public void setSymbolStack(SymbolStack symbolStack) {
         this.symbolStack = symbolStack;
@@ -122,11 +132,6 @@ public abstract class AbstractState implements StateInterface, Logable {
     }
 
 
-    public abstract State newModuleState();
-
-    public abstract State newStateWithImports();
-
-    public abstract State newStateNoImports();
 
     @Override
     public boolean isDebugOn() {

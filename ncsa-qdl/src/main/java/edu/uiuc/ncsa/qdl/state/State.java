@@ -7,7 +7,9 @@ import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.*;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTStack;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -34,10 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
@@ -52,7 +51,7 @@ public class State extends FunctionState implements QDLConstants {
     private static final long serialVersionUID = 0xcafed00d1L;
 
     public String getInternalID() {
-        if(internalID==null){
+        if (internalID == null) {
             internalID = UUID.randomUUID().toString();
         }
         return internalID;
@@ -63,6 +62,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     String internalID = null;
+
     public int getPID() {
         return pid;
     }
@@ -76,6 +76,7 @@ public class State extends FunctionState implements QDLConstants {
     /**
      * If you extend this class, you must override this method to return a new instance
      * of your state with everything in it you want or need.
+     *
      * @param opEvaluator
      * @param metaEvaluator
      * @param ftStack
@@ -88,38 +89,39 @@ public class State extends FunctionState implements QDLConstants {
      * @return
      */
     public State newInstance(SymbolStack symbolStack,
-            OpEvaluator opEvaluator,
+                             OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
-                             FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
+                             FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack,
                              MTStack mtStack,
                              MIStack miStack,
                              MyLoggingFacade myLoggingFacade,
                              boolean isServerMode,
                              boolean isRestrictedIO,
-                             boolean assertionsOn){
-        return new State( symbolStack,
-                          opEvaluator,
-                          metaEvaluator,
-                          ftStack,
-                          mtStack,
-                          miStack,
-                          myLoggingFacade,
-                          isServerMode,
-                         isRestrictedIO,
-                         assertionsOn);
+                             boolean assertionsOn) {
+        return new State(symbolStack,
+                opEvaluator,
+                metaEvaluator,
+                ftStack,
+                mtStack,
+                miStack,
+                myLoggingFacade,
+                isServerMode,
+                isRestrictedIO,
+                assertionsOn);
     }
+
     public State(
-                 SymbolStack symbolStack,
-                 OpEvaluator opEvaluator,
-                 MetaEvaluator metaEvaluator,
-                 FStack<? extends FTable<? extends FKey,? extends FunctionRecord>> ftStack,
-                 MTStack mtStack,
-                 MIStack miStack,
-                 MyLoggingFacade myLoggingFacade,
-                 boolean isServerMode,
-                 boolean isRestrictedIO,
-                 boolean assertionsOn) {
-        super( symbolStack,
+            SymbolStack symbolStack,
+            OpEvaluator opEvaluator,
+            MetaEvaluator metaEvaluator,
+            FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack,
+            MTStack mtStack,
+            MIStack miStack,
+            MyLoggingFacade myLoggingFacade,
+            boolean isServerMode,
+            boolean isRestrictedIO,
+            boolean assertionsOn) {
+        super(symbolStack,
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
@@ -132,7 +134,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public StemVariable getSystemConstants() {
-        if(systemConstants == null){
+        if (systemConstants == null) {
             createSystemConstants();
         }
         return systemConstants;
@@ -378,6 +380,7 @@ public class State extends FunctionState implements QDLConstants {
 
     /**
      * In server mode, some IO for debugging can still be allowed. This is checked
+     *
      * @return
      */
     public boolean isRestrictedIO() {
@@ -403,10 +406,12 @@ public class State extends FunctionState implements QDLConstants {
     public void addVFSProvider(VFSFileProvider scriptProvider) {
         vfsFileProviders.put(scriptProvider.getScheme() + VFSPaths.SCHEME_DELIMITER + scriptProvider.getMountPoint(), scriptProvider);
     }
-    public boolean hasMountPoint(String mountPoint){
+
+    public boolean hasMountPoint(String mountPoint) {
         return vfsFileProviders.containsKey(mountPoint);
     }
-    public void removeVFSProvider(String mountPoint){
+
+    public void removeVFSProvider(String mountPoint) {
         vfsFileProviders.remove(mountPoint);
     }
 
@@ -484,6 +489,7 @@ public class State extends FunctionState implements QDLConstants {
         return 0 < path.indexOf(VFSPaths.SCHEME_DELIMITER);
     }
 
+/*
     public State newStateNoImports() {
         SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
         MIStack miStack = new MIStack();
@@ -503,61 +509,104 @@ public class State extends FunctionState implements QDLConstants {
         return newState;
 
     }
+*/
 
     /**
-     * Takes this state object and sets up a new local environment. This is passed to things
-     * like loops, functions, conditionals etc. The lifecycle of these is that they are basically abandoned
-     * when done then garbage collected.
-     *
+     * Convenience method for {@link #newLocalState(State)} with a null argument
      * @return State
      */
-    public State newStateWithImports() {
-        SymbolStack newStack = new SymbolStack(symbolStack.getParentTables());
-        State newState = newInstance(
-                newStack,
-                getOpEvaluator(),
-                getMetaEvaluator(),
-                (FStack) getFTStack().clone(),
-                getMTemplates(),
-                getMInstances(),
-                getLogger(),
-                isServerMode(),
-                isRestrictedIO(),
-                isAssertionsOn());
-        newState.setMInstances(getMInstances());
-        newState.setScriptArgs(getScriptArgs());
-        newState.setScriptPaths(getScriptPaths());
-        newState.setModulePaths(getModulePaths());
-        newState.setVfsFileProviders(getVfsFileProviders());
-        return newState;
+    public State newLocalState() {
+        return newLocalState(null);
     }
-    public State newStateWithImports(State moduleState) {
+
+    /**
+     * Takes the modules in the moduleState and pushes a new stack, function table and modules
+     * onto the current stack.
+     * @param moduleState
+     * @return
+     */
+    public State newLocalState(State moduleState) {
+                //   return newStateWithImportsOLD(moduleState);
+                   return newStateWithImportsNEW(moduleState);
+    }
+    protected State newStateWithImportsNEW(State moduleState) {
         SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
-        newStack.getParentTables().set(0,moduleState.symbolStack);
-        newStack.getParentTables().addAll(symbolStack.getParentTables());
+        if (moduleState!= null && !moduleState.symbolStack.isEmpty()) {
+            newStack.getParentTables().set(0, moduleState.symbolStack);
+        }
+        if (!symbolStack.isEmpty()) {
+            newStack.getParentTables().addAll(symbolStack.getParentTables());
+        }
 
         FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
-        ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
-        ftStack.addTables(moduleState.getFTStack());
+        if (!getFTStack().isEmpty()) {
+            ftStack.addTables(getFTStack()); // pushes elements in reverse order
+        }
+        if (moduleState!= null && !moduleState.getFTStack().isEmpty()) {
+            ftStack.addTables(moduleState.getFTStack());
+        }
+
+        MTStack mtStack = new MTStack();
+
+        if(!getMTemplates().isEmpty()) {
+            mtStack.addTables(getMTemplates());
+        }
+        if(moduleState!= null &&  !moduleState.getMTemplates().isEmpty()){
+            mtStack.addTables(moduleState.getMTemplates());
+        }
+        MIStack miStack = new MIStack();
+        if(!getMInstances().isEmpty()) {
+            miStack.addTables(getMInstances());
+        }
+        if(moduleState!= null &&  !moduleState.getMInstances().isEmpty()){
+            mtStack.addTables(moduleState.getMInstances());
+        }
 
         State newState = newInstance(
                 newStack,
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 ftStack,
-                getMTemplates(),
-                getMInstances(),
+                mtStack,
+                miStack,
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        newState.setMInstances(getMInstances());
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
+
+    public State newStateWithImportsOLD(State moduleState) {
+          SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
+          newStack.getParentTables().set(0,moduleState.symbolStack);
+          newStack.getParentTables().addAll(symbolStack.getParentTables());
+
+          FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
+          ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
+          ftStack.addTables(moduleState.getFTStack());
+
+          State newState = newInstance(
+                  newStack,
+                  getOpEvaluator(),
+                  getMetaEvaluator(),
+                  ftStack,
+                  getMTemplates(),
+                  getMInstances(),
+                  getLogger(),
+                  isServerMode(),
+                  isRestrictedIO(),
+                  isAssertionsOn());
+          newState.setScriptArgs(getScriptArgs());
+          newState.setScriptPaths(getScriptPaths());
+          newState.setModulePaths(getModulePaths());
+          newState.setVfsFileProviders(getVfsFileProviders());
+          return newState;
+      }
+
     /**
      * For the case the this has been deserialized and needs to have its transient
      * fields initialized. These are things like the {@link MetaEvaluator} that
@@ -592,70 +641,32 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     /**
-     * For modules only. This copies the state except that no functions are inherited. The
-     * contract is that modules only internal state that may be imported.
+     * This creates a completely clean state, using the current environment
+     * (so modules and script paths, but not variables, modules etc.)
      *
      * @return
      */
-    public State newModuleState() {
+    public State newCleanState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
-        SymbolStack newStack = new SymbolStack();
-        //      newStack.addParent(new SymbolTableImpl());
-        MTStack mtStack = new MTStack();
-    //    mtStack.setStack(getMTemplates().getStack());
-        MIStack miStack = new MIStack();
-        //miStack.setStack(getMInstances().getStack());
-
-        miStack.pushNewTable();
-        mtStack.pushNewTable();
         State newState = newInstance(
-                newStack,
+                new SymbolStack(),
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FStack(),
-                mtStack,
-                miStack, // CHECK THIS!!
-                getLogger(),
-                isServerMode(),
-                isRestrictedIO(),
-                isAssertionsOn());
-        // May want to rethink setting these...
-        newState.setScriptArgs(getScriptArgs());
-        newState.setScriptPaths(getScriptPaths());
-        newState.setModulePaths(getModulePaths());
-        newState.setVfsFileProviders(getVfsFileProviders());
-        return newState;
-    }
-
-    /**
-     * This will return a pristine copy of the current state for debugging purposes.
-     * Generally only use this in the state indicator when explicitly asked, since there
-     * are no imports and such. It will send along the VFS's, if in server mode and the script path
-     *
-     * @return
-     */
-    public State newDebugState() {
-        // NOTE this has no parents. Modules have completely clear state when starting!
-        SymbolStack newStack = new SymbolStack();
-        //       newStack.addParent(new SymbolTableImpl());
-        State newState = newInstance(
-                newStack,
-                getOpEvaluator(),
-                getMetaEvaluator(),
-                new FStack(),
-                new MTStack(), // so no modules
+                new MTStack(),
                 new MIStack(),
                 getLogger(),
                 isServerMode(),
                 isRestrictedIO(),
                 isAssertionsOn());
-        // May want to rethink setting these...
         newState.setScriptArgs(getScriptArgs());
         newState.setScriptPaths(getScriptPaths());
         newState.setModulePaths(getModulePaths());
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
     }
+
+
 
     /**
      * Add the module under the default alias
@@ -664,7 +675,7 @@ public class State extends FunctionState implements QDLConstants {
      */
     public void addModule(Module module) {
         if (module instanceof JavaModule) {
-            ((JavaModule) module).init(this.newModuleState());
+            ((JavaModule) module).init(this.newCleanState());
         }
         getMTemplates().put(module);
     }
@@ -712,7 +723,7 @@ public class State extends FunctionState implements QDLConstants {
         // so we know where in the stream we are starting automatically.
 
         XMLEvent xe = xer.nextEvent(); // start iteration it should be at the state tag
-        if(xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
+        if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
             internalID = xe.asStartElement().getAttributeByName(new QName(STATE_ID_TAG)).getValue();
             readExtraXMLAttributes(xe.asStartElement());
         }
@@ -739,7 +750,7 @@ public class State extends FunctionState implements QDLConstants {
                             XMLUtils.deserializeTemplates(xer, xp, this);
                             break;
                         default:
-                            readExtraXMLElements(xe,xer);
+                            readExtraXMLElements(xe, xer);
                             break;
                     }
 
@@ -752,7 +763,7 @@ public class State extends FunctionState implements QDLConstants {
             }
             xer.next(); // advance cursor
         }
-        throw new XMLMissingCloseTagException( STATE_TAG);
+        throw new XMLMissingCloseTagException(STATE_TAG);
     }
 
     /**
@@ -772,6 +783,7 @@ public class State extends FunctionState implements QDLConstants {
                             public Module newInstance(State state) {
                                 return null;
                             }
+
                             List<String> doc = new ArrayList<>();
 
                             @Override
@@ -781,7 +793,7 @@ public class State extends FunctionState implements QDLConstants {
 
                             @Override
                             public void setDocumentation(List<String> documentation) {
-                                                             doc = documentation;
+                                doc = documentation;
                             }
                         };
                     }
@@ -800,61 +812,67 @@ public class State extends FunctionState implements QDLConstants {
     /**
      * This is invoked at the end of the serialization and lets you add additional things to be serialized
      * in the State. All new elements are added right before the final closing tag for the state object.
+     *
      * @param xsr
      * @throws XMLStreamException
      */
-    public void writeExtraXMLElements(XMLStreamWriter xsr) throws XMLStreamException{
+    public void writeExtraXMLElements(XMLStreamWriter xsr) throws XMLStreamException {
 
     }
 
     /**
      * This exists to let you add additional attributes to the state tag. It should <b><i>only</i></b>
      * contain {@link XMLStreamWriter#writeAttribute(String, String)} calls, nothing else.
+     *
      * @param xsw
      * @throws XMLStreamException
      */
-    public void writeExtraXMLAttributes(XMLStreamWriter xsw ) throws XMLStreamException{
+    public void writeExtraXMLAttributes(XMLStreamWriter xsw) throws XMLStreamException {
 
     }
 
     /**
      * This passes in the current start event so you can add your own event loop and cases.
      * Note you need have only a switch on the tag names you want.
+     *
      * @param xe
      * @param xer
      * @throws XMLStreamException
      */
 
-    public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException{
+    public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
 
     }
 
     /**
      * Allows you to read custome attributes from teh state tag. This should <b><i>only</i></b> contain
      * calls to {@link StartElement#getAttributeByName(QName)} by name calls.
+     *
      * @param xe
      * @throws XMLStreamException
      */
-    public void readExtraXMLAttributes(StartElement xe) throws XMLStreamException{
+    public void readExtraXMLAttributes(StartElement xe) throws XMLStreamException {
 
     }
+
     SecureRandom secureRandom = new SecureRandom();
-   transient  Base32 base32 = new Base32('_'); // set trailing char to be an underscore
+    transient Base32 base32 = new Base32('_'); // set trailing char to be an underscore
 
     /**
      * Returns an unused variable name.
+     *
      * @return
      */
-  public String getTempVariableName(){
-      byte[] b = new byte[16];
-      for(int i = 0; i<10; i++){
-          String var = base32.encodeToString(b);
-          if(!isDefined(var)){
-              return var;
-          }
-      }
-      throw new NFWException("Was unable to create a random, unused variable");
-  }
+    public String getTempVariableName() {
+        byte[] b = new byte[16];
+        for (int i = 0; i < 10; i++) {
+            String var = base32.encodeToString(b);
+            if (!isDefined(var)) {
+                return var;
+            }
+        }
+        throw new NFWException("Was unable to create a random, unused variable");
+    }
 
     public boolean isAssertionsOn() {
         return assertionsOn;
@@ -868,6 +886,7 @@ public class State extends FunctionState implements QDLConstants {
 
     /**
      * Allows back reference to workspace to run macros.
+     *
      * @return
      */
     public WorkspaceCommands getWorkspaceCommands() {
@@ -879,4 +898,6 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     WorkspaceCommands workspaceCommands;
+
+
 }

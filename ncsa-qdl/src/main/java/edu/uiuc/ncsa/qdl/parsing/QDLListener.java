@@ -179,8 +179,6 @@ public class QDLListener implements QDLParserListener {
     }
 
 
-
-
     @Override
     public void enterFunction(QDLParserParser.FunctionContext ctx) {
         stash(ctx, new Polyad(tp(ctx)));
@@ -403,8 +401,8 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void enterEqExpression(QDLParserParser.EqExpressionContext ctx) {
         ComparisonDyad c = new ComparisonDyad(OpEvaluator.UNKNOWN_VALUE);
-                c.setTokenPosition(tp(ctx));
-            stash(ctx, c);
+        c.setTokenPosition(tp(ctx));
+        stash(ctx, c);
     }
 
     @Override
@@ -416,7 +414,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterAndExpression(QDLParserParser.AndExpressionContext ctx) {
-        stash(ctx, new Dyad(OpEvaluator.AND_VALUE,tp(ctx)));
+        stash(ctx, new Dyad(OpEvaluator.AND_VALUE, tp(ctx)));
     }
 
     @Override
@@ -503,7 +501,7 @@ public class QDLListener implements QDLParserListener {
     @Override
     public void exitAddExpression(QDLParserParser.AddExpressionContext ctx) {
         Dyad dyad;
-         Token token = ctx.getStart();
+        Token token = ctx.getStart();
 
         // Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
         if (ctx.Minus() != null) {
@@ -514,15 +512,18 @@ public class QDLListener implements QDLParserListener {
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
+
     @Override
     public void enterCompExpression(QDLParserParser.CompExpressionContext ctx) {
     }
-    protected TokenPosition tp(ParserRuleContext ctx){
-        if(ctx == null || ctx.getStart() == null){
+
+    protected TokenPosition tp(ParserRuleContext ctx) {
+        if (ctx == null || ctx.getStart() == null) {
             return null;
         }
         return new TokenPosition(ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
     }
+
     @Override
     public void exitCompExpression(QDLParserParser.CompExpressionContext ctx) {
         // only now can we determine the comparison type
@@ -645,7 +646,7 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void enterLoopStatement(QDLParserParser.LoopStatementContext ctx) {
-        WhileLoop w= new WhileLoop();
+        WhileLoop w = new WhileLoop();
         w.setTokenPosition(tp(ctx));
         stash(ctx, new WhileLoop());
     }
@@ -1041,9 +1042,10 @@ illegal argument:no module named "b" was  imported at (1, 67)
         // Parser strips off trailing ; which in turn causes a parser error later when we are runnign the import command.
         moduleStatement.setSourceCode(getSource(moduleContext));
     }
-        /*
-        module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];];module_import('b:b');say(B#u);];
-         */
+
+    /*
+    module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];];module_import('b:b');say(B#u);];
+     */
     @Override
     public void enterTryCatchStatement(QDLParserParser.TryCatchStatementContext ctx) {
         TryCatch tryCatch = new TryCatch();
@@ -1280,13 +1282,36 @@ illegal argument:no module named "b" was  imported at (1, 67)
             // If it is a termminal node (a node consisting of just be the stem marker) skip it
             if (!(p instanceof TerminalNodeImpl)) {
                 StatementWithResultInterface swri = (StatementWithResultInterface) resolveChild(p);
-                if ((i == 0) && (swri instanceof VariableNode)) {
+                if (i == 0) {
+                    if (swri instanceof VariableNode) {
+                        VariableNode vNode = (VariableNode) swri;
+                        vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                        expressionStemNode.getArguments().add(vNode);
+                    } else {
+                        if (swri instanceof ModuleExpression) {
+                            // If it's a module (e.g. a#b.i) then mark the variable, b here, as b. so
+                            // it is interpreted as a stem in later resolution.
+                            ModuleExpression moduleExpression = (ModuleExpression) swri;
+                            if (moduleExpression.getExpression() instanceof VariableNode) {
+                                VariableNode vNode = (VariableNode) moduleExpression.getExpression();
+                                vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
+                            }
+                            expressionStemNode.getArguments().add(moduleExpression);
+
+                        } else {
+                            expressionStemNode.getArguments().add(swri);
+                        }
+                    }
+                } else {
+                    expressionStemNode.getArguments().add(swri);
+                }
+/*                if ((i == 0) && (swri instanceof VariableNode)) {
                     VariableNode vNode = (VariableNode) swri;
                     vNode.setVariableReference(vNode.getVariableReference() + STEM_INDEX_MARKER);
                     expressionStemNode.getArguments().add(vNode);
                 } else {
                     expressionStemNode.getArguments().add(swri);
-                }
+                }*/
             }
             // surgery might be needed. Getting the parser to see c.1.2.3.4 as not (c.).(1.2).(3.4)
 
@@ -1333,9 +1358,9 @@ illegal argument:no module named "b" was  imported at (1, 67)
         Object value;
         try {
             value = Long.parseLong(ctx.getChild(0).getText());
-        }catch(NumberFormatException nfx){
+        } catch (NumberFormatException nfx) {
             // it is possible the user is entering a simply huge number, try plan B
-             value = new BigDecimal(ctx.getChild(0).getText());
+            value = new BigDecimal(ctx.getChild(0).getText());
         }
         constantNode = new ConstantNode(value);
         constantNode.setTokenPosition(tp(ctx));
@@ -1714,6 +1739,35 @@ illegal argument:no module named "b" was  imported at (1, 67)
             stash(ctx, esn);
             esn.setLeftArg((StatementWithResultInterface) resolveChild(expressionContext));
         }
+        if (expressionContext instanceof QDLParserParser.ModuleExpressionContext) {
+            QDLParserParser.ModuleExpressionContext moduleExpressionContext = (QDLParserParser.ModuleExpressionContext) expressionContext;
+            ModuleExpression moduleExpression = (ModuleExpression) resolveChild(moduleExpressionContext);
+
+            //ExpressionStemNode esn = new ExpressionStemNode();
+            ESN2 esn = new ESN2();
+            // Have to make a new one or we get a recursive structure.
+            ModuleExpression moduleExpression1 = new ModuleExpression();
+            moduleExpression1.setAlias(moduleExpression.getAlias());
+            if (moduleExpression.getExpression() instanceof VariableNode) {
+                VariableNode vn = (VariableNode) moduleExpression.getExpression();
+                vn.setVariableReference(vn.getVariableReference() + STEM_INDEX_MARKER);
+                esn.setLeftArg(vn);
+                esn.setSourceCode(vn.getSourceCode());
+            } else {
+                esn.setLeftArg(moduleExpression.getExpression()); // if it's a function or constant,leave alone.
+            }
+            moduleExpression1.setExpression(esn);
+            //esn.setSourceCode(getSource(ctx));
+            //esn.setTokenPosition(tp(ctx));
+            stash(ctx, esn);
+            stash(ctx, moduleExpression1);
+            //esn.setLeftArg((StatementWithResultInterface) resolveChild(expressionContext));
+            moduleExpression1.setTokenPosition(tp(ctx));
+            //stash(ctx, moduleExpression);
+            List<String> source = new ArrayList<>();
+            source.add(ctx.getText());
+            moduleExpression1.setSourceCode(source);
+        }
     }
 
     @Override
@@ -1895,11 +1949,30 @@ illegal argument:no module named "b" was  imported at (1, 67)
 
     @Override
     public void exitModuleExpression(QDLParserParser.ModuleExpressionContext ctx) {
-        if(ctx.getChildCount() == 2){
+        if (ctx.getChildCount() == 2) {
             // This is of the form #expression, so it is just an expression
             // Don't wrap it and no special processing needed.
             stash(ctx, resolveChild(ctx.expression()));
             return;
+        }
+        /**
+         * Check for intrinsic violations here rather than try to set things up and check later.
+         * Basically any varliable or function that starts with a __ cannot have an alias attached to
+         * it, so X#__a, X#__f(3) will fail. 
+         */
+        Statement statement = resolveChild(ctx.expression());
+        if (statement instanceof FunctionDefinitionStatement) {
+            throw new IntrinsicViolation("cannot define function in an existing module");
+        }
+        if(statement instanceof VariableNode){
+            if(State.isIntrinsic(((VariableNode)statement).getVariableReference())){
+                throw new IntrinsicViolation("cannot access intrinsic variable outside of module.");
+            }
+        }
+        if(statement instanceof Polyad){
+            if(State.isIntrinsic(((Polyad)statement).getName())){
+                throw new IntrinsicViolation("cannot access intrinsic function outside of module.");
+            }
         }
         ModuleExpression moduleExpression = new ModuleExpression();
         moduleExpression.setTokenPosition(tp(ctx));
@@ -1912,10 +1985,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
             throw new IllegalArgumentException("unexpected argument for alias");
         }
         moduleExpression.setAlias(((VariableNode) var).getVariableReference());
-        Statement statement = resolveChild(ctx.expression());
-        if(statement instanceof FunctionDefinitionStatement){
-            throw new IntrinsicViolation("cannot define function in an existing module");
-        }
+
         moduleExpression.setExpression((StatementWithResultInterface) statement);
     }
 }

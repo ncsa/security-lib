@@ -500,7 +500,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
      */
     private void doReduceOrExpand(Polyad polyad, State state0, boolean doReduce) {
-        State state = state0.newStateWithImports();
+        State state = state0.newLocalState();
         FunctionReferenceNode frn;
         StatementWithResultInterface arg0 = polyad.getArguments().get(0);
 
@@ -685,7 +685,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
 
             argName = ((VariableNode) moduleExpression.getExpression()).getVariableReference();
             moduleExpression.setModuleState(module.getState());
-            state = moduleExpression.getLocalState(state);
+            state = moduleExpression.getModuleState(state);
             gotOne = true;
         }
 
@@ -851,7 +851,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         StringReader r = new StringReader((String) arg0);
         String message = "";
-        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newDebugState());
+        QDLParserDriver driver = new QDLParserDriver(new XProperties(), state.newCleanState());
         try {
             QDLRunner runner = new QDLRunner(driver.parse(r));
         } catch (ParseCancellationException pc) {
@@ -1466,7 +1466,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         State localState = state;
         if (hasNewState) {
-            localState = state.newModuleState();
+            localState = state.newCleanState();
         }
 
         Object arg1 = polyad.evalArg(0, state);
@@ -1677,7 +1677,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                     public List<Module> load() {
                         List<Module> m = new ArrayList<>();
                         JavaModule javaModule = (JavaModule) newThingy;
-                        State newState = state.newModuleState();
+                        State newState = state.newCleanState();
                         javaModule = (JavaModule) javaModule.newInstance(newState);
                         javaModule.init(newState); // set it up
                         m.add(javaModule);
@@ -1852,7 +1852,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }
 
-            State newModuleState = state.newModuleState();
+            State newModuleState = state.newCleanState();
+            //State newModuleState = state.newStateWithImports(state);
             newModuleState.setSuperState(state);
 
             Module newInstance = m.newInstance(newModuleState);
@@ -1864,8 +1865,6 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 alias = m.getAlias();
             }
             newModuleState.setSuperState(null); // get rid of it now.
-          //  MAliases mAliases = state.getMAliases();
-           // mAliases.addImport(moduleNS, alias);
             state.getMInstances().put(new MIWrapper(new XKey(alias), newInstance));
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);

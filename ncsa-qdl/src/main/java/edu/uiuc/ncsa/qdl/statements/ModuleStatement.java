@@ -42,11 +42,17 @@ public class ModuleStatement implements Statement {
         this.alias = alias;
     }
 
-
+     /*
+       module['a:/a','a']body[q:=1;];
+  module_import('a:/a');
+  module_import('a:/a','b');
+  module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];
+      */
     @Override
     public Object evaluate(State state) {
         // Only use local state at this point.
-        State localState = state.newModuleState();
+       //State localState = state.newCleanState();
+        State localState = state.newLocalState(state);
         if(state.hasSuperState()){
             localState.setSuperState(state);
         //    localState.setSuperStateReadOnly(state.isSuperStateReadOnly());

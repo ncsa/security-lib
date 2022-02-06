@@ -67,16 +67,27 @@ public class ModuleExpression extends ExpressionImpl {
         if (state.getMInstances().isEmpty()) {
             throw new ImportException("module '" + getAlias() + "' not found");
         }
+        Object result;
         // no module state means to look at global state to find the module state.
         if (getExpression() instanceof ModuleExpression) {
+            // Modules expression like a#b#c work within their scope, so b must be an imported module.
             ModuleExpression nextME = (ModuleExpression) getExpression();
             XKey xKey = new XKey(nextME.getAlias());
             if (getModuleState(state).getMInstances().containsKey(xKey)) {
                 nextME.setModuleState(getModuleState(state).getMInstances().getModule(xKey).getState());
             }
+            getExpression().setAlias(getAlias());
+            result = getExpression().evaluate(getModuleState(state));
+        }else{
+            // Simple expressions like a#b must work within the scope of a
+
+            if(getExpression() instanceof Polyad){
+                getModuleState(state).setSuperState(state);
+                result = getExpression().evaluate(getModuleState(state));
+            }else {
+                result = getExpression().evaluate(getModuleState(state));
+            }
         }
-        getExpression().setAlias(getAlias());
-        Object result = getExpression().evaluate(getLocalState(state));
         setResult(result);
         setResultType(Constant.getType(result));
         setEvaluated(true);
@@ -108,7 +119,7 @@ public class ModuleExpression extends ExpressionImpl {
     }
 
     /**
-     * The state of the module only. This is used to construct the local state.
+     * The state of the current module only. This is used to construct the local state.
      *
      * @return
      */
@@ -132,7 +143,8 @@ public class ModuleExpression extends ExpressionImpl {
     }
 
     public State getLocalState(State state) {
-        return state.newStateWithImports(getModuleState(state));
+       return state.newLocalState(getModuleState(state));
+     //   return getModuleState(state);
     }
 
     State moduleState;
@@ -151,8 +163,7 @@ public class ModuleExpression extends ExpressionImpl {
                 throw new IntrinsicViolation("cannot set an intrinsic variable");
             }
             if (getModuleState(state).isDefined(variableName)) {
-                State localState = getLocalState(state);
-                localState.setValue(variableName, newValue);
+                getModuleState(state).setValue(variableName, newValue);
             } else {
                 throw new IllegalArgumentException("Cannot define new variables in a module.");
             }

@@ -2794,82 +2794,82 @@ public class QDLParserParser extends Parser {
 				break;
 			case 2:
 				{
+				_localctx = new ModuleExpressionContext(_localctx);
+				_ctx = _localctx;
+				_prevctx = _localctx;
+				setState(323);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+				if (_la==Identifier) {
+					{
+					setState(322);
+					variable();
+					}
+				}
+
+				setState(325);
+				match(Hash);
+				setState(326);
+				expression(35);
+				}
+				break;
+			case 3:
+				{
 				_localctx = new LambdaDefContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(331);
+				setState(336);
 				_errHandler.sync(this);
 				switch (_input.LA(1)) {
 				case FuncStart:
 					{
-					setState(322);
+					setState(327);
 					function();
 					}
 					break;
 				case T__3:
 					{
-					setState(323);
+					setState(328);
 					match(T__3);
-					setState(327);
+					setState(332);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 					while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__3) | (1L << ConstantKeywords) | (1L << Null) | (1L << Integer) | (1L << Decimal) | (1L << SCIENTIFIC_NUMBER) | (1L << Bool) | (1L << STRING) | (1L << LeftBracket) | (1L << SemiColon) | (1L << LDoubleBracket) | (1L << PlusPlus) | (1L << Plus) | (1L << MinusMinus) | (1L << Minus) | (1L << LogicalNot) | (1L << Tilde) | (1L << Hash))) != 0) || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & ((1L << (UnaryMinus - 64)) | (1L << (UnaryPlus - 64)) | (1L << (Floor - 64)) | (1L << (Ceiling - 64)) | (1L << (Identifier - 64)) | (1L << (FuncStart - 64)) | (1L << (F_REF - 64)))) != 0)) {
 						{
 						{
-						setState(324);
+						setState(329);
 						f_args();
 						}
 						}
-						setState(329);
+						setState(334);
 						_errHandler.sync(this);
 						_la = _input.LA(1);
 					}
-					setState(330);
+					setState(335);
 					match(T__2);
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
-				setState(333);
+				setState(338);
 				match(LambdaConnector);
-				setState(336);
+				setState(341);
 				_errHandler.sync(this);
-				switch ( getInterpreter().adaptivePredict(_input,31,_ctx) ) {
+				switch ( getInterpreter().adaptivePredict(_input,32,_ctx) ) {
 				case 1:
 					{
-					setState(334);
+					setState(339);
 					expression(0);
 					}
 					break;
 				case 2:
 					{
-					setState(335);
+					setState(340);
 					expressionBlock();
 					}
 					break;
 				}
-				}
-				break;
-			case 3:
-				{
-				_localctx = new ModuleExpressionContext(_localctx);
-				_ctx = _localctx;
-				_prevctx = _localctx;
-				setState(339);
-				_errHandler.sync(this);
-				_la = _input.LA(1);
-				if (_la==Identifier) {
-					{
-					setState(338);
-					variable();
-					}
-				}
-
-				setState(341);
-				match(Hash);
-				setState(342);
-				expression(32);
 				}
 				break;
 			case 4:
@@ -3091,7 +3091,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new DotOpContext(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(371);
-						if (!(precpred(_ctx, 35))) throw new FailedPredicateException(this, "precpred(_ctx, 35)");
+						if (!(precpred(_ctx, 34))) throw new FailedPredicateException(this, "precpred(_ctx, 34)");
 						setState(373); 
 						_errHandler.sync(this);
 						_la = _input.LA(1);
@@ -3107,7 +3107,7 @@ public class QDLParserParser extends Parser {
 							_la = _input.LA(1);
 						} while ( _la==StemDot );
 						setState(377);
-						expression(36);
+						expression(35);
 						}
 						break;
 					case 2:
@@ -3319,7 +3319,7 @@ public class QDLParserParser extends Parser {
 						_localctx = new DotOp2Context(new ExpressionContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_expression);
 						setState(421);
-						if (!(precpred(_ctx, 34))) throw new FailedPredicateException(this, "precpred(_ctx, 34)");
+						if (!(precpred(_ctx, 33))) throw new FailedPredicateException(this, "precpred(_ctx, 33)");
 						setState(422);
 						((DotOp2Context)_localctx).postfix = match(StemDot);
 						}
@@ -3531,7 +3531,7 @@ public class QDLParserParser extends Parser {
 	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 35);
+			return precpred(_ctx, 34);
 		case 1:
 			return precpred(_ctx, 27);
 		case 2:
@@ -3557,7 +3557,7 @@ public class QDLParserParser extends Parser {
 		case 12:
 			return precpred(_ctx, 2);
 		case 13:
-			return precpred(_ctx, 34);
+			return precpred(_ctx, 33);
 		case 14:
 			return precpred(_ctx, 26);
 		}
@@ -3590,8 +3590,8 @@ public class QDLParserParser extends Parser {
 		"\3\32\3\32\3\32\5\32\u0125\n\32\3\33\3\33\3\33\5\33\u012a\n\33\3\34\3"+
 		"\34\7\34\u012e\n\34\f\34\16\34\u0131\13\34\3\34\3\34\3\35\3\35\5\35\u0137"+
 		"\n\35\3\36\3\36\3\36\7\36\u013c\n\36\f\36\16\36\u013f\13\36\3\37\3\37"+
-		"\3 \3 \3 \3 \3 \7 \u0148\n \f \16 \u014b\13 \3 \5 \u014e\n \3 \3 \3 \5"+
-		" \u0153\n \3 \5 \u0156\n \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3"+
+		"\3 \3 \3 \5 \u0146\n \3 \3 \3 \3 \3 \7 \u014d\n \f \16 \u0150\13 \3 \5"+
+		" \u0153\n \3 \3 \3 \5 \u0158\n \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3"+
 		" \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \5 \u0174\n \3 \3 \6 \u0178\n"+
 		" \r \16 \u0179\3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3"+
 		" \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \3 \6 \u01a0\n \r \16"+
@@ -3677,30 +3677,30 @@ public class QDLParserParser extends Parser {
 		"\3\2\2\2\u0138\u013d\58\35\2\u0139\u013a\7\"\2\2\u013a\u013c\58\35\2\u013b"+
 		"\u0139\3\2\2\2\u013c\u013f\3\2\2\2\u013d\u013b\3\2\2\2\u013d\u013e\3\2"+
 		"\2\2\u013e;\3\2\2\2\u013f\u013d\3\2\2\2\u0140\u0141\7J\2\2\u0141=\3\2"+
-		"\2\2\u0142\u0143\b \1\2\u0143\u0174\5\66\34\2\u0144\u014e\5\66\34\2\u0145"+
-		"\u0149\7\6\2\2\u0146\u0148\5:\36\2\u0147\u0146\3\2\2\2\u0148\u014b\3\2"+
-		"\2\2\u0149\u0147\3\2\2\2\u0149\u014a\3\2\2\2\u014a\u014c\3\2\2\2\u014b"+
-		"\u0149\3\2\2\2\u014c\u014e\7\5\2\2\u014d\u0144\3\2\2\2\u014d\u0145\3\2"+
-		"\2\2\u014e\u014f\3\2\2\2\u014f\u0152\7\'\2\2\u0150\u0153\5> \2\u0151\u0153"+
-		"\5$\23\2\u0152\u0150\3\2\2\2\u0152\u0151\3\2\2\2\u0153\u0174\3\2\2\2\u0154"+
-		"\u0156\5@!\2\u0155\u0154\3\2\2\2\u0155\u0156\3\2\2\2\u0156\u0157\3\2\2"+
-		"\2\u0157\u0158\7>\2\2\u0158\u0174\5> \"\u0159\u0174\5.\30\2\u015a\u0174"+
-		"\5\62\32\2\u015b\u0174\5,\27\2\u015c\u0174\5*\26\2\u015d\u015e\t\2\2\2"+
-		"\u015e\u0174\5> \33\u015f\u0160\t\3\2\2\u0160\u0174\5> \30\u0161\u0162"+
-		"\t\4\2\2\u0162\u0174\5> \27\u0163\u0164\7<\2\2\u0164\u0174\5> \26\u0165"+
-		"\u0166\7\66\2\2\u0166\u0174\5> \17\u0167\u0168\7\6\2\2\u0168\u0169\5>"+
-		" \2\u0169\u016a\7\5\2\2\u016a\u0174\3\2\2\2\u016b\u0174\7\37\2\2\u016c"+
+		"\2\2\u0142\u0143\b \1\2\u0143\u0174\5\66\34\2\u0144\u0146\5@!\2\u0145"+
+		"\u0144\3\2\2\2\u0145\u0146\3\2\2\2\u0146\u0147\3\2\2\2\u0147\u0148\7>"+
+		"\2\2\u0148\u0174\5> %\u0149\u0153\5\66\34\2\u014a\u014e\7\6\2\2\u014b"+
+		"\u014d\5:\36\2\u014c\u014b\3\2\2\2\u014d\u0150\3\2\2\2\u014e\u014c\3\2"+
+		"\2\2\u014e\u014f\3\2\2\2\u014f\u0151\3\2\2\2\u0150\u014e\3\2\2\2\u0151"+
+		"\u0153\7\5\2\2\u0152\u0149\3\2\2\2\u0152\u014a\3\2\2\2\u0153\u0154\3\2"+
+		"\2\2\u0154\u0157\7\'\2\2\u0155\u0158\5> \2\u0156\u0158\5$\23\2\u0157\u0155"+
+		"\3\2\2\2\u0157\u0156\3\2\2\2\u0158\u0174\3\2\2\2\u0159\u0174\5.\30\2\u015a"+
+		"\u0174\5\62\32\2\u015b\u0174\5,\27\2\u015c\u0174\5*\26\2\u015d\u015e\t"+
+		"\2\2\2\u015e\u0174\5> \33\u015f\u0160\t\3\2\2\u0160\u0174\5> \30\u0161"+
+		"\u0162\t\4\2\2\u0162\u0174\5> \27\u0163\u0164\7<\2\2\u0164\u0174\5> \26"+
+		"\u0165\u0166\7\66\2\2\u0166\u0174\5> \17\u0167\u0168\7\6\2\2\u0168\u0169"+
+		"\5> \2\u0169\u016a\7\5\2\2\u016a\u0174\3\2\2\2\u016b\u0174\7\37\2\2\u016c"+
 		"\u0174\5D#\2\u016d\u0174\5B\"\2\u016e\u0174\5@!\2\u016f\u0174\5F$\2\u0170"+
 		"\u0174\7\36\2\2\u0171\u0174\7\26\2\2\u0172\u0174\7$\2\2\u0173\u0142\3"+
-		"\2\2\2\u0173\u014d\3\2\2\2\u0173\u0155\3\2\2\2\u0173\u0159\3\2\2\2\u0173"+
+		"\2\2\2\u0173\u0145\3\2\2\2\u0173\u0152\3\2\2\2\u0173\u0159\3\2\2\2\u0173"+
 		"\u015a\3\2\2\2\u0173\u015b\3\2\2\2\u0173\u015c\3\2\2\2\u0173\u015d\3\2"+
 		"\2\2\u0173\u015f\3\2\2\2\u0173\u0161\3\2\2\2\u0173\u0163\3\2\2\2\u0173"+
 		"\u0165\3\2\2\2\u0173\u0167\3\2\2\2\u0173\u016b\3\2\2\2\u0173\u016c\3\2"+
 		"\2\2\u0173\u016d\3\2\2\2\u0173\u016e\3\2\2\2\u0173\u016f\3\2\2\2\u0173"+
 		"\u0170\3\2\2\2\u0173\u0171\3\2\2\2\u0173\u0172\3\2\2\2\u0174\u01ad\3\2"+
-		"\2\2\u0175\u0177\f%\2\2\u0176\u0178\7A\2\2\u0177\u0176\3\2\2\2\u0178\u0179"+
+		"\2\2\u0175\u0177\f$\2\2\u0176\u0178\7A\2\2\u0177\u0176\3\2\2\2\u0178\u0179"+
 		"\3\2\2\2\u0179\u0177\3\2\2\2\u0179\u017a\3\2\2\2\u017a\u017b\3\2\2\2\u017b"+
-		"\u01ac\5> &\u017c\u017d\f\35\2\2\u017d\u017e\t\5\2\2\u017e\u01ac\5> \36"+
+		"\u01ac\5> %\u017c\u017d\f\35\2\2\u017d\u017e\t\5\2\2\u017e\u01ac\5> \36"+
 		"\u017f\u0180\f\32\2\2\u0180\u0181\7\67\2\2\u0181\u01ac\5> \33\u0182\u0183"+
 		"\f\31\2\2\u0183\u0184\t\6\2\2\u0184\u01ac\5> \32\u0185\u0186\f\25\2\2"+
 		"\u0186\u0187\t\7\2\2\u0187\u01ac\5> \26\u0188\u0189\f\24\2\2\u0189\u018a"+
@@ -3712,7 +3712,7 @@ public class QDLParserParser extends Parser {
 		"\5> \16\u019c\u01ac\3\2\2\2\u019d\u019f\f\f\2\2\u019e\u01a0\7=\2\2\u019f"+
 		"\u019e\3\2\2\2\u01a0\u01a1\3\2\2\2\u01a1\u019f\3\2\2\2\u01a1\u01a2\3\2"+
 		"\2\2\u01a2\u01a3\3\2\2\2\u01a3\u01ac\5> \r\u01a4\u01a5\f\4\2\2\u01a5\u01a6"+
-		"\7G\2\2\u01a6\u01ac\5> \5\u01a7\u01a8\f$\2\2\u01a8\u01ac\7A\2\2\u01a9"+
+		"\7G\2\2\u01a6\u01ac\5> \5\u01a7\u01a8\f#\2\2\u01a8\u01ac\7A\2\2\u01a9"+
 		"\u01aa\f\34\2\2\u01aa\u01ac\t\2\2\2\u01ab\u0175\3\2\2\2\u01ab\u017c\3"+
 		"\2\2\2\u01ab\u017f\3\2\2\2\u01ab\u0182\3\2\2\2\u01ab\u0185\3\2\2\2\u01ab"+
 		"\u0188\3\2\2\2\u01ab\u018b\3\2\2\2\u01ab\u018e\3\2\2\2\u01ab\u0191\3\2"+
@@ -3723,7 +3723,7 @@ public class QDLParserParser extends Parser {
 		"\3\2\2\2\u01b4\u01b5\7\33\2\2\u01b5E\3\2\2\2\u01b6\u01b7\7\b\2\2\u01b7"+
 		"G\3\2\2\2(K^bgnw\u0082\u008c\u0095\u009c\u00a0\u00b8\u00c0\u00c9\u00d1"+
 		"\u00dd\u00e9\u00f0\u00f6\u00fd\u0107\u010e\u0112\u011d\u0124\u0129\u012f"+
-		"\u0136\u013d\u0149\u014d\u0152\u0155\u0173\u0179\u01a1\u01ab\u01ad";
+		"\u0136\u013d\u0145\u014e\u0152\u0157\u0173\u0179\u01a1\u01ab\u01ad";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

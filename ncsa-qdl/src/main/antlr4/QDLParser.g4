@@ -95,11 +95,11 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
+  | variable? Hash expression                                                   #moduleExpression
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
   | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
- | variable? Hash expression                                                   #moduleExpression
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
  | rInterval                                                                   #realInterval
