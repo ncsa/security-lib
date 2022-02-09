@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -206,4 +207,11 @@ public class SymbolTableImpl extends AbstractSymbolTable implements SymbolTable 
     public int getSymbolCount() {
         return map.size();
     }
+
+    UUID id = UUID.randomUUID();
+
+    public UUID getID() {
+        return id;
+    }
+
 }

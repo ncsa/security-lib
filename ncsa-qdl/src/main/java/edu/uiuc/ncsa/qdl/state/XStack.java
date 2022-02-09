@@ -5,10 +5,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
@@ -50,25 +47,35 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         // add backwards from stack
         for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
             XTable xt = (XTable)xStack.getStack().get(i);
+            if(addedTables.contains(xt.getID())){
+                continue;
+            }
             if(!xt.isEmpty()) {
                 push((XTable) xStack.getStack().get(i)); // puts at 0th elements each time
+                addedTables.add(xt.getID());
             }
         }
     }
-
+    Set<UUID> addedTables = new HashSet<>();
     /**
      * Similar to {@link #addTables(XStack)}, but this appends them to the existing
      * set of tables. If XStack is [A,B,C,...] And the existing stack is
-     *      * [P,Q,...] the result is [P,Q,...,A,B,C,...,]
+     * [P,Q,...] the result is [P,Q,...,A,B,C,...,]
      * @param xStack
      */
     public void appendTables(XStack xStack) {
-        // add backwards from stack
-        for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
+        //for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
+        for (int i =0;i< xStack.getStack().size();  i++) {
             XTable xt = (XTable)xStack.getStack().get(i);
+            if(addedTables.contains(xt.getID())){
+                     continue;
+                 }
             if(!xt.isEmpty()) {
                 append((V) xStack.getStack().get(i)); // puts at 0th elements each time
+                addedTables.add(xt.getID());
+
             }
+
         }
     }
 
@@ -189,8 +196,8 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return empty;
     }
 
-    public XTable<? extends XKey, ? extends XThing> peek() {
-        return getStack().get(0);
+    public XTable<XKey, XThing> peek() {
+        return (XTable<XKey, XThing>) getStack().get(0);
     }
 
     public void push(XTable<? extends XKey, ? extends XThing> xTable) {
@@ -252,6 +259,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     public void remove(XKey key) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             xTable.remove(key);
+            addedTables.remove(xTable.getID());
         }
     }
 

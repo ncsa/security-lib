@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 
@@ -15,14 +16,22 @@ import java.util.List;
  */
 public class ModuleStatement implements Statement {
     TokenPosition tokenPosition = null;
-    @Override
-    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
-    public TokenPosition getTokenPosition() {return tokenPosition;}
+    public void setTokenPosition(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
 
     @Override
-    public boolean hasTokenPosition() {return tokenPosition!=null;}
+    public TokenPosition getTokenPosition() {
+        return tokenPosition;
+    }
+
+    @Override
+    public boolean hasTokenPosition() {
+        return tokenPosition != null;
+    }
+
     URI namespace;
     String alias;
 
@@ -42,42 +51,59 @@ public class ModuleStatement implements Statement {
         this.alias = alias;
     }
 
-     /*
-       module['a:/a','a']body[q:=1;];
-  module_import('a:/a');
-  module_import('a:/a','b');
-  module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];
-      */
+    /*
+      module['a:/a','a']body[q:=1;];
+ module_import('a:/a');
+ module_import('a:/a','b');
+ module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;];
+     */
     @Override
     public Object evaluate(State state) {
-        // Only use local state at this point.
-       //State localState = state.newCleanState();
-        State localState = state.newLocalState(state);
-        if(state.hasSuperState()){
-            localState.setSuperState(state);
-        //    localState.setSuperStateReadOnly(state.isSuperStateReadOnly());
-        }
-        boolean restrictedio = state.isRestrictedIO();
-        // don't print stuff when creating the module.
-        state.setRestrictedIO(true);
-        for(Statement s : getStatements()){
-            s.evaluate(localState);
-        }
 
-        state.setRestrictedIO(restrictedio);
         QDLModule module = new QDLModule();
         module.setNamespace(getNamespace());
         module.setAlias(getAlias());
-        localState.setSuperState(null); // back out of it
-        module.setState(localState);
         module.setTemplate(true);
         module.setModuleStatement(this);
         module.setDocumentation(getDocumentation());
         //state.getMTemplates().put(new MTKey(getNamespace()), module);
-        state.getMTemplates().put( module);
+        if (state.isImportMode()) {
+            // This creates the instance from the statement.
+            State localState = state.newLocalState(state);
+            localState.setImportMode(true);
+            for (Statement s : getStatements()) {
+                if (s instanceof ModuleStatement) {
+                    // Then a module is being created inside the current module. Toggle import mode
+                    // so the templates inside the local state get updated (and not either lost or
+                    // something else is updated.
+                    localState.setImportMode(false);
+                }
+                s.evaluate(localState);
+                if (s instanceof ModuleStatement) {
+                    localState.setImportMode(true);
+                }
+            }
+            localState.setImportMode(false);
+            module.setState(localState);
+            //state.getMInstances().put(module);
+            this.mInstance = module;
+        } else {
+            state.getMTemplates().put(module);
+        }
 
         return null;
     }
+
+    public Module getmInstance() {
+        return mInstance;
+    }
+
+    Module mInstance;
+
+    public void clearInstance() {
+        mInstance = null;
+    }
+
     List<Statement> statements = new ArrayList<>();
 
     public List<Statement> getStatements() {

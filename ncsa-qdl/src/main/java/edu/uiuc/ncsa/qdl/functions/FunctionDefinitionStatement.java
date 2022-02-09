@@ -45,7 +45,11 @@ public class FunctionDefinitionStatement implements Statement {
 /*        if(state.getMetaEvaluator().isBuiltInFunction(functionRecord.name)){
             throw new IllegalArgumentException("'" + functionRecord.name + "' already defined in this context");
         }*/
-        state.getFTStack().put(functionRecord);
+        if(state.isImportMode()){
+            state.getFTStack().localPut(functionRecord);
+        } else {
+            state.getFTStack().put(functionRecord);
+        }
         return QDLNull.getInstance(); // for now
     }
 

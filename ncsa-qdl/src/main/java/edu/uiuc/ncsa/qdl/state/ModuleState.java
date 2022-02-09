@@ -57,4 +57,14 @@ public abstract class ModuleState extends AbstractState {
          }
          return  getMInstances().getModule(new XKey(alias));
      }
+
+     boolean importMode = false;
+
+    public boolean isImportMode() {
+        return importMode;
+    }
+
+    public void setImportMode(boolean importMode) {
+        this.importMode = importMode;
+    }
 }

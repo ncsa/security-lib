@@ -40,8 +40,8 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             metaEvaluator.addEvaluator(0, new SystemEvaluator());  //  5000
             metaEvaluator.addEvaluator(0, new MathEvaluator());    //  1000
             metaEvaluator.addEvaluator(0, new TMathEvaluator());   //  7000
-            // must be last always to resolve user defined functions.
-            metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000
+           /* // must be last always to resolve user defined functions.
+            metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000*/
             systemNamespaces.add(StringEvaluator.STRING_NAMESPACE);
             systemNamespaces.add(IOEvaluator.IO_NAMESPACE);
             systemNamespaces.add(StemEvaluator.STEM_NAMESPACE);
@@ -53,6 +53,18 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         return metaEvaluator;
     }
 
+    public FunctionEvaluator getFunctionEvaluator() {
+        if(functionEvaluator == null){
+            functionEvaluator = new FunctionEvaluator();
+        }
+        return functionEvaluator;
+    }
+
+    public void setFunctionEvaluator(FunctionEvaluator functionEvaluator) {
+        this.functionEvaluator = functionEvaluator;
+    }
+
+    FunctionEvaluator functionEvaluator;
     public static boolean isSystemNS(String name) {
         return getSystemNamespaces().contains(name);
     }
@@ -76,8 +88,8 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         evaluators.add(evaluator);
     }
 
-    public void addEvaluator(int index ,AbstractFunctionEvaluator evaluator) {
-        evaluators.add(index,evaluator);
+    public void addEvaluator(int index, AbstractFunctionEvaluator evaluator) {
+        evaluators.add(index, evaluator);
     }
 
 
@@ -97,6 +109,10 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         for (AbstractFunctionEvaluator evaluator : evaluators) {
             if (evaluator.evaluate(polyad, state)) return true;
         }
+        if (getFunctionEvaluator().evaluate(polyad, state)) {
+            return true;
+        }
+
         throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
     }
 

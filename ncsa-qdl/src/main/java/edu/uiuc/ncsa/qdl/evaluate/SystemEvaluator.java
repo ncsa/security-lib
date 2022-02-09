@@ -1851,12 +1851,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (m == null) {
                 throw new IllegalStateException("no such module '" + moduleNS + "'");
             }
-
-            State newModuleState = state.newCleanState();
-            //State newModuleState = state.newStateWithImports(state);
-            newModuleState.setSuperState(state);
-
-            Module newInstance = m.newInstance(newModuleState);
+            State newModuleState = state.newLocalState(state);
+            // QDLModules create the local state, java modules assume the state is exactly the local state.
+            // Get a new instance and then set the state to the local state later for Java modules.
+            Module newInstance = m.newInstance((m instanceof JavaModule)?null:state);
             if (newInstance instanceof JavaModule) {
                 ((JavaModule) newInstance).init(newModuleState);
             }
@@ -1864,8 +1862,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             if (alias == null) {
                 alias = m.getAlias();
             }
-            newModuleState.setSuperState(null); // get rid of it now.
-            state.getMInstances().put(new MIWrapper(new XKey(alias), newInstance));
+          //  newModuleState.setSuperState(null); // get rid of it now.
+            state.getMInstances().localPut(new MIWrapper(new XKey(alias), newInstance));
             if (isLong(key)) {
                 outputStem.put((Long) key, alias);
             } else {

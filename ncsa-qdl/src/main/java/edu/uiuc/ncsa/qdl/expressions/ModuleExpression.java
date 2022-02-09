@@ -42,7 +42,7 @@ public class ModuleExpression extends ExpressionImpl {
             // In this case, it is a built in function and there are no constants
             // or variables defined in those modules.
             if (getExpression() instanceof ConstantNode) {
-                ConstantNode cNode = (ConstantNode)getExpression();
+                ConstantNode cNode = (ConstantNode) getExpression();
                 setResult(cNode.getResult());
                 setResultType(cNode.getResultType());
                 setEvaluated(true);
@@ -78,15 +78,9 @@ public class ModuleExpression extends ExpressionImpl {
             }
             getExpression().setAlias(getAlias());
             result = getExpression().evaluate(getModuleState(state));
-        }else{
+        } else {
             // Simple expressions like a#b must work within the scope of a
-
-            if(getExpression() instanceof Polyad){
-                getModuleState(state).setSuperState(state);
-                result = getExpression().evaluate(getModuleState(state));
-            }else {
-                result = getExpression().evaluate(getModuleState(state));
-            }
+            result = getExpression().evaluate(getModuleState(state));
         }
         setResult(result);
         setResultType(Constant.getType(result));
@@ -128,12 +122,13 @@ public class ModuleExpression extends ExpressionImpl {
             return null;
         }
         if (moduleState == null) {
-            XKey xKey = new XKey(getAlias()) ;
+            XKey xKey = new XKey(getAlias());
             if (!state.getMInstances().containsKey(xKey)) {
                 throw new IllegalArgumentException("no module named '" + getAlias() + "' was  imported");
             }
             Module module = state.getMInstances().getModule(xKey);
-            setModuleState(module.getState());
+            moduleState = state.newLocalState(state.getMInstances().getModule(xKey).getState());
+          // setModuleState(module.getState());
         }
         return moduleState;
     }
@@ -143,8 +138,8 @@ public class ModuleExpression extends ExpressionImpl {
     }
 
     public State getLocalState(State state) {
-       return state.newLocalState(getModuleState(state));
-     //   return getModuleState(state);
+        return state.newLocalState(getModuleState(state));
+        //   return getModuleState(state);
     }
 
     State moduleState;

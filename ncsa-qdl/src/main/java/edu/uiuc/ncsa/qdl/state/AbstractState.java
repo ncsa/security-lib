@@ -37,7 +37,9 @@ public abstract class AbstractState implements StateInterface, Logable {
     /**
      * Superstate is used in modules. If a module is created, then its state sets the super
      * state so that references to the state vs. local module state can be cleanly separated.
-     * This is what allows for intrinsic variables and functions.
+     * <br/>
+     * For instance, in an expression like a#b#f(x) the instance of b would have a superstate that
+     * is the current state of a.
      * @return
      */
     public State getSuperState() {

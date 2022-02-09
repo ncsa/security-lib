@@ -10,9 +10,7 @@ import edu.uiuc.ncsa.qdl.module.*;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 
 /**
@@ -67,10 +65,10 @@ public abstract class FunctionState extends VariableState {
 
             // Nothing imported, so nothing to look through.
             frs.state = this;
-            if(getFTStack().containsKey(new FKey(name, -1))){
+            if (getFTStack().containsKey(new FKey(name, -1))) {
                 frs.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
 
-            }else{
+            } else {
 
                 frs.functionRecord = null;
             }
@@ -95,8 +93,8 @@ public abstract class FunctionState extends VariableState {
         // No UNQ function, so try to find one, but check that it is actually unique.
         if (!isIntrinsic(name)) {
             for (Object xx : getMInstances().keySet()) {
-                XKey xkey = (XKey)xx;
-                Module module =  getMInstances().getModule(xkey);
+                XKey xkey = (XKey) xx;
+                Module module = getMInstances().getModule(xkey);
 
                 if (fr.functionRecord == null) {
                     FunctionRecord tempFR = (FunctionRecord) getImportedModule(xkey.getKey()).getState().getFTStack().get(new FKey(name, argCount));
@@ -145,6 +143,7 @@ public abstract class FunctionState extends VariableState {
 
     /**
      * Lists the functions for various components.
+     *
      * @param useCompactNotation
      * @param regex
      * @return
@@ -152,18 +151,21 @@ public abstract class FunctionState extends VariableState {
     public TreeSet<String> listFunctions(boolean useCompactNotation, String regex,
                                          boolean includeModules,
                                          boolean showIntrinsic) {
+        HashSet<XKey> processedAliases = new HashSet<>();
+        return listFunctions(useCompactNotation, regex, includeModules, showIntrinsic, processedAliases);
+/*
         TreeSet<String> out = getFTStack().listFunctions(regex);
         // no module templates, so no need to snoop through them
         if ((!includeModules) || getMTemplates().isEmpty()) {
             return out;
         }
         // Get the functions for active (current) module instances
-        for(Object key : getMInstances().keySet()){
-            XKey xKey = (XKey)key;
-              Module mm=  ((MIWrapper)getMInstances().get(xKey)).getModule();
+        for (Object key : getMInstances().keySet()) {
+            XKey xKey = (XKey) key;
+            Module mm = ((MIWrapper) getMInstances().get(xKey)).getModule();
             TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
             for (String x : uqVars) {
-                if (isIntrinsic(x)&& !showIntrinsic) {
+                if (isIntrinsic(x) && !showIntrinsic) {
                     continue;
                 }
                 if (useCompactNotation) {
@@ -176,33 +178,64 @@ public abstract class FunctionState extends VariableState {
             }
 
         }
-/*        for (URI key : getMAliases().keySet()) {
-            Module mm = getMTemplates().get(key);
-            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
-            for (String x : uqVars) {
-                if (isIntrinsic(x)&& !showIntrinsic) {
-                    continue;
-                }
-                if (useCompactNotation) {
-                    out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
-                } else {
-                    for (String alias : getMAliases().getAliases(key)) {
-                        out.add(alias + NS_DELIMITER + x);
-                    }
-                }
-            }
-        }*/
         return out;
+*/
     }
 
+    /**
+     * Since multiple aliases may be imported, just stop at the first on in the stack
+     * rather then trying to list all of them.
+     * @param useCompactNotation
+     * @param regex
+     * @param includeModules
+     * @param showIntrinsic
+     * @param processedAliases
+     * @return
+     */
+    protected TreeSet<String> listFunctions(boolean useCompactNotation, String regex,
+                                           boolean includeModules,
+                                           boolean showIntrinsic,
+                                         Set<XKey> processedAliases) {
+        TreeSet<String> out = getFTStack().listFunctions(regex);
+            // no module templates, so no need to snoop through them
+            if ((!includeModules) || getMTemplates().isEmpty()) {
+                return out;
+            }
+            // Get the functions for active (current) module instances
+            for (Object key : getMInstances().keySet()) {
+                XKey xKey = (XKey) key;
+                /*if(processedAliases.contains(xKey)){
+                    return out;
+                }*/
+                Module mm = ((MIWrapper) getMInstances().get(xKey)).getModule();
+                processedAliases.add(xKey);
+                //TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic, processedAliases);
+                TreeSet<String> uqVars = mm.getState().getFTStack().listFunctions( regex);
+                for (String x : uqVars) {
+                    if (isIntrinsic(x) && !showIntrinsic) {
+                        continue;
+                    }
+                    if (useCompactNotation) {
+                        out.add(getMInstances().getAliasesAsString(mm.getMTKey()) + NS_DELIMITER + x);
+                    } else {
+                        for (Object alias : getMInstances().getAliasesAsString(mm.getMTKey())) {
+                            out.add(alias + NS_DELIMITER + x);
+                        }
+                    }
+                }
+
+            }
+            return out;
+    }
     public List<String> listAllDocumentation() {
         List<String> out = getFTStack().listAllDocs();
-        for(Object key : getMTemplates().keySet()){
-            MTKey mtKey = (MTKey)key;
-            Module template= (Module) getMTemplates().get(mtKey);
+        for (Object key : getMTemplates().keySet()) {
+            MTKey mtKey = (MTKey) key;
+            Module template = (Module) getMTemplates().get(mtKey);
             List<String> uqVars = template.getState().getFTStack().listAllDocs();
             for (String x : uqVars) {
-                List<String> aliases = getMInstances().getAliasesAsString(mtKey);;
+                List<String> aliases = getMInstances().getAliasesAsString(mtKey);
+                ;
                 if (aliases.size() == 1) {
                     // don't put list notation in if there is no list.
                     out.add(aliases.get(0) + NS_DELIMITER + x);
@@ -230,6 +263,7 @@ public abstract class FunctionState extends VariableState {
 
     /**
      * This list the documentation templates by their preferred alias
+     *
      * @param fname
      * @return
      */
@@ -238,12 +272,12 @@ public abstract class FunctionState extends VariableState {
             return new ArrayList<>(); // no help
         }
         String alias = fname.substring(0, fname.indexOf(NS_DELIMITER));
-         XKey xKey = new XKey(alias);
-         Module module = getMInstances().getModule(xKey);
-         if(module == null){
-             return new ArrayList<>();
+        XKey xKey = new XKey(alias);
+        Module module = getMInstances().getModule(xKey);
+        if (module == null) {
+            return new ArrayList<>();
 
-         }
+        }
 /*
         if (!getMTemplates().containsKey(xKey)) {
             return new ArrayList<>();
@@ -319,7 +353,7 @@ public abstract class FunctionState extends VariableState {
         }
         for (Object key : getMInstances().keySet()) {
             XKey xKey = (XKey) key;
-            Module m =  getMInstances().getModule(xKey);
+            Module m = getMInstances().getModule(xKey);
             if (m.getState().getFTStack().containsKey(new FKey(fname, argCount))) {
                 List<String> doxx;
                 if (argCount == -1) {

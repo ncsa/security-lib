@@ -532,35 +532,41 @@ public class State extends FunctionState implements QDLConstants {
     protected State newStateWithImportsNEW(State moduleState) {
         SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
         if (moduleState!= null && !moduleState.symbolStack.isEmpty()) {
-            newStack.getParentTables().set(0, moduleState.symbolStack);
+            newStack.getParentTables().addAll(moduleState.symbolStack.getParentTables());
+            //newStack.getParentTables().set(0, moduleState.symbolStack);
         }
         if (!symbolStack.isEmpty()) {
             newStack.getParentTables().addAll(symbolStack.getParentTables());
         }
 
         FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
-        if (!getFTStack().isEmpty()) {
-            ftStack.addTables(getFTStack()); // pushes elements in reverse order
-        }
         if (moduleState!= null && !moduleState.getFTStack().isEmpty()) {
-            ftStack.addTables(moduleState.getFTStack());
+            ftStack.appendTables(moduleState.getFTStack());
         }
+        if (!getFTStack().isEmpty()) {
+            ftStack.appendTables(getFTStack()); // pushes elements in reverse order
+        }
+
 
         MTStack mtStack = new MTStack();
+        if(moduleState!= null &&  !moduleState.getMTemplates().isEmpty()){
+            mtStack.appendTables(moduleState.getMTemplates());
+        }
 
         if(!getMTemplates().isEmpty()) {
-            mtStack.addTables(getMTemplates());
+            mtStack.appendTables(getMTemplates());
         }
         if(moduleState!= null &&  !moduleState.getMTemplates().isEmpty()){
-            mtStack.addTables(moduleState.getMTemplates());
+            mtStack.appendTables(moduleState.getMTemplates());
         }
         MIStack miStack = new MIStack();
-        if(!getMInstances().isEmpty()) {
-            miStack.addTables(getMInstances());
-        }
         if(moduleState!= null &&  !moduleState.getMInstances().isEmpty()){
-            mtStack.addTables(moduleState.getMInstances());
+            miStack.appendTables(moduleState.getMInstances());
         }
+        if(!getMInstances().isEmpty()) {
+            miStack.appendTables(getMInstances());
+        }
+
 
         State newState = newInstance(
                 newStack,

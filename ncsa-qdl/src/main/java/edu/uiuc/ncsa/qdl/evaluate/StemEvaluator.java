@@ -254,15 +254,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        try{
+        try {
             return evaluate2(polyad, state);
-        }catch(QDLException q){
-              throw q;
-        }catch(Throwable t){
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
             QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
             throw qq;
         }
     }
+
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case DIMENSION:
@@ -275,8 +276,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 doJoin(polyad, state);
                 return true;
             case SIZE:
-                doSize(polyad, state);
-                return true;
+               return doSize(polyad, state);
             case SET_DEFAULT:
                 doSetDefault(polyad, state);
                 return true;
@@ -650,12 +650,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 output = JsonPath.using(conf).parse(stemVariable.toJSON(false).toString()).read(query).toString();
                 outStem = stemPathConverter(output);
             } catch (JsonPathException jpe) {
-                if(jpe.getMessage().contains("No results")){
+                if (jpe.getMessage().contains("No results")) {
                     // A "feature" of this API is to return an empty list if there are no values
                     // but throw a path exception if you want the results as paths.
                     // Only way to check is to look at the message. 
                     outStem = new StemVariable();
-                }else {
+                } else {
                     throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
                 }
             }
@@ -1192,9 +1192,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResultType(Constant.STEM_TYPE);
     }
 
-    protected void doSize(Polyad polyad, State state) {
+    protected boolean doSize(Polyad polyad, State state) {
         if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("the " + SIZE + " function requires 1 argument");
+            //throw new IllegalArgumentException("the " + SIZE + " function requires 1 argument");
+            return false;
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
@@ -1209,7 +1210,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setResult(size);
         polyad.setResultType(Constant.LONG_TYPE);
         polyad.setEvaluated(true);
-
+        return true;
     }
 
 
@@ -2048,15 +2049,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         boolean overwriteKeys = false; //default
-        if(polyad.getArgCount() == 3){
+        if (polyad.getArgCount() == 3) {
             polyad.evalArg(2, state);
 
             Object arg3 = polyad.getArgAt(2).getResult();
             polyad.evalArg(2, state);
             checkNull(arg2, polyad.getArgAt(2));
-            if(arg3 instanceof Boolean){
-                      overwriteKeys = (Boolean)arg3;
-            }else{
+            if (arg3 instanceof Boolean) {
+                overwriteKeys = (Boolean) arg3;
+            } else {
                 throw new IllegalArgumentException(RENAME_KEYS + " third argument, if present, must be a boolean");
             }
 

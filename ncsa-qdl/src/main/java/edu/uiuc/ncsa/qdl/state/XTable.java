@@ -6,7 +6,8 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.Serializable;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * A symbol table. This should hold functions modules and (eventually) variables.
@@ -14,25 +15,24 @@ import java.util.Map;
  * <p>Created by Jeff Gaynor<br>
  * on 11/7/21 at  5:14 AM
  */
-public interface XTable<K extends XKey, V extends XThing> extends Map<K, V>, Cloneable, Serializable {
+public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K, V> implements Cloneable, Serializable {
     /**
      * Should add the {@link XThing} based on its {@link XThing#getName()} as the key.
+     *
      * @param value
      * @return
      */
-    V put(XThing value);
+        public V put(XThing value) {
+            return put((K) value.getKey(), (V) value);
+        }
 
-    void toXML(XMLStreamWriter xsw) throws XMLStreamException;
+    public abstract void toXML(XMLStreamWriter xsw) throws XMLStreamException;
 
-    void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
+    public abstract void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 
-    /**
-     * This is in cases where the {@link XThing} needs to be stored under a different key, such as
-     * in the case of module instances.
-     * @param xKey
-     * @param xThing
-     * @return
-     */
-    V put(XKey xKey, XThing xThing);
+    UUID uuid = UUID.randomUUID();
 
+    public UUID getID() {
+        return uuid;
+    }
 }

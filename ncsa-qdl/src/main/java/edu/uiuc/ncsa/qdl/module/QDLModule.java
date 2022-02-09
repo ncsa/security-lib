@@ -1,10 +1,8 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.exceptions.ModuleInstantiationException;
-import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
-import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -13,6 +11,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_SOURCE_TAG;
 
@@ -30,6 +29,7 @@ public class QDLModule extends Module {
     }
 
     String filePath;
+
     public ModuleStatement getModuleStatement() {
         return moduleStatement;
     }
@@ -47,13 +47,21 @@ public class QDLModule extends Module {
         return moduleStatement.getSourceCode();
     }
 
+    UUID uuid = UUID.randomUUID();
 
     @Override
     public Module newInstance(State state) {
-        QDLInterpreter p = new QDLInterpreter(new XProperties(), state);
+        State localState = state.newLocalState();
+//        QDLInterpreter p = new QDLInterpreter(new XProperties(), localState);
         try {
-            p.execute(getModuleStatement().getSourceCode());
-            return state.getMTemplates().getModule(new MTKey(getNamespace()));
+            //p.execute(getModuleStatement().getSourceCode());
+            localState.setImportMode(true);
+            getModuleStatement().evaluate(localState);
+            Module m  = getModuleStatement().getmInstance();
+            getModuleStatement().clearInstance();
+            localState.setImportMode(false);
+            //Module m = state.getMTemplates().getModule(new MTKey(getNamespace()));
+            return m;
         } catch (Throwable throwable) {
             if (throwable instanceof RuntimeException) {
                 throw (RuntimeException) throwable;
@@ -76,10 +84,12 @@ public class QDLModule extends Module {
     public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
         super.readExtraXMLElements(xe, xer);
     }
-  List<String> documentation = new ArrayList<>();
+
+    List<String> documentation = new ArrayList<>();
 
     /**
      * Documentation resides in the module definition, so it is loaded here at parse time.
+     *
      * @return
      */
     @Override
@@ -89,6 +99,6 @@ public class QDLModule extends Module {
 
     @Override
     public void setDocumentation(List<String> documentation) {
-            this.documentation = documentation;
+        this.documentation = documentation;
     }
 }

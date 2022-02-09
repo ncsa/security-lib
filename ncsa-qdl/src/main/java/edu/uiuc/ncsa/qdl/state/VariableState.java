@@ -2,7 +2,10 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.*;
+import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -11,9 +14,7 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.state.SymbolTable.int_regex;
@@ -64,6 +65,11 @@ public abstract class VariableState extends NamespaceAwareState {
      * @return
      */
     public Object getValue(String variableName) {
+        return getValue(variableName, null); // kick off the search
+
+    }
+
+    public Object getValueOLD(String variableName) {
         if (isStem(variableName)) {
             /* KEEP for future use.
             If we want to have system variables this is how to do it. A long as nothing is put there
@@ -79,35 +85,71 @@ public abstract class VariableState extends NamespaceAwareState {
                 return s.get(w);
             }*/
             StemMultiIndex w = new StemMultiIndex(variableName);
-            return gsrNSStemOp(w, OP_GET, null);
+            return gsrNSStemOp(w, OP_GET, null, new HashSet<>());
         }
-        return gsrNSScalarOp(variableName, OP_GET, null);
+        return gsrNSScalarOp(variableName, OP_GET, null, new HashSet<>());
     }
 
-    public void setValue(String variableName, Object value) {
+    public Object getValue(String variableName, Set<XKey> checkedAliases) {
+        if (checkedAliases == null) {
+            checkedAliases = new HashSet<>();
+        }
+        if (isStem(variableName)) {
+            StemMultiIndex w = new StemMultiIndex(variableName);
+            return gsrNSStemOp(w, OP_GET, null, checkedAliases);
+        }
+        return gsrNSScalarOp(variableName, OP_GET, null, checkedAliases);
+    }
+
+
+    public void setValueOLD(String variableName, Object value) {
         if (isStem(variableName)) {
             StemMultiIndex w = new StemMultiIndex(variableName);
             if (!w.isStem() && (value instanceof StemVariable)) {
                 throw new IndexError("Error: You cannot set a scalar variable to a stem value");
             }
-            gsrNSStemOp(w, OP_SET, value);
+            gsrNSStemOp(w, OP_SET, value, new HashSet<>());
             return;
         }
         if (value instanceof StemVariable) {
             throw new IndexError("Error: You cannot set a scalar variable to a stem value");
         }
 
-        gsrNSScalarOp(variableName, OP_SET, value);
+        gsrNSScalarOp(variableName, OP_SET, value, new HashSet<>());
+        return;
+    }
+
+    public void setValue(String variableName, Object value) {
+        setValue(variableName, value, null);
+    }
+
+    public void setValue(String variableName, Object value, Set<XKey> checkedAliases) {
+        if (checkedAliases == null) {
+            checkedAliases = new HashSet<>();
+        }
+        if (isStem(variableName)) {
+            StemMultiIndex w = new StemMultiIndex(variableName);
+            if (!w.isStem() && (value instanceof StemVariable)) {
+                throw new IndexError("Error: You cannot set a scalar variable to a stem value");
+            }
+            gsrNSStemOp(w, OP_SET, value, new HashSet<>());
+            return;
+        }
+        if (value instanceof StemVariable) {
+            throw new IndexError("Error: You cannot set a scalar variable to a stem value");
+        }
+
+        gsrNSScalarOp(variableName, OP_SET, value, checkedAliases);
         return;
     }
 
     public void remove(String variableName) {
         if (isStem(variableName)) {
             StemMultiIndex w = new StemMultiIndex(variableName);
-            gsrNSStemOp(w, OP_REMOVE, null);
+            gsrNSStemOp(w, OP_REMOVE, null, new HashSet<>());
             return;
         }
-        gsrNSScalarOp(variableName, OP_REMOVE, null);
+        gsrNSScalarOp(variableName, OP_REMOVE, null, new HashSet<>());
     }
 
 
@@ -138,7 +180,7 @@ public abstract class VariableState extends NamespaceAwareState {
             // Check if current index is a stem and feed what's to the right to it as a multi-index
             if (isDefined(newIndex + STEM_INDEX_MARKER)) {
                 StemMultiIndex ww = new StemMultiIndex(w, i);
-                Object v = gsrNSStemOp(ww, OP_GET, null);
+                Object v = gsrNSStemOp(ww, OP_GET, null, new HashSet<>());
                 if (v == null) {
                     throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value");
                 }
@@ -168,13 +210,14 @@ public abstract class VariableState extends NamespaceAwareState {
      * @param value
      * @return
      */
-    protected Object gsrNSStemOp(StemMultiIndex w, int op, Object value) {
+    protected Object gsrNSStemOp(StemMultiIndex w, int op,
+                                 Object value, Set<XKey> checkInstances) {
         //  checkNSClash(w.name);
         w = resolveStemIndices(w);
         String variableName;
         StemVariable stem = null;
-    //    boolean isNSQ = false;
-    //    URI uri = null;
+        //    boolean isNSQ = false;
+        //    URI uri = null;
         boolean isQDLNull = false;
         SymbolTable st = null;
         variableName = w.name;
@@ -187,7 +230,11 @@ public abstract class VariableState extends NamespaceAwareState {
                 stem = (StemVariable) object;
             }
         } else {
-            st = getSymbolStack().getRightST(variableName);
+            if(isImportMode()){
+                st = getSymbolStack().getLocalST();
+            }else{
+                st = getSymbolStack().getRightST(variableName);
+            }
             object = st.resolveValue(getFQName(variableName));
             if (object instanceof QDLNull) {
                 isQDLNull = true;
@@ -203,9 +250,14 @@ public abstract class VariableState extends NamespaceAwareState {
             if (stem == null && !isQDLNull) {
                 if (!getMInstances().isEmpty()) {
                     for (Object key : getMInstances().keySet()) {
+                        XKey xKey = (XKey) key;
+                        if (checkInstances.contains(xKey)) {
+                            return null;
+                        }
                         Module m = getMInstances().getModule((XKey) key);
                         if (m != null) {
                             Object obj = m.getState().getValue(variableName);
+                            checkInstances.add(xKey);
                             if (obj != null && (obj instanceof StemVariable)) {
                                 stem = (StemVariable) obj;
                                 break;
@@ -214,19 +266,6 @@ public abstract class VariableState extends NamespaceAwareState {
                         }
                     }
                 }
-             /*   if (MAliases.hasImports()) {
-                    for (URI key : MAliases.keySet()) {
-                        Module m = getMTemplates().get(key);
-                        if (m != null) {
-                            Object obj = m.getState().getValue(variableName);
-                            if (obj != null && (obj instanceof StemVariable)) {
-                                stem = (StemVariable) obj;
-                                break;
-                            }
-
-                        }
-                    }
-                }*/
             }
         }
 
@@ -248,43 +287,25 @@ public abstract class VariableState extends NamespaceAwareState {
             case OP_SET:
 
                 if (w.isEmpty()) {
-                    // set the whole stem, not a value within the stem to the new value (which is a stem)
-            /*        if (isNSQ) {
-                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, value);
-                    } else {*/
-                        //getSymbolStack().getLocalST().setValue(variableName, value);
-                        st.setValue(variableName, value);
-                    //}
-
+                    setValueImportAware(variableName, value, st);
                 } else {
                     if (stem == null || isQDLNull) {
                         stem = new StemVariable();
-                        st.setValue(variableName, stem);
+//                        st.setValue(variableName, stem);
+                        setValueImportAware(variableName, stem, st);
+
                     }
                     stem.set(w, value);
-/*
-                    if (isNSQ) {
-                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().setValue(variableName, stem);
-                    } else {
-*/
-                        //getSymbolStack().getLocalST().setValue(variableName, stem);
-                        st.setValue(variableName, stem);
-//                    }
+//                    st.setValue(variableName, stem);
+                    setValueImportAware(variableName, stem, st);
                 }
-                //  stash it in the right place. The value within the stem is set. The stack only manages top-level instances.
-
                 return null;
             case OP_REMOVE:
                 if (stem == null && !isQDLNull) {
                     throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
                 }
                 if (w.isEmpty()) {
-                    /*if (isNSQ) {
-                        getMTemplates().get(uri).getState().getSymbolStack().getLocalST().remove(variableName);
-                    } else {*/
-                        //getSymbolStack().getLocalST().remove(variableName);
-                        st.remove(variableName);
-                    //}
+                    st.remove(variableName);
                 } else {
 
                     stem.remove(w);
@@ -292,6 +313,18 @@ public abstract class VariableState extends NamespaceAwareState {
                 return null;
         }
         throw new NFWException("Internal error; unknown operation type on stem variables.");
+    }
+
+    private void setValueImportAware(String variableName, Object value, SymbolTable st) {
+        if (isImportMode()) {
+            if (st instanceof SymbolTable) {
+                st.setValue(variableName, value);
+            } else {
+                ((SymbolStack) st).setLocalValue(variableName, value);
+            }
+        } else {
+            st.setValue(variableName, value);
+        }
     }
 
     Pattern intPattern = Pattern.compile(int_regex);
@@ -302,7 +335,10 @@ public abstract class VariableState extends NamespaceAwareState {
    X#__a
       X#get_a()
      */
-    protected Object gsrNSScalarOp(String variableName, int op, Object value) {
+    protected Object gsrNSScalarOp(String variableName,
+                                   int op,
+                                   Object value,
+                                   Set<XKey> checkedAliases) {
         // if(!pattern.matcher(v.getName()).matches()){
         if (variableName.equals("0") || intPattern.matcher(variableName).matches()) {
             // so its an actual index, like 0, 1, ...
@@ -315,35 +351,29 @@ public abstract class VariableState extends NamespaceAwareState {
         SymbolTable st = null;
         if (isIntrinsic(variableName)) {
             st = getSymbolStack();
-           v = getSymbolStack().resolveValue(variableName);
-     /*       if (v == null) {
-                throw new IntrinsicViolation("no value for '" + variableName + "'");
-            }*/
-
-/*
-            int startIndex = 1;
-            // startIndex == 0 means that there is exactly one stack, so moving up or down the
-            // stack does not work. This is the case of, e.g., a module being loaded the first time
-
-            if (st instanceof SymbolStack) {
-                startIndex = ((SymbolStack) st).getParentTables().size() == 1 ? 0 : startIndex;
-            }
-            v = st.resolveValue(variableName, startIndex);
-            //v = st.resolveValue(variableName, ((SymbolStack)st).getParentTables().size()-1);
-            if (0 < startIndex && v == null) {
-                throw new IntrinsicViolation("no value for '" + variableName + "'");
-            }*/
-
+            v = getSymbolStack().resolveValue(variableName);
         } else {
-            st = getSymbolStack().getRightST(variableName);
+            if(isImportMode()){
+                    st = getSymbolStack();
+            }else{
+
+                st = getSymbolStack().getRightST(variableName);
+            }
             v = st.resolveValue(variableName);
             if (v == null) {
 
-                if (!getMInstances().isEmpty()) {
+                if (!(isImportMode() || getMInstances().isEmpty())) {
+                   // System.out.println(getClass().getSimpleName() + "--- import on? " + isImportMode());
+
                     for (Object key : getMInstances().keySet()) {
+                        XKey xkey = (XKey) key;
+                        if (checkedAliases.contains(xkey)) {
+                            return null;
+                        }
                         Module m = getMInstances().getModule((XKey) key);
                         if (m != null) {
-                            Object obj = m.getState().getValue(variableName);
+                            checkedAliases.add(xkey);
+                            Object obj = m.getState().getValue(variableName, checkedAliases);
                             if (obj != null) {
                                 if (v != null) {
                                     // uniqueness. Only get an unqualified name if it is unique within
@@ -362,12 +392,16 @@ public abstract class VariableState extends NamespaceAwareState {
         switch (op) {
             case OP_GET:
                 // For resolving intrinsic variables.
-                if (v == null && hasSuperState()) {
-              //      v = getSuperState().getValue(variableName);
-                }
+              /*  if (v == null && hasSuperState()) {
+                    v = getSuperState().getValue(variableName);
+                }*/
                 return v;
             case OP_SET:
-                st.setValue(variableName, value);
+                if (isImportMode()) {
+                    getSymbolStack().setLocalValue(variableName, value);
+                } else {
+                    st.setValue(variableName, value);
+                }
                 return null;
             case OP_REMOVE:
                 st.remove(variableName);
@@ -425,7 +459,7 @@ public abstract class VariableState extends NamespaceAwareState {
         if (!includeModules) {
             return out;
         }
-        for(Object key : getMInstances().keySet()){
+        for (Object key : getMInstances().keySet()) {
             Module m = getMInstances().getModule((XKey) key);
             if (m == null) {
                 continue; // the user specified a non-existent module.

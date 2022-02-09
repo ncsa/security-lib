@@ -119,14 +119,14 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
      */
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        try{
+ //       try{
             return evaluate2(polyad, state);
-        }catch(QDLException q){
+      /*  }catch(QDLException q){
               throw q;
         }catch(Throwable t){
             QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
             throw qq;
-        }
+        }*/
     }
     public boolean evaluate2(Polyad polyad, State state) {
           return evaluate(null, polyad, state);

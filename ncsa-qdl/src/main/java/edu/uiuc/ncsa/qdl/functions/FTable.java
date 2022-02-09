@@ -23,16 +23,15 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 11/19/21 at  7:48 AM
  */
-public class FTable<K extends FKey, V extends FunctionRecord>  extends HashMap<K, V>  implements Documentable,XTable<K,V> {
-    @Override
-    public V put(XThing value) {
-        return put((K) value.getKey(), (V) value);
-    }
+public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,V>  implements Documentable {
 
+
+/*
     @Override
-    public V put(XKey xKey, XThing xThing) {
+    public V put(K xKey, V xThing) {
         return super.put((K) xKey, (V) xThing);
     }
+*/
 
     /**
      * If argCount === -1, remove all named functions, otherwise only remove the one with the
@@ -273,12 +272,11 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends HashMap<K
         return getClass().getSimpleName() + "[size=" + size() + "]";
     }
 
-/*    public FunctionRecord getFunctionReference(String name) {
-          FKey key = new FKey(name,-1);
-            if (super.containsKey(key)) {
-                return get(key);
-            }
-            return null;
-        }*/
+    UUID id = UUID.randomUUID();
+
+    @Override
+    public UUID getID() {
+        return id;
+    }
 }
 

@@ -22,7 +22,13 @@ public class LambdaDefinitionNode extends ExpressionImpl {
     }
     @Override
     public Object evaluate(State state) {
-        state.getFTStack().put(functionRecord);
+        if(state.isImportMode()){
+            state.getFTStack().localPut(functionRecord);
+
+        } else{
+
+            state.getFTStack().put(functionRecord);
+        }
         return null; // for now
     }
 

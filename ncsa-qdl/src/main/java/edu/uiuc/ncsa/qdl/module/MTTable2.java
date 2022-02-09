@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
 
@@ -10,25 +9,29 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Module template table.
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/21 at  12:22 PM
  */
-public class MTTable2<K extends MTKey, V extends Module>  extends HashMap<K, V> implements  XTable<K, V> {
+public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V> {
+    // class MITable2<K extends XKey, V extends MIWrapper> extends   XTable<K, V>
     @Override
     public V put(XThing value) {
-        return put(((Module) value).getMTKey(),  value);
+        MTKey mtKey = ((Module) value).getMTKey();
+        return put(mtKey,  value);
     }
 
-    @Override
-    public V put(XKey xKey, XThing xThing) {
-        return super.put( (K)xKey, (V) xThing);
+    private V put(MTKey mtKey, XThing value) {
+        return super.put( (K)mtKey,  (V)value);
+
     }
+
+
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
 
@@ -66,4 +69,12 @@ public class MTTable2<K extends MTKey, V extends Module>  extends HashMap<K, V> 
         }
         super.putAll(m);
     }
+
+    UUID id = UUID.randomUUID();
+
+    @Override
+    public UUID getID() {
+        return id;
+    }
+
 }

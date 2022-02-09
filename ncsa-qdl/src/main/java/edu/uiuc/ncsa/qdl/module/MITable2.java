@@ -10,23 +10,20 @@ import edu.uiuc.ncsa.qdl.statements.Documentable;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Table of modules keyed by <b>alias</b>.
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */
-public class MITable2<K extends XKey, V extends MIWrapper> extends HashMap<K, V> implements XTable<K, V>, Documentable {
-    @Override
+public class MITable2<K extends XKey, V extends MIWrapper> extends   XTable<K, V> implements Documentable {
+
+ /*   @Override
     public V put(XThing value) {
         return put(value.getKey(), value);
-    }
+    }*/
 
-    @Override
     public V put(XKey xKey, XThing xThing) {
         return super.put( (K)xKey,  (V)xThing);
     }
@@ -75,5 +72,11 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends HashMap<K, V>
          }
     }
 
+    UUID id = UUID.randomUUID();
+
+    @Override
+    public UUID getID() {
+        return id;
+    }
 
 }
