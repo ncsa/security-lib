@@ -25,6 +25,10 @@ public abstract class ModuleState extends AbstractState {
         this.MInstances = mInstances;
     }
 
+    public void setMTemplates(MTStack MTemplates) {
+        this.MTemplates = MTemplates;
+    }
+
     public MTStack getMTemplates() {
            return MTemplates;
        }

@@ -22,6 +22,7 @@ public interface XMLConstants {
     String MODULE_TYPE_JAVA_TAG = "java";
     String MODULE_CLASS_NAME_TAG = "class_name";
     String MODULE_SOURCE_TAG = "source";
+    String MODULE_DOCUMENTATION_TAG = "documentation";
 
     String WORKSPACE_TAG = "workspace";
     String WS_ENV_TAG = "env";
@@ -87,4 +88,20 @@ public interface XMLConstants {
     String BR_MEMORY_ONLY = "memory_only";
     String BR_DELETED = "deleted";
     String BR_CONTENT = "content";
+
+    // Version 2 tags
+    String SERIALIZATION_VERSION_TAG = "serialization_version";
+    String VERSION_2_0_TAG = "2.0";
+    String TEMPLATE_REFERENCE_TAG = "template_reference";
+    String INSTANCE_REFERENCE_TAG = "instance_reference";
+    String STATE_REFERENCE_TAG = "state_reference";
+    String UUID_TAG = "uuid";
+    String STATES_TAG = "states";
+    String MODULE_INSTANCES_TAG = "module_instances";
+    String TEMPLATE_STACK = "template_stack";
+    String INSTANCE_STACK = "instance_stack";
+    String MODULES_TAG = "modules";
+    String VARIABLE_STACK = "variable_stack";
+    String VARIABLES_TAG = "variables";
+
 }

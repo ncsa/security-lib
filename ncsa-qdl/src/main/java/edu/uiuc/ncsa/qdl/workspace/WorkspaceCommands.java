@@ -1868,7 +1868,7 @@ public class WorkspaceCommands implements Logable {
             }
             if (module != null) {
                 say(importedString);
-                List<String> docs = module.getDocumentation();
+                List<String> docs = module.getListByTag();
                 for (String x : docs) {
                     say(x);
                 }
@@ -4988,6 +4988,7 @@ public class WorkspaceCommands implements Logable {
     public boolean fromXML(XMLEventReader xer) throws XMLStreamException {
         WSXMLSerializer serializer = new WSXMLSerializer();
         WorkspaceCommands newCommands = null;
+
         try {
             IOInterface ioInterface = getIoInterface();
             newCommands = serializer.fromXML(xer);

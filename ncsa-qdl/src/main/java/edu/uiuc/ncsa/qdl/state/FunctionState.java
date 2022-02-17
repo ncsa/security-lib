@@ -37,7 +37,10 @@ public abstract class FunctionState extends VariableState {
 
     private static final long serialVersionUID = 0xcafed00d4L;
 
-    //@Override
+    public void setFTStack(FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> fStack) {
+        this.fStack = fStack;
+    }
+
     public FStack<? extends FTable> getFTStack() {
         return fStack;
     }
@@ -153,33 +156,6 @@ public abstract class FunctionState extends VariableState {
                                          boolean showIntrinsic) {
         HashSet<XKey> processedAliases = new HashSet<>();
         return listFunctions(useCompactNotation, regex, includeModules, showIntrinsic, processedAliases);
-/*
-        TreeSet<String> out = getFTStack().listFunctions(regex);
-        // no module templates, so no need to snoop through them
-        if ((!includeModules) || getMTemplates().isEmpty()) {
-            return out;
-        }
-        // Get the functions for active (current) module instances
-        for (Object key : getMInstances().keySet()) {
-            XKey xKey = (XKey) key;
-            Module mm = ((MIWrapper) getMInstances().get(xKey)).getModule();
-            TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic);
-            for (String x : uqVars) {
-                if (isIntrinsic(x) && !showIntrinsic) {
-                    continue;
-                }
-                if (useCompactNotation) {
-                    out.add(getMInstances().getAliasesAsString(mm.getMTKey()) + NS_DELIMITER + x);
-                } else {
-                    for (Object alias : getMInstances().getAliasesAsString(mm.getMTKey())) {
-                        out.add(alias + NS_DELIMITER + x);
-                    }
-                }
-            }
-
-        }
-        return out;
-*/
     }
 
     /**
@@ -195,7 +171,8 @@ public abstract class FunctionState extends VariableState {
     protected TreeSet<String> listFunctions(boolean useCompactNotation, String regex,
                                            boolean includeModules,
                                            boolean showIntrinsic,
-                                         Set<XKey> processedAliases) {
+                                           Set<XKey> processedAliases
+    ) {
         TreeSet<String> out = getFTStack().listFunctions(regex);
             // no module templates, so no need to snoop through them
             if ((!includeModules) || getMTemplates().isEmpty()) {
@@ -204,21 +181,18 @@ public abstract class FunctionState extends VariableState {
             // Get the functions for active (current) module instances
             for (Object key : getMInstances().keySet()) {
                 XKey xKey = (XKey) key;
-                /*if(processedAliases.contains(xKey)){
-                    return out;
-                }*/
-                Module mm = ((MIWrapper) getMInstances().get(xKey)).getModule();
-                processedAliases.add(xKey);
-                //TreeSet<String> uqVars = mm.getState().listFunctions(useCompactNotation, regex, true, showIntrinsic, processedAliases);
-                TreeSet<String> uqVars = mm.getState().getFTStack().listFunctions( regex);
-                for (String x : uqVars) {
+
+                Module m = ((MIWrapper) getMInstances().get(xKey)).getModule();
+        //        processedAliases.add(xKey);
+                TreeSet<String> uqFuncs = m.getState().getFTStack().listFunctions( regex);
+                for (String x : uqFuncs) {
                     if (isIntrinsic(x) && !showIntrinsic) {
                         continue;
                     }
                     if (useCompactNotation) {
-                        out.add(getMInstances().getAliasesAsString(mm.getMTKey()) + NS_DELIMITER + x);
+                        out.add(getMInstances().getAliasesAsString(m.getMTKey()) + NS_DELIMITER + x);
                     } else {
-                        for (Object alias : getMInstances().getAliasesAsString(mm.getMTKey())) {
+                        for (Object alias : getMInstances().getAliasesAsString(m.getMTKey())) {
                             out.add(alias + NS_DELIMITER + x);
                         }
                     }
@@ -284,7 +258,7 @@ public abstract class FunctionState extends VariableState {
         }
 */
         //Module module = getMTemplates().get(xKey);
-        List<String> docs = module.getDocumentation();
+        List<String> docs = module.getListByTag();
         if (docs == null) {
             return new ArrayList<>();
         }

@@ -3,6 +3,8 @@ package edu.uiuc.ncsa.qdl.module;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XThing;
 
+import java.util.UUID;
+
 /**
  * A wrapper for module instances. These have to exist since they are keyed off alias
  * rather than the {@link MTKey} for templates.
@@ -35,5 +37,14 @@ public class MIWrapper implements XThing {
     @Override
     public XKey getKey() {
         return key;
+    }
+     UUID uuid = UUID.randomUUID();
+
+    @Override
+    public String toString() {
+        return "MIWrapper{" +
+                "key=" + key +
+                ", module id =" + uuid +
+                '}';
     }
 }

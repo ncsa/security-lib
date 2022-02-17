@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.config;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
+import edu.uiuc.ncsa.qdl.module.MIWrapper;
 import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -262,11 +263,11 @@ public class QDLConfigurationLoaderUtils {
             state.addModule(m); // done!
             importedFQNames.add(m.getNamespace().toString());
             if (importASAP) {
-                state.getMInstances().put(m);
-                State state1 = state.newCleanState();
+               // state.getMInstances().put(m);
+                State state1 = state.newLocalState();
                 Module mm = m.newInstance(state1);
                 ((JavaModule) mm).init(state1);
-                state.getMInstances().put(mm);
+                state.getMInstances().put(new MIWrapper(m.getKey(), mm));// puts it in the table with default alias.
             }
         }
         return importedFQNames;

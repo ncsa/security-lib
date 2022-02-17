@@ -9,7 +9,6 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -76,15 +75,36 @@ public class FStack<V extends FTable<? extends FKey, ? extends FunctionRecord>> 
      * @param xsw
      * @throws XMLStreamException
      */
-    @Override
-    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+/*    @Override
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
         if (isEmpty()) {
             return;
         }
-        xsw.writeStartElement(XMLConstants.FUNCTION_TABLE_STACK_TAG);
+//        xsw.writeStartElement(XMLConstants.FUNCTION_TABLE_STACK_TAG);
+        xsw.writeStartElement(getXMLStackTag());
         xsw.writeComment("The functions for this state.");
-        super.toXML(xsw);
+        for (int i = getStack().size() - 1; 0 <= i; i--) {
+            XTable xTable =  getStack().get(i);
+            if(xTable.isEmpty()){
+                continue;
+            }
+            xsw.writeStartElement(getXMLTableTag());
+            xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, Integer.toString(i));
+            xTable.toXML(xsw, serializationObjects);
+            xsw.writeEndElement(); // end of table.
+
+          }
         xsw.writeEndElement(); // end of tables.
+    }*/
+
+    @Override
+    public String getXMLStackTag() {
+        return XMLConstants.FUNCTION_TABLE_STACK_TAG;
+    }
+
+    @Override
+    public String getXMLTableTag() {
+        return XMLConstants.FUNCTIONS_TAG;
     }
 
     @Override

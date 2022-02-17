@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 
 import javax.xml.namespace.QName;
@@ -66,7 +67,8 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         // We actually DO want empty stacks since we need to preserve hierachies of variable states
-        xsw.writeStartElement(STACK_TAG);
+        //  xsw.writeStartElement(STACK_TAG);
+        xsw.writeStartElement(VARIABLES_TAG);
         for (Object key : getMap().keySet()) {
             xsw.writeStartElement(VARIABLE_TAG);
             xsw.writeAttribute(VARIABLE_NAME_TAG, key.toString());
@@ -74,6 +76,38 @@ public abstract class AbstractSymbolTable implements SymbolTable {
             xsw.writeEndElement();
         }
         xsw.writeEndElement();
+    }
+
+    @Override
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+            toXML(xsw);
+    }
+
+    @Override
+    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        // no attributes for this tag.
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case VARIABLE_TAG:
+                            varFromXML(xer);
+                            break;
+                        default:
+                            return;
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(VARIABLES_TAG)) {
+                        return;
+                    }
+                    break;
+            }
+
+            xe = xer.nextEvent();
+        }
     }
 
     @Override
@@ -121,7 +155,7 @@ public abstract class AbstractSymbolTable implements SymbolTable {
             }
             xer.next();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VARIABLE_TAG );
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VARIABLE_TAG);
 
     }
 }

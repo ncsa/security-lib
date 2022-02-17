@@ -10,6 +10,8 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public interface XMLSerializable {
     void toXML(XMLStreamWriter xsw) throws XMLStreamException;
+    void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException;
 
+     void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException;
      void fromXML(XMLEventReader xer) throws XMLStreamException;
 }

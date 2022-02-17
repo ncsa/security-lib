@@ -88,14 +88,15 @@ assertStatement2:
         f_ref : F_REF;
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
-// and checking for regression. Also Antlr 4 interprets the #tag in the right hand column and
-// will use these for generating method names in Java. Be careful of altering these, they are not comments!
+// and checking for regression. Also Antlr 4 interprets the # tag in the right hand column and
+// will use these for generating method names in Java. Be careful of altering these, they are
+// parser directives, not comments!
 
 
 expression
  :
    function                                                                    #functions
-  | variable? Hash expression                                                   #moduleExpression
+  | variable? Hash expression                                                  #moduleExpression
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
   | (function | '(' f_args* ')')

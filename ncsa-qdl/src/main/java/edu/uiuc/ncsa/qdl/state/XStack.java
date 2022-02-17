@@ -1,11 +1,16 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.util.*;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
@@ -46,31 +51,34 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     public void addTables(XStack xStack) {
         // add backwards from stack
         for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
-            XTable xt = (XTable)xStack.getStack().get(i);
-            if(addedTables.contains(xt.getID())){
+            XTable xt = (XTable) xStack.getStack().get(i);
+            if (addedTables.contains(xt.getID())) {
                 continue;
             }
-            if(!xt.isEmpty()) {
+            if (!xt.isEmpty()) {
                 push((XTable) xStack.getStack().get(i)); // puts at 0th elements each time
                 addedTables.add(xt.getID());
             }
         }
     }
+
     Set<UUID> addedTables = new HashSet<>();
+
     /**
      * Similar to {@link #addTables(XStack)}, but this appends them to the existing
      * set of tables. If XStack is [A,B,C,...] And the existing stack is
      * [P,Q,...] the result is [P,Q,...,A,B,C,...,]
+     *
      * @param xStack
      */
     public void appendTables(XStack xStack) {
         //for (int i = xStack.getStack().size() - 1; 0 <= i; i--) {
-        for (int i =0;i< xStack.getStack().size();  i++) {
-            XTable xt = (XTable)xStack.getStack().get(i);
-            if(addedTables.contains(xt.getID())){
-                     continue;
-                 }
-            if(!xt.isEmpty()) {
+        for (int i = 0; i < xStack.getStack().size(); i++) {
+            XTable xt = (XTable) xStack.getStack().get(i);
+            if (addedTables.contains(xt.getID())) {
+                continue;
+            }
+            if (!xt.isEmpty()) {
                 append((V) xStack.getStack().get(i)); // puts at 0th elements each time
                 addedTables.add(xt.getID());
 
@@ -135,18 +143,19 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return getStack().get(0).get(key);
     }
 
-    public boolean localHas(XKey xkey){
+    public boolean localHas(XKey xkey) {
         if (getStack().isEmpty()) {
             return false;
         }
-        return getStack().get(0).get(xkey)!= null;
+        return getStack().get(0).get(xkey) != null;
 
     }
+
     public XThing get(XKey key) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             XThing xThing = xTable.get(key);
             if (xThing != null) {
-                return  xThing;
+                return xThing;
             }
         }
         return null;
@@ -176,8 +185,8 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     public List<XTable<? extends XKey, ? extends XThing>> getStack() {
-        if(stack == null){
-            stack = new  ArrayList();
+        if (stack == null) {
+            stack = new ArrayList();
         }
         return stack;
     }
@@ -221,7 +230,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return oldValue;
     }
 
-    public XThing put(XKey xKey, XThing xThing){
+    public XThing put(XKey xKey, XThing xThing) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             if (xTable.containsKey(xKey)) {
                 xTable.put(xThing);
@@ -231,6 +240,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return peek().put(xKey, xThing);
 
     }
+
     public XThing put(XThing value) {
         for (XTable<? extends XKey, ? extends XThing> xTable : getStack()) {
             if (xTable.containsKey(value.getKey())) {
@@ -295,21 +305,74 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     /**
      * Does the grunt work of writing the stack in the right order. You write the start tag,
-     * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter)}
+     * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter, SerializationObjects)}
      * for a canonical example.
      *
      * @param xsw
      * @throws XMLStreamException
      */
-    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        // lay these in in reverse order so we just have to read them in the fromXML method
-        // and push them on the stack
-        for (int i = getStack().size() - 1; 0 <= i; i--) {
-            getStack().get(i).toXML(xsw);
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+        if (isEmpty()) {
+            return;
         }
+        xsw.writeStartElement(getXMLStackTag());
+        for (int i = getStack().size() - 1; 0 <= i; i--) {
+            XTable xTable = getStack().get(i);
+            if (xTable.isEmpty()) {
+                continue;
+            }
+            xsw.writeStartElement(getXMLTableTag());
+            xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, Integer.toString(i));
+            xTable.toXML(xsw, serializationObjects);
+            xsw.writeEndElement(); // end of table.
+        }
+        if (getStack().get(0).isEmpty()) {
+            // write the zero-th elements as an empty table so the structure of the stack
+            // stays intact
+            xsw.writeStartElement(getXMLTableTag());
+            xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, "0");
+            xsw.writeEndElement(); // end of table.
+        }
+
+
+        xsw.writeEndElement(); // end of stacks.
+    }
+
+    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+        // points to stacks tag
+        XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        getStack().clear(); // Needed or there will be an extra empty stack after this call.
+        // no attributes or such with the stacks tag.
+        //boolean foundStack = false;
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    String localPart = xe.asStartElement().getName().getLocalPart();
+                    if (localPart.equals(getXMLTableTag())) {
+                        XTable xTable = newTableInstance();
+                        xTable.fromXML(xer, serializationObjects);
+                        push(xTable);
+                    }
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(getXMLStackTag())) {
+                        return;
+                    }
+                    break;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG);
+
     }
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
+
+    abstract public String getXMLStackTag();
+
+    abstract public String getXMLTableTag();
 
     /**
      * Returns the <b><i>unique</i></b> set of keys over the tables.

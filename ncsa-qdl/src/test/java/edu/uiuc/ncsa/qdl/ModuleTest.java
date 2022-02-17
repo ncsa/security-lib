@@ -192,8 +192,8 @@ public class ModuleTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("okd", state) : "expected d = -9, got " + getLongValue("d",state);
-        assert getBooleanValue("oke", state) : "expected e = -20, got " + getLongValue("e",state);
+        assert getBooleanValue("okd", state) : "expected d = -9, got " + getLongValue("d", state);
+        assert getBooleanValue("oke", state) : "expected e = -20, got " + getLongValue("e", state);
     }
 
     /**
@@ -260,8 +260,8 @@ public class ModuleTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
 
         assert getLongValue("d", state).equals(1L) : "value found d== " + getLongValue("d", state) + ", expected 1";
-        assert getLongValue("e", state).equals(-19L): "value found e== " + getLongValue("e", state) + ", expected -19";
-        assert getLongValue("q", state).equals(-19L): "value found q== " + getLongValue("q", state) + ", expected -19";
+        assert getLongValue("e", state).equals(-19L) : "value found e== " + getLongValue("e", state) + ", expected -19";
+        assert getLongValue("q", state).equals(-19L) : "value found q== " + getLongValue("q", state) + ", expected -19";
     }
 
     /**
@@ -292,7 +292,6 @@ public class ModuleTest extends AbstractQDLTester {
         w#a#f(3)
         w#g(2)
      */
-
 
 
     /**
@@ -362,8 +361,8 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "f2 :=  f(2);"); // does not effect f outside
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state)  : "expected g(3)=16, got " + getLongValue("g3",state);
-        assert getBooleanValue("okf", state)  : "expected f(2)=2, got " + getLongValue("f2",state);
+        assert getBooleanValue("ok", state) : "expected g(3)=16, got " + getLongValue("g3", state);
+        assert getBooleanValue("okf", state) : "expected f(2)=2, got " + getLongValue("f2", state);
     }
         /*
         module['a:/b','X'][u := 2;v := 3;times(x,y)->x*y;f(x,y)->times(x,u)+times(y,v);g()->u+v;];
@@ -436,9 +435,9 @@ public class ModuleTest extends AbstractQDLTester {
         assert getStringValue("all", state).contains("module['a:/b','X']");
 
     }
+
     /**
      * Test that creating a module inside another module works completely locally.
-     *
      */
     /*
         module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];module_import('b:b');];
@@ -458,20 +457,22 @@ public class ModuleTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state) : "was not able to nest a module definition in another module.";
 
     }
+
     boolean testImports = true;
-        /*
-      module['a:/a','a']body[q:=1;];
-      module_import('a:/a');
-      module_import('a:/a','b');
-      module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;]
-      module_import('q:/q');
-      a#q:=10;b#q:=11;
-      w#a#q
-      a#q
-      b#q
-         */
+
+    /*
+  module['a:/a','a']body[q:=1;];
+  module_import('a:/a');
+  module_import('a:/a','b');
+  module['q:/q','w']body[module_import('a:/a');zz:=a#q+2;]
+  module_import('q:/q');
+  a#q:=10;b#q:=11;
+  w#a#q
+  a#q
+  b#q
+     */
     public void testNestedVariableImport() throws Throwable {
-        if(!testImports){
+        if (!testImports) {
             return;
         }
         StringBuffer script = new StringBuffer();
@@ -495,10 +496,11 @@ public class ModuleTest extends AbstractQDLTester {
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("okw", state) : "expected w#a#q=3, got " + getLongValue("waq",state);
-        assert getBooleanValue("okaq", state)  : "expected a#q=10, got " + getLongValue("aq",state);
-        assert getBooleanValue("okbq", state)  : "expected b#q=11, got " + getLongValue("bq",state);
+        assert getBooleanValue("okw", state) : "expected w#a#q=3, got " + getLongValue("waq", state);
+        assert getBooleanValue("okaq", state) : "expected a#q=10, got " + getLongValue("aq", state);
+        assert getBooleanValue("okbq", state) : "expected b#q=11, got " + getLongValue("bq", state);
     }
+
     /*
       define[f(x)]body[return(x+100);];
   module['a:/t','a']body[define[f(x)]body[return(x+1);];];
@@ -509,7 +511,7 @@ public class ModuleTest extends AbstractQDLTester {
 
      */
     public void testNestedFunctionImport() throws Throwable {
-        if(!testImports){
+        if (!testImports) {
             return;
         }
         StringBuffer script = new StringBuffer();
@@ -545,7 +547,7 @@ a
      */
 
     public void testNestedModule2() throws Throwable {
-        if(!testImports){
+        if (!testImports) {
             return;
         }
         State state = testUtils.getNewState();
@@ -910,7 +912,7 @@ cannot access '__a'
      * @throws Throwable
      */
     public void testMLBuiltinOverride() throws Throwable {
-        if(skipBuiltinOverride)return;
+        if (skipBuiltinOverride) return;
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -923,7 +925,7 @@ cannot access '__a'
     }
 
     public void testMLOverrideBuiltin() throws Throwable {
-        if(skipBuiltinOverride)return;
+        if (skipBuiltinOverride) return;
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -943,7 +945,7 @@ cannot access '__a'
      * @throws Throwable
      */
     public void testMLOverrideBuiltin2() throws Throwable {
-        if(skipBuiltinOverride)return;
+        if (skipBuiltinOverride) return;
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -955,6 +957,7 @@ cannot access '__a'
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Could not locally override built-in 'size' function";
     }
+
     boolean skipBuiltinOverride = true;
 
     String javaTestModule = "edu.uiuc.ncsa.qdl.extensions.example.MyModule";
@@ -979,5 +982,76 @@ cannot access '__a'
         assert getBooleanValue("ok", state) : "Could not access FQ java module function.";
         assert getBooleanValue("ok1", state) : "Could not access FQ Java moduel variable.";
     }
+
+    /*
+      module['a:a','A'][module['b:b','B'][a:=1;f(x)->a*x^2;];module_import('b:b','X');module_import('b:b','Y');X#a:=2;Y#a:=5;g(x)->X#f(x)*Y#f(x);];
+      module_import('a:a')
+    A
+      g(3)
+    810
+      g(1)
+     */
+
+    /**
+     * This defines a module and imports two instances of it,then defines a function in terms of these.
+     * It is therefore self-contained completely in the outer module.
+     *
+     * @throws Throwable
+     */
+    public void testMultipleNestedModules() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][module['b:b','B'][a:=1;f(x)->a*x^2;];module_import('b:b','X');module_import('b:b','Y');X#a:=2;Y#a:=5;g(x)->X#f(x)*Y#f(x);];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "g3 := g(3);"); // g(x) ends up being 10*x^4
+        addLine(script, "g1 := g(1);");
+        addLine(script, "ok := 810 ==g3;");
+        addLine(script, "ok1 := 10 ==g1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Expected g(3)==810, but got " + getLongValue("g3", state);
+        assert getBooleanValue("ok", state) : "Expected g(1)==10, but got " + getLongValue("g1", state);
+    }
+/*
+   module['a:a','A'][__a := 2*b; f(x)->x*__a;];
+ */
+
+    /**
+     * Tests that creating a module before a referenced global variable (b) works on import.
+     *
+     * @throws Throwable
+     */
+    public void testModuleInitialization() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][__a := 2*b; f(x)->x*__a;];");
+        addLine(script, "b := 5;");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "f2 := f(2);");
+        addLine(script, "ok := 20 == f2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Expected f(2) == 20, but got " + getLongValue("f2", state);
+    }
+
+    public void testModuleInitializationFailure() throws Throwable {
+
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][__a := 2*b; f(x)->x*__a;];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "f2 := f(2);");
+        addLine(script, "ok := 20 == f2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try {
+            interpreter.execute(script.toString());
+            assert false : "Was able to import a module when there was a missing global variable referenced";
+        } catch (UnknownSymbolException unknownSymbolException) {
+            assert true;
+        }
+    }
+
 
 }

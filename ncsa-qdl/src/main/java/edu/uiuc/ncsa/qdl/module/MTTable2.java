@@ -1,17 +1,25 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
  * Module template table.
@@ -31,15 +39,42 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
 
     }
 
+    @Override
+    public String getXMLTableTag() {
+        return XMLConstants.MODULES_TAG;
+    }
 
     @Override
-    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
+    public String getXMLElementTag() {
+        return MODULE_TAG;
+    }
 
+    @Override
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+          for(XKey key : keySet()){
+              xsw.writeStartElement(getXMLElementTag());
+              Module module = get(key);
+              xsw.writeAttribute(XMLConstants.UUID_TAG, module.getId().toString());
+              serializationObjects.templateMap.put(module.getId(), module);
+              xsw.writeEndElement(); // end module tag
+          }
     }
 
     @Override
     public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
 
+    }
+
+
+
+    @Override
+    public V deserializeElement( XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException {
+        XMLEvent xe = xer.peek();
+        XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
+        if(!serializationObjects.processedTemplate(moduleAttributes.uuid)){
+            throw new IllegalStateException("template '" + moduleAttributes.uuid + "' not found");
+        }
+        return (V) serializationObjects.getTemplate(moduleAttributes.uuid);
     }
 
     public void clearChangeList(){

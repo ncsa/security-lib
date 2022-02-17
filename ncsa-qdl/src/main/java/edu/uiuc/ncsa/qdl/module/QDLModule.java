@@ -11,7 +11,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_SOURCE_TAG;
 
@@ -47,12 +46,20 @@ public class QDLModule extends Module {
         return moduleStatement.getSourceCode();
     }
 
-    UUID uuid = UUID.randomUUID();
 
     @Override
     public Module newInstance(State state) {
+        if(state == null){
+            // return a barebones module -- everything that does not depend on the state that
+            // the template has
+            QDLModule qdlModule = new QDLModule();
+            qdlModule.setParentTemplateID(getId());// this object is a template, so set the parent uuid accordingly
+            qdlModule.setAlias(getAlias());
+            qdlModule.setNamespace(getNamespace());
+            qdlModule.setModuleStatement(getModuleStatement());
+            return qdlModule;
+        }
         State localState = state.newLocalState();
-//        QDLInterpreter p = new QDLInterpreter(new XProperties(), localState);
         try {
             //p.execute(getModuleStatement().getSourceCode());
             localState.setImportMode(true);
@@ -60,6 +67,7 @@ public class QDLModule extends Module {
             Module m  = getModuleStatement().getmInstance();
             getModuleStatement().clearInstance();
             localState.setImportMode(false);
+            m.setParentTemplateID(getId());// this object is a template, so set the parent uuid accordingly
             //Module m = state.getMTemplates().getModule(new MTKey(getNamespace()));
             return m;
         } catch (Throwable throwable) {
@@ -93,7 +101,7 @@ public class QDLModule extends Module {
      * @return
      */
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getListByTag() {
         return documentation;
     }
 

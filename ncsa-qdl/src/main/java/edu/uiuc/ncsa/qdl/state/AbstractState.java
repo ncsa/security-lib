@@ -25,6 +25,10 @@ public abstract class AbstractState implements StateInterface, Logable {
         return uuid;
     }
 
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     UUID uuid = UUID.randomUUID();
     UUID antecessor;
 

@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.xml;
 
-import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.module.Module;
@@ -32,6 +31,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -360,10 +360,15 @@ public class XMLUtils implements XMLConstants {
         XMLEvent xe = xer.peek();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
         state.getFTStack().fromXML(xer, qi);
-
     }
 
-
+    /**
+     * Used for reading very old serialized versions, before there were multiple stacks. Keep for a bit just in case.
+     * @param xer
+     * @param xp
+     * @param state
+     * @throws XMLStreamException
+     */
     public static void oldDeserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
@@ -452,7 +457,7 @@ public class XMLUtils implements XMLConstants {
                                               XProperties xp,
                                               State state) throws XMLStreamException {
         // Cursor management: The stream points to the module tag or we would not be here, but we need to
-        // create the
+        // create the module
         Module module = null;
         State moduleState = state.newCleanState();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
@@ -465,7 +470,8 @@ public class XMLUtils implements XMLConstants {
                 Class klasse = state.getClass().forName(moduleAttributes.className);
                 module = ((JavaModule) klasse.newInstance()).newInstance(moduleState); // this populates the functions and variables!!
             } catch (Throwable t) {
-                throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
+                System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '" + t.getMessage() + "' ("+t.getClass().getName() + ")");
+                //throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
             }
 
         } else {
@@ -486,15 +492,18 @@ public class XMLUtils implements XMLConstants {
     }
 
     /**
-     * Internal class to manage attributes for a module.
+     * Internal class to manage attributes for a module.   Not all modules have all of these all the time!
      */
-    protected static class ModuleAttributes {
-        String type = null;
-        URI ns = null;
-        String alias = null;
-        String className = null;
+    public static class ModuleAttributes {
+     public String type = null;
+     public URI ns = null;
+     public String alias = null;
+     public String className = null;
+     public UUID uuid = null;
+     public UUID stateReference = null;
+     public UUID templateReference = null;
 
-        protected boolean isJavaModule() {
+        public boolean isJavaModule() {
             if (type == null) {
                 return false;
             }
@@ -503,7 +512,7 @@ public class XMLUtils implements XMLConstants {
 
     }
 
-    protected static ModuleAttributes getModuleAttributes(XMLEvent xe) throws XMLStreamException {
+    public static ModuleAttributes getModuleAttributes(XMLEvent xe) throws XMLStreamException {
         ModuleAttributes moduleAttributes = new ModuleAttributes();
         Iterator iterator = xe.asStartElement().getAttributes(); // Use iterator since it tracks state
         while (iterator.hasNext()) {
@@ -521,6 +530,15 @@ public class XMLUtils implements XMLConstants {
                     break;
                 case MODULE_TYPE_TAG:
                     moduleAttributes.type = v;
+                    break;
+                case UUID_TAG: // new in version 2.0 of serialization
+                    moduleAttributes.uuid = UUID.fromString(v);
+                    break;
+                case TEMPLATE_REFERENCE_TAG:
+                    moduleAttributes.templateReference = UUID.fromString(v);
+                    break;
+                case STATE_REFERENCE_TAG:
+                    moduleAttributes.stateReference = UUID.fromString(v);
                     break;
             }
         }

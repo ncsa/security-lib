@@ -1,10 +1,10 @@
 package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -24,14 +24,6 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TAG;
  * on 11/19/21 at  7:48 AM
  */
 public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,V>  implements Documentable {
-
-
-/*
-    @Override
-    public V put(K xKey, V xThing) {
-        return super.put((K) xKey, (V) xThing);
-    }
-*/
 
     /**
      * If argCount === -1, remove all named functions, otherwise only remove the one with the
@@ -186,14 +178,10 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     }
    /**
     *  Writes every function in no particular order by its source code. Look at
-    * {@link FStack#toXML(XMLStreamWriter)} for top level of functions
+    * {@link FStack#toXML(XMLStreamWriter, SerializationObjects)} for top level of functions
    */
     @Override
-    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        if (isEmpty()) {
-            return;
-        }
-        xsw.writeStartElement(FUNCTIONS_TAG);
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
         for (XKey key : keySet()) {
             if (get(key).sourceCode.isEmpty()) {
                 // No source code usually means it is from some external function
@@ -209,12 +197,12 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
             xsw.writeCData(StringUtils.listToString(get(key).sourceCode));
             xsw.writeEndElement();
         }
-        xsw.writeEndElement();
     }
 
 
     /**
-     * Deserialize a single function using the interpreter (and its current state);
+     * Deserialize a single function using the interpreter (and its current state); This assumes that the function
+     * will get stuffed into the current state and that will get processed.
      *
      * @param xer
      * @param qi
@@ -247,6 +235,48 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     }
 
     @Override
+    public V deserializeElement(XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException {
+        XMLEvent xe = xer.nextEvent();
+        //Since this requires parsing from the source which can get extremely complex (that's why we have a parser)
+        // about the only way to do this is to black box it, viz., look at the state (set of functions) beforehand
+        // then let the magic happen and look at the set afterwords. Return the difference.
+        Set<XKey> oldKeys = qi.getState().getFTStack().keySet();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    break;
+                case XMLEvent.CHARACTERS:
+                    if (!xe.asCharacters().isIgnorableWhiteSpace()) {
+                        try {
+                            qi.execute(xe.asCharacters().getData());
+                        } catch (Throwable t) {
+                            // should do something else??
+                            System.err.println("Error deserializing function:" + t.getMessage());
+                        }
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(getXMLElementTag())) {
+                        Set<XKey> newKeys = qi.getState().getFTStack().keySet();
+                        newKeys.removeAll(oldKeys);
+                        if(newKeys.isEmpty()){
+                            throw new IllegalStateException("no function found to deserialize");
+                        }
+                        if(newKeys.size() !=1){
+                            throw new IllegalStateException(newKeys.size() + " functions deserialized. A single one was expected");
+                        }
+                        return (V) qi.getState().getFTStack().get(newKeys.iterator().next());
+                    }
+                    break;
+
+            }
+            xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(FUNCTION_TAG);
+    }
+
+    @Override
     public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
@@ -267,16 +297,37 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
         throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 
+/*    @Override
+    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+        State state = new State();
+        QDLInterpreter qi = new QDLInterpreter(null, new State());
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
+                        processSingleFunction(xer, qi);
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTIONS_TAG)) {
+                        return;
+                    }
+            }
+            xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
+    }*/
+
     @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[size=" + size() + "]";
+    public String getXMLTableTag() {
+        return FUNCTIONS_TAG;
     }
 
-    UUID id = UUID.randomUUID();
-
     @Override
-    public UUID getID() {
-        return id;
+    public String getXMLElementTag() {
+        return FUNCTION_TAG;
     }
 }
 

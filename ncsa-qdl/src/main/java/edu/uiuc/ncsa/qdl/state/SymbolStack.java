@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
@@ -11,11 +12,10 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STACKS_TAG;
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.VARIABLE_STACK;
 
 /**
  * /**
@@ -29,15 +29,16 @@ public class SymbolStack extends AbstractSymbolTable {
         addParent(new SymbolTableImpl());
     }
 
-      public boolean isEmpty(){
-          for (SymbolTable s : parentTables) {
-              // use this and not addParent, since that reverses their order, inserting a the front of the list
-              if(!getParentTables().isEmpty()){
-                  return false;
-              }
-          }
+    public boolean isEmpty() {
+        for (SymbolTable s : parentTables) {
+            // use this and not addParent, since that reverses their order, inserting a the front of the list
+            if (!getParentTables().isEmpty()) {
+                return false;
+            }
+        }
         return true;
-      }
+    }
+
     /**
      * This constructor takes all of the parents and then pushes a new {@link SymbolTableImpl}
      * on to the stack.
@@ -52,9 +53,10 @@ public class SymbolStack extends AbstractSymbolTable {
         addParent(new SymbolTableImpl());
     }
 
-    public int parentCount(){
+    public int parentCount() {
         return getParentTables().size();
     }
+
     /*
         Note that the order of the parents is that the most recent comes 0th. So the local table
         is at index 0, then its parent is 1, ... the very last table is the global state.
@@ -68,6 +70,31 @@ public class SymbolStack extends AbstractSymbolTable {
         return parentTables;
     }
 
+    List<UUID> addedTables = new ArrayList<>();
+
+    protected void add(SymbolTableImpl si) {
+        if (si.getMap().isEmpty()) {
+            return;
+        }
+        if (addedTables.contains(si.getID())) {
+            return;
+        }
+        addedTables.add(si.getID());
+        getParentTables().add(si);
+    }
+
+    public void addAll(List<SymbolTable> tables) {
+        for (SymbolTable symbolTable : tables) {
+            if (symbolTable instanceof SymbolTableImpl) {
+                add((SymbolTableImpl) symbolTable);
+            }
+            if (symbolTable instanceof SymbolStack) {
+                SymbolStack symbolStack = (SymbolStack) symbolTable;
+                addAll(symbolStack.getParentTables());
+            }
+        }
+
+    }
 
     ArrayList<SymbolTable> parentTables;
 
@@ -97,12 +124,13 @@ public class SymbolStack extends AbstractSymbolTable {
 
     /**
      * startIndex = 0 means look in local state too, startIndex = 1 means skip local state.
+     *
      * @param var
      * @param startIndex
      * @return
      */
     protected Object findValueInATable(String var, int startIndex) {
-        for(int i = startIndex; i < getParentTables().size(); i++){
+        for (int i = startIndex; i < getParentTables().size(); i++) {
             Object obj = getParentTables().get(i).resolveValue(var);
             if (obj != null) {
                 return obj;
@@ -113,35 +141,39 @@ public class SymbolStack extends AbstractSymbolTable {
 
     /**
      * Gets the value from the most local table. Used mostly for intrinsic values.
+     *
      * @param variableName
      * @return
      */
-    public Object getLocalValue(String variableName){
+    public Object getLocalValue(String variableName) {
         return getParentTables().get(0).resolveValue(variableName);
     }
 
     /**
      * Sets the value in the most local table. Used mostly for intrinsic values.
+     *
      * @param variableName
      * @param value
      */
-    public void setLocalValue(String variableName, Object value){
-          getParentTables().get(0).setValue(variableName, value);
+    public void setLocalValue(String variableName, Object value) {
+        getParentTables().get(0).setValue(variableName, value);
     }
 
     /**
      * Checks if the most local table contains the value. Used mostly for intrinsic values.
+     *
      * @param variableName
      * @return
      */
-    public boolean hasLocalValue(String variableName){
-        return null!= getParentTables().get(0).resolveValue(variableName);
+    public boolean hasLocalValue(String variableName) {
+        return null != getParentTables().get(0).resolveValue(variableName);
     }
 
     public Object resolveValue(String variableName, int startIndex) {
         return findValueInATable(variableName, startIndex); // to keep current code working
 
     }
+
     public Object resolveValue(String variableName) {
         return findValueInATable(variableName, 0); // to keep current code working
     }
@@ -276,13 +308,59 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     @Override
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+         toXML(xsw);
+    }
+
+    @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        xsw.writeStartElement(XMLConstants.STACKS_TAG);
+        //xsw.writeStartElement(XMLConstants.STACKS_TAG);
+        xsw.writeStartElement(VARIABLE_STACK);
         xsw.writeComment("The list of symbol tables for this state.");
         for (SymbolTable st : getParentTables()) {
             st.toXML(xsw);
         }
         xsw.writeEndElement();
+    }
+
+    /**
+     * For version 2,0
+     * @param xer
+     * @param serializationObjects
+     * @throws XMLStreamException
+     */
+    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+        // points to stacks tag
+        XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        // no attributes or such with the stacks tag.
+        while (xer.hasNext()) {
+            xe = xer.peek();
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case XMLConstants.VARIABLES_TAG:
+                            SymbolTableImpl si = new SymbolTableImpl();
+                            si.fromXML(xer, serializationObjects);
+                            if (0 < si.getSymbolCount()) {
+                                add(si);
+                            }
+                    }
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(VARIABLE_STACK)) {
+                        if(getParentTables().isEmpty()){
+                            // Just make sure there is at least one.
+                            getParentTables().add(new SymbolTableImpl());
+                        }
+                        return;
+                    }
+                    break;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VARIABLE_STACK);
+
+
     }
 
     public void fromXML(XMLEventReader xer) throws XMLStreamException {
@@ -297,7 +375,7 @@ public class SymbolStack extends AbstractSymbolTable {
                         case XMLConstants.STACK_TAG:
                             SymbolTableImpl si = new SymbolTableImpl();
                             si.fromXML(xer);
-                            if(0 < si.getSymbolCount()) {
+                            if (0 < si.getSymbolCount()) {
                                 addParent(si);
                             }
                     }
@@ -310,7 +388,7 @@ public class SymbolStack extends AbstractSymbolTable {
             }
             xe = xer.nextEvent();
         }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STACKS_TAG );
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STACKS_TAG);
 
     }
 

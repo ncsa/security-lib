@@ -7,9 +7,7 @@ import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.MIStack;
-import edu.uiuc.ncsa.qdl.module.MTStack;
-import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.module.*;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
@@ -20,8 +18,10 @@ import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
+import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -36,14 +36,16 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 
 /**
  * This is a facade for the various stateful components we have to track.
- * Represents the internal state of the system. It has the {@link edu.uiuc.ncsa.qdl.module.MAliases},
- * {@link SymbolTable}, {@link edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator} and such.
+ * Represents the internal state of the system.
  * <p>Created by Jeff Gaynor<br>
  * on 1/21/20 at  7:25 AM
  */
@@ -52,13 +54,9 @@ public class State extends FunctionState implements QDLConstants {
 
     public String getInternalID() {
         if (internalID == null) {
-            internalID = UUID.randomUUID().toString();
+            internalID = getUuid().toString(); // basically just cache it.
         }
         return internalID;
-    }
-
-    public void setInternalID(String internalID) {
-        this.internalID = internalID;
     }
 
     String internalID = null;
@@ -513,6 +511,7 @@ public class State extends FunctionState implements QDLConstants {
 
     /**
      * Convenience method for {@link #newLocalState(State)} with a null argument
+     *
      * @return State
      */
     public State newLocalState() {
@@ -522,48 +521,54 @@ public class State extends FunctionState implements QDLConstants {
     /**
      * Takes the modules in the moduleState and pushes a new stack, function table and modules
      * onto the current stack.
+     *
      * @param moduleState
      * @return
      */
     public State newLocalState(State moduleState) {
-                //   return newStateWithImportsOLD(moduleState);
-                   return newStateWithImportsNEW(moduleState);
+        //   return newStateWithImportsOLD(moduleState);
+        return newStateWithImportsNEW(moduleState);
     }
+
     protected State newStateWithImportsNEW(State moduleState) {
         SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
-        if (moduleState!= null && !moduleState.symbolStack.isEmpty()) {
-            newStack.getParentTables().addAll(moduleState.symbolStack.getParentTables());
-            //newStack.getParentTables().set(0, moduleState.symbolStack);
+        if (moduleState != null && !moduleState.symbolStack.isEmpty()) {
+            newStack.addAll(moduleState.symbolStack.getParentTables());
         }
+
         if (!symbolStack.isEmpty()) {
-            newStack.getParentTables().addAll(symbolStack.getParentTables());
+            newStack.addAll(symbolStack.getParentTables());
         }
 
         FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
-        if (moduleState!= null && !moduleState.getFTStack().isEmpty()) {
+        if (moduleState != null && !moduleState.getFTStack().isEmpty()) {
             ftStack.appendTables(moduleState.getFTStack());
         }
+
         if (!getFTStack().isEmpty()) {
             ftStack.appendTables(getFTStack()); // pushes elements in reverse order
         }
 
 
         MTStack mtStack = new MTStack();
-        if(moduleState!= null &&  !moduleState.getMTemplates().isEmpty()){
+        if (moduleState != null && !moduleState.getMTemplates().isEmpty()) {
             mtStack.appendTables(moduleState.getMTemplates());
         }
 
-        if(!getMTemplates().isEmpty()) {
+        if (!getMTemplates().isEmpty()) {
             mtStack.appendTables(getMTemplates());
         }
-        if(moduleState!= null &&  !moduleState.getMTemplates().isEmpty()){
+
+        if (moduleState != null && !moduleState.getMTemplates().isEmpty()) {
             mtStack.appendTables(moduleState.getMTemplates());
         }
+
         MIStack miStack = new MIStack();
-        if(moduleState!= null &&  !moduleState.getMInstances().isEmpty()){
+        if (moduleState != null && !moduleState.getMInstances().isEmpty()) {
             miStack.appendTables(moduleState.getMInstances());
         }
-        if(!getMInstances().isEmpty()) {
+
+        if (!getMInstances().isEmpty()) {
             miStack.appendTables(getMInstances());
         }
 
@@ -587,31 +592,31 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public State newStateWithImportsOLD(State moduleState) {
-          SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
-          newStack.getParentTables().set(0,moduleState.symbolStack);
-          newStack.getParentTables().addAll(symbolStack.getParentTables());
+        SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
+        newStack.getParentTables().set(0, moduleState.symbolStack);
+        newStack.getParentTables().addAll(symbolStack.getParentTables());
 
-          FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
-          ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
-          ftStack.addTables(moduleState.getFTStack());
+        FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
+        ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
+        ftStack.addTables(moduleState.getFTStack());
 
-          State newState = newInstance(
-                  newStack,
-                  getOpEvaluator(),
-                  getMetaEvaluator(),
-                  ftStack,
-                  getMTemplates(),
-                  getMInstances(),
-                  getLogger(),
-                  isServerMode(),
-                  isRestrictedIO(),
-                  isAssertionsOn());
-          newState.setScriptArgs(getScriptArgs());
-          newState.setScriptPaths(getScriptPaths());
-          newState.setModulePaths(getModulePaths());
-          newState.setVfsFileProviders(getVfsFileProviders());
-          return newState;
-      }
+        State newState = newInstance(
+                newStack,
+                getOpEvaluator(),
+                getMetaEvaluator(),
+                ftStack,
+                getMTemplates(),
+                getMInstances(),
+                getLogger(),
+                isServerMode(),
+                isRestrictedIO(),
+                isAssertionsOn());
+        newState.setScriptArgs(getScriptArgs());
+        newState.setScriptPaths(getScriptPaths());
+        newState.setModulePaths(getModulePaths());
+        newState.setVfsFileProviders(getVfsFileProviders());
+        return newState;
+    }
 
     /**
      * For the case the this has been deserialized and needs to have its transient
@@ -652,7 +657,7 @@ public class State extends FunctionState implements QDLConstants {
      *
      * @return
      */
-    public State newCleanState() {
+    public  State newCleanState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
         State newState = newInstance(
                 new SymbolStack(),
@@ -672,7 +677,13 @@ public class State extends FunctionState implements QDLConstants {
         return newState;
     }
 
-
+    /**
+     * This is needed for XML deserlization and makes dummy state for everything, assuming the deserializer will
+     * replace it all. Generally do not use outside of XML deserialization.
+     */
+    public State() {
+        super(new SymbolStack(),new OpEvaluator(), new MetaEvaluator(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
+    }
 
     /**
      * Add the module under the default alias
@@ -688,6 +699,19 @@ public class State extends FunctionState implements QDLConstants {
 
     public int getStackSize() {
         return getSymbolStack().getSymbolCount();
+    }
+
+    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+        xsw.writeStartElement(STATE_TAG);
+        xsw.writeAttribute(UUID_TAG, getInternalID());
+        writeExtraXMLAttributes(xsw);
+        getSymbolStack().toXML(xsw);
+        getFTStack().toXML(xsw, serializationObjects);
+        getMTemplates().toXML(xsw, serializationObjects);
+        getMInstances().toXML(xsw, serializationObjects);
+        writeExtraXMLElements(xsw);
+        xsw.writeEndElement(); // end state tag
+
     }
 
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
@@ -711,19 +735,80 @@ public class State extends FunctionState implements QDLConstants {
         // overwrite what is there. This way if the user has modified things, it is preserved.
 
         // Templates
-        getMTemplates().toXML(xsw);
+        getMTemplates().toXML(xsw, null);
 
         // imports
-        getMInstances().toXML(xsw);
+        getMInstances().toXML(xsw, null);
 
         // Symbol stack has the variables
         getSymbolStack().toXML(xsw);
         // Function table has the functions
-        getFTStack().toXML(xsw);
+        getFTStack().toXML(xsw, null);
         writeExtraXMLElements(xsw);
         xsw.writeEndElement(); // end state tag
     }
 
+    public void fromXML(XMLEventReader xer, XProperties xp, SerializationObjects serializationObjects) throws XMLStreamException {
+        // At this point, caller peeked and knows this is the right type of event,
+        // so we know where in the stream we are starting automatically.
+
+        XMLEvent xe = xer.nextEvent(); // start iteration it should be at the state tag
+        if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(STATE_TAG)) {
+            internalID = xe.asStartElement().getAttributeByName(new QName(UUID_TAG)).getValue();
+            readExtraXMLAttributes(xe.asStartElement());
+        }
+        while (xer.hasNext()) {
+            xe = xer.peek(); // start iteration
+            switch (xe.getEventType()) {
+                case XMLEvent.START_ELEMENT:
+                    switch (xe.asStartElement().getName().getLocalPart()) {
+                        case VARIABLE_STACK:
+                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)){
+                                SymbolStack st = new SymbolStack();
+                                st.getParentTables().clear(); // or there is an extra top level element.
+                                st.fromXML(xer, serializationObjects);
+                                setSymbolStack(st);
+
+                            }else{
+                                SymbolStack st = new SymbolStack();
+                                st.fromXML(xer);
+                                setSymbolStack(st);
+                            }
+                            break;
+                        case FUNCTION_TABLE_STACK_TAG:
+                            XMLUtils.deserializeFunctions(xer, xp, this);
+                            break;
+                        case INSTANCE_STACK:
+                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeInstances(xer, this, serializationObjects);
+                            }else{
+                                XMLUtils.deserializeImports(xer, xp, this);
+                            }
+                            break;
+                        case TEMPLATE_STACK:
+                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeTemplates(xer, this, serializationObjects);
+                            }else{
+                                XMLUtils.deserializeTemplates(xer, xp,this);
+
+                            }
+                            break;
+                        default:
+                            readExtraXMLElements(xe, xer);
+                            break;
+                    }
+
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(STATE_TAG)) {
+                        return;
+                    }
+                    break;
+            }
+            xer.next(); // advance cursor
+        }
+        throw new XMLMissingCloseTagException(STATE_TAG);
+    }
     public void fromXML(XMLEventReader xer, XProperties xp) throws XMLStreamException {
         // At this point, caller peeked and knows this is the right type of event,
         // so we know where in the stream we are starting automatically.
@@ -793,7 +878,7 @@ public class State extends FunctionState implements QDLConstants {
                             List<String> doc = new ArrayList<>();
 
                             @Override
-                            public List<String> getDocumentation() {
+                            public List<String> getListByTag() {
                                 return doc;
                             }
 
@@ -851,7 +936,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     /**
-     * Allows you to read custome attributes from teh state tag. This should <b><i>only</i></b> contain
+     * Allows you to read custom attributes from the state tag. This should <b><i>only</i></b> contain
      * calls to {@link StartElement#getAttributeByName(QName)} by name calls.
      *
      * @param xe
@@ -905,5 +990,28 @@ public class State extends FunctionState implements QDLConstants {
 
     WorkspaceCommands workspaceCommands;
 
+    public void buildSO(SerializationObjects serializationObjects) {
+        for (Object key : getMTemplates().keySet()) {
+            MTKey mtKey = (MTKey) key;
+            Module module = getMTemplates().getModule(mtKey);
+            if (!serializationObjects.processedTemplate(module)) {
+                serializationObjects.addTemplate(module);
+            }
+        }
+        for (Object key : getMInstances().keySet()) {
+            XKey xKey = (XKey) key;
+            MIWrapper wrapper = (MIWrapper) getMInstances().get(xKey);
+            Module module = wrapper.getModule();
+            if (!serializationObjects.processedInstance(module)) {
+                serializationObjects.addInstance(wrapper);
+                if (!serializationObjects.processedState(module.getState())) {
+                    serializationObjects.addState(module.getState());
+                    module.getState().buildSO(serializationObjects);
+                }
+            }
+
+        }
+
+    }
 
 }

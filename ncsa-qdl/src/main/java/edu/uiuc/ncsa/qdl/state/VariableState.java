@@ -256,7 +256,9 @@ public abstract class VariableState extends NamespaceAwareState {
                         }
                         Module m = getMInstances().getModule((XKey) key);
                         if (m != null) {
-                            Object obj = m.getState().getValue(variableName);
+                            checkInstances.add(xKey);
+
+                            Object obj = m.getState().getValue(variableName, checkInstances);
                             checkInstances.add(xKey);
                             if (obj != null && (obj instanceof StemVariable)) {
                                 stem = (StemVariable) obj;
@@ -460,12 +462,13 @@ public abstract class VariableState extends NamespaceAwareState {
             return out;
         }
         for (Object key : getMInstances().keySet()) {
-            Module m = getMInstances().getModule((XKey) key);
+            XKey xKey = (XKey)key;
+            Module m = getMInstances().getModule(xKey);
             if (m == null) {
                 continue; // the user specified a non-existent module.
             }
-            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation,
-                    true, showIntrinsic);
+
+            TreeSet<String> uqVars = m.getState().getSymbolStack().listVariables();
             for (String x : uqVars) {
                 if (isIntrinsic(x) && !showIntrinsic) {
                     continue;
@@ -473,34 +476,12 @@ public abstract class VariableState extends NamespaceAwareState {
                 if (useCompactNotation) {
                     out.add(getMInstances().getAliasesAsString(m.getMTKey()) + NS_DELIMITER + x);
                 } else {
-                    for (Object alias : getMInstances().getAliases(m.getMTKey())) {
+                    for (Object alias : getMInstances().getAliasesAsString(m.getMTKey())) {
                         out.add(alias + NS_DELIMITER + x);
                     }
                 }
             }
         }
-/*
-        for (URI key : getMAliases().keySet()) {
-            Module m = getMTemplates().get(key);
-            if (m == null) {
-                continue; // the user specified a non-existent module.
-            }
-            TreeSet<String> uqVars = m.getState().listVariables(useCompactNotation,
-                    true, showIntrinsic);
-            for (String x : uqVars) {
-                if (isIntrinsic(x) && !showIntrinsic) {
-                    continue;
-                }
-                if (useCompactNotation) {
-                    out.add(getMAliases().getAliases(key) + NS_DELIMITER + x);
-                } else {
-                    for (String alias : getMAliases().getAliases(key)) {
-                        out.add(alias + NS_DELIMITER + x);
-                    }
-                }
-            }
-        }
-*/
         return out;
     }
 

@@ -4,10 +4,11 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.state.XTable;
+import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,7 +36,9 @@ public class MIStack<V extends MITable2<? extends XKey, ? extends MIWrapper>> ex
 
     @Override
     public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException {
+        throw new NotImplementedException("implement version 1 serialization for new instance stack");
     }
+
 
     /**
      * Convenience method that casts
@@ -49,14 +52,16 @@ public class MIStack<V extends MITable2<? extends XKey, ? extends MIWrapper>> ex
        }
          return (wrapper).getModule();
    }
+
+
     @Override
-    public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        if (isEmpty()) {
-            return;
-        }
-        xsw.writeComment("Modules.");
-        super.toXML(xsw);
-        xsw.writeEndElement(); // end of tables.
+    public String getXMLStackTag() {
+        return XMLConstants.INSTANCE_STACK;
+    }
+
+    @Override
+    public String getXMLTableTag() {
+        return XMLConstants.MODULES_TAG;
     }
 
     /**

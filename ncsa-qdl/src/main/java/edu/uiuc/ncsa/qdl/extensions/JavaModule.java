@@ -99,7 +99,6 @@ public abstract class JavaModule extends Module {
             state.setValue(v.getName(), v.getValue());
         }
         setDocumentation(createDefaultDocs());
-
         for (QDLFunction f : funcs) {
             for (int i : f.getArgCount()) {
                 QDLFunctionRecord fr = new QDLFunctionRecord();
@@ -124,6 +123,8 @@ public abstract class JavaModule extends Module {
         xsw.writeAttribute(XMLConstants.MODULE_TYPE_TAG, XMLConstants.MODULE_TYPE_JAVA_TAG);
         xsw.writeAttribute(XMLConstants.MODULE_CLASS_NAME_TAG, getClassname());
     }
+
+
 
     /**
      * Creates the documentation from the first of each line of every function. Use this or
@@ -179,7 +180,7 @@ public abstract class JavaModule extends Module {
      List<String> documentation = new ArrayList<>();
 
     @Override
-    public List<String> getDocumentation() {
+    public List<String> getListByTag() {
         return documentation;
     }
 
@@ -187,4 +188,6 @@ public abstract class JavaModule extends Module {
     public void setDocumentation(List<String> documentation) {
                    this.documentation = documentation;
     }
+
+
 }
