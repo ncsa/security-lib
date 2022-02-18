@@ -4,7 +4,7 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
@@ -178,10 +178,10 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     }
    /**
     *  Writes every function in no particular order by its source code. Look at
-    * {@link FStack#toXML(XMLStreamWriter, SerializationObjects)} for top level of functions
+    * {@link FStack#toXML(XMLStreamWriter, XMLSerializationState)} for top level of functions
    */
     @Override
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         for (XKey key : keySet()) {
             if (get(key).sourceCode.isEmpty()) {
                 // No source code usually means it is from some external function
@@ -235,7 +235,7 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     }
 
     @Override
-    public V deserializeElement(XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException {
+    public V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         //Since this requires parsing from the source which can get extremely complex (that's why we have a parser)
         // about the only way to do this is to black box it, viz., look at the state (set of functions) beforehand

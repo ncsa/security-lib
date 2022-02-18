@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.xml;
 import edu.uiuc.ncsa.qdl.module.MIWrapper;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import java.util.*;
 
@@ -14,7 +15,7 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/22 at  4:52 PM
  */
-public class SerializationObjects {
+public class XMLSerializationState {
     public boolean processedState(UUID uuid) {
         return stateMap.containsKey(uuid);
     }
@@ -126,5 +127,21 @@ public class SerializationObjects {
         this.version = version;
     }
 
+    public boolean isVersion2_0(){
+        if(StringUtils.isTrivial(getVersion())){
+            return false;
+        }
+        return getVersion().equals(XMLConstants.VERSION_2_0_TAG);
+    }
     String version;
+
+    public boolean isFailOnMissingModules() {
+        return failOnMissingModules;
+    }
+
+    public void setFailOnMissingModules(boolean failOnMissingModules) {
+        this.failOnMissingModules = failOnMissingModules;
+    }
+
+    boolean failOnMissingModules = false;
 }

@@ -25,7 +25,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
  */
 public class XMLUtilsV2 {
 
-    public static void deserializeTemplateStore(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public static void deserializeTemplateStore(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
 
         while (xer.hasNext()) {
@@ -36,12 +36,11 @@ public class XMLUtilsV2 {
                         // Have to get the attributes first because they are needed to determine which
                         // type of module to create.
                         XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
-                        Module module = deserializeTemplate(xer, moduleAttributes, serializationObjects);
-                        serializationObjects.addTemplate(module);
+                        Module module = deserializeTemplate(xer, moduleAttributes, XMLSerializationState);
+                        XMLSerializationState.addTemplate(module);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
-                    System.err.println(XMLUtilsV2.class.getSimpleName() + ": end tag = " + xe.asEndElement().getName().getLocalPart());
                     if (xe.asEndElement().getName().getLocalPart().equals(MODULE_TEMPLATE_TAG)) {
                         return;
                     }
@@ -51,7 +50,7 @@ public class XMLUtilsV2 {
         throw new XMLMissingCloseTagException(TEMPLATE_STACK);
     }
 
-    public static void deserializeStateStore(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public static void deserializeStateStore(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
 
         while (xer.hasNext()) {
@@ -63,18 +62,17 @@ public class XMLUtilsV2 {
                         // type of module to create.
                         StateAttributes stateAttributes = getStateAttributes(xe);
                         State state;
-                        if (serializationObjects.processedState(stateAttributes.uuid)) {
-                            state = serializationObjects.getState(stateAttributes.uuid);
+                        if (XMLSerializationState.processedState(stateAttributes.uuid)) {
+                            state = XMLSerializationState.getState(stateAttributes.uuid);
                         } else {
                             state = StateUtils.newInstance();
                             state.setUuid(stateAttributes.uuid);
-                            serializationObjects.addState(state);
+                            XMLSerializationState.addState(state);
                         }
-                        StateUtils.load(state, serializationObjects, xer);
+                        StateUtils.load(state, XMLSerializationState, xer);
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
-                    System.err.println(XMLUtilsV2.class.getSimpleName() + ": end tag = " + xe.asEndElement().getName().getLocalPart());
                     if (xe.asEndElement().getName().getLocalPart().equals(STATES_TAG)) {
                         return;
                     }
@@ -89,10 +87,10 @@ public class XMLUtilsV2 {
      *
      * @param xer
      * @param moduleAttributes
-     * @param serializationObjects
+     * @param XMLSerializationState
      * @return
      */
-    public static Module deserializeTemplate(XMLEventReader xer, XMLUtils.ModuleAttributes moduleAttributes, SerializationObjects serializationObjects) throws XMLStreamException {
+    public static Module deserializeTemplate(XMLEventReader xer, XMLUtils.ModuleAttributes moduleAttributes, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         Module module = null;
 
         if (moduleAttributes.isJavaModule()) {
@@ -111,7 +109,7 @@ public class XMLUtilsV2 {
         } else {
             module = new QDLModule();
         }
-        module.fromXML(xer, serializationObjects, true);
+        module.fromXML(xer, XMLSerializationState, true);
         module.setId(moduleAttributes.uuid);
         module.setAlias(moduleAttributes.alias);
         module.setNamespace(moduleAttributes.ns);
@@ -135,20 +133,20 @@ public class XMLUtilsV2 {
      * Deserializes a template stack of references.
      *
      * @param xer
-     * @param serializationObjects
+     * @param XMLSerializationState
      * @throws XMLStreamException
      */
-    public static void deserializeTemplates(XMLEventReader xer, State state, SerializationObjects serializationObjects) throws XMLStreamException {
+    public static void deserializeTemplates(XMLEventReader xer, State state, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();// advance cursor
         MTStack mtStack = new MTStack();
-        mtStack.fromXML(xer, serializationObjects);
+        mtStack.fromXML(xer, XMLSerializationState);
         state.setMTemplates(mtStack);
     }
 
-    public static void deserializeInstances(XMLEventReader xer, State state, SerializationObjects serializationObjects) throws XMLStreamException {
+    public static void deserializeInstances(XMLEventReader xer, State state, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();// advance cursor
         MIStack miStack = new MIStack();
-        miStack.fromXML(xer, serializationObjects);
+        miStack.fromXML(xer, XMLSerializationState);
         state.setMInstances(miStack);
     }
 

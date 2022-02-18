@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 
 import javax.xml.stream.XMLEventReader;
@@ -29,25 +29,25 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
             return put((K) value.getKey(), (V) value);
         }
 
-    public abstract void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException;
+    public abstract void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException;
 
 
     public abstract void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
     /**
      * Version 2.0 serialization
      * @param xer
-     * @param serializationObjects
+     * @param XMLSerializationState
      * @throws XMLStreamException
      */
 
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
             xe = xer.peek();
             switch (xe.getEventType()) {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(getXMLElementTag())) {
-                        put(deserializeElement(xer, serializationObjects, null)); // no interpreter needed
+                        put(deserializeElement(xer, XMLSerializationState, null)); // no interpreter needed
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -62,7 +62,7 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
 
     public abstract String getXMLTableTag();
     public abstract String getXMLElementTag();
-    public abstract V deserializeElement( XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException;
+    public abstract V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException;
 
     //public abstract void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException;
 

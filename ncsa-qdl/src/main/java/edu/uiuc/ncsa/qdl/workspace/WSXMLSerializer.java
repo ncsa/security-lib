@@ -6,7 +6,7 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
@@ -40,8 +40,8 @@ public class WSXMLSerializer {
 
 
     public void toXML(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
-        SerializationObjects serializationObjects = new SerializationObjects();
-        serializationObjects.setVersion(VERSION_2_0_TAG);
+        XMLSerializationState XMLSerializationState = new XMLSerializationState();
+        XMLSerializationState.setVersion(VERSION_2_0_TAG);
         xsw.writeStartDocument();
         xsw.writeStartElement(WORKSPACE_TAG);
         xsw.writeAttribute(SERIALIZATION_VERSION_TAG, VERSION_2_0_TAG);
@@ -58,17 +58,17 @@ public class WSXMLSerializer {
         // Lay in the object store for templates then states. Since we use an event driven XML parser
         // order matters for deserialization.
         State state = workspaceCommands.getState();
-        serializationObjects.addState(state);
+        XMLSerializationState.addState(state);
         xsw.writeComment("Top-level state object for the workspace.");
         // Serialize main workspace state. This kicks off all the other serializations.
-        state.buildSO(serializationObjects);
+        state.buildSO(XMLSerializationState);
 
         // Global list of templates
         xsw.writeStartElement(MODULE_TEMPLATE_TAG);
             xsw.writeComment("templates for all modules");
-            for (UUID key : serializationObjects.templateMap.keySet()) {
-                Module module = serializationObjects.getTemplate(key);
-                module.toXML(xsw, null, true, serializationObjects);
+            for (UUID key : XMLSerializationState.templateMap.keySet()) {
+                Module module = XMLSerializationState.getTemplate(key);
+                module.toXML(xsw, null, true, XMLSerializationState);
             }
             xsw.writeEndElement(); // end module templates
 
@@ -80,10 +80,10 @@ public class WSXMLSerializer {
          * At this point we have a flat list of states. Serialize all of them.
          */
         Set<UUID> currentKeys = new HashSet<>();
-        currentKeys.addAll(serializationObjects.stateMap.keySet());
+        currentKeys.addAll(XMLSerializationState.stateMap.keySet());
         for (UUID key : currentKeys) {
             if (!key.equals(state.getUuid()))
-                serializationObjects.getState(key).toXML(xsw, serializationObjects);
+                XMLSerializationState.getState(key).toXML(xsw, XMLSerializationState);
         }
         xsw.writeEndElement(); // end states reference
 
@@ -197,7 +197,7 @@ public class WSXMLSerializer {
         }
 
         // Absolute last thing to write is the actual state object for the workspace.
-        state.toXML(xsw, serializationObjects);
+        state.toXML(xsw, XMLSerializationState);
 
         xsw.writeEndElement(); // end workspace tag
     }
@@ -217,7 +217,7 @@ public class WSXMLSerializer {
         }
         // search for first workspace tag
         boolean hasWorkspaceTag = false;
-        SerializationObjects serializationObjects = new SerializationObjects();
+        XMLSerializationState XMLSerializationState = new XMLSerializationState();
         while (xer.hasNext()) {
             xe = xer.nextEvent(); // SHOULD be the workspace tag but there can be comments, DTDs etc.
             if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(WORKSPACE_TAG)) {
@@ -234,7 +234,7 @@ public class WSXMLSerializer {
             Attribute a = (Attribute) iterator.next();
             switch (a.getName().getLocalPart()) {
                 case SERIALIZATION_VERSION_TAG:
-                    serializationObjects.setVersion(a.getValue());
+                    XMLSerializationState.setVersion(a.getValue());
             }
         }
 
@@ -246,7 +246,6 @@ public class WSXMLSerializer {
                 xe = xer.peek(); // May have to slog through a bunch of events (like whitespace)
                 switch (xe.getEventType()) {
                     case XMLEvent.START_ELEMENT:
-                        System.err.println(getClass().getSimpleName() + ": tag name=" + xe.asStartElement().getName().getLocalPart());
                         switch (xe.asStartElement().getName().getLocalPart()) {
                             case WS_ENV_TAG:
                                 processAttr(testCommands, xe);
@@ -269,15 +268,15 @@ public class WSXMLSerializer {
                                 }
                                 break;
                             case STATES_TAG:
-                                XMLUtilsV2.deserializeStateStore(xer, serializationObjects);
+                                XMLUtilsV2.deserializeStateStore(xer, XMLSerializationState);
                                 break;
                             case MODULE_TEMPLATE_TAG:
-                                XMLUtilsV2.deserializeTemplateStore(xer, serializationObjects);
+                                XMLUtilsV2.deserializeTemplateStore(xer, XMLSerializationState);
                                 break;
                             case STATE_TAG:
                                 if (!workspaceAttributesOnly) {
-                                    if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)){
-                                        testCommands.state = StateUtils.load(testCommands.state, serializationObjects, xer);
+                                    if(XMLSerializationState.isVersion2_0()){
+                                        testCommands.state = StateUtils.load(testCommands.state, XMLSerializationState, xer);
                                     }else {
                                         testCommands.state = StateUtils.load(testCommands.state, xer);
                                     }

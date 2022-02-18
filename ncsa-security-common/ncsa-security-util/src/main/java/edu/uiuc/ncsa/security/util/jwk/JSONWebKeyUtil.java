@@ -263,6 +263,9 @@ public class JSONWebKeyUtil {
     }
 
     public static void main(String[] args) throws Throwable{
+
+        JSONWebKeys jsonWebKeys;
+
         File f = new File("/tmp/pub.jwk");
         JSONWebKeys jwks = fromJSON(f);
         System.out.println(jwks);

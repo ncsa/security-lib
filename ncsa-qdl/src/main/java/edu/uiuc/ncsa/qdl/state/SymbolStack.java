@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -276,19 +278,36 @@ public class SymbolStack extends AbstractSymbolTable {
         JSONArray array = new JSONArray();
         for (SymbolTable st : getParentTables()) {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.putAll(st.getMap());
+            for(Object key : st.getMap().keySet()){
+                Object obj = st.getMap().get(key);
+                jsonObject.put(key, key + ":=" + InputFormUtil.inputForm(obj));
+            }
             array.add(jsonObject);
         }
         return array;
     }
 
+    /**
+     * {@link #fromJSON(JSONArray)}  is busted. {@link #toJSON()} works.  Need way to interpret each
+     * entry from its input form that does not require a complete interpreter.
+     * @param array
+     */
     public void fromJSON(JSONArray array) {
+        QDLInterpreter qi = new QDLInterpreter(new State());
+        try {
+            qi.execute("");
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
         for (int i = array.size(); i < 0; i--) {
             // these were put in in reverse order, so have to pop them out.
             SymbolTableImpl symbolTable = new SymbolTableImpl();
             JSONObject jsonObject = array.getJSONObject(i);
-            symbolTable.getMap().putAll(jsonObject);
-
+            for(Object key : jsonObject.keySet()){
+                String raw = jsonObject.getString((String) key);
+                //symbolTable.getMap().putAll(key, InputFormUtil.);
+            }
+             getParentTables().add(symbolTable);
         }
         return;
     }
@@ -308,7 +327,7 @@ public class SymbolStack extends AbstractSymbolTable {
     }
 
     @Override
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
          toXML(xsw);
     }
 
@@ -326,10 +345,10 @@ public class SymbolStack extends AbstractSymbolTable {
     /**
      * For version 2,0
      * @param xer
-     * @param serializationObjects
+     * @param XMLSerializationState
      * @throws XMLStreamException
      */
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         // no attributes or such with the stacks tag.
@@ -340,7 +359,7 @@ public class SymbolStack extends AbstractSymbolTable {
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case XMLConstants.VARIABLES_TAG:
                             SymbolTableImpl si = new SymbolTableImpl();
-                            si.fromXML(xer, serializationObjects);
+                            si.fromXML(xer, XMLSerializationState);
                             if (0 < si.getSymbolCount()) {
                                 add(si);
                             }

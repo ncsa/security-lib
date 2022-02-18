@@ -7,7 +7,7 @@ import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 
@@ -39,7 +39,7 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
     }
 
     @Override
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         for (XKey key : keySet()) {
             xsw.writeStartElement(getXMLElementTag());
             MIWrapper wrapper = get(key);
@@ -67,32 +67,32 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
     }
 
     @Override
-    public V deserializeElement(XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException {
+    public V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.peek();
         XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
-        if(serializationObjects.processedInstance(moduleAttributes.uuid)){
-            return (V) serializationObjects.getInstance(moduleAttributes.uuid);
+        if(XMLSerializationState.processedInstance(moduleAttributes.uuid)){
+            return (V) XMLSerializationState.getInstance(moduleAttributes.uuid);
         }
-        if (!serializationObjects.processedTemplate(moduleAttributes.templateReference)) {
+        if (!XMLSerializationState.processedTemplate(moduleAttributes.templateReference)) {
             throw new IllegalStateException("template '" + moduleAttributes.uuid + "' not found");
         }
-        Module template = serializationObjects.getTemplate(moduleAttributes.templateReference);
+        Module template = XMLSerializationState.getTemplate(moduleAttributes.templateReference);
         Module newInstance = template.newInstance(null);
         State state ;
-        if(serializationObjects.processedState(moduleAttributes.stateReference)) {
-            state = serializationObjects.getState(moduleAttributes.stateReference);
+        if(XMLSerializationState.processedState(moduleAttributes.stateReference)) {
+            state = XMLSerializationState.getState(moduleAttributes.stateReference);
         }else{
             // edge case that the state does not yet exist, so create a new one, assuming that it
             // will get populated later.
             state = new State();
             state.setUuid(moduleAttributes.stateReference);
-            serializationObjects.addState(state);
+            XMLSerializationState.addState(state);
         }
         newInstance.setState(state);
         newInstance.setId(moduleAttributes.uuid);
         // no stash it with whatever it was stashed with
         MIWrapper miWrapper = new MIWrapper(new XKey(moduleAttributes.alias), newInstance);
-        serializationObjects.addInstance(miWrapper);
+        XMLSerializationState.addInstance(miWrapper);
         return (V) miWrapper;
     }
 

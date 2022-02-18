@@ -23,6 +23,7 @@ import org.junit.runners.Suite;
         ParserTest.class,
         ModuleTest.class,
         GlomTest.class,
+        SerializationTest.class,
         // Without the VFS tests, all other tests (156 of them) take 1.532 s. (av. 9.82 ms per test)
         // Running this next test adds a full 3 seconds for the initial database connection
         // and unzipping.

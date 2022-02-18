@@ -18,7 +18,7 @@ import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
@@ -682,7 +682,7 @@ public class State extends FunctionState implements QDLConstants {
      * replace it all. Generally do not use outside of XML deserialization.
      */
     public State() {
-        super(new SymbolStack(),new OpEvaluator(), new MetaEvaluator(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
+        super(new SymbolStack(),new OpEvaluator(), MetaEvaluator.getInstance(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
     }
 
     /**
@@ -701,14 +701,14 @@ public class State extends FunctionState implements QDLConstants {
         return getSymbolStack().getSymbolCount();
     }
 
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         xsw.writeStartElement(STATE_TAG);
         xsw.writeAttribute(UUID_TAG, getInternalID());
         writeExtraXMLAttributes(xsw);
         getSymbolStack().toXML(xsw);
-        getFTStack().toXML(xsw, serializationObjects);
-        getMTemplates().toXML(xsw, serializationObjects);
-        getMInstances().toXML(xsw, serializationObjects);
+        getFTStack().toXML(xsw, XMLSerializationState);
+        getMTemplates().toXML(xsw, XMLSerializationState);
+        getMInstances().toXML(xsw, XMLSerializationState);
         writeExtraXMLElements(xsw);
         xsw.writeEndElement(); // end state tag
 
@@ -748,7 +748,7 @@ public class State extends FunctionState implements QDLConstants {
         xsw.writeEndElement(); // end state tag
     }
 
-    public void fromXML(XMLEventReader xer, XProperties xp, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XProperties xp, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // At this point, caller peeked and knows this is the right type of event,
         // so we know where in the stream we are starting automatically.
 
@@ -763,10 +763,10 @@ public class State extends FunctionState implements QDLConstants {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case VARIABLE_STACK:
-                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)){
+                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)){
                                 SymbolStack st = new SymbolStack();
                                 st.getParentTables().clear(); // or there is an extra top level element.
-                                st.fromXML(xer, serializationObjects);
+                                st.fromXML(xer, XMLSerializationState);
                                 setSymbolStack(st);
 
                             }else{
@@ -779,15 +779,15 @@ public class State extends FunctionState implements QDLConstants {
                             XMLUtils.deserializeFunctions(xer, xp, this);
                             break;
                         case INSTANCE_STACK:
-                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)) {
-                                XMLUtilsV2.deserializeInstances(xer, this, serializationObjects);
+                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeInstances(xer, this, XMLSerializationState);
                             }else{
                                 XMLUtils.deserializeImports(xer, xp, this);
                             }
                             break;
                         case TEMPLATE_STACK:
-                            if(serializationObjects.getVersion().equals(VERSION_2_0_TAG)) {
-                                XMLUtilsV2.deserializeTemplates(xer, this, serializationObjects);
+                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeTemplates(xer, this, XMLSerializationState);
                             }else{
                                 XMLUtils.deserializeTemplates(xer, xp,this);
 
@@ -990,23 +990,23 @@ public class State extends FunctionState implements QDLConstants {
 
     WorkspaceCommands workspaceCommands;
 
-    public void buildSO(SerializationObjects serializationObjects) {
+    public void buildSO(XMLSerializationState XMLSerializationState) {
         for (Object key : getMTemplates().keySet()) {
             MTKey mtKey = (MTKey) key;
             Module module = getMTemplates().getModule(mtKey);
-            if (!serializationObjects.processedTemplate(module)) {
-                serializationObjects.addTemplate(module);
+            if (!XMLSerializationState.processedTemplate(module)) {
+                XMLSerializationState.addTemplate(module);
             }
         }
         for (Object key : getMInstances().keySet()) {
             XKey xKey = (XKey) key;
             MIWrapper wrapper = (MIWrapper) getMInstances().get(xKey);
             Module module = wrapper.getModule();
-            if (!serializationObjects.processedInstance(module)) {
-                serializationObjects.addInstance(wrapper);
-                if (!serializationObjects.processedState(module.getState())) {
-                    serializationObjects.addState(module.getState());
-                    module.getState().buildSO(serializationObjects);
+            if (!XMLSerializationState.processedInstance(module)) {
+                XMLSerializationState.addInstance(wrapper);
+                if (!XMLSerializationState.processedState(module.getState())) {
+                    XMLSerializationState.addState(module.getState());
+                    module.getState().buildSO(XMLSerializationState);
                 }
             }
 

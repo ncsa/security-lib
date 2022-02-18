@@ -1853,7 +1853,10 @@ public class WorkspaceCommands implements Logable {
                 XKey xKey = new XKey(arg);
                 if (state.getMInstances().containsKey(xKey)) {
                     module = state.getMInstances().getModule(xKey);
-                    importedString = getImportString(module.getNamespace());
+                    if(module!=null) {
+                        // pull it off the template.
+                        module = state.getMTemplates().getModule(new MTKey(module.getNamespace()));
+                    }
                 }
             }
             if (module == null) {

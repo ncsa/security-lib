@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 
 import javax.xml.stream.XMLEventReader;
@@ -305,13 +305,13 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     /**
      * Does the grunt work of writing the stack in the right order. You write the start tag,
-     * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter, SerializationObjects)}
+     * any comments, invoke this, then the end tag. See {@link edu.uiuc.ncsa.qdl.functions.FStack#toXML(XMLStreamWriter, XMLSerializationState)}
      * for a canonical example.
      *
      * @param xsw
      * @throws XMLStreamException
      */
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         if (isEmpty()) {
             return;
         }
@@ -323,7 +323,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             }
             xsw.writeStartElement(getXMLTableTag());
             xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, Integer.toString(i));
-            xTable.toXML(xsw, serializationObjects);
+            xTable.toXML(xsw, XMLSerializationState);
             xsw.writeEndElement(); // end of table.
         }
         if (getStack().get(0).isEmpty()) {
@@ -338,7 +338,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         xsw.writeEndElement(); // end of stacks.
     }
 
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         getStack().clear(); // Needed or there will be an extra empty stack after this call.
@@ -351,7 +351,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
                     String localPart = xe.asStartElement().getName().getLocalPart();
                     if (localPart.equals(getXMLTableTag())) {
                         XTable xTable = newTableInstance();
-                        xTable.fromXML(xer, serializationObjects);
+                        xTable.fromXML(xer, XMLSerializationState);
                         push(xTable);
                     }
 

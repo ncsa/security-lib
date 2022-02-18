@@ -4,9 +4,8 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
-import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -50,12 +49,12 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
     }
 
     @Override
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
           for(XKey key : keySet()){
               xsw.writeStartElement(getXMLElementTag());
               Module module = get(key);
               xsw.writeAttribute(XMLConstants.UUID_TAG, module.getId().toString());
-              serializationObjects.templateMap.put(module.getId(), module);
+              XMLSerializationState.templateMap.put(module.getId(), module);
               xsw.writeEndElement(); // end module tag
           }
     }
@@ -68,13 +67,13 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
 
 
     @Override
-    public V deserializeElement( XMLEventReader xer, SerializationObjects serializationObjects, QDLInterpreter qi) throws XMLStreamException {
+    public V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.peek();
         XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
-        if(!serializationObjects.processedTemplate(moduleAttributes.uuid)){
+        if(!XMLSerializationState.processedTemplate(moduleAttributes.uuid)){
             throw new IllegalStateException("template '" + moduleAttributes.uuid + "' not found");
         }
-        return (V) serializationObjects.getTemplate(moduleAttributes.uuid);
+        return (V) XMLSerializationState.getTemplate(moduleAttributes.uuid);
     }
 
     public void clearChangeList(){

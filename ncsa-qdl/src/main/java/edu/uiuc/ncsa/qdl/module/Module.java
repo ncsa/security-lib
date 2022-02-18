@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -158,7 +158,7 @@ public abstract class Module implements XThing, Serializable {
     public void toXML(XMLStreamWriter xsw,
                       String alias,
                       boolean fullSerialization,
-                      SerializationObjects serializationObjects) throws XMLStreamException {
+                      XMLSerializationState XMLSerializationState) throws XMLStreamException {
         xsw.writeStartElement(MODULE_TAG);
 
         if (fullSerialization) {
@@ -169,8 +169,8 @@ public abstract class Module implements XThing, Serializable {
             State state = getState();
             // if(state != null) {
             if (!(isTemplate() || state == null)) {
-                if (serializationObjects.addState(state)) {
-                    state.toXML(xsw, serializationObjects);
+                if (XMLSerializationState.addState(state)) {
+                    state.toXML(xsw, XMLSerializationState);
                 }
                 //serializationObjects.stateMap.put(state.getUuid(), state);
             }
@@ -179,7 +179,7 @@ public abstract class Module implements XThing, Serializable {
             xsw.writeAttribute(XMLConstants.UUID_TAG, getId().toString());
             if (!(isTemplate() || state == null)) {
                 xsw.writeAttribute(XMLConstants.STATE_REFERENCE_TAG, getState().getUuid().toString());
-                serializationObjects.stateMap.put(getState().getUuid(), getState());
+                XMLSerializationState.stateMap.put(getState().getUuid(), getState());
             }
 
         }
@@ -219,11 +219,11 @@ public abstract class Module implements XThing, Serializable {
      * Used in version 2,0 serialization
      *
      * @param xer
-     * @param serializationObjects
+     * @param XMLSerializationState
      * @param isTemplate
      * @throws XMLStreamException
      */
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects, boolean isTemplate) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState, boolean isTemplate) throws XMLStreamException {
         readExtraXMLAttributes(xer.peek());
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {

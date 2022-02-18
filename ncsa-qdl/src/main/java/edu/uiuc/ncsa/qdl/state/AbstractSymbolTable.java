@@ -1,6 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
-import edu.uiuc.ncsa.qdl.xml.SerializationObjects;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 
 import javax.xml.namespace.QName;
@@ -79,12 +79,12 @@ public abstract class AbstractSymbolTable implements SymbolTable {
     }
 
     @Override
-    public void toXML(XMLStreamWriter xsw, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
             toXML(xsw);
     }
 
     @Override
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         // no attributes for this tag.
         while (xer.hasNext()) {

@@ -1,7 +1,9 @@
 package edu.uiuc.ncsa.qdl.xml;
 
+import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FTable;
+import edu.uiuc.ncsa.qdl.module.MIWrapper;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
@@ -211,13 +213,13 @@ public class XMLUtils implements XMLConstants {
                     throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
                 }
 
-                while(xe.asCharacters().isWhiteSpace()){
+                while (xe.asCharacters().isWhiteSpace()) {
                     xe = xer.nextEvent();
                 }
 
-             //   System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: is CDATA = " + xe.asCharacters().isCData());
+                //   System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: is CDATA = " + xe.asCharacters().isCData());
                 String raw = xe.asCharacters().getData();
-           //     System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: raw(" + raw.length() + " chars) = " + raw);
+                //     System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: raw(" + raw.length() + " chars) = " + raw);
               /*  if(xe.asCharacters().isCharacters()){
                     System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: chars of chars " + xe.asCharacters().asCharacters().getData());
                 }*/
@@ -245,7 +247,7 @@ public class XMLUtils implements XMLConstants {
         while (xer.hasNext()) {
             if (xe.getEventType() == XMLEvent.END_ELEMENT) {
                 if (xe.asEndElement().getName().getLocalPart().equals(tagName)) {
-                   // System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: returning output = " + output);
+                    // System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: returning output = " + output);
                     return output;
                 }
             }
@@ -275,8 +277,8 @@ public class XMLUtils implements XMLConstants {
                             xe1 = xer.peek();
                         }
                         Object value = resolveConstant(xer);
-                        stem.put(key,value);
-                 //       System.err.println(XMLUtils.class.getSimpleName() + ".resolveStem: key=" + key + ", value='" + value + "'");
+                        stem.put(key, value);
+                        //       System.err.println(XMLUtils.class.getSimpleName() + ".resolveStem: key=" + key + ", value='" + value + "'");
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -337,7 +339,7 @@ public class XMLUtils implements XMLConstants {
                 break;
             case Constant.UNKNOWN_TYPE:
                 IllegalArgumentException iax = new IllegalArgumentException("Error:Unknown constants type for \"" + obj + "\"");
-                if(DebugUtil.isEnabled()){
+                if (DebugUtil.isEnabled()) {
                     iax.printStackTrace();
                 }
                 throw iax;
@@ -364,6 +366,7 @@ public class XMLUtils implements XMLConstants {
 
     /**
      * Used for reading very old serialized versions, before there were multiple stacks. Keep for a bit just in case.
+     *
      * @param xer
      * @param xp
      * @param state
@@ -402,8 +405,13 @@ public class XMLUtils implements XMLConstants {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
-                        Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        state.getMInstances().put(new XKey(moduleAttributes.alias), module);
+                        try {
+                            Module module = deserializeModule(xer, moduleAttributes, xp, state);
+                            state.getMInstances().put(new MIWrapper(new XKey(moduleAttributes.alias), module));
+                            //state.getMInstances().put(new XKey(moduleAttributes.alias), module);
+                        } catch (DeserializationException dx) {
+                            System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '");
+                        }
                         //state.getMAliases().addImport(moduleAttributes.ns, moduleAttributes.alias);
                     }
                     break;
@@ -427,9 +435,12 @@ public class XMLUtils implements XMLConstants {
                 case XMLEvent.START_ELEMENT:
                     if (xe.asStartElement().getName().getLocalPart().equals(MODULE_TAG)) {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
-                        Module module = deserializeModule(xer, moduleAttributes, xp, state);
-                        //state.getMTemplates().put(moduleAttributes.ns, module);
-                        state.getMTemplates().put(module);
+                        try {
+                            Module module = deserializeModule(xer, moduleAttributes, xp, state);
+                            state.getMTemplates().put(module);
+                        } catch (DeserializationException dx) {
+                            System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '");
+                        }
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -470,8 +481,7 @@ public class XMLUtils implements XMLConstants {
                 Class klasse = state.getClass().forName(moduleAttributes.className);
                 module = ((JavaModule) klasse.newInstance()).newInstance(moduleState); // this populates the functions and variables!!
             } catch (Throwable t) {
-                System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '" + t.getMessage() + "' ("+t.getClass().getName() + ")");
-                //throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
+                throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
             }
 
         } else {
@@ -495,13 +505,13 @@ public class XMLUtils implements XMLConstants {
      * Internal class to manage attributes for a module.   Not all modules have all of these all the time!
      */
     public static class ModuleAttributes {
-     public String type = null;
-     public URI ns = null;
-     public String alias = null;
-     public String className = null;
-     public UUID uuid = null;
-     public UUID stateReference = null;
-     public UUID templateReference = null;
+        public String type = null;
+        public URI ns = null;
+        public String alias = null;
+        public String className = null;
+        public UUID uuid = null;
+        public UUID stateReference = null;
+        public UUID templateReference = null;
 
         public boolean isJavaModule() {
             if (type == null) {

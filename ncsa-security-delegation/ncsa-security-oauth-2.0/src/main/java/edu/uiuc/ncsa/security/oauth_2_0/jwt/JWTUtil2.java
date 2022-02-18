@@ -18,6 +18,7 @@ import net.sf.json.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.security.*;
@@ -366,11 +367,12 @@ public class JWTUtil2 {
      */
     public static void main(String[] args) {
         try {
-            // firstTest();
+        //    firstTest();
             //   firstTestB();
             //    otherTest();
-            testSigning();
+         //   testSigning();
             JSONWebKeys keys = getJsonWebKeys("https://test.cilogon.org/oauth2/.well-known");
+            //JSONWebKeys keys = getJsonWebKeys("https://lw-issuer.osgdev.chtc.io/scitokens-server/certs");
             System.out.println("Detected " + keys.size() + " keys on test.cilogon.org");
             //  testSigningDirectly();
             //testJWT_IO();
@@ -409,6 +411,9 @@ public class JWTUtil2 {
     }
 
     public static void firstTest() throws Exception {
+        PublicKey publicKey = KeyUtil.fromX509PEM(new FileReader("/tmp/pub.pem"));
+                System.out.println(publicKey);
+
         JSONObject header = new JSONObject();
         header.put(TYPE, "JWT");
         header.put(ALGORITHM, "RS256");
@@ -416,9 +421,11 @@ public class JWTUtil2 {
         JSONWebKey webKey = new JSONWebKey();
         webKey.algorithm = "RS256";
         webKey.privateKey = keyPair.getPrivate();
-        webKey.publicKey = keyPair.getPublic();
+        //webKey.publicKey = keyPair.getPublic();
+        webKey.publicKey = publicKey;
         webKey.id = "qwert";
-        webKey.type = "sig";
+        //webKey.type = "sig";
+        System.out.println(JSONWebKeyUtil.toJSON(webKey));
         JSONObject payload = new JSONObject();
         payload.put("name", "jeff");
         payload.put("id", "sukjfhusdfsdjkfh");
