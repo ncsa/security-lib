@@ -31,6 +31,8 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
 
     public abstract void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException;
 
+    public abstract String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState);
+    public abstract String fromJSONEntry(String x, XMLSerializationState xmlSerializationState);
 
     public abstract void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
     /**

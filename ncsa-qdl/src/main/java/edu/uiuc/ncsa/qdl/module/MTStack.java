@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
@@ -76,5 +77,13 @@ public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> exte
         return (Module) get(mtKey);
     }
 
+    @Override
+    public void setStateStack(State state, XStack xStack) {
+        state.setMTemplates((MTStack) xStack);
+    }
 
+    @Override
+    public XStack getStateStack(State state) {
+        return null;
+    }
 }

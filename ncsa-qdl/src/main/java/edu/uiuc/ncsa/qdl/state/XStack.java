@@ -1,16 +1,26 @@
 package edu.uiuc.ncsa.qdl.state;
 
+import edu.uiuc.ncsa.qdl.functions.FKey;
+import edu.uiuc.ncsa.qdl.functions.FStack;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
+import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.VARIABLE_STACK;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
@@ -311,7 +321,10 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
      * @param xsw
      * @throws XMLStreamException
      */
-    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+                      toXMLNEW(xsw, xmlSerializationState);
+    }
+    public void toXMLOLD(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         if (isEmpty()) {
             return;
         }
@@ -339,6 +352,9 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+                       fromXMLNEW(xer, XMLSerializationState);
+    }
+    public void fromXMLOLD(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         getStack().clear(); // Needed or there will be an extra empty stack after this call.
@@ -400,5 +416,162 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         return arrayList;
     }
 
+    public JSONArray toJSON(XMLSerializationState xmlSerializationState) {
+        JSONArray array = new JSONArray();
+        for (XTable xTable : getStack()) {
+            JSONArray jsonArray = new JSONArray();
+            for (Object key : xTable.keySet()) {
+                XThing xThing = (XThing) xTable.get(key);
+                jsonArray.add(xTable.toJSONEntry( xThing, xmlSerializationState));
+            }
+            array.add(jsonArray);
+        }
+        return array;
+    }
 
+    /**
+     * This sets the stack corresponding to this class from the state with the given stack.
+     * If the stack is not of the correct type, a class cast exception will result. <br/><br/>
+     * We <i>could</i> have tried this with some type of dynamic casting, but that is messy and fragile in Java
+     * @param state
+     * @param xStack
+     */
+    public abstract void setStateStack(State state, XStack xStack);
+
+    /**
+     * This gets the stack corresponding to this class from the state..
+     * @param state
+     * @return
+     */
+
+    public abstract XStack getStateStack(State state);
+
+    public void fromJSON(JSONArray array, XMLSerializationState xmlSerializationState) {
+        // To recreate the various states, we still need to use the parser and essentially
+        // create local state repeatedly. The aim is to be as faithful as possible to
+        // recreating the serialized stack.
+        getStack().clear();
+        XStack scratch = newInstance();
+        State state = new State();
+        setStateStack(state, scratch);
+
+        QDLInterpreter qi = new QDLInterpreter(state);
+
+        for (int i = 0; i < array.size(); i++) {
+            // these were put in in reverse order, so have to pop them out.
+            scratch.getStack().clear();
+            XTable currentST = newTableInstance();
+            scratch.push(currentST);
+
+            JSONArray jsonArray = array.getJSONArray(i);
+            for (int k = 0; k < jsonArray.size(); k++) {
+                try {
+                    qi.execute(currentST.fromJSONEntry(jsonArray.getString(k), xmlSerializationState));
+                } catch (Throwable e) {
+                    // For now
+                    e.printStackTrace();
+                }
+            }
+            // since this is the stack in the interpreter state, this pushes a new table there
+            getStack().add(currentST);
+        }
+
+        return;
+    }
+
+    protected void fromXMLNEW(XMLEventReader xer, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        // points to stacks tag
+        JSONArray jsonArray = getJSON(xer);
+        fromJSON(jsonArray, xmlSerializationState);
+        //XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        // no attributes or such with the stacks tag.
+        while (xer.hasNext()) {
+          XMLEvent  xe = xer.peek();
+            switch (xe.getEventType()) {
+
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(getXMLStackTag())) {
+                        if (getStack().isEmpty()) {
+                            // Just make sure there is at least one.
+                            getStack().add(newTableInstance());
+                        }
+                        return;
+                    }
+                    break;
+            }
+            xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + getXMLStackTag());
+    }
+    protected JSONArray getJSON(XMLEventReader xer) throws XMLStreamException {
+        JSONArray jsonArray = null;
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.CHARACTERS:
+                    if (xe.asCharacters().isWhiteSpace()) {
+                        break;
+                    }
+                    jsonArray = JSONArray.fromObject(xe.asCharacters().getData());
+                    return jsonArray;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(VARIABLE_STACK);
+    }
+
+    protected void toXMLNEW(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        xsw.writeStartElement(getXMLStackTag());
+        System.err.println(getClass().getSimpleName() + ": json=" + toJSON(xmlSerializationState).toString(1));
+        xsw.writeCData(toJSON(xmlSerializationState).toString());
+        xsw.writeEndElement();
+    }
+
+    public static void main(String[] args) throws Throwable {
+        // Roundtrip test for JSON serialization. Should populate a stack, print it out, deserialize it, then
+        // print out the exact same stack.
+         testFStack();
+    }
+    static void testFStack(){
+        FStack fStack = new FStack();
+        fStack.put(new FunctionRecord(new FKey("f", 1), Arrays.asList("f(x)->x^2;")));
+        fStack.put(new FunctionRecord(new FKey("g", 1), Arrays.asList("g(x)->x^3;")));
+        fStack.put(new FunctionRecord(new FKey("h", 2), Arrays.asList("h(x,y)->x*y;")));
+        fStack.pushNewTable();
+        fStack.localPut(new FunctionRecord(new FKey("f", 1), Arrays.asList("f(x)->x^4;")));
+        fStack.localPut(new FunctionRecord(new FKey("h", 1), Arrays.asList("h(x)->x+1;")));
+        fStack.pushNewTable();
+        JSONArray serialized = fStack.toJSON(null);
+        System.out.println(serialized.toString(2));
+
+        FStack fStack1 = new FStack();
+        fStack1.fromJSON(serialized, null);
+        System.out.println(fStack1.toJSON(null).toString(2));
+
+    }
+    static void testVStack(){
+        // Roundtrip test for JSON serialization. Should populate a stack, print it out, deserialize it, then
+        // print out the exact same stack.
+        VStack vStack = new VStack();
+        vStack.pushNewTable();
+        vStack.put(new VThing(new XKey("a"), Boolean.TRUE));
+        vStack.put(new VThing(new XKey("b"), "foo"));
+        vStack.put(new VThing(new XKey("x"), new BigDecimal("123.456789")));
+        StemVariable s = new StemVariable();
+        s.put("a", 5L);
+        s.put("foo", "bar");
+        vStack.put(new VThing(new XKey("s."), s));
+        vStack.pushNewTable();
+        vStack.localPut(new VThing(new XKey("a"), Boolean.FALSE));
+        vStack.localPut(new VThing(new XKey("x"), new BigDecimal("9.87654321")));
+        vStack.pushNewTable();
+
+        // One reason to use VStack here is that the xmlSerializationState can be null, since it is not used
+        System.out.println(vStack.toJSON(null).toString(2));
+        JSONArray serialized = vStack.toJSON(null);
+        VStack vStack1 = new VStack();
+        vStack1.fromJSON(serialized, null);
+        System.out.println(vStack1.toJSON(null).toString(2));
+
+    }
 }

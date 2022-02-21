@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.functions;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
@@ -72,7 +73,6 @@ public class FStack<V extends FTable<? extends FKey, ? extends FunctionRecord>> 
      * in reverse order n,n-1,...0 so that at deserialization they can be read in the
      * correct order and the stack can be faithfully reconstructed. As such the serialization
      * format is not quite XML -- order matters.
-     * @param xsw
      * @throws XMLStreamException
      */
 /*    @Override
@@ -196,4 +196,15 @@ public class FStack<V extends FTable<? extends FKey, ? extends FunctionRecord>> 
     public XTable newTableInstance() {
         return new FTable<>();
     }
+
+    @Override
+    public void setStateStack(State state, XStack xStack) {
+         state.setFTStack((FStack<? extends FTable<? extends FKey,? extends FunctionRecord>>) xStack);
+    }
+
+    @Override
+    public XStack getStateStack(State state) {
+        return state.getFTStack();
+    }
+
 }

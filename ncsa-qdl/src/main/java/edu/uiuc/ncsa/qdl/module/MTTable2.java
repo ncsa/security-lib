@@ -4,9 +4,10 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.state.XThing;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import net.sf.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
+import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
 
 /**
  * Module template table.
@@ -111,4 +112,16 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
         return id;
     }
 
+    @Override
+    public String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(XMLConstants.UUID_TAG, xThing.getId().toString());
+        xmlSerializationState.templateMap.put(xThing.getId(), xThing);
+        return jsonObject.toString();
+    }
+
+    @Override
+    public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
+        return null;
+    }
 }

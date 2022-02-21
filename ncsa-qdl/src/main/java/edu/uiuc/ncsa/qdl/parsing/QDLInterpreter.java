@@ -56,6 +56,9 @@ public class QDLInterpreter implements Serializable {
      * the command line this is ok but does not scale in any way.
      */
     public void execute(String line) throws Throwable {
+        if(line == null || line.length() == 0){
+            return;
+        }
         StringReader reader = new StringReader(line);
         execute(reader);
     }

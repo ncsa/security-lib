@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.module;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.state.XTable;
@@ -115,5 +116,15 @@ public class MIStack<V extends MITable2<? extends XKey, ? extends MIWrapper>> ex
             aliases.add(xKey.getKey());
         }
         return aliases;
+    }
+
+    @Override
+    public void setStateStack(State state, XStack xStack) {
+           state.setMInstances((MIStack) xStack);
+    }
+
+    @Override
+    public XStack getStateStack(State state) {
+        return state.getMInstances();
     }
 }

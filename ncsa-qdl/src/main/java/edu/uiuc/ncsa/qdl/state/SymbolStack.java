@@ -4,16 +4,16 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
+import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
-import net.sf.json.JSON;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.math.BigDecimal;
 import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.STACKS_TAG;
@@ -274,42 +274,79 @@ public class SymbolStack extends AbstractSymbolTable {
         return vars;
     }
 
-    public JSON toJSON() {
+    public JSONArray toJSON() {
         JSONArray array = new JSONArray();
         for (SymbolTable st : getParentTables()) {
-            JSONObject jsonObject = new JSONObject();
-            for(Object key : st.getMap().keySet()){
+            JSONArray jsonArray = new JSONArray();
+            for (Object key : st.getMap().keySet()) {
                 Object obj = st.getMap().get(key);
-                jsonObject.put(key, key + ":=" + InputFormUtil.inputForm(obj));
+                jsonArray.add(key + ":=" + InputFormUtil.inputForm(obj) + ";");
             }
-            array.add(jsonObject);
+            array.add(jsonArray);
         }
         return array;
     }
 
     /**
-     * {@link #fromJSON(JSONArray)}  is busted. {@link #toJSON()} works.  Need way to interpret each
-     * entry from its input form that does not require a complete interpreter.
+     *  Take a JSON serialized symbol stack from {@link #toJSON()} and turn repopulate
+     *  the current stack from it <b>overwriting it</b>. This destroys the current stack's
+     *  contents.
      * @param array
      */
     public void fromJSON(JSONArray array) {
-        QDLInterpreter qi = new QDLInterpreter(new State());
-        try {
-            qi.execute("");
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        for (int i = array.size(); i < 0; i--) {
+        // To recreate the various states, we still need to use the parser and essentially
+        // create local state repeatedly. The aim is to be as faithful as possible to
+        // recreating the serialized stack.
+        getParentTables().clear();
+        SymbolStack scratch = new SymbolStack();
+        State state = new State();
+        state.setSymbolStack(scratch);
+
+        QDLInterpreter qi = new QDLInterpreter(state);
+
+        for (int i = 0; i < array.size(); i++) {
             // these were put in in reverse order, so have to pop them out.
-            SymbolTableImpl symbolTable = new SymbolTableImpl();
-            JSONObject jsonObject = array.getJSONObject(i);
-            for(Object key : jsonObject.keySet()){
-                String raw = jsonObject.getString((String) key);
-                //symbolTable.getMap().putAll(key, InputFormUtil.);
+            scratch.getParentTables().clear();
+            SymbolTableImpl currentST = new SymbolTableImpl();
+            scratch.addParent(currentST);
+
+            JSONArray jsonArray = array.getJSONArray(i);
+            for (int k = 0; k < jsonArray.size(); k++) {
+                try {
+                    qi.execute(jsonArray.getString(k));
+                } catch (Throwable e) {
+                    // For now
+                    e.printStackTrace();
+                }
             }
-             getParentTables().add(symbolTable);
+            // since this is the stack in the interpreter state, this pushes a new table there
+            getParentTables().add(currentST);
         }
+
         return;
+    }
+
+    public static void main(String[] args) throws Throwable {
+        // Roundtrip test for JSON serialization. Should populate a stack, print it out, deserialize it, then
+        // print out the exact same stack.
+        SymbolStack symbolStack = new SymbolStack();
+        symbolStack.getParentTables().get(0).setValue("a", Boolean.TRUE);
+        symbolStack.getParentTables().get(0).setValue("x", new BigDecimal("123.456789"));
+        StemVariable s = new StemVariable();
+        s.put("a", 5L);
+        s.put("foo", "bar");
+        symbolStack.getParentTables().get(0).setValue("s.", s);
+        symbolStack.addParent(new SymbolTableImpl());
+        symbolStack.getParentTables().get(0).setValue("a", Boolean.FALSE);
+        symbolStack.getParentTables().get(0).setValue("x", new BigDecimal("9.87654321"));
+        symbolStack.addParent(new SymbolTableImpl()); // have an empty on on the top of the stack
+
+        System.out.println(symbolStack.toJSON().toString(2));
+        JSONArray serialized = symbolStack.toJSON();
+        SymbolStack symbolStack1 = new SymbolStack();
+        symbolStack1.fromJSON(serialized);
+        System.out.println(symbolStack1.toJSON().toString(2));
+
     }
 
     @Override
@@ -328,12 +365,15 @@ public class SymbolStack extends AbstractSymbolTable {
 
     @Override
     public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-         toXML(xsw);
+        toXML(xsw);
     }
 
     @Override
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
-        //xsw.writeStartElement(XMLConstants.STACKS_TAG);
+        //toXMLOLD(xsw);
+        toXMLNEW(xsw);
+    }
+    protected void toXMLOLD(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(VARIABLE_STACK);
         xsw.writeComment("The list of symbol tables for this state.");
         for (SymbolTable st : getParentTables()) {
@@ -342,13 +382,27 @@ public class SymbolStack extends AbstractSymbolTable {
         xsw.writeEndElement();
     }
 
+    protected void toXMLNEW(XMLStreamWriter xsw) throws XMLStreamException {
+        xsw.writeStartElement(VARIABLE_STACK);
+        xsw.writeComment("The list of symbol tables for this state.");
+        System.err.println(getClass().getSimpleName() + ": json=" + toJSON().toString(1));
+        xsw.writeCData(toJSON().toString());
+        xsw.writeEndElement();
+    }
+
     /**
      * For version 2,0
+     *
      * @param xer
      * @param XMLSerializationState
      * @throws XMLStreamException
      */
     public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+                  //fromXMLOLD(xer,XMLSerializationState);
+                  fromXMLNEW(xer,XMLSerializationState);
+    }
+
+    protected void fromXMLOLD(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         // no attributes or such with the stacks tag.
@@ -367,7 +421,7 @@ public class SymbolStack extends AbstractSymbolTable {
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (xe.asEndElement().getName().getLocalPart().equals(VARIABLE_STACK)) {
-                        if(getParentTables().isEmpty()){
+                        if (getParentTables().isEmpty()) {
                             // Just make sure there is at least one.
                             getParentTables().add(new SymbolTableImpl());
                         }
@@ -378,10 +432,57 @@ public class SymbolStack extends AbstractSymbolTable {
             xe = xer.nextEvent();
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VARIABLE_STACK);
-
-
     }
 
+    protected void fromXMLNEW(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+        // points to stacks tag
+        JSONArray jsonArray = getJSON(xer);
+        fromJSON(jsonArray);
+        //XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
+        // no attributes or such with the stacks tag.
+        while (xer.hasNext()) {
+          XMLEvent  xe = xer.peek();
+            switch (xe.getEventType()) {
+
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(VARIABLE_STACK)) {
+                        if (getParentTables().isEmpty()) {
+                            // Just make sure there is at least one.
+                            getParentTables().add(new SymbolTableImpl());
+                        }
+                        return;
+                    }
+                    break;
+            }
+            xer.nextEvent();
+        }
+        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + VARIABLE_STACK);
+    }
+
+    /**
+     * One at the right tag, this just runs through any white space until it finds the CDATA element,
+     * grabs that, converts it to JSON, then returns its contents. It will end with the cursor
+     * before the close tag, but does not process it.
+     * @param xer
+     * @return
+     * @throws XMLStreamException
+     */
+    protected JSONArray getJSON(XMLEventReader xer) throws XMLStreamException {
+        JSONArray jsonArray = null;
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.CHARACTERS:
+                    if (xe.asCharacters().isWhiteSpace()) {
+                        break;
+                    }
+                    jsonArray = JSONArray.fromObject(xe.asCharacters().getData());
+                    return jsonArray;
+            }
+            xe = xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(VARIABLE_STACK);
+    }
     public void fromXML(XMLEventReader xer) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.

@@ -116,9 +116,6 @@ public class XMLUtilsV2 {
         module.setTemplate(true);
         module.setParentTemplateID(null);
 
-
-        //  module.setDocumentation(StringUtils.stringToList(raw));
-
         // scorecard: at this point, enough information existed in the attributes to re-assemble the module
         // The cursor is still on this tag. Now send it to the module for further processing.
         //module.fromXML(xer, xp, qi);

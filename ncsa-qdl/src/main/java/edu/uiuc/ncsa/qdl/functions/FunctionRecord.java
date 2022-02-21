@@ -16,6 +16,14 @@ import java.util.List;
  * on 1/22/20 at  10:48 AM
  */
 public class FunctionRecord implements XThing {
+    public FunctionRecord() {
+    }
+
+    public FunctionRecord(FKey key, List<String> sourceCode) {
+        this.sourceCode = sourceCode;
+        this.key = key;
+    }
+
     @Override
     public String getName() {
         return name;

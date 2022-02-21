@@ -4,16 +4,18 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.statements.Documentable;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTIONS_TAG;
@@ -297,29 +299,6 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
         throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 
-/*    @Override
-    public void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException {
-        State state = new State();
-        QDLInterpreter qi = new QDLInterpreter(null, new State());
-        XMLEvent xe = xer.nextEvent();
-        while (xer.hasNext()) {
-            xe = xer.peek();
-            switch (xe.getEventType()) {
-                case XMLEvent.START_ELEMENT:
-                    if (xe.asStartElement().getName().getLocalPart().equals(FUNCTION_TAG)) {
-                        processSingleFunction(xer, qi);
-                    }
-                    break;
-                case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(FUNCTIONS_TAG)) {
-                        return;
-                    }
-            }
-            xer.nextEvent();
-        }
-        throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
-    }*/
-
     @Override
     public String getXMLTableTag() {
         return FUNCTIONS_TAG;
@@ -328,6 +307,17 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     @Override
     public String getXMLElementTag() {
         return FUNCTION_TAG;
+    }
+
+    @Override
+    public String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState) {
+        String src =  StringUtils.listToString(xThing.sourceCode);
+        return Base64.encodeBase64URLSafeString(src.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
+          return new String(Base64.decodeBase64(x));
     }
 }
 

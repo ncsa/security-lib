@@ -15,7 +15,7 @@ import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
-import edu.uiuc.ncsa.security.core.util.StringUtils;
+import net.sf.json.JSONObject;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.*;
@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
+
+import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
 /**
  * A class for all those XML related snippets that are re-used everywhere.
@@ -437,6 +439,7 @@ public class XMLUtils implements XMLConstants {
                         ModuleAttributes moduleAttributes = getModuleAttributes(xe);
                         try {
                             Module module = deserializeModule(xer, moduleAttributes, xp, state);
+                            module.setTemplate(true); // older workspaces don't set this, so do it.
                             state.getMTemplates().put(module);
                         } catch (DeserializationException dx) {
                             System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '");
@@ -474,7 +477,7 @@ public class XMLUtils implements XMLConstants {
         QDLInterpreter qi = new QDLInterpreter(xp, state);
 
         if (moduleAttributes.isJavaModule()) {
-            if (StringUtils.isTrivial(moduleAttributes.className)) {
+            if (isTrivial(moduleAttributes.className)) {
                 throw new IllegalStateException("Error: serialized java module without a classs -- cannot deserialize");
             }
             try {
@@ -504,7 +507,7 @@ public class XMLUtils implements XMLConstants {
     /**
      * Internal class to manage attributes for a module.   Not all modules have all of these all the time!
      */
-    public static class ModuleAttributes {
+    public static class ModuleAttributes implements XMLConstants {
         public String type = null;
         public URI ns = null;
         public String alias = null;
@@ -520,6 +523,60 @@ public class XMLUtils implements XMLConstants {
             return type.equals(MODULE_TYPE_JAVA_TAG);
         }
 
+        public void fromJSON(String rawJSON) {
+            JSONObject jsonObject = JSONObject.fromObject(rawJSON);
+            fromJSON(jsonObject);
+        }
+
+        public void fromJSON(JSONObject jsonObject) {
+            if (jsonObject.containsKey(MODULE_ALIAS_ATTR)) {
+                alias = jsonObject.getString(MODULE_ALIAS_ATTR);
+            }
+            if (jsonObject.containsKey(MODULE_NS_ATTR)) {
+                ns = URI.create(jsonObject.getString(MODULE_NS_ATTR));
+            }
+            if (jsonObject.containsKey(MODULE_CLASS_NAME_TAG)) {
+                className = jsonObject.getString(MODULE_CLASS_NAME_TAG);
+            }
+            if (jsonObject.containsKey(MODULE_TYPE_TAG)) {
+                type = jsonObject.getString(MODULE_TYPE_TAG);
+            }
+            if (jsonObject.containsKey(UUID_TAG)) {
+                uuid = UUID.fromString(jsonObject.getString(UUID_TAG));
+            }
+            if (jsonObject.containsKey(TEMPLATE_REFERENCE_TAG)) {
+                templateReference = UUID.fromString(jsonObject.getString(TEMPLATE_REFERENCE_TAG));
+            }
+            if (jsonObject.containsKey(STATE_REFERENCE_TAG)) {
+                stateReference = UUID.fromString(jsonObject.getString(STATE_REFERENCE_TAG));
+            }
+        }
+
+        public JSONObject toJSON() {
+            JSONObject jsonObject = new JSONObject();
+            if (!isTrivial(type)) {
+                jsonObject.put(MODULE_TYPE_TAG, type);
+            }
+            if (ns != null) {
+                jsonObject.put(MODULE_NS_ATTR, ns.toString());
+            }
+            if (!isTrivial(alias)) {
+                jsonObject.put(MODULE_ALIAS_ATTR, alias);
+            }
+            if (!isTrivial(className)) {
+                jsonObject.put(MODULE_CLASS_NAME_TAG, className);
+            }
+            if (uuid != null) {
+                jsonObject.put(UUID_TAG, uuid.toString());
+            }
+            if (stateReference != null) {
+                jsonObject.put(STATE_REFERENCE_TAG, stateReference.toString());
+            }
+            if (templateReference != null) {
+                jsonObject.put(TEMPLATE_REFERENCE_TAG, templateReference.toString());
+            }
+            return jsonObject;
+        }
     }
 
     public static ModuleAttributes getModuleAttributes(XMLEvent xe) throws XMLStreamException {
