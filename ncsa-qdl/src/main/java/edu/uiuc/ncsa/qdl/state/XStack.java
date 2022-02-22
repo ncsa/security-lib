@@ -522,7 +522,6 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     protected void toXMLNEW(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         xsw.writeStartElement(getXMLStackTag());
-        System.err.println(getClass().getSimpleName() + ": json=" + toJSON(xmlSerializationState).toString(1));
         xsw.writeCData(toJSON(xmlSerializationState).toString());
         xsw.writeEndElement();
     }

@@ -1,12 +1,14 @@
 package edu.uiuc.ncsa.qdl.xml;
 
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
+import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -130,21 +132,25 @@ public class XMLUtilsV2 {
      * Deserializes a template stack of references.
      *
      * @param xer
-     * @param XMLSerializationState
+     * @param xmlSerializationState
      * @throws XMLStreamException
      */
-    public static void deserializeTemplates(XMLEventReader xer, State state, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-        XMLEvent xe = xer.nextEvent();// advance cursor
-        MTStack mtStack = new MTStack();
-        mtStack.fromXML(xer, XMLSerializationState);
-        state.setMTemplates(mtStack);
+    public static void deserializeTemplates(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        deserializeXStack(xer, new MTStack(), state, xmlSerializationState);
     }
 
-    public static void deserializeInstances(XMLEventReader xer, State state, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-        XMLEvent xe = xer.nextEvent();// advance cursor
-        MIStack miStack = new MIStack();
-        miStack.fromXML(xer, XMLSerializationState);
-        state.setMInstances(miStack);
+
+    public static void deserializeFunctions(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        deserializeXStack(xer, new FStack(), state, xmlSerializationState);
+    }
+
+    public static void deserializeInstances(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        deserializeXStack(xer, new MIStack(), state, xmlSerializationState);
+    }
+    protected static void deserializeXStack(XMLEventReader xer, XStack xStack, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        xer.nextEvent();// advance cursor
+        xStack.fromXML(xer, xmlSerializationState);
+        xStack.setStateStack(state, xStack);
     }
 
     public static class StateAttributes {

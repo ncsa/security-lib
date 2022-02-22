@@ -748,7 +748,7 @@ public class State extends FunctionState implements QDLConstants {
         xsw.writeEndElement(); // end state tag
     }
 
-    public void fromXML(XMLEventReader xer, XProperties xp, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+    public void fromXML(XMLEventReader xer, XProperties xp, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         // At this point, caller peeked and knows this is the right type of event,
         // so we know where in the stream we are starting automatically.
 
@@ -763,10 +763,10 @@ public class State extends FunctionState implements QDLConstants {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case VARIABLE_STACK:
-                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)){
+                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)){
                                 SymbolStack st = new SymbolStack();
                                 st.getParentTables().clear(); // or there is an extra top level element.
-                                st.fromXML(xer, XMLSerializationState);
+                                st.fromXML(xer, xmlSerializationState);
                                 setSymbolStack(st);
 
                             }else{
@@ -776,18 +776,22 @@ public class State extends FunctionState implements QDLConstants {
                             }
                             break;
                         case FUNCTION_TABLE_STACK_TAG:
-                            XMLUtils.deserializeFunctions(xer, xp, this);
+                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeFunctions(xer,  this, xmlSerializationState);
+                            }else {
+                                XMLUtils.deserializeFunctions(xer, xp, this);
+                            }
                             break;
                         case INSTANCE_STACK:
-                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
-                                XMLUtilsV2.deserializeInstances(xer, this, XMLSerializationState);
+                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeInstances(xer, this, xmlSerializationState);
                             }else{
                                 XMLUtils.deserializeImports(xer, xp, this);
                             }
                             break;
                         case TEMPLATE_STACK:
-                            if(XMLSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
-                                XMLUtilsV2.deserializeTemplates(xer, this, XMLSerializationState);
+                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeTemplates(xer, this, xmlSerializationState);
                             }else{
                                 XMLUtils.deserializeTemplates(xer, xp,this);
 

@@ -146,14 +146,6 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
         moduleAttributes.templateReference = module.parentTemplateID;
         moduleAttributes.stateReference = module.getState().getUuid();
 
-/*
-        JSONObject reference = new JSONObject();
-        reference.put(XMLConstants.UUID_TAG, module.getId().toString());
-        reference.put(XMLConstants.TEMPLATE_REFERENCE_TAG, module.getParentTemplateID().toString());
-        reference.put(XMLConstants.MODULE_ALIAS_ATTR, key.getKey());
-        reference.put(XMLConstants.STATE_REFERENCE_TAG, module.getState().getInternalID());
-        return reference.toString();
-*/
         return moduleAttributes.toJSON().toString();
     }
 
@@ -163,6 +155,7 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
         XMLUtils.ModuleAttributes moduleAttributes = new XMLUtils.ModuleAttributes();
         moduleAttributes.fromJSON(x);
         V m = deserializeElement(moduleAttributes, xmlSerializationState);
-        return null;
+        put(new XKey(moduleAttributes.alias), m);
+        return null; // this returns what the interpreter should process. Nothing in this case.
     }
 }

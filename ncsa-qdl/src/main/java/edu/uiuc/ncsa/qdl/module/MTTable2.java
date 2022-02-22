@@ -65,16 +65,19 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
 
     }
 
+    public V deserializeElement(XMLUtils.ModuleAttributes moduleAttributes, XMLSerializationState XMLSerializationState)  {
+        if(!XMLSerializationState.processedTemplate(moduleAttributes.uuid)){
+            throw new IllegalStateException("template '" + moduleAttributes.uuid + "' not found");
+        }
+        return (V) XMLSerializationState.getTemplate(moduleAttributes.uuid);
+    }
 
 
     @Override
     public V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException {
         XMLEvent xe = xer.peek();
         XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
-        if(!XMLSerializationState.processedTemplate(moduleAttributes.uuid)){
-            throw new IllegalStateException("template '" + moduleAttributes.uuid + "' not found");
-        }
-        return (V) XMLSerializationState.getTemplate(moduleAttributes.uuid);
+        return deserializeElement(moduleAttributes, XMLSerializationState);
     }
 
     public void clearChangeList(){
@@ -122,6 +125,10 @@ public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V>
 
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
+        XMLUtils.ModuleAttributes moduleAttributes = new XMLUtils.ModuleAttributes();
+        moduleAttributes.fromJSON(x);
+        V m = deserializeElement(moduleAttributes, xmlSerializationState);
+        put(new MTKey(m.getNamespace()), m);
         return null;
     }
 }

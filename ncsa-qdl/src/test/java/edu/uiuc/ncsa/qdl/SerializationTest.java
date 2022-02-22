@@ -63,7 +63,6 @@ public class SerializationTest extends AbstractQDLTester{
         interpreter.execute(script.toString());
         SymbolStack ss = state.getSymbolStack();
         JSONArray jsonArray = (JSONArray)ss.toJSON();
-        System.out.println(jsonArray);
         ss.fromJSON(jsonArray);
         // The state has been created and populated. Now we serialize it, then deserialize it.
         StringWriter stringWriter = new StringWriter();

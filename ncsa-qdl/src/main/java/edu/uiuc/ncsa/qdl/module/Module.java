@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -18,6 +19,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -210,7 +212,7 @@ public abstract class Module implements XThing, Serializable {
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
         if (!getListByTag().isEmpty()) {
             xsw.writeStartElement(MODULE_DOCUMENTATION_TAG);
-            xsw.writeCData(StringUtils.listToString(getListByTag()));
+            xsw.writeCData(Base64.encodeBase64URLSafeString(StringUtils.listToString(getListByTag()).getBytes(StandardCharsets.UTF_8)));
             xsw.writeEndElement();
         }
     }
@@ -279,7 +281,8 @@ public abstract class Module implements XThing, Serializable {
                     if (xe.asCharacters().isWhiteSpace()) {
                         break;
                     }
-                    documentation = StringUtils.stringToList(xe.asCharacters().getData());
+                    String raw = new String(Base64.decodeBase64(xe.asCharacters().getData()));
+                    documentation = StringUtils.stringToList(raw);
                     break;
                 case XMLEvent.END_ELEMENT:
                     if (xe.asEndElement().getName().getLocalPart().equals(tag)) {

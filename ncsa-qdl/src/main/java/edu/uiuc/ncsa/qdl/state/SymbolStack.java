@@ -385,7 +385,6 @@ public class SymbolStack extends AbstractSymbolTable {
     protected void toXMLNEW(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(VARIABLE_STACK);
         xsw.writeComment("The list of symbol tables for this state.");
-        System.err.println(getClass().getSimpleName() + ": json=" + toJSON().toString(1));
         xsw.writeCData(toJSON().toString());
         xsw.writeEndElement();
     }

@@ -4,11 +4,13 @@ import edu.uiuc.ncsa.qdl.exceptions.ModuleInstantiationException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +85,7 @@ public class QDLModule extends Module {
         super.writeExtraXMLElements(xsw);
         if (!getSource().isEmpty()) {
             xsw.writeStartElement(MODULE_SOURCE_TAG);
-            xsw.writeCData(StringUtils.listToString(getSource()));
+            xsw.writeCData(Base64.encodeBase64URLSafeString(StringUtils.listToString(getSource()).getBytes(StandardCharsets.UTF_8)));
             xsw.writeEndElement();
         }
     }
