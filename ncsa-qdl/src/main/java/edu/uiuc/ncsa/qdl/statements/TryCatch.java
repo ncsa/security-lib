@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.qdl.statements;
 
 import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,19 +34,33 @@ public class TryCatch implements Statement {
             }
         } catch (RaiseErrorException t) {
             // custom error handling
-            localState.getSymbolStack().getLocalST().setValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
+/*
+            localState.getVStack().getLocalST().setValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
             if(t.getPolyad().getArgCount() ==2) {
-                localState.getSymbolStack().getLocalST().setValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
+                localState.getVStack().getLocalST().setValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
             }else{
-                localState.getSymbolStack().getLocalST().setValue("error_code", RESERVED_USER_ERROR_CODE);
+                localState.getVStack().getLocalST().setValue("error_code", RESERVED_USER_ERROR_CODE);
             }
+*/
+            localState.getVStack().localPut(new VThing(new XKey("error_message"), t.getPolyad().getArguments().get(0).getResult().toString()));
+            if(t.getPolyad().getArgCount() ==2) {
+                localState.getVStack().localPut(new VThing(new XKey("error_code"), (Long) t.getPolyad().getArguments().get(1).getResult()));
+            }else{
+                localState.getVStack().localPut(new VThing(new XKey("error_code"), RESERVED_USER_ERROR_CODE));
+            }
+
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }
         } catch (Throwable otherT) {
             // everything else.
-            localState.getSymbolStack().getLocalST().setValue("error_message", otherT.getMessage());
-            localState.getSymbolStack().getLocalST().setValue("error_code", RESERVED_ERROR_CODE);
+/*
+            localState.getVStack().getLocalST().setValue("error_message", otherT.getMessage());
+            localState.getVStack().getLocalST().setValue("error_code", RESERVED_ERROR_CODE);
+*/
+            localState.getVStack().localPut(new VThing(new XKey("error_message"), otherT.getMessage()));
+            localState.getVStack().localPut(new VThing(new XKey("error_code"), RESERVED_ERROR_CODE));
+
             for (Statement c : catchStatements) {
                 c.evaluate(localState);
             }

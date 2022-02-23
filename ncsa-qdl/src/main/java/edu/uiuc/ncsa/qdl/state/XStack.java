@@ -172,6 +172,22 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     /**
+     * searches for the entry every place except the most local state.
+     *
+     * @param key
+     * @return
+     */
+    public XThing nonlocalGet(XKey key) {
+        for (int i = 1; i < getStack().size(); i++) {
+            XThing xThing = getStack().get(i).get(key);
+            if (xThing != null) {
+                return xThing;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get all of the values from all tables.This returns a flat list.
      *
      * @return
@@ -322,8 +338,9 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
      * @throws XMLStreamException
      */
     public void toXML(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {
-                      toXMLNEW(xsw, xmlSerializationState);
+        toXMLNEW(xsw, xmlSerializationState);
     }
+
     public void toXMLOLD(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         if (isEmpty()) {
             return;
@@ -352,14 +369,14 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-                       fromXMLNEW(xer, XMLSerializationState);
+        fromXMLNEW(xer, XMLSerializationState);
     }
+
     public void fromXMLOLD(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         // points to stacks tag
         XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         getStack().clear(); // Needed or there will be an extra empty stack after this call.
         // no attributes or such with the stacks tag.
-        //boolean foundStack = false;
         while (xer.hasNext()) {
             xe = xer.peek();
             switch (xe.getEventType()) {
@@ -388,6 +405,10 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     abstract public String getXMLStackTag();
 
+    /**
+     * @deprecated 
+     * @return
+     */
     abstract public String getXMLTableTag();
 
     /**
@@ -422,7 +443,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             JSONArray jsonArray = new JSONArray();
             for (Object key : xTable.keySet()) {
                 XThing xThing = (XThing) xTable.get(key);
-                jsonArray.add(xTable.toJSONEntry( xThing, xmlSerializationState));
+                jsonArray.add(xTable.toJSONEntry(xThing, xmlSerializationState));
             }
             array.add(jsonArray);
         }
@@ -433,6 +454,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
      * This sets the stack corresponding to this class from the state with the given stack.
      * If the stack is not of the correct type, a class cast exception will result. <br/><br/>
      * We <i>could</i> have tried this with some type of dynamic casting, but that is messy and fragile in Java
+     *
      * @param state
      * @param xStack
      */
@@ -440,6 +462,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
 
     /**
      * This gets the stack corresponding to this class from the state..
+     *
      * @param state
      * @return
      */
@@ -486,7 +509,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         //XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
         // no attributes or such with the stacks tag.
         while (xer.hasNext()) {
-          XMLEvent  xe = xer.peek();
+            XMLEvent xe = xer.peek();
             switch (xe.getEventType()) {
 
                 case XMLEvent.END_ELEMENT:
@@ -503,6 +526,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + getXMLStackTag());
     }
+
     protected JSONArray getJSON(XMLEventReader xer) throws XMLStreamException {
         JSONArray jsonArray = null;
         XMLEvent xe = xer.nextEvent();
@@ -529,9 +553,10 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     public static void main(String[] args) throws Throwable {
         // Roundtrip test for JSON serialization. Should populate a stack, print it out, deserialize it, then
         // print out the exact same stack.
-         testFStack();
+        testFStack();
     }
-    static void testFStack(){
+
+    static void testFStack() {
         FStack fStack = new FStack();
         fStack.put(new FunctionRecord(new FKey("f", 1), Arrays.asList("f(x)->x^2;")));
         fStack.put(new FunctionRecord(new FKey("g", 1), Arrays.asList("g(x)->x^3;")));
@@ -548,7 +573,8 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         System.out.println(fStack1.toJSON(null).toString(2));
 
     }
-    static void testVStack(){
+
+    static void testVStack() {
         // Roundtrip test for JSON serialization. Should populate a stack, print it out, deserialize it, then
         // print out the exact same stack.
         VStack vStack = new VStack();

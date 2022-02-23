@@ -6,9 +6,11 @@ import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 import java.math.BigDecimal;
 
@@ -73,7 +75,7 @@ public class TestDyadicOperations extends AbstractQDLTester {
         stemVariable.put("bar", new BigDecimal("345.432"));
         stemVariable.put("baz", -34L);
         stemVariable.put("3", new BigDecimal("-123.987"));
-        state.getSymbolStack().setStemVariable("myStem.", stemVariable);
+        state.getVStack().put(new VThing(new XKey("myStem."), stemVariable));
         ConstantNode left = new ConstantNode(new Long(3L), Constant.LONG_TYPE);
         VariableNode right = new VariableNode("myStem.");
 
@@ -142,24 +144,25 @@ public class TestDyadicOperations extends AbstractQDLTester {
 
     public void testVariableExpression() throws Exception {
         State state = testUtils.getTestState();
-        SymbolTable st = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         // String test
-        String testValue = (String) st.resolveValue("string");
+
+        VThing testValue = (VThing) vStack.get(new XKey("string"));
         VariableNode variableNode = new VariableNode("string");
         variableNode.evaluate(state);
-        assert variableNode.getResult().equals(testValue);
+        assert variableNode.getResult().equals(testValue.getValue());
         assert variableNode.getResultType() == Constant.STRING_TYPE;
         // random string test
         variableNode = new VariableNode("random.0");
-        testValue = (String) st.resolveValue("random.0");
+        testValue = (VThing) vStack.get(new XKey("random."));
         variableNode.evaluate(state);
-        assert variableNode.getResult().equals(testValue);
+        assert variableNode.getResult().equals(testValue.getStemValue().get(0L));
         assert variableNode.getResultType() == Constant.STRING_TYPE;
         // Long-valued test
         variableNode = new VariableNode("long");
-        Long testLong = (Long) st.resolveValue("long");
+        testValue = (VThing) vStack.get(new XKey("long"));
         variableNode.evaluate(state);
-        assert variableNode.getResult().equals(testLong);
+        assert variableNode.getResult().equals(testValue.getLongValue());
         assert variableNode.getResultType() == Constant.LONG_TYPE;
     }
 

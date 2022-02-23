@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.security.core.Logable;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -94,23 +95,23 @@ public abstract class AbstractState implements StateInterface, Logable {
     private static final long serialVersionUID = 0xcafed00d3L;
 
     public AbstractState(
-                         SymbolStack symbolStack,
+                         VStack vStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          MyLoggingFacade myLoggingFacade) {
-        this.symbolStack = symbolStack;
+        this.vStack = vStack;
         this.metaEvaluator = metaEvaluator;
         this.opEvaluator = opEvaluator;
         this.logger = myLoggingFacade;
         stateRegistry.put(getUuid(), this);
     }
 
-    public SymbolStack getSymbolStack() {
-        return symbolStack;
+    public VStack getVStack() {
+        return vStack;
     }
 
-    public void setSymbolStack(SymbolStack symbolStack) {
-        this.symbolStack = symbolStack;
+    public void setvStack(VStack vStack) {
+        this.vStack = vStack;
     }
 
     public OpEvaluator getOpEvaluator() {
@@ -129,7 +130,7 @@ public abstract class AbstractState implements StateInterface, Logable {
         this.metaEvaluator = metaEvaluator;
     }
 
-    SymbolStack symbolStack;
+    VStack vStack;
     transient MetaEvaluator metaEvaluator;
     transient OpEvaluator opEvaluator;
 

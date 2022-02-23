@@ -6,8 +6,10 @@ import edu.uiuc.ncsa.qdl.expressions.Monad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -19,77 +21,81 @@ public class TestMonadicOperations extends AbstractQDLTester {
      
     public void testPlusPlusPostfix() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = 1L + initialValue;
-        st.setValue("i", initialValue);
+        vStack.put(new VThing(new XKey("i"), initialValue));
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad(OpEvaluator.PLUS_PLUS_VALUE, var);
         myMonad.evaluate(state);
 
         assert myMonad.getResult().equals(initialValue);
-        assert st.resolveValue(variableReference).equals(newValue);
+        assert checkVThing(variableReference, newValue, state);
+
+//        assert vStack.get(new XKey(variableReference)).equals(newValue);
         myMonad.evaluate(state);
         myMonad.evaluate(state);
-        assert st.resolveValue(variableReference).equals(newValue+2L);
+        assert checkVThing(variableReference, newValue+2L, state);
+        //assert vStack.get(new XKey(variableReference)).equals(newValue+2L);
 
     }
 
      
     public void testMinusMinusPostfix() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = initialValue - 1L;
-        st.setValue("i", initialValue);
+        vStack.put(new VThing(new XKey("i"), initialValue));
         OpEvaluator opEvaluator = new OpEvaluator();
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad( OpEvaluator.MINUS_MINUS_VALUE, var);
         myMonad.evaluate(state);
 
         assert myMonad.getResult().equals(initialValue);
-        assert st.resolveValue(variableReference).equals(newValue);
+        assert checkVThing(variableReference, newValue, state);
+
+//        assert vStack.get(new XKey(variableReference)).equals(newValue);
     }
 
      
     public void testPlusPlusPrefix() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = 1L + initialValue;
-        st.setValue("i", initialValue);
+        vStack.put(new VThing(new XKey("i"), initialValue));
         OpEvaluator opEvaluator = new OpEvaluator();
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad(OpEvaluator.PLUS_PLUS_VALUE, var, false);
         myMonad.evaluate(state);
 
         assert myMonad.getResult().equals(newValue);
-        assert st.resolveValue(variableReference).equals(newValue);
+        assert checkVThing(variableReference, newValue, state);
     }
 
      
     public void testMinusMinusPrefix() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String variableReference = "i"; // name of the variable
         Long initialValue = 2L;
         Long newValue = initialValue - 1L;
-        st.setValue("i", initialValue);
+        vStack.put(new VThing(new XKey("i"), initialValue));
         VariableNode var = new VariableNode(variableReference);
         Monad myMonad = new Monad( OpEvaluator.MINUS_MINUS_VALUE, var, false);
         myMonad.evaluate(state);
 
         assert myMonad.getResult().equals(newValue);
-        assert st.resolveValue(variableReference).equals(newValue);
+        assert checkVThing(variableReference, newValue, state);
     }
 
-     
+
     public void testNotPrefix() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable st = state.getSymbolStack();
         Boolean initialValue = Boolean.TRUE;
         ConstantNode constantNode = new ConstantNode(initialValue, Constant.BOOLEAN_TYPE);
         Boolean newValue = !initialValue;

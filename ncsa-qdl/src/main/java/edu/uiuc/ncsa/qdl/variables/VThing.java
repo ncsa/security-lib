@@ -45,5 +45,19 @@ public class VThing implements XThing {
         }
         return type;
     }
+     public boolean isStem(){
+        if(value == null) return false;
+        return value instanceof StemVariable;
+     }
 
+     public StemVariable getStemValue(){
+        return (StemVariable) value;
+     }
+     public Long getLongValue(){
+        return (Long) value;
+     }
+     public boolean isNull(){
+        if(value == null) return false;
+        return value instanceof QDLNull;
+     }
 }

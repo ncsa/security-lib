@@ -1,8 +1,10 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import org.apache.commons.codec.binary.Base64;
 
 import java.math.BigDecimal;
@@ -213,4 +215,16 @@ public class AbstractQDLTester extends TestBase {
         BigDecimal result = left.subtract(right);
         return result.compareTo(BigDecimal.ZERO) == 0;
     }
+
+    /**
+     * Tests that the variable has the given value in the {@link edu.uiuc.ncsa.qdl.variables.VStack}
+      * @param variableName
+     * @param newValue
+     * @param state
+     * @return
+     */
+    protected boolean checkVThing(String variableName, Object newValue, State state){
+        return ((VThing)state.getVStack().get(new XKey(variableName))).getValue().equals(newValue);
+    }
+
 }

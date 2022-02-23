@@ -10,6 +10,8 @@ import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -49,5 +51,13 @@ public class VTable<K extends XKey, V extends VThing> extends XTable<K,V> {
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
         return x;
+    }
+
+    public Set<String> listVariables() {
+        Set<String> vars = new HashSet<>();
+        for(XKey xKey: keySet()){
+               vars.add(xKey.getKey());
+        }
+        return vars;
     }
 }

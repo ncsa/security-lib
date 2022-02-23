@@ -90,7 +90,10 @@ public class WSXMLSerializer {
         // Do the workspace proper
         xsw.writeStartElement(WS_ENV_TAG);
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
-        xsw.writeAttribute(BUFFER_DEFAULT_SAVE_PATH, workspaceCommands.getBufferDefaultSavePath());
+        String zzz = workspaceCommands.getBufferDefaultSavePath();
+        if(zzz != null) {
+            xsw.writeAttribute(BUFFER_DEFAULT_SAVE_PATH, zzz);
+        }
         xsw.writeAttribute(ECHO_MODE, Boolean.toString(workspaceCommands.echoModeOn));
         xsw.writeAttribute(DEBUG_MODE, Boolean.toString(workspaceCommands.debugOn));
         xsw.writeAttribute(AUTOSAVE_ON, Boolean.toString(workspaceCommands.isAutosaveOn()));

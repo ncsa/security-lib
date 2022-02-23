@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.module.*;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -18,7 +19,7 @@ import java.util.*;
  * on 2/2/20 at  6:48 AM
  */
 public abstract class FunctionState extends VariableState {
-    public FunctionState(SymbolStack symbolStack,
+    public FunctionState(VStack vStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          FStack fStack,
@@ -26,7 +27,7 @@ public abstract class FunctionState extends VariableState {
                          MIStack miStack,
                          MyLoggingFacade myLoggingFacade) {
         super(
-                symbolStack,
+                vStack,
                 opEvaluator,
                 metaEvaluator,
                 mtStack,

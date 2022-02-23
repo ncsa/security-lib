@@ -9,12 +9,17 @@ import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import java.util.TreeSet;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 2/20/22 at  6:14 AM
  */
 public class VStack<V extends VTable<? extends XKey, ? extends VThing>> extends XStack<V> {
+    public VStack() {
+        pushNewTable();
+    }
+
     @Override
     public XStack newInstance() {
         return new VStack();
@@ -32,22 +37,29 @@ public class VStack<V extends VTable<? extends XKey, ? extends VThing>> extends 
 
     @Override
     public String getXMLStackTag() {
-        return XMLConstants.FUNCTION_TABLE_STACK_TAG;
+        return XMLConstants.VARIABLE_STACK;
     }
 
     @Override
     public String getXMLTableTag() {
-        return XMLConstants.FUNCTIONS_TAG;
+        return XMLConstants.VARIABLES_TAG;
     }
 
     @Override
     public void setStateStack(State state, XStack xStack) {
-                //state.setSymbolStack(this);
+                state.setvStack((VStack) xStack);
     }
 
     @Override
     public XStack getStateStack(State state) {
-        // return state.getSymbolStack();
-        return null;
+         return state.getVStack();
+    }
+    public TreeSet<String> listVariables() {
+        TreeSet<String> vars = new TreeSet<>();
+        for (XTable xTable : getStack()) {
+            VTable vTable = (VTable)xTable;
+            vars.addAll(vTable.listVariables());
+        }
+        return vars;
     }
 }

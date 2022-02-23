@@ -29,11 +29,23 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
             return put((K) value.getKey(), (V) value);
         }
 
+    /**
+     * @deprecated
+     * @param xsw
+     * @param XMLSerializationState
+     * @throws XMLStreamException
+     */
     public abstract void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException;
 
     public abstract String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState);
     public abstract String fromJSONEntry(String x, XMLSerializationState xmlSerializationState);
 
+    /**
+     * @deprecated
+     * @param xer
+     * @param qi
+     * @throws XMLStreamException
+     */
     public abstract void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
     /**
      * Version 2.0 serialization
@@ -62,8 +74,26 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
         throw new XMLMissingCloseTagException(getXMLTableTag());
     }
 
+    /**
+     * @deprecated
+     * @return
+     */
     public abstract String getXMLTableTag();
+
+    /**
+     * @deprecated 
+     * @return
+     */
     public abstract String getXMLElementTag();
+
+    /**
+     * @deprecated 
+     * @param xer
+     * @param XMLSerializationState
+     * @param qi
+     * @return
+     * @throws XMLStreamException
+     */
     public abstract V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException;
 
     //public abstract void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException;

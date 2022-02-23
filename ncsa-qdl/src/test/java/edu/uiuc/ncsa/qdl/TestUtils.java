@@ -9,9 +9,10 @@ import edu.uiuc.ncsa.qdl.module.MAliases;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 /**
@@ -36,17 +37,17 @@ public class TestUtils {
     MAliases mAliases = MAliases.newMInstances();
 
     public State createStateObject(
-                                   SymbolStack symbolStack,
-                                   OpEvaluator opEvaluator,
-                                   MetaEvaluator metaEvaluator,
-                                   FStack<? extends FTable<? extends XKey, ? extends FunctionRecord>> ftStack,
-                                   MTStack mTemplates,
-                                   MIStack mInstances,
-                                   MyLoggingFacade myLoggingFacade,
-                                   boolean isServerMode,
-                                   boolean assertionsOn) {
+            VStack vStack,
+            OpEvaluator opEvaluator,
+            MetaEvaluator metaEvaluator,
+            FStack<? extends FTable<? extends XKey, ? extends FunctionRecord>> ftStack,
+            MTStack mTemplates,
+            MIStack mInstances,
+            MyLoggingFacade myLoggingFacade,
+            boolean isServerMode,
+            boolean assertionsOn) {
         return new State(
-                symbolStack,
+                vStack,
                 new OpEvaluator(),
                 MetaEvaluator.getInstance(),
                 new FStack(),
@@ -59,9 +60,8 @@ public class TestUtils {
     }
 
     public State getNewState() {
-        SymbolTableImpl st = new SymbolTableImpl();
-        SymbolStack stack = new SymbolStack();
-        stack.addParent(st);
+        VStack stack = new VStack();
+        stack.pushNewTable();
         State state = createStateObject(
                 stack,
                 new OpEvaluator(),
@@ -103,16 +103,16 @@ public class TestUtils {
      *
      * @return
      */
-    public SymbolStack getTestSymbolStack() {
-        SymbolTableImpl st = new SymbolTableImpl();
-        st.setValue("string", "a string");
-        st.setValue("long", 2468L);
-        st.setValue("boolean", Boolean.TRUE);
-        st.setValue("random.0", AbstractQDLTester.getRandomString());
-        st.setValue("random.1", AbstractQDLTester.getRandomString());
-        st.setValue("random.2", AbstractQDLTester.getRandomString());
-        SymbolStack stack = new SymbolStack();
-        stack.addParent(st);
-        return stack;
+    public VStack getTestSymbolStack() {
+        VStack vStack = new VStack();
+        vStack.put(new VThing(new XKey("string"), "a string"));
+        vStack.put(new VThing(new XKey("long"), 2468L));
+        vStack.put(new VThing(new XKey("boolean"), Boolean.TRUE));
+        StemVariable stemVariable =new StemVariable();
+        stemVariable.put(0, AbstractQDLTester.getRandomString());
+        stemVariable.put(1, AbstractQDLTester.getRandomString());
+        stemVariable.put(2, AbstractQDLTester.getRandomString());
+        vStack.put(new VThing(new XKey("random."), stemVariable));
+        return vStack;
     }
 }

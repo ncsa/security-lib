@@ -5,11 +5,12 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
@@ -286,7 +287,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
    //     localState.getFTStack().push(frs.state.getFTStack().peek());
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
-        SymbolTable symbolTable = localState.getSymbolStack().getLocalST();
+        //SymbolTable symbolTable = localState.getVStack().getLocalST();
         //   boolean hasLocalFunctionTable = false;
         for (int i = 0; i < polyad.getArgCount(); i++) {
             if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
@@ -346,7 +347,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
                 // This had better be a function reference or this should blow up.
             } else {
-                symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(localState));
+                //symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(localState));
+                localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(localState)));
             }
         }
         if (functionRecord.isFuncRef) {
@@ -397,7 +399,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 polyad.setResultType(rx.resultType);
                 polyad.setEvaluated(true);
                 for (int i = 0; i < functionRecord.getArgCount(); i++) {
-                    symbolTable.remove(functionRecord.argNames.get(i));
+                    localState.getVStack().localRemove(new XKey(functionRecord.argNames.get(i)));
                 }
                 return;
             } catch (java.lang.StackOverflowError sx) {
@@ -407,7 +409,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         // Now remove the variables we created from the stack since they are no longer needed AND there is no
         // way to otherwise be rid of them.
         for (int i = 0; i < functionRecord.getArgCount(); i++) {
-            symbolTable.remove(functionRecord.argNames.get(i));
+//            symbolTable.remove(functionRecord.argNames.get(i));
+            localState.getVStack().localRemove(new XKey(functionRecord.argNames.get(i)));
         }
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);

@@ -4,8 +4,10 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -18,9 +20,9 @@ public class ExpressionTest extends AbstractQDLTester {
 
         // test !(a+2)<(b-3) for a = 10, b = 4. Should be TRUE
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-        symbolTable.setValue("a", 10L);
-        symbolTable.setValue("b", 4L);
+        VStack symbolTable = state.getVStack();
+        symbolTable.put(new VThing(new XKey("a"), 10L));
+        symbolTable.put(new VThing(new XKey("b"), 4L));
         ConstantNode twoNode = new ConstantNode(2L, Constant.LONG_TYPE);
         ConstantNode threeNode = new ConstantNode(3L, Constant.LONG_TYPE);
         VariableNode aNode = new VariableNode("a");
@@ -69,9 +71,9 @@ public class ExpressionTest extends AbstractQDLTester {
         //
         // Should be TRUE
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-        symbolTable.setValue("a", 10L);
-        symbolTable.setValue("b", 4L);
+        VStack vStack = state.getVStack();
+        vStack.put(new VThing(new XKey("a"), 10L));
+        vStack.put(new VThing(new XKey("b"), 4L));
         ConstantNode twoNode = new ConstantNode(2L, Constant.LONG_TYPE);
         ConstantNode threeNode = new ConstantNode(3L, Constant.LONG_TYPE);
         VariableNode aNode = new VariableNode("a");
@@ -87,8 +89,8 @@ public class ExpressionTest extends AbstractQDLTester {
         // This is the same as the previous test to show that state is kept straight.
         // now redo it. This time a = 0, b = 5 and the value should be false.
         State state2 = testUtils.getNewState();
-        state2.getSymbolStack().setValue("a", 0L);
-        state2.getSymbolStack().setValue("b", 10L);
+        state2.getVStack().put(new VThing(new XKey("a"), 0L));
+        state2.getVStack().put(new VThing(new XKey("b"), 10L));
 
         ExpressionNode notNode2 = notNode.makeCopy();
         notNode2.evaluate(state2);

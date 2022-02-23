@@ -11,6 +11,8 @@ import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -25,13 +27,13 @@ import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
  * on 2/2/20 at  6:42 AM
  */
 public abstract class VariableState extends NamespaceAwareState {
-    public VariableState(SymbolStack symbolStack,
+    public VariableState(VStack vStack,
                          OpEvaluator opEvaluator,
                          MetaEvaluator metaEvaluator,
                          MTStack mtStack,
                          MIStack miStack,
                          MyLoggingFacade myLoggingFacade) {
-        super(symbolStack,
+        super(vStack,
                 opEvaluator,
                 metaEvaluator,
                 mtStack,
@@ -212,38 +214,44 @@ public abstract class VariableState extends NamespaceAwareState {
      */
     protected Object gsrNSStemOp(StemMultiIndex w, int op,
                                  Object value, Set<XKey> checkInstances) {
-        //  checkNSClash(w.name);
         w = resolveStemIndices(w);
         String variableName;
         StemVariable stem = null;
-        //    boolean isNSQ = false;
-        //    URI uri = null;
         boolean isQDLNull = false;
-        SymbolTable st = null;
+        VStack vStack = null;
         variableName = w.name;
+        XKey vKey = new XKey(w.name);
         Object object;
         if (isIntrinsic(variableName)) {
-            st = getSymbolStack();
-            object = st.resolveValue(variableName, 1);
-            //object = st.resolveValue(variableName, ((SymbolStack) st).parentCount() - 1);
-            if (object instanceof StemVariable) {
-                stem = (StemVariable) object;
+            vStack = getVStack();
+            VThing vThing = (VThing) vStack.nonlocalGet(vKey);
+            if(vThing == null){
+                stem = null;
+            }else {
+                if (vThing.isStem()) {
+                    stem = vThing.getStemValue();
+                }
             }
         } else {
+            VThing vThing;
+            // look in specific places
             if(isImportMode()){
-                st = getSymbolStack().getLocalST();
+                vThing = (VThing) getVStack().localGet(vKey);
             }else{
-                st = getSymbolStack().getRightST(variableName);
+                vThing = (VThing) getVStack().get(vKey);
             }
-            object = st.resolveValue(getFQName(variableName));
-            if (object instanceof QDLNull) {
+            if (vThing != null && vThing.isNull()) {
                 isQDLNull = true;
             } else {
-                Object oooo = st.resolveValue(getFQName(variableName));
-                if (oooo != null && !(oooo instanceof StemVariable)) {
+                VThing oooo = (VThing) getVStack().get(vKey);
+                if (oooo != null && !(oooo.isStem())) {
                     throw new IllegalArgumentException("error: a stem was expected");
                 }
-                stem = (StemVariable) oooo;
+                if(oooo == null){
+                    stem =  null;
+                }else {
+                    stem = oooo.getStemValue();
+                }
             }
             // most likely place for it was in the main symbol table. But since there is
             // no name clash, look for it in the modules.
@@ -287,19 +295,16 @@ public abstract class VariableState extends NamespaceAwareState {
                 }
                 return stem.get(w);
             case OP_SET:
-
+                VThing vValue = new VThing(new XKey(variableName), value);
                 if (w.isEmpty()) {
-                    setValueImportAware(variableName, value, st);
+                    setValueImportAware(variableName, value);
                 } else {
                     if (stem == null || isQDLNull) {
                         stem = new StemVariable();
-//                        st.setValue(variableName, stem);
-                        setValueImportAware(variableName, stem, st);
-
+                        setValueImportAware(variableName, stem);
                     }
                     stem.set(w, value);
-//                    st.setValue(variableName, stem);
-                    setValueImportAware(variableName, stem, st);
+                    setValueImportAware(variableName, stem);
                 }
                 return null;
             case OP_REMOVE:
@@ -307,9 +312,8 @@ public abstract class VariableState extends NamespaceAwareState {
                     throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
                 }
                 if (w.isEmpty()) {
-                    st.remove(variableName);
+                    getVStack().remove(vKey);
                 } else {
-
                     stem.remove(w);
                 }
                 return null;
@@ -317,6 +321,13 @@ public abstract class VariableState extends NamespaceAwareState {
         throw new NFWException("Internal error; unknown operation type on stem variables.");
     }
 
+    /**
+     * If in import mode - if st is a SymbolTable, set value, if a symbol stack, set local<br/>
+     * otherwise, set value
+     * @param variableName
+     * @param value
+     * @param st
+     */
     private void setValueImportAware(String variableName, Object value, SymbolTable st) {
         if (isImportMode()) {
             if (st instanceof SymbolTable) {
@@ -327,6 +338,15 @@ public abstract class VariableState extends NamespaceAwareState {
         } else {
             st.setValue(variableName, value);
         }
+    }
+
+    private void setValueImportAware(String variableName, Object value) {
+         VThing vThing = new VThing(new XKey(variableName), value);
+         if(isImportMode()){
+             getVStack().localPut(vThing);
+         }else{
+             getVStack().put(vThing);
+         }
     }
 
     Pattern intPattern = Pattern.compile(int_regex);
@@ -349,24 +369,18 @@ public abstract class VariableState extends NamespaceAwareState {
             return null;
         }
 
-        Object v = null;
+        VThing v = null;
         SymbolTable st = null;
+        XKey xKey = new XKey(variableName);
         if (isIntrinsic(variableName)) {
-            st = getSymbolStack();
-            v = getSymbolStack().resolveValue(variableName);
+            //st = getvStack();
+            v = (VThing) getVStack().get(xKey);
+
         } else {
-            if(isImportMode()){
-                    st = getSymbolStack();
-            }else{
-
-                st = getSymbolStack().getRightST(variableName);
-            }
-            v = st.resolveValue(variableName);
+            v = (VThing) getVStack().get(xKey);
             if (v == null) {
-
+                VThing vThing;
                 if (!(isImportMode() || getMInstances().isEmpty())) {
-                   // System.out.println(getClass().getSimpleName() + "--- import on? " + isImportMode());
-
                     for (Object key : getMInstances().keySet()) {
                         XKey xkey = (XKey) key;
                         if (checkedAliases.contains(xkey)) {
@@ -382,7 +396,8 @@ public abstract class VariableState extends NamespaceAwareState {
                                     // all modules. If there is a duplicated, throw an exception.
                                     throw new NamespaceException("multiple modules found for '" + variableName + "', Please qualify the name.");
                                 }
-                                v = obj;
+                                //v = obj;
+                                v = new VThing(xKey, obj);
                             }
 
                         }
@@ -394,19 +409,20 @@ public abstract class VariableState extends NamespaceAwareState {
         switch (op) {
             case OP_GET:
                 // For resolving intrinsic variables.
-              /*  if (v == null && hasSuperState()) {
-                    v = getSuperState().getValue(variableName);
-                }*/
-                return v;
+                if(v == null){
+                    return null;
+                }
+                return v.getValue();
             case OP_SET:
+                VThing vThing = new VThing( new XKey(variableName), value);
                 if (isImportMode()) {
-                    getSymbolStack().setLocalValue(variableName, value);
+                    getVStack().localPut(vThing);
                 } else {
-                    st.setValue(variableName, value);
+                    getVStack().put(vThing);
                 }
                 return null;
             case OP_REMOVE:
-                st.remove(variableName);
+                getVStack().remove(xKey);
         }
 
         return null;
@@ -457,7 +473,7 @@ public abstract class VariableState extends NamespaceAwareState {
     public TreeSet<String> listVariables(boolean useCompactNotation,
                                          boolean includeModules,
                                          boolean showIntrinsic) {
-        TreeSet<String> out = getSymbolStack().listVariables();
+        TreeSet<String> out = getVStack().listVariables();
         if (!includeModules) {
             return out;
         }
@@ -468,7 +484,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 continue; // the user specified a non-existent module.
             }
 
-            TreeSet<String> uqVars = m.getState().getSymbolStack().listVariables();
+            TreeSet<String> uqVars = m.getState().getVStack().listVariables();
             for (String x : uqVars) {
                 if (isIntrinsic(x) && !showIntrinsic) {
                     continue;
@@ -486,6 +502,6 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     public boolean isStem(String var) {
-        return var.contains(STEM_INDEX_MARKER); // if ther eis an embedded period, needs to be resolved
+        return var.contains(STEM_INDEX_MARKER); // if there is an embedded period, needs to be resolved
     }
 }

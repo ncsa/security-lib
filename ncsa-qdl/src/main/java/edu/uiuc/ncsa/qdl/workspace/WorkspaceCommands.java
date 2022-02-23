@@ -22,6 +22,7 @@ import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.vfs.AbstractVFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
@@ -752,9 +753,11 @@ public class WorkspaceCommands implements Logable {
 
     public String getBufferDefaultSavePath() {
         if (bufferDefaultSavePath == null) {
-            bufferDefaultSavePath = getTempDir().getAbsolutePath();
-            if (!bufferDefaultSavePath.endsWith("/")) {
-                bufferDefaultSavePath = bufferDefaultSavePath + "/";
+            if(getTempDir() != null){
+                bufferDefaultSavePath = getTempDir().getAbsolutePath();
+                if (!bufferDefaultSavePath.endsWith("/")) {
+                    bufferDefaultSavePath = bufferDefaultSavePath + "/";
+                }
             }
         }
         return bufferDefaultSavePath;
@@ -3915,8 +3918,8 @@ public class WorkspaceCommands implements Logable {
          * the output and can make for NS conflicts on reload.
          */
         fileWriter.write("\n/* ** user defined variables ** */\n");
-        for (String varName : state.getSymbolStack().listVariables()) {
-            String output = inputFormVar(varName, 2, state);
+        for (Object varName : state.getVStack().listVariables()) {
+            String output = inputFormVar((String)varName, 2, state);
             fileWriter.write(varName + " := " + output + ";\n");
         }
 
@@ -4371,7 +4374,7 @@ public class WorkspaceCommands implements Logable {
 
     protected State getState() {
         if (state == null) {
-            SymbolStack stack = new SymbolStack();
+            VStack stack = new VStack();
             state = new State(
                     stack,
                     new OpEvaluator(),

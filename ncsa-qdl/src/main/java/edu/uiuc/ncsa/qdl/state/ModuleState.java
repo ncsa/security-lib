@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 /**
@@ -13,14 +14,14 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
  * on 1/31/22 at  7:26 AM
  */
 public abstract class ModuleState extends AbstractState {
-    public ModuleState(SymbolStack symbolStack,
+    public ModuleState(VStack vStack,
                        OpEvaluator opEvaluator,
                        MetaEvaluator metaEvaluator,
                        MTStack MTemplates,
                        MIStack mInstances,
                        MyLoggingFacade myLoggingFacade
                        ) {
-        super(symbolStack, opEvaluator, metaEvaluator, myLoggingFacade);
+        super(vStack, opEvaluator, metaEvaluator, myLoggingFacade);
         this.MTemplates = MTemplates;
         this.MInstances = mInstances;
     }

@@ -300,7 +300,7 @@ public class SymbolStack extends AbstractSymbolTable {
         getParentTables().clear();
         SymbolStack scratch = new SymbolStack();
         State state = new State();
-        state.setSymbolStack(scratch);
+       // state.setvStack(scratch);
 
         QDLInterpreter qi = new QDLInterpreter(state);
 

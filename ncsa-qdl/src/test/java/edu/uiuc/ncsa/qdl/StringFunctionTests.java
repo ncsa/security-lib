@@ -6,9 +6,11 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -37,15 +39,15 @@ public class StringFunctionTests extends AbstractQDLTester {
         // result should be conformable with the second argument
         String source = "Four score and seven years ago...";
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable snippets = new StemVariable();
         snippets.put("score", "score");
         snippets.put("Four", "Four");
         snippets.put("ago", "woof");
         snippets.put("7", "seven");
-        symbolTable.setStemVariable("snippets.", snippets);
-        symbolTable.setValue("source", source);
+        vStack.put(new VThing(new XKey("snippets."), snippets));
+        vStack.put(new VThing(new XKey("source"), source));
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("source");
@@ -77,7 +79,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testContainsStemString() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -86,8 +88,8 @@ public class StringFunctionTests extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
         String targetString = "One";
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setValue("targetString", targetString);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetString"), targetString));
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
@@ -110,7 +112,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testContainsStemStringCaseInsensitive() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "oNe Ring to rule them all");
@@ -119,8 +121,8 @@ public class StringFunctionTests extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
         String targetString = "One";
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setValue("targetString", targetString);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetString"), targetString));
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
@@ -145,7 +147,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testContainsStemStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -157,10 +159,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         targetStem.put("One", "One");
         targetStem.put("bind", "woof");
         targetStem.put("7", "seven");
-        symbolTable.setStemVariable("snippets.", targetStem);
-
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("targetStem.", targetStem);
+        vStack.put(new VThing(new XKey("snippets."), targetStem));
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetStem."), targetStem));
 
         Polyad polyad = new Polyad(StringEvaluator.CONTAINS);
         VariableNode left = new VariableNode("sourceStem.");
@@ -180,10 +181,10 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStringTrim() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         String arg = "   my   my   my    ";
-        symbolTable.setValue("arg", arg);
+        vStack.put(new VThing(new XKey("arg"), arg));
         String result = arg.trim();
         Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
@@ -197,10 +198,10 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testNumberTrim() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack symbolTable = state.getVStack();
 
         Long arg = System.currentTimeMillis();
-        symbolTable.setValue("arg", arg);
+        symbolTable.put(new VThing(new XKey("arg"), arg));
         Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("arg");
 
@@ -213,14 +214,14 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStemTrim() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack symbolTable = state.getVStack();
 
         StemVariable stem = new StemVariable();
         stem.put("1", "  foo");
         stem.put("woof", "      ");
         stem.put("warp", "foo           ");
         stem.put("9", "       foo           ");
-        symbolTable.setStemVariable("stem.", stem);
+        symbolTable.put(new VThing(new XKey("stem."), stem));
         Polyad polyad = new Polyad(StringEvaluator.TRIM);
         VariableNode left = new VariableNode("stem.");
 
@@ -253,15 +254,15 @@ public class StringFunctionTests extends AbstractQDLTester {
         State state = testUtils.getNewState();
 
         String source = "Four score and seven years ago...";
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable snippets = new StemVariable();
         snippets.put("score", "score");
         snippets.put("Four", "Four");
         snippets.put("ago", "woof");
         snippets.put("7", "seven");
-        symbolTable.setStemVariable("snippets.", snippets);
-        symbolTable.setValue("source", source);
+        vStack.put(new VThing(new XKey("snippets."), snippets));
+        vStack.put(new VThing(new XKey("source"), source));
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("source");
@@ -280,7 +281,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testIndexOfStemString() throws Exception {
         State state = testUtils.getTestState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -289,8 +290,8 @@ public class StringFunctionTests extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
         String targetString = "One";
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setValue("targetString", targetString);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetString"), targetString));
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         polyad.setName(StringEvaluator.INDEX_OF);
@@ -311,7 +312,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testIndexOfStemString_ignoreCase() throws Exception {
         State state = testUtils.getTestState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "one Ring to rule them all");
@@ -320,8 +321,8 @@ public class StringFunctionTests extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
         String targetString = "ONE";
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setValue("targetString", targetString);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetString"), targetString));
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
@@ -343,7 +344,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testIndexOfStemStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -355,10 +356,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         targetStem.put("One", "One");
         targetStem.put("bind", "darkness");
         targetStem.put("7", "seven");
-        symbolTable.setStemVariable("snippets.", targetStem);
-        /**/
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("targetStem.", targetStem);
+        vStack.put(new VThing(new XKey("snippets."), targetStem));
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetStem."), targetStem));
 
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
@@ -377,9 +377,9 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStringToUpper() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String arg = "mairzy doats";
-        symbolTable.setValue("arg", arg);
+        vStack.put(new VThing(new XKey("arg"), arg));
         String result = "MAIRZY DOATS";
         Polyad polyad = new Polyad(StringEvaluator.TO_UPPER);
         VariableNode left = new VariableNode("arg");
@@ -393,9 +393,9 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStringToLower() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         String arg = "MAIRZY DOATS";
-        symbolTable.setValue("arg", arg);
+        vStack.put(new VThing(new XKey("arg"), arg));
         String result = "mairzy doats";
         Polyad polyad = new Polyad(StringEvaluator.TO_LOWER);
         VariableNode left = new VariableNode("arg");
@@ -409,7 +409,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStemToLower() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         StemVariable stem = new StemVariable();
         String arg1 = "HAlt WHO";
         String arg2 = "GoeS";
@@ -419,7 +419,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         stem.put("woof", arg2);
         stem.put("warp", arg3);
         stem.put("9", arg4);
-        symbolTable.setStemVariable("stem.", stem);
+        vStack.put(new VThing(new XKey("stem."), stem));
         Polyad polyad = new Polyad(StringEvaluator.TO_LOWER);
         VariableNode left = new VariableNode("stem.");
 
@@ -436,7 +436,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStemToUpper() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         StemVariable stem = new StemVariable();
         String arg1 = "HAlt WHO";
         String arg2 = "GoeS";
@@ -446,7 +446,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         stem.put("woof", arg2);
         stem.put("warp", arg3);
         stem.put("9", arg4);
-        symbolTable.setStemVariable("stem.", stem);
+        vStack.put(new VThing(new XKey("stem."), stem));
         Polyad polyad = new Polyad(StringEvaluator.TO_UPPER);
         VariableNode left = new VariableNode("stem.");
 
@@ -480,7 +480,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testStemStringReplace() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -492,10 +492,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         targetStem.put("One", "One");
         targetStem.put("bind", "darkness");
         targetStem.put("7", "seven");
-        symbolTable.setStemVariable("snippets.", targetStem);
-        /**/
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("targetStem.", targetStem);
+        vStack.put(new VThing(new XKey("snippets."), targetStem));
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("targetStem."), targetStem));
 
         Polyad polyad = new Polyad(StringEvaluator.REPLACE);
         VariableNode source = new VariableNode("sourceStem.");
@@ -536,7 +535,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testInsertStemString() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -548,7 +547,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         ConstantNode index = new ConstantNode(new Long(3L), Constant.LONG_TYPE);
 
         /**/
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
 
         Polyad polyad = new Polyad(StringEvaluator.INSERT);
         VariableNode source = new VariableNode("sourceStem.");
@@ -573,7 +572,7 @@ public class StringFunctionTests extends AbstractQDLTester {
      
     public void testInsertStemStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -589,9 +588,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         indices.setDefaultValue(new Long(4L));
         // This sticks the work "darkness" in the string associated with the key bind
         String expectedResult = "and darknessin the darkness bind them";
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("snippets.", snippets);
-        symbolTable.setStemVariable("indices.", indices);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("snippets."), snippets));
+        vStack.put(new VThing(new XKey("indices."), indices));
 
         Polyad polyad = new Polyad(StringEvaluator.INSERT);
         VariableNode left = new VariableNode("sourceStem.");

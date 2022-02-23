@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
@@ -160,7 +161,7 @@ public abstract class StateUtils {
                 @Override
                 public State create() {
                     return new State(
-                            new SymbolStack(),
+                            new VStack(),
                             new OpEvaluator(),
                             MetaEvaluator.getInstance(),
                             new FStack(),

@@ -14,6 +14,7 @@ import edu.uiuc.ncsa.qdl.statements.TryCatch;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
@@ -86,7 +87,7 @@ public class State extends FunctionState implements QDLConstants {
      * @param assertionsOn
      * @return
      */
-    public State newInstance(SymbolStack symbolStack,
+    public State newInstance(VStack symbolStack,
                              OpEvaluator opEvaluator,
                              MetaEvaluator metaEvaluator,
                              FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack,
@@ -109,7 +110,7 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public State(
-            SymbolStack symbolStack,
+            VStack vStack,
             OpEvaluator opEvaluator,
             MetaEvaluator metaEvaluator,
             FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack,
@@ -119,7 +120,7 @@ public class State extends FunctionState implements QDLConstants {
             boolean isServerMode,
             boolean isRestrictedIO,
             boolean assertionsOn) {
-        super(symbolStack,
+        super(vStack,
                 opEvaluator,
                 metaEvaluator,
                 ftStack,
@@ -531,13 +532,15 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     protected State newStateWithImportsNEW(State moduleState) {
-        SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
-        if (moduleState != null && !moduleState.symbolStack.isEmpty()) {
-            newStack.addAll(moduleState.symbolStack.getParentTables());
+        VStack newStack = new VStack(); // always creates an empty symbol table, replace it
+        if (moduleState != null && !moduleState.vStack.isEmpty()) {
+            //newStack.addAll(moduleState.symbolStack.getParentTables());
+            newStack.appendTables(moduleState.vStack);
         }
 
-        if (!symbolStack.isEmpty()) {
-            newStack.addAll(symbolStack.getParentTables());
+        if (!vStack.isEmpty()) {
+            //newStack.addAll(symbolStack.getParentTables());
+            newStack.appendTables(vStack);
         }
 
         FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
@@ -591,32 +594,7 @@ public class State extends FunctionState implements QDLConstants {
         return newState;
     }
 
-    public State newStateWithImportsOLD(State moduleState) {
-        SymbolStack newStack = new SymbolStack(); // always creates an empty symbol table, replace it
-        newStack.getParentTables().set(0, moduleState.symbolStack);
-        newStack.getParentTables().addAll(symbolStack.getParentTables());
 
-        FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
-        ftStack.addTables(getFTStack().clone()); // pushes elements in reverse order
-        ftStack.addTables(moduleState.getFTStack());
-
-        State newState = newInstance(
-                newStack,
-                getOpEvaluator(),
-                getMetaEvaluator(),
-                ftStack,
-                getMTemplates(),
-                getMInstances(),
-                getLogger(),
-                isServerMode(),
-                isRestrictedIO(),
-                isAssertionsOn());
-        newState.setScriptArgs(getScriptArgs());
-        newState.setScriptPaths(getScriptPaths());
-        newState.setModulePaths(getModulePaths());
-        newState.setVfsFileProviders(getVfsFileProviders());
-        return newState;
-    }
 
     /**
      * For the case the this has been deserialized and needs to have its transient
@@ -660,7 +638,7 @@ public class State extends FunctionState implements QDLConstants {
     public  State newCleanState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
         State newState = newInstance(
-                new SymbolStack(),
+                new VStack(),
                 getOpEvaluator(),
                 getMetaEvaluator(),
                 new FStack(),
@@ -682,7 +660,7 @@ public class State extends FunctionState implements QDLConstants {
      * replace it all. Generally do not use outside of XML deserialization.
      */
     public State() {
-        super(new SymbolStack(),new OpEvaluator(), MetaEvaluator.getInstance(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
+        super(new VStack(),new OpEvaluator(), MetaEvaluator.getInstance(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
     }
 
     /**
@@ -698,17 +676,18 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     public int getStackSize() {
-        return getSymbolStack().getSymbolCount();
+        return getVStack().size();
     }
 
-    public void toXML(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+    public void toXML(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         xsw.writeStartElement(STATE_TAG);
         xsw.writeAttribute(UUID_TAG, getInternalID());
         writeExtraXMLAttributes(xsw);
-        getSymbolStack().toXML(xsw);
-        getFTStack().toXML(xsw, XMLSerializationState);
-        getMTemplates().toXML(xsw, XMLSerializationState);
-        getMInstances().toXML(xsw, XMLSerializationState);
+        //getSymbolStack().toXML(xsw);
+        getVStack().toXML(xsw, xmlSerializationState);
+        getFTStack().toXML(xsw, xmlSerializationState);
+        getMTemplates().toXML(xsw, xmlSerializationState);
+        getMInstances().toXML(xsw, xmlSerializationState);
         writeExtraXMLElements(xsw);
         xsw.writeEndElement(); // end state tag
 
@@ -741,7 +720,7 @@ public class State extends FunctionState implements QDLConstants {
         getMInstances().toXML(xsw, null);
 
         // Symbol stack has the variables
-        getSymbolStack().toXML(xsw);
+        getVStack().toXML(xsw, null);
         // Function table has the functions
         getFTStack().toXML(xsw, null);
         writeExtraXMLElements(xsw);
@@ -764,15 +743,19 @@ public class State extends FunctionState implements QDLConstants {
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case VARIABLE_STACK:
                             if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)){
-                                SymbolStack st = new SymbolStack();
+                                XMLUtilsV2.deserializeVariables(xer, this, xmlSerializationState);
+                              /*  SymbolStack st = new SymbolStack();
                                 st.getParentTables().clear(); // or there is an extra top level element.
                                 st.fromXML(xer, xmlSerializationState);
-                                setSymbolStack(st);
+                                setvStack(st);*/
 
                             }else{
+                                VStack vStack = new VStack();
                                 SymbolStack st = new SymbolStack();
                                 st.fromXML(xer);
-                                setSymbolStack(st);
+                                // Have to transfer functions over.
+                                vStack.fromJSON(st.toJSON(), null);
+                                setvStack(vStack);
                             }
                             break;
                         case FUNCTION_TABLE_STACK_TAG:
@@ -830,7 +813,9 @@ public class State extends FunctionState implements QDLConstants {
                         case STACKS_TAG:
                             SymbolStack st = new SymbolStack();
                             st.fromXML(xer);
-                            setSymbolStack(st);
+                            VStack vStack = new VStack();
+                            vStack.fromJSON(st.toJSON(), null);
+                            setvStack(vStack);
                             break;
                         case FUNCTIONS_TAG:
                             XMLUtils.oldDeserializeFunctions(xer, xp, this);

@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
 import java.util.Arrays;
@@ -16,13 +17,13 @@ import java.util.List;
  * on 2/2/20 at  6:40 AM
  */
 public abstract class NamespaceAwareState extends ModuleState {
-    public NamespaceAwareState(SymbolStack symbolStack,
+    public NamespaceAwareState(VStack vStack,
                                OpEvaluator opEvaluator,
                                MetaEvaluator metaEvaluator,
                                MTStack mTemplates,
                                MIStack mInstances,
                                MyLoggingFacade myLoggingFacade) {
-        super(symbolStack,
+        super(vStack,
                 opEvaluator,
                 metaEvaluator,
                 mTemplates,
@@ -68,7 +69,7 @@ public abstract class NamespaceAwareState extends ModuleState {
         return variable.substring(0, variable.indexOf(NS_DELIMITER));
     }
 
-    public String getFQName(String variable) {
+    public String getUNQName(String variable) {
         return variable.substring(variable.indexOf(NS_DELIMITER) + 1);
     }
 

@@ -3,7 +3,9 @@ package edu.uiuc.ncsa.qdl.scripting;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.qdl.vfs.FileEntry;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.util.scripting.ScriptInterface;
@@ -97,7 +99,7 @@ public class QDLScript extends FileEntry implements ScriptInterface {
         QDLInterpreter parser = new QDLInterpreter((State) state);
         if (isRunScript()) {
             if (getScriptArglist() != null && !getScriptArglist().isEmpty()) {
-                ((State) state).getSymbolStack().setValue(getScriptArgName(), getScriptArglist());
+                ((State) state).getVStack().put(new VThing(new XKey(getScriptArgName()), getScriptArglist()));
             }
         }
         try {

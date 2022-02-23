@@ -9,6 +9,7 @@ import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.XStack;
+import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
 import javax.xml.stream.XMLEventReader;
@@ -139,7 +140,9 @@ public class XMLUtilsV2 {
         deserializeXStack(xer, new MTStack(), state, xmlSerializationState);
     }
 
-
+    public static void deserializeVariables(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        deserializeXStack(xer, new VStack(), state, xmlSerializationState);
+    }
     public static void deserializeFunctions(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         deserializeXStack(xer, new FStack(), state, xmlSerializationState);
     }

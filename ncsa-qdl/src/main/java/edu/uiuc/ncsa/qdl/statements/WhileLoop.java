@@ -7,8 +7,9 @@ import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -236,11 +237,11 @@ public class WhileLoop implements Statement {
 
         }
 
-        SymbolTable localST = localState.getSymbolStack().getLocalST();
+     //   SymbolTable localST = localState.getVStack().getLocalST();
         // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
         //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
         for (String key : stemVariable.keySet()) {
-            localST.setValue(loopVar, key);
+            localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
             for (Statement statement : getStatements()) {
                 try {
                     statement.evaluate(localState);

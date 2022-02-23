@@ -6,9 +6,11 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.qdl.variables.VThing;
 
 import java.math.BigDecimal;
 
@@ -30,19 +32,22 @@ public class MathFunctionsTest extends AbstractQDLTester {
         assert (Long) polyad.getResult() == 5L;
     }
 
-
+    /**
+     * Manually insert a stem into the symbol table and test that it can indeed be fully recovered.
+     * @throws Exception
+     */
     public void testAbsoluteValueStem() throws Exception {
 
         State state = testUtils.getNewState();
 
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack symbolTable = state.getVStack();
         StemVariable arg = new StemVariable();
         arg.put("0", new Long(-12345L));
         arg.put("1", new Long(2468L));
         arg.put("2", new Long(-1000000L));
         arg.put("3", new Long(987654321L));
 
-        symbolTable.setStemVariable("arg.", arg);
+        symbolTable.put(new VThing(new XKey("arg."), arg));
         VariableNode argNode = new VariableNode("arg.");
         Polyad polyad = new Polyad(MathEvaluator.ABS_VALUE);
         polyad.addArgument(argNode);
@@ -114,7 +119,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
 
     public void testHashStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("0", "One Ring to rule them all");
@@ -127,7 +132,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         expected.put("1", "15ac553ccb88f34f3c2a4f9ac0460d0fde29c8a8");
         expected.put("2", "5fd8b1f8f66de0848eca4dfc468fc15e147e4670");
         expected.put("3", "830b0c398047d0d3ac4834508eb1bb87ea7f9ba9");
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         VariableNode arg = new VariableNode("sourceStem.");
         Polyad polyad = new Polyad(MathEvaluator.HASH);
         polyad.addArgument(arg);

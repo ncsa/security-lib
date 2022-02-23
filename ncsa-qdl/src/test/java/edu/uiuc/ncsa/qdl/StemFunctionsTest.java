@@ -10,7 +10,7 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.generated.QDLParserParser;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.*;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
@@ -29,7 +29,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testSizeStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -37,7 +37,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
 
         Polyad polyad = new Polyad(StemEvaluator.SIZE);
         VariableNode arg = new VariableNode("sourceStem.");
@@ -50,7 +50,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testListKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -58,7 +58,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
 
         Polyad polyad = new Polyad(StemEvaluator.LIST_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
@@ -76,7 +76,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -84,7 +84,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
 
         Polyad polyad = new Polyad(StemEvaluator.KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
@@ -128,8 +128,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testSizeKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
@@ -137,7 +136,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         Polyad polyad = new Polyad(StemEvaluator.LIST_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
@@ -156,7 +155,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testCommonKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -173,8 +172,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem2.put("5", "whatever");
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("sourceStem2.", sourceStem2);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("sourceStem2."), sourceStem2));
         Polyad polyad = new Polyad(StemEvaluator.COMMON_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("sourceStem2.");
@@ -193,7 +192,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testIncludeKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -210,8 +209,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("keys.", keys);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("keys."), keys));
         Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
@@ -233,7 +232,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testParserKeyFiltering() throws Throwable {
         String cf = " a. := ['a',null,['x','y'],2]~{'p':123.34, 'q': -321, 'r':false};";
-        String cf2;
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, cf);
@@ -429,8 +427,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testExcludeKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         StemVariable keys = new StemVariable();
@@ -445,8 +442,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("keys.", keys);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("keys."), keys));
         Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
@@ -463,7 +460,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testExcludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -478,7 +475,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         Polyad polyad = new Polyad(StemEvaluator.EXCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
@@ -519,7 +516,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testIncludeScalarKey() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -531,7 +528,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         randomStem(sourceStem, count);
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         Polyad polyad = new Polyad(StemEvaluator.INCLUDE_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
@@ -546,8 +543,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testHasKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
-
+        VStack vStack = state.getVStack();
 
         StemVariable sourceStem = new StemVariable();
         int count = 5;
@@ -564,8 +560,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         for (int i = 0; i < count; i++) {
             keys.put(Integer.toString(j++), geter());
         }
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("keys.", keys);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("keys."), keys));
         Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         VariableNode arg2 = new VariableNode("keys.");
@@ -587,7 +583,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testHasScalarKeys() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -607,8 +603,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         for (int i = 0; i < count; i++) {
             keys.put(Integer.toString(j++), geter());
         }
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
-        symbolTable.setStemVariable("keys.", keys);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
+        vStack.put(new VThing(new XKey("keys."), keys));
         Polyad polyad = new Polyad(StemEvaluator.HAS_KEYS);
         VariableNode arg = new VariableNode("sourceStem.");
         ConstantNode arg2 = new ConstantNode(targetKey, Constant.STRING_TYPE);
@@ -639,27 +635,27 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testRemoveStem() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
         StemVariable sourceStem = new StemVariable();
         sourceStem.put("rule", "One Ring to rule them all");
         sourceStem.put("find", "One Ring to find them");
         sourceStem.put("bring", "One Ring to bring them all");
         sourceStem.put("bind", "and in the darkness bind them");
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
 
         Polyad polyad = new Polyad(StemEvaluator.REMOVE);
         VariableNode arg = new VariableNode("sourceStem.");
 
         polyad.addArgument(arg);
         polyad.evaluate(state);
-        assert !symbolTable.isDefined("sourceStem.");
+        assert !vStack.containsKey(new XKey("sourceStem."));
     }
 
 
     public void testdefaultValue() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -669,7 +665,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT);
         Long expectedResult = new Long(42L);
         VariableNode arg = new VariableNode("sourceStem.");
@@ -685,7 +681,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
     public void testBadValue() throws Exception {
         State state = testUtils.getNewState();
-        SymbolTable symbolTable = state.getSymbolStack();
+        VStack vStack = state.getVStack();
 
 
         StemVariable sourceStem = new StemVariable();
@@ -695,7 +691,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.put("bind", "and in the darkness bind them");
 
 
-        symbolTable.setStemVariable("sourceStem.", sourceStem);
+        vStack.put(new VThing(new XKey("sourceStem."), sourceStem));
         Polyad polyad = new Polyad(StemEvaluator.SET_DEFAULT);
         VariableNode arg = new VariableNode("sourceStem.");
         polyad.addArgument(arg);
@@ -715,7 +711,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         polyad.addArgument(arg);
         polyad.addArgument(arg2);
         polyad.evaluate(state);
-        StemVariable sourceStem = (StemVariable) state.getSymbolStack().resolveValue("sourceStem.");
+        StemVariable sourceStem = ((VThing) state.getVStack().get(new XKey("sourceStem."))).getStemValue();
         assert polyad.getResult() == QDLNull.getInstance();
         assert sourceStem.getDefaultValue().equals(expectedResult);
         assert sourceStem.get("foo").equals(expectedResult);
