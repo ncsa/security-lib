@@ -43,6 +43,7 @@ public class WSXMLSerializer {
         XMLSerializationState XMLSerializationState = new XMLSerializationState();
         XMLSerializationState.setVersion(VERSION_2_0_TAG);
         xsw.writeStartDocument();
+
         xsw.writeStartElement(WORKSPACE_TAG);
         xsw.writeAttribute(SERIALIZATION_VERSION_TAG, VERSION_2_0_TAG);
         String comment = "";

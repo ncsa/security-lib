@@ -38,6 +38,7 @@ public class QDLHTTPModule extends JavaModule {
         if(state != null){
             qdlhttp.init(state);
         }
+        setupModule(qdlhttp);
         return qdlhttp;
     }
     @Override

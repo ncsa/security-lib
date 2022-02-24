@@ -4370,6 +4370,14 @@ public class WorkspaceCommands implements Logable {
         say(INDENT + INDENT + x);
     }
 
+    /**
+     * This is used in serialization tests. Generally you should never set the state this way.
+     * @param state
+     */
+    public void setState(State state) {
+        this.state = state;
+    }
+
     State state;
 
     protected State getState() {
@@ -5050,7 +5058,14 @@ public class WorkspaceCommands implements Logable {
             return true;
         } catch (Throwable t) {
             // This should return a nice message to display.
-            getState().getLogger().error("Could not deserialize file", t);
+            // It is possible that the workspace cannot even pick itself off the floor in which case
+            // the state or even the logger might not exist. 
+            if(getState() != null && getState().getLogger() != null) {
+                getState().getLogger().error("Could not deserialize workspace:" + t.getMessage(), t);
+            }
+            if(isDebugOn()){
+                t.printStackTrace();
+            }
             //return false;
             throw t;
         }

@@ -153,6 +153,16 @@ public abstract class Module implements XThing, Serializable {
      */
     public abstract Module newInstance(State state);
 
+    /**
+     * Called in {@link #newInstance(State)} to finish setting up the module for things like
+     * serialization. When you write {@link #newInstance(State)} the very last thing you should
+     * do is invoke this on your new module.
+     * @param module
+     */
+    protected void setupModule(Module module){
+        module.setParentTemplateID(getId());
+    }
+
     public void toXML(XMLStreamWriter xsw, String alias) throws XMLStreamException {
 
     }

@@ -69,8 +69,7 @@ public class QDLModule extends Module {
             Module m  = getModuleStatement().getmInstance();
             getModuleStatement().clearInstance();
             localState.setImportMode(false);
-            m.setParentTemplateID(getId());// this object is a template, so set the parent uuid accordingly
-            //Module m = state.getMTemplates().getModule(new MTKey(getNamespace()));
+            setupModule(m);
             return m;
         } catch (Throwable throwable) {
             if (throwable instanceof RuntimeException) {

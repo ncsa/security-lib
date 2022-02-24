@@ -1011,7 +1011,7 @@ cannot access '__a'
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Expected g(3)==810, but got " + getLongValue("g3", state);
-        assert getBooleanValue("ok", state) : "Expected g(1)==10, but got " + getLongValue("g1", state);
+        assert getBooleanValue("ok1", state) : "Expected g(1)==10, but got " + getLongValue("g1", state);
     }
 /*
    module['a:a','A'][__a := 2*b; f(x)->x*__a;];

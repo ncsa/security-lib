@@ -7,9 +7,9 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.qdl.variables.VThing;
-import edu.uiuc.ncsa.qdl.xml.XMLConstants;
-import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
 import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
+import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
@@ -18,9 +18,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.math.BigDecimal;
 import java.util.*;
-
-import static edu.uiuc.ncsa.qdl.xml.XMLConstants.FUNCTION_TABLE_STACK_TAG;
-import static edu.uiuc.ncsa.qdl.xml.XMLConstants.VARIABLE_STACK;
 
 /**
  * A stateful stack of things, such as functions. This is the method by which local state
@@ -341,65 +338,12 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
         toXMLNEW(xsw, xmlSerializationState);
     }
 
-    public void toXMLOLD(XMLStreamWriter xsw, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-        if (isEmpty()) {
-            return;
-        }
-        xsw.writeStartElement(getXMLStackTag());
-        for (int i = getStack().size() - 1; 0 <= i; i--) {
-            XTable xTable = getStack().get(i);
-            if (xTable.isEmpty()) {
-                continue;
-            }
-            xsw.writeStartElement(getXMLTableTag());
-            xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, Integer.toString(i));
-            xTable.toXML(xsw, XMLSerializationState);
-            xsw.writeEndElement(); // end of table.
-        }
-        if (getStack().get(0).isEmpty()) {
-            // write the zero-th elements as an empty table so the structure of the stack
-            // stays intact
-            xsw.writeStartElement(getXMLTableTag());
-            xsw.writeAttribute(XMLConstants.LIST_INDEX_ATTR, "0");
-            xsw.writeEndElement(); // end of table.
-        }
-
-
-        xsw.writeEndElement(); // end of stacks.
-    }
 
     public void fromXML(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
         fromXMLNEW(xer, XMLSerializationState);
     }
 
-    public void fromXMLOLD(XMLEventReader xer, XMLSerializationState XMLSerializationState) throws XMLStreamException {
-        // points to stacks tag
-        XMLEvent xe = xer.nextEvent(); // moves off the stacks tag.
-        getStack().clear(); // Needed or there will be an extra empty stack after this call.
-        // no attributes or such with the stacks tag.
-        while (xer.hasNext()) {
-            xe = xer.peek();
-            switch (xe.getEventType()) {
-                case XMLEvent.START_ELEMENT:
-                    String localPart = xe.asStartElement().getName().getLocalPart();
-                    if (localPart.equals(getXMLTableTag())) {
-                        XTable xTable = newTableInstance();
-                        xTable.fromXML(xer, XMLSerializationState);
-                        push(xTable);
-                    }
 
-                    break;
-                case XMLEvent.END_ELEMENT:
-                    if (xe.asEndElement().getName().getLocalPart().equals(getXMLStackTag())) {
-                        return;
-                    }
-                    break;
-            }
-            xe = xer.nextEvent();
-        }
-        throw new IllegalStateException("Error: XML file corrupt. No end tag for " + FUNCTION_TABLE_STACK_TAG);
-
-    }
 
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 
@@ -443,7 +387,10 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             JSONArray jsonArray = new JSONArray();
             for (Object key : xTable.keySet()) {
                 XThing xThing = (XThing) xTable.get(key);
-                jsonArray.add(xTable.toJSONEntry(xThing, xmlSerializationState));
+                String x = xTable.toJSONEntry(xThing, xmlSerializationState);
+                     if(!StringUtils.isTrivial(x)) {
+                         jsonArray.add(x);
+                     }
             }
             array.add(jsonArray);
         }
@@ -528,6 +475,8 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
     protected JSONArray getJSON(XMLEventReader xer) throws XMLStreamException {
+        return JSONArray.fromObject(XMLUtilsV2.getText(xer, getXMLStackTag()));
+/*
         JSONArray jsonArray = null;
         XMLEvent xe = xer.nextEvent();
         while (xer.hasNext()) {
@@ -542,6 +491,7 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             xe = xer.nextEvent();
         }
         throw new XMLMissingCloseTagException(VARIABLE_STACK);
+*/
     }
 
     protected void toXMLNEW(XMLStreamWriter xsw, XMLSerializationState xmlSerializationState) throws XMLStreamException {

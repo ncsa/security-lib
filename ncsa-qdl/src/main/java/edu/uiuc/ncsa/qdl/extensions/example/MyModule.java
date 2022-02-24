@@ -45,7 +45,7 @@ public class MyModule extends JavaModule {
         if(state != null){
             myModule.init(state);
         }
-        myModule.setParentTemplateID(getId());
+        setupModule(myModule);
         return myModule;
     }
     List<String> description = null;

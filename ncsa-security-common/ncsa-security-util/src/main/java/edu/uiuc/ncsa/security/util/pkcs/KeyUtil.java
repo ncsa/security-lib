@@ -1,11 +1,17 @@
 package edu.uiuc.ncsa.security.util.pkcs;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
+import sun.security.util.DerInputStream;
+import sun.security.util.DerValue;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateCrtKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A utility for doing certain security-related operations, such as creating key pairs, serializing them and deserializing them
@@ -68,6 +74,109 @@ public class KeyUtil {
         return PEMFormatUtil.delimitBody(PEMFormatUtil.bytesToChunkedString(bytes), BEGIN_RSA_PRIVATE_KEY, END_RSA_PRIVATE_KEY);
     }
 
+    public static void main(String[] args) throws Exception {
+        //Reader r = new FileReader("/home/ncsa/temp/zzz/private.pem");
+        Reader r = new FileReader("/home/ncsa/temp/zzz/openssl-private.pem");
+        KeyPair keyPair = keyPairFromPKCS1(r);
+        System.out.println("keypair valid = " + validateKeyPair(keyPair));
+    }
+
+    public static PrivateKey fromPKCS1PEM(Reader reader) throws Exception {
+        return fromPKCS1PEM(PEMFormatUtil.readerToString(reader));
+    }
+
+
+    /**
+     * Read a PKCS 1 format pem and return the private key.
+     *
+     * @param pem
+     * @return
+     * @throws Exception
+     */
+    public static PrivateKey fromPKCS1PEM(String pem) throws Exception {
+        byte[] bytes = PEMFormatUtil.getBodyBytes(pem, BEGIN_RSA_PRIVATE_KEY, END_RSA_PRIVATE_KEY);
+
+        DerInputStream derReader = new DerInputStream(bytes);
+        DerValue[] seq = derReader.getSequence(0);
+        // skip version seq[0];
+        BigInteger modulus = seq[1].getBigInteger();
+        BigInteger publicExp = seq[2].getBigInteger();
+        BigInteger privateExp = seq[3].getBigInteger();
+        BigInteger prime1 = seq[4].getBigInteger();
+        BigInteger prime2 = seq[5].getBigInteger();
+        BigInteger exp1 = seq[6].getBigInteger();
+        BigInteger exp2 = seq[7].getBigInteger();
+        BigInteger crtCoef = seq[8].getBigInteger();
+
+        RSAPrivateCrtKeySpec keySpec =
+                new RSAPrivateCrtKeySpec(modulus, publicExp, privateExp, prime1, prime2, exp1, exp2, crtCoef);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+        return privateKey;
+    }
+
+    public static KeyPair keyPairFromPKCS1(Reader r) throws Exception {
+        return keyPairFromPKCS1(PEMFormatUtil.readerToString(r));
+    }
+
+    /**
+     * Verifies that a given keypair is correct.
+     *  A positive result means they are <i>most likely</i> correct. A failure
+     *  means they most certainly do not match.
+     * @param keyPair
+     * @return
+     */
+    public static boolean validateKeyPair(KeyPair keyPair) throws Exception{
+             return validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
+    }
+
+    public static boolean validateKeyPair(PublicKey publicKey, PrivateKey privateKey) throws Exception{
+        byte[] challenge = new byte[10000];
+        ThreadLocalRandom.current().nextBytes(challenge);
+
+        // sign using the private key
+        Signature sig = Signature.getInstance("SHA256withRSA");
+        sig.initSign(privateKey);
+        sig.update(challenge);
+        byte[] signature = sig.sign();
+
+        // verify signature using the public key
+        sig.initVerify(publicKey);
+        sig.update(challenge);
+
+        return sig.verify(signature);
+    }
+    /**
+     * Read a PKCS 1 key in and generate the keypair from it.
+     * @param pem
+     * @return
+     * @throws Exception
+     */
+    public static KeyPair keyPairFromPKCS1(String pem) throws Exception {
+        byte[] bytes = PEMFormatUtil.getBodyBytes(pem, BEGIN_RSA_PRIVATE_KEY, END_RSA_PRIVATE_KEY);
+
+        DerInputStream derReader = new DerInputStream(bytes);
+        DerValue[] seq = derReader.getSequence(0);
+        // skip version seq[0];
+        BigInteger modulus = seq[1].getBigInteger();
+        BigInteger publicExp = seq[2].getBigInteger();
+        BigInteger privateExp = seq[3].getBigInteger();
+        BigInteger prime1 = seq[4].getBigInteger();
+        BigInteger prime2 = seq[5].getBigInteger();
+        BigInteger exp1 = seq[6].getBigInteger();
+        BigInteger exp2 = seq[7].getBigInteger();
+        BigInteger crtCoef = seq[8].getBigInteger();
+
+        RSAPrivateCrtKeySpec keySpec =
+                new RSAPrivateCrtKeySpec(modulus, publicExp, privateExp, prime1, prime2, exp1, exp2, crtCoef);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+
+        RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(modulus, publicExp);
+        PublicKey publicKey = keyFactory.generatePublic(publicKeySpec);
+        return new KeyPair(publicKey, privateKey);
+    }
+
     public static void toX509PEM(PublicKey publicKey, Writer writer) throws IOException {
         writer.write(toX509PEM(publicKey));
         writer.flush();
@@ -119,7 +228,6 @@ public class KeyUtil {
      * @param encodedPrivate
      * @return
      * @throws edu.uiuc.ncsa.security.core.exceptions.GeneralException
-     *
      */
     public static PrivateKey fromPKCS8DER(byte[] encodedPrivate) {
         try {
@@ -151,7 +259,6 @@ public class KeyUtil {
      * @param pem
      * @return
      * @throws edu.uiuc.ncsa.security.core.exceptions.GeneralException
-     *
      */
     public static PrivateKey fromPKCS8PEM(String pem) throws GeneralException {
         return fromPKCS8DER(PEMFormatUtil.getBodyBytes(pem, BEGIN_PRIVATE_KEY, END_PRIVATE_KEY));
@@ -166,7 +273,6 @@ public class KeyUtil {
     public static PublicKey fromX509PEM(String encodedPublic) {
         return fromX509DER(PEMFormatUtil.getBodyBytes(encodedPublic, BEGIN_PUBLIC_KEY, END_PUBLIC_KEY));
     }
-
 
 
     public static PublicKey fromX509DER(byte[] encodedPublic) {

@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.variables.VStack;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -174,4 +175,34 @@ public class XMLUtilsV2 {
         }
         return stateAttributes;
     }
+
+    /**
+     * This will read the text contents of a tag. The assumption is that you have the cursor on the
+     * start tag then call this. It sifts through whitespace etc. until it finds actual characters, then
+     * returns. If it finds only white space, it returns the empty string.
+     * @param xer
+     * @param closeTag
+     * @return
+     * @throws XMLStreamException
+     */
+    public static String getText(XMLEventReader xer, String closeTag) throws XMLStreamException {
+        JSONArray jsonArray = null;
+        XMLEvent xe = xer.nextEvent();
+        while (xer.hasNext()) {
+            switch (xe.getEventType()) {
+                case XMLEvent.CHARACTERS:
+                    if (xe.asCharacters().isWhiteSpace()) {
+                        break;
+                    }
+                    return xe.asCharacters().getData();
+                case XMLEvent.END_ELEMENT:
+                    if (xe.asEndElement().getName().getLocalPart().equals(closeTag)) {
+                        return ""; // empty tag
+                    }
+            }
+            xe = xer.nextEvent();
+        }
+        throw new XMLMissingCloseTagException(closeTag);
+    }
+
 }

@@ -744,12 +744,8 @@ public class State extends FunctionState implements QDLConstants {
                         case VARIABLE_STACK:
                             if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)){
                                 XMLUtilsV2.deserializeVariables(xer, this, xmlSerializationState);
-                              /*  SymbolStack st = new SymbolStack();
-                                st.getParentTables().clear(); // or there is an extra top level element.
-                                st.fromXML(xer, xmlSerializationState);
-                                setvStack(st);*/
-
                             }else{
+                                // Legacy.
                                 VStack vStack = new VStack();
                                 SymbolStack st = new SymbolStack();
                                 st.fromXML(xer);
@@ -777,7 +773,6 @@ public class State extends FunctionState implements QDLConstants {
                                 XMLUtilsV2.deserializeTemplates(xer, this, xmlSerializationState);
                             }else{
                                 XMLUtils.deserializeTemplates(xer, xp,this);
-
                             }
                             break;
                         default:
@@ -979,6 +974,13 @@ public class State extends FunctionState implements QDLConstants {
 
     WorkspaceCommands workspaceCommands;
 
+    /**
+     * Recurse through thst modules and collects templates and state objects from instances.
+     * Now that templates and instances are handled as stacks with local state, old form of
+     * serialization fails due to recursion.<br/><br/>
+     * These are serialized into a flat list and references to them are used.
+     * @param XMLSerializationState
+     */
     public void buildSO(XMLSerializationState XMLSerializationState) {
         for (Object key : getMTemplates().keySet()) {
             MTKey mtKey = (MTKey) key;
