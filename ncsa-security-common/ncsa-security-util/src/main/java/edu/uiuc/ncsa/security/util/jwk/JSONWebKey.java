@@ -30,4 +30,16 @@ public class JSONWebKey implements Serializable {
         newKey.privateKey = privateKey;
         return newKey;
     }
+
+    @Override
+    public String toString() {
+        return "JSONWebKey{" +
+                "id='" + id + '\'' +
+                ", algorithm='" + algorithm + '\'' +
+                ", use='" + use + '\'' +
+                ", type='" + type + '\'' +
+                ", publicKey=" + publicKey +
+                ", privateKey=" + privateKey +
+                '}';
+    }
 }

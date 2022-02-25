@@ -5,8 +5,15 @@ import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VThing;
+import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
+import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import org.apache.commons.codec.binary.Base64;
 
+import javax.xml.stream.*;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -226,5 +233,40 @@ public class AbstractQDLTester extends TestBase {
     protected boolean checkVThing(String variableName, Object newValue, State state){
         return ((VThing)state.getVStack().get(new XKey(variableName))).getValue().equals(newValue);
     }
+    /**
+     * Takes the current state, serializes, deserializes it then returns a new workspace
+     * @param state
+     * @return
+     * @throws Throwable
+     */
+    protected WorkspaceCommands fromToWorkspaceCommands(State state) throws Throwable {
+        // Serialize the workspace
+        StringWriter stringWriter = new StringWriter();
+        XMLStreamWriter xsw = createXSW(stringWriter);
+        WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+        workspaceCommands.setState(state);
+        workspaceCommands.toXML(xsw);
 
+        // Deserialize the workspace
+        // Need pretty print. This takes the place or writing it to a file, then reading it.
+        StringReader reader = new StringReader(XMLUtils.prettyPrint(stringWriter.toString()));
+        XMLEventReader xer = createXER(reader);
+        workspaceCommands.fromXML(xer);
+        return workspaceCommands;
+    }
+
+    /**
+     * Create the {@link XMLStreamWriter}
+     *
+     * @param w
+     * @return
+     * @throws XMLStreamException
+     */
+    protected XMLStreamWriter createXSW(Writer w) throws XMLStreamException {
+        return XMLOutputFactory.newInstance().createXMLStreamWriter(w);
+    }
+
+    protected XMLEventReader createXER(Reader reader) throws XMLStreamException {
+        return XMLInputFactory.newInstance().createXMLEventReader(reader);
+    }
 }

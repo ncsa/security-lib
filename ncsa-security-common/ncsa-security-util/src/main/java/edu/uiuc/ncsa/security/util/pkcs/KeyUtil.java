@@ -76,9 +76,12 @@ public class KeyUtil {
 
     public static void main(String[] args) throws Exception {
         //Reader r = new FileReader("/home/ncsa/temp/zzz/private.pem");
-        Reader r = new FileReader("/home/ncsa/temp/zzz/openssl-private.pem");
-        KeyPair keyPair = keyPairFromPKCS1(r);
-        System.out.println("keypair valid = " + validateKeyPair(keyPair));
+        Reader privateFR = new FileReader("/home/ncsa/temp/zzz/openssl-private.pem");
+        Reader publicFR = new FileReader("/home/ncsa/temp/zzz/openssl-public.pem");
+        PrivateKey privateKey = fromPKCS1PEM(privateFR);
+        PublicKey publicKey = fromX509PEM(publicFR);
+        //KeyPair keyPair = keyPairFromPKCS1(publicKey, privateKey);
+        System.out.println("keypair valid = " + validateKeyPair(publicKey, privateKey));
     }
 
     public static PrivateKey fromPKCS1PEM(Reader reader) throws Exception {
@@ -87,7 +90,7 @@ public class KeyUtil {
 
 
     /**
-     * Read a PKCS 1 format pem and return the private key.
+     * Read a PKCS 1 format pem and return the private key.  Read the <a href="https://www.rfc-editor.org/rfc/rfc3447#page-44">RSA spec</a>
      *
      * @param pem
      * @return
@@ -97,22 +100,23 @@ public class KeyUtil {
         byte[] bytes = PEMFormatUtil.getBodyBytes(pem, BEGIN_RSA_PRIVATE_KEY, END_RSA_PRIVATE_KEY);
 
         DerInputStream derReader = new DerInputStream(bytes);
-        DerValue[] seq = derReader.getSequence(0);
-        // skip version seq[0];
-        BigInteger modulus = seq[1].getBigInteger();
-        BigInteger publicExp = seq[2].getBigInteger();
-        BigInteger privateExp = seq[3].getBigInteger();
-        BigInteger prime1 = seq[4].getBigInteger();
-        BigInteger prime2 = seq[5].getBigInteger();
-        BigInteger exp1 = seq[6].getBigInteger();
-        BigInteger exp2 = seq[7].getBigInteger();
-        BigInteger crtCoef = seq[8].getBigInteger();
+        DerValue[] sequence = derReader.getSequence(0);
+        // skip the version at index 0
+        //  Note that getting the big integers this way automatically corrects so that the result is always positive.
+        // We have do this manually in the JSONWebKeyUtil.
+        BigInteger modulus = sequence[1].getBigInteger();
+        BigInteger publicExp = sequence[2].getBigInteger();
+        BigInteger privateExp = sequence[3].getBigInteger();
+        BigInteger prime1 = sequence[4].getBigInteger();
+        BigInteger prime2 = sequence[5].getBigInteger();
+        BigInteger exp1 = sequence[6].getBigInteger();
+        BigInteger exp2 = sequence[7].getBigInteger();
+        BigInteger crtCoef = sequence[8].getBigInteger();
 
-        RSAPrivateCrtKeySpec keySpec =
+        RSAPrivateCrtKeySpec rsaPrivateCrtKeySpec =
                 new RSAPrivateCrtKeySpec(modulus, publicExp, privateExp, prime1, prime2, exp1, exp2, crtCoef);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
-        return privateKey;
+        return keyFactory.generatePrivate(rsaPrivateCrtKeySpec);
     }
 
     public static KeyPair keyPairFromPKCS1(Reader r) throws Exception {
@@ -121,18 +125,26 @@ public class KeyUtil {
 
     /**
      * Verifies that a given keypair is correct.
-     *  A positive result means they are <i>most likely</i> correct. A failure
-     *  means they most certainly do not match.
+     * A positive result means they are <i>most likely</i> correct. A failure
+     * means they most certainly do not match.
+     *
      * @param keyPair
      * @return
      */
-    public static boolean validateKeyPair(KeyPair keyPair) throws Exception{
-             return validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
+    public static boolean validateKeyPair(KeyPair keyPair) throws Exception {
+        return validateKeyPair(keyPair.getPublic(), keyPair.getPrivate());
     }
 
-    public static boolean validateKeyPair(PublicKey publicKey, PrivateKey privateKey) throws Exception{
+    /**
+     * See {@link #validateKeyPair(KeyPair)}
+     * @param publicKey
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static boolean validateKeyPair(PublicKey publicKey, PrivateKey privateKey) throws Exception {
         byte[] challenge = new byte[10000];
-        ThreadLocalRandom.current().nextBytes(challenge);
+        ThreadLocalRandom.current().nextBytes(challenge); // Get really random bytes
 
         // sign using the private key
         Signature sig = Signature.getInstance("SHA256withRSA");
@@ -146,8 +158,10 @@ public class KeyUtil {
 
         return sig.verify(signature);
     }
+
     /**
      * Read a PKCS 1 key in and generate the keypair from it.
+     *
      * @param pem
      * @return
      * @throws Exception

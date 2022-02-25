@@ -9,7 +9,7 @@ import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
  * on 1/27/20 at  12:03 PM
  */
 public class QDLFunctionRecord extends FunctionRecord {
-    protected int argCount = 0;
+    public int argCount = 0;
 
     @Override
     public int getArgCount() {

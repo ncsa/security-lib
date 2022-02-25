@@ -41,7 +41,7 @@ public class JSONWebKeys extends HashMap<String, JSONWebKey> implements Serializ
         this.defaultKeyID = defaultKeyID;
     }
 
-    String defaultKeyID;
+    String defaultKeyID = null;
 
     public JSONWebKeys(String defaultKeyID) {
         this.defaultKeyID = defaultKeyID;

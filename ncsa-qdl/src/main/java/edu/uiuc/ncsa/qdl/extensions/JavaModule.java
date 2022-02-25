@@ -86,17 +86,24 @@ public abstract class JavaModule extends Module {
      * @param state
      */
     public void init(State state) {
+                      init(state, false);
+    }
+    public void init(State state, boolean skipVariables) {
         if (initialized) return;
         if (state == null) return;
         setState(state);
-        for (QDLVariable v : vars) {
-            if (Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE) {
-                throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");
+        // If this is being recreated from its serialization, skip the variables so whatever
+        // the has set is not overwritten.
+        if(skipVariables) {
+            for (QDLVariable v : vars) {
+                if (Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE) {
+                    throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");
+                }
+                if (!pattern.matcher(v.getName()).matches()) {
+                    throw new IllegalArgumentException("Error: The variable name \"" + v.getName() + "\" is not a legal variable name.");
+                }
+                state.setValue(v.getName(), v.getValue());
             }
-            if (!pattern.matcher(v.getName()).matches()) {
-                throw new IllegalArgumentException("Error: The variable name \"" + v.getName() + "\" is not a legal variable name.");
-            }
-            state.setValue(v.getName(), v.getValue());
         }
         setDocumentation(createDefaultDocs());
         for (QDLFunction f : funcs) {

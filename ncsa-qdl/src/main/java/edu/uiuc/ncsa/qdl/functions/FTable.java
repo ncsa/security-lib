@@ -308,16 +308,26 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
     public String getXMLElementTag() {
         return FUNCTION_TAG;
     }
-
+    /*
+     Big note on serializing functions. All that are serialized here are QDL native functions.
+     The source is stored and on deserialization they are run through the interpreter again to
+     populate this table. This is because such functions are extremely dynamic and can be redefined
+     at any time. Java functions, however, live in Java code. When a module is deserialized, if it
+     is a Java module, the function table is populated from the template since such functions live
+     there and are immutable. 
+     */
     @Override
     public String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState) {
         String src =  StringUtils.listToString(xThing.sourceCode);
         return Base64.encodeBase64URLSafeString(src.getBytes(StandardCharsets.UTF_8));
     }
 
+
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
-          return new String(Base64.decodeBase64(x));
+
+        return new String(Base64.decodeBase64(x));
+
     }
 }
 

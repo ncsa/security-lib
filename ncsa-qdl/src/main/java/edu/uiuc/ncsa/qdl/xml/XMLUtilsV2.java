@@ -125,7 +125,7 @@ public class XMLUtilsV2 {
         //module.fromXML(xer, xp, qi);
         if (module instanceof JavaModule) {
             // call this at the right time -- after everything else has been done.
-            ((JavaModule) module).init(null);
+            ((JavaModule) module).init(null, true);
         }
         return module;
     }

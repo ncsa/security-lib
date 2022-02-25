@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.module;
 
+import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -137,7 +138,6 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
 
     @Override
     public String toJSONEntry(V wrapper, XMLSerializationState xmlSerializationState) {
-
         Module module = wrapper.getModule();
         K key = (K) wrapper.getKey();
         XMLUtils.ModuleAttributes moduleAttributes = new XMLUtils.ModuleAttributes();
@@ -156,6 +156,9 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
         moduleAttributes.fromJSON(x);
         V m = deserializeElement(moduleAttributes, xmlSerializationState);
         put(new XKey(moduleAttributes.alias), m);
+        if(m.getModule() instanceof JavaModule){
+            ((JavaModule)m.getModule()).init(m.getModule().getState(), true);
+        }
         return null; // this returns what the interpreter should process. Nothing in this case.
     }
 }

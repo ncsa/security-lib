@@ -4,6 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 
 import java.math.BigDecimal;
 
@@ -764,7 +765,7 @@ cannot access '__a'
     (vs. running a module) and is special cased in the VariableState/FunctionState objects. Mostly this is to
     guard against a change that breaks this. Simple, basic and essentail regression checks.
      */
-    protected String testModulePath = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl";
+    protected static String testModulePath = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl";
 
     // ML = module_load
     public void testMLIntrinsicFunction() throws Throwable {
@@ -975,12 +976,16 @@ cannot access '__a'
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('" + javaTestModule + "', 'java') =: q;");
         addLine(script, "module_import(q,'X');");
-        addLine(script, "ok := 'ab' == X#concat('a','b');");
-        addLine(script, "ok1 := var_type(X#eg.)==constants().var_type.stem;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok", state) : "Could not access FQ java module function.";
-        assert getBooleanValue("ok1", state) : "Could not access FQ Java moduel variable.";
+        WorkspaceCommands workspaceCommands = fromToWorkspaceCommands(state);
+        script = new StringBuffer();
+        addLine(script, "ok := 'ab' == X#concat('a','b');");
+        addLine(script, "ok1 := var_type(X#eg.)==constants().var_type.stem;");
+        workspaceCommands.getInterpreter().execute(script.toString());
+        State state2 = workspaceCommands.getInterpreter().getState();
+        assert getBooleanValue("ok", state2) : "Could not access FQ java module function.";
+        assert getBooleanValue("ok1", state2) : "Could not access FQ Java moduel variable.";
     }
 
     /*
