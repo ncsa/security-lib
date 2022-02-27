@@ -53,6 +53,10 @@ public class VTable<K extends XKey, V extends VThing> extends XTable<K,V> {
 
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
+        if(xmlSerializationState== null){
+            // old form
+            return x;
+        }
         return new String(Base64.decodeBase64(x));
     }
 

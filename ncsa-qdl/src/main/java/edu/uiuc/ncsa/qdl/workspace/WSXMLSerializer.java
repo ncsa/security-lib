@@ -6,8 +6,8 @@ import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -64,31 +64,12 @@ public class WSXMLSerializer {
         // Serialize main workspace state. This kicks off all the other serializations.
         state.buildSO(XMLSerializationState);
 
-        // Global list of templates
-        xsw.writeStartElement(MODULE_TEMPLATE_TAG);
-            xsw.writeComment("templates for all modules");
-            for (UUID key : XMLSerializationState.templateMap.keySet()) {
-                Module module = XMLSerializationState.getTemplate(key);
-                module.toXML(xsw, null, true, XMLSerializationState);
-            }
-            xsw.writeEndElement(); // end module templates
 
-        // Save other states (in modules).
-        xsw.writeStartElement(STATES_TAG);
-        xsw.writeComment("module states");
-
-        /**
-         * At this point we have a flat list of states. Serialize all of them.
-         */
-        Set<UUID> currentKeys = new HashSet<>();
-        currentKeys.addAll(XMLSerializationState.stateMap.keySet());
-        for (UUID key : currentKeys) {
-            if (!key.equals(state.getUuid()))
-                XMLSerializationState.getState(key).toXML(xsw, XMLSerializationState);
-        }
-        xsw.writeEndElement(); // end states reference
-
-        // Do the workspace proper
+        // Do the workspace proper. This comes first since it is basically a header and when listing
+        // the workspace, the system will jump out at the end of the header and not process the
+        // templates or states. If you move things aorund it will work, but it will slow
+        // listing workspaces quite a bit since it will deserialize the entire workspace before moving
+        // on to the next.
         xsw.writeStartElement(WS_ENV_TAG);
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
         String zzz = workspaceCommands.getBufferDefaultSavePath();
@@ -199,6 +180,30 @@ public class WSXMLSerializer {
             XMLUtils.write(xsw, stemVariable);
             xsw.writeEndElement(); // end editor clipboard
         }
+
+        // Global list of templates
+          xsw.writeStartElement(MODULE_TEMPLATE_TAG);
+              xsw.writeComment("templates for all modules");
+              for (UUID key : XMLSerializationState.templateMap.keySet()) {
+                  Module module = XMLSerializationState.getTemplate(key);
+                  module.toXML(xsw, null, true, XMLSerializationState);
+              }
+              xsw.writeEndElement(); // end module templates
+
+          // Save other states (in modules).
+          xsw.writeStartElement(STATES_TAG);
+          xsw.writeComment("module states");
+
+          /**
+           * At this point we have a flat list of states. Serialize all of them.
+           */
+          Set<UUID> currentKeys = new HashSet<>();
+          currentKeys.addAll(XMLSerializationState.stateMap.keySet());
+          for (UUID key : currentKeys) {
+              if (!key.equals(state.getUuid()))
+                  XMLSerializationState.getState(key).toXML(xsw, XMLSerializationState);
+          }
+          xsw.writeEndElement(); // end states reference
 
         // Absolute last thing to write is the actual state object for the workspace.
         state.toXML(xsw, XMLSerializationState);
