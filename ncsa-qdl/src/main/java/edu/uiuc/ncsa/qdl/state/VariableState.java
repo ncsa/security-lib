@@ -414,12 +414,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 }
                 return v.getValue();
             case OP_SET:
-                VThing vThing = new VThing( new XKey(variableName), value);
-                if (isImportMode()) {
-                    getVStack().localPut(vThing);
-                } else {
-                    getVStack().put(vThing);
-                }
+                setValueImportAware(variableName, value);
                 return null;
             case OP_REMOVE:
                 getVStack().remove(xKey);

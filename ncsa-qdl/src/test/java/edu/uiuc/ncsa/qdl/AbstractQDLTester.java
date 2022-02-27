@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
@@ -239,7 +240,7 @@ public class AbstractQDLTester extends TestBase {
      * @return
      * @throws Throwable
      */
-    protected WorkspaceCommands fromToWorkspaceCommands(State state) throws Throwable {
+    protected State pickleState(State state) throws Throwable {
         // Serialize the workspace
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xsw = createXSW(stringWriter);
@@ -249,10 +250,40 @@ public class AbstractQDLTester extends TestBase {
 
         // Deserialize the workspace
         // Need pretty print. This takes the place or writing it to a file, then reading it.
-        StringReader reader = new StringReader(XMLUtils.prettyPrint(stringWriter.toString()));
+        String pp = XMLUtils.prettyPrint(stringWriter.toString());
+      //  System.out.println("XML:\n" + pp);
+        StringReader reader = new StringReader(pp);
         XMLEventReader xer = createXER(reader);
         workspaceCommands.fromXML(xer);
-        return workspaceCommands;
+        return workspaceCommands.getInterpreter().getState();
+    }
+
+    /**
+     * One stop shopping for roundtripping serializing the state.
+     * The script is interpreted and serialized then deserialized and the new state is
+     * returned.
+     * <h3>Usage</h3>
+     * A typical use is to fork a test into a serialization test and nonserialization test
+     * by passing in the doRountrip. Then before the tests you want to run inser
+     * <pre>
+     *     State = ...
+     *     StringBuffer script; // <i>setup whatever state you need for your test</i>
+     *     if(doRoundtrip){
+     *         state = roundTripStateSerialization(state, script, true);
+     *         script = new StringBuffer();
+     *     }
+     *     // ... <i>Put in any checks you would do on the previously created state</i>
+     * </pre>
+     * This replaces the state with its roundtripped version and restarts the script
+     * @param oldState
+     * @param script
+     * @return
+     * @throws Throwable
+     */
+    protected State roundTripStateSerialization(State oldState, StringBuffer script) throws Throwable{
+            QDLInterpreter interpreter = new QDLInterpreter(null, oldState);
+            interpreter.execute(script.toString());
+            return pickleState(oldState);
     }
 
     /**

@@ -86,15 +86,15 @@ public abstract class JavaModule extends Module {
      * @param state
      */
     public void init(State state) {
-                      init(state, false);
+                      init(state, true);
     }
-    public void init(State state, boolean skipVariables) {
+    public void init(State state, boolean doVariables) {
         if (initialized) return;
         if (state == null) return;
         setState(state);
         // If this is being recreated from its serialization, skip the variables so whatever
         // the has set is not overwritten.
-        if(skipVariables) {
+        if(doVariables) {
             for (QDLVariable v : vars) {
                 if (Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE) {
                     throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");

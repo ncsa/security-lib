@@ -157,7 +157,7 @@ public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> 
         V m = deserializeElement(moduleAttributes, xmlSerializationState);
         put(new XKey(moduleAttributes.alias), m);
         if(m.getModule() instanceof JavaModule){
-            ((JavaModule)m.getModule()).init(m.getModule().getState(), true);
+            ((JavaModule)m.getModule()).init(m.getModule().getState(), false);
         }
         return null; // this returns what the interpreter should process. Nothing in this case.
     }

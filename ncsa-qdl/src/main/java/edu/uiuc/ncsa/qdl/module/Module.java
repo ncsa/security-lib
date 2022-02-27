@@ -4,10 +4,9 @@ import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XThing;
-import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
@@ -250,9 +249,34 @@ public abstract class Module implements XThing, Serializable {
                         case MODULE_SOURCE_TAG:
                             QDLModule qdlModule = (QDLModule) this;
                             List<String> source = getListByTag(xer, MODULE_SOURCE_TAG);
-                            ModuleStatement moduleStatement = new ModuleStatement();
-                            moduleStatement.setSourceCode(source);
-                            qdlModule.setModuleStatement(moduleStatement);
+                            // Version 2: The source is stored. In order to recoder this module
+                            // the only reliable way is to re-interpret the source and pilfer the
+                            // ModuleStatement which contains the documentation, executable statements etc.
+                            // Again, this is because any QDL module statement can be quite complex and
+                            // attempting to somehow serialize its module statements is vastly harder (and twitchier)
+                            // than using the parser.
+                            State state = new State();
+                            QDLInterpreter qdlInterpreter = new QDLInterpreter(state);
+                            try {
+                                qdlInterpreter.execute(StringUtils.listToString(source));
+                                if(state.getMTemplates().isEmpty()) {
+                                    // fall through case -- nothing resulted.
+                                    throw new IllegalStateException("no module found");
+/*
+                                    ModuleStatement moduleStatement = new ModuleStatement();
+                                    moduleStatement.setSourceCode(source);
+                                    qdlModule.setModuleStatement(moduleStatement);
+*/
+
+                                }else{
+                                    // Get the actual interpreted ModuleStatement
+                                    QDLModule tempM = (QDLModule) state.getMTemplates().getAll().get(0);
+                                    qdlModule.setModuleStatement(tempM.getModuleStatement());
+                                }
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                            }
+
                             break;
                     }
 

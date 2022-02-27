@@ -6,10 +6,12 @@ import edu.uiuc.ncsa.qdl.state.XTable;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;
 import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,12 +47,13 @@ public class VTable<K extends XKey, V extends VThing> extends XTable<K,V> {
 
     @Override
     public String toJSONEntry(V xThing, XMLSerializationState xmlSerializationState) {
-        return xThing.getKey().getKey() + ":=" + InputFormUtil.inputForm(xThing.getValue()) + ";";
+        String raw = xThing.getKey().getKey() + ":=" + InputFormUtil.inputForm(xThing.getValue()) + ";";
+        return Base64.encodeBase64URLSafeString(raw.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public String fromJSONEntry(String x, XMLSerializationState xmlSerializationState) {
-        return x;
+        return new String(Base64.decodeBase64(x));
     }
 
     public Set<String> listVariables() {

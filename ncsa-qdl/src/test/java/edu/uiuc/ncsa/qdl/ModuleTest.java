@@ -4,7 +4,6 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 
 import java.math.BigDecimal;
 
@@ -145,6 +144,10 @@ public class ModuleTest extends AbstractQDLTester {
      */
 
     public void testMultipleModuleImport() throws Throwable {
+        testMultipleModuleImport(false);
+        testMultipleModuleImport(true);
+    }
+    protected void testMultipleModuleImport(boolean testXML) throws Throwable {
         String g_x = "define[g(x)]body[return(x+1);];";
         String h_y = "define[h(y)]body[return(y-1);];";
         String g_module = "module['a:a','a']body[q:=2;w:=3;" + g_x + h_y + "];";
@@ -155,6 +158,10 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, g_module);
         addLine(script, import_g);
         addLine(script, import_g1);
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "a#q:=10;");
         addLine(script, "b#q:=11;");
         addLine(script, "oka := a#q==10;");
@@ -175,6 +182,10 @@ public class ModuleTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testNSAndStem() throws Throwable {
+        testNSAndStem(false);
+        testNSAndStem(true);
+    }
+    protected void testNSAndStem(boolean testXML) throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -183,13 +194,16 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
         addLine(script, "list. := n(10);");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
         addLine(script, "d := a#list.b#i;");// Should resolve index of b#i to 1.
         addLine(script, "e := b#list.i;");// should resolve i to 0 since it is not in the module.
         addLine(script, "okd := d == -9;");
         addLine(script, "oke := e == -20;");
-
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -205,6 +219,10 @@ public class ModuleTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testNSAndVariableResolution() throws Throwable {
+        testNSAndVariableResolution(false);
+        testNSAndVariableResolution(true);
+    }
+    protected void testNSAndVariableResolution(boolean testXML) throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -212,6 +230,12 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "module['a:b','b']body[j:=4;list2. := -20 + n(5);];");
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
+
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
+
         addLine(script, "p := i;");
         addLine(script, "q := list.0;");
         addLine(script, "r := j;");
@@ -240,6 +264,10 @@ public class ModuleTest extends AbstractQDLTester {
      */
 
     public void testImportAndAlias() throws Throwable {
+        testImportAndAlias(false);
+        testImportAndAlias(true);
+    }
+    public void testImportAndAlias(boolean testXML) throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -249,6 +277,10 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "i:=0;");
         addLine(script, "j:=5;");
         addLine(script, "list. := n(10);");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('b:b');");
         addLine(script, "module_import('a:b', 'd');");
@@ -311,10 +343,18 @@ public class ModuleTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testModuleFunctionVisibility() throws Throwable {
+        testModuleFunctionVisibility(false);
+        testModuleFunctionVisibility(true);
+    }
+    public void testModuleFunctionVisibility(boolean testXML) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
         addLine(script, "module_import('a:a');");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "ok := !is_function(f,1);"); // f didn't end up outside the module
         addLine(script, "ok1 := 4 == g(1);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -351,10 +391,18 @@ public class ModuleTest extends AbstractQDLTester {
      */
 
     public void testFunctionVisibility() throws Throwable {
+        testFunctionVisibility(false);
+        testFunctionVisibility(true);
+    }
+    public void testFunctionVisibility(boolean testXML) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "f(x)->x;");
         addLine(script, " module['a:a','a'][f(x)->x^2;g(x)->f(x+1);];");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "module_import('a:a');");
         addLine(script, "ok := 16 == g(3);"); // uses f inside the module
         addLine(script, "g3 := g(3);"); // uses f inside the module
@@ -446,9 +494,17 @@ public class ModuleTest extends AbstractQDLTester {
         -11 =:  A#B#u;
      */
     public void testNestedModule() throws Throwable {
+        testNestedModule(false);
+        testNestedModule(true);
+    }
+    public void testNestedModule(boolean testXML) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:a','A'][module['b:b','B'][u:=2;f(x)->x+1;];module_import('b:b');];");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "module_import('a:a');");
         addLine(script, "-11 =:  A#B#u;");
         addLine(script, "ok := -11 == A#B#u;"); // pull it out of the local state so we can test the value easily.
@@ -473,9 +529,14 @@ public class ModuleTest extends AbstractQDLTester {
   b#q
      */
     public void testNestedVariableImport() throws Throwable {
+        testNestedVariableImport(false);
+        testNestedVariableImport(true);
+    }
+    public void testNestedVariableImport(boolean testXML) throws Throwable {
         if (!testImports) {
             return;
         }
+        State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:/a','a']body[q:=1;];");
         addLine(script, "module_import('a:/a');");
@@ -484,6 +545,10 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "a#q:=10;");
         addLine(script, "b#q:=11;");
         // Make sure that some of the state has changed to detect state management issues.
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "module_import('q:/q');");
         addLine(script, "w#a#q:=3;");
         addLine(script, "waq := w#a#q;");
@@ -493,7 +558,6 @@ public class ModuleTest extends AbstractQDLTester {
         addLine(script, "okbq := b#q==11;");
         addLine(script, "bq := b#q;");
 
-        State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -518,11 +582,6 @@ public class ModuleTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "define[f(x)]body[return(x+100);];");
         addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
-
-        // Bug -- the import runs, but does nothing. This test actually shows that referring to a#f works
-        //        after the external import. Next line would fail
-        // addLine(script, "module['q:/z','w']body[module_import('a:/t','z');define[g(x)]body[return(z#f(x)+3);];];");
-
         addLine(script, "module['q:/z','w']body[module_import('a:/t');define[g(x)]body[return(a#f(x)+3);];];");
         addLine(script, "test_f:=f(1);");
         addLine(script, "module_import('a:/t');");
@@ -971,21 +1030,27 @@ cannot access '__a'
      * @throws Throwable
      */
     public void testJavaFQAccessTest() throws Throwable {
+        testJavaFQAccessTest(false);
+        testJavaFQAccessTest(true);
+    }
+    protected void testJavaFQAccessTest(boolean testXML) throws Throwable {
 
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module_load('" + javaTestModule + "', 'java') =: q;");
         addLine(script, "module_import(q,'X');");
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        WorkspaceCommands workspaceCommands = fromToWorkspaceCommands(state);
-        script = new StringBuffer();
+        if(testXML){
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            state = pickleState(state);
+            script = new StringBuffer();
+        }
         addLine(script, "ok := 'ab' == X#concat('a','b');");
         addLine(script, "ok1 := var_type(X#eg.)==constants().var_type.stem;");
-        workspaceCommands.getInterpreter().execute(script.toString());
-        State state2 = workspaceCommands.getInterpreter().getState();
-        assert getBooleanValue("ok", state2) : "Could not access FQ java module function.";
-        assert getBooleanValue("ok1", state2) : "Could not access FQ Java moduel variable.";
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not access FQ java module function.";
+        assert getBooleanValue("ok1", state) : "Could not access FQ Java moduel variable.";
     }
 
     /*

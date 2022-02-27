@@ -2,7 +2,6 @@ package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
 
 import static edu.uiuc.ncsa.qdl.ModuleTest.testModulePath;
 
@@ -11,7 +10,6 @@ import static edu.uiuc.ncsa.qdl.ModuleTest.testModulePath;
  * on 2/18/22 at  6:08 AM
  */
 public class SerializationTest extends AbstractQDLTester {
-
 
 
     /**
@@ -31,18 +29,18 @@ public class SerializationTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        WorkspaceCommands workspaceCommands = fromToWorkspaceCommands(state);
-
+        state = pickleState(state);
         script = new StringBuffer();
+
         addLine(script, "oka := a == 3;");
         addLine(script, "okb := reduce(@&&, b.==[;5]);");
         addLine(script, "okf2 := f(2)==4;");
-        workspaceCommands.getInterpreter().execute(script.toString());
-        State state2 = workspaceCommands.getInterpreter().getState();
-        assert getBooleanValue("ok", state2);
-        assert getBooleanValue("oka", state2);
-        assert getBooleanValue("okb", state2);
-        assert getBooleanValue("okf2", state2);
+        interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("oka", state);
+        assert getBooleanValue("okb", state);
+        assert getBooleanValue("okf2", state);
     }
 
     /**
@@ -61,7 +59,7 @@ public class SerializationTest extends AbstractQDLTester {
         // The state has been created and populated. Now we serialize it, then deserialize it.
 
         // Serialize the workspace
-        WorkspaceCommands workspaceCommands = fromToWorkspaceCommands(state);
+        state = pickleState(state);
 
         // Test that the things we set are faithfully recreated
         script = new StringBuffer();
@@ -69,17 +67,16 @@ public class SerializationTest extends AbstractQDLTester {
         addLine(script, "g1 := g(1);");
         addLine(script, "ok := 810 ==g3;");
         addLine(script, "ok1 := 10 ==g1;");
-        //interpreter = new QDLInterpreter(null, state2);
-        //interpreter.execute(script.toString());
-        workspaceCommands.getInterpreter().execute(script.toString());
-        State state2 = workspaceCommands.getInterpreter().getState();
-        assert getBooleanValue("ok", state2) : "Expected g(3)==810, but got " + getLongValue("g3", state2);
-        assert getBooleanValue("ok1", state2) : "Expected g(1)==10, but got " + getLongValue("g1", state2);
+        interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Expected g(3)==810, but got " + getLongValue("g3", state);
+        assert getBooleanValue("ok1", state) : "Expected g(1)==10, but got " + getLongValue("g1", state);
     }
 
     /**
      * Repeat a test that reads a module from a file, serializes the workspace, deserializes it and
      * runs the rest of the test.
+     *
      * @throws Throwable
      */
     public void testExternalModule() throws Throwable {
@@ -91,17 +88,47 @@ public class SerializationTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // The state has been created and populated. Now we serialize it, then deserialize it.
-        WorkspaceCommands workspaceCommands = fromToWorkspaceCommands(state);
+        state = pickleState(state);
 
         script = new StringBuffer();
         addLine(script, "ok := 4 == X#get_private();");
         addLine(script, "X#set_private(-10);");
         addLine(script, "ok1 := -10 == X#get_private();");
-        workspaceCommands.getInterpreter().execute(script.toString());
-        State state2 = workspaceCommands.getInterpreter().getState();
-        assert getBooleanValue("ok", state2) : "Could not access getter for private variable.";
-        assert getBooleanValue("ok1", state2) : "Could not access getter for private variable.";
+        interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Could not access getter for private variable.";
+        assert getBooleanValue("ok1", state) : "Could not access getter for private variable.";
     }
 
+    /**
+     * Tests that embedding XML snippets in a function and variable does not break the serialization
+     *
+     * @throws Exception
+     */
+    public void testEmbeddedXML() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := '<foo>bar</bar>';");
+        addLine(script, "b := '</baz></baz>';");
+        addLine(script, "c := '<baz><baz>';");
+        addLine(script, "d := 'woof]]>';"); // close tag of XML CDATA section
+        addLine(script, "f(x)->'<![CDATA[[' + x + ']]>';");
+        state = roundTripStateSerialization(state, script);
+        script = new StringBuffer();
+        addLine(script, "okf := f('foo') == '<![CDATA[[foo]]>';");
+        addLine(script, "oka := a=='<foo>bar</bar>';");
+        addLine(script, "okb := b=='</baz></baz>';");
+        addLine(script, "okc := c=='<baz><baz>';");
+        addLine(script, "okd := d=='woof]]>';");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+
+        assert getBooleanValue("oka", state) : "open + close XML tag in variable fails.";
+        assert getBooleanValue("okb", state) : "multiple close XML tags in variable fails.";
+        assert getBooleanValue("okc", state) : "multiple open XML tags in variable fails.";
+        assert getBooleanValue("okd", state) : "close CDATA XML tag in variable fails.";
+        assert getBooleanValue("okf", state) : "embedded CDATA section in function fails.";
+
+    }
 
 }
