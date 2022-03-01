@@ -5,7 +5,7 @@ import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.functions.FTable;
 import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
-import edu.uiuc.ncsa.qdl.module.MAliases;
+import edu.uiuc.ncsa.qdl.module.legacy.MAliases;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.state.State;

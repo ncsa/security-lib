@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
+import static edu.uiuc.ncsa.qdl.state.legacy.SymbolTable.var_regex;
 
 /**
  * This will let you create your own extensions to QDL in Java. Simply implement the interfaces
@@ -90,6 +90,7 @@ public abstract class JavaModule extends Module {
     }
     public void init(State state, boolean doVariables) {
         if (initialized) return;
+        setDocumentation(createDefaultDocs());
         if (state == null) return;
         setState(state);
         // If this is being recreated from its serialization, skip the variables so whatever
@@ -105,7 +106,6 @@ public abstract class JavaModule extends Module {
                 state.setValue(v.getName(), v.getValue());
             }
         }
-        setDocumentation(createDefaultDocs());
         for (QDLFunction f : funcs) {
             for (int i : f.getArgCount()) {
                 QDLFunctionRecord fr = new QDLFunctionRecord();

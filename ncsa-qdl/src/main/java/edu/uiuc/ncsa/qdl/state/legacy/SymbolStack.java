@@ -1,6 +1,7 @@
-package edu.uiuc.ncsa.qdl.state;
+package edu.uiuc.ncsa.qdl.state.legacy;
 
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.xml.XMLConstants;

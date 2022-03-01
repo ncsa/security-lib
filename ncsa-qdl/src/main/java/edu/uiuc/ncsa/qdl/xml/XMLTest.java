@@ -4,8 +4,8 @@ import com.sun.xml.internal.stream.events.CommentEvent;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolStack;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolTableImpl;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 
 import javax.xml.stream.*;

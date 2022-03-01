@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.*;
 import edu.uiuc.ncsa.qdl.scripting.QDLScript;
 import edu.uiuc.ncsa.qdl.scripting.Scripts;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolStack;
 import edu.uiuc.ncsa.qdl.statements.TryCatch;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -19,8 +20,8 @@ import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 import edu.uiuc.ncsa.qdl.vfs.VFSFileProvider;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands;
-import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLMissingCloseTagException;
+import edu.uiuc.ncsa.qdl.xml.XMLSerializationState;
 import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -28,7 +29,9 @@ import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
 import edu.uiuc.ncsa.security.core.util.MetaDebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -36,6 +39,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -595,7 +599,6 @@ public class State extends FunctionState implements QDLConstants {
     }
 
 
-
     /**
      * For the case the this has been deserialized and needs to have its transient
      * fields initialized. These are things like the {@link MetaEvaluator} that
@@ -635,7 +638,7 @@ public class State extends FunctionState implements QDLConstants {
      *
      * @return
      */
-    public  State newCleanState() {
+    public State newCleanState() {
         // NOTE this has no parents. Modules have completely clear state when starting!
         State newState = newInstance(
                 new VStack(),
@@ -660,7 +663,7 @@ public class State extends FunctionState implements QDLConstants {
      * replace it all. Generally do not use outside of XML deserialization.
      */
     public State() {
-        super(new VStack(),new OpEvaluator(), MetaEvaluator.getInstance(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
+        super(new VStack(), new OpEvaluator(), MetaEvaluator.getInstance(), new FStack(), new MTStack(), new MIStack(), new MyLoggingFacade((Logger) null));
     }
 
     /**
@@ -742,9 +745,9 @@ public class State extends FunctionState implements QDLConstants {
                 case XMLEvent.START_ELEMENT:
                     switch (xe.asStartElement().getName().getLocalPart()) {
                         case VARIABLE_STACK:
-                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)){
+                            if (xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
                                 XMLUtilsV2.deserializeVariables(xer, this, xmlSerializationState);
-                            }else{
+                            } else {
                                 // Legacy.
                                 VStack vStack = new VStack();
                                 SymbolStack st = new SymbolStack();
@@ -755,24 +758,24 @@ public class State extends FunctionState implements QDLConstants {
                             }
                             break;
                         case FUNCTION_TABLE_STACK_TAG:
-                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
-                                XMLUtilsV2.deserializeFunctions(xer,  this, xmlSerializationState);
-                            }else {
+                            if (xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                                XMLUtilsV2.deserializeFunctions(xer, this, xmlSerializationState);
+                            } else {
                                 XMLUtils.deserializeFunctions(xer, xp, this);
                             }
                             break;
                         case INSTANCE_STACK:
-                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                            if (xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
                                 XMLUtilsV2.deserializeInstances(xer, this, xmlSerializationState);
-                            }else{
+                            } else {
                                 XMLUtils.deserializeImports(xer, xp, this);
                             }
                             break;
                         case TEMPLATE_STACK:
-                            if(xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
+                            if (xmlSerializationState.getVersion().equals(VERSION_2_0_TAG)) {
                                 XMLUtilsV2.deserializeTemplates(xer, this, xmlSerializationState);
-                            }else{
-                                XMLUtils.deserializeTemplates(xer, xp,this);
+                            } else {
+                                XMLUtils.deserializeTemplates(xer, xp, this);
                             }
                             break;
                         default:
@@ -791,6 +794,7 @@ public class State extends FunctionState implements QDLConstants {
         }
         throw new XMLMissingCloseTagException(STATE_TAG);
     }
+
     public void fromXML(XMLEventReader xer, XProperties xp) throws XMLStreamException {
         // At this point, caller peeked and knows this is the right type of event,
         // so we know where in the stream we are starting automatically.
@@ -892,7 +896,19 @@ public class State extends FunctionState implements QDLConstants {
      * @throws XMLStreamException
      */
     public void writeExtraXMLElements(XMLStreamWriter xsr) throws XMLStreamException {
-
+        xsr.writeStartElement(STATE_CONSTANTS_TAG);
+        JSONObject json = new JSONObject();
+        json.put(STATE_ASSERTIONS_ENABLED_TAG, isAssertionsOn());
+        json.put(STATE_PID_TAG, getPID());
+        json.put(STATE_RESTRICTED_IO_TAG, isRestrictedIO());
+        json.put(STATE_SERVER_MODE_TAG, isServerMode());
+        // Saving the numeric digits this way is unsatisfactory since it is also done in all
+        // of the sub-states, but there is no easy way to set this once and get it right
+        // The top-level state is the last read, so it wil always end up getting set
+        // correctly at the end. Best we can do without a ton of machinery...
+        json.put(STATE_NUMERIC_DIGITS_TAG, OpEvaluator.getNumericDigits());
+        xsr.writeCData(Base64.encodeBase64URLSafeString(json.toString().getBytes(StandardCharsets.UTF_8)));
+        xsr.writeEndElement();
     }
 
     /**
@@ -916,7 +932,17 @@ public class State extends FunctionState implements QDLConstants {
      */
 
     public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
-
+        if(xe.asStartElement().getName().getLocalPart().equals(STATE_CONSTANTS_TAG)) {
+            // only process the tag if it is the right one
+            String text = XMLUtilsV2.getText(xer, STATE_CONSTANTS_TAG);
+            text = new String(Base64.decodeBase64(text));
+            JSONObject json = JSONObject.fromObject(text);
+            setAssertionsOn(json.getBoolean(STATE_ASSERTIONS_ENABLED_TAG));
+            setPID(json.getInt(STATE_PID_TAG));
+            setServerMode(json.getBoolean(STATE_SERVER_MODE_TAG));
+            setRestrictedIO(json.getBoolean(STATE_RESTRICTED_IO_TAG));
+            OpEvaluator.setNumericDigits(json.getInt(STATE_NUMERIC_DIGITS_TAG));
+        }
     }
 
     /**
@@ -979,6 +1005,7 @@ public class State extends FunctionState implements QDLConstants {
      * Now that templates and instances are handled as stacks with local state, old form of
      * serialization fails due to recursion.<br/><br/>
      * These are serialized into a flat list and references to them are used.
+     *
      * @param XMLSerializationState
      */
     public void buildSO(XMLSerializationState XMLSerializationState) {

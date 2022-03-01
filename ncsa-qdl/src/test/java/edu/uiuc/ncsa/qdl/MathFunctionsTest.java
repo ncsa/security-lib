@@ -359,6 +359,10 @@ public class MathFunctionsTest extends AbstractQDLTester {
      */
 
     public void testRecursion() throws Throwable {
+        testRecursion(false);
+        testRecursion(true);
+    }
+    public void testRecursion(boolean testXML) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "define[");
@@ -367,6 +371,10 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "    if[ n <= 2 ]then[ return(1);];");
         addLine(script, "    return( fib(n - 1) + fib(n - 2));");
         addLine(script, "];");
+        if(testXML){
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "x := fib(20);"); // should return 6765
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -432,16 +440,28 @@ public class MathFunctionsTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testBigMod() throws Throwable {
+        testBigMod(false);
+        testBigMod(true);
+    }
+    public void testBigMod(boolean testXML) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := mod(494590348974597684,394874589745) == 53454241559;");
         addLine(script, "numeric_digits(100);");
+        if(testXML){
+            // check that numeric digits this gets serialized correctly
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
         addLine(script, "ok1 := mod(498723987945689378498579456, 1009) == 556;");
+        addLine(script, "ok2 := numeric_digits()==100;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Could not find modulus of two huge integers.";
         assert getBooleanValue("ok1", state) : "Could not find modulus of one huge, one small integer.";
+        assert getBooleanValue("ok2", state) : "numeric_digits not saved correctly.";
     }
+
     public void testMinMax() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();

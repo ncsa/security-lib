@@ -9,6 +9,8 @@ import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.module.Module;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolStack;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolTable;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VStack;
@@ -19,7 +21,7 @@ import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static edu.uiuc.ncsa.qdl.state.SymbolTable.int_regex;
+import static edu.uiuc.ncsa.qdl.state.legacy.SymbolTable.int_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
 /**

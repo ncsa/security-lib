@@ -29,7 +29,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 12/1/21 at  1:03 PM
  */
-public class MITable2<K extends XKey, V extends MIWrapper> extends XTable<K, V> implements Documentable {
+public class MITable<K extends XKey, V extends MIWrapper> extends XTable<K, V> implements Documentable {
 
 
     public V put(XKey xKey, XThing xThing) {

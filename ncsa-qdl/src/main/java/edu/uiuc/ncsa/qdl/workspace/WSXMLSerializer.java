@@ -13,6 +13,8 @@ import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
@@ -24,11 +26,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.IMPORTS_COMMAND;
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
+import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -40,8 +43,8 @@ public class WSXMLSerializer {
 
 
     public void toXML(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
-        XMLSerializationState XMLSerializationState = new XMLSerializationState();
-        XMLSerializationState.setVersion(VERSION_2_0_TAG);
+        XMLSerializationState xmlSerializationState = new XMLSerializationState();
+        xmlSerializationState.setVersion(VERSION_2_0_TAG);
         xsw.writeStartDocument();
 
         xsw.writeStartElement(WORKSPACE_TAG);
@@ -59,10 +62,10 @@ public class WSXMLSerializer {
         // Lay in the object store for templates then states. Since we use an event driven XML parser
         // order matters for deserialization.
         State state = workspaceCommands.getState();
-        XMLSerializationState.addState(state);
+        xmlSerializationState.addState(state);
         xsw.writeComment("Top-level state object for the workspace.");
         // Serialize main workspace state. This kicks off all the other serializations.
-        state.buildSO(XMLSerializationState);
+        state.buildSO(xmlSerializationState);
 
 
         // Do the workspace proper. This comes first since it is basically a header and when listing
@@ -71,9 +74,157 @@ public class WSXMLSerializer {
         // listing workspaces quite a bit since it will deserialize the entire workspace before moving
         // on to the next.
         xsw.writeStartElement(WS_ENV_TAG);
+        if (xmlSerializationState.isVersion2_0()) {
+            processWSEnvNEW(workspaceCommands, xsw);
+        } else {
+            processWSEnvOLD(workspaceCommands, xsw);
+        }
+
+        xsw.writeEndElement(); // end WS env
+        // Buffer manager can stay full XML for a bit since it is pretty complex and not a simple
+        // data structure.
+        if (workspaceCommands.bufferManager != null && !workspaceCommands.bufferManager.isEmpty()) {
+            xsw.writeStartElement(BUFFER_MANAGER);
+            workspaceCommands.bufferManager.toXML(xsw);
+            xsw.writeEndElement();
+        }
+        if (workspaceCommands.env != null && !workspaceCommands.env.isEmpty()) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.putAll(workspaceCommands.env);
+            xsw.writeStartElement(ENV_PROPERTIES);
+            xsw.writeCData(encodeBase64String(jsonObject.toString().getBytes(StandardCharsets.UTF_8)));
+            xsw.writeEndElement();
+
+            /*
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                xsw.writeStartElement(ENV_PROPERTIES);
+                workspaceCommands.env.storeToXML(baos, "workspace serialization");
+                xsw.writeCData(encodeBase64String(baos.toByteArray()));
+                xsw.writeEndElement();
+            } catch (IOException e) {
+                workspaceCommands.logger.warn("Could not serialize environment to XML:\"" + e.getMessage() + "\".");
+            }*/
+        }
+        saveWSList(xsw, workspaceCommands.commandHistory, COMMAND_HISTORY, xmlSerializationState);
+        saveWSList(xsw, workspaceCommands.getState().getScriptPaths(), SCRIPT_PATH, xmlSerializationState);
+        saveWSList(xsw, workspaceCommands.getState().getModulePaths(), MODULE_PATH, xmlSerializationState);
+        saveWSList(xsw, workspaceCommands.editorClipboard, EDITOR_CLIPBOARD, xmlSerializationState);
+
+        // Global list of templates
+        xsw.writeStartElement(MODULE_TEMPLATE_TAG);
+        xsw.writeComment("templates for all modules");
+        for (UUID key : xmlSerializationState.templateMap.keySet()) {
+            Module module = xmlSerializationState.getTemplate(key);
+            module.toXML(xsw, null, true, xmlSerializationState);
+        }
+        xsw.writeEndElement(); // end module templates
+
+        // Save other states (in modules).
+        xsw.writeStartElement(STATES_TAG);
+        xsw.writeComment("module states");
+
+        /**
+         * At this point we have a flat list of states. Serialize all of them.
+         */
+        Set<UUID> currentKeys = new HashSet<>();
+        currentKeys.addAll(xmlSerializationState.stateMap.keySet());
+        for (UUID key : currentKeys) {
+            if (!key.equals(state.getUuid()))
+                xmlSerializationState.getState(key).toXML(xsw, xmlSerializationState);
+        }
+        xsw.writeEndElement(); // end states reference
+
+        // Absolute last thing to write is the actual state object for the workspace.
+        state.toXML(xsw, xmlSerializationState);
+
+        xsw.writeEndElement(); // end workspace tag
+    }
+
+    private void saveWSList(XMLStreamWriter xsw,
+                            List<String> s,
+                            String tag,
+                            XMLSerializationState xmlSerializationState) throws XMLStreamException {
+        if (s != null && !s.isEmpty()) {
+            xsw.writeStartElement(tag);
+            if (xmlSerializationState.isVersion2_0()) {
+                toCDataB64(xsw, s);
+            } else {
+                StemVariable stemVariable = new StemVariable();
+                stemVariable.addList(s);
+                XMLUtils.write(xsw, stemVariable);
+            }
+            xsw.writeEndElement(); // end script paths
+        }
+    }
+
+    private void toCDataB64(XMLStreamWriter xsw, List<String> s) throws XMLStreamException {
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.addAll(s);
+        xsw.writeCData(encodeBase64String(jsonArray.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private void processWSEnvNEW(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
+        JSONObject json = new JSONObject();
+        json.put(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
+        String zzz = workspaceCommands.getBufferDefaultSavePath();
+        if (zzz != null) {
+            json.put(BUFFER_DEFAULT_SAVE_PATH, zzz);
+        }
+        // booleans
+        json.put(ECHO_MODE, workspaceCommands.echoModeOn);
+        json.put(DEBUG_MODE, workspaceCommands.debugOn);
+        json.put(AUTOSAVE_ON, workspaceCommands.isAutosaveOn());
+        json.put(RUN_INIT_ON_LOAD, workspaceCommands.runInitOnLoad);
+        json.put(AUTOSAVE_MESSAGES_ON, workspaceCommands.isAutosaveMessagesOn());
+        json.put(COMPRESS_XML, workspaceCommands.compressXML);
+        json.put(USE_EXTERNAL_EDITOR, workspaceCommands.isUseExternalEditor());
+        json.put(ASSERTIONS_ON, workspaceCommands.isAssertionsOn());
+        json.put(PRETTY_PRINT, workspaceCommands.isPrettyPrint());
+        json.put(ENABLE_LIBRARY_SUPPORT, workspaceCommands.getState().isEnableLibrarySupport());
+        // ints
+        json.put(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
+        // longs
+        json.put(AUTOSAVE_INTERVAL, workspaceCommands.getAutosaveInterval());
+        // dates
+        json.put(START_TS, Iso8601.date2String(workspaceCommands.startTimeStamp));
+
+        // strings
+
+        if (!isTrivial(workspaceCommands.getExternalEditorName())) {
+            json.put(EXTERNAL_EDITOR_NAME, workspaceCommands.getExternalEditorName());
+        }
+
+        if (!isTrivial(workspaceCommands.getWSID())) {
+            json.put(WS_ID, workspaceCommands.getWSID());
+        }
+        if (workspaceCommands.envFile != null) {
+            json.put(ENV_FILE, workspaceCommands.envFile.getAbsolutePath());
+        }
+        if (!isTrivial(workspaceCommands.runScriptPath)) {
+            json.put(RUN_SCRIPT_PATH, workspaceCommands.runScriptPath);
+        }
+        if (workspaceCommands.currentWorkspace != null) {
+            json.put(CURRENT_WORKSPACE, workspaceCommands.currentWorkspace.getAbsolutePath());
+        }
+
+        if (workspaceCommands.rootDir != null) {
+            json.put(ROOT_DIR, workspaceCommands.rootDir.getAbsolutePath());
+        }
+        if (workspaceCommands.saveDir != null) {
+            json.put(SAVE_DIR, workspaceCommands.saveDir.getAbsolutePath());
+        }
+        if (workspaceCommands.description != null) {
+            json.put(DESCRIPTION, workspaceCommands.description);
+        }
+
+        xsw.writeCData(encodeBase64String(json.toString().getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private void processWSEnvOLD(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeAttribute(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
         String zzz = workspaceCommands.getBufferDefaultSavePath();
-        if(zzz != null) {
+        if (zzz != null) {
             xsw.writeAttribute(BUFFER_DEFAULT_SAVE_PATH, zzz);
         }
         xsw.writeAttribute(ECHO_MODE, Boolean.toString(workspaceCommands.echoModeOn));
@@ -95,7 +246,7 @@ public class WSXMLSerializer {
             // Note that since we want this to be an attribute, we are limited to what characters normally
             // can be set. Base64 encoding the id allows the user to give this id of just about anything
             // without having to do a bunch of complex escaping.
-            xsw.writeAttribute(WS_ID, Base64.encodeBase64String(workspaceCommands.getWSID().getBytes()));
+            xsw.writeAttribute(WS_ID, encodeBase64String(workspaceCommands.getWSID().getBytes()));
         }
         if (workspaceCommands.envFile != null) {
             xsw.writeAttribute(ENV_FILE, workspaceCommands.envFile.getAbsolutePath());
@@ -138,77 +289,6 @@ public class WSXMLSerializer {
             }
             xsw.writeEndElement(); // end env properties file
         }
-
-        xsw.writeEndElement(); // end WS env
-        if (workspaceCommands.bufferManager != null && !workspaceCommands.bufferManager.isEmpty()) {
-            xsw.writeStartElement(BUFFER_MANAGER);
-            workspaceCommands.bufferManager.toXML(xsw);
-            xsw.writeEndElement();
-        }
-
-        List<String> ch = workspaceCommands.commandHistory;
-        if (ch != null && !ch.isEmpty()) {
-            xsw.writeStartElement(COMMAND_HISTORY);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(ch);
-            XMLUtils.write(xsw, stemVariable);
-            xsw.writeEndElement();
-        }
-
-        List<String> s = workspaceCommands.getState().getScriptPaths();
-        if (s != null && !s.isEmpty()) {
-            xsw.writeStartElement(SCRIPT_PATH);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(s);
-            XMLUtils.write(xsw, stemVariable);
-            xsw.writeEndElement(); // end script paths
-        }
-
-        s = workspaceCommands.getState().getModulePaths();
-        if (s != null && !s.isEmpty()) {
-            xsw.writeStartElement(MODULE_PATH);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(s);
-            XMLUtils.write(xsw, stemVariable);
-            xsw.writeEndElement(); // end module paths
-        }
-        s = workspaceCommands.editorClipboard;
-        if (s != null && !s.isEmpty()) {
-            xsw.writeStartElement(EDITOR_CLIPBOARD);
-            StemVariable stemVariable = new StemVariable();
-            stemVariable.addList(s);
-            XMLUtils.write(xsw, stemVariable);
-            xsw.writeEndElement(); // end editor clipboard
-        }
-
-        // Global list of templates
-          xsw.writeStartElement(MODULE_TEMPLATE_TAG);
-              xsw.writeComment("templates for all modules");
-              for (UUID key : XMLSerializationState.templateMap.keySet()) {
-                  Module module = XMLSerializationState.getTemplate(key);
-                  module.toXML(xsw, null, true, XMLSerializationState);
-              }
-              xsw.writeEndElement(); // end module templates
-
-          // Save other states (in modules).
-          xsw.writeStartElement(STATES_TAG);
-          xsw.writeComment("module states");
-
-          /**
-           * At this point we have a flat list of states. Serialize all of them.
-           */
-          Set<UUID> currentKeys = new HashSet<>();
-          currentKeys.addAll(XMLSerializationState.stateMap.keySet());
-          for (UUID key : currentKeys) {
-              if (!key.equals(state.getUuid()))
-                  XMLSerializationState.getState(key).toXML(xsw, XMLSerializationState);
-          }
-          xsw.writeEndElement(); // end states reference
-
-        // Absolute last thing to write is the actual state object for the workspace.
-        state.toXML(xsw, XMLSerializationState);
-
-        xsw.writeEndElement(); // end workspace tag
     }
 
     public WorkspaceCommands fromXML(XMLEventReader xer) throws XMLStreamException {
@@ -226,7 +306,7 @@ public class WSXMLSerializer {
         }
         // search for first workspace tag
         boolean hasWorkspaceTag = false;
-        XMLSerializationState XMLSerializationState = new XMLSerializationState();
+        XMLSerializationState xmlSerializationState = new XMLSerializationState();
         while (xer.hasNext()) {
             xe = xer.nextEvent(); // SHOULD be the workspace tag but there can be comments, DTDs etc.
             if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(WORKSPACE_TAG)) {
@@ -243,7 +323,7 @@ public class WSXMLSerializer {
             Attribute a = (Attribute) iterator.next();
             switch (a.getName().getLocalPart()) {
                 case SERIALIZATION_VERSION_TAG:
-                    XMLSerializationState.setVersion(a.getValue());
+                    xmlSerializationState.setVersion(a.getValue());
             }
         }
 
@@ -257,36 +337,56 @@ public class WSXMLSerializer {
                     case XMLEvent.START_ELEMENT:
                         switch (xe.asStartElement().getName().getLocalPart()) {
                             case WS_ENV_TAG:
-                                processAttr(testCommands, xe);
+                                if (xmlSerializationState.isVersion2_0()) {
+                                    processJSONAttr(xer, testCommands);
+                                } else {
+                                    processAttr(testCommands, xe);
+                                }
                                 break;
                             case SCRIPT_PATH:
-                                testCommands.state.setScriptPaths(getStemAsListFromXML(SCRIPT_PATH, xer));
+                                if (xmlSerializationState.isVersion2_0()) {
+                                    testCommands.state.setScriptPaths(getStringsFromJSON(xer, SCRIPT_PATH));
+                                } else {
+                                    testCommands.state.setScriptPaths(getStemAsListFromXML(SCRIPT_PATH, xer));
+                                }
                                 break;
                             case COMMAND_HISTORY:
-                                testCommands.commandHistory = getStemAsListFromXML(COMMAND_HISTORY, xer);
+                                if (xmlSerializationState.isVersion2_0()) {
+                                    testCommands.commandHistory = getStringsFromJSON(xer, COMMAND_HISTORY);
+                                } else {
+                                    testCommands.commandHistory = getStemAsListFromXML(COMMAND_HISTORY, xer);
+                                }
                                 break;
                             case MODULE_PATH:
-                                testCommands.state.setModulePaths(getStemAsListFromXML(MODULE_PATH, xer));
+                                if (xmlSerializationState.isVersion2_0()) {
+                                    testCommands.state.setModulePaths(getStringsFromJSON(xer, MODULE_PATH));
+                                } else {
+                                    testCommands.state.setModulePaths(getStemAsListFromXML(MODULE_PATH, xer));
+                                }
                                 break;
                             case DESCRIPTION:
                                 testCommands.setDescription(getDescription(xer));
                                 break;
                             case EDITOR_CLIPBOARD:
                                 if (!workspaceAttributesOnly) {
-                                    testCommands.editorClipboard = getStemAsListFromXML(EDITOR_CLIPBOARD, xer);
+                                    if (xmlSerializationState.isVersion2_0()) {
+                                        testCommands.editorClipboard = getStringsFromJSON(xer, EDITOR_CLIPBOARD);
+                                    } else {
+                                        testCommands.editorClipboard = getStemAsListFromXML(EDITOR_CLIPBOARD, xer);
+                                    }
                                 }
                                 break;
                             case STATES_TAG:
-                                XMLUtilsV2.deserializeStateStore(xer, XMLSerializationState);
+                                XMLUtilsV2.deserializeStateStore(xer, xmlSerializationState);
                                 break;
                             case MODULE_TEMPLATE_TAG:
-                                XMLUtilsV2.deserializeTemplateStore(xer, XMLSerializationState);
+                                XMLUtilsV2.deserializeTemplateStore(xer, xmlSerializationState);
                                 break;
                             case STATE_TAG:
                                 if (!workspaceAttributesOnly) {
-                                    if(XMLSerializationState.isVersion2_0()){
-                                        testCommands.state = StateUtils.load(testCommands.state, XMLSerializationState, xer);
-                                    }else {
+                                    if (xmlSerializationState.isVersion2_0()) {
+                                        testCommands.state = StateUtils.load(testCommands.state, xmlSerializationState, xer);
+                                    } else {
                                         testCommands.state = StateUtils.load(testCommands.state, xer);
                                     }
                                 }
@@ -299,14 +399,41 @@ public class WSXMLSerializer {
                                 break;
                             case ENV_PROPERTIES:
                                 if (!workspaceAttributesOnly) {
-                                    doEnvProps(testCommands, xer);
+                                    if (xmlSerializationState.isVersion2_0()) {
+                                        String text = XMLUtilsV2.getText(xer, ENV_PROPERTIES);
+                                        String raw = new String(Base64.decodeBase64(text));
+                                        JSONObject jsonObject = JSONObject.fromObject(raw);
+                                        XProperties xp = new XProperties();
+                                        xp.add(jsonObject, true);
+                                        testCommands.env = xp;
+/*
+                                        // This is a base 64 encoded XProperties
+                                        ByteArrayInputStream bais = new ByteArrayInputStream(raw);
+                                        XProperties xp = new XProperties();
+                                        try {
+                                            xp.loadFromXML(bais);
+                                            bais.close();
+                                            if (testCommands.env == null) {
+                                                testCommands.env = xp;
+                                            } else {
+                                                testCommands.env.add(xp, true);
+                                            }
+
+                                        } catch (IOException e) {
+                                            say("Could not deserialize stored properties:" + e.getMessage() + (e.getCause() == null ? "" : ", cause = " + e.getCause().getMessage()));
+                                        }
+*/
+
+                                    } else {
+                                        doEnvProps(testCommands, xer);
+                                    }
                                 }
                                 break;
-                            case IMPORTS_COMMAND:
+/*                            case IMPORTS_COMMAND:
                                 if (!workspaceAttributesOnly) {
                                     XMLUtils.deserializeImports(xer, testCommands.getEnv(), testCommands.getState());
                                 }
-                                break;
+                                break;*/
                             case OLD_MODULE_TEMPLATE_TAG:
                                 if (!workspaceAttributesOnly) {
                                     XMLUtils.deserializeTemplates(xer, testCommands.getEnv(), testCommands.getState());
@@ -343,6 +470,15 @@ public class WSXMLSerializer {
 
         }
         throw new NFWException("Error: Could not deserialize the file from XML."); // should not happen, and yet...
+    }
+
+    private List<String> getStringsFromJSON(XMLEventReader xer, String tag) throws XMLStreamException {
+        String text = XMLUtilsV2.getText(xer, tag);
+        String rawJSON = new String(Base64.decodeBase64(text));
+        JSONArray array = JSONArray.fromObject(rawJSON);
+        List<String> xx = new ArrayList<>();
+        xx.addAll(array);
+        return xx;
     }
 
     protected String getDescription(XMLEventReader xer) throws XMLStreamException {
@@ -433,6 +569,56 @@ public class WSXMLSerializer {
         }
         throw new IllegalStateException("Error: XML file corrupt. No end tag for " + STATE_TAG);
 
+    }
+
+    protected void processJSONAttr(XMLEventReader xer, WorkspaceCommands workspaceCommands) throws Throwable {
+        String text = XMLUtilsV2.getText(xer, WS_ENV_TAG); // should be JSON b64 encoded
+        String rawJSON = new String(Base64.decodeBase64(text));
+        JSONObject json = JSONObject.fromObject(rawJSON);
+
+        // booleans
+        workspaceCommands.echoModeOn = json.getBoolean(ECHO_MODE);
+        workspaceCommands.debugOn = json.getBoolean(DEBUG_MODE);
+        workspaceCommands.setAutosaveOn(json.getBoolean(AUTOSAVE_ON));
+        workspaceCommands.runInitOnLoad = json.getBoolean(RUN_INIT_ON_LOAD);
+        workspaceCommands.setAutosaveMessagesOn(json.getBoolean(AUTOSAVE_MESSAGES_ON));
+        workspaceCommands.compressXML = json.getBoolean(COMPRESS_XML);
+        workspaceCommands.setUseExternalEditor(json.getBoolean(USE_EXTERNAL_EDITOR));
+        workspaceCommands.setAssertionsOn(json.getBoolean(ASSERTIONS_ON));
+        workspaceCommands.setPrettyPrint(json.getBoolean(PRETTY_PRINT));
+
+        // numbers
+        workspaceCommands.setAutosaveInterval(json.getLong(AUTOSAVE_INTERVAL));
+        workspaceCommands.currentPID = json.getInt(CURRENT_PID);
+
+        //dates
+        workspaceCommands.startTimeStamp = Iso8601.string2Date(json.getString(START_TS)).getTime();
+
+        // strings
+        if (json.containsKey(EXTERNAL_EDITOR_NAME)) {
+            workspaceCommands.setExternalEditorName(json.getString(EXTERNAL_EDITOR_NAME));
+        }
+        if (json.containsKey(WS_ID)) {
+            workspaceCommands.setWSID(json.getString(WS_ID));
+        }
+        if (json.containsKey(ENV_FILE)) {
+            workspaceCommands.envFile = new File(json.getString(ENV_FILE));
+        }
+        if (json.containsKey(RUN_SCRIPT_PATH)) {
+            workspaceCommands.runScriptPath = json.getString(RUN_SCRIPT_PATH);
+        }
+        if (json.containsKey(CURRENT_WORKSPACE)) {
+            workspaceCommands.currentWorkspace = new File(json.getString(CURRENT_WORKSPACE));
+        }
+        if (json.containsKey(ROOT_DIR)) {
+            workspaceCommands.rootDir = new File(json.getString(ROOT_DIR));
+        }
+        if (json.containsKey(SAVE_DIR)) {
+            workspaceCommands.saveDir = new File(json.getString(SAVE_DIR));
+        }
+        if (json.containsKey(DESCRIPTION)) {
+            workspaceCommands.description = json.getString(DESCRIPTION);
+        }
     }
 
     protected void processAttr(WorkspaceCommands testCommands, XMLEvent xe) throws Throwable {

@@ -3723,7 +3723,7 @@ public class WorkspaceCommands implements Logable {
         IOInterface currentIOI = getIoInterface();
         // Get rid of everything.
         state = null;
-        MAliases.setmInstances(null); // zero this out or we have bogus entries.
+        //MAliases.setmInstances(null); // zero this out or we have bogus entries.
         state = getState();
         state.setIoInterface(currentIOI);
         setIoInterface(currentIOI);
@@ -3761,7 +3761,7 @@ public class WorkspaceCommands implements Logable {
             say("See also: autosave_on (ws variable)");
             return RC_NO_OP;
         }
-
+        long startTime = System.currentTimeMillis();
         boolean showFile = inputLine.hasArg(SHOW_FLAG);
         boolean doJava = inputLine.hasArg(SAVE_AS_JAVA_FLAG);
         boolean keepCurrentWS = inputLine.hasArg(KEEP_WSF);
@@ -3793,7 +3793,7 @@ public class WorkspaceCommands implements Logable {
         if (showFile) {
             try {
                 long uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
-                say("size is " + uncompressedXMLSize);
+                say("size: " + uncompressedXMLSize + "\n  elapsed time:" + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
                 return RC_CONTINUE;
             } catch (Throwable throwable) {
                 say("warning. could not show file \"" + throwable.getMessage() + "\"");
@@ -3854,7 +3854,8 @@ public class WorkspaceCommands implements Logable {
 
             if (qdlDump || target.getAbsolutePath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)) {
                 _doQDLDump(target);
-                say("dumped " + target.length() + " bytes to \"" + target.getAbsolutePath() + "\"");
+                say("saved '" + target.getAbsolutePath() + "'\n  bytes: " + target.length() + "\n  elapsed time:" +((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
+//                say("dumped " + target.length() + " bytes to '" + target.getAbsolutePath() + "'. Elapsed time " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
                 return RC_CONTINUE;
             }
             long uncompressedXMLSize = -1L;
@@ -3863,9 +3864,15 @@ public class WorkspaceCommands implements Logable {
             } else {
                 uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
             }
-            String head = 0 <= uncompressedXMLSize ? (", uncompressed size = " + uncompressedXMLSize + " ") : "";
+            //String head = 0 <= uncompressedXMLSize ? (", uncompressed size: " + uncompressedXMLSize + " ") : "";
+            String head = 0 <= uncompressedXMLSize ? ("uncompressed size: " + uncompressedXMLSize + " ") : "";
             if (!silentMode) {
-                say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head);
+                say("saved: '" + target.getCanonicalPath() +"'" +
+                        "\n  on: " + new Date() +
+                        "\n  " + head +
+                        "\n  bytes written: " + target.length() +
+                        "\n  elapsed time: " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
+                //say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head + ". Elapsed time " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec."  );
             }
             if (!keepCurrentWS) {
                 currentWorkspace = target;

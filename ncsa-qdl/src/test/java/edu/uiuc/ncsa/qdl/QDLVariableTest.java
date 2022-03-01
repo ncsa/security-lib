@@ -3,9 +3,9 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.state.SymbolStack;
-import edu.uiuc.ncsa.qdl.state.SymbolTable;
-import edu.uiuc.ncsa.qdl.state.SymbolTableImpl;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolStack;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolTable;
+import edu.uiuc.ncsa.qdl.state.legacy.SymbolTableImpl;
 
 /**
  * Test that directly test the functioning of variables and state. These typically create and manipulate stacks
@@ -134,62 +134,6 @@ public class QDLVariableTest extends AbstractQDLTester {
      *
      * @throws Exception
      */
-     // This used to work by manipulating the stacks directly. VStack is different and it is unclear the
-    // utility of attempting to recreate this. For one thing, older code in SymbolStack allowed for
-    // actually setting stem elements like y.1 in the stack and resolving it. Stems now handle that and
-    // all that should be in the vStack is y.
-/*    public void testDeepResolutionOnStack() throws Exception {
-        VTable st0 = new VTable<>();
-        VTable st1 = new VTable<>();
-        VTable st2 = new VTable<>();
-        VTable st3 = new VTable<>();
-        VTable st4 = new VTable<>();
-        VStack stack = new VStack();
-
-        st4.put(new VThing(new XKey("z"), 1L));
-        stack.append(st4);
-        st3.put(new VThing(new XKey("y.1"), 2L));
-        stack.append(st3);
-        st2.put(new VThing(new XKey("x.2"), 3L));
-        stack.append(st2);
-        st1.put(new VThing(new XKey("w.3"), "4"));
-        stack.append(st0);
-        st0.put(new VThing(new XKey("A.4"), 5L));
-        stack.append(st1);
-        State state = testUtils.getNewState();
-        state.setvStack(stack);
-        String stem = "A.w.x.y.z";
-        Object output = state.getValue(stem);
-        assert output.equals(5L) : "expected 5 and got " + stack.get(new XKey(stem));
-        assert state.isDefined(stem);
-    }*/
-
-    /* Old version used SymbolStack
-    public void testDeepResolutionOnStack() throws Exception {
-        SymbolTableImpl st0 = new SymbolTableImpl();
-        SymbolTableImpl st1 = new SymbolTableImpl();
-        SymbolTableImpl st2 = new SymbolTableImpl();
-        SymbolTableImpl st3 = new SymbolTableImpl();
-        SymbolTableImpl st4 = new SymbolTableImpl();
-        SymbolStack stack = new SymbolStack();
-
-        st4.setValue("z", 1L);
-        stack.addParent(st4);
-        st3.setValue("y.1", 2L);
-        stack.addParent(st3);
-        st2.setValue("x.2", 3L);
-        stack.addParent(st2);
-        st1.setValue("w.3", "4");
-        stack.addParent(st0);
-        st0.setValue("A.4", 5L);
-        stack.addParent(st1);
-        State state = testUtils.getNewState();
-        state.setvStack(stack);
-        String stem = "A.w.x.y.z";
-        Object output = state.getValue(stem);
-        assert output.equals(5L) : "expected 5 and got " + stack.resolveValue(stem);
-        assert state.isDefined(stem);
-    }*/
 
     /**
      * This also checks for deep resolution and then it sets the value and then reads it.
@@ -234,10 +178,18 @@ public class QDLVariableTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testIsDefined() throws Throwable{
+        testIsDefined(false);
+        testIsDefined(true);
+    }
+    public void testIsDefined(boolean testXML) throws Throwable{
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a.epe. := {'a':'b','b':'c'};");
         addLine(script, "b := 'foo';");
+        if(testXML){
+            state=roundTripStateSerialization(state,script);
+            script = new StringBuffer();
+        }
         addLine(script, "ok0 := is_defined(a.epe) && is_defined(a.epe.);"); // should handle both cases of trailing . or not
         addLine(script, "ok1 := is_defined(b);"); // most basic test
         addLine(script, "ok2 := !is_defined(a.ZZZ);"); // check that missing elements in stems

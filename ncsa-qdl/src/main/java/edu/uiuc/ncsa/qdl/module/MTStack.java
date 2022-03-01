@@ -19,7 +19,7 @@ import java.util.List;
  * on 12/13/21 at  7:17 AM
  */
 
-public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> extends XStack<V> implements Serializable {
+public class MTStack<V extends MTTable<? extends MTKey, ? extends Module>> extends XStack<V> implements Serializable {
 
     public MTStack() {
         pushNewTable();
@@ -32,7 +32,7 @@ public class MTStack<V extends MTTable2<? extends MTKey, ? extends Module>> exte
 
     @Override
     public XTable newTableInstance() {
-        return new MTTable2();
+        return new MTTable();
     }
 
 

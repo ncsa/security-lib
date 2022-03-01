@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
+import static edu.uiuc.ncsa.qdl.state.legacy.SymbolTable.var_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemConverter.convert;
 
 /**

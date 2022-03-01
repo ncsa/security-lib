@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.module;
+package edu.uiuc.ncsa.qdl.module.legacy;
 
 import edu.uiuc.ncsa.qdl.evaluate.*;
 import edu.uiuc.ncsa.qdl.exceptions.ImportException;

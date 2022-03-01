@@ -33,6 +33,8 @@ public interface XMLConstants {
     String DEBUG_MODE = "debug_mode";
     String AUTOSAVE_ON = "autosave_on";
     String AUTOSAVE_INTERVAL = "autosave_interval";
+    String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
+    String EXTERNAL_EDITOR_NAME = "external_editor";
     String AUTOSAVE_MESSAGES_ON = "autosave_messages_on";
     String START_TS = "start_ts";
     String ROOT_DIR = "root_dir";
@@ -96,6 +98,12 @@ public interface XMLConstants {
     String INSTANCE_REFERENCE_TAG = "instance_reference";
     String STATE_REFERENCE_TAG = "state_reference";
     String UUID_TAG = "uuid";
+    String STATE_CONSTANTS_TAG = "constants";
+    String STATE_RESTRICTED_IO_TAG = "restricted_io";
+    String STATE_SERVER_MODE_TAG = "server_mode";
+    String STATE_PID_TAG = "pid";
+    String STATE_ASSERTIONS_ENABLED_TAG = "assertions_on";
+    String STATE_NUMERIC_DIGITS_TAG = "numeric_digits";
     String STATES_TAG = "states";
     String MODULE_INSTANCES_TAG = "module_instances";
     String TEMPLATE_STACK = "template_stack";

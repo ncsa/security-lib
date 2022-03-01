@@ -22,7 +22,7 @@ import net.sf.json.JSONObject;
 import java.util.*;
 import java.util.regex.Pattern;
 
-import static edu.uiuc.ncsa.qdl.state.SymbolTable.var_regex;
+import static edu.uiuc.ncsa.qdl.state.legacy.SymbolTable.var_regex;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 

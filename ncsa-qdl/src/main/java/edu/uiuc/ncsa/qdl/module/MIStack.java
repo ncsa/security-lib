@@ -20,7 +20,7 @@ import java.util.Set;
  * <p>Created by Jeff Gaynor<br>
  * on 1/29/22 at  7:25 AM
  */
-public class MIStack<V extends MITable2<? extends XKey, ? extends MIWrapper>> extends XStack<V> implements Serializable {
+public class MIStack<V extends MITable<? extends XKey, ? extends MIWrapper>> extends XStack<V> implements Serializable {
     public MIStack() {
         pushNewTable();
     }
@@ -32,7 +32,7 @@ public class MIStack<V extends MITable2<? extends XKey, ? extends MIWrapper>> ex
 
     @Override
     public XTable newTableInstance() {
-        return new MITable2();
+        return new MITable();
     }
 
     @Override

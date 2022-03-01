@@ -1,4 +1,4 @@
-package edu.uiuc.ncsa.qdl.state;
+package edu.uiuc.ncsa.qdl.state.legacy;
 
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 

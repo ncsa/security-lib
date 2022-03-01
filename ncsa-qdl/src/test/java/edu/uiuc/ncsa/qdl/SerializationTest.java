@@ -113,6 +113,7 @@ public class SerializationTest extends AbstractQDLTester {
         addLine(script, "c := '<baz><baz>';");
         addLine(script, "d := 'woof]]>';"); // close tag of XML CDATA section
         addLine(script, "f(x)->'<![CDATA[[' + x + ']]>';");
+        addLine(script, "module['a:a','A'][f(x)->'<![CDATA[[' + x + '2]]>';];");
         state = roundTripStateSerialization(state, script);
         script = new StringBuffer();
         addLine(script, "okf := f('foo') == '<![CDATA[[foo]]>';");
@@ -120,6 +121,8 @@ public class SerializationTest extends AbstractQDLTester {
         addLine(script, "okb := b=='</baz></baz>';");
         addLine(script, "okc := c=='<baz><baz>';");
         addLine(script, "okd := d=='woof]]>';");
+        addLine(script,"module_import('a:a');");
+        addLine(script,"okmf := A#f('foo') == '<![CDATA[[foo2]]>';");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
@@ -128,6 +131,7 @@ public class SerializationTest extends AbstractQDLTester {
         assert getBooleanValue("okc", state) : "multiple open XML tags in variable fails.";
         assert getBooleanValue("okd", state) : "close CDATA XML tag in variable fails.";
         assert getBooleanValue("okf", state) : "embedded CDATA section in function fails.";
+        assert getBooleanValue("okmf", state) : "embedded CDATA section in module function fails.";
 
     }
 

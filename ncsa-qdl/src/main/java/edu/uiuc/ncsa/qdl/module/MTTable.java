@@ -26,7 +26,7 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
  * <p>Created by Jeff Gaynor<br>
  * on 12/14/21 at  12:22 PM
  */
-public class MTTable2<K extends MTKey, V extends Module>  extends   XTable<K, V> {
+public class MTTable<K extends MTKey, V extends Module>  extends   XTable<K, V> {
     // class MITable2<K extends XKey, V extends MIWrapper> extends   XTable<K, V>
     @Override
     public V put(XThing value) {

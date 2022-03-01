@@ -18,7 +18,6 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import java.io.Serializable;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -219,11 +218,6 @@ public abstract class Module implements XThing, Serializable {
      * @throws XMLStreamException
      */
     public void writeExtraXMLElements(XMLStreamWriter xsw) throws XMLStreamException {
-        if (!getListByTag().isEmpty()) {
-            xsw.writeStartElement(MODULE_DOCUMENTATION_TAG);
-            xsw.writeCData(Base64.encodeBase64URLSafeString(StringUtils.listToString(getListByTag()).getBytes(StandardCharsets.UTF_8)));
-            xsw.writeEndElement();
-        }
     }
 
     /**
@@ -262,16 +256,15 @@ public abstract class Module implements XThing, Serializable {
                                 if(state.getMTemplates().isEmpty()) {
                                     // fall through case -- nothing resulted.
                                     throw new IllegalStateException("no module found");
-/*
-                                    ModuleStatement moduleStatement = new ModuleStatement();
-                                    moduleStatement.setSourceCode(source);
-                                    qdlModule.setModuleStatement(moduleStatement);
-*/
-
                                 }else{
                                     // Get the actual interpreted ModuleStatement
                                     QDLModule tempM = (QDLModule) state.getMTemplates().getAll().get(0);
                                     qdlModule.setModuleStatement(tempM.getModuleStatement());
+                                    qdlModule.setDocumentation(tempM.getModuleStatement().getDocumentation());
+                                    qdlModule.setAlias(tempM.getAlias());
+                                    qdlModule.setNamespace(tempM.getNamespace());
+                                    qdlModule.setParentTemplateID(tempM.getParentTemplateID());
+                                    // Note that the source is gotten from the ModuleStatement
                                 }
                             } catch (Throwable e) {
                                 e.printStackTrace();

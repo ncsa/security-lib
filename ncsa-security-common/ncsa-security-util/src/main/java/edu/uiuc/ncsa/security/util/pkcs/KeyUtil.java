@@ -82,6 +82,8 @@ public class KeyUtil {
         PublicKey publicKey = fromX509PEM(publicFR);
         //KeyPair keyPair = keyPairFromPKCS1(publicKey, privateKey);
         System.out.println("keypair valid = " + validateKeyPair(publicKey, privateKey));
+        KeyPair kp = generateKeyPair();
+        System.out.println("generated keypair:" + kp);
     }
 
     public static PrivateKey fromPKCS1PEM(Reader reader) throws Exception {

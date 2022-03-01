@@ -1,4 +1,6 @@
-package edu.uiuc.ncsa.qdl.module;
+package edu.uiuc.ncsa.qdl.module.legacy;
+
+import edu.uiuc.ncsa.qdl.module.Module;
 
 import java.net.URI;
 import java.util.ArrayList;
