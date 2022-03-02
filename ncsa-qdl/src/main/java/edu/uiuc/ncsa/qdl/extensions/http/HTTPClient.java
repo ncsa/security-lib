@@ -43,7 +43,8 @@ import java.util.Base64;
 import java.util.List;
 
 /**
- * Class that is the workhorse for {@link QDLHTTPModule}.
+ * Class that is the workhorse for {@link QDLHTTPModule}. See the blurb <br/>
+ * /home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/docs/http-extension.odt
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/21 at  7:02 AM
  */
@@ -58,6 +59,30 @@ q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java') ;
        http#open();
         z. := http#get({'sub':'https://nagim.dev/p/wjaha-ppqrg-10000'});
 
+  Ex. Doing a DB service (to CILogon) all to my local box with a self-signed cert.
+      This approves the user with the user_code who has a pending flow
+
+      q := module_load('edu.uiuc.ncsa.qdl.extensions.http.QDLHTTPLoader','java') ;
+      module_import(q) ;
+      http#host('https://localhost:9443/oauth2/dbService');
+      http#open(true);
+      http#get({'action':'userCodeApproved','approved':'1','user_code':'JJX-J6N-RJ6'})
+
+{
+ headers: {
+  Transfer-Encoding:chunked,
+  Server:Apache-Coyote/1.1,
+  Date:Wed, 02 Mar 2022 12:16:18 GMT,
+  Content-Type:oa4mp:form_encoding;charset=UTF-8
+ },
+ content: [status=0,client_id=localhost:test/df,grant=NB2HI4B2F4XWY33DMFWGQ33TOQ5DSNBUGMXW6YLVORUDELZXMI3GMYRSHFSGKNTEGBRWKOBWMQ4TSZJSMM3TAN3FHE3TEZBQGI7XI6LQMU6WC5LUNB5EO4TBNZ2CM5DTHUYTMNBWGIZDGMBRGI2TSNZGOZSXE43JN5XD25RSFYYCM3DJMZSXI2LNMU6TSMBQGAYDA,user_code=JJX-J6N-RJ6],
+ status: {
+  code:200,
+  message:OK
+ }
+}
+
+  Which returns a status of 0 (so all ok), the client_id and the current base 32 encoded grant.
   */
 public class HTTPClient implements QDLModuleMetaClass {
     CloseableHttpClient httpClient = null;

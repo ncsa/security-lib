@@ -1,12 +1,13 @@
 package edu.uiuc.ncsa.security.util.cli.editing;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/21 at  8:09 AM
  */
-public class Editors {
+public class Editors implements Serializable {
     Map<String, EditorEntry> editors = new HashMap<>();
 
     public void put(EditorEntry editor) {

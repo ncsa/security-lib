@@ -18,10 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -29,6 +26,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Random;
 
 import static edu.uiuc.ncsa.security.core.util.StringUtils.isTrivial;
 
@@ -189,7 +187,7 @@ public class JSONWebKeyUtil {
         // first byte and would send [b0,b1,...] which would yield a negative modulus which in turn
         // causes an exception. This next call forces the bytes to be interpreted as positive (so it basically
         // just adds an initial byte of 0 if its missing):
-        return new BigInteger(1,Base64.decodeBase64(key.getString(component)));
+        return new BigInteger(1, Base64.decodeBase64(key.getString(component)));
     }
 
     protected static String bigIntToString(BigInteger bigInteger) {
@@ -214,6 +212,31 @@ public class JSONWebKeyUtil {
         return json;
     }
 
+    /**
+     * Create a new  {@link JSONWebKey} from a key pair. This creates a new random id too.
+     *
+     * @param keyPair
+     * @return
+     */
+    public static JSONWebKey create(KeyPair keyPair) {
+        JSONWebKey jsonWebKey = new JSONWebKey();
+        jsonWebKey.privateKey = keyPair.getPrivate();
+        jsonWebKey.publicKey = keyPair.getPublic();
+        if (jsonWebKey.privateKey instanceof RSAPrivateKey) {
+            jsonWebKey.type = "RSA";
+        } else {
+            throw new IllegalArgumentException("Unknown keypair type. Only RSA is supported");
+        }
+
+        Random random = new Random();
+        byte[] bytes = new byte[8];
+        random.nextBytes(bytes);
+        jsonWebKey.id = Base64.encodeBase64URLSafeString(bytes);
+        jsonWebKey.use = "sig";
+        jsonWebKey.algorithm = "RS256";
+        return jsonWebKey;
+    }
+
     public static JSONObject toJSON(JSONWebKey webKey) {
 
         if (webKey.type.equals("RSA")) {
@@ -226,7 +249,7 @@ public class JSONWebKeyUtil {
             jsonKey.put(USE, webKey.use);
             jsonKey.put(KEY_TYPE, "RSA");
             if (webKey.privateKey != null) {
-                if(webKey.privateKey instanceof RSAPrivateCrtKey){
+                if (webKey.privateKey instanceof RSAPrivateCrtKey) {
                     // CIL-1193 Support CRT (Chinese remainder theorem) in keys.
                     RSAPrivateCrtKey privateCrtKey = (RSAPrivateCrtKey) webKey.privateKey;
                     jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateCrtKey.getPrivateExponent()));
@@ -236,7 +259,7 @@ public class JSONWebKeyUtil {
                     jsonKey.put(RSA_EXPONENT_2, bigIntToString(privateCrtKey.getPrimeExponentQ()));
                     jsonKey.put(RSA_COEFFICIENTS, bigIntToString(privateCrtKey.getCrtCoefficient()));
 
-                }else{
+                } else {
                     // bare bones -- best we can do
                     RSAPrivateKey privateKey = (RSAPrivateKey) webKey.privateKey;
                     jsonKey.put(PRIVATE_EXPONENT, bigIntToString(privateKey.getPrivateExponent()));
@@ -333,12 +356,15 @@ public class JSONWebKeyUtil {
         JSONWebKeys jsonWebKeys;
 
         File f = new File("/home/ncsa/temp/zzz/python-keys.jwk");
-      //  File f = new File("/home/ncsa/temp/zzz/jwks.jwk");
+        //  File f = new File("/home/ncsa/temp/zzz/jwks.jwk");
         JSONWebKeys jwks = fromJSON(f);
         JSONWebKey key = jwks.getDefault();
         System.out.println("keys valid? " + KeyUtil.validateKeyPair(key.publicKey, key.privateKey));
         System.out.println("full key=" + toJSON(key).toString(2));
         System.out.println();
         System.out.println("public keys = " + toJSON(makePublic(jwks)).toString(2));
+
+        KeyPair kp = KeyUtil.generateKeyPair();
+        System.out.println(toJSON(create(kp)).toString(2));
     }
 }

@@ -15,7 +15,7 @@ import java.util.TreeSet;
  * <p>Created by Jeff Gaynor<br>
  * on 2/20/22 at  6:14 AM
  */
-public class VStack<V extends VTable<? extends XKey, ? extends VThing>> extends XStack<V> {
+public class VStack<V extends VTable<? extends XKey, ? extends VThing>> extends XStack<V>  {
     public VStack() {
         pushNewTable();
     }

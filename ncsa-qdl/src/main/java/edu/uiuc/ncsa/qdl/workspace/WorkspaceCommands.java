@@ -76,7 +76,7 @@ import static edu.uiuc.ncsa.security.util.cli.CLIDriver.HELP_SWITCH;
  * <p>Created by Jeff Gaynor<br>
  * on 1/30/20 at  9:21 AM
  */
-public class WorkspaceCommands implements Logable {
+public class WorkspaceCommands implements Logable, Serializable {
 
 
     public WorkspaceCommands() {
@@ -102,7 +102,7 @@ public class WorkspaceCommands implements Logable {
         return logger;
     }
 
-    public MyLoggingFacade logger;
+    public transient MyLoggingFacade logger;
 
     XProperties env;
 
@@ -3869,7 +3869,7 @@ public class WorkspaceCommands implements Logable {
             if (!silentMode) {
                 say("saved: '" + target.getCanonicalPath() +"'" +
                         "\n  on: " + new Date() +
-                        "\n  " + head +
+                        (0<head.length() ? "\n  " :"") + head + // trick to get no characters printed if head is empty (e.g. after java save)
                         "\n  bytes written: " + target.length() +
                         "\n  elapsed time: " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
                 //say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head + ". Elapsed time " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec."  );

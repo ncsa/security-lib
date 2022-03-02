@@ -2,6 +2,8 @@ package edu.uiuc.ncsa.security.oauth_2_0.jwt;
 
 import edu.uiuc.ncsa.security.core.exceptions.GeneralException;
 
+import java.net.URI;
+
 /**
  * If there is a user-created exception thrown by the {@link edu.uiuc.ncsa.security.util.scripting.ScriptRuntimeEngine}
  * this will be thrown. This allows for propagating error conditions inside of scripts outside whatever the runtime
@@ -44,4 +46,19 @@ public class ScriptRuntimeException extends GeneralException {
     }
 
     int status;
+
+    /**
+     * An error URI if one is needed. (Optional!)
+     * @return
+     */
+
+    public URI getErrorURI() {
+        return errorURI;
+    }
+
+    public void setErrorURI(URI errorURI) {
+        this.errorURI = errorURI;
+    }
+
+    URI errorURI = null;
 }

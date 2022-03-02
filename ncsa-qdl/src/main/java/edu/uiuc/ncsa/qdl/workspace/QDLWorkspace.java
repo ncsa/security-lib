@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.security.util.cli.InputLine;
 import edu.uiuc.ncsa.security.util.terminal.ISO6429IO;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
@@ -21,7 +22,7 @@ import static edu.uiuc.ncsa.qdl.workspace.WorkspaceCommands.*;
  * <p>Created by Jeff Gaynor<br>
  * on 1/11/20 at  4:21 PM
  */
-public class QDLWorkspace {
+public class QDLWorkspace implements Serializable {
 
     public QDLWorkspace(WorkspaceCommands workspaceCommands) {
         this.workspaceCommands = workspaceCommands;

@@ -16,6 +16,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -46,7 +47,7 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 11/8/21 at  6:27 AM
  */
-public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> {
+public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> implements Serializable {
     /**
      * Take an XStack and add all of the tables in this stack in the correct order
      * to the front of the stack. If XStack is [A,B,C,...] And the existing stack is

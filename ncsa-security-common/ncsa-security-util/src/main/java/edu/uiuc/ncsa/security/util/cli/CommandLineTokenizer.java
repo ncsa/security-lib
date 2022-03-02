@@ -1,4 +1,5 @@
 package edu.uiuc.ncsa.security.util.cli;
+import java.io.Serializable;
 import java.util.Vector;
 /**
  * This is a very specific tokenizer for command lines from the Dumb gridFTP client.
@@ -9,7 +10,7 @@ import java.util.Vector;
  * calls.
  *
  */
-public final class CommandLineTokenizer {
+public final class CommandLineTokenizer implements Serializable {
 	public char getQuoteDelimiter() {
 		return quoteDelimiter;
 	}

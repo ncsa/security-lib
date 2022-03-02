@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.util.cli.editing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  * <p>Created by Jeff Gaynor<br>
  * on 3/12/21 at  8:09 AM
  */
-public class EditorEntry {
+public class EditorEntry implements Serializable {
     public String name;
     public String exec;
     public boolean clearScreen;
