@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.Store;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
@@ -19,6 +20,8 @@ public interface TransactionStore<V extends BasicTransaction> extends Store<V> {
     V get(AccessToken accessToken);
 
     V get(Verifier verifier);
+
+    V getByProxyID(Identifier proxyID);
 
     MapConverter getMapConverter();
 

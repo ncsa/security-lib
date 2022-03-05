@@ -114,7 +114,7 @@ public class JWTRunner {
 
         // now for the actual getting of the claims
 
-        getFromSources(transaction.getFlowStates(),SRE_PRE_AUTH, true);
+        getFromSources(transaction.getFlowStates(), SRE_PRE_AUTH, true);
 
         doScript(ScriptingConstants.SRE_POST_AUTH);
 
@@ -174,7 +174,7 @@ public class JWTRunner {
     protected void doTokenClaims(boolean isRefresh) throws Throwable {
         doScript(isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT);
 
-        getFromSources(transaction.getFlowStates(),isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT, false);
+        getFromSources(transaction.getFlowStates(), isRefresh ? SRE_PRE_REFRESH : SRE_PRE_AT, false);
         if (isRefresh) {
             for (PayloadHandler h : handlers) {
                 h.setAccountingInformation();
@@ -234,7 +234,7 @@ public class JWTRunner {
                     trace(this, "user info for claim source #" + claimSource + " = " + claims.toString(1));
                 }
             }
-            if(claims != null){
+            if (claims != null) {
                 // make sure that chained claims get stashed if there are any.
                 // In functors it might not get set right, so do it here and be sure.
                 transaction.setUserMetaData(claims);
@@ -265,6 +265,11 @@ public class JWTRunner {
             @Override
             public Map<String, Object> getArgs() {
                 map.put(SRE_REQ_CLAIMS, transaction.getUserMetaData());
+                if (transaction.getProxyState().containsKey("claims")) {
+                    map.put(SRE_REQ_PROXY_CLAIMS, transaction.getProxyState().getJSONObject("claims"));
+                } else {
+                    map.put(SRE_REQ_PROXY_CLAIMS, new JSONObject());
+                }
                 // Any claim sources are injected by the appropriate handler since they typically
                 // require a great deal of state that is not available yet.
                 map.put(SRE_REQ_SCOPES, transaction.getScopes());

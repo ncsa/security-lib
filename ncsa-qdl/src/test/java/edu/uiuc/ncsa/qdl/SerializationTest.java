@@ -74,6 +74,36 @@ public class SerializationTest extends AbstractQDLTester {
     }
 
     /**
+     * Test as per above but with Java serialization. Mostly Java serialization fails if something is not flagged as
+     * serializable, so this is basically a test for that. We don't need to really hammer it like the XML case
+     * since we don't control the serialization mechanism -- we are just a user of it.
+     * @throws Throwable
+     */
+    public void testModulesJava() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][module['b:b','B'][a:=1;f(x)->a*x^2;];module_import('b:b','X');module_import('b:b','Y');X#a:=2;Y#a:=5;g(x)->X#f(x)*Y#f(x);];");
+        addLine(script, "module_import('a:a');");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // The state has been created and populated. Now we serialize it, then deserialize it.
+
+        // Serialize the workspace
+        state = pickleJavaState(state);
+
+        // Test that the things we set are faithfully recreated
+        script = new StringBuffer();
+        addLine(script, "g3 := g(3);"); // g(x) ends up being 10*x^4
+        addLine(script, "g1 := g(1);");
+        addLine(script, "ok := 810 ==g3;");
+        addLine(script, "ok1 := 10 ==g1;");
+        interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Expected g(3)==810, but got " + getLongValue("g3", state);
+        assert getBooleanValue("ok1", state) : "Expected g(1)==10, but got " + getLongValue("g1", state);
+    }
+
+    /**
      * Repeat a test that reads a module from a file, serializes the workspace, deserializes it and
      * runs the rest of the test.
      *

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.storage.impl;
 
 import edu.uiuc.ncsa.security.core.IdentifiableProvider;
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.TransactionStore;
@@ -42,6 +43,7 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
     TokenIndex agIndex;
     TokenIndex atIndex;
     TokenIndex vIndex;
+    TokenIndex proxyIDIndex = null;
 
 
     public TokenIndex getAgIndex() {
@@ -57,6 +59,13 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
             atIndex = new TokenIndex();
         }
         return atIndex;
+    }
+
+    public TokenIndex getProxyIDIndex() {
+        if (proxyIDIndex == null) {
+            proxyIDIndex = new TokenIndex();
+        }
+        return proxyIDIndex;
     }
 
 
@@ -77,6 +86,11 @@ public  class TransactionMemoryStore<V extends BasicTransaction> extends MemoryS
     @Override
     public V get(AccessToken accessToken) {
         return getAtIndex().get(accessToken.getToken());
+    }
+
+    @Override
+    public V getByProxyID(Identifier proxyID) {
+        return getProxyIDIndex().get(proxyID.toString());
     }
 
     @Override

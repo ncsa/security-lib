@@ -91,6 +91,26 @@ public class TF2Test extends TestBase {
         }
 
         @Override
+        public String getProxyId() {
+            return null;
+        }
+
+        @Override
+        public void setProxyId(String proxyId) {
+
+        }
+
+        @Override
+        public JSONObject getProxyState() {
+            return null;
+        }
+
+        @Override
+        public void setProxyState(JSONObject proxyState) {
+
+        }
+
+        @Override
         public List<String> getAudience() {
             return null;
         }

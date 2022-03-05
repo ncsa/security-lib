@@ -3860,7 +3860,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             long uncompressedXMLSize = -1L;
             if (doJava) {
-                _realSave(target);
+                javaSave(target);
             } else {
                 uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
             }
@@ -3994,9 +3994,11 @@ public class WorkspaceCommands implements Logable, Serializable {
         return uncompressedSize;
     }
 
-    private void _realSave(File target) throws IOException {
-        FileOutputStream fos = new FileOutputStream(target);
+    public void javaSave(File target) throws IOException {
         logger.info("saving workspace '" + target.getAbsolutePath() + "'");
+           javaSave(new FileOutputStream(target));
+    }
+    public void javaSave(OutputStream fos) throws IOException {
         WSInternals wsInternals = new WSInternals();
         wsInternals.defaultState = defaultState;
         wsInternals.currentPID = currentPID;
@@ -4081,9 +4083,23 @@ public class WorkspaceCommands implements Logable, Serializable {
     /*
     Does the actual work of loading a serialized file once the logic for what to do has been done.
      */
-    private boolean _javaLoad(File f) {
+    public boolean javaLoad(File f) {
         try {
-            FileInputStream fis = new FileInputStream(f);
+            javaLoad(new FileInputStream(f));
+            currentWorkspace = f;
+            return true;
+        } catch (FileNotFoundException t) {
+            if (DebugUtil.isEnabled()) {
+                t.printStackTrace();
+            }
+            say("sorry, but '" + f.getAbsolutePath() + "' does not exist");
+            t.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean javaLoad(InputStream fis) {
+        try {
             WSInternals wsInternals = (WSInternals) StateUtils.loadObject(fis);
 
             //State newState = StateUtils.load(fis);
@@ -4114,7 +4130,6 @@ public class WorkspaceCommands implements Logable, Serializable {
             interpreter.setEchoModeOn(isEchoModeOn());
             interpreter.setDebugOn(isDebugOn());
             state = newState;
-            currentWorkspace = f;
             if (runInitOnLoad && state.getFTStack().containsKey(new FKey(DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME, 0))) {
                 String runnit = DEFAULT_BOOT_FUNCTION_ON_LOAD_NAME + "();";
                 getInterpreter().execute(runnit);
@@ -4276,7 +4291,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 return RC_NO_OP;
             }
         }
-        loadOK = _javaLoad(target);
+        loadOK = javaLoad(target);
         if (!loadOK) {
             try {
                 loadOK = _xmlLoad(target);

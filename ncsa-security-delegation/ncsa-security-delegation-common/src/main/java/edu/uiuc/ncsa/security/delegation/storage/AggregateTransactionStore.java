@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.security.delegation.storage;
 
+import edu.uiuc.ncsa.security.core.Identifier;
 import edu.uiuc.ncsa.security.core.XMLConverter;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
@@ -24,6 +25,16 @@ public class AggregateTransactionStore<V extends TransactionStore> extends Aggre
         BasicTransaction t = null;
         for(TransactionStore s: stores){
            t = s.get(accessToken);
+            if(t != null) return t;
+        }
+        return null;
+    }
+
+    @Override
+    public BasicTransaction getByProxyID(Identifier proxyID) {
+        BasicTransaction t = null;
+        for(TransactionStore s: stores){
+           t = s.getByProxyID(proxyID);
             if(t != null) return t;
         }
         return null;

@@ -528,4 +528,9 @@ public class TransactionCache<V extends BasicTransaction> extends CachedMapFacad
     public boolean remove(List<Identifiable> objects) {
         throw new NotImplementedException("Error: This is not yet implemented for cache");
     }
+
+    @Override
+    public V getByProxyID(Identifier proxyID) {
+        throw new NotImplementedException("Error: This is not yet implemented for cache");
+    }
 }

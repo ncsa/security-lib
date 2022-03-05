@@ -21,6 +21,7 @@ public interface ScriptingConstants {
     String SRE_PRE_USER_INFO = "pre_user_info";
     String SRE_POST_USER_INFO = "post_user_info";
     String SRE_REQ_CLAIMS = "claims";
+    String SRE_REQ_PROXY_CLAIMS = "proxy_claims";
     String SRE_REQ_ACCESS_TOKEN = "access_token";
     String SRE_REQ_REFRESH_TOKEN = "refresh_token";
     String SRE_REQ_SCOPES = "scopes";

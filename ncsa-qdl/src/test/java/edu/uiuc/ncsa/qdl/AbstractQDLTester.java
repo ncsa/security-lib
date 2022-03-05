@@ -11,10 +11,7 @@ import edu.uiuc.ncsa.qdl.xml.XMLUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.*;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -255,6 +252,21 @@ public class AbstractQDLTester extends TestBase {
         StringReader reader = new StringReader(pp);
         XMLEventReader xer = createXER(reader);
         workspaceCommands.fromXML(xer);
+        return workspaceCommands.getInterpreter().getState();
+    }
+
+    protected State pickleJavaState(State state) throws Throwable {
+        // Serialize the workspace
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+        workspaceCommands.setState(state);
+        workspaceCommands.javaSave(baos);
+
+        // Deserialize the workspace
+        // Need pretty print. This takes the place or writing it to a file, then reading it.
+      //  System.out.println("XML:\n" + pp);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        workspaceCommands.javaLoad(bais);
         return workspaceCommands.getInterpreter().getState();
     }
 
