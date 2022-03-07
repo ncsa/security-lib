@@ -80,12 +80,14 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         }
         if (inputLine.getArgCount() == 0) {
             if (StringUtils.isTrivial(configName) && StringUtils.isTrivial(getConfigFile())) {
-                say("no configuration set");
+                info("no configuration set");
+                sayv("no configuration set");
                 return;
             }
             String m = StringUtils.isTrivial(configName) ? "no config name" : "current config name= \"" + configName;
             m = m + " " + (StringUtils.isTrivial(getConfigFile()) ? "no file set" : ("from file " + getConfigFile()));
-            say(m);
+            info(m);
+            sayv(m);
             return;
         }
         if (inputLine.hasArg(LIST_CFGS)) {
@@ -104,9 +106,9 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
         } else {
             fileName = getConfigFile();
         }
-        say("loading configuration from " + fileName + ", named " + configName);
+        sayv("loading configuration from " + fileName + ", named " + configName);
         loadConfig(fileName, configName);
-        say("done!");
+        sayv("done!");
     }
 
     boolean traceOn = false;
