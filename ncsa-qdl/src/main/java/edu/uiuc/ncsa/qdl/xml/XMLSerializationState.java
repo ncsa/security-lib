@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * This is for things like {@link edu.uiuc.ncsa.qdl.state.State} and {@link edu.uiuc.ncsa.qdl.module.Module}
  * objects that are to be references by uuid when serializing/deserializing to prevent infinite recursion.
- * As state and modules (which include state) gets seriqalized, this holds running accounts of
+ * As state and modules (which include state) gets serialized, this holds running accounts of
  * unique elements which are in turn serialized individually for the workspace.
  * <p>Created by Jeff Gaynor<br>
  * on 2/10/22 at  4:52 PM

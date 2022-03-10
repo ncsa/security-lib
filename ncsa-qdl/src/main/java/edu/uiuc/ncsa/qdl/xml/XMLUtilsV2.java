@@ -15,8 +15,10 @@ import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.UUID;
 
@@ -205,4 +207,18 @@ public class XMLUtilsV2 {
         throw new XMLMissingCloseTagException(closeTag);
     }
 
+    /**
+     * Converts a collection to a {@link JSONArray} then to a string. This is the
+     * compliment to {@link #getText(XMLEventReader, String)}.
+     * <h3>Use</h3>
+     * You write the start element, invoke this, then write the end element.
+     * @param xsw
+     * @param collection
+     * @return
+     */
+    public static void toCDATA(XMLStreamWriter xsw, Collection collection) throws XMLStreamException {
+           JSONArray jsonArray = new JSONArray();
+           jsonArray.addAll(collection);
+           xsw.writeCData(jsonArray.toString());
+    }
 }

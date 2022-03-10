@@ -11,11 +11,6 @@ import org.apache.commons.cli.*;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.XMLEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -174,62 +169,6 @@ public abstract class ConfigurableCommandsImpl implements Commands, ComponentMan
 
     }
 
-    /**
-     * Faster and smaller, but does not resolve file includes.
-     * @param inputLine
-     * @throws Exception
-     */
-    protected void oldlistConfigs(InputLine inputLine) throws Exception {
-        String targetFilename = getConfigFile();
-        if (inputLine.hasArg(FILE_SWITCH)) {
-            targetFilename = inputLine.getNextArgFor(FILE_SWITCH);
-            inputLine.removeSwitchAndValue(FILE_SWITCH);
-        }
-        if (StringUtils.isTrivial(targetFilename)) {
-            say("Sorry no configuration file specified.");
-            return;
-        }
-        File target = new File(targetFilename);
-
-        if (!target.exists()) {
-            say("Sorry but \"" + target.getAbsolutePath() + "\" does not exist.");
-            return;
-        }
-        if (!target.isFile()) {
-            say("Sorry but \"" + target.getAbsolutePath() + "\" is not a file.");
-            return;
-        }
-        String component = getComponentName();
-        FileReader fr = new FileReader(target);
-        XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        XMLEventReader xer = xmlif.createXMLEventReader(fr);
-        List<String> names = new ArrayList<>(); // To keep sorted
-        if (!xer.hasNext()) {
-            say("sorry but \"" + target.getAbsolutePath() + "\" does not contain XML.");
-            xer.close();
-            return;
-        }
-        XMLEvent xe;
-        say("reading " + component + " names from " + target.getAbsolutePath());
-        // really stupid loop to look for exactly one attribute in a specific tag.
-        while (xer.hasNext()) {
-            xe = xer.nextEvent();
-            if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(component)) {
-                Attribute a = xe.asStartElement().getAttributeByName(new QName("name"));
-                if (a != null) {
-                    names.add(a.getValue());
-                }
-            }
-        }
-        xer.close();
-
-        if (names.isEmpty()) {
-            say("no configurations found.");
-        } else {
-            FormatUtil.formatList(inputLine, names);
-            say("found " + names.size() + " entries. Done!");
-        }
-    }
 
     String LIST_CFGS = "-list";
 

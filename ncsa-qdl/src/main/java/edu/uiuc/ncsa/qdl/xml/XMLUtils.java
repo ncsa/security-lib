@@ -190,8 +190,12 @@ public class XMLUtils implements XMLConstants {
         // score card, we have a start event that either has char data to be converted to a
         // scalar or a stem.
         XMLEvent xe = xer.nextEvent(); // get current event
-        if (!xe.isStartElement()) {
-            throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
+        // Jump over white space, comments etc until we find the actual start tag.
+        while (xer.hasNext()) {
+            if (xe.isStartElement()) {
+                break;
+            }
+            xe = xer.nextEvent();
         }
         Object output = null;
         String tagName = xe.asStartElement().getName().getLocalPart();
@@ -214,21 +218,28 @@ public class XMLUtils implements XMLConstants {
                 if (xe.getEventType() != XMLEvent.CHARACTERS) {
                     throw new IllegalStateException("Error: Wrong XML tag type. line " + xe.getLocation().getLineNumber() + ", col " + xe.getLocation().getColumnNumber()); // just in case
                 }
-
-                while (xe.asCharacters().isWhiteSpace()) {
-                    xe = xer.nextEvent();
+                // CIL-1206
+                // All that SHOULD be here is white space. Loop along until the contents is found
+                // then grab it.
+                boolean doLoop = true;
+                while (doLoop && xer.hasNext()) {
+                    switch (xe.getEventType()) {
+                        case XMLEvent.CHARACTERS:
+                            if (!xe.asCharacters().isWhiteSpace()) {
+                                doLoop = false;
+                            }
+                            break;
+                        default:
+                            // hit something other than character data.
+                            doLoop = false;
+                            break;
+                    }
+                    if(doLoop) { // only advance the cursor if we have whitespace!
+                        xe = xer.nextEvent();
+                    }
                 }
-
-                //   System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: is CDATA = " + xe.asCharacters().isCData());
                 String raw = xe.asCharacters().getData();
-                //     System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: raw(" + raw.length() + " chars) = " + raw);
-              /*  if(xe.asCharacters().isCharacters()){
-                    System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: chars of chars " + xe.asCharacters().asCharacters().getData());
-                }*/
-                XMLEvent zz = xer.peek();
-               /* if(zz.isCharacters()){
-                    System.err.println(XMLUtils.class.getSimpleName() + ".resolveConstant: nmext chars " + zz.asCharacters().getData());
-                }*/
+
                 // several of these strip out the whitespace (which may include line feeds and other cruft.
                 switch (tagName) {
                     case INTEGER_TAG:
@@ -360,7 +371,8 @@ public class XMLUtils implements XMLConstants {
         xsw.writeEndElement();
     }
 
-    public static void deserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
+    public static void deserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws
+            XMLStreamException {
         XMLEvent xe = xer.peek();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
         state.getFTStack().fromXML(xer, qi);
@@ -374,7 +386,8 @@ public class XMLUtils implements XMLConstants {
      * @param state
      * @throws XMLStreamException
      */
-    public static void oldDeserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
+    public static void oldDeserializeFunctions(XMLEventReader xer, XProperties xp, State state) throws
+            XMLStreamException {
         XMLEvent xe = xer.nextEvent();
         QDLInterpreter qi = new QDLInterpreter(xp, state);
         while (xer.hasNext()) {
@@ -398,7 +411,8 @@ public class XMLUtils implements XMLConstants {
         throw new XMLMissingCloseTagException(FUNCTIONS_TAG);
     }
 
-    public static void deserializeImports(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
+    public static void deserializeImports(XMLEventReader xer, XProperties xp, State state) throws
+            XMLStreamException {
         XMLEvent xe = xer.nextEvent();
 
         while (xer.hasNext()) {
@@ -428,7 +442,8 @@ public class XMLUtils implements XMLConstants {
     }
 
 
-    public static void deserializeTemplates(XMLEventReader xer, XProperties xp, State state) throws XMLStreamException {
+    public static void deserializeTemplates(XMLEventReader xer, XProperties xp, State state) throws
+            XMLStreamException {
         XMLEvent xe = xer.nextEvent();
 
         while (xer.hasNext()) {
