@@ -120,7 +120,7 @@ public class HTTPClient implements QDLModuleMetaClass {
      * @param objects
      * @return a valid get/delete string of host+uri_path+?key0=value0&key1=value1...
      */
-    protected String paramsToRequest(Object[] objects) {
+    protected String paramsToRequest(Object[] objects) throws UnsupportedEncodingException {
         String actualHost = host;
         StemVariable parameters = null;
         if (objects.length == 2) {
@@ -137,12 +137,13 @@ public class HTTPClient implements QDLModuleMetaClass {
         String p = parameters.size() == 0 ? "" : "?";
         boolean isFirst = true;
         for (String key : parameters.keySet()) {
+            String v = URLEncoder.encode(parameters.getString(key), "UTF-8");
             if (isFirst) {
-                p = p + key + "=" + parameters.get(key);
+                p = p + key + "=" + v;
                 isFirst = false;
             } else {
-                p = p + "&" + key + "=" + parameters.get(key);
-
+                // Always encode parameters or this bombs on even simple calls.
+                p = p + "&" + key + "=" + v;
             }
         }
         return actualHost + p;
@@ -192,7 +193,12 @@ public class HTTPClient implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            String r = paramsToRequest(objects);
+            String r = null;
+            try {
+                r = paramsToRequest(objects);
+            } catch (UnsupportedEncodingException e) {
+                throw new QDLException("could not do " + getName() + " because of 'unsupported encoding exception': '" + e.getMessage() + "'");
+            }
             DebugUtil.trace(this, "getting from address " + r);
             HttpGet request = new HttpGet(r);
             if ((headers != null) && !headers.isEmpty()) {
@@ -640,7 +646,12 @@ public class HTTPClient implements QDLModuleMetaClass {
         @Override
         public Object evaluate(Object[] objects, State state) {
             checkInit();
-            String r = paramsToRequest(objects);
+            String r = null;
+            try {
+                r = paramsToRequest(objects);
+            } catch (UnsupportedEncodingException e) {
+                throw new QDLException("could not do " + getName() + " because of 'unsupported encoding exception': '" + e.getMessage() + "'");
+            }
             DebugUtil.trace(this, "delete from address " + r);
             HttpDelete request = new HttpDelete(r);
             if ((headers != null) && !headers.isEmpty()) {

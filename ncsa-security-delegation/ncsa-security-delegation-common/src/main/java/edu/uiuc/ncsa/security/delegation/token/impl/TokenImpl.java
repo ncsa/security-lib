@@ -33,6 +33,7 @@ public class TokenImpl implements NewToken {
 
     /**
      * If this is a JWT, then this returns the JTI. If not, it just returns the token.
+     *
      * @return
      */
     public URI getJti() {
@@ -44,6 +45,7 @@ public class TokenImpl implements NewToken {
     }
 
     URI jti;
+
     /**
      * Checks if the version is null, effectively meaning it was created before versions existed.
      *
@@ -200,9 +202,12 @@ public class TokenImpl implements NewToken {
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
-        json.put("token", token.toString());
         json.put(TIMESTAMP_TAG, issuedAt);
         json.put(LIFETIME_TAG, lifetime);
+        if (isJWT) {
+            json.put("jwt", token.toString());
+        }
+        json.put("token", jti.toString());
         return json;
     }
 
@@ -212,7 +217,14 @@ public class TokenImpl implements NewToken {
         if (!json.containsKey("token")) {
             throw new IllegalArgumentException("Error: the json object is not a token");
         }
-        token = URI.create(json.getString("token"));
+        jti = URI.create(json.getString("token"));
+        if (json.containsKey("jwt")) {
+            token = URI.create(json.getString("jwt"));
+            isJWT = true;
+        } else {
+            token = jti;
+            isJWT = false;
+        }
         if (json.containsKey(TIMESTAMP_TAG)) {
             issuedAt = json.getLong(TIMESTAMP_TAG);
         }
@@ -221,10 +233,11 @@ public class TokenImpl implements NewToken {
         }
     }
 
-    public String encodeToken(){
+    public String encodeToken() {
         return TokenUtils.b32EncodeToken(this);
     }
-    public void decodeToken(String b32Encoded){
+
+    public void decodeToken(String b32Encoded) {
         String rawToken = TokenUtils.b32DecodeToken(b32Encoded);
         URI newToken = URI.create(rawToken);
         setToken(newToken);

@@ -168,7 +168,6 @@ public class XMLUtils implements XMLConstants {
     public static List<String> readStemAsStrings(XMLEventReader xer) throws XMLStreamException {
         Object obj = resolveConstant(xer);
         DebugUtil.trace(XMLUtils.class, "returned obj= " + obj);
-        StemVariable stem = new StemVariable();
 
         if (obj == null) {
             return new ArrayList<>();
@@ -176,7 +175,7 @@ public class XMLUtils implements XMLConstants {
         if (!(obj instanceof StemVariable)) {
             throw new IllegalArgumentException("Error: expected a stem and got a " + obj.getClass().getSimpleName());
         }
-        return stem.getStemList().toJSON();
+        return ((StemVariable) obj).getStemList().toJSON();
     }
 
     /**

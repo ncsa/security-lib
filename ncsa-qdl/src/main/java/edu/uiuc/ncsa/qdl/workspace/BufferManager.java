@@ -10,8 +10,9 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
-import edu.uiuc.ncsa.qdl.xml.XMLUtils;
+import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
+import net.sf.json.JSONArray;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -86,9 +87,9 @@ public class BufferManager implements Serializable {
             }
             if (content != null && !content.isEmpty()) {
                 xsw.writeStartElement(BR_CONTENT);
-                StemVariable s = new StemVariable();
-                s.addList(content);
-                XMLUtils.write(xsw, s);
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.addAll(content);
+                xsw.writeCData(jsonArray.toString());
                 xsw.writeEndElement(); //end content tag
             }
             xsw.writeEndElement(); //end BR tag
@@ -130,12 +131,18 @@ public class BufferManager implements Serializable {
                 xe = xer.peek();
                 switch (xe.getEventType()) {
                     case XMLEvent.START_ELEMENT:
+                        if (xe.asStartElement().getName().getLocalPart().equals(BR_CONTENT)) {
+                            String raw = XMLUtilsV2.getText(xer, BR_CONTENT);
+                            content = JSONArray.fromObject(raw);
+                        }
+/*
                         if (xe.asStartElement().getName().getLocalPart().equals(STEM_TAG)) {
                             Object obj = XMLUtils.resolveConstant(xer);
                             if (obj instanceof StemVariable) {
                                 content = ((StemVariable) obj).getStemList().toJSON();
                             }
                         }
+*/
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORD)) {
@@ -359,6 +366,8 @@ public class BufferManager implements Serializable {
     public void toXML(XMLStreamWriter xsw) throws XMLStreamException {
         xsw.writeStartElement(BUFFER_MANAGER);
         xsw.writeStartElement(BUFFER_RECORDS);
+        // improvement might be to pass along the index and use that as part of the BR attributes. Someday?
+        // This relies on the implicit ordering in and out to keep the indices right.
         for (BufferRecord br : bufferRecords) {
             br.toXML(xsw);
         }

@@ -11,11 +11,17 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FStack;
-import edu.uiuc.ncsa.qdl.module.*;
+import edu.uiuc.ncsa.qdl.module.MIStack;
+import edu.uiuc.ncsa.qdl.module.MTKey;
+import edu.uiuc.ncsa.qdl.module.MTStack;
+import edu.uiuc.ncsa.qdl.module.Module;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.parsing.QDLParserDriver;
 import edu.uiuc.ncsa.qdl.parsing.QDLRunner;
-import edu.uiuc.ncsa.qdl.state.*;
+import edu.uiuc.ncsa.qdl.state.SIEntry;
+import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.state.StateUtils;
+import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -753,7 +759,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     public String getBufferDefaultSavePath() {
         if (bufferDefaultSavePath == null) {
-            if(getTempDir() != null){
+            if (getTempDir() != null) {
                 bufferDefaultSavePath = getTempDir().getAbsolutePath();
                 if (!bufferDefaultSavePath.endsWith("/")) {
                     bufferDefaultSavePath = bufferDefaultSavePath + "/";
@@ -1856,7 +1862,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 XKey xKey = new XKey(arg);
                 if (state.getMInstances().containsKey(xKey)) {
                     module = state.getMInstances().getModule(xKey);
-                    if(module!=null) {
+                    if (module != null) {
                         // pull it off the template.
                         module = state.getMTemplates().getModule(new MTKey(module.getNamespace()));
                     }
@@ -1912,7 +1918,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             return RC_CONTINUE;
         }
         for (Object key : getState().getMTemplates().keySet()) {
-            String out = getImportString(((MTKey)key).getUriKey());
+            String out = getImportString(((MTKey) key).getUriKey());
             m.add(out);
         }
         // so these are sorted. Print them
@@ -2293,6 +2299,12 @@ public class WorkspaceCommands implements Logable, Serializable {
                 sayi("          will treat the contents as text and set the variable to that.");
                 sayi("          Note that you won't need quotes around the string if you edit it with " + EDIT_TEXT_FLAG + ".");
                 sayi("          and you can enter linefeeds etc. which will be converted.");
+                sayi("          If you omit the -x flag, then the variable is treated as a string.");
+                sayi("\nE.g. Creating a variable of text\n");
+                sayi(")vars edit readme -x\n");
+                sayi("This would create a variable named readme (or edit it if it exists) in the external editor,");
+                sayi("treating the contents as text. This allows for writing very complex text (such as a read me for");
+                sayi("your workspace and is invaluable for writing documentation generally.");
                 return RC_NO_OP;
             case "system":
                 return _varsSystem(inputLine);
@@ -3363,7 +3375,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
         WSXMLSerializer serializer = new WSXMLSerializer();
         try {
-            WorkspaceCommands tempWSC = serializer.fromXML(xer, true);
+            WorkspaceCommands tempWSC = serializer.fromXML(xer, true, false);
             xer.close();
             wsLibEntry = getWsLibEntry(currentFile, gotCompressed, tempWSC);
             wsLibEntry.fileFormat = "xml";
@@ -3793,7 +3805,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         if (showFile) {
             try {
                 long uncompressedXMLSize = _xmlSave(target, compressionOn, showFile);
-                say("size: " + uncompressedXMLSize + "\n  elapsed time:" + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
+                say("size: " + uncompressedXMLSize + "\n  elapsed time:" + ((System.currentTimeMillis() - startTime) / 1000.0D) + " sec.");
                 return RC_CONTINUE;
             } catch (Throwable throwable) {
                 say("warning. could not show file \"" + throwable.getMessage() + "\"");
@@ -3854,7 +3866,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
             if (qdlDump || target.getAbsolutePath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)) {
                 _doQDLDump(target);
-                say("saved '" + target.getAbsolutePath() + "'\n  bytes: " + target.length() + "\n  elapsed time:" +((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
+                say("saved '" + target.getAbsolutePath() + "'\n  bytes: " + target.length() + "\n  elapsed time:" + ((System.currentTimeMillis() - startTime) / 1000.0D) + " sec.");
 //                say("dumped " + target.length() + " bytes to '" + target.getAbsolutePath() + "'. Elapsed time " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
                 return RC_CONTINUE;
             }
@@ -3867,11 +3879,11 @@ public class WorkspaceCommands implements Logable, Serializable {
             //String head = 0 <= uncompressedXMLSize ? (", uncompressed size: " + uncompressedXMLSize + " ") : "";
             String head = 0 <= uncompressedXMLSize ? ("uncompressed size: " + uncompressedXMLSize + " ") : "";
             if (!silentMode) {
-                say("saved: '" + target.getCanonicalPath() +"'" +
+                say("saved: '" + target.getCanonicalPath() + "'" +
                         "\n  on: " + new Date() +
-                        (0<head.length() ? "\n  " :"") + head + // trick to get no characters printed if head is empty (e.g. after java save)
+                        (0 < head.length() ? "\n  " : "") + head + // trick to get no characters printed if head is empty (e.g. after java save)
                         "\n  bytes written: " + target.length() +
-                        "\n  elapsed time: " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec.");
+                        "\n  elapsed time: " + ((System.currentTimeMillis() - startTime) / 1000.0D) + " sec.");
                 //say("Saved " + target.length() + " bytes to " + target.getCanonicalPath() + " on " + (new Date()) + head + ". Elapsed time " + ((System.currentTimeMillis() - startTime)/1000.0D) + " sec."  );
             }
             if (!keepCurrentWS) {
@@ -3897,7 +3909,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         fileWriter.write("\n/* ** module definitions ** */\n");
 
         for (Object kk : getState().getMTemplates().keySet()) {
-            MTKey key = (MTKey)kk;
+            MTKey key = (MTKey) kk;
             String output = inputFormModule(key.getUriKey(), state);
             if (output.startsWith(JAVA_CLASS_MARKER)) {
                 output = SystemEvaluator.MODULE_LOAD + "('" + output.substring(JAVA_CLASS_MARKER.length())
@@ -3910,7 +3922,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         fileWriter.write("\n/* ** module imports ** */\n");
 
         for (Object kk : getState().getMInstances().keySet()) {
-            XKey key = (XKey)kk;
+            XKey key = (XKey) kk;
             Module module = getState().getMInstances().getModule(key);
             List<String> aliases = getState().getMInstances().getAliasesAsString(module.getMTKey());
             for (String alias : aliases) {
@@ -3926,7 +3938,7 @@ public class WorkspaceCommands implements Logable, Serializable {
          */
         fileWriter.write("\n/* ** user defined variables ** */\n");
         for (Object varName : state.getVStack().listVariables()) {
-            String output = inputFormVar((String)varName, 2, state);
+            String output = inputFormVar((String) varName, 2, state);
             fileWriter.write(varName + " := " + output + ";\n");
         }
 
@@ -3996,8 +4008,9 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     public void javaSave(File target) throws IOException {
         logger.info("saving workspace '" + target.getAbsolutePath() + "'");
-           javaSave(new FileOutputStream(target));
+        javaSave(new FileOutputStream(target));
     }
+
     public void javaSave(OutputStream fos) throws IOException {
         WSInternals wsInternals = new WSInternals();
         wsInternals.defaultState = defaultState;
@@ -4016,7 +4029,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         StateUtils.saveObject(wsInternals, fos);
     }
 
-    private boolean _xmlLoad(File f) {
+    private boolean _xmlLoad(File f, boolean skipBadModules) {
         // The file may be in XML format. If not, then it is assumed to be
         // zipped and binary.
         // First attempt is to assume no compression
@@ -4030,7 +4043,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         if (xer != null) {
             try {
-                fromXML(xer);
+                fromXML(xer, skipBadModules);
                 xer.close();
                 currentWorkspace = f;
                 getState().setWorkspaceCommands(this);
@@ -4067,7 +4080,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
 
         try {
-            fromXML(xer);
+            fromXML(xer, skipBadModules);
             xer.close();
             currentWorkspace = f;
             return true;
@@ -4085,9 +4098,11 @@ public class WorkspaceCommands implements Logable, Serializable {
      */
     public boolean javaLoad(File f) {
         try {
-            javaLoad(new FileInputStream(f));
-            currentWorkspace = f;
-            return true;
+            if(javaLoad(new FileInputStream(f))){
+                currentWorkspace = f;
+                return true;
+            }
+            return false;
         } catch (FileNotFoundException t) {
             if (DebugUtil.isEnabled()) {
                 t.printStackTrace();
@@ -4148,6 +4163,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     File currentWorkspace;
     public final String RELOAD_FLAG = SWITCH + "reload";
+    public final String SKIP_BAD_MODULES_FLAG = SWITCH + "skip_bad_modules";
 
     private int _wsLoad(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -4158,6 +4174,9 @@ public class WorkspaceCommands implements Logable, Serializable {
             sayi(KEEP_WSF + " = keep the current " + CURRENT_WORKSPACE_FILE + " rather than automatically updating it");
             sayi(QDL_DUMP_FLAG + " = the format of the file is QDL. This loads it into the current workspace.");
             sayi(JAVA_FLAG + " = the format of the file is serialized java. default is XML");
+            sayi(SKIP_BAD_MODULES_FLAG + " = (xml only) if a module is missing or fails to load, continue, otherwise abort the entire load.");
+            sayi("   Note that skipping modules will cause many errors later and result in an not fully functional workspace." +
+                    "\n   As such it should only be done except in dire cases.");
             sayi("If there is no file given, the current workspace is used.");
             sayi("If you dumped a workspace to QDL, you may simply load it as any other script");
             sayi("e.g.");
@@ -4175,6 +4194,8 @@ public class WorkspaceCommands implements Logable, Serializable {
         inputLine.removeSwitch(QDL_DUMP_FLAG);
         boolean isJava = inputLine.hasArg(JAVA_FLAG) && !isQDLDump; // QDL has right of way
         inputLine.removeSwitch(JAVA_FLAG);
+        boolean skipBadModules = inputLine.hasArg(SKIP_BAD_MODULES_FLAG);
+        inputLine.removeSwitch(SKIP_BAD_MODULES_FLAG);;
 
         if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             fName = inputLine.getArg(FIRST_ARG_INDEX);
@@ -4294,7 +4315,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         loadOK = javaLoad(target);
         if (!loadOK) {
             try {
-                loadOK = _xmlLoad(target);
+                loadOK = _xmlLoad(target, skipBadModules);
             } catch (DeserializationException deserializationException) {
                 say("Could not deserialize workspace: " + deserializationException.getMessage());
                 return RC_NO_OP;
@@ -4394,6 +4415,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     /**
      * This is used in serialization tests. Generally you should never set the state this way.
+     *
      * @param state
      */
     public void setState(State state) {
@@ -5021,13 +5043,13 @@ public class WorkspaceCommands implements Logable, Serializable {
         serializer.toXML(this, xsw);
     }
 
-    public boolean fromXML(XMLEventReader xer) throws XMLStreamException {
+    public boolean fromXML(XMLEventReader xer, boolean skipBadModules) throws XMLStreamException {
         WSXMLSerializer serializer = new WSXMLSerializer();
         WorkspaceCommands newCommands = null;
 
         try {
             IOInterface ioInterface = getIoInterface();
-            newCommands = serializer.fromXML(xer);
+            newCommands = serializer.fromXML(xer, skipBadModules);
             State oldState = getState();
             newCommands.getState().injectTransientFields(oldState);
             // later this is injected into the state. Set it here or custom IO fails later.
@@ -5082,10 +5104,10 @@ public class WorkspaceCommands implements Logable, Serializable {
             // This should return a nice message to display.
             // It is possible that the workspace cannot even pick itself off the floor in which case
             // the state or even the logger might not exist. 
-            if(getState() != null && getState().getLogger() != null) {
+            if (getState() != null && getState().getLogger() != null) {
                 getState().getLogger().error("Could not deserialize workspace:" + t.getMessage(), t);
             }
-            if(isDebugOn()){
+            if (isDebugOn()) {
                 t.printStackTrace();
             }
             //return false;

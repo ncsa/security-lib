@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.xml;
 
+import edu.uiuc.ncsa.qdl.exceptions.DeserializationException;
 import edu.uiuc.ncsa.qdl.extensions.JavaModule;
 import edu.uiuc.ncsa.qdl.functions.FStack;
 import edu.uiuc.ncsa.qdl.module.MIStack;
@@ -10,6 +11,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.StateUtils;
 import edu.uiuc.ncsa.qdl.state.XStack;
 import edu.uiuc.ncsa.qdl.variables.VStack;
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
 
@@ -43,7 +45,9 @@ public class XMLUtilsV2 {
                         // type of module to create.
                         XMLUtils.ModuleAttributes moduleAttributes = XMLUtils.getModuleAttributes(xe);
                         Module module = deserializeTemplate(xer, moduleAttributes, XMLSerializationState);
-                        XMLSerializationState.addTemplate(module);
+                        if(module != null) {
+                            XMLSerializationState.addTemplate(module);
+                        }
                     }
                     break;
                 case XMLEvent.END_ELEMENT:
@@ -93,10 +97,10 @@ public class XMLUtilsV2 {
      *
      * @param xer
      * @param moduleAttributes
-     * @param XMLSerializationState
+     * @param xmlSerializationState
      * @return
      */
-    public static Module deserializeTemplate(XMLEventReader xer, XMLUtils.ModuleAttributes moduleAttributes, XMLSerializationState XMLSerializationState) throws XMLStreamException {
+    public static Module deserializeTemplate(XMLEventReader xer, XMLUtils.ModuleAttributes moduleAttributes, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         Module module = null;
 
         if (moduleAttributes.isJavaModule()) {
@@ -108,14 +112,17 @@ public class XMLUtilsV2 {
                 module = ((JavaModule) klasse.newInstance()).newInstance(null); // this populates the functions and variables!!
                 ((JavaModule) module).setClassName(moduleAttributes.className);
             } catch (Throwable t) {
-                System.out.println("Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '" + t.getMessage() + "' (" + t.getClass().getName() + ")");
-                //throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
+                DebugUtil.trace(XMLUtilsV2.class, "Warn: cannot deserialize class \"" + moduleAttributes.className + "\". Skipping. '" + t.getMessage() + "' (" + t.getClass().getName() + ")");
+                if(!xmlSerializationState.skipBadModules) {
+                    throw new DeserializationException("cannot deserialize class \"" + moduleAttributes.className + "\".", t);
+                }
+                return null;
             }
 
         } else {
             module = new QDLModule();
         }
-        module.fromXML(xer, XMLSerializationState, true);
+        module.fromXML(xer, xmlSerializationState, true);
         module.setId(moduleAttributes.uuid);
         module.setAlias(moduleAttributes.alias);
         module.setNamespace(moduleAttributes.ns);

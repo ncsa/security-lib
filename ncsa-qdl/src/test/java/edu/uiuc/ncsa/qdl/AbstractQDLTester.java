@@ -251,7 +251,7 @@ public class AbstractQDLTester extends TestBase {
       //  System.out.println("XML:\n" + pp);
         StringReader reader = new StringReader(pp);
         XMLEventReader xer = createXER(reader);
-        workspaceCommands.fromXML(xer);
+        workspaceCommands.fromXML(xer, false);
         return workspaceCommands.getInterpreter().getState();
     }
 

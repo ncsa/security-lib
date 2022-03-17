@@ -291,12 +291,13 @@ public class WSXMLSerializer {
         }
     }
 
-    public WorkspaceCommands fromXML(XMLEventReader xer) throws XMLStreamException {
-        return fromXML(xer, false);
+
+    public WorkspaceCommands fromXML(XMLEventReader xer, boolean skipBadModules) throws XMLStreamException {
+        return fromXML(xer, false, skipBadModules);
 
     }
 
-    public WorkspaceCommands fromXML(XMLEventReader xer, boolean workspaceAttributesOnly) throws XMLStreamException {
+    public WorkspaceCommands fromXML(XMLEventReader xer, boolean workspaceAttributesOnly, boolean skipBadModules) throws XMLStreamException {
         if (!xer.hasNext()) {
             say("Error! no XML found to deserialize");
         }
@@ -307,6 +308,7 @@ public class WSXMLSerializer {
         // search for first workspace tag
         boolean hasWorkspaceTag = false;
         XMLSerializationState xmlSerializationState = new XMLSerializationState();
+        xmlSerializationState.skipBadModules = skipBadModules;
         while (xer.hasNext()) {
             xe = xer.nextEvent(); // SHOULD be the workspace tag but there can be comments, DTDs etc.
             if (xe.isStartElement() && xe.asStartElement().getName().getLocalPart().equals(WORKSPACE_TAG)) {
