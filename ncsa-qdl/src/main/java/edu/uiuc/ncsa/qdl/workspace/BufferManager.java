@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import net.sf.json.JSONArray;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -21,6 +22,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 import java.io.File;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.xml.XMLConstants.*;
@@ -89,7 +91,7 @@ public class BufferManager implements Serializable {
                 xsw.writeStartElement(BR_CONTENT);
                 JSONArray jsonArray = new JSONArray();
                 jsonArray.addAll(content);
-                xsw.writeCData(jsonArray.toString());
+                xsw.writeCData(Base64.encodeBase64URLSafeString(jsonArray.toString().getBytes(StandardCharsets.UTF_8)));
                 xsw.writeEndElement(); //end content tag
             }
             xsw.writeEndElement(); //end BR tag
@@ -132,17 +134,9 @@ public class BufferManager implements Serializable {
                 switch (xe.getEventType()) {
                     case XMLEvent.START_ELEMENT:
                         if (xe.asStartElement().getName().getLocalPart().equals(BR_CONTENT)) {
-                            String raw = XMLUtilsV2.getText(xer, BR_CONTENT);
+                            String raw = new String(Base64.decodeBase64(XMLUtilsV2.getText(xer, BR_CONTENT)));
                             content = JSONArray.fromObject(raw);
                         }
-/*
-                        if (xe.asStartElement().getName().getLocalPart().equals(STEM_TAG)) {
-                            Object obj = XMLUtils.resolveConstant(xer);
-                            if (obj instanceof StemVariable) {
-                                content = ((StemVariable) obj).getStemList().toJSON();
-                            }
-                        }
-*/
                         break;
                     case XMLEvent.END_ELEMENT:
                         if (xe.asEndElement().getName().getLocalPart().equals(BUFFER_RECORD)) {
