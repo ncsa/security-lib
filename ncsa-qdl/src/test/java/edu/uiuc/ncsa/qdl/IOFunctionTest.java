@@ -28,7 +28,7 @@ public class IOFunctionTest extends AbstractQDLTester {
         System.out.println("you entered:\"" + polyad.getResult() + "\"");
     }
 
-     
+
     public void testSay() throws Exception {
         State state = testUtils.getNewState();
         Polyad polyad = new Polyad(SystemEvaluator.SAY_FUNCTION);
@@ -39,12 +39,12 @@ public class IOFunctionTest extends AbstractQDLTester {
         System.out.println("Check that the phrase \"" + testString + "\" was printed");
     }
 
-    public void testIniFileRead() throws Throwable{
+    public void testIniFileRead() throws Throwable {
         String file = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/sample.ini";
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "out. := file_read('" + file + "', 2);"); // INIT files are type 2
-        
+
         addLine(script, "ok0 := 'Fiona Smythe' == out.owner.name;");
         addLine(script, "ok1 := 'Big State University/Physics' == out.owner.organization.0;");
         addLine(script, "ok2 := 'Big State University/Astronomy' == out.owner.organization.1;");
@@ -59,7 +59,8 @@ public class IOFunctionTest extends AbstractQDLTester {
         assert getBooleanValue("ok4", state);
 
     }
-    public void testIniFileWrite() throws Throwable{
+
+    public void testIniFileWrite() throws Throwable {
         String rawIni = "{'owner':{'organization':['Big State University/Physics','Big State University/Astronomy'], 'name':'Fiona Smythe'}, 'database':{'server':'192.168.1.42', 'port':1029}}";
         String file = "/tmp/ini_test.ini";
         State state = testUtils.getNewState();
@@ -83,4 +84,37 @@ public class IOFunctionTest extends AbstractQDLTester {
         assert getBooleanValue("ok4", state);
 
     }
+
+    /**
+     * Note that the assumption is that the clipboard DOES exist in the current runtime environment
+     *
+     * @throws Throwable
+     */
+    public void testClipboardExists() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := cb_exists();");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Clipboard does not exist";
+    }
+
+    public void testClipboardWriteAndRead() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        String testLine = "mairzy doats and dozey doats";
+        addLine(script, "test_line := '" + testLine + "';");
+        // add some line feeds to show they are removed
+        addLine(script, "write_ok := cb_write(test_line + '\\n\\n\\n');");
+        addLine(script, "read_line := cb_read();");
+        addLine(script, "read_ok := read_line == test_line;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        System.out.println(script.toString());
+        interpreter.execute(script.toString());
+        assert getBooleanValue("write_ok", state) : "Clipboard write ok";
+        assert getBooleanValue("read_ok", state) : "Clipboard read failed. Expected " +
+                testLine + ", but got " +
+                getStringValue("read_line", state);
+    }
+
 }

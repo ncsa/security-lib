@@ -620,12 +620,8 @@ public class StringUtils {
      * @return
      */
     public static List<String> stringToList(String s) {
-        StringTokenizer stringTokenizer = new StringTokenizer(s, "\n");
-        List<String> output = new ArrayList<>();
-        while (stringTokenizer.hasMoreTokens()) {
-            output.add(stringTokenizer.nextToken());
-        }
-        return output;
+        String lines[] = s.split("\\r?\\n");
+        return new ArrayList<>(Arrays.asList(lines));
     }
 
     public static final String tableFieldDelimiter = "|";
@@ -686,12 +682,12 @@ public class StringUtils {
             for (int j = 0; j < row.size(); j++) {
                 String delim = showDelimiter ? (" " + tableFieldDelimiter + " ") : "";
                 String entry;
-                if(StringUtils.isTrivial(row.get(j) )) {
+                if (StringUtils.isTrivial(row.get(j))) {
                     entry = getBlanks(columnWidths.get(j));
-                }else{
+                } else {
                     entry = justify(row.get(j), columnWidths.get(j), false);
                 }
-                r = r + (firstPass ? "" : delim) + entry ;
+                r = r + (firstPass ? "" : delim) + entry;
                 if (firstPass) {
                     firstPass = false;
                 }

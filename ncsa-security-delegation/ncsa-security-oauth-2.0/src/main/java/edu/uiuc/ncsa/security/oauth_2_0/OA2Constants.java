@@ -49,7 +49,7 @@ public interface OA2Constants {
     public static String GRANT_TYPE_DEVICE_FLOW = "urn:ietf:params:oauth:grant-type:device_code";
 
     // CIL-771 proposed grant type
-    String GRANT_TYPE_TOKEN_INFO = "urn:cilogon:params:oauth:grant-type:token-info";
+    String GRANT_TYPE_TOKEN_INFO = "urn:oa4mp:params:oauth:grant-type:token-info";
 
     public static String NONCE = "nonce";
     public static String PROMPT = "prompt";

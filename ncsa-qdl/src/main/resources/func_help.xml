@@ -3371,6 +3371,69 @@ true
                   ]]>
               </body>
           </entry>
+
+    <entry id="cb_exists">
+            <body>
+                <![CDATA[
+cb_exists() - boolean valued function to see if the current Java
+              environment supports clipboard operations.
+              true if supported, false otherwise.
+See also: cb_read, cb_write
+                ]]>
+            </body>
+        </entry>
+    <entry id="cb_read">
+            <body>
+                <![CDATA[
+cb_read() - read the value of the clipboard as a string.
+            You must do any conversions you want afterwards.
+
+Note that this will trim any lead/trailing whitespace
+since different applications have very different ideas about
+that, so it's better to just get rid of it. While we can write
+QDL objects to the clipboard, at this point, reading them is
+strictly as a string.
+
+E.g.
+  cb_read()
+mairzy doats
+
+This means that the string 'mairzy doats' was in the clipboard.
+See also: cb_exists, cb_write
+                ]]>
+            </body>
+        </entry>
+    <entry id="cb_write">
+            <body>
+                <![CDATA[
+cb_write(arg | arg.) - write the argument as a string to the clipboard.
+               Returns a true if the operation succeeded and
+               false otherwise. Note that stems are converted to JSON
+               first.
+
+E.g.
+   cb_write('mairzy doats')
+true
+See also: cb_exists, cb_read
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="clipboard">
+            <body>
+                <![CDATA[
+QDL does support clipboard operations with the provisio that the
+system supports them too. This is not always a given. The three main
+functions are
+cb_exists - boolean function to check if there is a system clipboard
+  cb_read - read the current value of the clipboard as a string
+ cb_write - write a string to the clipboard
+
+ QDL is restricted to only reading/writing string since other data types
+ may be very hard indeed to parse.
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

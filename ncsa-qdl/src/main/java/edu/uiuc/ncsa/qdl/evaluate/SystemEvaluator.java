@@ -35,12 +35,15 @@ import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.StringReader;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
+import java.util.List;
 import java.util.logging.Level;
 
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
@@ -174,10 +177,23 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String WS_MACRO = "ws_macro";
     public static final int WS_MACRO_COMMAND_TYPE = 404 + SYSTEM_BASE_VALUE;
 
+    public static final String HAS_CLIPBOARD = "cb_exists";
+    public static final int HAS_CLIPBOARD_COMMAND_TYPE = 405 + SYSTEM_BASE_VALUE;
+
+    public static final String CLIPBOARD_COPY = "cb_read";
+    public static final int CLIPBOARD_COPY_COMMAND_TYPE = 406 + SYSTEM_BASE_VALUE;
+
+    public static final String CLIPBOARD_PASTE = "cb_write";
+    public static final int CLIPBOARD_PASTE_COMMAND_TYPE = 407 + SYSTEM_BASE_VALUE;
+
+
     @Override
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
+                    HAS_CLIPBOARD,
+                    CLIPBOARD_COPY,
+                    CLIPBOARD_PASTE,
                     WS_MACRO,
                     IS_DEFINED,
                     VAR_TYPE,
@@ -219,6 +235,12 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case HAS_CLIPBOARD:
+                return HAS_CLIPBOARD_COMMAND_TYPE;
+            case CLIPBOARD_COPY:
+                return CLIPBOARD_COPY_COMMAND_TYPE;
+            case CLIPBOARD_PASTE:
+                return CLIPBOARD_PASTE_COMMAND_TYPE;
             case WS_MACRO:
                 return WS_MACRO_COMMAND_TYPE;
             case VAR_TYPE:
@@ -311,6 +333,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case HAS_CLIPBOARD:
+                doHasClipboard(polyad, state);
+                return true;
+            case CLIPBOARD_COPY:
+                doClipboardRead(polyad, state);
+                return true;
+            case CLIPBOARD_PASTE:
+                doClipboardWrite(polyad, state);
+                return true;
             case WS_MACRO:
                 doWSMacro(polyad, state);
                 return true;
@@ -408,6 +439,100 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doClipboardRead(Polyad polyad, State state) {
+        if(state.isServerMode()){
+            throw new UnsupportedOperationException(CLIPBOARD_PASTE + " not supported in server mode");
+        }
+        if(polyad.getArgCount() != 0){
+            throw new IllegalArgumentException(CLIPBOARD_PASTE + " requires an argument");
+        }
+
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            String out =  (String) clipboard.getData(DataFlavor.stringFlavor);
+            out = out.trim(); // removes random line feeds at the end.
+            polyad.setEvaluated(true);
+            polyad.setResult(out);
+            polyad.setResultType(Constant.STRING_TYPE);
+            return;
+        } catch (Throwable t) {
+
+        }
+        polyad.setEvaluated(true);
+        polyad.setResult(QDLNull.getInstance());
+        polyad.setResultType(Constant.NULL_TYPE);
+    }
+
+    private void doClipboardWrite(Polyad polyad, State state) {
+        if(state.isServerMode()){
+            throw new UnsupportedOperationException(CLIPBOARD_PASTE + " not supported in server mode");
+        }
+        if(polyad.getArgCount() != 1){
+            throw new IllegalArgumentException(CLIPBOARD_PASTE + " requires an argument");
+        }
+        polyad.evalArg(0,state);
+        Object obj = polyad.getArgAt(0).getResult();
+        String out = "";
+        if(obj instanceof StemVariable){
+            out = ((StemVariable)obj).toJSON().toString();
+        }else{
+            out = obj.toString();
+        }
+
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            if (clipboard != null) {
+                StringSelection data = new StringSelection(obj.toString());
+                clipboard.setContents(data, data);
+                polyad.setEvaluated(true);
+                polyad.setResult(Boolean.TRUE);
+                polyad.setResultType(Constant.BOOLEAN_TYPE);
+            }
+        } catch (Throwable t) {
+            // there was a problem with the clipboard. Skip it.
+            polyad.setEvaluated(true);
+            polyad.setResult(Boolean.FALSE);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+        }
+    }
+
+    /**
+     * Checks if there is clipboard support.
+     * @param polyad
+     * @param state
+     */
+    private void doHasClipboard(Polyad polyad, State state) {
+        // Annoying thing #42. we check if the clipboard exists by trying to read from it
+        // this is the most reliable cross platform way to do it. The problem is that
+        // error messages can be generated very deep in the stack that cannot be intercepted
+        // with a try...catch block and sent to std err. So we have to turn redirect the error
+        // then reset the std err. Pain in the neck, but users should not see large random
+        // stack traces that the last thing someone left on their clipboard can't be
+        // easily converted to a string.
+        if(state.isServerMode()){
+            throw new UnsupportedOperationException(HAS_CLIPBOARD + " not supported in server mode");
+        }
+        PrintStream errStream = System.err;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(byteArrayOutputStream));
+
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.getData(DataFlavor.stringFlavor);
+            System.setErr(errStream);
+            polyad.setEvaluated(true);
+            polyad.setResult(Boolean.TRUE);
+            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            return;
+        } catch (Throwable t) {
+            state.getLogger().info("Probably benign message from checking clipboard:" + new String(byteArrayOutputStream.toByteArray()));
+        }
+        System.setErr(errStream);
+        polyad.setEvaluated(true);
+        polyad.setResult(Boolean.FALSE);
+        polyad.setResultType(Constant.BOOLEAN_TYPE);
     }
 
     private void doWSMacro(Polyad polyad, State state) {
