@@ -2515,7 +2515,7 @@ E.g.
     <entry id="version">
             <body>
                 <![CDATA[
-The current version of QDL is 1.4-QDL-SNAPSHOT
+The current version of QDL is 1,4,5
                 ]]>
             </body>
         </entry>
