@@ -16,7 +16,7 @@ import java.util.*;
  * This helps us organize the functionality of the state object. There are
  * subclasses of this that do specific tasks. The inheritance hierarchy is
  * <pre>
- * namespaces --> variables --> functions --. total state.
+ * namespaces → variables → functions --. total state.
  * </pre>
  * <p>Created by Jeff Gaynor<br>
  * on 2/2/20 at  6:37 AM

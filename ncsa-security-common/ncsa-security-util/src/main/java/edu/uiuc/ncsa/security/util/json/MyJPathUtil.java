@@ -17,7 +17,7 @@ import static edu.uiuc.ncsa.security.util.cli.json_edit.JSONPaths.resolve;
  * <pre>
  *     getObject(obj, "/foo/bar")
  * </pre>
- * gets the object <code>foo-->bar</code>. This does permit appending to an array, so if the array is at
+ * gets the object <code>foo→bar</code>. This does permit appending to an array, so if the array is at
  * /a/b/array then
  * <pre>
  *     append(json, "/a/b/array", newValue)

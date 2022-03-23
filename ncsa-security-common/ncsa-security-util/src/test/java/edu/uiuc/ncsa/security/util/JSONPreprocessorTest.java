@@ -34,9 +34,9 @@ public class JSONPreprocessorTest extends TestBase {
     /**
      * Initialize the store. The entries are
      * <pre>
-     *      {"#import":"id:array/1"} --> ["A","B"]
-     *      {"#import":"id:object/1"} --> {"X":"x","Y","y"}
-     *      {#import":"id:circular"} --> {"A":"a","X":{"B":"b","#import":"id:circular"}}
+     *      {"#import":"id:array/1"} → ["A","B"]
+     *      {"#import":"id:object/1"} → {"X":"x","Y","y"}
+     *      {#import":"id:circular"} → {"A":"a","X":{"B":"b","#import":"id:circular"}}
      * </pre>
      * This gives a basic object and a basic array. The circular object is self-referential
      * and there are tests that use it to show an exception is thrown when a cycle is found (or we get

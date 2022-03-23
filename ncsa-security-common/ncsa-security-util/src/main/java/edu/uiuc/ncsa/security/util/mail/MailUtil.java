@@ -26,7 +26,7 @@ import java.util.Properties;
  * <p>Created by Jeff Gaynor<br>
  * on 10/5/11 at  1:18 PM
  */
-public class MailUtil  implements Logable {
+public class MailUtil implements Logable {
     public Session getSession(Properties props) throws NamingException {
         return Session.getDefaultInstance(props);
     }
@@ -67,7 +67,7 @@ public class MailUtil  implements Logable {
         return getMailEnvironment().mailEnabled;
     }
 
-    public static class MailEnvironment extends AbstractEnvironment implements  MailConfigurationTags{
+    public static class MailEnvironment extends AbstractEnvironment implements MailConfigurationTags {
         public MailEnvironment(boolean mailEnabled) {
             this.mailEnabled = mailEnabled;
         }
@@ -76,11 +76,12 @@ public class MailUtil  implements Logable {
 
         /**
          * Populate from a map
+         *
          * @param map
          */
         public MailEnvironment(Map<String, Object> map) {
-             if(map.containsKey(MAIL_ENABLED)) this.mailEnabled = (boolean) map.get(MAIL_ENABLED);
-             if(map.containsKey(MAIL_MESSAGE_TEMPLATE))this.messageTemplate = (String) map.get(MAIL_MESSAGE_TEMPLATE);
+            if (map.containsKey(MAIL_ENABLED)) this.mailEnabled = (boolean) map.get(MAIL_ENABLED);
+            if (map.containsKey(MAIL_MESSAGE_TEMPLATE)) this.messageTemplate = (String) map.get(MAIL_MESSAGE_TEMPLATE);
         }
 
         public MailEnvironment(
@@ -110,9 +111,10 @@ public class MailUtil  implements Logable {
 
         /**
          * Take
+         *
          * @param otherME
          */
-        public void update(MailEnvironment otherME){
+        public void update(MailEnvironment otherME) {
 
         }
 
@@ -151,7 +153,8 @@ public class MailUtil  implements Logable {
     }
 
     MailEnvironment mailEnvironment;
-    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements)  {
+
+    synchronized public boolean sendMessage(String subjectTemplate, String messageTemplate, Map replacements) {
         return sendMessage(subjectTemplate, messageTemplate, replacements, null);
     }
 
@@ -161,6 +164,7 @@ public class MailUtil  implements Logable {
      * internally generated messages that may need a lot of customization on the fly. Remember that
      * a template has string delimited with ${KEY} which the replacements map (KEY, VALUE pairs) will
      * render into VALUES.
+     *
      * @param subjectTemplate
      * @param messageTemplate
      * @param replacements
@@ -170,19 +174,23 @@ public class MailUtil  implements Logable {
                                             String messageTemplate,
                                             Map replacements,
                                             String newRecipients) {
+       // CIL-1225
+        if (!isEnabled()) {
+            return true;
+        }
         Transport tr = null;
 
         InternetAddress[] recipients = getMailEnvironment().recipients;
-        
-        if(!StringUtils.isTrivial(newRecipients)){
+
+        if (!StringUtils.isTrivial(newRecipients)) {
             try {
                 getMailEnvironment().parseRecipients(newRecipients);
-            }catch(AddressException addressException){
-                if(DebugUtil.isEnabled()){
+            } catch (AddressException addressException) {
+                if (DebugUtil.isEnabled()) {
                     addressException.printStackTrace();
                 }
-                warn( "The requested list of recipients \"" + newRecipients + "\" could not be parsed.\n" +
-                        "error message reads \""+ addressException.getMessage() + "\"\n"+
+                warn("The requested list of recipients \"" + newRecipients + "\" could not be parsed.\n" +
+                        "error message reads \"" + addressException.getMessage() + "\"\n" +
                         "Did you use the right separator \"" + MailUtil.ADDRESS_SEPARATOR + "\" between addresses?\n" +
                         "Using default addresses.");
             }
@@ -227,7 +235,7 @@ public class MailUtil  implements Logable {
             message.setFrom(getMailEnvironment().from);
 
             message.setRecipients(Message.RecipientType.TO, recipients);
-            if(replacements != null) {
+            if (replacements != null) {
                 message.setSubject(TemplateUtil.replaceAll(subjectTemplate, replacements));
                 message.setContent(TemplateUtil.replaceAll(messageTemplate, replacements), "text/plain");
                 if (replacements.containsKey("reply-to")) {
@@ -240,7 +248,7 @@ public class MailUtil  implements Logable {
             return true;
         } catch (Throwable throwable) {
             info("got exception sending message:");
-            if(replacements != null) {
+            if (replacements != null) {
                 for (Object key : replacements.keySet()) {
                     info("(" + key + "," + replacements.get(key.toString()) + ")");
                 }
@@ -273,6 +281,7 @@ public class MailUtil  implements Logable {
     // Probable fix for CIL-324: a sudden attempt to send many messages causes strange failures.
     // This looks like a synchronization issue, so this method is now synchronized.
     synchronized public boolean sendMessage(Map replacements) {
+
         try {
             return sendMessage(getSubjectTemplate(), getMessageTemplate(), replacements);
         } catch (IOException e) {

@@ -177,7 +177,7 @@ public class ParsingMap extends HashMap<String, ParseRecord> {
      * record. This will take an id then look at the parent child relations and return the first child it finds
      * in this map. E.g.,
      * <pre>
-     *     A --> B --> C --> D
+     *     A → B → C → D
      * </pre>
      * In this case, A is in the map, B and C are artifacts of parsing that are not in the map
      * and we need D. So we take the ParseTree for A, look at the childen for B and continue

@@ -1922,7 +1922,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * rename_keys(10+3*indices(5), [4,2,3,1,0])
      * [22,19,13,16,10]
      * </pre>
-     * read that in [4,2,3,1,0]: old --> new, so 0 --> 4, 1 --> 2, 2-->3, 3-->1, 4-->0
+     * read that in [4,2,3,1,0]: old → new, so 0 → 4, 1 → 2, 2→3, 3→1, 4→0
      */
     /*
     Test commands
