@@ -26,6 +26,8 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +91,7 @@ public class ServiceClient {
         public HttpClient create() {
             try {
                 return getF().getClient(address.getHost()); // otherwise the client has the *entire* address.
-            } catch (IOException e) {
+            } catch (IOException | NoSuchAlgorithmException | KeyStoreException e) {
                 throw new GeneralException("Error getting https-aware client");
             }
         }

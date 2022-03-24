@@ -13,6 +13,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,11 +65,11 @@ public class OAuthUtilities implements OAuthConstants {
      *
      * @return
      */
-    public static OAuthHTTPSClientPool newClientPool(URI address) throws IOException {
+    public static OAuthHTTPSClientPool newClientPool(URI address) throws IOException, NoSuchAlgorithmException, KeyStoreException {
         return new OAuthHTTPSClientPool(getClientFactory().getClient(address.getHost()));
     }
 
-    public static OAuthClient newOAuthClient(URI address) throws IOException {
+    public static OAuthClient newOAuthClient(URI address) throws IOException, NoSuchAlgorithmException, KeyStoreException {
         return new OAuthClient(new HttpClient4(newClientPool(address)));
     }
 

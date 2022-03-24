@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.util.ssl;
 
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
+import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.apache.commons.configuration.tree.ConfigurationNode;
 
 import java.io.Serializable;
@@ -26,6 +27,8 @@ public class SSLConfigurationUtil implements Serializable {
     public static final String SSL_KEYSTORE_FACTORY = "factory";
     public static final String SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE = "useJavaTrustStore";
     public static final String SSL_TRUSTSTORE_USE_JAVA_TRUSTSTORE_OLD = "useJavaKeystore";
+    public static final String SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES = "useStrictHostnames";
+    public static final String SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER = "useDefaultTrustManager";
     public static final String SSL_TRUSTSTORE_TAG = "trustStore";
     public static final String SSL_TRUSTSTORE_PATH = "path";
     public static final String SSL_TRUSTSTORE_PASSWORD = "password";
@@ -158,6 +161,20 @@ public class SSLConfigurationUtil implements Serializable {
                 sslConfiguration.setUseDefaultJavaTrustStore(Boolean.parseBoolean(x));
             }
 
+            // Now check if strict hostnames
+            x = getFirstAttribute(node, SSL_TRUSTSTORE_IS_STRICT_HOSTNAMES);
+            if (StringUtils.isTrivial(x)) {
+
+            } else {
+                try {
+                    sslConfiguration.setStrictHostnames(Boolean.parseBoolean(x));
+                } catch (Throwable throwable) {
+                    sslConfiguration.setStrictHostnames(true);
+                }
+            }
+
+
+
             // Now get the trust store and keystore
             ConfigurationNode keyStoreNode = getFirstNode(node, SSL_KEYSTORE_TAG);
             if (keyStoreNode != null) {
@@ -167,17 +184,38 @@ public class SSLConfigurationUtil implements Serializable {
                 sslConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
                 sslConfiguration.setKeystoreType(getNodeValue(keyStoreNode, SSL_KEYSTORE_TYPE));
             }
-            ConfigurationNode trustStoreNode = getFirstNode(node, SSL_TRUSTSTORE_TAG);
 
+
+            // If they want to use the default trust manager, don't read any other
+            // trust manager configuration, just return
+            ConfigurationNode trustStoreNode = getFirstNode(node, SSL_TRUSTSTORE_TAG);
             if (trustStoreNode != null) {
                 sslConfiguration.setTrustRootPath(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PATH));
                 sslConfiguration.setTrustRootPassword(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_PASSWORD));
-                //sslKeystoreConfiguration.setKeyManagerFactory(getNodeValue(keyStoreNode, SSL_KEYSTORE_FACTORY));
                 sslConfiguration.setTrustRootType(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_TYPE));
                 sslConfiguration.setTrustRootCertDN(getNodeValue(trustStoreNode, SSL_TRUSTSTORE_CERTIFICATE_DN));
+                sslConfiguration.setUseDefaultTrustManager(false);
+                return sslConfiguration;
             }
-            if (logger != null) {
-                logger.info("Done loading SSL configuration");
+
+            x = getFirstAttribute(node, SSL_TRUSTSTORE_USE_DEFAULT_TRUST_MANAGER);
+            if (StringUtils.isTrivial(x)) {
+                sslConfiguration.setUseDefaultTrustManager(true);
+            } else {
+                try {
+                    sslConfiguration.setUseDefaultTrustManager(Boolean.parseBoolean(x));
+                    if(sslConfiguration.isUseDefaultTrustManager()){
+                        return sslConfiguration;
+                    }
+                } catch (Throwable throwable) {
+                    sslConfiguration.setUseDefaultTrustManager(true);
+                }
+            }
+            // If this is false, then they did not configure a trust manager and they
+            // explicitly said not to use the default, so there is no possible trust manager
+            // possible. Tell them about that.
+            if(!sslConfiguration.isUseDefaultTrustManager()){
+                throw new IllegalStateException("Must have a trust manager.");
             }
         }
         return sslConfiguration;

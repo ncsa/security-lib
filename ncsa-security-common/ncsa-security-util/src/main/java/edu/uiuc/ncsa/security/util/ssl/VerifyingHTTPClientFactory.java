@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ import java.util.List;
 public class VerifyingHTTPClientFactory implements Logable {
     public VerifyingHTTPClientFactory(MyLoggingFacade logger, SSLConfiguration sslConfiguration) {
         this.sslConfiguration = sslConfiguration;
+        setStrictHostnames(sslConfiguration.isStrictHostnames());
         this.logger = logger;
     }
 
@@ -39,6 +41,7 @@ public class VerifyingHTTPClientFactory implements Logable {
      * false without and excellent reason since it will relax security. It is, however, warranted in certain cases
      * (such as in testing environments with self-signed certs whose host names aren't quite right.) Generally if
      * you have to set this to false in a production environment, there is something wrong with the server's certificates.
+     *
      * @return
      */
     public boolean isStrictHostnames() {
@@ -181,17 +184,37 @@ public class VerifyingHTTPClientFactory implements Logable {
      * @return
      * @throws IOException
      */
-    public HttpClient getClient(String host) throws IOException {
+    public HttpClient getClient(String host) throws IOException, NoSuchAlgorithmException, KeyStoreException {
         return getClient(host, 0, 0);
     }
+    //CIL-1174: Allow for use of default trust manager.
+    protected X509TrustManager getDefaultTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+        TrustManagerFactory tmf = TrustManagerFactory
+                .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init((KeyStore) null); // initializes with default trust store
 
+        X509TrustManager trustManager = null;
+        for (TrustManager tm : tmf.getTrustManagers()) {
+            if (tm instanceof X509TrustManager) {
+                trustManager = (X509TrustManager) tm;
+                break;
+            }
+        }
+        return trustManager;
+    }
 
-    public HttpClient getClient(String host, int connectionTimeout, int socketTimeout) throws IOException {
-        MyTrustManager myTrustManager = newMyTrustManager();
-
-        myTrustManager.setHost(host); //varies per request.
-        debug("my trust manager: trust root path+" + myTrustManager.getTrustRootPath());
-        return getClient(myTrustManager, connectionTimeout, socketTimeout);
+    public HttpClient getClient(String host, int connectionTimeout, int socketTimeout) throws IOException, NoSuchAlgorithmException, KeyStoreException {
+        X509TrustManager trustManager;
+        if (getSSLConfiguration().isUseDefaultTrustManager()) {
+            trustManager = getDefaultTrustManager();
+        } else {
+            trustManager = newMyTrustManager();
+        }
+        if (trustManager instanceof MyTrustManager) {
+            ((MyTrustManager) trustManager).setHost(host); //varies per request.
+        }
+        //debug("my trust manager: trust root path+" + myTrustManager.getTrustRootPath());
+        return getClient(trustManager, connectionTimeout, socketTimeout);
     }
 
     public HttpClient getClient(X509TrustManager x509TrustManager) {

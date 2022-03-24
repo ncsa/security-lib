@@ -109,7 +109,6 @@ public class IOFunctionTest extends AbstractQDLTester {
         addLine(script, "read_line := cb_read();");
         addLine(script, "read_ok := read_line == test_line;");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        System.out.println(script.toString());
         interpreter.execute(script.toString());
         assert getBooleanValue("write_ok", state) : "Clipboard write ok";
         assert getBooleanValue("read_ok", state) : "Clipboard read failed. Expected " +
