@@ -527,7 +527,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.BOOLEAN_TYPE);
             return;
         } catch (Throwable t) {
-            state.getLogger().info("Probably benign message from checking clipboard:");
+            if(state.getLogger()!=null) {
+                state.getLogger().info("Probably benign message from checking clipboard:");
+            }
         }
         System.setErr(errStream);
         polyad.setEvaluated(true);

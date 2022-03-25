@@ -59,6 +59,27 @@ public class InputLine {
         parsedInput = vector;
     }
 
+    /**
+     * For use with constructing more complex command lines. The issue with {@link #InputLine(String)}
+     * is that the assumed control flow is from the command line, where Java will parse the input then
+     * call {@link #InputLine(Vector)}. So it is not possible to create a command line with components.
+     * <br/><br/>
+     * E.g.
+     * new InputLine("set_param -a scopes \"a b c\"");
+     * <br/><br/>
+     * would create 3 arguments "a, b, c". Instead use this with<br/></br>
+     * new InputLine("set_param", "-a", "scopes", "a b c");
+     * @param strings
+     */
+    public InputLine(String... strings) {
+             parsedInput = new ArrayList<>();
+             originalLine = "";
+             for(int i = 0; i < strings.length; i++){
+                 parsedInput.add(strings[i]);
+                 originalLine = originalLine + (i==0?"":" ") +strings[i];
+             }
+    }
+
     public String getOriginalLine() {
         return originalLine;
     }
@@ -496,5 +517,10 @@ public class InputLine {
         System.out.println(inputLine);
         inputLine.removeSwitchAndValue("-one");
         System.out.println(inputLine);
+
+        InputLine inputLine1 = new InputLine("set_param", "-a", "scope", "a b c d");
+        System.out.println(inputLine1);
+        inputLine1 = new InputLine("set_param", "-a", "scope", "read: write: x.y:");
+        System.out.println(inputLine1);
     }
 }
