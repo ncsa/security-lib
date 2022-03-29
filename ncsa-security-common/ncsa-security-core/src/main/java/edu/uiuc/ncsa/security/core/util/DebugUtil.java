@@ -23,6 +23,22 @@ public class DebugUtil implements DebugConstants{
         return debugUtil;
     }
 
+    public static void setInstance(MetaDebugUtil newDebugUtil){
+        debugUtil = newDebugUtil;
+    }
+
+    /**
+     * If an instance has been set. Note that calling {@link #getInstance()}  will always return
+     * an instance.
+     * @return
+     */
+    public static boolean hasInstance(){
+        return debugUtil != null;
+    }
+    public static void setEnabled(boolean enabled){
+        getInstance().setIsEnabled(enabled);
+    }
+
     public static boolean isPrintTS() {
         return getInstance().isPrintTS();
     }

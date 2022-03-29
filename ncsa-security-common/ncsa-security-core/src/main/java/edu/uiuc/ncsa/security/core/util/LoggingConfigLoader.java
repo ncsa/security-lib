@@ -28,25 +28,30 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
     protected Provider<MyLoggingFacade> loggerProvider;
     protected MyLoggingFacade myLogger = null;
 
+    protected MetaDebugUtil debugger = null;
     /**
      * Checks for and sets up the debugging for this loader. Once this is set up, you may have to tell any environments that
-     * use it that debugging is enabled.
+     * use it that debugging is enabled.  Note that this is not used in this module, but in OA4MP proper, but has to b
+     * here for visibility later.
      */
-    protected void loadDebug() {
-        String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
-        try {
-            DebugUtil.trace(this, ".load: setting debug for \"" + rawDebug + "\"");
-            if (rawDebug == null || rawDebug.isEmpty()) {
-                DebugUtil.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
-            } else {
-                DebugUtil.setDebugLevel(rawDebug);
-            }
-            DebugUtil.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
+    public MetaDebugUtil getDebugger() {
+        if(debugger == null){
+            debugger = new MetaDebugUtil();
+            String rawDebug = Configurations.getFirstAttribute(cn, ConfigurationTags.DEBUG);
+            try {
+                if (rawDebug == null || rawDebug.isEmpty()) {
+                    debugger.setDebugLevel(DebugUtil.DEBUG_LEVEL_OFF);
+                } else {
+                    debugger.setDebugLevel(rawDebug);
+                }
+                debugger.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
 
-        } catch (Throwable t) {
-            // ok, so that didn't work, fall back to the old way
-            DebugUtil.setIsEnabled(Boolean.parseBoolean(rawDebug));
+            } catch (Throwable t) {
+                // ok, so that didn't work, fall back to the old way
+                debugger.setIsEnabled(Boolean.parseBoolean(rawDebug));
+            }
         }
+        return debugger;
     }
 
 

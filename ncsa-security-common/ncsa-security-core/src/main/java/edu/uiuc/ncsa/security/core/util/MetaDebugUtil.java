@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.core.util;
 
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
+import net.sf.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -91,7 +92,6 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
         // Standard logging format is date host service: message
         if (level <= getDebugLevel()) {
             if(host == null || host.isEmpty()) {
-
                 printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
             }else{
                 printIt((isPrintTS()?Iso8601.date2String(new Date()):"") + " " + host + " " + callingClass.getSimpleName() + " " + toLabel(level) + ": " + message);
@@ -190,4 +190,27 @@ public class MetaDebugUtil implements DebugConstants, Serializable {
 
     public  String host;
 
+    @Override
+    public String toString() {
+        return "MetaDebugUtil{" +
+                "enabled=" + isEnabled() +
+                ",printTS=" + printTS +
+                ", debugLevel=" + debugLevel +
+                ", host='" + host + '\'' +
+                ", hash='" + hashCode() + '\'' +
+                '}';
+    }
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("level", getDebugLevel());
+        jsonObject.put("print_ts", isPrintTS());
+        jsonObject.put("enabled", isEnabled());
+        return jsonObject;
+    }
+
+    public void fromJSON(JSONObject json){
+        setDebugLevel(json.getInt("level"));
+        setPrintTS(json.getBoolean("print_ts"));
+        setIsEnabled(json.getBoolean("enabled"));
+    }
 }

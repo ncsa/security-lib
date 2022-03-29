@@ -1,11 +1,11 @@
 package edu.uiuc.ncsa.security.oauth_2_0.server;
 
+import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.delegation.server.ServiceTransaction;
 import edu.uiuc.ncsa.security.delegation.token.AccessToken;
 import edu.uiuc.ncsa.security.delegation.token.impl.AccessTokenImpl;
 import edu.uiuc.ncsa.security.delegation.token.impl.RefreshTokenImpl;
 import edu.uiuc.ncsa.security.oauth_2_0.JWTUtil;
-import edu.uiuc.ncsa.security.servlet.ServletDebugUtil;
 import edu.uiuc.ncsa.security.util.jwk.JSONWebKey;
 import net.sf.json.JSONObject;
 
@@ -119,6 +119,7 @@ public abstract class IDTokenResponse extends IResponse2 {
      * @param response Response to write to
      */
     public void write(HttpServletResponse response) throws IOException {
+        DebugUtil.trace(this, "starting ID token response write");
         // m contains the top-level JSON object that is serialized for the response. The
         // claims are part of this and keyed to the id_token.
         HashMap m = new HashMap();
@@ -150,18 +151,15 @@ public abstract class IDTokenResponse extends IResponse2 {
             }
             m.put(SCOPE, ss);
         }
+
         if (isOIDC()) {
             JSONObject claims = getClaims();
-
             try {
                 String idTokken = null;
                 if (isSignToken()) {
                     idTokken = JWTUtil.createJWT(claims, getJsonWebKey());
                 } else {
                     idTokken = JWTUtil.createJWT(claims);
-                }
-                if (ServletDebugUtil.isEnabled()) {
-                    ServletDebugUtil.trace(this, "raw ID_Token=" + idTokken);
                 }
                 m.put(ID_TOKEN, idTokken);
             } catch (Throwable e) {
@@ -171,6 +169,7 @@ public abstract class IDTokenResponse extends IResponse2 {
         }
 
         JSONObject json = JSONObject.fromObject(m);
+        DebugUtil.trace(this, "writing ID token response");
 
         response.setContentType("application/json;charset=UTF-8");
         response.setCharacterEncoding("UTF-8");
