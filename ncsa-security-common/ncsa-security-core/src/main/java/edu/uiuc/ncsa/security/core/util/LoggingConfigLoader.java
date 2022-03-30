@@ -44,7 +44,7 @@ public abstract class LoggingConfigLoader<T extends AbstractEnvironment> impleme
                 } else {
                     debugger.setDebugLevel(rawDebug);
                 }
-                debugger.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
+            //    debugger.trace(this, ".load: set debug to level " + DebugUtil.getDebugLevel());
 
             } catch (Throwable t) {
                 // ok, so that didn't work, fall back to the old way
