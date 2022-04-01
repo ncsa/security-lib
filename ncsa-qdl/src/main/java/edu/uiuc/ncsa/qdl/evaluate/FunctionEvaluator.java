@@ -93,9 +93,11 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                    polyad.setEvaluated(true);
                    return true;
            }
-           if (polyad.isInModule() || !polyad.isBuiltIn()) {
+           //if (polyad.isInModule() || !polyad.isBuiltIn()) {
+       //    if (polyad.isInModule()) {
                try {
                    figureOutEvaluation(polyad, state, !polyad.isInModule());
+                   return true;
                } catch(UndefinedFunctionException ufe){
                    // special case this one QDLException so it gives usedful user feedback.
                    QDLStatementExecutionException qq = new QDLStatementExecutionException(ufe, polyad);
@@ -106,9 +108,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                    QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
                    throw qq;
                }
-               return true;
-           }
-           return false;
+        //   }
+         //  return false;
     }
     /*
       m := '/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl'

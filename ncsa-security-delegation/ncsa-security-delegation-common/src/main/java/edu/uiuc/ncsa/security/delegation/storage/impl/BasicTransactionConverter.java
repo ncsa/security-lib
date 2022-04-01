@@ -48,7 +48,9 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
         // contention over the value later. The id never changes.
         Identifier id = b.getIdentifier();
         Object token = data.get(getBTKeys().authGrant());
-        if (token != null) {
+        if (token == null) {
+            b.setAuthorizationGrant(null);
+        }else{
             if (token instanceof AuthorizationGrant) {
                 b.setAuthorizationGrant((AuthorizationGrant) token);
             } else {
@@ -57,7 +59,9 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
         }
 
         token = data.get(getBTKeys().accessToken());
-        if (token != null) {
+        if (token == null) {
+            b.setAccessToken(null);
+        }else{
             if (token instanceof AccessToken) {
                 b.setAccessToken((AccessToken) token);
             } else {

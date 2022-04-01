@@ -1945,5 +1945,35 @@ public class StemFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : StemEvaluator.UNIQUE_VALUES + " failed.";
     }
+
+
+    public void testSetStemToScalar() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ϱ. := 'foo';"); // matrix
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         boolean isOk = false;
+        try{
+            interpreter.execute(script.toString());
+        }catch (IndexError ix){
+                isOk = true;
+        }
+        assert isOk : "could set stem variable to non-null scalar";
+    }
+
+    public void testSetScalarToStem() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ϱ := [;5];"); // matrix
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         boolean isOk = false;
+        try{
+            interpreter.execute(script.toString());
+        }catch (IndexError ix){
+                isOk = true;
+        }
+        assert isOk : "could set scalar variable to stem value";
+    }
+
 }
 

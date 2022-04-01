@@ -85,12 +85,24 @@ public class IOFunctionTest extends AbstractQDLTester {
 
     }
 
+    /*
+     Since the next two tests require that the system clipboard be available (not always true)
+     you must pass in the flag
+
+     -DtestClipboard="true"
+
+     to the JVM to run these.
+     */
     /**
      * Note that the assumption is that the clipboard DOES exist in the current runtime environment
      *
      * @throws Throwable
      */
     public void testClipboardExists() throws Throwable {
+        if(!System.getProperty("testClipboard","false").equalsIgnoreCase("true")){
+            System.out.println("Clipboard test exist skipped");
+            return;
+        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := cb_exists();");
@@ -100,6 +112,10 @@ public class IOFunctionTest extends AbstractQDLTester {
     }
 
     public void testClipboardWriteAndRead() throws Throwable {
+        if(!System.getProperty("testClipboard","false").equalsIgnoreCase("true")){
+            System.out.println("Clipboard test read/write skipped");
+            return;
+        }
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         String testLine = "mairzy doats and dozey doats";

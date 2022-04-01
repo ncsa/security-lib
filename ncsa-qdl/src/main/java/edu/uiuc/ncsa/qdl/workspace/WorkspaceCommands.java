@@ -2779,6 +2779,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 }
                 return NOT_SET;
             case EXTERNAL_EDITOR:
+            case SHORT_EXTERNAL_EDITOR:
                 return getExternalEditorName();
             case USE_EXTERNAL_EDITOR:
                 return isUseExternalEditor();
@@ -2877,6 +2878,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 }
                 break;
             case EXTERNAL_EDITOR:
+            case SHORT_EXTERNAL_EDITOR:
                 say(getExternalEditorName());
                 break;
             case USE_EXTERNAL_EDITOR:
@@ -2958,6 +2960,7 @@ public class WorkspaceCommands implements Logable, Serializable {
     public static final String AUTOSAVE_MESSAGES_ON = "autosave_messages_on";
     public static final String AUTOSAVE_INTERVAL = "autosave_interval";
     public static final String EXTERNAL_EDITOR = "external_editor";
+    public static final String SHORT_EXTERNAL_EDITOR = "ee";
     public static final String USE_EXTERNAL_EDITOR = "use_external_editor";
     public static final String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
     public static final String ASSERTIONS_ON = "assertions_on";
@@ -3481,6 +3484,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 say("use external editor " + (isUseExternalEditor() ? "on" : "off"));
                 break;
             case EXTERNAL_EDITOR:
+            case SHORT_EXTERNAL_EDITOR:
                 if (!value.equals(LINE_EDITOR_NAME)) {
                     EditorEntry x = getQdlEditors().get(value);
                     if (x == null) {
@@ -3632,6 +3636,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             ECHO,
             ENABLE_LIBRARY_SUPPORT,
             EXTERNAL_EDITOR,
+            SHORT_EXTERNAL_EDITOR,
             LIB_PATH_TAG,
             PRETTY_PRINT,
             PRETTY_PRINT_SHORT,

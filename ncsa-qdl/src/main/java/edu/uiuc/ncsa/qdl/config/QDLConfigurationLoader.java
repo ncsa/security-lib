@@ -185,9 +185,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(cn, CONFG_ATTR_RESTRICTED_IO_RESTRICTED, false);
     }
 
-    protected boolean areAssertionsEnabled() {
+  /*  protected boolean areAssertionsEnabled() {
         return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
-    }
+    }*/
 
     protected String getDebugLevel() {
         String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
@@ -200,6 +200,10 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
     protected boolean isEchoModeOn() {
         ConfigurationNode node = getFirstNode(cn, WS_TAG);
         return getFirstBooleanValue(node, WS_ATTR_ECHO_MODE_ON, true);
+    }
+    protected boolean areAssertionsEnabled() {
+        ConfigurationNode node = getFirstNode(cn, WS_TAG);
+        return getFirstBooleanValue(node, WS_ATTR_ASSERTIONS_ON, true);
     }
 
     protected boolean isPrettyPrint() {

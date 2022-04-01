@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static edu.uiuc.ncsa.qdl.state.legacy.SymbolTable.var_regex;
+import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.LAST_AXIS_ARGUMENT_VALUE;
 import static edu.uiuc.ncsa.qdl.variables.StemVariable.STEM_INDEX_MARKER;
 
@@ -128,6 +129,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
     public static final String VALUES = "values";
     public static final int VALUES_TYPE = 208 + STEM_FUNCTION_BASE_VALUE;
+
 
     // Conversions to/from JSON.
     public static final String TO_JSON = "to_json";
@@ -276,7 +278,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 doJoin(polyad, state);
                 return true;
             case SIZE:
-               return doSize(polyad, state);
+                return doSize(polyad, state);
             case SET_DEFAULT:
                 doSetDefault(polyad, state);
                 return true;
@@ -424,7 +426,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable rc = returnAll ? stem.indices() : stem.indices(axis);
         polyad.setResult(rc);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(Boolean.TRUE);
     }
 
@@ -450,7 +452,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -506,7 +508,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             forEachRecursion(output, f, state, stems);
         }
         polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -604,7 +606,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         ArrayList<StatementWithResultInterface> args = new ArrayList<>();
         for (Object obj : objects) {
             int type = Constant.getType(obj);
-            if (type == Constant.UNKNOWN_TYPE) {
+            if (type == UNKNOWN_TYPE) {
                 // Future proofing in case something changes in the future internally
                 throw new IllegalArgumentException(" unknown object type");
             }
@@ -682,7 +684,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
         }
         polyad.setResult(outStem);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -823,21 +825,21 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     private void doRank(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0 || !isStem(polyad.evalArg(0, state))) {
             polyad.setEvaluated(true);
-            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setResultType(LONG_TYPE);
             polyad.setResult(0L);
             return;
         }
         polyad.setEvaluated(true);
         StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
         polyad.setResult(s.getRank());
-        polyad.setResultType(Constant.LONG_TYPE);
+        polyad.setResultType(LONG_TYPE);
 
     }
 
     private void doDimension(Polyad polyad, State state) {
         if (polyad.getArgCount() == 0 || !isStem(polyad.evalArg(0, state))) {
             polyad.setEvaluated(true);
-            polyad.setResultType(Constant.LONG_TYPE);
+            polyad.setResultType(LONG_TYPE);
             polyad.setResult(0L);
             return;
         }
@@ -845,7 +847,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         polyad.setEvaluated(true);
         StemVariable s = (StemVariable) polyad.getArgAt(0).getResult();
         polyad.setResult(s.dim());
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
 
     }
 
@@ -859,7 +861,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
@@ -867,7 +869,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = stemVariable.almostUnique().almostUnique();
 
         polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -912,7 +914,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             polyad.setResult(result);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
 
         } else {
             Boolean result = Boolean.FALSE;
@@ -928,7 +930,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 result = leftArg.equals(rightArg);
             }
             polyad.setResult(result);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setResultType(BOOLEAN_TYPE);
 
         }
         polyad.setEvaluated(true);
@@ -970,7 +972,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
         }
         polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -1036,7 +1038,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         } else {
             polyad.setResult(j.toString());
         }
-        polyad.setResultType(Constant.STRING_TYPE);
+        polyad.setResultType(STRING_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1076,7 +1078,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.setResult(outStem);
         polyad.setEvaluated(true);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
 
     }
 
@@ -1154,7 +1156,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             state.remove(varName);
         }
         polyad.setResult(Boolean.TRUE);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setResultType(BOOLEAN_TYPE);
 
         polyad.setEvaluated(true);
     }
@@ -1189,7 +1191,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
         polyad.setResult(stem);
         polyad.setEvaluated(true);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
     }
 
     protected boolean doSize(Polyad polyad, State state) {
@@ -1208,7 +1210,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             size = new Long(arg.toString().length());
         }
         polyad.setResult(size);
-        polyad.setResultType(Constant.LONG_TYPE);
+        polyad.setResultType(LONG_TYPE);
         polyad.setEvaluated(true);
         return true;
     }
@@ -1232,7 +1234,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg, polyad.getArgAt(0));
 
         int returnScope = all_keys;
-        int returnType = Constant.UNKNOWN_TYPE;
+        int returnType = UNKNOWN_TYPE;
         boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
@@ -1257,7 +1259,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         long size = 0;
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
@@ -1287,7 +1289,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                         }
                         break;
                     case only_scalars:
-                        if (Constant.getType(stemVariable.get(key)) != Constant.STEM_TYPE) {
+                        if (Constant.getType(stemVariable.get(key)) != STEM_TYPE) {
                             if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
                             } else {
@@ -1296,7 +1298,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                         }
                         break;
                     case only_stems:
-                        if (Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE) {
+                        if (Constant.getType(stemVariable.get(key)) == STEM_TYPE) {
                             if (out.isLongIndex(key)) {
                                 out.put(i++, Long.parseLong(key));
                             } else {
@@ -1309,7 +1311,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         }
         polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -1333,12 +1335,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
             polyad.setResult(new StemVariable()); // just an empty stem
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
         int returnScope = all_keys;
-        int returnType = Constant.UNKNOWN_TYPE;
+        int returnType = UNKNOWN_TYPE;
         boolean returnByType = false;
         if (polyad.getArgCount() == 2) {
             Object arg2 = polyad.evalArg(1, state);
@@ -1378,12 +1380,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                         putLongOrStringKey(out, key);
                         break;
                     case only_scalars:
-                        if (Constant.getType(stemVariable.get(key)) != Constant.STEM_TYPE) {
+                        if (Constant.getType(stemVariable.get(key)) != STEM_TYPE) {
                             putLongOrStringKey(out, key);
                         }
                         break;
                     case only_stems:
-                        if (Constant.getType(stemVariable.get(key)) == Constant.STEM_TYPE) {
+                        if (Constant.getType(stemVariable.get(key)) == STEM_TYPE) {
                             putLongOrStringKey(out, key);
                         }
                         break;
@@ -1391,7 +1393,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
         }
         polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -1437,13 +1439,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         if (!isStem(arg2)) {
             polyad.setResult(target.containsKey(arg2.toString()));
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setResultType(BOOLEAN_TYPE);
             polyad.setEvaluated(true);
             return;
         }
         StemVariable result = target.hasKeys((StemVariable) arg2);
         polyad.setResult(result);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1511,7 +1513,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
             polyad.setResult(out);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
@@ -1525,7 +1527,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
 
                 polyad.setResult(out);
-                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setResultType(STEM_TYPE);
                 polyad.setEvaluated(true);
                 return;
 
@@ -1548,7 +1550,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 // Any dimension of 0 returns an empty list
                 if (lengths[i] == 0) {
                     polyad.setResult(new StemVariable());
-                    polyad.setResultType(Constant.STEM_TYPE);
+                    polyad.setResultType(STEM_TYPE);
                     polyad.setEvaluated(true);
                     return;
                 }
@@ -1561,7 +1563,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = new StemVariable();
         indexRecursion(out, lengths, 0, cyclicArgList);
         polyad.setResult(out);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
         return;
     }
@@ -1569,7 +1571,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     private StemVariable createSimpleStemVariable(Polyad polyad, CyclicArgList cyclicArgList, boolean hasFill, long size) {
         if (size == 0) {
             polyad.setResult(new StemVariable());
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return null;
         }
@@ -1695,7 +1697,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1746,7 +1748,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1762,7 +1764,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable stemVariable = (StemVariable) arg1;
         Boolean isList = stemVariable.isList();
         polyad.setResult(isList);
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setResultType(BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1806,7 +1808,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             // it is possible that the user is trying to grab something impossible
             polyad.setEvaluated(true);
             polyad.setResult(Boolean.TRUE);
-            polyad.setResultType(Constant.BOOLEAN_TYPE);
+            polyad.setResultType(BOOLEAN_TYPE);
             return;
         }
         String var = null;
@@ -1830,7 +1832,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setResult(esn2.remove(state));
         }
 
-        polyad.setResultType(Constant.BOOLEAN_TYPE);
+        polyad.setResultType(BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1862,13 +1864,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 result.put(arg2.toString(), target.get(arg2.toString()));
             }
             polyad.setResult(result);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
         StemVariable result = target.includeKeys((StemVariable) arg2);
         polyad.setResult(result);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1901,13 +1903,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             result.remove(excluded);
             polyad.setResult(result);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
         StemVariable result = target.excludeKeys((StemVariable) arg2);
         polyad.setResult(result);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -1954,7 +1956,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             StemVariable stem = new StemVariable();
             stem.addList(longList);
             polyad.setResult(stem);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
@@ -1999,7 +2001,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         polyad.setResult(output);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -2066,7 +2068,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         target.renameKeys((StemVariable) arg2, overwriteKeys);
 
         polyad.setResult(target);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -2100,7 +2102,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable result = target.commonKeys((StemVariable) arg2);
 
         polyad.setResult(result);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -2126,7 +2128,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         // now return the previous result or null if there was none
         if (oldDefault == null) {
             polyad.setResult(QDLNull.getInstance());
-            polyad.setResultType(Constant.NULL_TYPE);
+            polyad.setResultType(NULL_TYPE);
         } else {
             polyad.setResult(oldDefault);
             polyad.setResultType(Constant.getType(oldDefault));
@@ -2152,7 +2154,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable stem1 = (StemVariable) obj1;
         StemVariable stem2 = (StemVariable) obj2;
         StemVariable result = stem1.mask(stem2);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setResult(result);
         polyad.setEvaluated(true);
 
@@ -2267,7 +2269,7 @@ z. :=  join3(q.,w.)
         if (axis == 0) {
             StemVariable outStem = leftStem.union(rightStem);
             polyad.setEvaluated(true);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setResult(outStem);
             return;
         }
@@ -2275,7 +2277,7 @@ z. :=  join3(q.,w.)
             if (axis == -1) {
                 StemVariable outStem = leftStem.union(rightStem);
                 polyad.setEvaluated(true);
-                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setResultType(STEM_TYPE);
                 polyad.setResult(outStem);
                 return;
             }
@@ -2286,7 +2288,7 @@ z. :=  join3(q.,w.)
         if (leftStem.isEmpty() || rightStem.isEmpty()) {
             // edge case -- they sent an empty argument, so don't blow up, just return nothing
             polyad.setResult(outStem);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(true);
             return;
         }
@@ -2302,7 +2304,7 @@ z. :=  join3(q.,w.)
         }
         StemUtility.axisDayadRecursion(outStem, leftStem, rightStem, doJoinOnLastAxis ? 1000000 : (axis - 1), doJoinOnLastAxis, joinAction);
         polyad.setResult(outStem);
-        polyad.setResultType(Constant.STEM_TYPE);
+        polyad.setResultType(STEM_TYPE);
         polyad.setEvaluated(true);
     }
 
@@ -2398,7 +2400,7 @@ z. :=  join3(q.,w.)
         if (rank == 1) {
             // nothing to do. This is just a list
             polyad.setResult(stem);
-            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setResultType(STEM_TYPE);
             polyad.setEvaluated(Boolean.TRUE);
             return;
         }
@@ -2406,8 +2408,8 @@ z. :=  join3(q.,w.)
         StemVariable pStem0;
         // Start QDL. sliceNode is [;rank]
         OpenSliceNode sliceNode = new OpenSliceNode(polyad.getTokenPosition());
-        sliceNode.getArguments().add(new ConstantNode(0L, Constant.LONG_TYPE));
-        sliceNode.getArguments().add(new ConstantNode(Integer.toUnsignedLong(rank), Constant.LONG_TYPE));
+        sliceNode.getArguments().add(new ConstantNode(0L, LONG_TYPE));
+        sliceNode.getArguments().add(new ConstantNode(Integer.toUnsignedLong(rank), LONG_TYPE));
 
         if (polyad.getArgCount() == 2) {
             Object arg1 = polyad.evalArg(1, state);
@@ -2419,7 +2421,7 @@ z. :=  join3(q.,w.)
                 if (longArg == 0L) {
                     // The are requesting essentially the identity permutation, so don't jump through hoops.
                     polyad.setResult(stem);
-                    polyad.setResultType(Constant.STEM_TYPE);
+                    polyad.setResultType(STEM_TYPE);
                     polyad.setEvaluated(Boolean.TRUE);
                     return;
                 }
@@ -2449,12 +2451,12 @@ z. :=  join3(q.,w.)
             // p. ~ ~ exclude_keys([;rank], p.)
             Polyad excludeKeys = new Polyad(EXCLUDE_KEYS);
             excludeKeys.addArgument(sliceNode);
-            excludeKeys.addArgument(new ConstantNode(stem1, Constant.STEM_TYPE));
+            excludeKeys.addArgument(new ConstantNode(stem1, STEM_TYPE));
             Dyad monadicTilde = new Dyad(OpEvaluator.TILDE_VALUE); // mondic tilde does not exist. It is done as []~arg.
-            monadicTilde.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
+            monadicTilde.setLeftArgument(new ConstantNode(new StemVariable(), STEM_TYPE));
             monadicTilde.setRightArgument(excludeKeys);
             Dyad dyadicTilde = new Dyad(OpEvaluator.TILDE_VALUE);
-            dyadicTilde.setLeftArgument(new ConstantNode(stem1, Constant.STEM_TYPE));
+            dyadicTilde.setLeftArgument(new ConstantNode(stem1, STEM_TYPE));
             dyadicTilde.setRightArgument(monadicTilde);
             dyadicTilde.evaluate(state);
             pStem0 = (StemVariable) dyadicTilde.getResult();
@@ -2475,15 +2477,15 @@ z. :=  join3(q.,w.)
         FunctionReferenceNode frn = new FunctionReferenceNode();
         frn.setFunctionName(SHUFFLE);
         makeNew.addArgument(frn);
-        makeNew.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));
-        makeNew.addArgument(new ConstantNode(pStem, Constant.STEM_TYPE));
+        makeNew.addArgument(new ConstantNode(oldIndices, STEM_TYPE));
+        makeNew.addArgument(new ConstantNode(pStem, STEM_TYPE));
         StemVariable newIndices = (StemVariable) makeNew.evaluate(state);
 
         // QDl to remap everything.
         Polyad subset = new Polyad(REMAP);
-        subset.addArgument(new ConstantNode(stem, Constant.STEM_TYPE));
-        subset.addArgument(new ConstantNode(oldIndices, Constant.STEM_TYPE));
-        subset.addArgument(new ConstantNode(newIndices, Constant.STEM_TYPE));
+        subset.addArgument(new ConstantNode(stem, STEM_TYPE));
+        subset.addArgument(new ConstantNode(oldIndices, STEM_TYPE));
+        subset.addArgument(new ConstantNode(newIndices, STEM_TYPE));
         polyad.setResult(subset.evaluate(state));
         polyad.setEvaluated(Boolean.TRUE); // set evaluated true or next line bombs.
         polyad.setResultType(Constant.getType(polyad.getResult()));

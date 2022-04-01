@@ -1537,8 +1537,11 @@ See also: truncate, constants (which contains the option values for reference)
     <entry id="trim">
         <body>
             <![CDATA[
- trim(arg) - remove all leading and trailing blanks from the arg. The argument
-             may also be a stem of strings.
+trim(arg) - remove all leading and trailing blanks from the arg. The argument
+            may also be a stem of strings.
+
+Remember that the "-" operator will remove characters as well. trim() just removes
+from the ends.
 ]]>
         </body>
     </entry>
@@ -2486,6 +2489,8 @@ E.g. [|-pi()/4; pi()/3; 11 |]
 
 produces a list of 11 equally spaced numbers from -pi/4 to pi/3,
 including the endpoints.
+
+See also [|, |], ⟦, ⟧
 ]]>
             </body>
         </entry>
@@ -2980,29 +2985,54 @@ Note that indices(a., 1) == indices(a., -1) in this case.
     <entry id="transpose">
             <body>
                 <![CDATA[
+
+Restructure a higher dimension stem by transposing its axes.
+
 transpose(x.) - reverses dim(x.) an remaps the axes of x. If x. is a matrix,
            this is the standard matrix transpose
 transpose(x., a) - transforms x. so that the zeroth axis is a.,
+             This is equivalent to transpose(x., [a,1,2,...,â,...n])
+             where â means the a-th axis is removed. See below
 transpose(x., permutation.) - transforms x. as per the permutation.
+                    permutation. is a list stem of axes indices.
+This does not alter x.  This has no effect on a rank 1 stem (i.e. a simple list).
 
-This does not alter x.  This can be extremely useful at restructuring
-data. This has no effect on a rank 1 stem (i.e. a simple list).
-
+A few quick examples
+  a. := n(2,3,4,5,6,7)
+  dim(a.)
+[2,3,4,5,6,7]
+  dim(transpose(a.))
+[7,6,5,4,3,2]
+  dim(transpose(a., 2)); // swap axis 2 to 0th position
+[4,2,3,5,6,7]
+  dim(transpose(a.,[5,0,4,1,3,2]))
+[7,2,6,3,5,4]
 
 Note that this intended to operate  on stem lists
 of higher dimension and on general stems may lose some of the
 entries (of lower dimensionality). The stems do not need all
 integer indices, just the same dimension.
 
- E.g. Normally reduce operates on the first axis -- by row.
-To sum along the last axis (columns) compare
-    reduce(@+, [[1,2,3],[5,6,7]]); // adds the first row to the second
+E.g. Normally reduce operates on the first axis -- by row.
+Compare axis operations on this stem
+[
+ [1,2,3],
+ [5,6,7]
+]
+Axis 0 operation (default) adds the first row to the second
+i.e. add this structure vertically:
+    reduce(@+, [[1,2,3],[5,6,7]]);
 [6,8,10]
-    // Now, add the columns, reducing each list.
+What if we want to add the elements in each row together,
+i.e. add horizontally? This is summation on the last axis:
     reduce(@+, transpose([[1,2,3],[5,6,7]],-1));
-[6,18]
+[
+ 6,
+ 18
+]
 
 An axis of -1 is always the last axis.
+
 Alias: τ (greek letter tau).
 This could be an operator in its own right, but is much easier to
 work with as a function in most contexts. The alternate Greek letter
@@ -3432,6 +3462,121 @@ cb_exists - boolean function to check if there is a system clipboard
  QDL is restricted to only reading/writing string since other data types
  may be very hard indeed to parse.
                 ]]>
+            </body>
+        </entry>
+    <entry id="external_editor">
+            <body>
+                <![CDATA[
+(ws variable)
+external_editor the name of the editor to invoke for WS edit commands.
+
+    )ws set external_editor nano
+external editor was line now is 'nano'
+
+These are set in the configuration, so see the documentation for the
+workspace configuration. The line editor is built in and always
+available.
+
+See also: ee
+                ]]>
+            </body>
+        </entry>
+    <entry id="ee">
+            <body>
+                <![CDATA[
+(workspace variable)
+Short form of external_editor.
+
+See also: external_editor
+                ]]>
+            </body>
+        </entry>
+    <entry id="assertions_on">
+            <body>
+                <![CDATA[
+(workspace variable)
+Globally toggle assertions on or off. If off, then no
+assertions will be active. If assertions are off, then all
+assertions will be skipped at runtime. This is also a
+configuration option for the workspace.
+                ]]>
+            </body>
+        </entry>
+    <entry id="to_set">
+            <body>
+                <![CDATA[
+(sets module)
+to(set(list.)) - Convert a list to a set.
+
+A set is a stem whose keys and values are the same, so
+  x.key == key
+
+There is no canonical ordering of elements in a set.
+The sets module allows for quick comparisons, such
+as membership or intersections.
+E.g.
+  to_set(3*[;5]+2)
+{2:2, 5:5, 8:8, 11:11, 14:14}
+
+See also: is_member, peek, intersection
+                ]]>
+            </body>
+        </entry>
+    <entry id="peek">
+            <body>
+                <![CDATA[
+(sets module)
+  peek(set. {,count}) - Show part of a set.
+
+count - (optional) the number of elements to show.
+     Default is 5.
+
+There is no canonical ordering of elements in a set.
+This will display count elements.
+See also: to_set, to_list, intersection, is_member
+                ]]>
+            </body>
+        </entry>
+    <entry id="is_member">
+            <body>
+                <![CDATA[
+(sets module)
+is_member(x., y.) - return a left conformable boolean mask of all
+   elements of x. that are in y. T
+
+E.g.
+  a. := sets#to_set(['a','b','c'])
+  b. := sets#to_set(['p','q','b','a'])
+  is_member(a., b.)
+{
+ a:true,
+ b:true,
+ c:false
+}
+
+This is useful with the mask function.
+See also: intersection.
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="intersection">
+            <body>
+                <![CDATA[
+(sets module)
+intersection(x., y.) - The set that is the elements common
+   to both arguments.
+
+E.g.
+
+  intersection(a., b.)
+{
+ a:a,
+ b:b
+}
+
+See also: is_member
+]]>
             </body>
         </entry>
     <!--
