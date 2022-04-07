@@ -1214,6 +1214,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg, polyad.getArgAt(0));
 
         long size = 0;
+        if(isSet(arg)){
+            size = new Long(((QDLSet)arg).size());
+        }
         if (isStem(arg)) {
             size = new Long(((StemVariable) arg).size());
         }
