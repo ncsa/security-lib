@@ -115,6 +115,16 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         }
         add(newEntry);
     }
+    public void append(QDLSet set) {
+        long index = 0L;
+        if(!isEmpty()) {
+             index = last().index;
+        }
+        for(Object k : set){
+             add((V)new StemEntry(index++, k));
+         }
+    }
+
 
     public void appendStem(StemList stemList){
         Iterator<StemEntry> iterator = stemList.iterator();

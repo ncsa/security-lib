@@ -13,6 +13,7 @@ import edu.uiuc.ncsa.qdl.module.QDLModule;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
@@ -36,6 +37,7 @@ public class InputFormUtil {
         if (obj instanceof String) return inputForm((String) obj);
         if (obj instanceof StemVariable) return inputForm((StemVariable) obj);
         if (obj instanceof QDLNull) return inputForm((QDLNull) obj);
+        if(obj instanceof QDLSet) return inputForm((QDLSet)obj);
         return "";
     }
 
@@ -168,6 +170,9 @@ public class InputFormUtil {
         return stemVariable.inputForm(indentFactor);
     }
 
+    public static String inputForm(QDLSet set){
+        return set.inputForm();
+    }
     /**
      * Finds teh input form for a module. Note that the name is either
      * an alias, like acl or acl# (trailing # is optional) or the namespace

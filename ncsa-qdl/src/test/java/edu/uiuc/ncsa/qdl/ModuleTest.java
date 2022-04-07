@@ -1123,5 +1123,21 @@ cannot access '__a'
         }
     }
 
+/*
+  With extensions added.
+    a. := [1,2,3,2,3,2,3]
+    b. :=[;size(a.)]
+    f(jjj)->reduce(@+,mask(n_copy(1,size(a.)),b.jjj==a.))
+    g(j)->reduce(@+,mask(n_copy(1,size(a.)),b.j==a.));
 
+  g(2) fails because the loop in n_copy runs with variable j which resets the argument j.
+  f works because jjj is not used elsewhere.
+
+  ** FIX for 5.2.6 release. Change loop variable in n_copy to __j, so there is no name
+  collision.
+
+  ==> There needs to be a design review about this. It is probably the case that we don't want to have
+      variables passed along like this unless there is an explicit agreement to do so,
+      e.g. delegates[] call, or a type. This is not a trivial discussion.
+ */
 }

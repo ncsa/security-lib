@@ -117,6 +117,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String TO_BOOLEAN = "to_boolean";
     public static final int TO_BOOLEAN_TYPE = 21 + SYSTEM_BASE_VALUE;
 
+    public static final String TO_SET = "to_set";
+        public static final int TO_SET_TYPE = 22 + SYSTEM_BASE_VALUE;
+
     // function stuff
     public static final String RETURN = "return";
     public static final int RETURN_TYPE = 100 + SYSTEM_BASE_VALUE;
@@ -191,6 +194,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
+                    TO_SET,
                     HAS_CLIPBOARD,
                     CLIPBOARD_COPY,
                     CLIPBOARD_PASTE,
@@ -235,6 +239,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     @Override
     public int getType(String name) {
         switch (name) {
+            case TO_SET:
+                return TO_SET_TYPE;
             case HAS_CLIPBOARD:
                 return HAS_CLIPBOARD_COMMAND_TYPE;
             case CLIPBOARD_COPY:
@@ -333,6 +339,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case TO_SET:
+                return doToSet(polyad,state);
             case HAS_CLIPBOARD:
                 doHasClipboard(polyad, state);
                 return true;
@@ -439,6 +447,19 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private boolean doToSet(Polyad polyad, State state) {
+        Polyad v = new Polyad(StemEvaluator.UNIQUE_VALUES);
+        v.setArguments(polyad.getArguments());
+        v.evaluate(state);
+        StemVariable stemVariable = (StemVariable) v.getResult(); // as per contract
+        QDLSet set = new QDLSet();
+        set.addAll(stemVariable.getStemList().values());
+        polyad.setEvaluated(true);
+        polyad.setResultType(Constant.SET_TYPE);
+        polyad.setResult(set);
+        return true;
     }
 
     private void doClipboardRead(Polyad polyad, State state) {
@@ -1981,6 +2002,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             // QDLModules create the local state, java modules assume the state is exactly the local state.
             // Get a new instance and then set the state to the local state later for Java modules.
             Module newInstance = m.newInstance((m instanceof JavaModule)?null:state);
+            //Module newInstance = m.newInstance(null);
             if (newInstance instanceof JavaModule) {
                 State newModuleState = state.newLocalState(state);
                 ((JavaModule) newInstance).init(newModuleState);

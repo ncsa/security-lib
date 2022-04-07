@@ -4,6 +4,10 @@ package edu.uiuc.ncsa.security.core.cache;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -34,6 +38,16 @@ public class Cleanup<K, V> extends Thread {
     // only enable this if there is a very serious issue since the amount of output will skyrocket.
     boolean deepDebug = true;
 
+    public boolean isTestMode() {
+        return testMode;
+    }
+
+    public void setTestMode(boolean testMode) {
+        this.testMode = testMode;
+    }
+
+    boolean testMode = false;
+
     /**
      * Clean out old entries by aging the elements, i.e., apply the retention policies.
      * Returns a list of the entries removed
@@ -54,8 +68,10 @@ public class Cleanup<K, V> extends Thread {
                 // see if we should bother in the first place...
                 if (rp.applies()) {
                     if (!rp.retain(key, co)) {
-                        debug("removing " + key);
-                        getMap().remove(key);
+                        if(!isTestMode()){
+                            debug("removing " + key);
+                            getMap().remove(key);
+                        }
                         linkedList.add(co);
                     }
                 }
@@ -94,6 +110,16 @@ public class Cleanup<K, V> extends Thread {
     public void setCleanupInterval(long cleanupInterval) {
         this.cleanupInterval = cleanupInterval;
     }
+
+    public Collection<LocalTime> getAlarms() {
+        return alarms;
+    }
+
+    public void setAlarms(Collection<LocalTime> alarms) {
+        this.alarms = alarms;
+    }
+
+    Collection<LocalTime> alarms = null;
 
     public Map<K, V> getMap() {
         return map;
@@ -148,20 +174,33 @@ public class Cleanup<K, V> extends Thread {
 
     LinkedList<RetentionPolicy> retentionPolicies;
 
-    protected void log(String x) {
+    protected void info(String x) {
+        if(logger == null){
+            DebugUtil.info(this, x);
+            return;
+        }
         logger.info(x);
+    }
+
+
+    protected void warn(String x) {
+        if(logger == null){
+            DebugUtil.warn(this, x);
+            return;
+        }
+        logger.warn(x);
     }
 
     /**
      * Log the results of this. Override this if you need more detailed output.
      * It takes the list of removed entries. Actual writing to the log is done
-     * with the call {@link #log(String)}.
+     * with the call {@link #info(String)}.
      *
      * @param removed
      */
 
-    public void log(List<V> removed) {
-        log("removed:" + removed.size() + ", remaining:" + getMap().size());
+    public void info(List<V> removed) {
+        info("removed:" + removed.size() + ", remaining:" + getMap().size());
     }
 
     protected void debug(String x) {
@@ -173,20 +212,63 @@ public class Cleanup<K, V> extends Thread {
         DebugUtil.trace(deepDebug, this, x, t);
     }
 
+    protected long getNextSleepInterval() {
+        /*
+        Note that this asssumes that the alarms are in a sorted collection -- such as
+        a TreeSet.
+         */
+        if (getAlarms() == null || getAlarms().isEmpty()) {
+            return getCleanupInterval(); // always set
+        }
+
+        LocalDate today = LocalDate.now();
+        // trick is that there is no canonical ordering to the alarms, they may be repeated
+        // or they may not be distinct for other reasons. Our task here is to find the smallest
+        // positive one
+        long nextAlarm = -1L;
+        for (LocalTime lt : getAlarms()) {
+            ZonedDateTime zonedDateTime = ZonedDateTime.of(today, lt, ZoneId.systemDefault());
+            long nextInterval = zonedDateTime.toEpochSecond() * 1000L - System.currentTimeMillis();
+            if(0 < nextInterval) {
+                if(nextAlarm < 0){
+                      nextAlarm = nextInterval;
+                }else{
+                    // don't check ones in the past
+                    nextAlarm = Math.min(nextAlarm, nextInterval);
+                }
+            }
+        }
+        if(nextAlarm <= 0L){ // nothing was found
+            //So look in the next day
+            LocalDate tomorrow = today.plusDays(1);
+            ZonedDateTime zonedDateTime = ZonedDateTime.of(tomorrow, getAlarms().iterator().next(), ZoneId.systemDefault());
+            nextAlarm = zonedDateTime.toEpochSecond()*1000 - System.currentTimeMillis();
+        }
+        return nextAlarm;
+    }
+
     @Override
     public void run() {
-        log("starting cleanup thread for " + getMap());
+        info("starting cleanup thread for " + getMap());
         while (!isStopThread()) {
             try {
-                sleep(getCleanupInterval());
+                Date nextRun = new Date();
+                long nextCleanup = getNextSleepInterval();
+                nextRun.setTime(nextRun.getTime() + nextCleanup);
+                info("next cleanup for " + getName() + " scheduled for " + nextRun);
+                sleep(nextCleanup);
 
-                if (getMap() != null) {
+
+                if (getMap() == null) {
+                    info("cleanup for " + getName() + " no entries, skipped at " + (new Date()));
+                }else{
+                    info("cleanup for " + getName() + " starting at " + (new Date()));
                     try {
                         List<V> removed = age();
                         if (!removed.isEmpty()) {
-                            log(removed);
+                            info(removed);
                         }
-
+                        info("cleanup removed " + removed.size() + " entries for " + getName());
                     } catch (Throwable throwable) {
                         debug("error in cleanup:" + throwable.getMessage(), throwable);
                         // nix to do, really if this fails.
@@ -196,21 +278,21 @@ public class Cleanup<K, V> extends Thread {
                             sz = getMap().size();
                             if (0 < sz) {
                                 String msg = throwable.getMessage() == null ? "(no message available)" : throwable.getMessage();
-                                logger.warn("Error in cleanup:\"" + msg + "\" Processing will continue on " + sz + " elements.");
+                                warn("Error in cleanup:\"" + msg + "\" Processing will continue on " + sz + " elements.");
                             }
 
                         } catch (Throwable x) {
                             // since the size() call can fail (e.g. database + network flakiness) catch anything.
                             String msg = x.getMessage() == null ? "(no message available)" : x.getMessage();
-                            logger.warn("Error in cleanup:\"" + msg + "\" Processing will continue.");
-
+                            warn("Error in cleanup:\"" + msg + "\" Processing will continue.");
                         }
                         return;
                     }
+                    // sleep after cleanup so startup gets a cleanup.
                 }
             } catch (InterruptedException e) {
                 setStopThread(true); // just in case.
-                logger.warn("Cleanup for " + getName() + " interrupted, stopping thread...");
+                warn("Cleanup for " + getName() + " interrupted, stopping thread...");
             }
         }
     }

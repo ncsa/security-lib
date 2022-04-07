@@ -374,7 +374,7 @@ has_value(left_arg, right_arg) - returns a boolean result conformable to the
          right_arg. Note that unlike many other stem functions, the keys are
          ignored. The resulting key set will always be identical
          to the left_arg.
-See also: mask
+See also: mask, ∈
             ]]>
         </body>
     </entry>
@@ -774,7 +774,10 @@ E.g.
   unique(['a',2,4,true]~[[['a','b',0,3,true]]])
 [0,a,2,b,3,4,true]
 
-This may be used on any stem. There is never any implied order.
+This may be used on any stem and it will recurse the entire stem.
+There is never any implied order.
+
+See also: values
                 ]]>
         </body>
     </entry>
@@ -2326,6 +2329,7 @@ Standard    Unicode   ALT   escape code   What is it
 /              ÷       /    \u00f7         division
 +              ⁺       +    \u207a         unary plus
 ->             →       d    \u2192         lambda function
+               ∈       e    \u2208         has value
 null           ∅       n    \u2205         null
 &&             ∧       &    \u2227         logical and
 ||             ∨       |    \u2228         logical or
@@ -2750,7 +2754,7 @@ E.g. values returned are unique.
   values(arg.)
 [2]
 
-See also: list_keys, keys.
+See also: list_keys, keys, unique.
                 ]]>
             </body>
         </entry>
@@ -2819,7 +2823,10 @@ See also: ceiling, floor, ⌊
     <entry id="%">
             <body>
                 <![CDATA[
-Integer division. This is normal division, but the remainder is discarded.
+Integer division (numbers) or symmetric difference (sets).
+For numbers.
+-----------
+This is normal division, but the remainder is discarded.
 The result is always an integer.
 E.g.
   5432%321
@@ -2829,6 +2836,30 @@ E.g.
    frac(x)->x - x%1; // returns fractional part of a number
    frac(5432/432)
 0.574074074074074
+
+For sets
+--------
+  The symmetric difference of two sets is defined as
+  (A / B) || (B / A)  which is everything but the
+  starred area below:
+
+╔═══════════════════════╗
+║                       ║   A
+║                       ║
+║                       ║
+║                       ║
+║           ╔═══════════╬══════════════════╗
+║           ║  *  *  *  ║                  ║
+║           ║  *  *  *  ║                  ║
+╚═══════════╬═══════════╝                  ║
+            ║                              ║
+            ║                              ║
+            ║                              ║
+            ╚══════════════════════════════╝
+                         B
+E.g.
+  {1,2,3}%{2,4,6}
+{1,3,4,6}
                 ]]>
             </body>
         </entry>
@@ -2899,6 +2930,11 @@ E.g.
 E.g. Glom two sparse lists together then re-index them
   ~{2:4,3:5}~{1:7,11:-2}
 [4,5,7,-2]
+
+On sets.
+--------
+To convert a set to a list, use monadic ~. Note that sets have no canonical
+ordering, so do check what you get.
 
 There is also the laminate function in the extension module for pasting
 two stems together along an axis.
@@ -3505,78 +3541,139 @@ configuration option for the workspace.
     <entry id="to_set">
             <body>
                 <![CDATA[
-(sets module)
-to(set(list.)) - Convert a list to a set.
-
-A set is a stem whose keys and values are the same, so
-  x.key == key
+to_set(list.)) - Convert a list to a set.
 
 There is no canonical ordering of elements in a set.
-The sets module allows for quick comparisons, such
-as membership or intersections.
 E.g.
   to_set(3*[;5]+2)
-{2:2, 5:5, 8:8, 11:11, 14:14}
+{2, 5, 8, 11, 14}
 
-See also: is_member, peek, intersection
+See also: ∈ or has_value, && (intersection)
                 ]]>
             </body>
         </entry>
-    <entry id="peek">
+    <entry id="∈">
             <body>
                 <![CDATA[
-(sets module)
-  peek(set. {,count}) - Show part of a set.
-
-count - (optional) the number of elements to show.
-     Default is 5.
-
-There is no canonical ordering of elements in a set.
-This will display count elements.
-See also: to_set, to_list, intersection, is_member
-                ]]>
-            </body>
-        </entry>
-    <entry id="is_member">
-            <body>
-                <![CDATA[
-(sets module)
-is_member(x., y.) - return a left conformable boolean mask of all
-   elements of x. that are in y. T
+x ∈ y - return a left conformable boolean mask of all
+   elements of x. that are in y. Note that x may be a stem.
 
 E.g.
-  a. := sets#to_set(['a','b','c'])
-  b. := sets#to_set(['p','q','b','a'])
-  is_member(a., b.)
-{
- a:true,
- b:true,
- c:false
-}
+  a. := ['a','b','c']
+  b := {p','q','b','a'};
+  a. ∈ b
+[true,true,false]
 
 This is useful with the mask function.
-See also: intersection.
+See also: intersection, has_value.
                 ]]>
             </body>
         </entry>
 
-    <entry id="intersection">
+
+    <entry id="/">
             <body>
                 <![CDATA[
-(sets module)
-intersection(x., y.) - The set that is the elements common
-   to both arguments.
+Division (numbers) or difference (sets)
+E.g. you know, division
+  17/91
+0.186813186813186
 
+For sets, A/B is all elements in A not in B:
+   {1,3,'a','b',7}/{'a','b','c','d'}
+{1,3,7}
+
+See also && (intersection), % (symmetric difference)
+                ]]>
+            </body>
+        </entry>
+
+
+    <entry id="&amp;&amp;">
+            <body>
+                <![CDATA[
+Either logical and for booleans or intersection for sets.
+
+For sets, the result is a set whose elements are common to
+both arguments.
 E.g.
+    {0,2,3,5} && {4,2,1,0}
+{0,2}
 
-  intersection(a., b.)
-{
- a:a,
- b:b
-}
+NOTE: Since && is used for logical comparisons, the order of
+operations is somewhat different than you might expect.
+If you want to check if the intersection of a pair of sets
+is a given set, use parentheses:
+   a==(b && c)
+since the default parsing with no parentheses for QDL (to be
+consistent with order of operations) would be (a == b) && c.
 
-See also: is_member
+See also: || (set union)
+                ]]>
+            </body>
+        </entry>
+    <entry id="||">
+            <body>
+                <![CDATA[
+Either logical or for booleans or union for sets.
+E.g. (booleans)
+   true || false
+true
+
+For sets, the result is a set whose elements are in either of
+the arguments.
+E.g.
+    {0,2,3,5} && {4,2,1,0}
+{0,1,2,3,4,5}
+
+NOTE: Since || is used for logical comparisons, the order of
+operations is somewhat different than you might expect.
+If you want to check if the union of a pair of sets
+is a given set, use parentheses:
+   a==(b || c)
+since the default parsing with no parentheses for QDL (to be
+consistent with order of operations) would be (a == b) || c.
+
+The difference between ~ and union is that ~ is a list operator and
+returns a list, so a~b for two sets returns an error (since they are not
+lists). However, monadic ~ will convert a set to a list, which is also
+not union!
+   ~{3,4}
+[3,4]
+
+See also: || (set union), ~
+                ]]>
+            </body>
+        </entry>
+
+
+    <entry id="==">
+            <body>
+                <![CDATA[
+For scalars, returns a boolean if the values are the same.
+
+For sets, checks that the elements of one set are identical to
+another.
+E.g.
+  z := to_set([;20]*3+2)
+  z == z
+true
+
+See also: ∈ (has_value), <, > (subset operations.)
 ]]>
+            </body>
+        </entry>
+    <entry id="sets">
+            <body>
+                <![CDATA[
+Often you will just need to do operations on sets (such as
+comparisons) and really don't care about the internal
+structure. A set is collection of elements that are
+ immutable, unique and unordered.
+
+Note that sets have unique elements, so the list [1,1,1,1] (with repeated
+elements) will become the set {1} with as single element.
+                ]]>
             </body>
         </entry>
     <!--

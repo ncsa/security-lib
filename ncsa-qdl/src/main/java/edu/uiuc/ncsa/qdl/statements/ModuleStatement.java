@@ -70,6 +70,7 @@ public class ModuleStatement implements Statement {
         if (state.isImportMode()) {
             // This creates the instance from the statement.
             State localState = state.newLocalState(state);
+            //State localState = state.newCleanState();
             localState.setImportMode(true);
             for (Statement s : getStatements()) {
                 if (s instanceof ModuleStatement) {

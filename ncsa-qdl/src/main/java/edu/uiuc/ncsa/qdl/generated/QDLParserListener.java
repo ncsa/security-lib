@@ -228,6 +228,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitRInterval(QDLParserParser.RIntervalContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet(QDLParserParser.SetContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet(QDLParserParser.SetContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link QDLParserParser#stemVariable}.
 	 * @param ctx the parse tree
 	 */
@@ -428,6 +438,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitIntegers(QDLParserParser.IntegersContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code epsilon}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterEpsilon(QDLParserParser.EpsilonContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code epsilon}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitEpsilon(QDLParserParser.EpsilonContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code andExpression}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
@@ -439,6 +461,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAndExpression(QDLParserParser.AndExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code setThing}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterSetThing(QDLParserParser.SetThingContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code setThing}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitSetThing(QDLParserParser.SetThingContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code strings}
 	 * labeled alternative in {@link QDLParserParser#expression}.

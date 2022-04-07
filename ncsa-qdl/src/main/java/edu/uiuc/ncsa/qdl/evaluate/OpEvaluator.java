@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
+import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
@@ -310,6 +311,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    throw new IllegalArgumentException(REGEX_MATCH + " not defined on sets.");
+                }
+
                 if (!isString(objects[0])) {
                     throw new IllegalArgumentException(REGEX_MATCH + " requires a regular expression as its left argument");
                 }
@@ -340,6 +345,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
             throw new IllegalArgumentException("cannot do a union a null");
         }
+        if (isSet(obj1)) {
+            if (isSet(obj0)) {
+                throw new IllegalArgumentException(TILDE + " not defined on sets. Did you mean union (" + OR + ")?");
+            }
+        }
+        if (areAllSets(obj0, obj1)) {
+        }
         StemVariable stem0 = null;
         StemVariable stem1 = null;
 
@@ -350,13 +362,22 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             stem0.put(0L, obj0);
         }
 
+        if (obj1 instanceof QDLSet) {
+            StemVariable outStem = new StemVariable();
+            outStem.union(stem0);
+            outStem.getStemList().append((QDLSet) obj1);
+            dyad.setResult(outStem);
+            dyad.setResultType(Constant.STEM_TYPE);
+            dyad.setEvaluated(true);
+            return;
+        }
+
         if (obj1 instanceof StemVariable) {
             stem1 = (StemVariable) obj1;
         } else {
             stem1 = new StemVariable();
             stem1.put(0L, obj1);
         }
-
         // NOTE this is done so we don't end up shlepping around references to things and modifying them
         // without warning.
         //       stem0 = (StemVariable) stem0.clone();
@@ -372,6 +393,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    r.result = leftSet.symmetricDifference(rightSet);
+                    r.resultType = Constant.SET_TYPE;
+                    return r;
+                }
                 if (!areAllNumbers(objects)) {
                     throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
@@ -410,7 +438,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
-
+                if (areAllSets(objects)) {
+                    throw new IllegalArgumentException(POWER + " not defined for sets.");
+                }
                 if (areAllNumbers(objects)) {
                     boolean doBigD = isBigDecimal(objects[0]) || isBigDecimal(objects[1]);
                     BigDecimal left = toBD(objects[0]);
@@ -446,13 +476,36 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    switch (dyad.getOperatorType()) {
+                        case LESS_THAN_VALUE:
+                            r.result = leftSet.isSubsetOf(rightSet) && (leftSet.size() != rightSet.size());
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                        case LESS_THAN_EQUAL_VALUE:
+                            r.result = leftSet.isSubsetOf(rightSet);
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                        case MORE_THAN_VALUE:
+                            r.result = rightSet.isSubsetOf(leftSet) && (leftSet.size() != rightSet.size());
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                        case MORE_THAN_EQUAL_VALUE:
+                            r.result = rightSet.isSubsetOf(leftSet);
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                    }
+                    return r;
+                }
                 if (!areAllNumbers(objects)) {
                     throw new IllegalArgumentException("only numbers may be compared");
                 }
                 BigDecimal left = toBD(objects[0]);
                 BigDecimal right = toBD(objects[1]);
                 int leftToRight = left.compareTo(right);
-                fpResult r = new fpResult();
                 Boolean result = false;
                 switch (dyad.getOperatorType()) {
                     case LESS_THAN_VALUE:
@@ -498,6 +551,27 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+
+                if (areAllSets(objects)) {
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    r.result = leftSet.isEqualTo(rightSet);
+                    r.resultType = Constant.BOOLEAN_TYPE;
+                    return r;
+                }
+                if(isSet(objects[0])){
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    r.result = leftSet.contains(objects[1]);
+                    r.resultType = Constant.BOOLEAN_TYPE;
+                    return r;
+                }
+                if(isSet(objects[1])){
+                    QDLSet set = (QDLSet) objects[1];
+                    r.result = set.contains(objects[0]);
+                    r.resultType = Constant.BOOLEAN_TYPE;
+                    return r;
+                }
+
                 if (areAnyBigDecimals(objects)) {
                     BigDecimal left;
                     BigDecimal right;
@@ -563,6 +637,30 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    switch (dyad.getOperatorType()) {
+                        case AND_VALUE:
+                            r.result = leftSet.intersection(rightSet);
+                            r.resultType = Constant.SET_TYPE;
+                            break;
+                        case OR_VALUE:
+                            r.result = leftSet.union(rightSet);
+                            r.resultType = Constant.SET_TYPE;
+                            break;
+                        case EQUALS_VALUE:
+                            r.result = leftSet.isEqualTo(rightSet);
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                        case NOT_EQUAL_VALUE:
+                            r.result = !leftSet.isEqualTo(rightSet);
+                            r.resultType = Constant.BOOLEAN_TYPE;
+                            break;
+                    }
+                    return r;
+
+                }
                 if (!areAllBoolean(objects)) {
                     throw new IllegalArgumentException("arguments must be boolean for logical operations");
                 }
@@ -612,6 +710,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    throw new IllegalArgumentException(MINUS + " not defined on sets. Did you mean difference (" + DIVIDE + ")?");
+                }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
                         try {
@@ -652,6 +753,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             @Override
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    if (doTimes) {
+                        throw new IllegalArgumentException(TIMES + " not defined on sets.");
+                    }
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    r.result = leftSet.difference(rightSet);
+                    r.resultType = Constant.SET_TYPE;
+                    return r;
+                }
                 if (areAllNumbers(objects)) {
                     if (doTimes) {
                         if (areAllLongs(objects)) {
@@ -735,6 +846,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 // At this point, only scalars should ever get passed here as arguments.
                 fpResult r = new fpResult();
+                if (areAllSets(objects)) {
+                    throw new IllegalArgumentException(PLUS + " not defined on sets. Did you mean union (" + AND + ")?");
+                }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
                         try {

@@ -524,8 +524,8 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     /**
-     * Takes the modules in the moduleState and pushes a new stack, function table and modules
-     * onto the current stack.
+     * Creates a new state object and pushes the moduleState's stacks onto
+     * the current one. This means the resulting state inherits everything.
      *
      * @param moduleState
      * @return

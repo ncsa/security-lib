@@ -1797,6 +1797,9 @@ public class WorkspaceCommands implements Logable, Serializable {
                 value.append(" " + inputLine.getArg(i));
             }
         }
+        if(env == null){
+            env = new XProperties();
+        }
         env.put(pName, value.toString());
         return RC_CONTINUE;
     }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
@@ -1987,6 +1988,58 @@ illegal argument:no module named "b" was  imported at (1, 67)
         moduleExpression.setAlias(((VariableNode) var).getVariableReference());
 
         moduleExpression.setExpression((StatementWithResultInterface) statement);
+    }
+
+    @Override
+    public void enterSet(QDLParserParser.SetContext ctx) {
+
+    }
+
+    @Override
+    public void exitSet(QDLParserParser.SetContext ctx) {
+
+    }
+
+    @Override
+    public void enterSetThing(QDLParserParser.SetThingContext ctx) {
+
+
+    }
+
+    @Override
+    public void exitSetThing(QDLParserParser.SetThingContext ctx) {
+        QDLSetNode setNode = new QDLSetNode();
+        setNode.setTokenPosition(tp(ctx));
+        stash(ctx, setNode);
+        for (int i = 0; i < ctx.set().getChildCount(); i++) {
+            ParseTree pt = ctx.set().getChild(i);
+            if(!(pt instanceof TerminalNode)){
+                StatementWithResultInterface stmt = (StatementWithResultInterface) resolveChild(pt);
+                setNode.getStatements().add(stmt);
+
+            }
+        }
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+         setNode.setSourceCode(source);
+    }
+
+    @Override
+    public void enterEpsilon(QDLParserParser.EpsilonContext ctx) {
+
+    }
+
+    @Override
+    public void exitEpsilon(QDLParserParser.EpsilonContext ctx) {
+        Polyad dyad;
+        dyad = new Polyad(StemEvaluator.HAS_VALUE);
+        dyad.setTokenPosition(tp(ctx));
+        stash(ctx, dyad);
+        dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(0)));
+        dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(1)));
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        dyad.setSourceCode(source);
     }
 }
 

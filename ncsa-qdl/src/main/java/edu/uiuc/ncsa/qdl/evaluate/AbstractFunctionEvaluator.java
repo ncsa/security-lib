@@ -12,9 +12,11 @@ import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemUtility;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import org.apache.commons.codec.binary.Base32;
 
 import java.math.BigDecimal;
@@ -33,16 +35,18 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     public abstract String[] getFunctionNames();
 
     String[] fqNames = null;
-    public String[] getFQFunctionNames(){
-        if(fqNames == null){
+
+    public String[] getFQFunctionNames() {
+        if (fqNames == null) {
             fqNames = new String[getFunctionNames().length];
-            for(int i = 0; i < fqNames.length; i++){
-                fqNames[i]= getNamespace() + State.NS_DELIMITER + getFunctionNames()[i];
+            for (int i = 0; i < fqNames.length; i++) {
+                fqNames[i] = getNamespace() + State.NS_DELIMITER + getFunctionNames()[i];
             }
         }
 
         return fqNames;
     }
+
     @Override
     public TreeSet<String> listFunctions(boolean listFQ) {
         TreeSet<String> names = new TreeSet<>();
@@ -53,6 +57,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         return names;
     }
+
     public boolean isBuiltInFunction(String name) {
         for (String x : getFunctionNames()) {
             if (x.equals(name)) return true;
@@ -79,6 +84,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return StemUtility.isStem(obj);
     }
 
+    protected boolean isSet(Object obj) {
+        return obj instanceof QDLSet;
+    }
+
     protected boolean isStemList(Object obj) {
         return isStem(obj) && ((StemVariable) obj).containsKey("0");
     }
@@ -98,6 +107,12 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return true;
     }
 
+    protected  boolean areAllSets(Object... objects){
+        for(Object obj : objects){
+            if(!isSet(obj)){return false;}
+        }
+        return true;
+    }
     protected boolean areAllStems(Object... objects) {
         return StemUtility.areAllStems(objects);
     }
@@ -212,6 +227,16 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         Object arg1 = polyad.evalArg(0, state);
 
         checkNull(arg1, polyad.getArgAt(0), state);
+
+        if (isSet(arg1)) {
+            QDLSet argSet = (QDLSet) arg1;
+            QDLSet outSet = new QDLSet();
+            processSet1(outSet, argSet, pointer);
+            polyad.setResult(outSet);
+            polyad.setResultType(Constant.SET_TYPE);
+            polyad.setEvaluated(true);
+            return;
+        }
         if (!isStem(arg1)) {
             fpResult r = pointer.process(arg1);
             finishExpr(polyad, r);
@@ -245,8 +270,25 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 outStem.put(key, pointer.process(stemVariable.get(key)).result);
             }
         }
-
     }
+
+
+    protected void processSet1(QDLSet outSet, QDLSet arg, fPointer pointer) {
+        for (Object key : arg) {
+            if (key instanceof StemVariable) {
+                QDLSet newOut = new QDLSet();
+/*
+                processStem1(newOut, (StemVariable) key, pointer);
+                if (!newOut.isEmpty()) {
+                    outSet.put(key, newOut);
+                }
+*/
+            } else {
+                outSet.add(pointer.process(key).result);
+            }
+        }
+    }
+
 
     protected void process2(ExpressionImpl polyad,
                             fPointer pointer,
@@ -276,29 +318,43 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0), state);
-
+        Object arg2 = null;
+        UnknownSymbolException usx = null;
+        try {
+            arg2 = polyad.evalArg(1, state);
+            checkNull(arg2, polyad.getArgAt(1), state);
+        } catch (UnknownSymbolException unknownSymbolException) {
+            usx = unknownSymbolException;
+        }
         // Short circuit dyadic logical && ||
+        // We do allow for short circuiting if the second argument does not exist.
+        // This is a common construct e.g. if[is_defined(x.) && size(x.) != 0]then[...
         if (arg1 instanceof Boolean) {
             if (polyad.getOperatorType() == OpEvaluator.OR_VALUE) {
-                if ((Boolean) arg1) {
-                    polyad.setResult(Boolean.TRUE);
-                    polyad.setResultType(Constant.BOOLEAN_TYPE);
-                    polyad.setEvaluated(true);
-
-                    return;
+                if (((Boolean) arg1)) { // if arg1 true then...
+                    if ((usx != null) || !(isSet(arg2) || isStem(arg2))) {
+                        polyad.setResult(Boolean.TRUE);
+                        polyad.setResultType(Constant.BOOLEAN_TYPE);
+                        polyad.setEvaluated(true);
+                        return;
+                    }
                 }
             }
             if (polyad.getOperatorType() == OpEvaluator.AND_VALUE) {
-                if (!((Boolean) arg1)) {
-                    polyad.setResult(Boolean.FALSE);
-                    polyad.setResultType(Constant.BOOLEAN_TYPE);
-                    polyad.setEvaluated(true);
-                    return;
+                if (!((Boolean) arg1)) { // if arg1 false then...
+                    if ((usx != null) || !(isSet(arg2) || isStem(arg2))) {
+                        polyad.setResult(Boolean.FALSE);
+                        polyad.setResultType(Constant.BOOLEAN_TYPE);
+                        polyad.setEvaluated(true);
+                        return;
+                    }
+
                 }
             }
         }
-        Object arg2 = polyad.evalArg(1, state);
-        checkNull(arg2, polyad.getArgAt(1), state);
+        if (usx != null) {
+            throw usx;
+        }
         Object[] argList = new Object[polyad.getArgCount()];
         argList[0] = arg1;
         argList[1] = arg2;
@@ -307,6 +363,52 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 argList[i] = polyad.getArguments().get(i).evaluate(state);
             }
         }
+
+        boolean isOneSet = false;
+        boolean isTwoSets = false;
+
+        boolean scalarRHS = false;
+        QDLSet leftSet = null;
+        QDLSet rightSet = null;
+        if (arg1 instanceof QDLSet) {
+            if ((arg2 instanceof QDLSet)) {
+                leftSet = (QDLSet) arg1;
+                rightSet = (QDLSet) arg2;
+                isTwoSets = true;
+            } else {
+                if (arg2 instanceof StemVariable) {
+                    throw new IllegalArgumentException("can only apply scalar operations on sets.");
+                }
+                isOneSet = true;
+                scalarRHS = true;
+            }
+        }
+        if ((leftSet == null) && arg2 instanceof QDLSet) {
+            if (arg1 instanceof StemVariable) {
+                throw new IllegalArgumentException("can only apply scalar operations on sets.");
+            }
+            isOneSet = true;
+            scalarRHS = false;
+        }
+        if (isOneSet) {
+            QDLSet outSet = new QDLSet();
+            QDLSet inSet = (QDLSet) (scalarRHS ? arg1 : arg2);
+            Object scalar = scalarRHS ? arg2 : arg1;
+            processSet2(outSet, inSet, scalar, scalarRHS, pointer, polyad, optionalArgs);
+            polyad.setEvaluated(true);
+            polyad.setResult(outSet);
+            polyad.setResultType(Constant.SET_TYPE);
+            return;
+        }
+        if (isTwoSets) {
+            QDLSet outSet = new QDLSet();
+            Object result = processSet2(leftSet, rightSet, pointer, polyad, optionalArgs);
+            polyad.setEvaluated(true);
+            polyad.setResult(result);
+            polyad.setResultType(Constant.getType(result));
+            return;
+        }
+
         if (areNoneStems(argList)) {
             fpResult result = pointer.process(argList);
             finishExpr(polyad, result);
@@ -319,6 +421,81 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
+    }
+
+    /**
+     * Operations on two sets can return either a set (e.g. intersection) or a scalar (e.g. subset of)
+     * @param leftSet
+     * @param rightSet
+     * @param pointer
+     * @param polyad
+     * @param optionalArgs
+     * @return
+     */
+    protected Object processSet2(QDLSet leftSet, QDLSet rightSet, fPointer pointer, ExpressionImpl polyad, boolean optionalArgs) {
+        fpResult r = null;
+        Object[] objects;
+        if (optionalArgs) {
+            objects = new Object[polyad.getArgCount()];
+
+        } else {
+            objects = new Object[2];
+        }
+        objects[0] = leftSet;
+        objects[1] = rightSet;
+        if (optionalArgs) {
+            for (int i = 2; i < objects.length; i++) {
+                objects[i] = polyad.getArguments().get(i).getResult();
+            }
+        }
+        if (isStem(objects[0]) || isStem(objects[1])) {
+            throw new NotImplementedException("stems as elements of sets not implemented ");
+        } else {
+            r = pointer.process(objects);
+            return r.result;
+        }
+    }
+
+    /**
+     * Apply a scalar to ever element in a set.
+     *
+     * @param outSet
+     * @param inSet
+     * @param scalar
+     * @param pointer
+     * @param polyad
+     * @param optionalArgs
+     */
+    protected void processSet2(QDLSet outSet, QDLSet inSet, Object scalar, boolean scalarRHS, fPointer pointer, ExpressionImpl polyad, boolean optionalArgs) {
+        for (Object element : inSet) {
+            fpResult r = null;
+            Object[] objects;
+            if (optionalArgs) {
+                objects = new Object[polyad.getArgCount()];
+
+            } else {
+                objects = new Object[2];
+            }
+            if (scalarRHS) {
+                objects[0] = element;
+                objects[1] = scalar;
+            } else {
+                objects[0] = scalar;
+                objects[1] = element;
+
+            }
+            if (optionalArgs) {
+                for (int i = 2; i < objects.length; i++) {
+                    objects[i] = polyad.getArguments().get(i).getResult();
+                }
+            }
+            if (isStem(objects[0]) || isStem(objects[1])) {
+                throw new NotImplementedException("stems as elements of sets not implemented ");
+            } else {
+                r = pointer.process(objects);
+                outSet.add(r.result);
+            }
+        }
     }
 
     /*
@@ -627,7 +804,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         random.nextBytes(bytes);
         String tempName = base32.encodeToString(bytes);
         for (int i = 0; i < 10; i++) {
-            if (!state.getFTStack().containsKey(new FKey(tempName,-1))) {
+            if (!state.getFTStack().containsKey(new FKey(tempName, -1))) {
                 return tempName;
             }
             tempName = base32.encodeToString(bytes);

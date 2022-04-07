@@ -72,6 +72,7 @@ assertStatement2:
    rInterval : LDoubleBracket expression? ';' expression (';' | (';' expression))? RDoubleBracket;
 
 
+          set : '{' expression (',' expression)* '}';
  stemVariable : '{' stemEntry (',' stemEntry)* '}'
               | '{' '}';
     stemEntry : (Times | expression) ':' stemValue;
@@ -103,6 +104,7 @@ expression
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar
  | stemList                                                                    #stemLi
+ | set                                                                         #setThing
  | rInterval                                                                   #realInterval
  | iInterval                                                                   #intInterval
  | expression (Tilde | TildeRight ) expression                                 #tildeExpression
@@ -127,7 +129,7 @@ expression
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
-// | expression '∈' expression                                                   #epsilon
+ | expression '∈' expression                                                   #epsilon  // unicode 2208
  | STRING                                                                      #strings
  | integer                                                                     #integers
  | number                                                                      #numbers

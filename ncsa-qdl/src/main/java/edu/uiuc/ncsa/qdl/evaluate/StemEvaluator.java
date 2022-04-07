@@ -889,7 +889,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
         Object rightArg = polyad.evalArg(1, state);
         checkNull(rightArg, polyad.getArgAt(1));
-        // breaks down tidily in to 4 cases.
+        // breaks  down tidily in to 4 cases.
         if (isStem(leftArg)) {
             StemVariable lStem = (StemVariable) leftArg;
             StemVariable result = new StemVariable(); // result is always conformable to left arg
@@ -905,18 +905,25 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                         }
                     }
                     result.put(lkey, rc);
-
                 }
             } else {
-                // check if each element in the left stem matches the value of the right arg.
-                for (String lKey : lStem.keySet()) {
-                    result.put(lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
+                if(isSet(rightArg)){
+                    QDLSet rSet = (QDLSet) rightArg;
+                      for(String key : lStem.keySet()){
+                            result.put(key, rSet.contains(lStem.get(key)));
+                      }
+                }else {
+                    // check if each element in the left stem matches the value of the right arg.
+                    for (String lKey : lStem.keySet()) {
+                        result.put(lKey, lStem.get(lKey).equals(rightArg) ? Boolean.TRUE : Boolean.FALSE); // got to finagle these are right Java objects
+                    }
                 }
             }
             polyad.setResult(result);
             polyad.setResultType(STEM_TYPE);
 
         } else {
+            // left arg is not a stem.
             Boolean result = Boolean.FALSE;
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
@@ -927,7 +934,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                     }
                 }
             } else {
-                result = leftArg.equals(rightArg);
+                if(isSet(rightArg)){
+                   result = ((QDLSet)rightArg).contains(leftArg);
+                }else {
+                    result = leftArg.equals(rightArg);
+                }
             }
             polyad.setResult(result);
             polyad.setResultType(BOOLEAN_TYPE);

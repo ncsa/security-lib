@@ -14,6 +14,7 @@ import org.junit.runners.Suite;
         QDLVariableTest.class,
         TestMonadicOperations.class,
         TestDyadicOperations.class,
+        SetTest.class,
         ExpressionTest.class,
         StatementTest.class,
         IOFunctionTest.class,

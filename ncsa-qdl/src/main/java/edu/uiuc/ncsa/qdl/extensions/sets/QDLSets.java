@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.extensions.sets;
 
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.extensions.QDLFunction;
 import edu.uiuc.ncsa.qdl.extensions.QDLModuleMetaClass;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -9,12 +10,12 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static edu.uiuc.ncsa.qdl.variables.Constant.LONG_TYPE;
-import static edu.uiuc.ncsa.qdl.variables.Constant.STRING_TYPE;
+import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 4/1/22 at  12:24 PM
+ * @deprecated - this functionality has been improved and added to the base system. 
  */
 public class QDLSets implements QDLModuleMetaClass {
     public static String TO_SET_COMMAND = "to_set";
@@ -47,6 +48,9 @@ public class QDLSets implements QDLModuleMetaClass {
                 Object value = stemVariable.get(key);
                 int type = Constant.getType(value);
                 switch (type) {
+                    case NULL_TYPE:
+                    case BOOLEAN_TYPE:
+                    case DECIMAL_TYPE:
                     case STRING_TYPE:
                         result.put(value.toString(), stemVariable.get(key));
                         break;
@@ -126,7 +130,7 @@ public class QDLSets implements QDLModuleMetaClass {
                 doxx.add(IS_MEMBER_OF_COMMAND + "(x.,y.) = check if each element of set x. is the set y.");
                 doxx.add("The result is a left conformable list of booleans.");
                 doxx.add("Note that the result is a stem for each element.");
-                doxx.add("");
+                doxx.add("See also: " + SUBSET_COMMAND + ", " + EQUALS_COMMAND);
             }
             return doxx;
         }
@@ -173,7 +177,7 @@ public class QDLSets implements QDLModuleMetaClass {
                 doxx.add(INTERSECTION_COMMAND + "(x.,y.) - find the intersection of two sets.");
                 doxx.add("the result is set that contains the elements common to both of the ");
                 doxx.add("arguments.");
-                doxx.add("");
+                doxx.add("See also: " + DIFFERENCE_COMMAND);
             }
             return doxx;
         }
@@ -202,14 +206,14 @@ public class QDLSets implements QDLModuleMetaClass {
                 if (!(objects[1] instanceof Long)) {
                     throw new IllegalArgumentException(PEEK_COMMAND + " requires an integer as its second argument");
                 }
-               defaultCount = (Long)objects[1];
+                defaultCount = (Long) objects[1];
             }
             StemVariable arg = (StemVariable) objects[0];
-         //   defaultCount = Math.min(defaultCount, arg.size());
+            defaultCount = Math.min(defaultCount, arg.keySet().size());
             StemVariable result = new StemVariable();
             int i = 0;
             for (String key : arg.keySet()) {
-                if(i == defaultCount){
+                if (i == defaultCount) {
                     break;
                 }
                 result.put(i++, key);
@@ -229,15 +233,54 @@ public class QDLSets implements QDLModuleMetaClass {
                 doxx.add("Since sets have no canonical ordering, there is no easy way");
                 doxx.add("(like a list) to look at the first say 5 elements.");
                 doxx.add("This command allows you to look at a random number of elements");
-                doxx.add("The result is a list (not a set) of elements");
-                doxx.add("");
-
+                doxx.add("The result is a list (not set) of elements. ");
+                doxx.add("Why isn't this a set? Because the major use of this is to have a");
+                doxx.add("quick look at a few members and it is easier to list things and format");
+                doxx.add("them if they are a list.");
+                doxx.add("See also:" + TO_LIST_COMMAND);
             }
             return doxx;
         }
     }
+
+    public static String CARDINALITY_COMMAND = "card";
+
+    public class Cardinality implements QDLFunction {
+        @Override
+        public String getName() {
+            return CARDINALITY_COMMAND;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{1};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (objects[0] instanceof StemVariable) {
+                return (long) ((StemVariable) objects[0]).keySet().size();
+
+            }
+            return 1;
+        }
+
+        List<String> doxx = new ArrayList<>();
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doxx == null) {
+                doxx.add(CARDINALITY_COMMAND + "(set.) - quick count of the elements of the set");
+                doxx.add("This is faster than the standard size command which assumes possible recursive");
+                doxx.add("structures in the stem.");
+            }
+            return doxx;
+        }
+    }
+
     public static String TO_LIST_COMMAND = "to_list";
-    public class ToList implements QDLFunction{
+
+    public class ToList implements QDLFunction {
         @Override
         public String getName() {
             return TO_LIST_COMMAND;
@@ -250,27 +293,175 @@ public class QDLSets implements QDLModuleMetaClass {
 
         @Override
         public Object evaluate(Object[] objects, State state) {
-            if(!(objects[0] instanceof StemVariable)){
+            if (!(objects[0] instanceof StemVariable)) {
                 throw new IllegalArgumentException(TO_LIST_COMMAND + " requires a set as its argument");
             }
             StemVariable arg = (StemVariable) objects[0];
             long i = 0L;
             StemVariable result = new StemVariable();
-            for(String key : arg.keySet()){
+            for (String key : arg.keySet()) {
                 result.put(i++, key);
             }
             return result;
         }
 
         List<String> doxx = null;
+
         @Override
         public List<String> getDocumentation(int argCount) {
-            if(doxx == null){
+            if (doxx == null) {
                 doxx = new ArrayList<>();
                 doxx.add(TO_LIST_COMMAND + "(set.) - converts a set to a list.");
                 doxx.add("Note that there is no canonical ordering of elements in a set");
                 doxx.add("hence none is assured.");
                 doxx.add("See also:" + TO_SET_COMMAND);
+            }
+            return doxx;
+        }
+    }
+
+    public static String DIFFERENCE_COMMAND = "diff";
+
+    public class Difference implements QDLFunction {
+        @Override
+        public String getName() {
+            return DIFFERENCE_COMMAND;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (!(objects[0] instanceof StemVariable)) {
+                throw new IllegalArgumentException("first argument of " + DIFFERENCE_COMMAND + " must be a set");
+            }
+            StemVariable stem0 = (StemVariable) objects[0];
+            if (!(objects[1] instanceof StemVariable)) {
+                throw new IllegalArgumentException("second argument of " + DIFFERENCE_COMMAND + " must be a set");
+            }
+            StemVariable stem1 = (StemVariable) objects[1];
+            StemVariable result = new StemVariable();
+            for (String key : stem0.keySet()) {
+                if (stem0.containsKey(key) && !stem1.containsKey(key)) {
+                    result.put(key, key);
+                }
+            }
+            return result;
+        }
+
+        List<String> doxx = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doxx == null) {
+                doxx = new ArrayList<>();
+                doxx.add(DIFFERENCE_COMMAND + "(x., y.) - find the difference of two sets.");
+                doxx.add("The difference of two sets, A and B is defined as");
+                doxx.add("A - B := A ∩ B' = {x:x∈ A ∧ x ∉ B}");
+                doxx.add("See also: " + StemEvaluator.UNION);
+            }
+            return doxx;
+        }
+    }
+
+    public static String SUBSET_COMMAND = "subset_of";
+
+    public class Subset implements QDLFunction {
+        @Override
+        public String getName() {
+            return SUBSET_COMMAND;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (!(objects[0] instanceof StemVariable)) {
+                throw new IllegalArgumentException(SUBSET_COMMAND + " requires a set as its first argument");
+            }
+
+            if (!(objects[1] instanceof StemVariable)) {
+                throw new IllegalArgumentException(SUBSET_COMMAND + " requires a set as its second argument");
+            }
+            StemVariable stem1 = (StemVariable) objects[1];
+            StemVariable stem0 = (StemVariable) objects[0];
+
+            for (String key : stem0.keySet()) {
+                if (!stem1.containsKey(key)) {
+                    return Boolean.FALSE;
+                }
+            }
+            return Boolean.TRUE;
+        }
+
+        List<String> doxx = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doxx == null) {
+                doxx = new ArrayList<>();
+                doxx.add(SUBSET_COMMAND + "(x., y.) - returns true if every element in x. is in y.");
+                doxx.add("This returns a scalar, unlike " + IS_MEMBER_OF_COMMAND + " which tests");
+                doxx.add("each element and returns membership.");
+                doxx.add("See also:" + EQUALS_COMMAND + ", " + IS_MEMBER_OF_COMMAND);
+            }
+            return doxx;
+        }
+    }
+
+    public static String EQUALS_COMMAND = "equals";
+
+    public class Equals implements QDLFunction {
+        @Override
+        public String getName() {
+            return EQUALS_COMMAND;
+        }
+
+        @Override
+        public int[] getArgCount() {
+            return new int[]{2};
+        }
+
+        @Override
+        public Object evaluate(Object[] objects, State state) {
+            if (!(objects[0] instanceof StemVariable)) {
+                throw new IllegalArgumentException(SUBSET_COMMAND + " requires a set as its first argument");
+            }
+
+            if (!(objects[1] instanceof StemVariable)) {
+                throw new IllegalArgumentException(SUBSET_COMMAND + " requires a set as its second argument");
+            }
+            Subset subset = new Subset();
+            Boolean result = (Boolean) subset.evaluate(objects, state);
+            if (!result) {
+                return Boolean.FALSE;
+            }
+            // only test for equality if stem0 is a subset of stem1.
+            StemVariable stem0 = (StemVariable) objects[0];
+            StemVariable stem1 = (StemVariable) objects[1];
+
+            if (stem1.size() != stem0.size()) {
+                return Boolean.FALSE;
+            }
+            return Boolean.TRUE;
+        }
+
+        List<String> doxx = null;
+
+        @Override
+        public List<String> getDocumentation(int argCount) {
+            if (doxx == null) {
+                doxx = new ArrayList<>();
+                doxx.add(EQUALS_COMMAND + "(x.,y.) returns true if and only if every ");
+                doxx.add("   element of x. is in y. and conversely.");
+                doxx.add("See also: " + SUBSET_COMMAND);
+                doxx.add("");
             }
             return doxx;
         }

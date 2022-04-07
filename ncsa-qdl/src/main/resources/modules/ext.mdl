@@ -28,7 +28,7 @@ module[
      >> n_copy(s,n) - Create a stem with 0 < n copies of the single argument s.
      out. := null;
      if[n <= 0][return([]);];
-     while[for_next(j, [;n])][out.j := s;];
+     while[for_next(__j, [;n])][out.__j := s;];
      return(out.);
    ];
 

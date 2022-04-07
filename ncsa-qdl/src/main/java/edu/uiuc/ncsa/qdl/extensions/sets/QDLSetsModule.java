@@ -30,6 +30,10 @@ public class QDLSetsModule extends JavaModule {
         funcs.add(qdlSets.new Intersection());
         funcs.add(qdlSets.new Peek());
         funcs.add(qdlSets.new ToList());
+        funcs.add(qdlSets.new Difference());
+        funcs.add(qdlSets.new Subset());
+        funcs.add(qdlSets.new Equals());
+        funcs.add(qdlSets.new Cardinality());
         module.addFunctions(funcs);
         if(state != null){
             module.init(state);

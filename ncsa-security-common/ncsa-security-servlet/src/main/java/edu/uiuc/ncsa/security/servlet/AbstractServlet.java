@@ -204,7 +204,7 @@ public abstract class AbstractServlet extends HttpServlet implements Logable {
 
             doIt(httpServletRequest, httpServletResponse);
         } catch (Throwable t) {
-            t.printStackTrace();
+     //       t.printStackTrace();
             handleException(t, httpServletRequest, httpServletResponse);
         }
     }
