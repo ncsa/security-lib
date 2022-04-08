@@ -53,6 +53,7 @@ public abstract class JavaModule extends Module {
     }
 
     String loaderClassName;
+
     /**
      * Used by the factory method {@link #newInstance(State)}
      *
@@ -86,8 +87,9 @@ public abstract class JavaModule extends Module {
      * @param state
      */
     public void init(State state) {
-                      init(state, true);
+        init(state, true);
     }
+
     public void init(State state, boolean doVariables) {
         if (initialized) return;
         setDocumentation(createDefaultDocs());
@@ -95,7 +97,7 @@ public abstract class JavaModule extends Module {
         setState(state);
         // If this is being recreated from its serialization, skip the variables so whatever
         // the has set is not overwritten.
-        if(doVariables) {
+        if (doVariables) {
             for (QDLVariable v : vars) {
                 if (Constant.getType(v.getValue()) == Constant.UNKNOWN_TYPE) {
                     throw new IllegalArgumentException("Error: The value of  " + v.getValue() + " is unknown.");
@@ -132,7 +134,6 @@ public abstract class JavaModule extends Module {
     }
 
 
-
     /**
      * Creates the documentation from the first of each line of every function. Use this or
      * override as needed.
@@ -141,14 +142,14 @@ public abstract class JavaModule extends Module {
      */
     public List<String> createDefaultDocs() {
         List<String> docs = new ArrayList<>();
-        docs.add("  module name : " + getClass().getSimpleName() );
+        docs.add("  module name : " + getClass().getSimpleName());
         docs.add("    namespace : " + getNamespace());
         docs.add("default alias : " + getAlias());
         docs.add("   java class : " + getClass().getCanonicalName());
-        if(getDescription() != null ){
-              docs.addAll(getDescription());
+        if (getDescription() != null) {
+            docs.addAll(getDescription());
         }
-        if(!funcs.isEmpty()) {
+        if (!funcs.isEmpty()) {
             docs.add("functions:");
             // Now sort the functions
             TreeSet<String> treeSet = new TreeSet<>();
@@ -162,7 +163,7 @@ public abstract class JavaModule extends Module {
             }
             docs.addAll(treeSet);
         }
-        if(!vars.isEmpty()){
+        if (!vars.isEmpty()) {
             docs.add("variables:");
             TreeSet<String> treeSet = new TreeSet<>();
             for (QDLVariable variable : vars) {
@@ -178,13 +179,14 @@ public abstract class JavaModule extends Module {
      * The {@link #createDefaultDocs()} will create basic documentation for functions and such,
      * and is called automatically during module {@link #init(State)},
      * but the actual description of this module -- if any -- is done here. Override and return your description.
+     *
      * @return
      */
-     public List<String> getDescription(){
+    public List<String> getDescription() {
         return null;
-     }
+    }
 
-     List<String> documentation = new ArrayList<>();
+    List<String> documentation = new ArrayList<>();
 
     @Override
     public List<String> getListByTag() {
@@ -193,8 +195,11 @@ public abstract class JavaModule extends Module {
 
     @Override
     public void setDocumentation(List<String> documentation) {
-                   this.documentation = documentation;
+        this.documentation = documentation;
     }
 
-
+    @Override
+    public List<String> getDocumentation() {
+        return documentation;
+    }
 }

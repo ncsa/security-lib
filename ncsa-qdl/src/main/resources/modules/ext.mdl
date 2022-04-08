@@ -95,7 +95,7 @@ module[
   define[
       laminate(x, y)
    ][
-     >> Laminate along zero-th axis. See help for laminate(x,y,axis).
+     >> laminate(x, y) - Laminate along zero-th axis. See help for laminate(x,y,axis).
       return(laminate(x,y,0));
    ];
     //  laminate(n(2,3,[;6]),n(2,3,[10;16]),0)

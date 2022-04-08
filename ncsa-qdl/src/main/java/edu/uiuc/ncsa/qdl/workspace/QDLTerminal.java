@@ -56,6 +56,8 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('→');
                     case 'e':
                         return new KeyStroke('∈');
+                    case 'i':
+                        return new KeyStroke('∩');
                     case 'F':
                         return new KeyStroke('⊥');
                     case 'l':
@@ -68,6 +70,8 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('π');
                     case 'T':
                         return new KeyStroke('⊤');
+                    case 'u':
+                        return new KeyStroke('∪');
                     case ':':
                         return new KeyStroke('≔');
                     case '"':

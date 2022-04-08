@@ -99,4 +99,47 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok1", state);
     }
+    public void testSize() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := {0,1,2,3,4};");
+        addLine(script, "ok := size(a) == 5;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testSubset() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := {0,-2} == subset((x)->x<3, {-2,0,4,5});");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testReduce() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := 120 == reduce(@*, {1,2,3,4,5});");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testLoop() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 6;");
+        addLine(script, "while[j∈{1,2,3,4,5}][a:=a*j;];");
+        addLine(script, "ok := a== 720;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
 }
+/*
+      while[j∈{1,2,3,4,5}][a:=a*j;];
+
+ */

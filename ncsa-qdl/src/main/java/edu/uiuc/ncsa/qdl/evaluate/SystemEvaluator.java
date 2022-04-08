@@ -646,6 +646,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
       times(x,y)->x*y
       reduce(@times(), 1+n(5))
 
+  z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'}
+      q. :=  subset((x)->index_of(x, 'x_')==0, z.)
+        reduce(@&&, q. == q.)
+
      */
     private void doReduceOrExpand(Polyad polyad, State state0, boolean doReduce) {
         State state = state0.newLocalState();
@@ -655,17 +659,71 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         frn = getFunctionReferenceNode(state, polyad.getArguments().get(0), true);
         Object arg1 = polyad.evalArg(1, state);
         checkNull(arg1, polyad.getArgAt(1), state);
-        if (!isStem(arg1)) {
+        if (isScalar(arg1)) {
             polyad.setResult(arg1);
             polyad.setResultType(Constant.getType(arg1));
             polyad.setEvaluated(true);
             return;
         }
-        StemVariable stemVariable = (StemVariable) arg1;
-        if (!stemVariable.isList()) {
-            throw new IllegalArgumentException("second argument of " + (doReduce ? REDUCE : EXPAND) + " must be a list");
+        if(doReduce && isSet( arg1)){
+            QDLSet argSet = (QDLSet) arg1;
+            ExpressionImpl f = getOperator(state, frn,2);
+            Object lastResult = null;
+            ArrayList<Object> args = new ArrayList<>();
+            for(Object element : argSet){
+                if(lastResult == null){
+                    // first pass
+                    lastResult = element;
+                    continue;
+                }
+                args.clear();
+                args.add(lastResult);
+                args.add(element);
+                f.setArguments(toConstants(args));
+                lastResult = f.evaluate(state);
+            }
+            polyad.setResult(lastResult);
+            polyad.setResultType(Constant.getType(lastResult));
+            polyad.setEvaluated(true);
+            return;
         }
-        int axis = 0; // default
+
+        if(!doReduce && !isStem(arg1)){
+            throw new IllegalArgumentException(EXPAND + " requires a list as its argument");
+        }
+        StemVariable stemVariable = (StemVariable) arg1;
+
+        if(!doReduce && !stemVariable.isList()){
+            throw new IllegalArgumentException(EXPAND + " requires a list as its argument");
+        }
+
+
+        if(doReduce && !stemVariable.isList()){
+            // allow for reducing stems to a scalar
+            Object rrr = null;
+            ExpressionImpl f = getOperator(state, frn,2);
+            Object lastResult = null;
+            ArrayList<Object> args = new ArrayList<>();
+            for(String key : stemVariable.keySet()){
+                Object nextValue = stemVariable.get(key);
+                if(lastResult == null){
+                    // first pass
+                    lastResult = nextValue;
+                    continue;
+                }
+                args.clear();
+                args.add(lastResult);
+                args.add(nextValue);
+                f.setArguments(toConstants(args));
+                lastResult = f.evaluate(state);
+            }
+            polyad.setResult(lastResult);
+            polyad.setResultType(Constant.getType(lastResult));
+            polyad.setEvaluated(true);
+            return;
+        }
+
+      int axis = 0; // default
         if (polyad.getArgCount() == 3) {
             Object axisObj = polyad.evalArg(2, state);
             checkNull(axisObj, polyad.getArgAt(2));
@@ -674,6 +732,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             axis = ((Long) axisObj).intValue();
         }
+
         if (stemVariable.size() == 0) {
             polyad.setEvaluated(true);
             if (doReduce) {

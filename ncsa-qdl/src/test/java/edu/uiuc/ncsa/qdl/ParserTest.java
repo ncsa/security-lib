@@ -2704,5 +2704,15 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Recursion failed for a lambda function";
     }
+    public void testLocalBlock() throws Throwable {
+         State state = testUtils.getNewState();
+         StringBuffer script = new StringBuffer();
+         addLine(script, "a := 2;");
+         addLine(script, "local[a:=4;];");
+         addLine(script, "ok := a == 2;");
+         QDLInterpreter interpreter = new QDLInterpreter(null, state);
+         interpreter.execute(script.toString());
+         assert getBooleanValue("ok", state) : "Failed to isolate state in local block";
+     }
 
 }

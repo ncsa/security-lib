@@ -8,9 +8,7 @@ import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemListNode;
-import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
+import edu.uiuc.ncsa.qdl.variables.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -132,7 +130,7 @@ public class QDLRunner implements Serializable {
                                 stmt = p;
                             }
                         }
-                        if (stmt instanceof StemVariableNode || stmt instanceof StemListNode || stmt instanceof ExpressionStemNode) {
+                        if (stmt instanceof QDLSetNode || stmt instanceof StemVariableNode || stmt instanceof StemListNode || stmt instanceof ExpressionStemNode) {
                             stmt.evaluate(state);
                             ConstantNode cNode = new ConstantNode(((StatementWithResultInterface) stmt).getResult(), Constant.STEM_TYPE);
                             Polyad p = new Polyad(SAY_FUNCTION);

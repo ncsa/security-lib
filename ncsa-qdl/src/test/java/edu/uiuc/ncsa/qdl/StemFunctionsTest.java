@@ -1975,5 +1975,33 @@ public class StemFunctionsTest extends AbstractQDLTester {
         assert isOk : "could set scalar variable to stem value";
     }
 
+    /**
+     * Tests that the pick function works on stems
+     * @throws Throwable
+     */
+    public void testSubset() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := reduce(@&&, [-1,0,1] == subset((x)->x<2, [-1;5]));");
+        addLine(script, "z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'};");
+        addLine(script, "q. := subset((x)->index_of(x, 'x_')==0, z.);");
+        addLine(script, "ok1 := reduce(@&&, {'a':'x_baz', 'c':'x_bar'}==q.);");
+        addLine(script, "");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
+
+    public void testGenericReduce() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'};");
+        addLine(script, "ok := reduce(@&&, z.==z.);"); // result of == is stem with keys
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
 }
 

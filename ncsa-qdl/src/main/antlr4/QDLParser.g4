@@ -22,6 +22,7 @@ statement :
           | assertStatement
           | assertStatement2
           | blockStatement
+          | localStatement
           | moduleStatement
           ;
 
@@ -35,7 +36,6 @@ ifElseStatement :
 
 loopStatement:
      WHILE conditionalBlock DO? statementBlock ;
-    // WHILE loopBlock DO? statementBlock ;
 
 switchStatement:
     SWITCH '['  (ifStatement ';')* ']';
@@ -58,15 +58,18 @@ tryCatchStatement:
    blockStatement:
        BLOCK statementBlock;
 
+   localStatement:
+      LOCAL statementBlock;
+
 assertStatement2:
   ASSERT2 expression (':' expression)?;
 
     statementBlock : LeftBracket (statement ';')* RightBracket;
+        //localBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
    expressionBlock : LeftBracket expression ';' ( expression ';')+ RightBracket;
   conditionalBlock : LeftBracket expression RightBracket;
-  //loopBlock : LeftBracket (variable '∈')? expression RightBracket;
-   fdoc : FDOC;
+              fdoc : FDOC;
 
    iInterval : LeftBracket expression? ';' expression (';' | (';' expression))? RightBracket;
    rInterval : LDoubleBracket expression? ';' expression (';' | (';' expression))? RDoubleBracket;

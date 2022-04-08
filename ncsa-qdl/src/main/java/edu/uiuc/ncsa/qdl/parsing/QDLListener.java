@@ -1938,6 +1938,9 @@ illegal argument:no module named "b" was  imported at (1, 67)
         stash(ctx, dyad);
         dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
+        if(dyad.getRightArgument() instanceof QDLSetNode){
+            dyad.setLeftArgument(null);// special case it.
+        }
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
         dyad.setSourceCode(source);
@@ -2041,6 +2044,32 @@ illegal argument:no module named "b" was  imported at (1, 67)
         source.add(ctx.getText());
         dyad.setSourceCode(source);
     }
+
+    @Override
+    public void enterLocalStatement(QDLParserParser.LocalStatementContext ctx) {
+        LocalBlockStatement b = new LocalBlockStatement();
+        b.setTokenPosition(tp(ctx));
+        stash(ctx, b);
+    }
+
+    @Override
+    public void exitLocalStatement(QDLParserParser.LocalStatementContext ctx) {
+        // This is really identical to the block statement in every way except that the
+        // state is local.
+        LocalBlockStatement localBlock = (LocalBlockStatement) parsingMap.getStatementFromContext(ctx);
+        for (int i = 0; i < ctx.getChildCount(); i++) {
+            if (ctx.getChild(i) instanceof TerminalNodeImpl) {
+                continue;
+            }
+            // has a single parse statement block.
+            QDLParserParser.StatementBlockContext statementBlockContext = (QDLParserParser.StatementBlockContext) ctx.getChild(i);
+            ParseStatementBlock parseStatementBlock = (ParseStatementBlock) resolveChild(statementBlockContext);
+            localBlock.setStatements(parseStatementBlock.getStatements());
+
+        }
+    }
+
+
 }
 
 

@@ -571,8 +571,17 @@ So to get the transpose,
     <entry id="subset">
         <body>
             <![CDATA[
-Function to extract a subset from a list. Note that the result is
-*always* a rank 1 stem and this operates only on the zeroth axis.
+Function to extract a subset from a list or set.
+
+subset(@pick, arg) - picks elements from arg based on the boolean @pick
+          function. If arg is a stem or set, so is the result. If arg
+          is a scalar, so is the result. Note that for a scalar, if the
+          arg fails the test,a null will be returned.
+
+subset(set, count) - get count elements (at random) from a list.
+
+=> Note that for the remaining calls, the arg is a list and the result is
+=> *always* a rank 1 stem and this operates only on the zeroth axis.
 
 subset(source_list., start_index) -
           return a subset of the source_list starting at the given index.
@@ -583,11 +592,19 @@ Note: If n is omitted, then the rest of the list is returned from the start
       index on. The source is not altered and the resulting list has 0 as
       its first index.
 
-For general stems, consider remap.
+For general stems, also consider remap.
 
 E.g.
+  subset((x)->x<3, {-2,0,4,5}); // pick elements in a set < 3
+{0,-2}
+
+  subset({'a', 2,1,3/7,'b'}, 2); grab 2 elements from the set
+{a,1}
+
     subset([10;20],4); // get rest of list from index 4 on
 [14,15,16,17,18,19]
+
+
     subset([10;20],4,2); // start at index 4, give next 2 elements
 [14,15]
 
@@ -957,7 +974,7 @@ starts_with(x., y.) - returns a left conformable list that has the
                            is no such element, an index of -1 is returned.
 E.g.
   starts_with(['a','qrs','pqr'],['a','p','s','t'])
-{0=0, 1=-1, 2=1}
+[0,-1,1]
 How to read this: left element 0 starts with right element 0
                    "     "     1  does not start with any
                    "     "     2 starts with right element 1
@@ -968,12 +985,18 @@ To get a list of these, use mask, e.g.
                                  ['a','p','s','t']));
 {0=a, 2=pqr}
 
+This returns a list (always) so that it works with mask and other functions.
 
 Is there and ends_with command? No. Use =~ instead, e.g. to check if a string
 in the variable x ends in '.xml'
   '.*xml' =~ x
 
-See also: mask, =~
+If you need to find if a string begins with a set of characters, use index_of
+instead and test the location:
+   index_of('abc','a') == 0
+true
+
+See also: mask, =~, index_of
                ]]>
         </body>
     </entry>
@@ -1793,14 +1816,41 @@ ws_file - the current file to save to/load from by default. If you save or load 
     <entry id="reduce">
             <body>
                 <![CDATA[
-reduce(@f(), list.) - Takes a dyadic function f and applied it between
-             successive members of the list. The final result is a scalar.
+reduce(@f, arg) - Apply the function between all elements of the set
+    or generic (i.e. not a list) argument, stem, set or (trivially) scalar.
+    The result is always a scalar.
+reduce(@f(), list. {,axis}) - Takes a dyadic function f and applied it between
+             successive members of the list (i.e. in order).
+             The final result is a scalar.
 E.g.
 Are all elements of a boolean list true?
    a. := -1 < n(5); // list of boolean true values
    reduce(@&&, a.)
 true
 This applies && between each element.
+
+E.g. on a set
+   reduce(@*, {1,2,3,4,5})
+120
+E.g. on a stem
+   reduce(@+, {'foo':'a', 'bar':'b', 'baz':'c'})
+bac
+Do remember that for this (rather simple-minded) case, since there
+is *no* canonical ordering of elements in a stem, the result is
+a more or less random concatenation of the elements.
+E.g. On a higher dimension list
+  q. := n(3,4,n(12));
+  q.
+[[0,1,2,3],
+ [4,5,6,7],
+ [8,9,10,11]]
+  reduce(@+, q., 0); //apply to 0th axis (also default), sum columns
+[12,15,18,21]
+  reduce(@+, q., 1); // apply to first axis, so sum the rows
+[6,
+ 22,
+ 38]
+
 See also: expand()
                 ]]>
             </body>
@@ -1810,6 +1860,8 @@ See also: expand()
                 <![CDATA[
 expand(@f, list.) = apply the dyadic function f() pairwise and return the
               intermediate results.
+
+
 E.g. To compute the factorial of a number and see the parts:
    expand(@*, 1+n(5))
 [1, 2, 6, 24, 120]
@@ -1817,7 +1869,12 @@ E.g. To compute the factorial of a number and see the parts:
 In this case [1, 2, 3, 4, 5] becomes [1, 1*2, 1*2*3, 1*2*3*4, 1*2*3*4*5]
 Note that reduce() effectively returns just the final number. Using expand
 lets you use the intermediate results too.
-See also: reduce()
+
+Note that it is not possible to apply expand to a set or a generic stem,
+(what would it mean to stash intermediate results in random keys??)
+so attempts to do so will result in an exception.
+
+See also: reduce
                 ]]>
             </body>
         </entry>
@@ -2330,7 +2387,9 @@ Standard    Unicode   ALT   escape code   What is it
 +              ⁺       +    \u207a         unary plus
 ->             →       d    \u2192         lambda function
                ∈       e    \u2208         has value
+&&             ∩       i    \u2229         set intersection
 null           ∅       n    \u2205         null
+||             ∪       u    \u222a         set union
 &&             ∧       &    \u2227         logical and
 ||             ∨       |    \u2228         logical or
 =~             ≈       ?    \u2248         regex matches
@@ -2447,7 +2506,7 @@ assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
 Keyword.
 block is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside the block is local only
-to that block.
+to that block, but the block inherits the ambient state.
 E.g.
    a := 'foo';
    block[a := 'baz'; ok := true;];
@@ -2458,6 +2517,8 @@ baz
 
 a gets re-assigned to 'baz' inside the block, ok does not exist any place but the block.
 This is extremely useful in many places, such as scripts.
+
+See also: local
                 ]]>
             </body>
         </entry>
@@ -3134,6 +3195,9 @@ E.g.
 
 ("Let no one untrained in geometry enter." -- motto of Plato's Academy)
 
+Note ∈ (\u2208) denotes set membership and while derived from epsilon, is
+not a greek letter.
+
 See also: unicode
 
                 ]]>
@@ -3565,7 +3629,7 @@ E.g.
 [true,true,false]
 
 This is useful with the mask function.
-See also: intersection, has_value.
+See also: intersection, has_value, subset(@pick arg).
                 ]]>
             </body>
         </entry>
@@ -3608,7 +3672,7 @@ is a given set, use parentheses:
 since the default parsing with no parentheses for QDL (to be
 consistent with order of operations) would be (a == b) && c.
 
-See also: || (set union)
+See also: || (set union), subset(@pick arg)
                 ]]>
             </body>
         </entry>
@@ -3641,7 +3705,7 @@ not union!
    ~{3,4}
 [3,4]
 
-See also: || (set union), ~
+See also: || (set union), ~, subset(@pick arg)
                 ]]>
             </body>
         </entry>
@@ -3659,7 +3723,7 @@ E.g.
   z == z
 true
 
-See also: ∈ (has_value), <, > (subset operations.)
+See also: ∈ (has_value), <, > (subset operations.), subset(@pick arg)
 ]]>
             </body>
         </entry>
@@ -3669,10 +3733,58 @@ See also: ∈ (has_value), <, > (subset operations.)
 Often you will just need to do operations on sets (such as
 comparisons) and really don't care about the internal
 structure. A set is collection of elements that are
- immutable, unique and unordered.
+immutable, unique and unordered.
 
 Note that sets have unique elements, so the list [1,1,1,1] (with repeated
 elements) will become the set {1} with as single element.
+
+See also:&amp;&amp;, ||, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
+                ]]>
+            </body>
+        </entry>
+    <entry id="∩">
+            <body>
+                <![CDATA[
+Unicode \u2229
+Set intersection. This is an alternate to ascii &&.
+
+See &&.
+                ]]>
+            </body>
+        </entry>
+    <entry id="∪">
+            <body>
+                <![CDATA[
+Unicode \u222a
+Set union. This is an alternate to ascii ||.
+
+See || .
+                ]]>
+            </body>
+        </entry>
+    <entry id="local">
+            <body>
+                <![CDATA[
+
+Keyword.
+local is a reserved work to denote the beginning of a local environment.
+It is set off with []. Anything defined inside it is local only
+to that block, and the block *does not* inherit the ambient state.
+
+E.g.
+   a:= 5;
+   local[a :=2;];
+   a
+5
+
+Compare with
+E.g.
+   a:= 5;
+   block[a :=2;];
+   a
+2
+
+See also: block
                 ]]>
             </body>
         </entry>

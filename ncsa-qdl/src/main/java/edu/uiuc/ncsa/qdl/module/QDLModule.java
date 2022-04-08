@@ -110,4 +110,9 @@ public class QDLModule extends Module {
     public void setDocumentation(List<String> documentation) {
         this.documentation = documentation;
     }
+
+    @Override
+    public List<String> getDocumentation() {
+        return documentation;
+    }
 }

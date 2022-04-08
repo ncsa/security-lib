@@ -375,6 +375,8 @@ public abstract class Module implements XThing, Serializable {
 
     public abstract void setDocumentation(List<String> documentation);
 
+    public abstract List<String> getDocumentation();
+
     public UUID getParentTemplateID() {
         return parentTemplateID;
     }

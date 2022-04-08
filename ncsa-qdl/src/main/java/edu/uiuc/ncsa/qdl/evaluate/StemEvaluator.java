@@ -595,25 +595,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 ]
      */
 
-    /**
-     * Takes a list of Java objects and converts them to QDL constants to be used as
-     * arguments to functions. Checks also that there are no illegal values first.
-     *
-     * @param objects
-     * @return
-     */
-    protected ArrayList<StatementWithResultInterface> toConstants(ArrayList<Object> objects) {
-        ArrayList<StatementWithResultInterface> args = new ArrayList<>();
-        for (Object obj : objects) {
-            int type = Constant.getType(obj);
-            if (type == UNKNOWN_TYPE) {
-                // Future proofing in case something changes in the future internally
-                throw new IllegalArgumentException(" unknown object type");
-            }
-            args.add(new ConstantNode(obj, type));
-        }
-        return args;
-    }
+
 
     protected void doJPathQuery(Polyad polyad, State state) {
         Object arg0 = polyad.evalArg(0, state);

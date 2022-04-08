@@ -207,4 +207,5 @@ otherwise have an error raised on system function overwrite).
 | tmath#tan()                    |    "         |                             |
 | tmath#tanh()                   |    "         |                             |
 | tmath#π()                      |    "         |                             |
++--------------------------------+--------------+-----------------------------+
 131 total functions

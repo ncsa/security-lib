@@ -473,11 +473,11 @@ public class QDLSets implements QDLModuleMetaClass {
 tf.'new' := '/home/ncsa/dev/temp/2022-04-01-delete_transactions.sql';
 old. := file_read(tf.'old', 1);
 old. := substring(old., 51) - '\'';
-old. := to_set(old.);
+old := to_set(old.);
 
   new. := file_read(tf.'new', 1);
 new. := substring(new., 51) - '\'';
-new. := to_set(new.);
+new := to_set(new.);
   common. := intersection(new., old.)
 
   size(a,b,c) -> a+b+c

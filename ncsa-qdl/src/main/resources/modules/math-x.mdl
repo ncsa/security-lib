@@ -17,53 +17,6 @@ module[
       acsch(x)->asinh(1/x);
       acoth(x)->atanh(1/x);
 
-
-  // Here starts definitions using the full syntax, so we can include some
-  // online help.
-   /*
-   The rather curious ceiling(frac(x.))*frac(x.) converts decimals
-   that are zero -- 0.0 -- to actual zeros. Otherwise the operation to
-   compute max or min always returns decimals no matter what the input
-   Since these are used in various functions for computing indices, that
-   would cause Index errors left and right.
-   */
-/*   define[
-       max(a,b)
-    ][
-       >> max(a,b) - return the maximum of a or b.
-       >> E.g. max(-2, 3) returns 3.
-       >> E.g. on stems -- corresponding entries are compared
-       >>    max([;5],([;5]-2)*3)
-       >> [0,1,2,3,6]
-       if[
-          var_type(a)==2 && var_type(b)==2
-        ][
-          out := (a + b + abs(a-b))/2;
-         return(out%1);
-       ];
-       out. := (a + b + abs(a-b))/2;
-       return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
-    ];*/
-
-
-/*   define[
-       min(a,b)
-    ][
-       >> min(a,b) - return the minimum of a or b.
-       >> E.g. min(-2, 3) returns -2.
-       >> E.g. on stems -- corresponding entries are compared
-       >>    min([;5],([;5]-2)*3)
-       >> [-6,-3,0,3,4]
-       if[
-          var_type(a)==2 && var_type(b)==2
-        ][
-          out := (a + b - abs(a-b))/2;
-         return(out%1);
-       ];
-       out. := (a + b - abs(a-b))/2;
-       return(ceiling(frac(out.))*frac(out.) + int(out.)); // return correct types
-    ];*/
-
    define[
       int(x)
     ][
@@ -97,7 +50,7 @@ module[
    define[
        hypotenuse(a,b)
     ][
-       >> The hypotenuse of a right triangle, given the other two sides.
+       >> hypotenuse(a,b) - The hypotenuse of a right triangle, given the other two sides.
        >> sqrt(a^2 + b^2);
        return(sqrt(a^2 + b^2));
    ];
@@ -105,7 +58,8 @@ module[
    define[
        fibonacci(n)
      ][
-       >> Compute the nth Fibonacci number. Note that this uses Binet's  formula
+       >> fibonacci(n) - Compute the nth Fibonacci number.
+       >> Note that this uses Binet's  formula
        >> and is very, very fast, even for huge values of 0 <= n.
        >> E.g.
        >>    fibonacci(1000000)
@@ -127,7 +81,7 @@ module[
    define[
        sqrt(x)
     ][
-       >> The (non-negative) square root of the argument
+       >> sqrt(x) - The (non-negative) square root of the argument
        return(nroot(x, 2));
    ];
 
@@ -135,8 +89,7 @@ module[
    define[
        logn(n,x)
     ][
-        >> log(n,x)
-        >> The logarithm, base n for x.
+        >> log(n,x) - The logarithm, base n for x.
         >> Note that both may be stems.
         return(ln(x)/ln(n));
    ];
@@ -163,7 +116,7 @@ module[
       define[
          plot(@f(), arg.)
       ][
-        >> A program to generate the plot points a real valued function over an interval.
+        >> plot(@f(), arg.) - A program to generate the plot points a real valued function over an interval.
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
         >> plot(@sin, [|0; pi()/2; 10|])
@@ -175,7 +128,7 @@ module[
       define[
          pplot(@x(), @y(), t.)
       ][
-        >> A program to generate the parametric plot points of two real valued function over an interval.
+        >> pplot(@x(), @y(), t.) - A program to generate the parametric plot points of two real valued function over an interval.
         >> The result is a list of (x,y) coordinates.
         >> Try it out on
         >> pplot(@sin,@cos,  [|0; pi()/2; 10|])
@@ -186,7 +139,7 @@ module[
        define[
           splot(@x(), @y(), @z(), t., s.)
        ][
-         >> A program to generate the parametric surface plot points of three real valued functions
+         >> splot(@x(), @y(), @z(), t., s.) - A program to generate the parametric surface plot points of three real valued functions
          >> over the intervals for t ands.
          >> The result is a list of (x,y,z) coordinates.
          >> E.g.

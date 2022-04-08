@@ -5,10 +5,7 @@ import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.QDLSet;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
+import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 
 import java.math.BigDecimal;
@@ -340,18 +337,50 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doTilde(Dyad dyad, State state) {
-        Object obj0 = dyad.evalArg(0, state);
         Object obj1 = dyad.evalArg(1, state);
+        if (isSet(obj1)) {
+            QDLSet set = (QDLSet) obj1;
+            StemVariable outStem = new StemVariable();
+            // special case. If this is a unary ~, then the first argument is
+            // a Java null.
+            if(dyad.getLeftArgument() == null){
+                // contract is to add the elements to a stem list
+                //outStem.union(stem0);
+                outStem.getStemList().append(set);
+                dyad.setResult(outStem);
+                dyad.setResultType(Constant.STEM_TYPE);
+                dyad.setEvaluated(true);
+                return;
+
+            }
+            // so they are trying to append the list to an existing stem.
+            // In that case it becomes another entry
+            Object obj0 = dyad.evalArg(0, state);
+            if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
+                throw new IllegalArgumentException("cannot do a union a null");
+            }
+            StemVariable stem0;
+            if (obj0 instanceof StemVariable) {
+                stem0 = (StemVariable) obj0;
+            } else {
+                stem0 = new StemVariable();
+                stem0.put(0L, obj0);
+            }
+           outStem =  outStem.union(stem0); // copy over elements
+            StemEntry stemEntry = outStem.getStemList().last();
+            StemEntry newEntry =  new StemEntry(stemEntry.index + 1, set);
+
+            outStem.getStemList().add(newEntry);
+            dyad.setResult(outStem);
+            dyad.setResultType(Constant.STEM_TYPE);
+            dyad.setEvaluated(true);
+            return;
+        }
+        Object obj0 = dyad.evalArg(0, state);
         if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
             throw new IllegalArgumentException("cannot do a union a null");
         }
-        if (isSet(obj1)) {
-            if (isSet(obj0)) {
-                throw new IllegalArgumentException(TILDE + " not defined on sets. Did you mean union (" + OR + ")?");
-            }
-        }
-        if (areAllSets(obj0, obj1)) {
-        }
+
         StemVariable stem0 = null;
         StemVariable stem1 = null;
 
@@ -362,15 +391,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             stem0.put(0L, obj0);
         }
 
-        if (obj1 instanceof QDLSet) {
-            StemVariable outStem = new StemVariable();
-            outStem.union(stem0);
-            outStem.getStemList().append((QDLSet) obj1);
-            dyad.setResult(outStem);
-            dyad.setResultType(Constant.STEM_TYPE);
-            dyad.setEvaluated(true);
-            return;
-        }
 
         if (obj1 instanceof StemVariable) {
             stem1 = (StemVariable) obj1;
@@ -404,8 +424,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     throw new IllegalArgumentException("operation is not defined for  non-numeric types");
                 }
                 if (areAllLongs(objects)) {
-                    Long leftLong = (Long) objects[0];
-                    Long rightLong = (Long) objects[1];
                     r.result = (Long) objects[0] / (Long) objects[1];
                     r.resultType = Constant.LONG_TYPE;
                 } else {
@@ -555,17 +573,25 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 if (areAllSets(objects)) {
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
-                    r.result = leftSet.isEqualTo(rightSet);
+                    switch (dyad.getOperatorType()) {
+                        case EQUALS_VALUE:
+                            r.result = leftSet.isEqualTo(rightSet);
+                            break;
+                        case NOT_EQUAL_VALUE:
+                            r.result = !leftSet.isEqualTo(rightSet);
+                            break;
+                    }
+
                     r.resultType = Constant.BOOLEAN_TYPE;
                     return r;
                 }
-                if(isSet(objects[0])){
+                if (isSet(objects[0])) {
                     QDLSet leftSet = (QDLSet) objects[0];
                     r.result = leftSet.contains(objects[1]);
                     r.resultType = Constant.BOOLEAN_TYPE;
                     return r;
                 }
-                if(isSet(objects[1])){
+                if (isSet(objects[1])) {
                     QDLSet set = (QDLSet) objects[1];
                     r.result = set.contains(objects[0]);
                     r.resultType = Constant.BOOLEAN_TYPE;

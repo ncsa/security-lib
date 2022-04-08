@@ -4,10 +4,7 @@ import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
-import edu.uiuc.ncsa.qdl.expressions.Dyad;
-import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
-import edu.uiuc.ncsa.qdl.expressions.Polyad;
-import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -21,9 +18,12 @@ import org.apache.commons.codec.binary.Base32;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static edu.uiuc.ncsa.qdl.variables.Constant.UNKNOWN_TYPE;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -811,8 +811,18 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
         }
         throw new IllegalStateException("cannot create anonymous function");
+
     }
 
+    /**
+     * Checks if the argument is some form of a function reference. This lets you test for
+     * overloading before invoking one of {@link #getFunctionReferenceNode(State, StatementWithResultInterface)}
+     * @param arg0
+     * @return
+     */
+    public boolean isFunctionRef(StatementWithResultInterface arg0){
+        return (arg0 instanceof LambdaDefinitionNode) || (arg0 instanceof FunctionDefinitionStatement) ||(arg0 instanceof FunctionReferenceNode);
+    }
     /**
      * This will take a node that is either a function reference, {@link FunctionDefinitionStatement}
      * or perhaps a {@link LambdaDefinitionNode} and determine the right {@link FunctionReferenceNode},
@@ -877,7 +887,28 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         return frn;
     }
 
-
+    public boolean isScalar(Object arg){
+        return !isStem(arg) && !isSet(arg);
+    }
+    /**
+     * Takes a list of Java objects and converts them to QDL constants to be used as
+     * arguments to functions. Checks also that there are no illegal values first.
+     *
+     * @param objects
+     * @return
+     */
+    protected ArrayList<StatementWithResultInterface> toConstants(ArrayList<Object> objects) {
+        ArrayList<StatementWithResultInterface> args = new ArrayList<>();
+        for (Object obj : objects) {
+            int type = Constant.getType(obj);
+            if (type == UNKNOWN_TYPE) {
+                // Future proofing in case something changes in the future internally
+                throw new IllegalArgumentException(" unknown object type");
+            }
+            args.add(new ConstantNode(obj, type));
+        }
+        return args;
+    }
     protected FunctionReferenceNode getFunctionReferenceNode(State state, StatementWithResultInterface arg0) {
         return getFunctionReferenceNode(state, arg0, false);
     }

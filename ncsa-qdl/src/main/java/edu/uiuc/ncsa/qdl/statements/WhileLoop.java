@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.BreakException;
 import edu.uiuc.ncsa.qdl.exceptions.ContinueException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
@@ -8,6 +9,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VThing;
 
@@ -22,14 +24,22 @@ import static edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator.*;
  */
 public class WhileLoop implements Statement {
     TokenPosition tokenPosition = null;
-    @Override
-    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
-    public TokenPosition getTokenPosition() {return tokenPosition;}
+    public void setTokenPosition(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
 
     @Override
-    public boolean hasTokenPosition() {return tokenPosition!=null;}
+    public TokenPosition getTokenPosition() {
+        return tokenPosition;
+    }
+
+    @Override
+    public boolean hasTokenPosition() {
+        return tokenPosition != null;
+    }
+
     ExpressionNode conditional;
 
     public List<Statement> getStatements() {
@@ -59,6 +69,7 @@ public class WhileLoop implements Statement {
             if (p.isBuiltIn()) {
                 switch (p.getName()) {
                     case FOR_KEYS:
+                    case StemEvaluator.HAS_VALUE:
                         return forKeysLoop(localState);
                     case FOR_NEXT:
                         return doForLoop(localState);
@@ -221,15 +232,22 @@ public class WhileLoop implements Statement {
         }
         String loopVar = null;
         StemVariable stemVariable = null;
+        QDLSet qdlSet = null;
         Object arg = conditional.getArguments().get(1).evaluate(localState);
+        boolean isSet = false;
         if (arg instanceof StemVariable) {
             stemVariable = (StemVariable) arg;
         } else {
-            throw new IllegalArgumentException("Error: The target of the command must be a stem variable");
+            if (arg instanceof QDLSet) {
+                qdlSet = (QDLSet) arg;
+                isSet = true;
+            } else {
+                throw new IllegalArgumentException("Error: The target of the command must be a stem or set");
+            }
         }
 
         // Don't evaluate -- we just want the name of the variable.
-        arg = conditional.getArguments().get(0);
+        arg = conditional.getArguments().get(0); // reuse arg for variable
         if (arg instanceof VariableNode) {
             loopVar = ((VariableNode) arg).getVariableReference();
         } else {
@@ -237,22 +255,41 @@ public class WhileLoop implements Statement {
 
         }
 
-     //   SymbolTable localST = localState.getVStack().getLocalST();
+        //   SymbolTable localST = localState.getVStack().getLocalST();
         // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
         //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
-        for (String key : stemVariable.keySet()) {
-            localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
-            for (Statement statement : getStatements()) {
-                try {
-                    statement.evaluate(localState);
-                } catch (BreakException b) {
-                    return Boolean.TRUE;
-                } catch (ContinueException cx) {
-                    // just continue.
-                } catch (ReturnException rx) {
-                    return Boolean.TRUE;
+        if(isSet){
+            for (Object element : qdlSet) {
+                localState.getVStack().localPut(new VThing(new XKey(loopVar), element));
+                for (Statement statement : getStatements()) {
+                    try {
+                        statement.evaluate(localState);
+                    } catch (BreakException b) {
+                        return Boolean.TRUE;
+                    } catch (ContinueException cx) {
+                        // just continue.
+                    } catch (ReturnException rx) {
+                        return Boolean.TRUE;
+                    }
                 }
             }
+
+        }else{
+            for (String key : stemVariable.keySet()) {
+                localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
+                for (Statement statement : getStatements()) {
+                    try {
+                        statement.evaluate(localState);
+                    } catch (BreakException b) {
+                        return Boolean.TRUE;
+                    } catch (ContinueException cx) {
+                        // just continue.
+                    } catch (ReturnException rx) {
+                        return Boolean.TRUE;
+                    }
+                }
+            }
+
         }
         return Boolean.TRUE;
     }
