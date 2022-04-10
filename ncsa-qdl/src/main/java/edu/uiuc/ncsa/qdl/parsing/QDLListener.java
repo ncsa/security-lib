@@ -329,16 +329,6 @@ public class QDLListener implements QDLParserListener {
         monad.setTokenPosition(tp(ctx));
         finish(monad, ctx);
     }
-/*
-    @Override
-    public void enterLeftBracket(QDLParserParser.LeftBracketContext ctx) {
-
-    }
-
-    @Override
-    public void exitLeftBracket(QDLParserParser.LeftBracketContext ctx) {
-
-    }*/
 
 
     @Override
@@ -1938,7 +1928,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         stash(ctx, dyad);
         dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
-        if(dyad.getRightArgument() instanceof QDLSetNode){
+        if (dyad.getRightArgument() instanceof QDLSetNode) {
             dyad.setLeftArgument(null);// special case it.
         }
         List<String> source = new ArrayList<>();
@@ -1968,13 +1958,13 @@ illegal argument:no module named "b" was  imported at (1, 67)
         if (statement instanceof FunctionDefinitionStatement) {
             throw new IntrinsicViolation("cannot define function in an existing module");
         }
-        if(statement instanceof VariableNode){
-            if(State.isIntrinsic(((VariableNode)statement).getVariableReference())){
+        if (statement instanceof VariableNode) {
+            if (State.isIntrinsic(((VariableNode) statement).getVariableReference())) {
                 throw new IntrinsicViolation("cannot access intrinsic variable outside of module.");
             }
         }
-        if(statement instanceof Polyad){
-            if(State.isIntrinsic(((Polyad)statement).getName())){
+        if (statement instanceof Polyad) {
+            if (State.isIntrinsic(((Polyad) statement).getName())) {
                 throw new IntrinsicViolation("cannot access intrinsic function outside of module.");
             }
         }
@@ -2016,7 +2006,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         stash(ctx, setNode);
         for (int i = 0; i < ctx.set().getChildCount(); i++) {
             ParseTree pt = ctx.set().getChild(i);
-            if(!(pt instanceof TerminalNode)){
+            if (!(pt instanceof TerminalNode)) {
                 StatementWithResultInterface stmt = (StatementWithResultInterface) resolveChild(pt);
                 setNode.getStatements().add(stmt);
 
@@ -2024,7 +2014,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         }
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
-         setNode.setSourceCode(source);
+        setNode.setSourceCode(source);
     }
 
     @Override
@@ -2037,12 +2027,20 @@ illegal argument:no module named "b" was  imported at (1, 67)
         Polyad dyad;
         dyad = new Polyad(StemEvaluator.HAS_VALUE);
         dyad.setTokenPosition(tp(ctx));
-        stash(ctx, dyad);
         dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(0)));
         dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(1)));
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
-        dyad.setSourceCode(source);
+        if (ctx.op.getText().equals("∉")) {
+            Monad monad = new Monad(OpEvaluator.NOT_VALUE, false);
+            monad.setArgument(dyad);
+            monad.setSourceCode(source);
+            stash(ctx, monad);
+        } else {
+
+            stash(ctx, dyad);
+            dyad.setSourceCode(source);
+        }
     }
 
     @Override
@@ -2069,7 +2067,19 @@ illegal argument:no module named "b" was  imported at (1, 67)
         }
     }
 
+    @Override
+    public void enterIntersectionOrUnion(QDLParserParser.IntersectionOrUnionContext ctx) {
+        stash(ctx, new Dyad(OpEvaluator.AND_VALUE, tp(ctx)));
 
+    }
+
+    @Override
+    public void exitIntersectionOrUnion(QDLParserParser.IntersectionOrUnionContext ctx) {
+        Dyad dyad = (Dyad) parsingMap.getStatementFromContext(ctx);
+        dyad.setOperatorType(state.getOperatorType(ctx.op.getText()));
+        dyad.setTokenPosition(tp(ctx));
+        finish(dyad, ctx);
+    }
 }
 
 

@@ -2378,7 +2378,7 @@ an ASCII version (usually a digraph).
 
 Here is a table of supported unicode characters in QDL:
 
-Standard    Unicode   ALT   escape code   What is it
+Standard    Unicode   ALT   escape code    What is it
 !              ¬       !    \u00ac         logical not
 -              ¯       -    \u00af         unary minus
 `              ·       .    \u00b7         raised dot
@@ -2386,7 +2386,8 @@ Standard    Unicode   ALT   escape code   What is it
 /              ÷       /    \u00f7         division
 +              ⁺       +    \u207a         unary plus
 ->             →       d    \u2192         lambda function
-               ∈       e    \u2208         has value
+               ∈       e    \u2208         is member of
+               ∉       E    \u2209         is *not* member of
 &&             ∩       i    \u2229         set intersection
 null           ∅       n    \u2205         null
 ||             ∪       u    \u222a         set union
@@ -2653,7 +2654,25 @@ This is used for QDL's looping  construction:
    while[ boolean ][(statement;)*];
 or with the optional do keyword
    while[ boolean ]do[(statement;)*];
-See also: do, for_next, for_keys, return
+E.g.
+All of these are the same:
+   // loops that access the element directly
+   while[j∈{2,3,4}][say(j);];
+   while[for_next(j, [2;5])][say(j);];
+   while[for_next(j, 5, 2)][say(j);];
+
+   // loops that iterate over a stem (here just a list)
+   index. := [2;5];
+   while[has_value(j, index.)][say(index.j);];
+   while[for_keys(j, index.)][say(index.j);];
+
+   // looping directly
+   i := 2;
+   while[i< 5][say(i++);];
+
+That said, you really should not need to loop much in QDL...
+
+See also: do, for_next, for_keys, has_value, ∈, ∉, return
                 ]]>
             </body>
         </entry>
@@ -2661,7 +2680,11 @@ See also: do, for_next, for_keys, return
             <body>
                 <![CDATA[
 Keyword
-Optional connector in while loops.
+Optional connector in while loops.  So these are the
+same
+   while[condition][statements]
+   while[condition]do[statements]
+
 See also: while
                 ]]>
             </body>
@@ -2717,7 +2740,7 @@ See also: define
 The reserved keywords in QDL are
 
 true    if     while   try     module   define   block
-false   then   do      catch   body
+false   then   do      catch   body              local
 null    else   assert
 
 You may use the help facility for any of these.
@@ -3619,21 +3642,45 @@ See also: ∈ or has_value, && (intersection)
     <entry id="∈">
             <body>
                 <![CDATA[
+Unicode 2208.
 x ∈ y - return a left conformable boolean mask of all
    elements of x. that are in y. Note that x may be a stem.
 
 E.g.
   a. := ['a','b','c']
-  b := {p','q','b','a'};
+  b := {'p','q','b','a'};
   a. ∈ b
 [true,true,false]
 
 This is useful with the mask function.
-See also: intersection, has_value, subset(@pick arg).
+E.g.
+    mask(a., a. ∈ b)
+{0:a, 1:b}
+See also: ∉, intersection, has_value, subset(@pick arg).
                 ]]>
             </body>
         </entry>
+    <entry id="∉">
+            <body>
+                <![CDATA[
+Unicode 2209.
+x ∉ y - return a left conformable boolean mask of all
+   elements of x. that *not* are in y. Note that x may be a stem.
 
+E.g.
+  a. := ['a','b','c']
+  b := {'p','q','b','a'};
+  a. ∉ b
+[false,false,true]
+
+This is useful with the mask function.
+    mask(a., a. ∉ b)
+{2:c}
+
+See also: ∈, intersection, has_value, subset(@pick arg).
+                ]]>
+            </body>
+        </entry>
 
     <entry id="/">
             <body>
@@ -3653,50 +3700,29 @@ See also && (intersection), % (symmetric difference)
         </entry>
 
 
-    <entry id="&amp;&amp;">
+    <entry id="/\">
             <body>
                 <![CDATA[
-Either logical and for booleans or intersection for sets.
-
-For sets, the result is a set whose elements are common to
-both arguments.
+Ascii digraph for sets intersection. The result is a set
+whose elements are common to both arguments.
 E.g.
-    {0,2,3,5} && {4,2,1,0}
+    {0,2,3,5} /\ {4,2,1,0}
 {0,2}
 
-NOTE: Since && is used for logical comparisons, the order of
-operations is somewhat different than you might expect.
-If you want to check if the intersection of a pair of sets
-is a given set, use parentheses:
-   a==(b && c)
-since the default parsing with no parentheses for QDL (to be
-consistent with order of operations) would be (a == b) && c.
 
-See also: || (set union), subset(@pick arg)
+See also: \/ (set union), subset(@pick arg)
                 ]]>
             </body>
         </entry>
-    <entry id="||">
+    <entry id="\/">
             <body>
                 <![CDATA[
-Either logical or for booleans or union for sets.
-E.g. (booleans)
-   true || false
-true
-
-For sets, the result is a set whose elements are in either of
+Ascii digraph for set union, the result is a set whose
+elements are in either of
 the arguments.
 E.g.
-    {0,2,3,5} && {4,2,1,0}
+    {0,2,3,5} \/ {4,2,1,0}
 {0,1,2,3,4,5}
-
-NOTE: Since || is used for logical comparisons, the order of
-operations is somewhat different than you might expect.
-If you want to check if the union of a pair of sets
-is a given set, use parentheses:
-   a==(b || c)
-since the default parsing with no parentheses for QDL (to be
-consistent with order of operations) would be (a == b) || c.
 
 The difference between ~ and union is that ~ is a list operator and
 returns a list, so a~b for two sets returns an error (since they are not
@@ -3705,7 +3731,8 @@ not union!
    ~{3,4}
 [3,4]
 
-See also: || (set union), ~, subset(@pick arg)
+You can also used unicode ∪ (\u222a).
+See also: /\ (set intersection), ~, subset(@pick arg)
                 ]]>
             </body>
         </entry>
@@ -3730,15 +3757,35 @@ See also: ∈ (has_value), <, > (subset operations.), subset(@pick arg)
     <entry id="sets">
             <body>
                 <![CDATA[
-Often you will just need to do operations on sets (such as
-comparisons) and really don't care about the internal
+Often you will just need to do operations on aggregates
+ of elements  and really don't care about the internal
 structure. A set is collection of elements that are
 immutable, unique and unordered.
+
+Sets (from Mathematics Set Theory) in QDL allow for this.
+Operations are intersection, union, difference,
+symmetric difference, membership, subsset/superset testing
 
 Note that sets have unique elements, so the list [1,1,1,1] (with repeated
 elements) will become the set {1} with as single element.
 
-See also:&amp;&amp;, ||, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
+Order of operations on sets is supported as follows:
+unions, intersections
+differences, symmetric difference
+inclusions
+membership
+
+Note that in this implementation, intersections and symmetric differences
+function as analogs to multiplication and addition of integers, so that
+in QDL sets are treated as a elements of a Boolean ring, if you
+are aware of such things.
+
+Finally, sets may be nested but it is best to keep the elements
+as scalars. This is because testing stems for equality (which
+can be recursive structures, highly nested etc.) can
+be slow and very difficult.
+
+See also: |/, |\, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
                 ]]>
             </body>
         </entry>
@@ -3746,7 +3793,7 @@ See also:&amp;&amp;, ||, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
             <body>
                 <![CDATA[
 Unicode \u2229
-Set intersection. This is an alternate to ascii &&.
+Set intersection. This is an alternate to ascii digraph |\.
 
 See &&.
                 ]]>
@@ -3756,7 +3803,7 @@ See &&.
             <body>
                 <![CDATA[
 Unicode \u222a
-Set union. This is an alternate to ascii ||.
+Set union. This is an alternate to ascii digraph |/.
 
 See || .
                 ]]>
@@ -3770,6 +3817,15 @@ Keyword.
 local is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside it is local only
 to that block, and the block *does not* inherit the ambient state.
+
+To get values from the local block, use return.
+E.g.
+  f()->local[r :=5; return(r);]
+  f()
+5
+
+
+Let's compare local and block for how they affect the ambient state.
 
 E.g.
    a:= 5;

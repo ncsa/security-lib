@@ -592,6 +592,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterIntersectionOrUnion(QDLParserParser.IntersectionOrUnionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIntersectionOrUnion(QDLParserParser.IntersectionOrUnionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterModuleExpression(QDLParserParser.ModuleExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}

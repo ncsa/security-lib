@@ -51,6 +51,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String PLUS2 = "⁺"; // unciode 207a unary plus
     public static final String PLUS_PLUS = "++";
     public static final String POWER = "^";
+    public static final String UNION = "∪"; //unicode 2229
+    public static final String UNION_2 = "\\/";
+    public static final String INTERSECTION = "∩"; //unicode 222a
+    public static final String INTERSECTION_2 = "/\\";
     public static final String TILDE = "~";
     public static final String TILDE_STILE = "~|";
     public static final String TILDE_STILE2 = "≁"; // unicode 2241
@@ -83,10 +87,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int DOT_VALUE = 214;
     public static final int TILDE_STILE_VALUE = 215;
     public static final int REGEX_MATCH_VALUE = 216;
+    public static final int UNION_VALUE = 217;
+    public static final int INTERSECTION_VALUE = 218;
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
+            UNION, UNION_2, INTERSECTION, INTERSECTION_2,
             POWER,
             TILDE, TILDE_STILE, TILDE_STILE2,
             TIMES,
@@ -173,6 +180,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     public int getType(String oo) {
         switch (oo) {
+            case UNION:
+            case UNION_2:
+                return UNION_VALUE;
+            case INTERSECTION:
+            case INTERSECTION_2:
+                return INTERSECTION_VALUE;
             case ASSIGNMENT:
                 return ASSIGNMENT_VALUE;
             case AND:
@@ -250,6 +263,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     public void evaluate2(Dyad dyad, State state) {
         switch (dyad.getOperatorType()) {
+            case UNION_VALUE:
+            case INTERSECTION_VALUE:
+                doSetUnionOrInteresection(dyad, state);
+                return;
             case POWER_VALUE:
                 doPower(dyad, state);
                 return;
@@ -658,6 +675,44 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    protected void doSetUnionOrInteresection(Dyad dyad, State state){
+        fPointer pointer = new fPointer() {
+            @Override
+            public fpResult process(Object... objects) {
+                fpResult r = new fpResult();
+                if (!areAllSets(objects)) {
+                    throw new IllegalArgumentException("Set operations require only sets");
+                }
+                    QDLSet leftSet = (QDLSet) objects[0];
+                    QDLSet rightSet = (QDLSet) objects[1];
+                    switch (dyad.getOperatorType()) {
+                        case INTERSECTION_VALUE:
+                            r.result = leftSet.intersection(rightSet);
+                            r.resultType = Constant.SET_TYPE;
+                            break;
+                        case UNION_VALUE:
+                            r.result = leftSet.union(rightSet);
+                            r.resultType = Constant.SET_TYPE;
+                            break;
+                    }
+                    return r;
+
+
+            }
+        };
+        // Figure out the operator from the type to pass along
+        String op = "";
+        switch (dyad.getOperatorType()) {
+            case UNION_VALUE:
+                op = UNION;
+                break;
+            case INTERSECTION_VALUE:
+                op = INTERSECTION;
+                break;
+        }
+        process2(dyad, pointer, op, state);
+
+    }
     protected void doDyadLogicalOperator(Dyad dyad, State state) {
         fPointer pointer = new fPointer() {
             @Override
@@ -667,14 +722,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
                     switch (dyad.getOperatorType()) {
-                        case AND_VALUE:
+/*                        case AND_VALUE:
                             r.result = leftSet.intersection(rightSet);
                             r.resultType = Constant.SET_TYPE;
                             break;
                         case OR_VALUE:
                             r.result = leftSet.union(rightSet);
                             r.resultType = Constant.SET_TYPE;
-                            break;
+                            break;*/
                         case EQUALS_VALUE:
                             r.result = leftSet.isEqualTo(rightSet);
                             r.resultType = Constant.BOOLEAN_TYPE;

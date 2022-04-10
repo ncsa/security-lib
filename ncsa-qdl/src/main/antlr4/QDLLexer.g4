@@ -99,11 +99,15 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
          NotEquals : '!=' | '≠';  // unicode 2260
       RegexMatches : '=~' | '≈';  // unicode 2248
         LogicalNot : '!'  | '¬';  // unicode ac
+        Membership : '∈' | '∉'; // unicode 2208, 2209
     Exponentiation : '^';
+    
     // Note that the extra characters for && and || are there because certain unicode aware keyboards
     // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
-               And : '&&' | '⋀' | '∧' | '∩' ; // unicode 22c0, 2227 2229
-                Or : '||' | '⋁' | '∨' | '∪' ; // unicode 22c2, 2228 222a
+//               And : '&&' | '⋀' | '∧' | '∩' ; // unicode 22c0, 2227 2229
+               And : '&&' | '⋀' | '∧'  ; // unicode 22c0, 2227 2229
+//                Or : '||' | '⋁' | '∨' | '∪' ; // unicode 22c2, 2228 222a
+                Or : '||' | '⋁' | '∨'  ; // unicode 22c2, 2228 222a
           Backtick : '`';
            Percent : '%';
              Tilde : '~';
@@ -119,6 +123,11 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
      FunctionMarker: '@' | '⊗';  // unicode 2297
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
+/*
+    {1,2,3}\/{2,4,5}
+       {1,2,3}/\{2,4,5}
+
+*/
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.
 
