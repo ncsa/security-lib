@@ -54,6 +54,8 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('τ');
                     case 'd':
                         return new KeyStroke('→');
+                    case 'D':
+                        return new KeyStroke('∆');
                     case 'e':
                         return new KeyStroke('∈');
                     case 'E':

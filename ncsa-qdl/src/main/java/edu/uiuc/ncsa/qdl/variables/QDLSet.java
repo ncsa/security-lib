@@ -4,7 +4,9 @@ import edu.uiuc.ncsa.qdl.util.InputFormUtil;
 import net.sf.json.JSONArray;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -133,8 +135,11 @@ public class QDLSet extends HashSet {
         set2.add("a");
         set2.add("b");
         set2.add("q");
+        QDLSet nested = new QDLSet();
+        nested.addAll(set1);
+        nested.add(set2); // nested
 
-
+        System.out.println("to stem = " + nested.toStem());
         System.out.println("s1= " + set1);
         System.out.println("s2= " + set2);
         System.out.println("s1 + s2 = " + set1.union(set2));
@@ -144,5 +149,21 @@ public class QDLSet extends HashSet {
         System.out.println("s1 sDiff s2= " + set1.symmetricDifference(set2));
         System.out.println("s1 == s1? " + set1.isEqualTo(set1));
 
+    }
+   protected List convertToList(){
+       ArrayList list = new ArrayList();
+       for(Object element: this) {
+           if (element instanceof QDLSet) {
+               list.add(((QDLSet) element).convertToList());
+           } else {
+               list.add(element);
+           }
+       }
+        return list;
+   }
+    public StemVariable toStem(){
+        StemVariable outStem = new StemVariable();
+        outStem.addList(convertToList());
+        return outStem;
     }
 }

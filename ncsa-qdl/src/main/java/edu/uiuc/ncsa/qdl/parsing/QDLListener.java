@@ -97,7 +97,7 @@ public class QDLListener implements QDLParserListener {
             cnode.setSourceCode(getSource(ctx));
             return;
         }
-        if (ctx.getText().equals(QDLConstants.RESERVED_NULL) || ctx.getText().equals(QDLConstants.RESERVED_NULL2)) {
+        if (ctx.getText().equals(QDLConstants.RESERVED_NULL) || ctx.getText().equals(QDLConstants.RESERVED_NULL_SET)) {
             p.statement = QDLNull.getInstance();
             return;
         }
@@ -1619,9 +1619,16 @@ illegal argument:no module named "b" was  imported at (1, 67)
                 constantNode.setResultType(Constant.BOOLEAN_TYPE);
                 break;
             case QDLConstants.RESERVED_NULL:
-            case QDLConstants.RESERVED_NULL2:
                 constantNode.setResult(QDLNull.getInstance());
                 constantNode.setResultType(Constant.NULL_TYPE);
+            break;
+       //     case QDLConstants.RESERVED_NULL_SET:
+            case QDLConstants.RESERVED_NULL_SET:
+                constantNode.setResult(new QDLSet());
+                constantNode.setResultType(Constant.SET_TYPE);
+
+//                constantNode.setResult(QDLNull.getInstance());
+  //              constantNode.setResultType(Constant.NULL_TYPE);
                 break;
             case QDLConstants.RESERVED_COMPLEX_I:
                 throw new IllegalArgumentException("Complex numbers not supported.");
@@ -1924,13 +1931,11 @@ illegal argument:no module named "b" was  imported at (1, 67)
     public void exitUnaryTildeExpression(QDLParserParser.UnaryTildeExpressionContext ctx) {
         Dyad dyad;
         dyad = new Dyad(OpEvaluator.TILDE_VALUE);
+        dyad.setUnary(true);
         dyad.setTokenPosition(tp(ctx));
         stash(ctx, dyad);
         dyad.setLeftArgument(new ConstantNode(new StemVariable(), Constant.STEM_TYPE));
         dyad.setRightArgument((StatementWithResultInterface) resolveChild(ctx.expression()));
-        if (dyad.getRightArgument() instanceof QDLSetNode) {
-            dyad.setLeftArgument(null);// special case it.
-        }
         List<String> source = new ArrayList<>();
         source.add(ctx.getText());
         dyad.setSourceCode(source);

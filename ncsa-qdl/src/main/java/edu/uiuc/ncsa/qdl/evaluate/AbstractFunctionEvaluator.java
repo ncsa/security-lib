@@ -370,6 +370,18 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         boolean scalarRHS = false;
         QDLSet leftSet = null;
         QDLSet rightSet = null;
+        if ((arg1 instanceof QDLSet) && (arg2 instanceof StemVariable)) {
+                 if(((StemVariable)arg2).isEmpty()){
+                     arg2 = new QDLSet();// make the empty set
+                 }
+        }
+
+        if ((arg2 instanceof QDLSet) && (arg1 instanceof StemVariable)) {
+                 if(((StemVariable)arg1).isEmpty()){
+                     arg1 = new QDLSet();// make the empty set
+                 }
+        }
+
         if (arg1 instanceof QDLSet) {
             if ((arg2 instanceof QDLSet)) {
                 leftSet = (QDLSet) arg1;

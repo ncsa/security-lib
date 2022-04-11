@@ -52,6 +52,7 @@ public class CacheTest extends TestBase {
         Cleanup<Identifier, CachedObject> cacheAger = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade("test cleanup", true), "test cleanup");
         cacheAger.setMap(cache);
         cacheAger.addRetentionPolicy(maxCacheSizePolicy);
+        cacheAger.setEnabledLocking(false);
         cacheAger.age();
         assert maxCacheSize == cache.size();
 

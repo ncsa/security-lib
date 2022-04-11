@@ -29,6 +29,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String EQUALS = "==";
     public static final String EQUALS2 = "≡";  // unicode 2261
     public static final String INTEGER_DIVIDE = "%";
+    public static final String SYMMETRIC_DIFFERENCE = "∆"; // unicode 2206
     public static final String LESS_THAN = "<";
     public static final String LESS_THAN_EQUAL = "<=";
     public static final String LESS_THAN_EQUAL2 = "=<";
@@ -100,7 +101,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             TIMES2,
             DIVIDE,
             DIVIDE2,
-            INTEGER_DIVIDE,
+            INTEGER_DIVIDE, SYMMETRIC_DIFFERENCE,
             PLUS, PLUS2,
             MINUS, MINUS2,
             AND, AND2, AND3,
@@ -229,6 +230,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             case DIVIDE2:
                 return DIVIDE_VALUE;
             case INTEGER_DIVIDE:
+            case SYMMETRIC_DIFFERENCE:
                 return INTEGER_DIVIDE_VALUE;
             case MINUS_MINUS:
                 return MINUS_MINUS_VALUE;
@@ -359,12 +361,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             QDLSet set = (QDLSet) obj1;
             StemVariable outStem = new StemVariable();
             // special case. If this is a unary ~, then the first argument is
-            // a Java null.
-            if(dyad.getLeftArgument() == null){
-                // contract is to add the elements to a stem list
-                //outStem.union(stem0);
-                outStem.getStemList().append(set);
-                dyad.setResult(outStem);
+            // ignored.
+            if (dyad.isUnary() ) {
+                dyad.setResult(set.toStem());
                 dyad.setResultType(Constant.STEM_TYPE);
                 dyad.setEvaluated(true);
                 return;
@@ -383,9 +382,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 stem0 = new StemVariable();
                 stem0.put(0L, obj0);
             }
-           outStem =  outStem.union(stem0); // copy over elements
-            StemEntry stemEntry = outStem.getStemList().last();
-            StemEntry newEntry =  new StemEntry(stemEntry.index + 1, set);
+            outStem = outStem.union(stem0); // copy over elements
+            long index = -1L;
+            StemEntry stemEntry;
+            if (!outStem.getStemList().isEmpty()) {
+                stemEntry = outStem.getStemList().last();
+                index = stemEntry.index;
+            }
+            StemEntry newEntry = new StemEntry(index + 1, set);
 
             outStem.getStemList().add(newEntry);
             dyad.setResult(outStem);
@@ -675,7 +679,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     }
 
-    protected void doSetUnionOrInteresection(Dyad dyad, State state){
+    protected void doSetUnionOrInteresection(Dyad dyad, State state) {
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
@@ -683,19 +687,19 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 if (!areAllSets(objects)) {
                     throw new IllegalArgumentException("Set operations require only sets");
                 }
-                    QDLSet leftSet = (QDLSet) objects[0];
-                    QDLSet rightSet = (QDLSet) objects[1];
-                    switch (dyad.getOperatorType()) {
-                        case INTERSECTION_VALUE:
-                            r.result = leftSet.intersection(rightSet);
-                            r.resultType = Constant.SET_TYPE;
-                            break;
-                        case UNION_VALUE:
-                            r.result = leftSet.union(rightSet);
-                            r.resultType = Constant.SET_TYPE;
-                            break;
-                    }
-                    return r;
+                QDLSet leftSet = (QDLSet) objects[0];
+                QDLSet rightSet = (QDLSet) objects[1];
+                switch (dyad.getOperatorType()) {
+                    case INTERSECTION_VALUE:
+                        r.result = leftSet.intersection(rightSet);
+                        r.resultType = Constant.SET_TYPE;
+                        break;
+                    case UNION_VALUE:
+                        r.result = leftSet.union(rightSet);
+                        r.resultType = Constant.SET_TYPE;
+                        break;
+                }
+                return r;
 
 
             }
@@ -713,6 +717,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         process2(dyad, pointer, op, state);
 
     }
+
     protected void doDyadLogicalOperator(Dyad dyad, State state) {
         fPointer pointer = new fPointer() {
             @Override

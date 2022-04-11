@@ -979,7 +979,9 @@ public class StemVariable extends HashMap<String, Object> {
         } catch (StemList.seGapException x) {
             //rock on. Just means the list is sparse so use full notation.
         }
-
+        if(isEmpty()){
+            return "[]";
+        }
         String output = "{";
         boolean isFirst = true;
 

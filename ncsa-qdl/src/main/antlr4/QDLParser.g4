@@ -75,9 +75,8 @@ assertStatement2:
    rInterval : LDoubleBracket expression? ';' expression (';' | (';' expression))? RDoubleBracket;
 
 
-          set : '{' expression (',' expression)* '}';
- stemVariable : '{' stemEntry (',' stemEntry)* '}'
-              | '{' '}';
+          set : '{' expression (',' expression)* '}'  | '{' '}';
+ stemVariable : '{' stemEntry (',' stemEntry)* '}';
     stemEntry : (Times | expression) ':' stemValue;
      stemList : '[' stemValue (',' stemValue)* ']'
               | '[' ']';
@@ -114,9 +113,9 @@ expression
  | expression postfix=(PlusPlus | MinusMinus)                                  #postfix
  | prefix=(PlusPlus | MinusMinus) expression                                   #prefix
  | expression Exponentiation expression                                        #powerExpression
- | expression op=('\\/' | '∩' | '/\\' | '∪') expression                        #intersectionOrUnion
 // Comment -- do set ops here since doing it in the lexer causes issues with / and /\ not being distinct.
 // Keep lexical tokens separate and just glom them together here
+ | expression op=('\\/' | '∩' | '/\\' | '∪') expression                        #intersectionOrUnion
  | expression op=(Times | Divide | Percent ) expression                        #multiplyExpression
  | (Floor | Ceiling) expression                                                #floorOrCeilingExpression
  | (Plus | UnaryPlus | Minus | UnaryMinus) expression                          #unaryMinusExpression
@@ -135,7 +134,7 @@ expression
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
- | expression op=Membership expression                                         #epsilon  // unicode 2208
+ | expression op=Membership expression                                         #epsilon  // unicode 2208, 2209
  | STRING                                                                      #strings
  | integer                                                                     #integers
  | number                                                                      #numbers

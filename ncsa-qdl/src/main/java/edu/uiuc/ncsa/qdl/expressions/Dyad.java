@@ -30,7 +30,19 @@ public class Dyad extends ExpressionImpl {
         getArguments().add(rightNode);
     }
 
-  
+    /**
+     * Demotes that this is actually a unary operator that is converted to dyadic by the interpreter.
+     * @return
+     */
+    public boolean isUnary() {
+        return unary;
+    }
+
+    public void setUnary(boolean unary) {
+        this.unary = unary;
+    }
+
+    boolean unary = false;
 
     @Override
     public Object evaluate(State state) {

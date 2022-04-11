@@ -1,6 +1,10 @@
 package edu.uiuc.ncsa.security.core.cache;
 
 
+import edu.uiuc.ncsa.security.core.Identifiable;
+import edu.uiuc.ncsa.security.core.Identifier;
+import edu.uiuc.ncsa.security.core.Store;
+import edu.uiuc.ncsa.security.core.util.BasicIdentifier;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.MyLoggingFacade;
 
@@ -36,7 +40,7 @@ public class Cleanup<K, V> extends Thread {
     }
 
     // only enable this if there is a very serious issue since the amount of output will skyrocket.
-    boolean deepDebug = true;
+    boolean deepDebug = false;
 
     public boolean isTestMode() {
         return testMode;
@@ -48,11 +52,54 @@ public class Cleanup<K, V> extends Thread {
 
     boolean testMode = false;
 
+    public boolean isEnabledLocking() {
+        return enabledLocking;
+    }
+
+    public void setEnabledLocking(boolean enabledLocking) {
+        this.enabledLocking = enabledLocking;
+    }
+
+    boolean enabledLocking = true;
+    public static Identifier lockID = BasicIdentifier.newID("gc:lock");
+
+
+    Store store;
+
+
+    public Store getStore() {
+        return store;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+        setMap(store);
+    }
+    public List<V> age() {
+        if(!isEnabledLocking() || isTestMode()){
+            return oldAge();
+        }
+        if(getStore().containsKey(lockID)){
+            info("Locked store for " + getName() + " at " + new Date());
+            return new ArrayList<>();
+        }
+        Identifiable lock = getStore().create();
+        lock.setIdentifier(lockID);
+        getStore().save(lock);
+        try {
+            return oldAge();
+        }finally {
+            // finally block executes even after a return.
+            info("removing lock for " + getName() + " at " + new Date());
+            getStore().remove(lockID);
+            info("removed lock for " + getName());
+        }
+    }
     /**
      * Clean out old entries by aging the elements, i.e., apply the retention policies.
      * Returns a list of the entries removed
      */
-    public List<V> age() {
+    protected List<V> oldAge() {
         LinkedList<V> linkedList = new LinkedList<V>();
         if (getMap().size() == 0) {
             debug("empty map for " + getName());
@@ -63,6 +110,9 @@ public class Cleanup<K, V> extends Thread {
 
         // copy the object's sorted list or we will get a concurrent modification exception
         for (K key : getSortedKeys()) {
+            if(key.equals(lockID)){
+                continue;
+            }
             V co = getMap().get(key);
             for (RetentionPolicy rp : getRetentionPolicies()) {
                 // see if we should bother in the first place...

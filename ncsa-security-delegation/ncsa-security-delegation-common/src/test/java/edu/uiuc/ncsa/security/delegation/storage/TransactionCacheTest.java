@@ -63,6 +63,7 @@ public class TransactionCacheTest extends BaseTransactionStoreTest {
         Cleanup<Identifier, CachedObject> cc = new Cleanup<Identifier, CachedObject>(new MyLoggingFacade(getClass().getSimpleName()+".testCleanup", true), "test cleanup");
         cc.addRetentionPolicy(new MaxCacheSizePolicy(getTransactionCache().getCache(), maxCacheSize));
         cc.setMap(getTransactionCache().getCache());
+        cc.setEnabledLocking(false);
         HashMap<Identifier, Identifiable> hashMap = new HashMap<Identifier, Identifiable>();
         for (int i = 0; i < maxCacheSize + 5; i++) {
             BasicTransaction bt =  getStore().create();

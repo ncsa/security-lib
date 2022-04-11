@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.security.delegation.token.NewToken;
 import net.sf.json.JSONObject;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.security.core.util.BeanUtils.checkNoNulls;
@@ -157,7 +158,11 @@ public class TokenImpl implements NewToken {
 
     @Override
     public boolean isExpired() {
-        DebugUtil.trace(this, "current time " + System.currentTimeMillis() + " exp at " + (getLifetime() + getIssuedAt()));
+        if(DebugUtil.isEnabled()){
+            Date expireTS = new Date();
+            expireTS.setTime(getLifetime() + getIssuedAt());
+            DebugUtil.trace(this, "current time " + (new Date()) + " exp at " + expireTS);
+        }
         if (getLifetime() + getIssuedAt() < System.currentTimeMillis()) {
             return true;
         }

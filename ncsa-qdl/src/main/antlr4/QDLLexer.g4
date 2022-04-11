@@ -7,7 +7,7 @@ lexer grammar QDLLexer;
 
 
 // § 1 Keywords
-  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | COMPLEX_I;
+  ConstantKeywords: BOOL_TRUE | BOOL_FALSE | Null | Null_Set | COMPLEX_I;
 
          ASSERT : 'assert'; 
         ASSERT2 : '⊨'; // unicode 22a8
@@ -23,7 +23,8 @@ lexer grammar QDLLexer;
            ELSE : 'else';
              IF : 'if';
          MODULE : 'module';
-           Null : 'null'   | '∅';  // unicode 2205
+           Null : 'null';
+       Null_Set : '∅';  // unicode 2205
          SWITCH : 'switch';
            THEN : 'then';
             TRY : 'try';
@@ -109,7 +110,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 //                Or : '||' | '⋁' | '∨' | '∪' ; // unicode 22c2, 2228 222a
                 Or : '||' | '⋁' | '∨'  ; // unicode 22c2, 2228 222a
           Backtick : '`';
-           Percent : '%';
+           Percent : '%' | '∆'; // \u2206 -- laplace operatos
              Tilde : '~';
          Backslash : '\\';
               Hash : '#';
@@ -123,11 +124,6 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
      FunctionMarker: '@' | '⊗';  // unicode 2297
             ASSIGN : '≔' | ':=' | '≕' | '=:' | '+=' | '-=' | (Times '=') | (Divide '=') | '%=' | '^=' ;  // unicode 2254, 2255
 
-/*
-    {1,2,3}\/{2,4,5}
-       {1,2,3}/\{2,4,5}
-
-*/
 // Remember that changing this file is taking your life in your hands, since tiny changes here
 // can completely change parsing in fundamental ways.
 

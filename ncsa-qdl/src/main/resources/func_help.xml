@@ -1838,6 +1838,7 @@ bac
 Do remember that for this (rather simple-minded) case, since there
 is *no* canonical ordering of elements in a stem, the result is
 a more or less random concatenation of the elements.
+
 E.g. On a higher dimension list
   q. := n(3,4,n(12));
   q.
@@ -2268,6 +2269,29 @@ Equivalent to: !
                 ]]>
             </body>
         </entry>
+    <entry id="!">
+            <body>
+                <![CDATA[
+Unary negation. Note that this is a monadic operator (!).
+That means that it negates it right hand argument, so the order
+of operations using this is a wee bit different from what you might
+expect. For instance
+
+! true && false == !(true && false) == true
+
+which is not
+
+(! true) && false == false
+
+When in doubt, use parentheses. Again, the contract is that the entire
+RHS is evaluated and fed to the operator. Compare the tilde operator
+for lists or any of the other monadic operators.
+
+
+Equivalent to: unicode not ¬ or \u00ac
+                ]]>
+            </body>
+        </entry>
     <entry id="×">
             <body>
                 <![CDATA[
@@ -2316,11 +2340,21 @@ Equivalent to: ||
                 ]]>
             </body>
         </entry>
+    <entry id="∆">
+            <body>
+                <![CDATA[
+Unicode symmetric difference operator \u2206
+Symmetric difference operator. Note that this not
+the same as upper case Greek delta, which  is \u0394
+Equivalent to: % for sets.
+                ]]>
+            </body>
+        </entry>
     <entry id="∅">
             <body>
                 <![CDATA[
-Unicode null \u2205
-Equivalent to: null
+Unicode null set \u2205
+Equivalent to: {}, the null set.
                 ]]>
             </body>
         </entry>
@@ -2386,6 +2420,7 @@ Standard    Unicode   ALT   escape code    What is it
 /              ÷       /    \u00f7         division
 +              ⁺       +    \u207a         unary plus
 ->             →       d    \u2192         lambda function
+%              ∆       D    \u2206         symmetric difference operator
                ∈       e    \u2208         is member of
                ∉       E    \u2209         is *not* member of
 &&             ∩       i    \u2229         set intersection
@@ -2423,7 +2458,7 @@ You can request help on any QDL symbol by typing
 E.g.
     )help ∅
     
-would print the entry for null.
+would print the entry for the null set.
                 ]]>
             </body>
         </entry>
@@ -2811,10 +2846,24 @@ in the correct scope for subsequent operations:
 0
 Had a not been set to null first, then it would have only existed inside
 the conditional and attempts to access it would result in an error.
-See also: is_defined
+See also: is_defined, null_set
                 ]]>
             </body>
         </entry>
+
+    <entry id="null_set">
+            <body>
+                <![CDATA[
+Keyword
+The null_set, (or unicode 2205, ∅) is the empty set.
+
+The notation for the empty set, {}, is used to denote the
+(much more probably) case of an empty stem. 
+See also: is_defined, null_set, null
+                ]]>
+            </body>
+        </entry>
+
     <entry id="values">
             <body>
                 <![CDATA[
@@ -2924,8 +2973,8 @@ E.g.
 For sets
 --------
   The symmetric difference of two sets is defined as
-  (A / B) || (B / A)  which is everything but the
-  starred area below:
+  A∆B == (A/B)∪(B/a) == (A / B) \/ (B / A)  which is everything
+  except the starred area below:
 
 ╔═══════════════════════╗
 ║                       ║   A
@@ -2944,6 +2993,7 @@ For sets
 E.g.
   {1,2,3}%{2,4,6}
 {1,3,4,6}
+See also: ∆ (\u2206)
                 ]]>
             </body>
         </entry>
@@ -3018,7 +3068,8 @@ E.g. Glom two sparse lists together then re-index them
 On sets.
 --------
 To convert a set to a list, use monadic ~. Note that sets have no canonical
-ordering, so do check what you get.
+ordering, so do check what you get. A set of sets will be returned as a
+list of lists.
 
 There is also the laminate function in the extension module for pasting
 two stems together along an axis.
@@ -3754,15 +3805,17 @@ See also: ∈ (has_value), <, > (subset operations.), subset(@pick arg)
 ]]>
             </body>
         </entry>
-    <entry id="sets">
+    <entry id="set">
             <body>
                 <![CDATA[
 Often you will just need to do operations on aggregates
- of elements  and really don't care about the internal
+of elements  and really don't care about the internal
 structure. A set is collection of elements that are
-immutable, unique and unordered.
+immutable, unique and unordered. Sets are written as elements
+between curly braces:
 
-Sets (from Mathematics Set Theory) in QDL allow for this.
+{a,b,c,...}
+
 Operations are intersection, union, difference,
 symmetric difference, membership, subsset/superset testing
 
@@ -3775,17 +3828,26 @@ differences, symmetric difference
 inclusions
 membership
 
+E.g. the intersection of two sets
+   {1,2,3,4,'a', 'foo'}/\{'a','b',1,3,5}
+{1,a,3}
+
+The common elements in more or less random order are returned. If you need
+order, consider lists.
+
 Note that in this implementation, intersections and symmetric differences
 function as analogs to multiplication and addition of integers, so that
 in QDL sets are treated as a elements of a Boolean ring, if you
-are aware of such things.
+are aware of such things. This is a more algebraic approach to sets
+and works quite well in a programming environment.
 
 Finally, sets may be nested but it is best to keep the elements
 as scalars. This is because testing stems for equality (which
 can be recursive structures, highly nested etc.) can
-be slow and very difficult.
+be slow and very difficult. On the other hand, sets may
+be entries in stems with no issues.
 
-See also: |/, |\, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
+See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, to_set, subset(@pick, arg)
                 ]]>
             </body>
         </entry>
@@ -3793,7 +3855,7 @@ See also: |/, |\, /, %, <, >, ==, ∈, to_set, subset(@pick, arg)
             <body>
                 <![CDATA[
 Unicode \u2229
-Set intersection. This is an alternate to ascii digraph |\.
+Set intersection. This is an alternate to ascii digraph /\.
 
 See &&.
                 ]]>
@@ -3803,7 +3865,7 @@ See &&.
             <body>
                 <![CDATA[
 Unicode \u222a
-Set union. This is an alternate to ascii digraph |/.
+Set union. This is an alternate to ascii digraph \/.
 
 See || .
                 ]]>
@@ -3844,6 +3906,26 @@ See also: block
                 ]]>
             </body>
         </entry>
+    <entry id="stem">
+            <body>
+                <![CDATA[
+An indexed aggregate. Compare with a set, which is an aggregate
+with no distinguished way to access elements.
+Stems are notated as
+variable.
+where the final . is the index operator. General stems may be indexed by
+pretty much any string or integer. A stem that has only integer indices
+is called a list.
+
+Stems are extremely flexible objects and can effectively provide any data
+structure you want. Sets are a convenience mostly since emulating sets
+with stems is a bit clunky.
+
+See also: slice, sets
+                ]]>
+            </body>
+        </entry>
+
     <!--
         entry template
     -->
