@@ -26,6 +26,7 @@ public interface XMLConstants {
 
     String WORKSPACE_TAG = "workspace";
     String WS_ENV_TAG = "env";
+    String EXTRINSIC_VARIABLES_TAG = "extrinsic_variables";
     String ENV_FILE = "env_file";
     String PRETTY_PRINT = "pretty_print";
     String BUFFER_DEFAULT_SAVE_PATH = "buffer_default_save_path";

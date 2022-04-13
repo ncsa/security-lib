@@ -24,6 +24,15 @@ public class FunctionRecord implements XThing {
         this.key = key;
     }
 
+    public boolean isLambda() {
+        return lambda;
+    }
+
+    public void setLambda(boolean lambda) {
+        this.lambda = lambda;
+    }
+
+    boolean lambda = false;
     @Override
     public String getName() {
         return name;
@@ -83,6 +92,7 @@ public class FunctionRecord implements XThing {
         functionRecord.documentation = documentation;
         functionRecord.statements = statements;
         functionRecord.argNames = argNames;
+        functionRecord.lambda = lambda;
         return functionRecord;
     }
 

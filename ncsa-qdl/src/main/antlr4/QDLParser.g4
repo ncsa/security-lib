@@ -89,6 +89,9 @@ assertStatement2:
         f_arg : (stemValue | f_ref);
        f_args : f_arg (',' f_arg)* ;
         f_ref : F_REF;
+//        f_ref : FunctionMarker (AllOps | FUNCTION_NAME  | (FuncStart ')'));
+   //       f_ref : FunctionMarker (AllOps | FUNCTION_NAME | (FuncStart ')'));  // This allows for @f and @f() as equivalent.
+        me : variable? Hash expression;
 
 // Again, the order here has been tweaked and any changes to this list will require running all the tests
 // and checking for regression. Also Antlr 4 interprets the # tag in the right hand column and
@@ -99,9 +102,9 @@ assertStatement2:
 expression
  :
    function                                                                    #functions
-  | variable? Hash expression                                                  #moduleExpression
   | expression StemDot+ expression                                             #dotOp
   | expression postfix=StemDot                                                 #dotOp2
+  | me                                                                         #moduleExpression
   | (function | '(' f_args* ')')
        LambdaConnector (expression | expressionBlock)                          #lambdaDef
  | stemVariable                                                                #stemVar

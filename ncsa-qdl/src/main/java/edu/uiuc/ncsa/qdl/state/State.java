@@ -536,17 +536,22 @@ public class State extends FunctionState implements QDLConstants {
     }
 
     protected State newStateWithImportsNEW(State moduleState) {
+        return newStateWithImportsNEW(moduleState, true);
+    }
+
+    protected State newStateWithImportsNEW(State moduleState, boolean pushVariables) {
         VStack newStack = new VStack(); // always creates an empty symbol table, replace it
-        if (moduleState != null && !moduleState.vStack.isEmpty()) {
-            //newStack.addAll(moduleState.symbolStack.getParentTables());
-            newStack.appendTables(moduleState.vStack);
-        }
+        if (pushVariables) {
+            if (moduleState != null && !moduleState.vStack.isEmpty()) {
+                //newStack.addAll(moduleState.symbolStack.getParentTables());
+                newStack.appendTables(moduleState.vStack);
+            }
 
-        if (!vStack.isEmpty()) {
-            //newStack.addAll(symbolStack.getParentTables());
-            newStack.appendTables(vStack);
+            if (!vStack.isEmpty()) {
+                //newStack.addAll(symbolStack.getParentTables());
+                newStack.appendTables(vStack);
+            }
         }
-
         FStack<? extends FTable<? extends FKey, ? extends FunctionRecord>> ftStack = new FStack();
         if (moduleState != null && !moduleState.getFTStack().isEmpty()) {
             ftStack.appendTables(moduleState.getFTStack());
@@ -656,6 +661,15 @@ public class State extends FunctionState implements QDLConstants {
         newState.setModulePaths(getModulePaths());
         newState.setVfsFileProviders(getVfsFileProviders());
         return newState;
+    }
+
+    /**
+     * Carries over modules and functions, but <b>not</b> variables.
+     *
+     * @return
+     */
+    public State newFunctionState() {
+        return newStateWithImportsNEW(null, false);
     }
 
     /**
@@ -937,7 +951,7 @@ public class State extends FunctionState implements QDLConstants {
      */
 
     public void readExtraXMLElements(XMLEvent xe, XMLEventReader xer) throws XMLStreamException {
-        if(xe.asStartElement().getName().getLocalPart().equals(STATE_CONSTANTS_TAG)) {
+        if (xe.asStartElement().getName().getLocalPart().equals(STATE_CONSTANTS_TAG)) {
             // only process the tag if it is the right one
             String text = XMLUtilsV2.getText(xer, STATE_CONSTANTS_TAG);
             text = new String(Base64.decodeBase64(text));
@@ -1036,5 +1050,16 @@ public class State extends FunctionState implements QDLConstants {
         }
 
     }
+    public  VStack getExtrinsicVars() {
+        if(extrinsicVars == null){
+            extrinsicVars = new VStack();
+        }
+        return extrinsicVars;
+    }
+
+
+
+    public static VStack extrinsicVars;
+
 
 }

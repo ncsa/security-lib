@@ -200,8 +200,8 @@ public class ModuleTest extends AbstractQDLTester {
         }
         addLine(script, "module_import('a:a');");
         addLine(script, "module_import('a:b');");
-        addLine(script, "d := a#list.b#i;");// Should resolve index of b#i to 1.
-        addLine(script, "e := b#list.i;");// should resolve i to 0 since it is not in the module.
+        addLine(script, "d := (a#list.).(b#i);");// Should resolve (a#list).(b#i) so index of b#i to 1.
+        addLine(script, "e := (b#list.).i;");// should resolve i to 0 since it is not in the module.
         addLine(script, "okd := d == -9;");
         addLine(script, "oke := e == -20;");
 
@@ -1123,21 +1123,65 @@ cannot access '__a'
         }
     }
 
-/*
-  With extensions added.
-    a. := [1,2,3,2,3,2,3]
-    b. :=[;size(a.)]
-    f(jjj)->reduce(@+,mask(n_copy(1,size(a.)),b.jjj==a.))
-    g(j)->reduce(@+,mask(n_copy(1,size(a.)),b.j==a.));
+    /**
+     * Tests that passing a fully qualified function name as a reference is resolved right
+     * @throws Throwable
+     */
+    public void testModuleFunctionReference() throws Throwable {
 
-  g(2) fails because the loop in n_copy runs with variable j which resets the argument j.
-  f works because jjj is not used elsewhere.
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "module['a:a','A'][f(x)->x^2;];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, "h(@g, x)->g(x);");
+        addLine(script, "ok := 16 == h(@A#f, 4);");// this actually took a small parser rewrite to fix.
+        addLine(script, "ok1 := 16 == h(@f, 4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
 
-  ** FIX for 5.2.6 release. Change loop variable in n_copy to __j, so there is no name
-  collision.
+    /**
+     * Since modules assume the state of their calling environment, it was possible to have functions
+     * change the ambient state without warning. This has been fixed and this is the regression test
+     * for it. A variable j is defined, a module is imported with a function that has the variable j in it.
+     * The function is run. No change to j should happen.
+     *
+     * This was accomplished by making a split between the state of lambdas (inherited) and
+     * defined functions where the state is precisely what is passed in.
+     * @throws Throwable
+     */
+    public void testModuleVisibility() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "j := 5;");
+        addLine(script, "module['a:a','A'][define[n_copy(s, n)][ out. := null;while[for_next(j, [;n])][out.j := s;];return(out.);];];");
+        addLine(script, "module_import('a:a');");
+        addLine(script, " n_copy(1,10);");
+        addLine(script, "ok := 5 == j;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 
-  ==> There needs to be a design review about this. It is probably the case that we don't want to have
-      variables passed along like this unless there is an explicit agreement to do so,
-      e.g. delegates[] call, or a type. This is not a trivial discussion.
- */
+    public void testExtrinsic() throws Throwable {
+         testExtrinsic(false);
+         testExtrinsic(true); // amke sure serialization of extrinsics is done someplace
+    }
+    protected void testExtrinsic(boolean testXML) throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "&j := 5;");
+        addLine(script, "module['a:a','A'][define[f(s)][return(s*&j);];];");
+        if (testXML) {
+            state = roundTripStateSerialization(state, script);
+            script = new StringBuffer();
+        }
+        addLine(script, "module_import('a:a');");
+        addLine(script, "ok := 50 == A#f(10);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 }

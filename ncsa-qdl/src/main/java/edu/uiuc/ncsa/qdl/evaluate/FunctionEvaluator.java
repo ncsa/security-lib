@@ -276,20 +276,26 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
         State localState;
          if(moduleState == null){
-            localState = state.newLocalState();
+             //localState = state.newLocalState();
+
+             if(functionRecord.isLambda()|| functionRecord.isFuncRef){
+                 localState = state.newLocalState();
+             }else{
+                 localState = state.newFunctionState();
+             }
 
         }else{
-            localState = state.newLocalState(moduleState);
+        //  localState = state.newLocalState(moduleState);
+             if(functionRecord.isLambda()){
+                 localState = state.newLocalState(moduleState);
+             } else{
+                 localState = state.newFunctionState();
+             }
         }
          localState.setWorkspaceCommands(state.getWorkspaceCommands());
-       // State localState = state.newStateWithImports();
 
-   //     localState.getSymbolStack().addParent((SymbolTableImpl) moduleState.getSymbolStack().getLocalST());
-   //     localState.getFTStack().push(frs.state.getFTStack().peek());
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
-        //SymbolTable symbolTable = localState.getVStack().getLocalST();
-        //   boolean hasLocalFunctionTable = false;
         for (int i = 0; i < polyad.getArgCount(); i++) {
             if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
                 LambdaDefinitionNode ldn = (LambdaDefinitionNode) polyad.getArguments().get(i);
@@ -332,7 +338,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     functionRecord1.isFuncRef = true;
                     localState.getFTStack().peek().put(functionRecord1);
                 } else {
-                    List<FunctionRecord> functionRecordList = localState.getFTStack().getByAllName(xname);
+                    //List<FunctionRecord> functionRecordList = localState.getFTStack().getByAllName(xname);
+                    List<FunctionRecord> functionRecordList = localState.getAllFunctionsByName(xname);
                     for (FunctionRecord functionRecord1 : functionRecordList) {
                         FunctionRecord clonedFR = null;
                         try {
@@ -348,8 +355,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
 
                 // This had better be a function reference or this should blow up.
             } else {
-                //symbolTable.setValue(functionRecord.argNames.get(i), polyad.getArguments().get(i).evaluate(localState));
-                localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(localState)));
+               // localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(localState)));
+                localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(state)));
             }
         }
         if (functionRecord.isFuncRef) {

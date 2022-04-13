@@ -328,6 +328,16 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitF_ref(QDLParserParser.F_refContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link QDLParserParser#me}.
+	 * @param ctx the parse tree
+	 */
+	void enterMe(QDLParserParser.MeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link QDLParserParser#me}.
+	 * @param ctx the parse tree
+	 */
+	void exitMe(QDLParserParser.MeContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code functions}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

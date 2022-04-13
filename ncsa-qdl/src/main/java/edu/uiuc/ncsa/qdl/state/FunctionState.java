@@ -62,6 +62,31 @@ public abstract class FunctionState extends VariableState {
         return resolveFunction(polyad.getName(), polyad.getArgCount(), checkForDuplicates);
     }
 
+    public List<FunctionRecord> getAllFunctionsByName(String name) {
+        List<FunctionRecord> list = new ArrayList<>();
+        int nsDelimIndex = name.indexOf(NS_DELIMITER);
+        if (nsDelimIndex == 0) {
+            name = name.substring(1);
+        }
+        if (0 < nsDelimIndex) {
+            String alias = name.substring(0, nsDelimIndex);
+            String realName = name.substring(nsDelimIndex + 1);
+
+            // This is in an instance. Find that.
+            MIWrapper wrapper = (MIWrapper) getMInstances().get(new XKey(alias));
+            if (wrapper != null) {
+                list.addAll(wrapper.getModule().getState().getFTStack().getByAllName(realName));
+            }
+            return list;
+        }   // just a name, look fo all of them
+        list.addAll(getFTStack().getByAllName(name));
+        for (Object key : getMInstances().keySet()) {
+            MIWrapper wrapper = (MIWrapper) getMInstances().get((XKey) key);
+            list.addAll(wrapper.getModule().getState().getFTStack().getByAllName(name));
+        }
+        return list;
+    }
+
     public FR_WithState resolveFunction(String name, int argCount, boolean checkForDuplicates) {
         if (name == null || name.isEmpty()) {
             throw new NFWException(("Internal error: The function has not been named"));
@@ -74,12 +99,9 @@ public abstract class FunctionState extends VariableState {
             frs.state = this;
             if (getFTStack().containsKey(new FKey(name, -1))) {
                 frs.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
-
             } else {
-
                 frs.functionRecord = null;
             }
-
             return frs;
         }
         // check for unqualified names.

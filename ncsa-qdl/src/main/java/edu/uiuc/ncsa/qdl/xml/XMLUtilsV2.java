@@ -160,6 +160,14 @@ public class XMLUtilsV2 {
     public static void deserializeInstances(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         deserializeXStack(xer, new MIStack(), state, xmlSerializationState);
     }
+
+    public static void deserializeExtrinsicVariables(XMLEventReader xer, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException{
+        xer.nextEvent();// advance cursor
+        VStack exx = new VStack();
+        exx.fromXML(xer, xmlSerializationState);
+    //    state.setExtrinsicVars(exx);
+
+    }
     protected static void deserializeXStack(XMLEventReader xer, XStack xStack, State state, XMLSerializationState xmlSerializationState) throws XMLStreamException {
         xer.nextEvent();// advance cursor
         xStack.fromXML(xer, xmlSerializationState);

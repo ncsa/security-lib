@@ -2238,6 +2238,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     public static final String LIST_MODULES_SWITCH = "-m";
     public static final String LIST_INTRINSIC_SWITCH = "-intrinsic";
+    public static final String LIST_EXTRINSIC_SWITCH = "-extrinsic";
 
     protected int _funcsList(InputLine inputLine) {
         if (_doHelp(inputLine)) {
@@ -2245,7 +2246,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             sayi("List all user defined functions.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
             sayi(LIST_MODULES_SWITCH + " List modules as well. Default is just what you've defined.");
-            sayi(LIST_INTRINSIC_SWITCH + " List modules as well. Default is not to show them.");
+            sayi(LIST_INTRINSIC_SWITCH + " List intrinsic functions as well. Default is not to show them.");
             sayi("    Note that you cannot modify or query them, simply see what they are named.");
             return RC_NO_OP;
         }
@@ -2425,15 +2426,23 @@ public class WorkspaceCommands implements Logable, Serializable {
             say("list [" + COMPACT_ALIAS_SWITCH + "]");
             sayi("Lists the variables in the current workspace.");
             sayi(COMPACT_ALIAS_SWITCH + " will collapse all modules to show by alias.");
+            sayi(LIST_MODULES_SWITCH + " list variables in modules");
+            sayi(LIST_INTRINSIC_SWITCH + " show intrinsic variables");
+            sayi(LIST_EXTRINSIC_SWITCH + " show extrinsic (i.e. global) variables");
             return RC_NO_OP;
         }
         boolean includeModules = inputLine.hasArg(LIST_MODULES_SWITCH);
         boolean useCompactNotation = inputLine.hasArg(COMPACT_ALIAS_SWITCH);
         boolean showIntrinsic = inputLine.hasArg(LIST_INTRINSIC_SWITCH);
+        boolean showExtrinsic = inputLine.hasArg(LIST_EXTRINSIC_SWITCH);
         inputLine.removeSwitch(LIST_MODULES_SWITCH);
         inputLine.removeSwitch(COMPACT_ALIAS_SWITCH);
         inputLine.removeSwitch(LIST_INTRINSIC_SWITCH);
-        return printList(inputLine, getState().listVariables(useCompactNotation, includeModules, showIntrinsic));
+        inputLine.removeSwitch(LIST_EXTRINSIC_SWITCH);
+        return printList(inputLine, getState().listVariables(useCompactNotation,
+                includeModules,
+                showIntrinsic,
+                showExtrinsic));
     }
 
     /**

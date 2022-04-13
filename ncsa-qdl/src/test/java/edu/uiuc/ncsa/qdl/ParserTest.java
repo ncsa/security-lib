@@ -890,10 +890,8 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.13 := a" + NOT_EQUAL2 + "b;"); // T
         addLine(script, "a.4 := a<=a;"); //T
         addLine(script, "a.14 := a" + LESS_THAN_EQUAL3 + "a;"); //T
-        addLine(script, "a.5 := a=<a;"); //T
         addLine(script, "a.6 := b>=b;"); //T
         addLine(script, "a.16 := b" + MORE_THAN_EQUAL3 + "b;"); //T
-        addLine(script, "a.7 := b=>b;"); //T
         addLine(script, "a.8 := a==a;"); //T
         addLine(script, "a.18 := a" + EQUALS2 + "a;"); //T
         addLine(script, "a.9 := a!=a;"); //F
@@ -910,10 +908,8 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("a.13", state);
         assert getBooleanValue("a.4", state);
         assert getBooleanValue("a.14", state);
-        assert getBooleanValue("a.5", state);
         assert getBooleanValue("a.6", state);
         assert getBooleanValue("a.16", state);
-        assert getBooleanValue("a.7", state);
         assert getBooleanValue("a.8", state);
         assert getBooleanValue("a.18", state);
         assert !getBooleanValue("a.0", state);
@@ -985,7 +981,7 @@ public class ParserTest extends AbstractQDLTester {
         String slash = "\\";
         addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
                 "  ~`!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
-                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧≁⊗\\n" + // unicode
+                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧≁⊗∈∉∩∪∆\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );
         addLine(script, "say('printing all base characters with say:\\n');");

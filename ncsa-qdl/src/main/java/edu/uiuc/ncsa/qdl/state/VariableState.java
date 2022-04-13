@@ -73,26 +73,6 @@ public abstract class VariableState extends NamespaceAwareState {
 
     }
 
-    public Object getValueOLD(String variableName) {
-        if (isStem(variableName)) {
-            /* KEEP for future use.
-            If we want to have system variables this is how to do it. A long as nothing is put there
-            this won't get evaluated.
-             */
-            /*if (!systemVars.getMap().isEmpty() && variableName.startsWith(MetaEvaluator.SYS_FQ)) {
-                StemMultiIndex w = new StemMultiIndex(variableName);
-                variableName = getFQName(w.name);
-                StemVariable s = (StemVariable) systemVars.getMap().get(MetaEvaluator.SYS_FQ+variableName);
-                if (w.isEmpty()) {
-                    return s;
-                }
-                return s.get(w);
-            }*/
-            StemMultiIndex w = new StemMultiIndex(variableName);
-            return gsrNSStemOp(w, OP_GET, null, new HashSet<>());
-        }
-        return gsrNSScalarOp(variableName, OP_GET, null, new HashSet<>());
-    }
 
     public Object getValue(String variableName, Set<XKey> checkedAliases) {
         if (checkedAliases == null) {
@@ -106,23 +86,6 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
 
-    public void setValueOLD(String variableName, Object value) {
-        if (isStem(variableName)) {
-            StemMultiIndex w = new StemMultiIndex(variableName);
-            if (!w.isStem() && (value instanceof StemVariable)) {
-                throw new IndexError("Error: You cannot set a scalar variable to a stem value");
-            }
-            gsrNSStemOp(w, OP_SET, value, new HashSet<>());
-            return;
-        }
-        if (value instanceof StemVariable) {
-            throw new IndexError("Error: You cannot set a scalar variable to a stem value");
-        }
-
-        gsrNSScalarOp(variableName, OP_SET, value, new HashSet<>());
-        return;
-    }
-
     public void setValue(String variableName, Object value) {
         setValue(variableName, value, null);
     }
@@ -134,11 +97,11 @@ public abstract class VariableState extends NamespaceAwareState {
         if (isStem(variableName)) {
             StemMultiIndex w = new StemMultiIndex(variableName);
             // Don't allow assignments of wrong type, but do let them set a stem to null.
-            if(w.isStem()){
+            if (w.isStem()) {
                 if (!(value instanceof StemVariable) && !(value instanceof QDLNull)) {
                     throw new IndexError("Error: You cannot set a scalar value to a stem variable");
                 }
-            }else{
+            } else {
                 if (value instanceof StemVariable) {
                     throw new IndexError("Error: You cannot set a scalar variable to a stem value");
                 }
@@ -231,22 +194,36 @@ public abstract class VariableState extends NamespaceAwareState {
         variableName = w.name;
         XKey vKey = new XKey(w.name);
         Object object;
-        if (isIntrinsic(variableName)) {
-            vStack = getVStack();
-            VThing vThing = (VThing) vStack.nonlocalGet(vKey);
-            if(vThing == null){
+        boolean didIt = false;
+        if (isExtrinsic(variableName)) {
+            VThing vThing = (VThing) getExtrinsicVars().get(vKey);
+            if (vThing == null) {
                 stem = null;
-            }else {
+            } else {
                 if (vThing.isStem()) {
                     stem = vThing.getStemValue();
                 }
             }
-        } else {
+            didIt = true;
+        }
+        if (isIntrinsic(variableName)) {
+            vStack = getVStack();
+            VThing vThing = (VThing) vStack.nonlocalGet(vKey);
+            if (vThing == null) {
+                stem = null;
+            } else {
+                if (vThing.isStem()) {
+                    stem = vThing.getStemValue();
+                }
+            }
+            didIt = true;
+        }
+        if (!didIt) {
             VThing vThing;
             // look in specific places
-            if(isImportMode()){
+            if (isImportMode()) {
                 vThing = (VThing) getVStack().localGet(vKey);
-            }else{
+            } else {
                 vThing = (VThing) getVStack().get(vKey);
             }
             if (vThing != null && vThing.isNull()) {
@@ -256,9 +233,9 @@ public abstract class VariableState extends NamespaceAwareState {
                 if (oooo != null && !(oooo.isStem())) {
                     throw new IllegalArgumentException("error: a stem was expected");
                 }
-                if(oooo == null){
-                    stem =  null;
-                }else {
+                if (oooo == null) {
+                    stem = null;
+                } else {
                     stem = oooo.getStemValue();
                 }
             }
@@ -321,7 +298,11 @@ public abstract class VariableState extends NamespaceAwareState {
                     throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
                 }
                 if (w.isEmpty()) {
-                    getVStack().remove(vKey);
+                    if(isExtrinsic(variableName)){
+                        getExtrinsicVars().remove(vKey);
+                    } else {
+                        getVStack().remove(vKey);
+                    }
                 } else {
                     stem.remove(w);
                 }
@@ -333,6 +314,7 @@ public abstract class VariableState extends NamespaceAwareState {
     /**
      * If in import mode - if st is a SymbolTable, set value, if a symbol stack, set local<br/>
      * otherwise, set value
+     *
      * @param variableName
      * @param value
      * @param st
@@ -350,12 +332,16 @@ public abstract class VariableState extends NamespaceAwareState {
     }
 
     private void setValueImportAware(String variableName, Object value) {
-         VThing vThing = new VThing(new XKey(variableName), value);
-         if(isImportMode()){
-             getVStack().localPut(vThing);
-         }else{
-             getVStack().put(vThing);
-         }
+        VThing vThing = new VThing(new XKey(variableName), value);
+        if (isExtrinsic(variableName)) {
+            getExtrinsicVars().put(vThing);
+            return;
+        }
+        if (isImportMode()) {
+            getVStack().localPut(vThing);
+        } else {
+            getVStack().put(vThing);
+        }
     }
 
     Pattern intPattern = Pattern.compile(int_regex);
@@ -381,11 +367,16 @@ public abstract class VariableState extends NamespaceAwareState {
         VThing v = null;
         SymbolTable st = null;
         XKey xKey = new XKey(variableName);
+        boolean didIt = false;
+        if (isExtrinsic(variableName)) {
+            v = (VThing) getExtrinsicVars().get(xKey);
+            didIt = true;
+        }
         if (isIntrinsic(variableName)) {
-            //st = getvStack();
             v = (VThing) getVStack().get(xKey);
-
-        } else {
+            didIt = true;
+        }
+        if (!didIt) {
             v = (VThing) getVStack().get(xKey);
             if (v == null) {
                 VThing vThing;
@@ -418,7 +409,7 @@ public abstract class VariableState extends NamespaceAwareState {
         switch (op) {
             case OP_GET:
                 // For resolving intrinsic variables.
-                if(v == null){
+                if (v == null) {
                     return null;
                 }
                 return v.getValue();
@@ -426,7 +417,11 @@ public abstract class VariableState extends NamespaceAwareState {
                 setValueImportAware(variableName, value);
                 return null;
             case OP_REMOVE:
-                getVStack().remove(xKey);
+                if (isExtrinsic(variableName)) {
+                    getExtrinsicVars().remove(xKey);
+                } else {
+                    getVStack().remove(xKey);
+                }
         }
 
         return null;
@@ -476,13 +471,17 @@ public abstract class VariableState extends NamespaceAwareState {
 
     public TreeSet<String> listVariables(boolean useCompactNotation,
                                          boolean includeModules,
-                                         boolean showIntrinsic) {
+                                         boolean showIntrinsic,
+                                         boolean showExtrinsic) {
         TreeSet<String> out = getVStack().listVariables();
+        if (showExtrinsic) {
+            out.addAll(getExtrinsicVars().listVariables());
+        }
         if (!includeModules) {
             return out;
         }
         for (Object key : getMInstances().keySet()) {
-            XKey xKey = (XKey)key;
+            XKey xKey = (XKey) key;
             Module m = getMInstances().getModule(xKey);
             if (m == null) {
                 continue; // the user specified a non-existent module.
@@ -502,10 +501,25 @@ public abstract class VariableState extends NamespaceAwareState {
                 }
             }
         }
+
         return out;
     }
 
     public boolean isStem(String var) {
         return var.contains(STEM_INDEX_MARKER); // if there is an embedded period, needs to be resolved
     }
+
+    public static final String EXTRINSIC_MARKER = "&";
+
+    public boolean isExtrinsic(String x) {
+        return x.startsWith(EXTRINSIC_MARKER);
+    }
+
+    // This is actually static but due to some visibility issues with static elements, it
+    // has to be in the State object proper. This accessor is overridden there.,
+    public VStack getExtrinsicVars() {
+        return null;
+    }
+
+
 }

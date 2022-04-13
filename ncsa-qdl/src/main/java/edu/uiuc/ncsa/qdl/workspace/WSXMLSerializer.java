@@ -133,11 +133,17 @@ public class WSXMLSerializer {
             if (!key.equals(state.getUuid()))
                 xmlSerializationState.getState(key).toXML(xsw, xmlSerializationState);
         }
+
+
         xsw.writeEndElement(); // end states reference
 
         // Absolute last thing to write is the actual state object for the workspace.
         state.toXML(xsw, xmlSerializationState);
-
+        if (!state.getExtrinsicVars().isEmpty()) {
+            xsw.writeStartElement(EXTRINSIC_VARIABLES_TAG);
+            state.getExtrinsicVars().toXML(xsw, xmlSerializationState);
+            xsw.writeEndElement();
+        }
         xsw.writeEndElement(); // end workspace tag
     }
 
@@ -393,6 +399,9 @@ public class WSXMLSerializer {
                                     }
                                 }
                                 break;
+                            case EXTRINSIC_VARIABLES_TAG:
+                                XMLUtilsV2.deserializeExtrinsicVariables(xer, testCommands.state, xmlSerializationState);
+                           break;
                             case BUFFER_MANAGER:
                                 if (!workspaceAttributesOnly) {
                                     testCommands.bufferManager = new BufferManager();
@@ -408,34 +417,12 @@ public class WSXMLSerializer {
                                         XProperties xp = new XProperties();
                                         xp.add(jsonObject, true);
                                         testCommands.env = xp;
-/*
-                                        // This is a base 64 encoded XProperties
-                                        ByteArrayInputStream bais = new ByteArrayInputStream(raw);
-                                        XProperties xp = new XProperties();
-                                        try {
-                                            xp.loadFromXML(bais);
-                                            bais.close();
-                                            if (testCommands.env == null) {
-                                                testCommands.env = xp;
-                                            } else {
-                                                testCommands.env.add(xp, true);
-                                            }
-
-                                        } catch (IOException e) {
-                                            say("Could not deserialize stored properties:" + e.getMessage() + (e.getCause() == null ? "" : ", cause = " + e.getCause().getMessage()));
-                                        }
-*/
-
                                     } else {
                                         doEnvProps(testCommands, xer);
                                     }
                                 }
                                 break;
-/*                            case IMPORTS_COMMAND:
-                                if (!workspaceAttributesOnly) {
-                                    XMLUtils.deserializeImports(xer, testCommands.getEnv(), testCommands.getState());
-                                }
-                                break;*/
+
                             case OLD_MODULE_TEMPLATE_TAG:
                                 if (!workspaceAttributesOnly) {
                                     XMLUtils.deserializeTemplates(xer, testCommands.getEnv(), testCommands.getState());

@@ -396,7 +396,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
          This tests that arguments to functions are executed in the function scope, not
          in the ambient scope.
      */
-    public void testFunctionArgumentScope() throws Throwable {
+/*    public void testFunctionArgumentScope() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "f(x)->a*x^2;"); // define a function that does not have a set.
@@ -406,7 +406,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok2", state);
-    }
+    }*/
 
     /**
      * Test nroot and sqrt. this computes the closed form solution of

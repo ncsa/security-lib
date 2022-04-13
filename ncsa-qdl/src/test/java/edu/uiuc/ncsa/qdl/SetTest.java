@@ -132,9 +132,9 @@ public class SetTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a := {0,1,2,3,4};");
         addLine(script, "ok := 2 ∈ a;");
-        addLine(script, "ok1 := reduce(@&&, [0,1]∈a);"); // list can be used
+        addLine(script, "ok1 := reduce(@∧, [0,1]∈a);"); // list can be used
         addLine(script, "ok2 := 7 ∉ a;");
-        addLine(script, "ok3 := reduce(@&&, [8,6]∉a);"); // list can be used
+        addLine(script, "ok3 := reduce(@∧, [8,6]∉a);"); // list can be used
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);

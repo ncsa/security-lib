@@ -299,11 +299,17 @@ public class Cleanup<K, V> extends Thread {
 
     @Override
     public void run() {
-        info("starting cleanup thread for " + getMap());
+        info("starting cleanup thread for " + getName());
         while (!isStopThread()) {
             try {
                 Date nextRun = new Date();
                 long nextCleanup = getNextSleepInterval();
+                if(nextCleanup <=0){
+                    // this disables cleanup.
+                    warn("Cleanup disabled for " + getName() + ". Exiting...");
+                    setStopThread(true); //just in case
+                    return;
+                }
                 nextRun.setTime(nextRun.getTime() + nextCleanup);
                 info("next cleanup for " + getName() + " scheduled for " + nextRun);
                 sleep(nextCleanup);

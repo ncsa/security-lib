@@ -20,7 +20,7 @@ module[
         >> sets element 42 in b. as well. To have them independent, use this
         >> If arg is not a stem, it is simply returned since all other references
         >> are by value.
-        if[var_type(arg) != constants('var_type').stem][return(arg);];
+        if[var_type(arg) != constants('var_type').'stem'][return(arg);];
         return(from_json(to_json(arg)));
    ];
 
@@ -112,8 +112,8 @@ module[
       types ≔ (var_type(x) ≡ 4?1:0) + (var_type(y) ≡ 4?2:0);
       // 0 - both scalars, 1 - x only stem, 2 - y only stem 3 - both stems
       if[types ≡ 0][return([x,y]);]; // trivial case
-      left. ≔ ∅; right. ≔ ∅;
-      l_dim. ≔ ∅; r_dim.≔ ∅;
+      left. ≔ []; right. ≔ [];
+      l_dim. ≔ []; r_dim.≔ [];
       switch[
           if[types ≡ 1][left.≔x; l_dim.≔ dim(x);r_dim.≔clone(l_dim.);right.≔n(r_dim., [y]);];
           if[types ≡ 2][right.≔y;r_dim.≔dim(y);l_dim.≔clone(r_dim.);left.≔n(l_dim., [x]);];
