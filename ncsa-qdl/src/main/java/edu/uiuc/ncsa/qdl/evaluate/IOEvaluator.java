@@ -158,14 +158,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doScan(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLRuntimeException("scan is not allowed in server mode.");
-        }
         if(polyad.isSizeQuery()){
                  polyad.setResult(new int[]{0,1});
                  polyad.setEvaluated(true);
                  return;
              }
+        if (state.isServerMode()) {
+            throw new QDLRuntimeException("scan is not allowed in server mode.");
+        }
 
          if (1 < polyad.getArgCount()) {
              throw new ExtraArgException(SCAN_FUNCTION + " requires at most 1 argument");
@@ -455,14 +455,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void vfsUnmount(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
-        }
         if(polyad.isSizeQuery()){
                  polyad.setResult(new int[]{1});
                  polyad.setEvaluated(true);
                  return;
-             }
+             }       if (state.isServerMode()) {
+            throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
+        }
+
          if (polyad.getArgCount() < 1) {
              throw new MissingArgException(VFS_UNMOUNT + " requires at least 1 argument");
          }
@@ -490,14 +490,14 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void vfsMount(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
-        }
         if(polyad.isSizeQuery()){
                  polyad.setResult(new int[]{1});
                  polyad.setEvaluated(true);
                  return;
              }
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
+        }
          if (polyad.getArgCount() < 1) {
              throw new MissingArgException(VFS_MOUNT + " requires at least 1 argument");
          }
@@ -581,15 +581,15 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doWriteFile(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("File operations are not permitted in server mode");
-        }
-
         if(polyad.isSizeQuery()){
                  polyad.setResult(new int[]{2,3});
                  polyad.setEvaluated(true);
                  return;
              }
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("File operations are not permitted in server mode");
+        }
+
          if (polyad.getArgCount() < 2) {
              throw new MissingArgException(WRITE_FILE + " requires at least 2 arguments");
          }

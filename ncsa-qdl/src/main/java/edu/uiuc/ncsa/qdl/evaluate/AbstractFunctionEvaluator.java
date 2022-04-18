@@ -15,10 +15,7 @@ import org.apache.commons.codec.binary.Base32;
 
 import java.math.BigDecimal;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static edu.uiuc.ncsa.qdl.variables.Constant.UNKNOWN_TYPE;
 
@@ -51,7 +48,17 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         String[] fnames = listFQ ? getFQFunctionNames() : getFunctionNames();
 
         for (String key : fnames) {
-            names.add(key + "()");
+            try {
+                int[] argCount = MetaEvaluator.getInstance().getArgCount(key);
+                if(AbstractFunctionEvaluator.MAX_ARG_COUNT <= argCount.length){
+                    names.add(key + "([" + argCount[0] + "," + argCount[1] + "," + argCount[2] + ",...]");
+                }else{
+                    names.add(key + "(" + Arrays.toString(argCount) + ")");
+                }
+            }catch(Throwable t) {
+                System.out.println("key = " + key + " failed");
+                t.printStackTrace();
+            }
         }
         return names;
     }
@@ -981,13 +988,13 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @return
      */
     protected static int[] getBigArgList0(){
-        if(bigArgList == null){
-              bigArgList = new int[MAX_ARG_COUNT];
+        if(bigArgList0== null){
+              bigArgList0 = new int[MAX_ARG_COUNT+1];
               for(int i = 0 ; i < MAX_ARG_COUNT+1; i++){
-                  bigArgList[i] = i;
+                  bigArgList0[i] = i;
               }
         }
-        return bigArgList;
+        return bigArgList0;
     }
 
 }

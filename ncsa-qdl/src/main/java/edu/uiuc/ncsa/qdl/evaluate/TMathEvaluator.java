@@ -17,6 +17,7 @@ import java.math.RoundingMode;
  */
 public class TMathEvaluator extends AbstractFunctionEvaluator {
     public static final String TMATH_NAMESPACE = "tmath";
+
     @Override
     public String getNamespace() {
         return TMATH_NAMESPACE;
@@ -85,15 +86,14 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     public static final int CEILING_TYPE = 20 + TMATH_FUNCTION_BASE_VALUE;
 
 
-
     @Override
     public String[] getFunctionNames() {
-        if(fNames == null){
-            fNames =  new String[]{
-                        COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
-                        ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
-                        N_ROOT,  FLOOR, CEILING
-                };
+        if (fNames == null) {
+            fNames = new String[]{
+                    COSINE, SINE, TANGENT, LOG_10, LOG_E, EXP, SINH, COSH, TANH,
+                    ARC_COSINE, ARC_SINE, ARC_TANGENT, ARC_COSH, ARC_SINH, ARC_TANH, PI, PI2,
+                    N_ROOT, FLOOR, CEILING
+            };
         }
         return fNames;
     }
@@ -132,15 +132,16 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        try{
+        try {
             return evaluate2(polyad, state);
-        }catch(QDLException q){
-              throw q;
-        }catch(Throwable t){
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
             QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
             throw qq;
         }
     }
+
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
             case SINE:
@@ -215,18 +216,18 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     private void doFloorOrCeiling(Polyad polyad, State state, boolean isFloor) {
 
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException((isFloor ? FLOOR : CEILING) + " requires at least 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException((isFloor ? FLOOR : CEILING) + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException((isFloor ? FLOOR : CEILING) + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException((isFloor ? FLOOR : CEILING) + " requires at most 1 argument");
+        }
 
         fPointer pointer = new fPointer() {
             @Override
@@ -243,7 +244,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 if (ob instanceof BigDecimal) {
                     bd = (BigDecimal) ob;
                 } else {
-                    throw new IllegalArgumentException((isFloor?FLOOR:CEILING) + " is only defined for numbers");
+                    throw new IllegalArgumentException((isFloor ? FLOOR : CEILING) + " is only defined for numbers");
                 }
                 if (isFloor) {
                     r.result = bd.setScale(0, RoundingMode.FLOOR);
@@ -259,18 +260,18 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doNRoot(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{2});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(N_ROOT + " requires 2 arguments");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(N_ROOT + " requires 2 arguments");
+        }
 
-         if (2 < polyad.getArgCount()) {
-             throw new ExtraArgException(N_ROOT + " requires at most 2 arguments");
-         }
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(N_ROOT + " requires at most 2 arguments");
+        }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
             @Override
@@ -337,15 +338,15 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void computePi(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{0,1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0, 1});
+            polyad.setEvaluated(true);
+            return;
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(PI + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(PI + " requires at most 1 argument");
+        }
 
         Object exponent;
         if (polyad.getArgCount() == 0) {
@@ -416,7 +417,6 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-
     private BigDecimal evaluateBD(BigDecimal x, MathContext mathContext, String op) {
         return evaluateBD(x, mathContext, false, op);
     }
@@ -439,7 +439,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             case TANGENT:
                 try {
                     bd = ch.obermuhlner.math.big.BigDecimalMath.tan(x, mathContext);
-                }catch(ArithmeticException ax){
+                } catch (ArithmeticException ax) {
                     throw new IllegalArgumentException("you do not have enough precision to compute " + TANGENT + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
                 }
                 break;
@@ -470,7 +470,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             case TANH:
                 try {
                     bd = ch.obermuhlner.math.big.BigDecimalMath.tanh(x, mathContext);
-                }catch(ArithmeticException ax){
+                } catch (ArithmeticException ax) {
                     throw new IllegalArgumentException("you do not have enough precision to compute " + TANH + ". Please increase " + MathEvaluator.NUMERIC_DIGITS);
                 }
                 break;
@@ -486,23 +486,30 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     private void doTranscendentalMath(Polyad polyad, String op, State state) {
         // The next test hits all but the case of exp()
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(op + " requires 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(op + " requires 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(op + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(op + " requires at most 1 argument");
+        }
 
         doTranscendentalMath(polyad, op, false, state);
     }
 
     private void doTranscendentalMath(Polyad polyad, String op, boolean doPowers, State state) {
+        if (doPowers) {
+            if (polyad.isSizeQuery()) {
+                polyad.setResult(new int[]{0, 1});
+                polyad.setEvaluated(true);
+                return;
+            }
+        }
         if (doPowers && polyad.getArgCount() == 0) {
             // do  exp() as if exp(1)
             polyad.setResult(getNaturalLogBase(OpEvaluator.getMathContext()));

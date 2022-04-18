@@ -39,8 +39,7 @@ public class ParserTest extends AbstractQDLTester {
     }
 
     public void testRational1(boolean testXML) throws Throwable {
-        BigDecimal[] results = {
-                new BigDecimal("1.37037037037037"),
+        BigDecimal[] results = {                new BigDecimal("1.37037037037037"),
                 new BigDecimal("1.87793427230047"),
                 new BigDecimal("1.69230769230769"),
                 new BigDecimal("1.39375629405841")
@@ -2805,6 +2804,11 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(v, BigDecimal.ZERO);
     }
 
+    /**
+     * A function s (triadic) is defined. It is references along with the other functions that dereferecse
+     * to s (monad, dyad).
+     * @throws Throwable
+     */
     public void testOverloadFunction2a() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2822,6 +2826,10 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(v, BigDecimal.ZERO);
     }
 
+    /**
+     * 3 differnce valences of functions are defined and areferenced/dereferenced.
+     * @throws Throwable
+     */
     public void testOverloadFunction3() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -2836,4 +2844,18 @@ public class ParserTest extends AbstractQDLTester {
         assert areEqual(v, BigDecimal.ZERO);
     }
 
+    /**
+     * Tests resolution of overloading a built in function (here substring) with difference valences.
+     * @throws Throwable
+     */
+    public void testOverloadFunction4() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@s, x,y,z)->s(x,y)+ s(x,y,z);");
+        addLine(script, "ok :='defghijkdefg' ==  qq(@substring, 'abcdefghijk',3, 4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
 }
+

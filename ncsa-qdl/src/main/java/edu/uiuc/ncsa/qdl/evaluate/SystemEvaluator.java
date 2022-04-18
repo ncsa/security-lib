@@ -30,6 +30,7 @@ import edu.uiuc.ncsa.qdl.variables.*;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.workspace.QDLWorkspace;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
+import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -338,6 +339,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case FOR_NEXT:
+                doForNext(polyad, state);
+                return true;
+            case FOR_KEYS:
+                doForKeys(polyad, state);
+                return true;
+            case CHECK_AFTER:
+                doCheckAfter(polyad, state);
+                return true;
             case TO_SET:
                 return doToSet(polyad, state);
             case HAS_CLIPBOARD:
@@ -384,6 +394,14 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 doScriptArgs(polyad, state);
                 return true;
             case BREAK:
+                if (polyad.isSizeQuery()) {
+                    polyad.setResult(new int[]{0});
+                    polyad.setEvaluated(true);
+                    return true;
+                }
+                if (0 != polyad.getArgCount()) {
+                    throw new ExtraArgException(BREAK + " does not take an argument");
+                }
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
@@ -404,6 +422,14 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 doSysLog(polyad, state, true);
                 return true;
             case CONTINUE:
+                if (polyad.isSizeQuery()) {
+                    polyad.setResult(new int[]{0});
+                    polyad.setEvaluated(true);
+                    return true;
+                }
+                if (0 != polyad.getArgCount()) {
+                    throw new ExtraArgException(CONTINUE + " does not take an argument");
+                }
                 polyad.setEvaluated(true);
                 polyad.setResultType(Constant.BOOLEAN_TYPE);
                 polyad.setResult(Boolean.TRUE);
@@ -448,6 +474,33 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+    private void doCheckAfter(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        throw new NotImplementedException(CHECK_AFTER + " can only be executed in a loop");
+    }
+
+    private void doForKeys(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        throw new NotImplementedException(FOR_KEYS + " can only be executed in a loop");
+    }
+
+    private void doForNext(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2, 3, 4});
+            polyad.setEvaluated(true);
+            return;
+        }
+        throw new NotImplementedException(FOR_NEXT + " can only be executed in a loop");
+    }
+
     private boolean doToSet(Polyad polyad, State state) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1});
@@ -475,14 +528,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doClipboardRead(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new UnsupportedOperationException(CLIPBOARD_COPY + " not supported in server mode");
-        }
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{0});
             polyad.setEvaluated(true);
             return;
         }
+        if (state.isServerMode()) {
+            throw new UnsupportedOperationException(CLIPBOARD_COPY + " not supported in server mode");
+        }
+
 
         if (0 < polyad.getArgCount()) {
             throw new ExtraArgException(CLIPBOARD_COPY + " takes no arguments");
@@ -506,15 +560,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doClipboardWrite(Polyad polyad, State state) {
-
-        if (state.isServerMode()) {
-            throw new UnsupportedOperationException(CLIPBOARD_PASTE + " not supported in server mode");
-        }
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1});
             polyad.setEvaluated(true);
             return;
         }
+        if (state.isServerMode()) {
+            throw new UnsupportedOperationException(CLIPBOARD_PASTE + " not supported in server mode");
+        }
+
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException(CLIPBOARD_PASTE + " requires an argument");
         }
@@ -557,14 +611,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // then reset the std err. Pain in the neck, but users should not see large random
         // stack traces that the last thing someone left on their clipboard can't be
         // easily converted to a string.
-        if (state.isServerMode()) {
-            throw new UnsupportedOperationException(HAS_CLIPBOARD + " not supported in server mode");
-        }
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{0});
             polyad.setEvaluated(true);
             return;
         }
+        if (state.isServerMode()) {
+            throw new UnsupportedOperationException(HAS_CLIPBOARD + " not supported in server mode");
+        }
+
 
         if (0 < polyad.getArgCount()) {
             throw new ExtraArgException(HAS_CLIPBOARD + " requires no arguments");
@@ -594,14 +649,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doWSMacro(Polyad polyad, State state) {
-        if (state.getWorkspaceCommands() == null) {
-            throw new IllegalStateException("no workspace active");
-        }
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1});
             polyad.setEvaluated(true);
             return;
         }
+        if (state.getWorkspaceCommands() == null) {
+            throw new IllegalStateException("no workspace active");
+        }
+
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException(WS_MACRO + " requires 1 argument");
         }
@@ -1103,6 +1159,11 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doInterrupt(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0, 1});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (state.isServerMode()) {
             // no interrupts in server mode.
             polyad.setResult(-1L);
@@ -1110,11 +1171,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.isSizeQuery()) {
-            polyad.setResult(new int[]{0, 1});
-            polyad.setEvaluated(true);
-            return;
-        }
+
 
         if (1 < polyad.getArgCount()) {
             throw new ExtraArgException(INTERRUPT + " requires at most 1 argument");
@@ -1531,17 +1588,18 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     // 1 or more, return environment variable for each. Single one returns the value, otherwise a stem
     // Empty result at all times in server mode.
     protected void doOSEnv(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(getBigArgList0());
+            polyad.setEvaluated(true);
+            return;
+        }
         if (state.isServerMode()) {
             polyad.setResult("");
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.isSizeQuery()) {
-            polyad.setResult(getBigArgList0());
-            polyad.setEvaluated(true);
-            return;
-        }
+
 
         StemVariable env = new StemVariable();
         QDLCodec codec = new QDLCodec();
@@ -1585,10 +1643,26 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doSysInfo(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0, 1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(SYS_INFO + " requires at most 1 argument");
+        }
         getConst(polyad, state, state.getSystemInfo());
     }
 
     protected void doConstants(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0, 1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(CONSTANTS + " requires at most 1 argument");
+        }
         getConst(polyad, state, state.getSystemConstants());
     }
 
@@ -1599,16 +1673,6 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             polyad.setResultType(Constant.STEM_TYPE);
             return;
         }
-        if (polyad.isSizeQuery()) {
-            polyad.setResult(new int[]{0, 1});
-            polyad.setEvaluated(true);
-            return;
-        }
-
-        if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(CONSTANTS + " requires at most 1 argument");
-        }
-
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0), state);
         if (!isString(obj)) {
@@ -1745,15 +1809,16 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     public static void runnit(Polyad polyad, State state, String commandName, boolean hasNewState) {
-        runnit(polyad, state, commandName, state.getScriptPaths(), hasNewState);
-    }
-
-    public static void runnit(Polyad polyad, State state, String commandName, List<String> paths, boolean hasNewState) {
         if (polyad.isSizeQuery()) {
             polyad.setResult(AbstractFunctionEvaluator.getBigArgList());
             polyad.setEvaluated(true);
             return;
         }
+        runnit(polyad, state, commandName, state.getScriptPaths(), hasNewState);
+    }
+
+    public static void runnit(Polyad polyad, State state, String commandName, List<String> paths, boolean hasNewState) {
+
         if (polyad.getArgCount() == 0) {
             throw new MissingArgException((hasNewState ? RUN_COMMAND : LOAD_COMMAND) + " requires at least 1 argument");
         }
@@ -1911,14 +1976,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doNewLoadModule(Polyad polyad, State state) {
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("reading files is not supported in server mode");
-        }
         if (polyad.isSizeQuery()) {
             polyad.setResult(new int[]{1, 2});
             polyad.setEvaluated(true);
             return;
         }
+        if (state.isServerMode()) {
+            throw new QDLServerModeException("reading files is not supported in server mode");
+        }
+
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException(MODULE_LOAD + " requires at least 1 argument");
         }
@@ -2479,18 +2545,18 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
      * @param printIt
      */
     protected void doPrint(Polyad polyad, State state, boolean printIt) {
-
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (printIt && state.isRestrictedIO()) {
             polyad.setResult(QDLNull.getInstance());
             polyad.setResultType(Constant.NULL_TYPE);
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.isSizeQuery()) {
-            polyad.setResult(new int[]{1, 2});
-            polyad.setEvaluated(true);
-            return;
-        }
+
         if (polyad.getArgCount() < 1) {
             throw new MissingArgException(SAY_FUNCTION + " requires at least 1 argument");
         }
