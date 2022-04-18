@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:43 PM
  */
-public class Monad extends ExpressionImpl {
+public class Monad extends ExpressionImpl{
 
     public Monad(boolean postFix) {
         this.postFix = postFix;

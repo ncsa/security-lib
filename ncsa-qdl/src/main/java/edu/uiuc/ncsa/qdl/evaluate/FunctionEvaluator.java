@@ -6,6 +6,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLFunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
+import edu.uiuc.ncsa.qdl.state.XThing;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -14,7 +15,10 @@ import edu.uiuc.ncsa.qdl.variables.VThing;
 import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER;
 import static edu.uiuc.ncsa.qdl.state.QDLConstants.FUNCTION_REFERENCE_MARKER2;
@@ -45,10 +49,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     }
 
 
-
     @Override
     public String[] getFunctionNames() {
-        if(fNames == null){
+        if (fNames == null) {
             fNames = new String[]{IS_FUNCTION};
         }
         return fNames;
@@ -57,60 +60,66 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     @Override
     public boolean evaluate(String alias, Polyad polyad, State state) {
         switch (polyad.getName()) {
-               case IS_FUNCTION:
-                   if (polyad.getArgCount() == 0) {
-                       throw new IllegalArgumentException("You must supply at least one argument.");
-                   }
-                   if (polyad.getArguments().get(0) instanceof VariableNode) {
-                       // they either are asking about a variable or it does not exist and by default, the parser thinks
-                       // it was one
-                       polyad.setEvaluated(true);
-                       polyad.setResultType(Constant.BOOLEAN_TYPE);
-                       polyad.setResult(false);
-                       return true;
-                   }
-                   Object object = polyad.evalArg(0, state);
+            case IS_FUNCTION:
+                if(polyad.isSizeQuery()){
+                         polyad.setResult(new int[]{1,2});
+                         polyad.setEvaluated(true);
+                         return true;
+                     }
+                 if (polyad.getArgCount() < 1) {
+                     throw new MissingArgException(IS_FUNCTION + " requires at least 1 argument");
+                 }
+         
+                 if (2 < polyad.getArgCount()) {
+                     throw new ExtraArgException(IS_FUNCTION + " requires at most 2 argument");
+                 }
+                
+                if (polyad.getArguments().get(0) instanceof VariableNode) {
+                    // they either are asking about a variable or it does not exist and by default, the parser thinks
+                    // it was one
+                    polyad.setEvaluated(true);
+                    polyad.setResultType(Constant.BOOLEAN_TYPE);
+                    polyad.setResult(false);
+                    return true;
+                }
+                Object object = polyad.evalArg(0, state);
 
-                   if (object == null) {
-                       throw new MissingArgumentException(" You must supply an argument for the " + IS_FUNCTION + " command.");
-                   }
-                   if (!isString(object)) {
-                       throw new IllegalArgumentException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
-                   }
-                   String name = object.toString();
-                   int argCount = -1; // default -- get any
-                   if (polyad.getArgCount() == 2) {
-                       Object object2 = polyad.evalArg(1, state);
-                       ;
-                       if (!isLong(object2)) {
-                           throw new IllegalArgumentException(" The argument count must be a number.");
-                       }
-                       argCount = ((Long) object2).intValue();
-                   }
+                if (object == null) {
+                    throw new BadArgException(" You must supply an argument for the " + IS_FUNCTION + " command.");
+                }
+                if (!isString(object)) {
+                    throw new BadArgException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
+                }
+                String name = object.toString();
+                int argCount = -1; // default -- get any
+                if (polyad.getArgCount() == 2) {
+                    Object object2 = polyad.evalArg(1, state);
+                    if (!isLong(object2)) {
+                        throw new BadArgException(" The argument count must be a number.");
+                    }
+                    argCount = ((Long) object2).intValue();
+                }
 
-                   polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
-                   polyad.setResultType(Constant.BOOLEAN_TYPE);
-                   polyad.setEvaluated(true);
-                   return true;
-           }
-           //if (polyad.isInModule() || !polyad.isBuiltIn()) {
-       //    if (polyad.isInModule()) {
-               try {
-                   figureOutEvaluation(polyad, state, !polyad.isInModule());
-                   return true;
-               } catch(UndefinedFunctionException ufe){
-                   // special case this one QDLException so it gives usedful user feedback.
-                   QDLStatementExecutionException qq = new QDLStatementExecutionException(ufe, polyad);
-                   throw qq;
-               }catch(QDLException qe){
-                   throw qe;
-               }catch (Throwable t) {
-                   QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
-                   throw qq;
-               }
-        //   }
-         //  return false;
+                polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
+                polyad.setResultType(Constant.BOOLEAN_TYPE);
+                polyad.setEvaluated(true);
+                return true;
+        }
+        try {
+            figureOutEvaluation(polyad, state, !polyad.isInModule());
+            return true;
+        } catch (UndefinedFunctionException ufe) {
+            // special case this one QDLException so it gives usedful user feedback.
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(ufe, polyad);
+            throw qq;
+        } catch (QDLException qe) {
+            throw qe;
+        } catch (Throwable t) {
+            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            throw qq;
+        }
     }
+
     /*
       m := '/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl'
   q :=module_load(m)
@@ -121,31 +130,27 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
      */
     @Override
     public boolean evaluate(Polyad polyad, State state) {
- //       try{
-            return evaluate2(polyad, state);
-      /*  }catch(QDLException q){
-              throw q;
-        }catch(Throwable t){
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
-            throw qq;
-        }*/
+        return evaluate2(polyad, state);
     }
+
     public boolean evaluate2(Polyad polyad, State state) {
-          return evaluate(null, polyad, state);
+        return evaluate(null, polyad, state);
     }
-     protected boolean isFDef(Statement statement){
+
+    protected boolean isFDef(Statement statement) {
         return (statement instanceof LambdaDefinitionNode) || (statement instanceof FunctionDefinitionStatement) || (statement instanceof FunctionReferenceNode);
-     }
+    }
+
     protected void doJavaFunction(Polyad polyad, State state, FR_WithState frs) {
         // Contains a java function that is wrapped in a QDLFunction. The polyad here contains the
         // arguments that are needed to unpack this.
         Object[] argList = new Object[polyad.getArgCount()];
         for (int i = 0; i < polyad.getArgCount(); i++) {
-            if(isFDef(polyad.getArguments().get(i))){
+            if (isFDef(polyad.getArguments().get(i))) {
                 // Can't do getOperator since we do not know how many other arguments
                 // are functions or constants.
                 argList[i] = getFunctionReferenceNode(state, polyad.getArguments().get(i));
-            }else{
+            } else {
                 argList[i] = polyad.getArguments().get(i).evaluate(state);
             }
         }
@@ -192,10 +197,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     protected void figureOutEvaluation(Polyad polyad, State state, boolean checkForDuplicates) throws Throwable {
         FR_WithState frs;
         try {
-            if(state.isIntrinsic(polyad.getName()) && polyad.isInModule()){
+            if (state.isIntrinsic(polyad.getName()) && polyad.isInModule()) {
                 // if it is in a module and at the top of the stack, then this is an access violation
-                //if(state.getFTStack().getStack().get(0).containsKey(new FKey(polyad.getName(),polyad.getArgCount()))){
-                if(state.getFTStack().localHas(new FKey(polyad.getName(),polyad.getArgCount()))){
+                if (state.getFTStack().localHas(new FKey(polyad.getName(), polyad.getArgCount()))) {
                     throw new IntrinsicViolation("cannot access intrinsic function directly.");
                 }
             }
@@ -216,51 +220,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         }
     }
 
-    /*   f(x)->ln(x-2); f(sin(pi()/4))
-      module['a:/b','X'][__f(x,y)->x*y;]
-  module_import('a:/b', 'A')
-         A#__f(2,3)
-         // last should fail
-
-      r(x)->x^2 + 1;
-  f(*h(), x) -> h(x);
-            f(*r(), 2)
-
-
-  g(*h(), x, y)->h(x+'pqr', y+1) + h(x+'tuv', y)
-  g(*substring(), 'abcd', 2)
-
-  g1(x,y,*h())->h(x+'pqr', y+1) + h(x+'tuv', y)
-  g1(*substring(), 'abcd', 2) // fails on purpose -- shoudl check for right location of f ref in arg list.
-  g1('abcd', 2, *substring())
-
-  op(*h(), x, y) -> h(x,y)
-  op(*+, 2, 3)
-   op(**, 2, 3)
-  op(*^, 2, 3)
-
-            */
-    //  sum(x.)->reduce(*+, x.);
-    //fork(*sum(), */, *size(), [2,5,7])
-
-    /*
-       module['a:a', 'a'][f(x)->x+1;g(x)->f(x+2);];
-       module_import('a:a');
-       g(1);
-
-       y. := pplot(@cos(),@sin(),-pi(),pi(),50);
-       y. := pplot(@sin(),@cos(),-1,1,100);
-         lissy(x)->sin(x)*cosh(x)
-  y. := pplot(@lissx(), @lissy(), -pi(), pi(), 500
-
-  search >home_url  -out [home_url, email] -r  .*ncifcrf\.gov
-
-     */
-
     protected void doFunctionEvaluation(Polyad polyad, State state, FR_WithState frs) throws Throwable {
         FunctionRecord functionRecord = frs.functionRecord;
         State moduleState = null;
-        if(frs.isModule){
+        if (frs.isModule) {
             moduleState = (State) frs.state;
         }
         if (functionRecord == null) {
@@ -275,90 +238,46 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             functionRecord = functionRecord.newInstance();
         }
         State localState;
-         if(moduleState == null){
-             //localState = state.newLocalState();
+        if (moduleState == null) {
 
-             if(functionRecord.isLambda()|| functionRecord.isFuncRef){
-                 localState = state.newLocalState();
-             }else{
-                 localState = state.newFunctionState();
-             }
+            if (functionRecord.isLambda() || functionRecord.isFuncRef) {
+                localState = state.newLocalState();
+            } else {
+                localState = state.newFunctionState();
+            }
 
-        }else{
-        //  localState = state.newLocalState(moduleState);
-             if(functionRecord.isLambda()){
-                 localState = state.newLocalState(moduleState);
-             } else{
-                 localState = state.newFunctionState();
-             }
+        } else {
+            if (functionRecord.isLambda()) {
+                localState = state.newLocalState(moduleState);
+            } else {
+                localState = state.newFunctionState();
+            }
         }
-         localState.setWorkspaceCommands(state.getWorkspaceCommands());
+        localState.setWorkspaceCommands(state.getWorkspaceCommands());
 
         // we are going to write local variables here and the MUST get priority over already exiting ones
         // but without actually changing them (or e.g., recursion is impossible). 
         for (int i = 0; i < polyad.getArgCount(); i++) {
             if (polyad.getArguments().get(i) instanceof LambdaDefinitionNode) {
                 LambdaDefinitionNode ldn = (LambdaDefinitionNode) polyad.getArguments().get(i);
-                if(!ldn.hasName()){
+                if (!ldn.hasName()) {
                     ldn.getFunctionRecord().name = tempFname(state);
                     // This is anonymous
                 }
                 ldn.evaluate(localState);
             }
         }
-        /*
-            Two ways to do test
-             g(@f, x)-> f(x)^3
-             g(v(x)->x^2, 5)
-            w(x)->x^2
-            g(@w, 5)
 
-         */
-        //  g(@f, x)-> x^3
-//         g(v(x)->x^2, 5)
         // now we populate the local state with the variables.
-        for (int i = 0; i < functionRecord.getArgCount(); i++) {
-            // note that the call evaluates the state in the non-local environment as per contract,
-            // but the named result goes in to the localState.
-            String localName = functionRecord.argNames.get(i);
 
-            if (isFunctionReference(localName)) {
-                localName = dereferenceFunctionName(localName);
-                localState.getFTStack().pushNewTable();
-                // This is the local name of the function.
-                FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(i), false);
+        /*
+        Note that the paramList is a listing of all variables and possible overloaded functions
+        There may be lots of overloaded functions. These are then systematically added to the
+        states later. This is not the argument list passed in to the function -- that is not changed.
+         */
+        resolveArguments(functionRecord, polyad, state, localState);
 
-                String xname = frn.getFunctionName(); // dereferenced in the parser
-                boolean isBuiltin = state.getMetaEvaluator().isBuiltInFunction(xname) || state.getOpEvaluator().isMathOperator(xname);
 
-                if (isBuiltin) {
-                    FunctionRecord functionRecord1 = new FunctionRecord();
-                    functionRecord1.name = localName;
-                    functionRecord1.fRefName = xname;
-                    functionRecord1.isFuncRef = true;
-                    localState.getFTStack().peek().put(functionRecord1);
-                } else {
-                    //List<FunctionRecord> functionRecordList = localState.getFTStack().getByAllName(xname);
-                    List<FunctionRecord> functionRecordList = localState.getAllFunctionsByName(xname);
-                    for (FunctionRecord functionRecord1 : functionRecordList) {
-                        FunctionRecord clonedFR = null;
-                        try {
-                            clonedFR = functionRecord1.clone();
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                            throw new NFWException("Somehow function records are no longer clonable. Check signatures.");
-                        }
-                        clonedFR.name = localName;
-                        localState.getFTStack().peek().put(clonedFR);
-                    }
-                }
-
-                // This had better be a function reference or this should blow up.
-            } else {
-               // localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(localState)));
-                localState.getVStack().localPut(new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(state)));
-            }
-        }
         if (functionRecord.isFuncRef) {
             String realName = functionRecord.fRefName;
             if (state.getOpEvaluator().isMathOperator(realName)) {
@@ -397,8 +316,8 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             }
         }
         for (Statement statement : functionRecord.statements) {
-            if(statement instanceof StatementWithResultInterface){
-                ((StatementWithResultInterface)statement).setAlias(polyad.getAlias());
+            if (statement instanceof StatementWithResultInterface) {
+                ((StatementWithResultInterface) statement).setAlias(polyad.getAlias());
             }
             try {
                 statement.evaluate(localState);
@@ -414,17 +333,146 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 throw new RecursionException();
             }
         }
-        // Now remove the variables we created from the stack since they are no longer needed AND there is no
-        // way to otherwise be rid of them.
-        for (int i = 0; i < functionRecord.getArgCount(); i++) {
-//            symbolTable.remove(functionRecord.argNames.get(i));
-            localState.getVStack().localRemove(new XKey(functionRecord.argNames.get(i)));
-        }
+
         polyad.setResult(Boolean.TRUE);
         polyad.setResultType(Constant.BOOLEAN_TYPE);
         polyad.setEvaluated(true);
     }
 
+    /**
+     * This will take the function record and polyad and find the arguments that are requested
+     * in the function record vs. what's in the polyad and stash them in the correct state
+     * objects.
+     *
+     * @param functionRecord
+     * @param polyad
+     * @param state
+     * @param localState
+     */
+    protected void resolveArguments(FunctionRecord functionRecord,
+                                    Polyad polyad,
+                                    State state,
+                                    State localState) {
+        ArrayList<XThing> paramList = new ArrayList<>();
+        if (functionRecord.isFuncRef) {
+            return;// implicit parameter list since this is an operator or built in function.
+        }
+
+        HashMap<UUID, UUID> localStateLookup = new HashMap<>();
+        localStateLookup.put(state.getUuid(), localState.getUuid());
+
+        HashMap<UUID, State> referencedStates = new HashMap<>();
+        referencedStates.put(localState.getUuid(), localState);
+        for (int i = 0; i < functionRecord.getArgCount(); i++) {
+            // note that the call evaluates the state in the non-local environment as per contract,
+            // but the named result goes in to the localState.
+            String localName = functionRecord.argNames.get(i);
+
+            if (isFunctionReference(localName)) {
+                localName = dereferenceFunctionName(localName);
+                // This is the local name of the function.
+                FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArguments().get(i), false);
+
+                String xname = frn.getFunctionName(); // dereferenced in the parser
+                boolean isOp = state.getOpEvaluator().isMathOperator(xname);
+                boolean isFunc = state.getMetaEvaluator().isBuiltInFunction(xname);
+                List<FR_WithState> functionRecordList = null;
+                if (isOp || isFunc) {
+                    functionRecordList = new ArrayList<>();
+                    int airity[];
+                    if (isOp) {
+                        // operator like + or *
+                        airity = state.getOpEvaluator().getArgCount(xname);
+                    } else {
+                        airity = state.getMetaEvaluator().getArgCount(xname);
+                    }
+                    for (int j = 0; j < airity.length; j++) {
+                        FunctionRecord functionRecord1 = new FunctionRecord();
+                        functionRecord1.name = localName;
+                        functionRecord1.fRefName = xname;
+                        functionRecord1.isFuncRef = true;
+                        functionRecord1.isOperator = isOp;
+                        functionRecord1.setArgCount(airity[j]);
+                        FR_WithState frs0 = new FR_WithState();
+                        frs0.functionRecord = functionRecord1;
+                        functionRecordList.add(frs0);
+                    }
+
+                } else {
+                    try {
+                        // function records come back cloned
+                        functionRecordList = localState.getAllFunctionsByName(xname);
+                    } catch (CloneNotSupportedException e) {
+                        e.printStackTrace();
+                        throw new NFWException("Somehow function records are no longer clonable. Check signatures.");
+                    }
+
+
+                }
+                // The next block only gets used if there are references to function in modules
+                // E.g. @w#z#f
+                for (FR_WithState fr_withState : functionRecordList) {
+                    fr_withState.functionRecord.name = localName;
+                    paramList.add(fr_withState);
+                    if (fr_withState.hasState()) {
+                        State s = (State) fr_withState.state;
+                        if (!localStateLookup.containsKey(s.getUuid())) {
+                            State ss = s.newLocalState();
+                            localStateLookup.put(s.getUuid(), ss.getUuid());
+                            referencedStates.put(ss.getUuid(), ss);
+                        }
+                    }
+                }
+                // This had better be a function reference or this should blow up.
+            } else {
+                VThing vThing = new VThing(new XKey(functionRecord.argNames.get(i)), polyad.getArguments().get(i).evaluate(state));
+                paramList.add(vThing);
+            }
+        }
+        // Add the arguments to the state object(s). At the least, there is always
+        // localState (derived from the original state argument to this method).
+        for (UUID uuid : referencedStates.keySet()) {
+            State s = referencedStates.get(uuid);
+            for (XThing xThing : paramList) {
+                if (xThing instanceof VThing) {
+                    s.getVStack().localPut(xThing);
+                } else {
+                    s.getFTStack().localPut(xThing);
+                }
+            }
+        }
+        return;
+    }
+
+    /*
+
+          g(@h(), x, y)->h(x+'pqr', y+1) + h(x+'tuv', y)
+          define[g(@h(), x, y)][return(h(x+'pqr', y+1) + h(x+'tuv', y));]
+  g(@substring, 'abcd', 2); // result == dpqrcdtuv
+  
+  h(@g,x)->g(x)
+  g(@substring, 'abcd', 2)
+    Test function references to things in modules.
+
+      define[f(x)]body[return(x+100);];
+  module['a:/t','a']body[define[f(x)]body[return(x+1);];];
+  module['q:/z','w']body[zz:=17;module_import('a:/t');g(x)->a#f(x)+zz;];
+  module_import('q:/z');
+  w#a#f(3); // returns 20
+  w#g(2); // returns 6
+  hh(@g, x)->g(x)
+
+  hh(@w#g, 2); // == w#g(2)
+  hh(@w#a#f, 3); // == w#a#f(3)
+
+    
+      qq(x)->x^2
+      qq(3); // returns 9
+     ww(@p, x)->p(x)
+     ww(@-, 2); // returns -2
+     ww((x)->x^3, 4)
+
+     */
     protected boolean isFunctionReference(String name) {
         return name.startsWith(FUNCTION_REFERENCE_MARKER) || name.startsWith(FUNCTION_REFERENCE_MARKER2);
     }

@@ -231,8 +231,8 @@ public class State extends FunctionState implements QDLConstants {
         characters.put("2261", OpEvaluator.EQUALS2);
         characters.put("2264", OpEvaluator.LESS_THAN_EQUAL3);
         characters.put("2265", OpEvaluator.MORE_THAN_EQUAL3);
-        characters.put("22a4", "⊤");
-        characters.put("22a5", "⊥");
+        //characters.put("22a4", "⊤");
+        //characters.put("22a5", "⊥");
         characters.put("22a8", "⊨");
         characters.put("2241", "≁");
         characters.put("2297", "⊗");
@@ -1061,5 +1061,13 @@ public class State extends FunctionState implements QDLConstants {
 
     public static VStack extrinsicVars;
 
+    public boolean isAllowBaseFunctionOverrides() {
+        return allowBaseFunctionOverrides;
+    }
 
+    public void setAllowBaseFunctionOverrides(boolean allowBaseFunctionOverrides) {
+        this.allowBaseFunctionOverrides = allowBaseFunctionOverrides;
+    }
+
+    boolean allowBaseFunctionOverrides = false;
 }

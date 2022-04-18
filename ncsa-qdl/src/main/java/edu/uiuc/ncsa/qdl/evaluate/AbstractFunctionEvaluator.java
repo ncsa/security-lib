@@ -1,9 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.MissingArgumentException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
-import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -30,6 +27,7 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.UNKNOWN_TYPE;
  * on 1/16/20 at  10:59 AM
  */
 public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
+
     protected String[] fNames = null;
 
     public abstract String[] getFunctionNames();
@@ -221,8 +219,11 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             fPointer pointer,
                             String name,
                             State state) {
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException(name + " requires 1 argument");
+        if(polyad.getArgCount() == 0){
+            throw new MissingArgException(name + " requires 1 argument");
+        }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(name + " requires 1 argument");
         }
         Object arg1 = polyad.evalArg(0, state);
 
@@ -276,13 +277,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     protected void processSet1(QDLSet outSet, QDLSet arg, fPointer pointer) {
         for (Object key : arg) {
             if (key instanceof StemVariable) {
-                QDLSet newOut = new QDLSet();
-/*
-                processStem1(newOut, (StemVariable) key, pointer);
-                if (!newOut.isEmpty()) {
-                    outSet.put(key, newOut);
-                }
-*/
+              // Do something here???
             } else {
                 outSet.add(pointer.process(key).result);
             }
@@ -858,12 +853,6 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 FTable ft = new FTable();
                 ft.put(lds.getFunctionRecord());
                 state.getFTStack().push(ft);
-
-/*
-                FunctionTableImpl ft = new FunctionTableImpl();
-                ft.put(lds.getFunctionRecord());
-                state.getFTStack().push(ft);
-*/
             } else {
                 lds.evaluate(state);
             }
@@ -967,4 +956,38 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             throw unknownSymbolException;
         }
     }
+   static protected int[] bigArgList = null;
+    static protected int[] bigArgList0 = null;
+
+    public static int MAX_ARG_COUNT = 10;
+    /**
+     * Used in arg count queries. Returns [1,2,... {@link #MAX_ARG_COUNT}].
+     * Note that this does not limit argument lists, but it used in dereferencing
+     * function references. See {@link FunctionEvaluator#resolveArguments(FunctionRecord, Polyad, State, State)}.
+     * @return
+     */
+    protected static int[] getBigArgList(){
+        if(bigArgList == null){
+              bigArgList = new int[MAX_ARG_COUNT];
+              for(int i = 1 ; i < MAX_ARG_COUNT+1; i++){
+                  bigArgList[i-1] = i;
+              }
+        }
+        return bigArgList;
+    }
+
+    /**
+     * returns integers [0,1,..., {@link #MAX_ARG_COUNT}
+     * @return
+     */
+    protected static int[] getBigArgList0(){
+        if(bigArgList == null){
+              bigArgList = new int[MAX_ARG_COUNT];
+              for(int i = 0 ; i < MAX_ARG_COUNT+1; i++){
+                  bigArgList[i] = i;
+              }
+        }
+        return bigArgList;
+    }
+
 }

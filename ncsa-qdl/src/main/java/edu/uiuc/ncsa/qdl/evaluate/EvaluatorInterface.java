@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.expressions.Polyad;
+
 import java.io.Serializable;
 import java.util.TreeSet;
 
@@ -15,4 +17,5 @@ public interface EvaluatorInterface extends Serializable {
 
      TreeSet<String> listFunctions(boolean listFQ);
      String getNamespace();
+
 }

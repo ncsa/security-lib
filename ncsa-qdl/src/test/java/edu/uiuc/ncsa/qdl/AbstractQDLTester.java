@@ -62,6 +62,13 @@ public class AbstractQDLTester extends TestBase {
         return x.subtract(y).abs().compareTo(comparisonTolerance) < 0;
     }
 
+    /**
+     * Tests that two {@link BigDecimal} numbers are with {@link #comparisonTolerance}
+     * of each other.
+     * @param x
+     * @param y
+     * @return
+     */
     protected boolean areEqual(BigDecimal x, BigDecimal y) {
         return areEqual(x, y, comparisonTolerance);
     }

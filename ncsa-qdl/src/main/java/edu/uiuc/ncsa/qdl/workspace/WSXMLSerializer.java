@@ -400,6 +400,9 @@ public class WSXMLSerializer {
                                 }
                                 break;
                             case EXTRINSIC_VARIABLES_TAG:
+                                // Actually, there is exactly one of these. So this populates whatever is current.
+                                // Clear it, then re-populate it.
+                                testCommands.state.getExtrinsicVars().clear();
                                 XMLUtilsV2.deserializeExtrinsicVariables(xer, testCommands.state, xmlSerializationState);
                            break;
                             case BUFFER_MANAGER:

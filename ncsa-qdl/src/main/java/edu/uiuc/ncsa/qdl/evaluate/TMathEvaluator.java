@@ -1,8 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
-import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
-import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
@@ -217,6 +215,19 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
     private void doFloorOrCeiling(Polyad polyad, State state, boolean isFloor) {
 
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException((isFloor ? FLOOR : CEILING) + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException((isFloor ? FLOOR : CEILING) + " requires at most 1 argument");
+         }
+
         fPointer pointer = new fPointer() {
             @Override
             public fpResult process(Object... objects) {
@@ -248,6 +259,18 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doNRoot(Polyad polyad, State state) {
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{2});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 2) {
+             throw new MissingArgException(N_ROOT + " requires 2 arguments");
+         }
+
+         if (2 < polyad.getArgCount()) {
+             throw new ExtraArgException(N_ROOT + " requires at most 2 arguments");
+         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
             @Override
@@ -314,9 +337,16 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void computePi(Polyad polyad, State state) {
-        if (1 < polyad.getArgCount()) {
-            throw new IllegalArgumentException(PI + " takes at most one argument");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{0,1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(PI + " requires at most 1 argument");
+         }
+
         Object exponent;
         if (polyad.getArgCount() == 0) {
             // implicit assumption that the exponent is 1.
@@ -333,7 +363,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
             }
             if (rr == null) {
-                throw new IllegalArgumentException("argument must be a number");
+                throw new BadArgException("argument must be a number");
             }
             polyad.setResult(rr);
 
@@ -455,6 +485,20 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
     }
 
     private void doTranscendentalMath(Polyad polyad, String op, State state) {
+        // The next test hits all but the case of exp()
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(op + " requires 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(op + " requires at most 1 argument");
+         }
+
         doTranscendentalMath(polyad, op, false, state);
     }
 

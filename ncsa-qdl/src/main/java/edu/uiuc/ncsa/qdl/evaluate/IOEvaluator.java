@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static edu.uiuc.ncsa.qdl.config.QDLConfigurationConstants.*;
@@ -162,6 +161,16 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLRuntimeException("scan is not allowed in server mode.");
         }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{0,1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(SCAN_FUNCTION + " requires at most 1 argument");
+         }
+
         if (polyad.isEvaluated()) {
             // If this has already been run, then do not prompt the user repeatedly.
             // If scan is used as an argument to a function, e.g.
@@ -191,13 +200,26 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doRMDir(Polyad polyad, State state) {
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(RMDIR + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(RMDIR + " requires at most 1 argument");
+         }
+
         if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("" + RMDIR + " requires a file name to read.");
+            throw new BadArgException(RMDIR + " requires a file name to read.");
         }
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The " + RMDIR + " command requires a string for its first argument.");
+            throw new BadArgException(RMDIR + " requires a string for its first argument.");
         }
         String fileName = obj.toString();
 
@@ -233,13 +255,23 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doRMFile(Polyad polyad, State state) {
-        if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("" + RM_FILE + " requires a file name to read.");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(RM_FILE + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(RM_FILE + " requires at most 1 argument");
+         }
+
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The " + RM_FILE + " command requires a string for its first argument.");
+            throw new BadArgException(RM_FILE + " requires a string for its argument.");
         }
         String fileName = obj.toString();
 
@@ -276,13 +308,23 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doMkDir(Polyad polyad, State state) {
-        if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("" + MKDIR + " requires a file name to read.");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(MKDIR + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(MKDIR + " requires at most 1 argument");
+         }
+
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The " + MKDIR + " command requires a string for its first argument.");
+            throw new BadArgException( MKDIR + " requires a string for its argument.");
         }
         DebugUtil.trace(this, "in " + MKDIR + ": starting, arg = " + obj);
         String fileName = obj.toString();
@@ -337,14 +379,24 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doDir(Polyad polyad, State state) {
-        if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("" + DIR + " requires a file name to read.");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(DIR + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(DIR + " requires at most 1 argument");
+         }
+
         DebugUtil.trace(this, "starting " + DIR + " command");
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The " + DIR + " command requires a string for its first argument.");
+            throw new BadArgException(DIR + " requires a string for its first argument.");
         }
         String fileName = obj.toString();
         DebugUtil.trace(this, "in " + DIR + " command: file name =" + fileName);
@@ -406,14 +458,24 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
         }
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException(VFS_UNMOUNT + " requires a single argument");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(VFS_UNMOUNT + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(VFS_UNMOUNT + " requires at most 1 argument");
+         }
+
         Object arg = polyad.evalArg(0, state);
 
         checkNull(arg, polyad.getArgAt(0), state);
         if (!isString(arg)) {
-            throw new IllegalArgumentException(VFS_UNMOUNT + " requires a string as its argument");
+            throw new BadArgException(VFS_UNMOUNT + " requires a string as its argument");
         }
         String mountPoint = (String) arg;
         if (!state.hasMountPoint(mountPoint)) {
@@ -431,13 +493,23 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         if (state.isServerMode()) {
             throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
         }
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("" + VFS_MOUNT + " requires one argument");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(VFS_MOUNT + " requires at least 1 argument");
+         }
+
+         if (1 < polyad.getArgCount()) {
+             throw new ExtraArgException(VFS_MOUNT + " requires at most 1 argument");
+         }
+
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
         if (!isStem(arg1)) {
-            throw new IllegalArgumentException("The argument must be a stem");
+            throw new BadArgException("The argument must be a stem");
         }
         StemVariable cfg = (StemVariable) arg1;
         if (!cfg.containsKey(VFS_ATTR_TYPE)) {
@@ -513,16 +585,26 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new QDLServerModeException("File operations are not permitted in server mode");
         }
 
-        if (polyad.getArgCount() < 2) {
-            throw new IllegalArgumentException("" + WRITE_FILE + " requires a two arguments.");
-        }
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{2,3});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 2) {
+             throw new MissingArgException(WRITE_FILE + " requires at least 2 arguments");
+         }
+
+         if (3 < polyad.getArgCount()) {
+             throw new ExtraArgException(WRITE_FILE + " requires at most 3 arguments");
+         }
+
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
 
         Object obj2 = polyad.evalArg(1, state);
         checkNull(obj2, polyad.getArgAt(1));
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The first argument to '" + WRITE_FILE + "' must be a string that is the file name.");
+            throw new BadArgException("The first argument to '" + WRITE_FILE + "' must be a string that is the file name.");
         }
         String fileName = obj.toString();
         //boolean isBase64 = false;
@@ -531,7 +613,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             Object obj3 = polyad.evalArg(2, state);
             checkNull(obj3, polyad.getArgAt(2));
             if (!isLong(obj3)) {
-                throw new IllegalArgumentException("The third argument to '" + WRITE_FILE + "' must be an integer.");
+                throw new BadArgException("The third argument to '" + WRITE_FILE + "' must be an integer.");
             }
             fileType = ((Long) obj3).intValue();
         }
@@ -548,7 +630,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         }
                         xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
                         lines.add(convertToIni((StemVariable) obj2));
-                        ;
                         break;
                     case FILE_OP_BINARY:
                         xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.BINARY_TYPE);
@@ -562,7 +643,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                             xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
                             // allow for writing empty files. Edge case but happens.
                             if (!contents.containsKey("0") && !contents.isEmpty()) {
-                                throw new IllegalArgumentException("The given stem is not a list. It must be a list to use this function.");
+                                throw new BadArgException("The given stem is not a list. It must be a list to use this function.");
                             }
                             for (int i = 0; i < contents.size(); i++) {
                                 lines.add(contents.getString(Integer.toString(i)));
@@ -653,15 +734,25 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         return stringBuilder.toString();
     }
     protected void doReadFile(Polyad polyad, State state) {
+        if(polyad.isSizeQuery()){
+                 polyad.setResult(new int[]{1,2});
+                 polyad.setEvaluated(true);
+                 return;
+             }
+         if (polyad.getArgCount() < 1) {
+             throw new MissingArgException(READ_FILE + " requires at least 1 argument");
+         }
 
-        if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException("" + READ_FILE + " requires a file name to read.");
-        }
+         if (2 < polyad.getArgCount()) {
+             throw new ExtraArgException(READ_FILE + " requires at most 2 arguments");
+         }
+
+
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
 
         if (!isString(obj)) {
-            throw new IllegalArgumentException("The " + READ_FILE + " command requires a string for its first argument.");
+            throw new BadArgException(READ_FILE + " requires a string for its first argument.");
         }
         String fileName = obj.toString();
         int op = FILE_OP_AUTO; // default
@@ -671,7 +762,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             checkNull(obj2, polyad.getArgAt(1));
 
             if (!isLong(obj2)) {
-                throw new IllegalArgumentException("The " + READ_FILE + " command's second argument must be an integer.");
+                throw new BadArgException(READ_FILE + " requires its second argument be an integer.");
             }
             op = ((Long) obj2).intValue();
         }
@@ -749,23 +840,5 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             throw new QDLException("Error reading file '" + fileName + "'" + t.getMessage());
         }
 
-    }
-
-    protected StemVariable fromIniFile(List<String> content) {
-        StemVariable out = new StemVariable();
-        StemVariable current = null;
-
-        for (String line : content) {
-            line = line.trim();
-            if (line.startsWith("[")) {
-                if (line.endsWith("]")) {
-                    current = new StemVariable();
-
-                } else {
-                    throw new IllegalArgumentException("ini file sections must be enclosed in brackets");
-                }
-            }
-        }
-        return out;
     }
 }

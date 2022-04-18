@@ -82,8 +82,8 @@ sectionheader : '[' Identifier ']' EOL;
 
     Identifier :  [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
-      BOOL_FALSE : 'false'  | '⊥';
-       BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
+      BOOL_FALSE : 'false'  ;
+       BOOL_TRUE : 'true'   ; 
             Bool : BOOL_TRUE | BOOL_FALSE;
           Number : SIGN? Integer | Decimal |  SCIENTIFIC_NUMBER;
 

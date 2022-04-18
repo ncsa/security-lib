@@ -50,6 +50,7 @@ public class FunctionRecord implements XThing {
     public List<Statement> statements = new ArrayList<>();
     public List<String> argNames = new ArrayList<>();
     public boolean isFuncRef = false;
+    public boolean isOperator = false;
     public String fRefName = null;
 
     @Override
@@ -66,9 +67,20 @@ public class FunctionRecord implements XThing {
     public boolean hasName(){
         return name != null;
     }
+    public void setArgCount(int argCount){
+        this.argCount = argCount;
+    }
+
+    Integer argCount = null;
     public int getArgCount() {
-        if (isFuncRef) return FREF_ARG_COUNT;
-        return argNames.size();
+        if(argCount == null){
+            if(argNames == null || argNames.isEmpty()){
+                argCount = FREF_ARG_COUNT;
+            }else {
+                argCount = argNames.size();
+            }
+        }
+        return argCount;
     }
 
     @Override

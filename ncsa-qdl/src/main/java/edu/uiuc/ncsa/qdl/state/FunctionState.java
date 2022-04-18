@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.state;
 import edu.uiuc.ncsa.qdl.evaluate.MetaEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.NamespaceException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLIllegalAccessException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.functions.*;
@@ -62,27 +63,52 @@ public abstract class FunctionState extends VariableState {
         return resolveFunction(polyad.getName(), polyad.getArgCount(), checkForDuplicates);
     }
 
-    public List<FunctionRecord> getAllFunctionsByName(String name) {
-        List<FunctionRecord> list = new ArrayList<>();
+    public List<FR_WithState> getAllFunctionsByName(String name) throws CloneNotSupportedException {
+        List<FR_WithState> list = new ArrayList<>();
         int nsDelimIndex = name.indexOf(NS_DELIMITER);
         if (nsDelimIndex == 0) {
             name = name.substring(1);
         }
-        if (0 < nsDelimIndex) {
-            String alias = name.substring(0, nsDelimIndex);
-            String realName = name.substring(nsDelimIndex + 1);
 
-            // This is in an instance. Find that.
-            MIWrapper wrapper = (MIWrapper) getMInstances().get(new XKey(alias));
+        if (0 < nsDelimIndex) {
+            // This is at least of the form x#y
+            StringTokenizer st = new StringTokenizer(name, NS_DELIMITER);
+            MIWrapper wrapper  = (MIWrapper) getMInstances().get(new XKey(st.nextToken()));
+            if(wrapper == null){
+                throw new QDLIllegalAccessException("module not found");
+            }
+            // We need the last token
+            String lastName = st.nextToken();
+            State currentState = wrapper.getModule().getState();
+            while(st.hasMoreTokens()){
+                if(st.hasMoreTokens()) {
+                    wrapper = (MIWrapper) currentState.getMInstances().get(new XKey(lastName));
+                    if(wrapper == null){
+                        throw new QDLIllegalAccessException("module not found");
+                    }
+                    currentState = wrapper.getModule().getState();
+                }
+                lastName = st.nextToken();
+            }
             if (wrapper != null) {
-                list.addAll(wrapper.getModule().getState().getFTStack().getByAllName(realName));
+                for(FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(lastName)){
+                    list.add(new FR_WithState(fr.clone(), wrapper.getModule().getState(), true));
+                }
             }
             return list;
-        }   // just a name, look fo all of them
-        list.addAll(getFTStack().getByAllName(name));
+        }   // just a name, look for all of them
+        for(FunctionRecord fr : getFTStack().getByAllName(name)){
+            list.add(new FR_WithState(fr.clone(), this, false));
+        }
+
         for (Object key : getMInstances().keySet()) {
             MIWrapper wrapper = (MIWrapper) getMInstances().get((XKey) key);
-            list.addAll(wrapper.getModule().getState().getFTStack().getByAllName(name));
+            if(wrapper == null){
+                throw new QDLIllegalAccessException("module not found");
+            }
+            for(FunctionRecord fr : wrapper.getModule().getState().getFTStack().getByAllName(name)){
+                list.add(new FR_WithState(fr.clone(), wrapper.getModule().getState(), true));
+            }
         }
         return list;
     }
@@ -98,17 +124,47 @@ public abstract class FunctionState extends VariableState {
             // Nothing imported, so nothing to look through.
             frs.state = this;
             if (getFTStack().containsKey(new FKey(name, -1))) {
-                frs.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
+                // First case. Since cannot specify which arguments are in a function ref
+                // E.g. f(@g, x, y) -> g(x)*g(x,y)
+                // f(@-, 6, 3) yields (-6)*(6 - 3) == -18.
+                // may have several other functions named g in the state, we have to
+                // find the (in this case monadic function or dyadic function
+                // for this. Such arguments are stored with no arg count (so < 0)
+                // The next bit gets that and, if this is a function ref with the right number
+                // arguments, uses that.
+                XThing  xThing = getFTStack().get(new FKey(name, -1));
+                if(xThing instanceof FunctionRecord){
+                    FunctionRecord functionRecord = (FunctionRecord) xThing;
+                    if(functionRecord.isFuncRef){
+                        System.out.println(functionRecord.fRefName);
+                    }
+                }
+                XThing xThing1 = getFTStack().get(new FKey(name, argCount));
+                if(xThing1 instanceof FunctionRecord){
+                    frs.functionRecord = (FunctionRecord) xThing1;
+                }else{
+                    if(xThing1 instanceof FR_WithState){
+                        frs = (FR_WithState) xThing1;
+                    }else{
+                        frs.functionRecord = null;
+                    }
+                }
             } else {
                 frs.functionRecord = null;
             }
             return frs;
         }
         // check for unqualified names.
-        FR_WithState fr = new FR_WithState();
-        fr.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
-
-        fr.state = this;
+        FR_WithState fr_withState = new FR_WithState();
+        XThing xThing = getFTStack().get(new FKey(name, argCount));
+        if(xThing instanceof FunctionRecord) {
+            fr_withState.functionRecord = (FunctionRecord) getFTStack().get(new FKey(name, argCount));
+            fr_withState.state = this;
+        }else{
+            if(xThing instanceof FR_WithState){
+                    fr_withState = (FR_WithState)  xThing;
+            }
+        }
         // if there is an unqualified named function, return it.
         // Note that there cannot ever be an actual new definition of a function in a module
         // since QDLListener will flag FunctionDefinitionStatements as illegal.
@@ -116,8 +172,8 @@ public abstract class FunctionState extends VariableState {
         //    X#f(x,y)->x*y;
         // will fail.
 
-        if (fr.functionRecord != null) {
-            return fr;
+        if (fr_withState.functionRecord != null) {
+            return fr_withState;
         }
         // No UNQ function, so try to find one, but check that it is actually unique.
         if (!isIntrinsic(name)) {
@@ -125,15 +181,15 @@ public abstract class FunctionState extends VariableState {
                 XKey xkey = (XKey) xx;
                 Module module = getMInstances().getModule(xkey);
 
-                if (fr.functionRecord == null) {
+                if (fr_withState.functionRecord == null) {
                     FunctionRecord tempFR = (FunctionRecord) getImportedModule(xkey.getKey()).getState().getFTStack().get(new FKey(name, argCount));
                     if (tempFR != null) {
-                        fr.functionRecord = tempFR;
-                        fr.state = module.getState();
-                        fr.isExternalModule = module.isExternal();
-                        fr.isModule = true;
+                        fr_withState.functionRecord = tempFR;
+                        fr_withState.state = module.getState();
+                        fr_withState.isExternalModule = module.isExternal();
+                        fr_withState.isModule = true;
                         if (!checkForDuplicates) {
-                            return fr;
+                            return fr_withState;
                         }
                     }
                 } else {
@@ -145,15 +201,15 @@ public abstract class FunctionState extends VariableState {
             }
 
         }
-        if (fr.functionRecord == null) {
+        if (fr_withState.functionRecord == null) {
             // edge case is that it is actually a built-in function reference.
-            fr.functionRecord = getFTStack().getFunctionReference(name);
+            fr_withState.functionRecord = getFTStack().getFunctionReference(name);
             //fr.isExternalModule = false; // just to be sure.
-            if (fr.functionRecord == null) {
+            if (fr_withState.functionRecord == null) {
                 throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "" : "s"));
             }
         }
-        return fr;
+        return fr_withState;
     }
      /*
              module_import(module_load('test'))

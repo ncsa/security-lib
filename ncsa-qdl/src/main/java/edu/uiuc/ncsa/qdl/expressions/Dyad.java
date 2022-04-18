@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * <p>Created by Jeff Gaynor<br>
  * on 1/13/20 at  3:47 PM
  */
-public class Dyad extends ExpressionImpl {
+public class Dyad extends ExpressionImpl{
     public Dyad(int operatorType, TokenPosition tokenPosition) {
         super(operatorType, tokenPosition);
     }

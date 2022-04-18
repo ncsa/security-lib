@@ -49,6 +49,14 @@ import java.util.*;
  */
 public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>> implements Serializable {
     /**
+     * Clears the entire stack and resets it.
+     */
+    public void clear() {
+        getStack().clear();
+        pushNewTable();
+    }
+
+    /**
      * Take an XStack and add all of the tables in this stack in the correct order
      * to the front of the stack. If XStack is [A,B,C,...] And the existing stack is
      * [P,Q,...] the result is [A,B,C,...,P,Q,...]
@@ -345,14 +353,13 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
     }
 
 
-
     abstract public void fromXML(XMLEventReader xer, QDLInterpreter qi) throws XMLStreamException;
 
     abstract public String getXMLStackTag();
 
     /**
-     * @deprecated 
      * @return
+     * @deprecated
      */
     abstract public String getXMLTableTag();
 
@@ -389,9 +396,9 @@ public abstract class XStack<V extends XTable<? extends XKey, ? extends XThing>>
             for (Object key : xTable.keySet()) {
                 XThing xThing = (XThing) xTable.get(key);
                 String x = xTable.toJSONEntry(xThing, xmlSerializationState);
-                     if(!StringUtils.isTrivial(x)) {
-                         jsonArray.add(x);
-                     }
+                if (!StringUtils.isTrivial(x)) {
+                    jsonArray.add(x);
+                }
             }
             array.add(jsonArray);
         }

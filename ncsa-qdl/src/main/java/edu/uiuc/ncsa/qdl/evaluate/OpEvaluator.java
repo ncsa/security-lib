@@ -11,6 +11,8 @@ import edu.uiuc.ncsa.security.core.exceptions.NotImplementedException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.TreeSet;
 
 /**
@@ -120,6 +122,32 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             MORE_THAN_EQUAL3,
             NOT, NOT2,
             REGEX_MATCH, REGEX_MATCH2};
+
+    public static ArrayList<String> ALL_MONADS = new ArrayList<>(Arrays.asList(new String[]{
+            NOT, NOT2, MINUS, MINUS2, PLUS, PLUS2, TILDE, PLUS_PLUS, MINUS_MINUS
+    }));
+    public static ArrayList<String> ONLY_MONADS = new ArrayList<>(Arrays.asList(new String[]{
+            NOT, NOT2, PLUS_PLUS, MINUS_MINUS
+    }));
+    int[] monadOnlyArg = new int[]{1};
+    int[] dyadOnlyArg = new int[]{2};
+    int[] monadAndDyadArg = new int[]{1, 2};
+
+    /**
+     * Return the arg counts for an operator.
+     *
+     * @param name
+     * @return
+     */
+    public int[] getArgCount(String name) {
+        if (ONLY_MONADS.contains(name)) {
+            return monadOnlyArg;
+        }
+        if (!ALL_MONADS.contains(name)) {
+            return dyadOnlyArg;
+        }
+        return monadAndDyadArg;
+    }
 
     @Override
     public String getNamespace() {
@@ -362,7 +390,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             StemVariable outStem = new StemVariable();
             // special case. If this is a unary ~, then the first argument is
             // ignored.
-            if (dyad.isUnary() ) {
+            if (dyad.isUnary()) {
                 dyad.setResult(set.toStem());
                 dyad.setResultType(Constant.STEM_TYPE);
                 dyad.setEvaluated(true);
@@ -1133,4 +1161,15 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(Polyad polyad, State state) {
         return false;
     }
+
+    public int[] getArgCount(Monad monad) {
+        evaluate(monad, null);
+        return (int[]) monad.getResult();
+    }
+
+    public int[] getArgCount(Dyad dyad) {
+        evaluate(dyad, null);
+        return (int[]) dyad.getResult();
+    }
+
 }

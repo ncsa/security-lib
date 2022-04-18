@@ -33,7 +33,8 @@ public class iniParser extends Parser {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'['", "']'", "','", null, "'\u00AF'", "'\u207A'", "'+'", "'-'"
+			null, "'['", "']'", "','", null, "'\u00AF'", "'\u207A'", "'+'", "'-'", 
+			null, null, null, "'false'", "'true'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();

@@ -86,9 +86,7 @@ public class QDLListener implements QDLParserListener {
     public void exitVariable(QDLParserParser.VariableContext ctx) {
         StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
         if (ctx.getText().equals(QDLConstants.RESERVED_TRUE) ||
-                ctx.getText().equals(QDLConstants.RESERVED_TRUE2) ||
-                ctx.getText().equals(QDLConstants.RESERVED_FALSE) ||
-                ctx.getText().equals(QDLConstants.RESERVED_FALSE2)) {
+                ctx.getText().equals(QDLConstants.RESERVED_FALSE) ) {
             // SPECIAL CASE. The parse recognizes true and false, but does not know what to do with them.
             // We are here because it lumps them together with the variable values.
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals(QDLConstants.RESERVED_TRUE)), Constant.BOOLEAN_TYPE);
@@ -1628,12 +1626,10 @@ illegal argument:no module named "b" was  imported at (1, 67)
         ConstantNode constantNode = (ConstantNode) p.statement;
         switch (ctx.getText()) {
             case QDLConstants.RESERVED_FALSE:
-            case QDLConstants.RESERVED_FALSE2:
                 constantNode.setResult(Boolean.FALSE);
                 constantNode.setResultType(Constant.BOOLEAN_TYPE);
                 break;
             case QDLConstants.RESERVED_TRUE:
-            case QDLConstants.RESERVED_TRUE2:
                 constantNode.setResult(Boolean.TRUE);
                 constantNode.setResultType(Constant.BOOLEAN_TYPE);
                 break;
@@ -1966,7 +1962,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         if (ctx.getChildCount() == 2) {
             // This is of the form #expression, so it is just an expression
             // Don't wrap it and no special processing needed.
-            stash(ctx, resolveChild(ctx.me()));
+            stash(ctx, resolveChild(ctx.expression()));
             return;
         }
         /**
@@ -1974,33 +1970,42 @@ illegal argument:no module named "b" was  imported at (1, 67)
          * Basically any varliable or function that starts with a __ cannot have an alias attached to
          * it, so X#__a, X#__f(3) will fail. 
          */
-        ModuleExpression moduleExpression = (ModuleExpression) resolveChild(ctx.me());
-
-        if (moduleExpression.getExpression() instanceof VariableNode) {
-            if (State.isIntrinsic(((VariableNode) moduleExpression.getExpression()).getVariableReference())) {
+        Statement statement = resolveChild(ctx.expression());
+        if (statement instanceof FunctionDefinitionStatement) {
+            throw new IntrinsicViolation("cannot define function in an existing module");
+        }
+        if(statement instanceof VariableNode){
+            if(State.isIntrinsic(((VariableNode)statement).getVariableReference())){
                 throw new IntrinsicViolation("cannot access intrinsic variable outside of module.");
             }
         }
-        if (moduleExpression.getExpression() instanceof Polyad) {
-            if (State.isIntrinsic(((Polyad) moduleExpression.getExpression()).getName())) {
+        if(statement instanceof Polyad){
+            if(State.isIntrinsic(((Polyad)statement).getName())){
                 throw new IntrinsicViolation("cannot access intrinsic function outside of module.");
             }
         }
-        if(moduleExpression.getExpression() instanceof ANode2){
-            ANode2 anode = (ANode2) moduleExpression.getExpression();
-            if(anode.getLeftArg() instanceof VariableNode){
-                if (State.isIntrinsic(((VariableNode)anode.getLeftArg()).getVariableReference())){
-                    throw new IntrinsicViolation("cannot set intrinsic variable.");
-                }
-            }
-        }
-
+        /*        if(moduleExpression.getExpression() instanceof ANode2){
+                    ANode2 anode = (ANode2) moduleExpression.getExpression();
+                    if(anode.getLeftArg() instanceof VariableNode){
+                        if (State.isIntrinsic(((VariableNode)anode.getLeftArg()).getVariableReference())){
+                            throw new IntrinsicViolation("cannot set intrinsic variable.");
+                        }
+                    }
+                }*/
+        ModuleExpression moduleExpression = new ModuleExpression();
         moduleExpression.setTokenPosition(tp(ctx));
-        moduleExpression.setSourceCode(getSource(ctx));
-        StatementWithResultInterface var = (StatementWithResultInterface) resolveChild(ctx.me().variable());
+        stash(ctx, moduleExpression);
+        List<String> source = new ArrayList<>();
+        source.add(ctx.getText());
+        moduleExpression.setSourceCode(source);
+        StatementWithResultInterface var = (StatementWithResultInterface) resolveChild(ctx.variable());
         if (!(var instanceof VariableNode)) {
             throw new IllegalArgumentException("unexpected argument for alias");
         }
+        moduleExpression.setAlias(((VariableNode) var).getVariableReference());
+
+               moduleExpression.setExpression((StatementWithResultInterface) statement);
+
     }
 
     @Override
@@ -2100,24 +2105,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         finish(dyad, ctx);
     }
 
-    @Override
-    public void enterMe(QDLParserParser.MeContext ctx) {
 
-    }
-
-    @Override
-    public void exitMe(QDLParserParser.MeContext ctx) {
-        // sets up the module expression, but other checks are done in exitModuleExpression
-        // so the parser can run a wee bit and resolve everything more fully first.
-        ModuleExpression me = new ModuleExpression();
-        me.setAlias(ctx.variable().getText());
-        Statement statement = resolveChild(ctx.expression());
-        if (statement instanceof FunctionDefinitionStatement) {
-            throw new IntrinsicViolation("cannot define function in an existing module");
-        }
-        me.setExpression((StatementWithResultInterface)statement);
-        stash(ctx, me);
-    }
 }
 
 

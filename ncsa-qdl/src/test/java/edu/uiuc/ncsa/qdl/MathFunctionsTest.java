@@ -393,15 +393,14 @@ public class MathFunctionsTest extends AbstractQDLTester {
     }
 
     /*
-         This tests that arguments to functions are executed in the function scope, not
-         in the ambient scope.
+         This tests that arguments to functions are executed  in the ambient scope.
      */
-/*    public void testFunctionArgumentScope() throws Throwable {
+  /*  public void testFunctionArgumentScope() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "f(x)->a*x^2;"); // define a function that does not have a set.
         addLine(script, "ok := f(a:=3) == 27;"); // should return 27
-        addLine(script, "ok2 := !is_defined(a);"); // should return 27
+        addLine(script, "ok2 := !is_defined(a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);

@@ -259,4 +259,5 @@ public class ExpressionTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert !getBooleanValue("x_not_ok", state);
     }
+
 }

@@ -1128,7 +1128,6 @@ cannot access '__a'
      * @throws Throwable
      */
     public void testModuleFunctionReference() throws Throwable {
-
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "module['a:a','A'][f(x)->x^2;];");
@@ -1140,6 +1139,50 @@ cannot access '__a'
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok1", state);
+    }
+
+    public void testNestedModuleFunctionReference() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[f(x)]body[return(x+100);];");
+        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
+        addLine(script, "module['q:/z','w']body[zz:=17;module_import('a:/t');g(x)->a#f(x)+zz;];");
+        addLine(script, "module_import('q:/z');");
+        addLine(script, "h(@g, x)->g(x);");
+        addLine(script, "ok := w#a#f(3) == h(@w#a#f, 3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+    /*
+  define[f(x)]body[return(x+100);];
+  module['a:/t','a']body[define[f(x)]body[return(x+1);];];
+  module['q:/z','w']body[zz:=17;module_import('a:/t');g(x)->a#f(x)+zz;];
+  module_import('q:/z');
+  w#a#f(3); // returns 4
+  w#g(2); // returns 20
+  h(@g, x)->g(x)
+
+  h(@w#g, 2); // == w#g(2)
+  h(@w#a#f, 3); // == w#a#f(3)
+     */
+
+    /**
+     * tests that function references from two different modules with different states are resolved correctly.
+     * @throws Throwable
+     */
+    public void testNestedModuleFunctionReference2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "define[f(x)]body[return(x+100);];"); // This does not get evaluated. If it does, there is a state error.
+        addLine(script, "module['a:/t','a']body[define[f(x)]body[return(x+1);];];");
+        addLine(script, "module['q:/z','w']body[zz:=17;module_import('a:/t');g(x)->a#f(x)+zz;];");
+        addLine(script, "module_import('q:/z');");
+        addLine(script, "h(@g, @f, x)->g(x)*f(x);"); // reuse names in different order to test if they are kept straight
+        addLine(script, "ok := w#a#f(3) * w#g(3) == h(@w#a#f, @w#g,3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
     }
 
     /**

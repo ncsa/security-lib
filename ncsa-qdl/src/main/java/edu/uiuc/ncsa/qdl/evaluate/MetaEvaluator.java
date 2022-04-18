@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.evaluate;
 
+import edu.uiuc.ncsa.qdl.exceptions.FunctionArgException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
@@ -53,8 +54,23 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         return metaEvaluator;
     }
 
+    /**
+     * Given the name of a built in function, find the number of possible arguments it
+     * can take. This is needed for resolving function references.
+     *
+     * @param name
+     * @return
+     */
+    public int[] getArgCount(String name) {
+        Polyad polyad = new Polyad(name);
+        polyad.setSizeQuery(true);
+        evaluate(polyad, null);
+        return (int[]) polyad.getResult();
+    }
+
+
     public FunctionEvaluator getFunctionEvaluator() {
-        if(functionEvaluator == null){
+        if (functionEvaluator == null) {
             functionEvaluator = new FunctionEvaluator();
         }
         return functionEvaluator;
@@ -65,6 +81,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     }
 
     FunctionEvaluator functionEvaluator;
+
     public static boolean isSystemNS(String name) {
         return getSystemNamespaces().contains(name);
     }
@@ -106,6 +123,43 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
+      //      return evaluateNEW(polyad, state);
+        return evaluateOLD(polyad, state);
+    }
+
+    /**
+     * Proposed method to allow for overriding base system functions. Maybe. Still
+     * have to decide if this is really a great idea. Needs debugging.
+     * @param polyad
+     * @param state
+     * @return
+     */
+    public boolean evaluateNEW(Polyad polyad, State state) {
+        if(state.isAllowBaseFunctionOverrides()){
+            if (getFunctionEvaluator().evaluate(polyad, state)) {
+                return true;
+            }
+            for (AbstractFunctionEvaluator evaluator : evaluators) {
+                if (evaluator.evaluate(polyad, state)) return true;
+            }
+
+        }else{
+            try{
+                for (AbstractFunctionEvaluator evaluator : evaluators) {
+                    if (evaluator.evaluate(polyad, state)) return true;
+                }
+                return  getFunctionEvaluator().evaluate(polyad, state);
+
+            }catch(FunctionArgException fax){
+              return  getFunctionEvaluator().evaluate(polyad, state);
+            }
+
+        }
+
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
+    }
+
+    public boolean evaluateOLD(Polyad polyad, State state) {
         for (AbstractFunctionEvaluator evaluator : evaluators) {
             if (evaluator.evaluate(polyad, state)) return true;
         }

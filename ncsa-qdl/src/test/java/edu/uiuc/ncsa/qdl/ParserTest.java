@@ -235,6 +235,7 @@ public class ParserTest extends AbstractQDLTester {
         testContinuedFraction1(false);
         testContinuedFraction1(true);
     }
+
     public void testContinuedFraction1(boolean testXML) throws Throwable {
         String cf = "1/(2*x+3*y/(4*x+5*y/(6*x+7*y/(8*x+9*y/(x^2+y^2+1)))))";
         String cf2 = "  (192*x^3 + 192*x^5 + 68*x*y + 216*x^2*y + 68*x^3*y + 45*y^2 + " +
@@ -981,7 +982,7 @@ public class ParserTest extends AbstractQDLTester {
         String slash = "\\";
         addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
                 "  ~`!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
-                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊤⊥⊨⌈⌊⟦⟧≁⊗∈∉∩∪∆\\n" + // unicode
+                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊨⌈⌊⟦⟧≁⊗∈∉∩∪∆\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );
         addLine(script, "say('printing all base characters with say:\\n');");
@@ -1893,6 +1894,47 @@ public class ParserTest extends AbstractQDLTester {
         assert getStringValue("a", state).equals("dpqrcdtuv");
     }
 
+   /*
+                         qq(@f, x,y)->f(x)*f(x,y);
+
+                   ss(x)->-x
+                   ss(x,y)->x-y
+                   qq(@ss, 6, 3); // works with ans == -18
+    */
+
+    /**
+     * This tests a critical case: The call with the reference is to "f" which has no argument count
+     * but the body of the function uses a couple of overloaded versions. This test shows these
+     * are resolved correctly and evaluated correctly
+     *
+     * @throws Throwable
+     */
+    public void testOverloadResolution() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@f, x,y)->f(x)*f(x,y);");
+        addLine(script, "ss(x)->-x;");
+        addLine(script, "ss(x,y)->x-y;");
+        addLine(script, "ok := -18 == qq(@ss, 6, 3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "reference to overloaded user defined functions not resolved correctly";
+    }
+
+    /**
+     * Same as {@link #testOverloadResolution()}, but for a built in operator.
+     *
+     * @throws Throwable
+     */
+    public void testOverloadResolution2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@f, x,y)->f(x)*f(x,y);");
+        addLine(script, "ok := -18 == qq(@-, 6, 3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "reference to overloaded built in function (-) not resolved correctly";
+    }
 
     public void testBuiltInFunctionReferenceOrder() throws Throwable {
         State state = testUtils.getNewState();
@@ -2700,15 +2742,98 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "Recursion failed for a lambda function";
     }
+
     public void testLocalBlock() throws Throwable {
-         State state = testUtils.getNewState();
-         StringBuffer script = new StringBuffer();
-         addLine(script, "a := 2;");
-         addLine(script, "local[a:=4;];");
-         addLine(script, "ok := a == 2;");
-         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         interpreter.execute(script.toString());
-         assert getBooleanValue("ok", state) : "Failed to isolate state in local block";
-     }
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a := 2;");
+        addLine(script, "local[a:=4;];");
+        addLine(script, "ok := a == 2;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to isolate state in local block";
+    }
+
+    /**
+     * Operators and built in functions can take different numbers of arguments. Show that
+     * passing in a reference to these is resolved correctly to an overloaded function.
+     * Here minus is use monadically and dyadically.
+     *
+     * @throws Throwable
+     */
+    public void testOverloadFunction() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@f, x,y)->f(x)*f(x,y);");
+        addLine(script, "ss(x)->-x;");
+        addLine(script, "ss(x,y)->x-y;");
+        addLine(script, "ok := -18 == qq(@ss,6,3);");
+        addLine(script, "ok1 := -18 == qq(@-,6,3);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "Failed to resolve overloaded function reference";
+        assert getBooleanValue("ok1", state) : "Failed to resolve overloaded operator reference";
+    }
+
+    /*
+
+                       qq(@f, x,y)->f(x)*f(x,y);
+
+                       ss(x)->-x
+                       ss(x,y)->x-y
+                       qq(@ss, 6, 3);
+                       qq(@-, 6,3); // test
+    */
+
+    /**
+     * Function reference is for 2 different valences. Local is (here s) which is alse
+     * a tri-valent function.
+     *
+     * @throws Throwable
+     */
+    public void testOverloadFunction2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@s, x,y,z)->s(z)*s(x,y) -s(x,y,z);");
+        addLine(script, "r(x)->1/(1+x^2);");
+        addLine(script, "r(x,y)->x^2+y^2;");
+        addLine(script, "s(x,y,z)->(x^2+y^2)/(1+z^2);");
+        addLine(script, "v := qq(@r, 2,3, 4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        BigDecimal v = getBDValue("v", state);
+        assert areEqual(v, BigDecimal.ZERO);
+    }
+
+    public void testOverloadFunction2a() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@s, x,y,z)->s(z)*s(x,y) -s(x,y,z);");
+        addLine(script, "s(x)->x;");
+        addLine(script, "s(x,y)->x-y;");
+        addLine(script, "r(x)->1/(1+x^2);");
+        addLine(script, "r(x,y)->x^2+y^2;");
+        addLine(script, "s(x,y,z)->(x^2+y^2)/(1+z^2);");
+        addLine(script, "v := qq(@r, 2,3, 4);");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        BigDecimal v = getBDValue("v", state);
+        assert areEqual(v, BigDecimal.ZERO);
+    }
+
+    public void testOverloadFunction3() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "qq(@s, x,y,z)->s(z)*s(x,y) -s(x,y,z);");
+        addLine(script, "r(x)->1/(1+x^2);");
+        addLine(script, "r(x,y)->x^2+y^2;");
+        addLine(script, "r(x,y,z)->(x^2+y^2)/(1+z^2);");
+        addLine(script, "v := qq(@r, 2,3, 4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        BigDecimal v = getBDValue("v", state);
+        assert areEqual(v, BigDecimal.ZERO);
+    }
 
 }

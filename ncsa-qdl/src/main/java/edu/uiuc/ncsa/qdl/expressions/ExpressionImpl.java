@@ -127,6 +127,21 @@ public abstract class ExpressionImpl implements ExpressionNode {
         return result;
     }
 
+    /**
+     * Used when resolving function references to query the operator itself as to how many
+     * arguments it accepts.
+     * @return
+     */
+    public boolean isSizeQuery() {
+        return sizeQuery;
+    }
+
+    public void setSizeQuery(boolean sizeQuery) {
+        this.sizeQuery = sizeQuery;
+    }
+
+    boolean sizeQuery = false;
+
     int resultType = Constant.UNKNOWN_TYPE;
 
     @Override

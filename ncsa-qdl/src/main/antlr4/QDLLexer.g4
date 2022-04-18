@@ -11,8 +11,8 @@ lexer grammar QDLLexer;
 
          ASSERT : 'assert'; 
         ASSERT2 : '⊨'; // unicode 22a8
-     BOOL_FALSE : 'false'  | '⊥'; // unicode 22a5
-      BOOL_TRUE : 'true'   | '⊤'; // unicode 22a4
+     BOOL_FALSE : 'false'  ; //  | '⊥'unicode 22a5
+      BOOL_TRUE : 'true'  ; //  | '⊤' unicode 22a4
           BLOCK : 'block';
           LOCAL : 'local';
            BODY : 'body';
@@ -143,7 +143,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
    Identifier :  ('&')?[a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;   // no .!
 
     FuncStart :  FUNCTION_NAME '(';
-        F_REF : FunctionMarker (AllOps | (Identifier Hash)? FUNCTION_NAME | (FuncStart ')'));  // This allows for @f and @f() as equivalent.
+        F_REF : FunctionMarker (AllOps | (Identifier Hash)* FUNCTION_NAME | (FuncStart ')'));  // This allows for @f and @f() as equivalent.
 
     // AllOps must be a fragment or every bloody operator outside of a function reference will
     // get flagged as a possible match.

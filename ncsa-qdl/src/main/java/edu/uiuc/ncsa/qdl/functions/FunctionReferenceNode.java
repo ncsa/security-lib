@@ -14,19 +14,29 @@ import java.util.List;
  */
 public class FunctionReferenceNode implements StatementWithResultInterface {
     TokenPosition tokenPosition = null;
-    @Override
-    public void setTokenPosition(TokenPosition tokenPosition) {this.tokenPosition=tokenPosition;}
 
     @Override
-    public TokenPosition getTokenPosition() {return tokenPosition;}
+    public void setTokenPosition(TokenPosition tokenPosition) {
+        this.tokenPosition = tokenPosition;
+    }
 
     @Override
-    public boolean hasTokenPosition() {return tokenPosition!=null;}
+    public TokenPosition getTokenPosition() {
+        return tokenPosition;
+    }
+
+    @Override
+    public boolean hasTokenPosition() {
+        return tokenPosition != null;
+    }
+
     @Override
     public boolean isInModule() {
-        return alias!=null;
+        return alias != null;
     }
-String alias = null;;
+
+    String alias = null;
+    ;
 
     @Override
     public String getAlias() {
@@ -48,6 +58,7 @@ String alias = null;;
 
     String functionName;
     Object result;
+
     @Override
     public Object getResult() {
         return result;
@@ -55,10 +66,11 @@ String alias = null;;
 
     @Override
     public void setResult(Object object) {
-                 this.result = object;
+        this.result = object;
     }
 
     int resultType = Constant.UNKNOWN_TYPE;
+
     @Override
     public int getResultType() {
         return resultType;
@@ -66,7 +78,7 @@ String alias = null;;
 
     @Override
     public void setResultType(int type) {
-               this.resultType = type;
+        this.resultType = type;
     }
 
     boolean evaluated = false;

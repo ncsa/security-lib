@@ -2443,8 +2443,6 @@ Standard    Unicode   ALT   escape code    What is it
 =>             ≥       >    \u2265         greater than or equals
 ~|             ≁       ~    \u2241         last axis join
 @              ⊗       @    \u2297         function reference
-true           ⊤       T    \u22a4         logical true
-false          ⊥       F    \u22a5         logical false
 assert[][]     ⊨       A    \u22a8         assert
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
