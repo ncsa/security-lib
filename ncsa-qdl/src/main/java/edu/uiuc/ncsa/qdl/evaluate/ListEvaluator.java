@@ -372,12 +372,11 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  polyad.setEvaluated(true);
                  return;
              }
-         if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(LIST_STARTS_WITH + " requires 2 arguments");
-         }
-
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(LIST_STARTS_WITH + " requires 2 arguments");
+        if (polyad.getArgCount()<2) {
+            throw new MissingArgException(LIST_STARTS_WITH + " requires 2 arguments");
+        }
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(LIST_STARTS_WITH + " requires 2 arguments");
          }
 
         Object leftArg = polyad.evalArg(0, state);
@@ -442,11 +441,11 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  polyad.setEvaluated(true);
                  return;
              }
-         if (polyad.getArgCount() < 1) {
+         if (polyad.getArgCount()<1) {
              throw new MissingArgException(LIST_REVERSE + " requires at least 1 argument");
          }
 
-         if (2 < polyad.getArgCount()) {
+         if (2<polyad.getArgCount()) {
              throw new ExtraArgException(LIST_REVERSE + " requires at most 2 arguments");
          }
 

@@ -51,7 +51,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             try {
                 int[] argCount = MetaEvaluator.getInstance().getArgCount(key);
                 if(AbstractFunctionEvaluator.MAX_ARG_COUNT <= argCount.length){
-                    names.add(key + "([" + argCount[0] + "," + argCount[1] + "," + argCount[2] + ",...]");
+                    names.add(key + "([" + argCount[0] + "," + argCount[1] + "," + argCount[2] + ",...])");
                 }else{
                     names.add(key + "(" + Arrays.toString(argCount) + ")");
                 }

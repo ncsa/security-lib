@@ -90,20 +90,32 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
 
     @Override
     public TreeSet<String> listFunctions(String regex) {
-        TreeSet<String> names = new TreeSet<>();
+        // The tree set keeps the argument counts in order since the functions are
+        // iterated out of order. 
+        HashMap<String, Set<Integer>> fAndArgs = new HashMap<>();
 
         for (XKey key : keySet()) {
             String name = ((FKey)key).getfName(); // de-munge
             FunctionRecord fr = get(key);
             if (regex != null && !regex.isEmpty()) {
                 if (name.matches(regex)) {
-                    name = name + "(" + fr.getArgCount() + ")";
-                    names.add(name);
+                    if(!fAndArgs.containsKey(name)){
+                        Set<Integer> list = new TreeSet<>();
+                        fAndArgs.put(name, list);
+                    }
+                    fAndArgs.get(name).add(fr.getArgCount());
                 }
             } else {
-                name = name + "(" + fr.getArgCount() + ")";
-                names.add(name);
+                if(!fAndArgs.containsKey(name)){
+                    Set<Integer> list = new TreeSet<>();
+                    fAndArgs.put(name, list);
+                }
+                fAndArgs.get(name).add(fr.getArgCount());
             }
+        }
+        TreeSet<String> names = new TreeSet<>();
+        for(String key : fAndArgs.keySet()){
+            names.add(key + "(" + fAndArgs.get(key) + ")");
         }
         return names;
     }

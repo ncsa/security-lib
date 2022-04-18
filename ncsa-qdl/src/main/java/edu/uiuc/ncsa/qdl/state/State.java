@@ -244,6 +244,11 @@ public class State extends FunctionState implements QDLConstants {
         characters.put("03c0", TMathEvaluator.PI2);
         characters.put("22c0", OpEvaluator.AND2);
         characters.put("22c1", OpEvaluator.OR2);
+        characters.put("2229", "∩");
+        characters.put("222a", "∪");
+        characters.put("2208", "∈");
+        characters.put("2209", "∉");
+
 
         systemConstants.put(SYS_VAR_TYPE_CHARACTERS, characters);
         StemVariable varTypes = new StemVariable();
@@ -254,6 +259,7 @@ public class State extends FunctionState implements QDLConstants {
         varTypes.put(SYS_VAR_TYPE_INTEGER, new Long(Constant.LONG_TYPE));
         varTypes.put(SYS_VAR_TYPE_DECIMAL, new Long(Constant.DECIMAL_TYPE));
         varTypes.put(SYS_VAR_TYPE_UNDEFINED, new Long(Constant.UNKNOWN_TYPE));
+        varTypes.put(SYS_VAR_TYPE_SET, new Long(Constant.SET_TYPE));
         systemConstants.put(SYS_VAR_TYPES, varTypes);
 
         StemVariable detokenizeTypes = new StemVariable();
