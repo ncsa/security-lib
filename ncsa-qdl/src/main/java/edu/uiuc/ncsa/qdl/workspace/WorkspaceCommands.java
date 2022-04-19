@@ -11,6 +11,7 @@ import edu.uiuc.ncsa.qdl.extensions.QDLLoader;
 import edu.uiuc.ncsa.qdl.functions.FKey;
 import edu.uiuc.ncsa.qdl.functions.FR_WithState;
 import edu.uiuc.ncsa.qdl.functions.FStack;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTKey;
 import edu.uiuc.ncsa.qdl.module.MTStack;
@@ -1797,7 +1798,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                 value.append(" " + inputLine.getArg(i));
             }
         }
-        if(env == null){
+        if (env == null) {
             env = new XProperties();
         }
         env.put(pName, value.toString());
@@ -3943,7 +3944,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             Module module = getState().getMInstances().getModule(key);
             List<String> aliases = getState().getMInstances().getAliasesAsString(module.getMTKey());
             for (String alias : aliases) {
-                String output = SystemEvaluator.MODULE_IMPORT + "('" + key + "','" + alias + "');";
+                String output = SystemEvaluator.MODULE_IMPORT + "('" + module.getNamespace() + "','" + alias + "');";
                 fileWriter.write(output + "\n");
             }
         }
@@ -3960,21 +3961,11 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
 
         fileWriter.write("\n/* ** user defined functions ** */\n");
-        for (String fWithArg : state.getFTStack().listFunctions(null)) {
-            // This gives back functions of the form fName(argCount). Since the
-            // logic involves jumping through a lot of hoops (e.g. getting them from
-            // modules, it is vastly easier to simply parse them to get the source code.
-            // The alternative is a slog through every component with a function.
 
-            int lpIndex = fWithArg.indexOf("(");
-            int rpIndex = fWithArg.indexOf(")");
-            String fName = fWithArg.substring(0, lpIndex);
-            String rawCount = fWithArg.substring(lpIndex + 1, rpIndex);
-
-            String output = inputForm(fName, Integer.parseInt(rawCount), state);
-            if (!output.startsWith(JAVA_CLASS_MARKER)) {
-                // Do not write java functions, since this makes no sense -- the must live in
-                // a module at this point.
+        for (XKey key : state.getFTStack().keySet()) {
+            String output = inputForm((FunctionRecord) state.getFTStack().get(key));
+            if (output != null && !output.startsWith(JAVA_CLASS_MARKER)) {
+                // Do not write java functions as they live in a module.
                 fileWriter.write(output + "\n");
             }
         }
@@ -4115,7 +4106,7 @@ public class WorkspaceCommands implements Logable, Serializable {
      */
     public boolean javaLoad(File f) {
         try {
-            if(javaLoad(new FileInputStream(f))){
+            if (javaLoad(new FileInputStream(f))) {
                 currentWorkspace = f;
                 return true;
             }
@@ -4212,7 +4203,8 @@ public class WorkspaceCommands implements Logable, Serializable {
         boolean isJava = inputLine.hasArg(JAVA_FLAG) && !isQDLDump; // QDL has right of way
         inputLine.removeSwitch(JAVA_FLAG);
         boolean skipBadModules = inputLine.hasArg(SKIP_BAD_MODULES_FLAG);
-        inputLine.removeSwitch(SKIP_BAD_MODULES_FLAG);;
+        inputLine.removeSwitch(SKIP_BAD_MODULES_FLAG);
+        ;
 
         if (inputLine.hasArgAt(FIRST_ARG_INDEX)) {
             fName = inputLine.getArg(FIRST_ARG_INDEX);

@@ -138,13 +138,17 @@ public class InputFormUtil {
      */
     public static String inputForm(String fName, int argCount, State state) {
         FR_WithState fr_withState = state.resolveFunction(fName, argCount, true);
-        String output = null;
 
         if (fr_withState == null) {
             // no such critter
-            return output;
+            return null;
         }
         FunctionRecord fr = fr_withState.functionRecord;
+        return inputForm(fr);
+    }
+
+    public  static String inputForm(FunctionRecord fr) {
+        String output = null;
         if (fr != null) {
             if (fr instanceof QDLFunctionRecord) {
                 QDLFunction qf = ((QDLFunctionRecord) fr).qdlFunction;
@@ -157,6 +161,23 @@ public class InputFormUtil {
         }
         return output;
     }
+/*
+    public static String inputForm(FunctionRecord fr, State state) {
+        String output = null;
+        if (fr != null) {
+            if (fr instanceof QDLFunctionRecord) {
+                QDLFunction qf = ((QDLFunctionRecord) fr).qdlFunction;
+                if (qf != null) {
+                    output = JAVA_CLASS_MARKER + qf.getClass().getCanonicalName();
+                }
+            } else {
+                output = StringUtils.listToString(fr.sourceCode);
+            }
+        }
+
+        return output;
+    }
+*/
 
     public static String inputForm(QDLNull qdlNull) {
         return "null";

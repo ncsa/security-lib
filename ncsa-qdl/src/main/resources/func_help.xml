@@ -821,6 +821,9 @@ union(arg0., arg1., ...) - takes the union of all stems, returning a single
                            stem all of whose keys-values are taken form the
                            arguments. Note that the stems are processed in
                            order and values may be over-written.
+
+Note that this is for stems. For sets, use \/ (or ∪).
+See also: sets, /\ or ∩.
                 ]]>
         </body>
     </entry>

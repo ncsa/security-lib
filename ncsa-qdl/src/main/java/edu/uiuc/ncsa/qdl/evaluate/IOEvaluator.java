@@ -113,15 +113,16 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
     @Override
     public boolean evaluate(Polyad polyad, State state) {
-        try{
+        try {
             return evaluate2(polyad, state);
-        }catch(QDLException q){
-              throw q;
-        }catch(Throwable t){
+        } catch (QDLException q) {
+            throw q;
+        } catch (Throwable t) {
             QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
             throw qq;
         }
     }
+
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
 
@@ -158,18 +159,18 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doScan(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{0,1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{0, 1});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (state.isServerMode()) {
             throw new QDLRuntimeException("scan is not allowed in server mode.");
         }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(SCAN_FUNCTION + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(SCAN_FUNCTION + " requires at most 1 argument");
+        }
 
         if (polyad.isEvaluated()) {
             // If this has already been run, then do not prompt the user repeatedly.
@@ -200,18 +201,18 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
 
 
     protected void doRMDir(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(RMDIR + " requires at least 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(RMDIR + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(RMDIR + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(RMDIR + " requires at most 1 argument");
+        }
 
         if (0 == polyad.getArgCount()) {
             throw new BadArgException(RMDIR + " requires a file name to read.");
@@ -255,18 +256,18 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doRMFile(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(RM_FILE + " requires at least 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(RM_FILE + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(RM_FILE + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(RM_FILE + " requires at most 1 argument");
+        }
 
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
@@ -308,23 +309,23 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doMkDir(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(MKDIR + " requires at least 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(MKDIR + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(MKDIR + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(MKDIR + " requires at most 1 argument");
+        }
 
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
         if (!isString(obj)) {
-            throw new BadArgException( MKDIR + " requires a string for its argument.");
+            throw new BadArgException(MKDIR + " requires a string for its argument.");
         }
         DebugUtil.trace(this, "in " + MKDIR + ": starting, arg = " + obj);
         String fileName = obj.toString();
@@ -379,18 +380,18 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doDir(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(DIR + " requires at least 1 argument");
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(DIR + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(DIR + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(DIR + " requires at most 1 argument");
+        }
 
         DebugUtil.trace(this, "starting " + DIR + " command");
         Object obj = polyad.evalArg(0, state);
@@ -455,21 +456,22 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void vfsUnmount(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }       if (state.isServerMode()) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (state.isServerMode()) {
             throw new QDLServerModeException("Unmounting virtual file systems is not permitted in server mode.");
         }
 
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(VFS_UNMOUNT + " requires at least 1 argument");
-         }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(VFS_UNMOUNT + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(VFS_UNMOUNT + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(VFS_UNMOUNT + " requires at most 1 argument");
+        }
 
         Object arg = polyad.evalArg(0, state);
 
@@ -490,21 +492,21 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void vfsMount(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1});
-                 polyad.setEvaluated(true);
-                 return;
-             }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (state.isServerMode()) {
             throw new QDLServerModeException("Mounting virtual file systems is not permitted in server mode.");
         }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(VFS_MOUNT + " requires at least 1 argument");
-         }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(VFS_MOUNT + " requires at least 1 argument");
+        }
 
-         if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(VFS_MOUNT + " requires at most 1 argument");
-         }
+        if (1 < polyad.getArgCount()) {
+            throw new ExtraArgException(VFS_MOUNT + " requires at most 1 argument");
+        }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
@@ -581,22 +583,22 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doWriteFile(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{2,3});
-                 polyad.setEvaluated(true);
-                 return;
-             }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2, 3});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (state.isServerMode()) {
             throw new QDLServerModeException("File operations are not permitted in server mode");
         }
 
-         if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(WRITE_FILE + " requires at least 2 arguments");
-         }
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(WRITE_FILE + " requires at least 2 arguments");
+        }
 
-         if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(WRITE_FILE + " requires at most 3 arguments");
-         }
+        if (3 < polyad.getArgCount()) {
+            throw new ExtraArgException(WRITE_FILE + " requires at most 3 arguments");
+        }
 
         Object obj = polyad.evalArg(0, state);
         checkNull(obj, polyad.getArgAt(0));
@@ -711,19 +713,19 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             StemVariable innerStem = (StemVariable) obj;
             for (String key1 : innerStem.keySet()) {
                 Object innerObject = innerStem.get(key1);
-                if(!isStem(innerObject)){
+                if (!isStem(innerObject)) {
                     stringBuilder.append(key1 + " := " + InputFormUtil.inputForm(innerObject) + "\n");
-                }else {
-                    StemVariable  innerInnerObject = (StemVariable)innerObject;
+                } else {
+                    StemVariable innerInnerObject = (StemVariable) innerObject;
                     String out = "";
                     boolean isFirst = true;
-                    for(String key2:innerInnerObject.keySet()){
-                           Object object2 = innerInnerObject.get(key2);
-                           if(isStem(object2)){
-                               throw new IllegalArgumentException("Ini files do not support nexted stems");
-                           }
-                           out = out + (isFirst?"":",") + InputFormUtil.inputForm(object2);
-                           if(isFirst) isFirst = false;
+                    for (String key2 : innerInnerObject.keySet()) {
+                        Object object2 = innerInnerObject.get(key2);
+                        if (isStem(object2)) {
+                            throw new IllegalArgumentException("Ini files do not support nexted stems");
+                        }
+                        out = out + (isFirst ? "" : ",") + InputFormUtil.inputForm(object2);
+                        if (isFirst) isFirst = false;
                     }
 
                     stringBuilder.append(key1 + " := " + out + "\n");
@@ -733,19 +735,20 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         }
         return stringBuilder.toString();
     }
-    protected void doReadFile(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1,2});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(READ_FILE + " requires at least 1 argument");
-         }
 
-         if (2 < polyad.getArgCount()) {
-             throw new ExtraArgException(READ_FILE + " requires at most 2 arguments");
-         }
+    protected void doReadFile(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(READ_FILE + " requires at least 1 argument");
+        }
+
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(READ_FILE + " requires at most 2 arguments");
+        }
 
 
         Object obj = polyad.evalArg(0, state);
@@ -769,11 +772,17 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         VFSEntry vfsEntry = null;
         boolean hasVF = false;
         if (state.isVFSFile(fileName)) {
-            vfsEntry = resolveResourceToFile(fileName,op, state);
+            vfsEntry = resolveResourceToFile(fileName, op, state);
             if (vfsEntry == null) {
                 throw new QDLException("The resource '" + fileName + "' was not found in the virtual file system");
             }
             hasVF = true;
+        } else {
+            // Only allow for virtual file reads in server mode.
+            // If the file does not live in a VFS throw an exception.
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
         }
         try {
             switch (op) {
@@ -820,6 +829,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     polyad.setEvaluated(true);
                     return;
                 default:
+                    throw new IllegalArgumentException(" unknown file type '" + op + "'");
                 case FILE_OP_TEXT_STRING:
                 case FILE_OP_AUTO:
                     // read it as a long string.

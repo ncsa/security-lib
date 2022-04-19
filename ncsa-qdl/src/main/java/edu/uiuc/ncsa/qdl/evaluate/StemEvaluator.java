@@ -1911,7 +1911,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (2 < polyad.getArgCount()) {
             throw new MissingArgException(EXCLUDE_KEYS + " requires 2 arguments");
         }
-        
+
         if (polyad.getArgCount() < 2) {
             throw new ExtraArgException(EXCLUDE_KEYS + " requires 2 arguments");
         }
@@ -1964,15 +1964,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      shuffle(a., b.);
      */
     protected void shuffleKeys(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{2});
-                polyad.setEvaluated(true);
-                return;
-            }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (polyad.getArgCount() < 2) {
             throw new MissingArgException(SHUFFLE + " requires 2 arguments");
         }
-        
+
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(SHUFFLE + " requires 2 arguments");
         }
@@ -2068,12 +2068,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      */
 
     protected void doRenameKeys(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{2,3});
-                polyad.setEvaluated(true);
-                return;
-            }
-        if (polyad.getArgCount() < 2 ) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2, 3});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 2) {
             throw new MissingArgException(RENAME_KEYS + " requires at least 2 arguments.");
         }
         if (3 < polyad.getArgCount()) {
@@ -2125,11 +2125,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doCommonKeys(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{2});
-                polyad.setEvaluated(true);
-                return;
-            }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (polyad.getArgCount() < 2) {
             throw new MissingArgException(COMMON_KEYS + " requires 2 arguments");
         }
@@ -2168,11 +2168,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * @param state
      */
     protected void doSetDefault(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{2});
-                polyad.setEvaluated(true);
-                return;
-            }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (2 < polyad.getArgCount()) {
             throw new MissingArgException(SET_DEFAULT + " requires 2 arguments");
         }
@@ -2200,12 +2200,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doMask(Polyad polyad, State state) {
-        
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{2});
-                polyad.setEvaluated(true);
-                return;
-            }
+
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
         if (polyad.getArgCount() < 2) {
             throw new MissingArgException(MASK + " requires 2 arguments");
         }
@@ -2311,14 +2311,19 @@ z. :=  join3(q.,w.)
      */
 
     protected void doJoin(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(getBigArgList());
-                polyad.setEvaluated(true);
-                return;
-            }
-        if(0 == polyad.getArgCount()){
-            throw new MissingArgException(JOIN + " requires at least 1 argument");
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2, 3});
+            polyad.setEvaluated(true);
+            return;
         }
+
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(JOIN + " requires at least 2 arguments");
+        }
+        if (3 < polyad.getArgCount()) {
+            throw new ExtraArgException(JOIN + " takes at most 3 arguments");
+        }
+
         Object[] args = new Object[polyad.getArgCount()];
         int argCount = polyad.getArgCount();
         for (int i = 0; i < argCount; i++) {
@@ -2395,11 +2400,11 @@ z. :=  join3(q.,w.)
 
 
     protected void doTransform(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                polyad.setResult(new int[]{1,2});
-                polyad.setEvaluated(true);
-                return;
-            }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
         /*  Waaaay easier to do this in QDL, but this should be in base system
            not a module.
          old. := all_keys(x., -1);

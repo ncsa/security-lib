@@ -281,7 +281,12 @@ public class ISO6429IO implements IOInterface {
                     return currentLine.toString();
                 case Backspace:
                     // delete character to LEFT of cursor and redraw
-                    currentCol0 = terminal.getCursorCol() - startCol;
+                    try {
+                        currentCol0 = terminal.getCursorCol() - startCol;
+                    }catch(Throwable t){
+                        // probably means that the user overran the lhs and the terminal lost its marbles.
+                        currentCol0 = 0;
+                    }
                     if (0 < currentCol0 && 0 < currentLine.length()) {
                         currentCol0 = Math.max(0, currentCol0 - 1);
                         currentLine = currentLine.deleteCharAt(currentCol0);
