@@ -326,7 +326,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -534,7 +534,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (state.isServerMode()) {
-            throw new UnsupportedOperationException(CLIPBOARD_COPY + " not supported in server mode");
+            throw new QDLServerModeException(CLIPBOARD_COPY + " not supported in server mode");
         }
 
 
@@ -566,7 +566,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (state.isServerMode()) {
-            throw new UnsupportedOperationException(CLIPBOARD_PASTE + " not supported in server mode");
+            throw new QDLServerModeException(CLIPBOARD_PASTE + " not supported in server mode");
         }
 
         if (polyad.getArgCount() < 1) {
@@ -617,7 +617,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (state.isServerMode()) {
-            throw new UnsupportedOperationException(HAS_CLIPBOARD + " not supported in server mode");
+            throw new QDLServerModeException(HAS_CLIPBOARD + " not supported in server mode");
         }
 
 
@@ -790,7 +790,13 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         if (doReduce && isSet(arg1)) {
             QDLSet argSet = (QDLSet) arg1;
-            ExpressionImpl f = getOperator(state, frn, 2);
+            ExpressionImpl f;
+            try {
+                f = getOperator(state, frn, 2);
+            }catch(UndefinedFunctionException ufx){
+                ufx.setStatement(polyad.getArgAt(0));
+                throw ufx;
+            }
             Object lastResult = null;
             ArrayList<Object> args = new ArrayList<>();
             for (Object element : argSet) {
@@ -824,7 +830,13 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (doReduce && !stemVariable.isList()) {
             // allow for reducing stems to a scalar
             Object rrr = null;
-            ExpressionImpl f = getOperator(state, frn, 2);
+            ExpressionImpl f;
+            try {
+                f = getOperator(state, frn, 2);
+            }catch(UndefinedFunctionException ufx){
+                        ufx.setStatement(polyad.getArgAt(0));
+                throw ufx;
+            }
             Object lastResult = null;
             ArrayList<Object> args = new ArrayList<>();
             for (String key : stemVariable.keySet()) {
@@ -891,10 +903,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         // oldReduceOrExpand(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
         // oldReduceOrExpand2(polyad, state, doReduce, (FunctionReferenceNode) arg0, stemVariable);
         StemUtility.StemAxisWalkerAction1 axisWalker;
-        if (doReduce) {
-            axisWalker = this.new AxisReduce(getOperator(state, frn, 2), state);
-        } else {
-            axisWalker = this.new AxisExpand(getOperator(state, frn, 2), state);
+        try {
+            if (doReduce) {
+                axisWalker = this.new AxisReduce(getOperator(state, frn, 2), state);
+            } else {
+                axisWalker = this.new AxisExpand(getOperator(state, frn, 2), state);
+            }
+        }catch(UndefinedFunctionException ufx){
+            ufx.setStatement(polyad.getArgAt(0));
+            throw ufx;
         }
         Object result = axisWalker(stemVariable, axis, axisWalker);
         polyad.setResult(result);
@@ -1146,9 +1163,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             QDLRunner runner = new QDLRunner(driver.parse(r));
         } catch (ParseCancellationException pc) {
             message = pc.getMessage();
-        } catch (AssignmentException ax) {
-            message = ax.getMessage();
-        } catch (Throwable t) {
+        }catch (Throwable t) {
             message = "non-syntax error:" + t.getMessage();
 
         }
@@ -1166,6 +1181,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         }
         if (state.isServerMode()) {
             // no interrupts in server mode.
+            // These may be present, but are ignored rather than throwing an exception. This way debugging aids
+            // can stay in place but don't do anything on the server.
             polyad.setResult(-1L);
             polyad.setResultType(Constant.LONG_TYPE);
             polyad.setEvaluated(true);
@@ -1594,10 +1611,13 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (state.isServerMode()) {
+            throw new QDLServerModeException(OS_ENV + " not supported in server mode");
+/*
             polyad.setResult("");
             polyad.setResultType(Constant.STRING_TYPE);
             polyad.setEvaluated(true);
             return;
+*/
         }
 
 
@@ -1865,8 +1885,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 script.execute(localState);
                 localState.setScriptArgs(oldArgs);
             } catch (QDLException qe) {
-                if (qe instanceof QDLStatementExecutionException) {
-                    QDLStatementExecutionException qq = (QDLStatementExecutionException) qe;
+                if (qe instanceof QDLExceptionWithTrace) {
+                    QDLExceptionWithTrace qq = (QDLExceptionWithTrace) qe;
                     qq.setScriptName(resourceName);
                     qq.setScript(true);
                     throw qq;
@@ -1880,7 +1900,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 }
                 throw qe;
             } catch (Throwable t) {
-                QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+                QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
                 qq.setScript(true);
                 qq.setScriptName(resourceName);
                 throw qq;

@@ -103,22 +103,6 @@ public class QDLSet extends HashSet {
         return difference(arg).union(arg.difference(this));
     }
 
-/*    @Override
-    public boolean equals(Object o) {
-        if ((o == null) || !(o instanceof QDLSet)) {
-            return false;
-        }
-        QDLSet arg = (QDLSet) o;
-        if (size() != arg.size()) {
-            return false;
-        }
-        for (Object element : this) {
-            if (!arg.contains(element)) {
-                return false;
-            }
-        }
-        return true;
-    }*/
 
     public static void main(String[] args) {
         QDLSet set1 = new QDLSet();

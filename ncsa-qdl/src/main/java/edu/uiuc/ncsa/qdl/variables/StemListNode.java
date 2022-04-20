@@ -99,7 +99,7 @@ public class StemListNode implements StatementWithResultInterface {
         for (StatementWithResultInterface stmt : statements) {
             stmt.evaluate(state);
             if(stmt.getResult() == null && stmt instanceof VariableNode){
-                throw new UnknownSymbolException("\'" + ((VariableNode)stmt).getVariableReference() + "' not found");
+                throw new UnknownSymbolException("\'" + ((VariableNode)stmt).getVariableReference() + "' not found", stmt);
             }
             stmt.setEvaluated(true);
             stmt.setResultType(Constant.getType(stmt.getResult()));

@@ -53,7 +53,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 if(AbstractFunctionEvaluator.MAX_ARG_COUNT <= argCount.length){
                     names.add(key + "([" + argCount[0] + "," + argCount[1] + "," + argCount[2] + ",...])");
                 }else{
-                    names.add(key + "(" + Arrays.toString(argCount) + ")");
+                    String aaa = Arrays.toString(argCount);
+                    aaa = aaa.replace(" ", ""); // remove blanks
+                    names.add(key + "(" + aaa + ")");
                 }
             }catch(Throwable t) {
                 System.out.println("key = " + key + " failed");
@@ -571,10 +573,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
 
         Object arg3 = polyad.evalArg(2, state);
         checkNull(arg3, polyad.getArgAt(3), state);
-
+/*
         if (arg1 == null || arg2 == null || arg3 == null) {
             throw new UnknownSymbolException("unknown symbol");
-        }
+        }*/
         Object[] argList = new Object[polyad.getArgCount()];
         argList[0] = arg1;
         argList[1] = arg2;
@@ -777,7 +779,11 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         ExpressionImpl operator;
         String operatorName = frNode.getFunctionName();
         if (state.getOpEvaluator().isMathOperator(operatorName)) {
-            operator = new Dyad(state.getOperatorType(operatorName));
+            if(nAry == 1){
+             operator = new Monad(state.getOperatorType(operatorName), false); // only post fix allowed for monads here
+            }else {
+                operator = new Dyad(state.getOperatorType(operatorName));
+            }
         } else {
             if (state.getMetaEvaluator().isBuiltInFunction(operatorName)) {
                 operator = new Polyad(operatorName);
@@ -786,7 +792,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 FR_WithState fr_withState = state.resolveFunction(operatorName, nAry, true); // It's a dyad!
 
                 if (fr_withState == null || fr_withState.functionRecord == null) {
-                    throw new UndefinedFunctionException("'" + operatorName + "' is not defined with " + nAry + " arguments");
+                    throw new UndefinedFunctionException("'" + operatorName + "' is not defined with " + nAry + " arguments", null);
                 }
                 Polyad polyad1 = new Polyad(operatorName);
                 polyad1.setBuiltIn(false); // or it will not execute!
@@ -934,9 +940,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
         }
         if (swri instanceof VariableNode) {
             VariableNode vNode = (VariableNode) swri;
-            throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'");
+            throw new UnknownSymbolException("unknown symbol '" + vNode.getVariableReference() + "'",vNode);
         }
-        throw new UnknownSymbolException("unknown symbol");
+        throw new UnknownSymbolException("unknown symbol", swri);
     }
 
     /**
@@ -952,9 +958,9 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
             String message = "unknown symbol";
             if (swri instanceof VariableNode) {
                 message = message + " '" + ((VariableNode) swri).getVariableReference() + "'";
-                unknownSymbolException = new UnknownSymbolException(message);
+                unknownSymbolException = new UnknownSymbolException(message, swri);
             } else {
-                unknownSymbolException = new UnknownSymbolException(message);
+                unknownSymbolException = new UnknownSymbolException(message, swri);
             }
             if (state.getLogger() != null) {
                 // Check they have logging in the first place before writing to it.

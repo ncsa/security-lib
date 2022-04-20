@@ -110,12 +110,12 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             return true;
         } catch (UndefinedFunctionException ufe) {
             // special case this one QDLException so it gives usedful user feedback.
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(ufe, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(ufe, polyad);
             throw qq;
         } catch (QDLException qe) {
             throw qe;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -155,10 +155,9 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             }
         }
         QDLFunctionRecord qfr = (QDLFunctionRecord) frs.functionRecord;
-        //Object result = qfr.qdlFunction.getInstance().evaluate(argList);
         // This is the direct analog of func(polyad, state):
         if (qfr == null) {
-            throw new UndefinedFunctionException("this function is not defined");
+            throw new UndefinedFunctionException("this function is not defined", polyad);
         }
         Object result = qfr.qdlFunction.evaluate(argList, state);
         polyad.setResult(result);
@@ -200,7 +199,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             if (state.isIntrinsic(polyad.getName()) && polyad.isInModule()) {
                 // if it is in a module and at the top of the stack, then this is an access violation
                 if (state.getFTStack().localHas(new FKey(polyad.getName(), polyad.getArgCount()))) {
-                    throw new IntrinsicViolation("cannot access intrinsic function directly.");
+                    throw new IntrinsicViolation("cannot access intrinsic function directly.", polyad);
                 }
             }
             frs = state.resolveFunction(polyad, checkForDuplicates);
@@ -231,7 +230,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
             functionRecord = state.getFTStack().getFunctionReference(polyad.getName());
             if (functionRecord == null) {
                 throw new UndefinedFunctionException(" the function '" + polyad.getName() + "' with "
-                        + polyad.getArgCount() + " arguments was not found.");
+                        + polyad.getArgCount() + " arguments was not found.", polyad);
             }
         }
         if (!functionRecord.isFuncRef) {

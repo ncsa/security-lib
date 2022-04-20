@@ -258,7 +258,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -369,8 +369,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.getArgCount() < 2 || 3 < polyad.getArgCount()) {
-            throw new WrongArgCountException("the " + REMAP + " function requires  two or three arguments");
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(REMAP + " requires  two or three arguments");
+        }
+        if(3 < polyad.getArgCount()){
+            throw new ExtraArgException(REMAP + " takes at most 3 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
@@ -396,7 +399,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             threeArgRemap(polyad, stem, (StemVariable) arg2, newIndices);
             return;
         }
-        twoArgRemap(polyad, stem, (StemVariable) arg2);
+        try {
+            twoArgRemap(polyad, stem, (StemVariable) arg2);
+        } catch (IndexError indexError) {
+            indexError.setStatement(polyad.getArgAt(1));
+            throw indexError;
+        }
 
 
     }
@@ -514,7 +522,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             stems[i - 1] = (StemVariable) arg;
         }
-        ExpressionImpl f = getOperator(state, frn, stems.length);
+        ExpressionImpl f;
+        try {
+            f = getOperator(state, frn, stems.length);
+        } catch (UndefinedFunctionException ufx) {
+            ufx.setStatement(polyad.getArgAt(0));
+            throw ufx;
+        }
 
         StemVariable output = new StemVariable();
         // special case single args. Otherwise have to special case a bunch of stuff in forEachRecursion
@@ -1595,7 +1609,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return null;
         }
         if (size < 0L) {
-            throw new IndexError("negative index encountered");
+            throw new IndexError("negative index encountered", polyad);
         }
         StemList stemList;
         if (hasFill) {
@@ -1763,7 +1777,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
             // Note that if there is strict matching on and it works, there is a single
             // value at index 0 in the result.
-            output.set(newIndex, stem.get(oldIndex, true).get(0));
+            try {
+                output.set(newIndex, stem.get(oldIndex, true).get(0));
+            }catch(IndexError indexError){
+                indexError.setStatement(polyad);// not great but it works.
+                throw   indexError;
+
+            }
         }
 
         polyad.setResult(output);
@@ -2471,12 +2491,12 @@ z. :=  join3(q.,w.)
                 if (longArg < 0) {
                     long newArg = rank + longArg;
                     if (newArg < 0) {
-                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank);
+                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank, polyad.getArgAt(1));
                     }
                     stem1.listAppend(newArg);
                 } else {
                     if (rank <= longArg) {
-                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank);
+                        throw new IndexError("the requested axis of " + longArg + " is not valid for a stem of rank " + rank, polyad.getArgAt(1));
                     }
                     stem1.listAppend(arg1);
                 }

@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
@@ -84,8 +86,19 @@ public class StemEntryNode implements StatementWithResultInterface {
     public Object evaluate(State state) {
         if(!isDefaultValue) {
             getKey().evaluate(state);
+            if(getKey() instanceof VariableNode){
+                if(((VariableNode)getKey()).getResult() == null){
+                    throw new UnknownSymbolException("\'" + ((VariableNode)getKey()).getVariableReference() + "' not found for stem key", getKey());
+                }
+            }
+
         }
         getValue().evaluate(state);
+        if(getValue() instanceof VariableNode){
+            if(((VariableNode)getValue()).getResult() == null){
+                throw new UnknownSymbolException("\'" + ((VariableNode)getValue()).getVariableReference() + "' not found for stem value", getValue());
+            }
+        }
         setEvaluated(true);
         return null;
     }

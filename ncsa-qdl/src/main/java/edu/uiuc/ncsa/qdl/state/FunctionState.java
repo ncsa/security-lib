@@ -128,16 +128,13 @@ public abstract class FunctionState extends VariableState {
                 // E.g. f(@g, x, y) -> g(x)*g(x,y)
                 // f(@-, 6, 3) yields (-6)*(6 - 3) == -18.
                 // may have several other functions named g in the state, we have to
-                // find the (in this case monadic function or dyadic function
+                // find the (in this case) monadic function or dyadic function
                 // for this. Such arguments are stored with no arg count (so < 0)
                 // The next bit gets that and, if this is a function ref with the right number
                 // arguments, uses that.
                 XThing  xThing = getFTStack().get(new FKey(name, -1));
                 if(xThing instanceof FunctionRecord){
                     FunctionRecord functionRecord = (FunctionRecord) xThing;
-                    if(functionRecord.isFuncRef){
-                        System.out.println(functionRecord.fRefName);
-                    }
                 }
                 XThing xThing1 = getFTStack().get(new FKey(name, argCount));
                 if(xThing1 instanceof FunctionRecord){
@@ -206,7 +203,7 @@ public abstract class FunctionState extends VariableState {
             fr_withState.functionRecord = getFTStack().getFunctionReference(name);
             //fr.isExternalModule = false; // just to be sure.
             if (fr_withState.functionRecord == null) {
-                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "" : "s"));
+                throw new UndefinedFunctionException("Error: No such function named \"" + name + "\" exists with " + argCount + " argument" + (argCount == 1 ? "" : "s"), null);
             }
         }
         return fr_withState;
@@ -323,12 +320,6 @@ public abstract class FunctionState extends VariableState {
             return new ArrayList<>();
 
         }
-/*
-        if (!getMTemplates().containsKey(xKey)) {
-            return new ArrayList<>();
-        }
-*/
-        //Module module = getMTemplates().get(xKey);
         List<String> docs = module.getListByTag();
         if (docs == null) {
             return new ArrayList<>();
@@ -385,7 +376,6 @@ public abstract class FunctionState extends VariableState {
             return out;
         }
         // Final case, unqualified name and there are imports. Return all that match.
-//        List<String> out = getFTStack().getDocumentation(fname, argCount);
         List<String> out;
         if (argCount == -1) {
             out = getFTStack().listAllDocs(fname);

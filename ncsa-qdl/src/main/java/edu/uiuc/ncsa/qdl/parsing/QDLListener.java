@@ -3,7 +3,6 @@ package edu.uiuc.ncsa.qdl.parsing;
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.TMathEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
 import edu.uiuc.ncsa.qdl.expressions.*;
@@ -353,7 +352,6 @@ public class QDLListener implements QDLParserListener {
         List<String> source = new ArrayList<>();
         source.add(parseTree.getText());
         dyad.setSourceCode(source);
-
     }
 
     protected void finish(Monad monad, ParseTree parseTree) {
@@ -1913,18 +1911,12 @@ illegal argument:no module named "b" was  imported at (1, 67)
 
     @Override
     public void exitFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) {
-        Polyad polyad;
-        if (null == ctx.Ceiling()) {
-            polyad = new Polyad(TMathEvaluator.FLOOR);
-        } else {
-            polyad = new Polyad(TMathEvaluator.CEILING);
-        }
-        polyad.addArgument((StatementWithResultInterface) resolveChild(ctx.getChild(1)));
-        List<String> source = new ArrayList<>();
-        source.add(ctx.getText());
-        polyad.setSourceCode(source);
-        polyad.setTokenPosition(tp(ctx));
-        stash(ctx, polyad);
+        boolean isFloor = ctx.children.get(0).getText().equals(OpEvaluator.FLOOR) ;
+        Monad monad = new Monad(isFloor ? OpEvaluator.FLOOR_VALUE : OpEvaluator.CEILING_VALUE, false);
+        monad.setSourceCode(getSource(ctx));
+        monad.setTokenPosition(tp(ctx));
+        stash(ctx, monad);
+        finish(monad, ctx);
     }
 
     @Override
@@ -1972,26 +1964,19 @@ illegal argument:no module named "b" was  imported at (1, 67)
          */
         Statement statement = resolveChild(ctx.expression());
         if (statement instanceof FunctionDefinitionStatement) {
-            throw new IntrinsicViolation("cannot define function in an existing module");
+            throw new IntrinsicViolation("cannot define function in an existing module", statement);
         }
         if(statement instanceof VariableNode){
             if(State.isIntrinsic(((VariableNode)statement).getVariableReference())){
-                throw new IntrinsicViolation("cannot access intrinsic variable outside of module.");
+                throw new IntrinsicViolation("cannot access intrinsic variable outside of module.", statement);
             }
         }
         if(statement instanceof Polyad){
             if(State.isIntrinsic(((Polyad)statement).getName())){
-                throw new IntrinsicViolation("cannot access intrinsic function outside of module.");
+                throw new IntrinsicViolation("cannot access intrinsic function outside of module.", statement);
             }
         }
-        /*        if(moduleExpression.getExpression() instanceof ANode2){
-                    ANode2 anode = (ANode2) moduleExpression.getExpression();
-                    if(anode.getLeftArg() instanceof VariableNode){
-                        if (State.isIntrinsic(((VariableNode)anode.getLeftArg()).getVariableReference())){
-                            throw new IntrinsicViolation("cannot set intrinsic variable.");
-                        }
-                    }
-                }*/
+
         ModuleExpression moduleExpression = new ModuleExpression();
         moduleExpression.setTokenPosition(tp(ctx));
         stash(ctx, moduleExpression);

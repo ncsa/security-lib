@@ -79,20 +79,38 @@ public class ESN2 extends ExpressionImpl {
         }
         // Made it this far. Now we need to do this again, but handing off indices
         // to the stem as needed.
-        whittleIndices(indexList);
+        try {
+            whittleIndices(indexList);
+        } catch (IndexError indexError) {
+            indexError.setStatement(this);
+            throw indexError;
+        }
 
         Object r0 = leftArgs.get(leftArgs.size() - 1).evaluate(state);
-        if(r0 == null){
-            if(leftArgs.get(leftArgs.size() - 1) instanceof VariableNode){
-                throw new UnknownSymbolException("variable '"+  ((VariableNode)leftArgs.get(leftArgs.size() - 1)).getVariableReference()+ "' is undefined");
+        if (r0 == null) {
+            StatementWithResultInterface lll = leftArgs.get(leftArgs.size() - 1);
+            if (lll instanceof VariableNode) {
+                throw new UnknownSymbolException("variable '" + ((VariableNode) lll).getVariableReference() + "' is undefined", lll);
             }
-            throw new IndexError("left argument is undefined");
+            throw new IndexError("left argument is undefined", lll);
         }
         if (!(r0 instanceof StemVariable)) {
             throw new IllegalStateException("error: left argument must evaluate to be a stem ");
         }
         StemVariable stemVariable = (StemVariable) r0;
-        IndexList r = stemVariable.get(indexList,true);
+        IndexList r;
+        try {
+            r = stemVariable.get(indexList, true);
+        }catch (IndexError indexError){
+            if(stemVariable.hasDefaultValue()){
+                setResult(stemVariable.getDefaultValue());
+                setResultType(Constant.getType(result));
+                setEvaluated(true);
+                return result;
+            }
+            indexError.setStatement(this);
+            throw indexError;
+        }
         Object result = r.get(0);
         setResult(result);
         setResultType(Constant.getType(result));
@@ -109,47 +127,36 @@ public class ESN2 extends ExpressionImpl {
      * @param indexList
      */
     protected void whittleIndices(IndexList indexList) {
-            newWhittle(indexList);
-//            oldWhittle(indexList);
+        newWhittle(indexList);
     }
-    protected void oldWhittle(IndexList indexList){
-        IndexList r;
 
-            for (int i = indexList.size() - 1; 0 <= i; i--) {
-                if (indexList.get(i) instanceof StemVariable) {
-                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
-                    indexList.truncate(i);
-                    indexList.addAll(i, r);
-                }
-            }
-    }
 
     /**
      * Turns on or off all machinery associated with the allowing . to accept stem lists
      * as multi indices.
      */
 
-    protected void newWhittle(IndexList indexList){
+    protected void newWhittle(IndexList indexList) {
         IndexList r;
 
-            for (int i = indexList.size() - 1; 0 <= i; i--) {
-                if (indexList.get(i) instanceof StemVariable) {
-                    if(i == indexList.size() - 1 ){
-                        continue;
-                       }
-                    r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
-                    indexList.truncate(i);
-                    indexList.addAll(i, r);
-                }else{
-                    // Case that left most argument is not a stem, but that the rhs is
-                    // which implies the user made a boo-boo
-                    if(i<indexList.size()-1){
-                        if(indexList.get(i+1) instanceof StemVariable){
-                            throw new IndexError("error: lhs is not a stem.");
-                        }
+        for (int i = indexList.size() - 1; 0 <= i; i--) {
+            if (indexList.get(i) instanceof StemVariable) {
+                if (i == indexList.size() - 1) {
+                    continue;
+                }
+                r = ((StemVariable) indexList.get(i)).get(indexList.tail(i + 1), false);
+                indexList.truncate(i);
+                indexList.addAll(i, r);
+            } else {
+                // Case that left most argument is not a stem, but that the rhs is
+                // which implies the user made a boo-boo
+                if (i < indexList.size() - 1) {
+                    if (indexList.get(i + 1) instanceof StemVariable) {
+                        throw new IndexError("error: lhs is not a stem.", null);
                     }
                 }
             }
+        }
     }
 
     private IndexList getIndexList(State state, ArrayList<StatementWithResultInterface> rightArgs) {
@@ -183,7 +190,7 @@ public class ESN2 extends ExpressionImpl {
 
                 }
             }
-            
+
             if (obj == null) {
                 VariableNode vNode = null;
                 StatementWithResultInterface x;
@@ -227,31 +234,33 @@ public class ESN2 extends ExpressionImpl {
         leftArgs.add(swri);
         Collections.reverse(rightArgs);
     }
-     public boolean remove(State state){
-         ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
-         ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();
-         linearizeTree(leftArgs, rightArgs);
-         // Evaluation pass. Make sure everything resolves w.r.t. the state
-         IndexList indexList = getIndexList(state, rightArgs);
 
-         // Made it this far. Now we need to do this again, but handing off indices
-         // to the stem as needed.
-         whittleIndices(indexList);
-         StemVariable stemVariable = null;
-         boolean gotOne = false;
-         StatementWithResultInterface realLeftArg = leftArgs.get(leftArgs.size() - 1);
-         Object arg0 = realLeftArg.evaluate(state);
-         if(arg0 instanceof StemVariable){
-             StemVariable arg = (StemVariable) arg0;
-             try {
-                 return arg.remove(indexList);
-             }catch(IndexError indexError){
-                 // means they want something removed that is not there. Peachy
-                 return true; 
-             }
-         }
-         return false;
-     }
+    public boolean remove(State state) {
+        ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
+        ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();
+        linearizeTree(leftArgs, rightArgs);
+        // Evaluation pass. Make sure everything resolves w.r.t. the state
+        IndexList indexList = getIndexList(state, rightArgs);
+
+        // Made it this far. Now we need to do this again, but handing off indices
+        // to the stem as needed.
+        whittleIndices(indexList);
+        StemVariable stemVariable = null;
+        boolean gotOne = false;
+        StatementWithResultInterface realLeftArg = leftArgs.get(leftArgs.size() - 1);
+        Object arg0 = realLeftArg.evaluate(state);
+        if (arg0 instanceof StemVariable) {
+            StemVariable arg = (StemVariable) arg0;
+            try {
+                return arg.remove(indexList);
+            } catch (IndexError indexError) {
+                // means they want something removed that is not there. Peachy
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void set(State state, Object newValue) {
         ArrayList<StatementWithResultInterface> leftArgs = new ArrayList<>();
         ArrayList<StatementWithResultInterface> rightArgs = new ArrayList<>();
@@ -293,8 +302,12 @@ public class ESN2 extends ExpressionImpl {
         if (stemVariable == null) {
             stemVariable = new StemVariable();
         }
-        stemVariable.set(indexList, newValue); // let the stem set its value internally
-
+        try {
+            stemVariable.set(indexList, newValue); // let the stem set its value internally
+        } catch (IndexError indexError) {
+            indexError.setStatement(this);
+            throw indexError;
+        }
         setResult(stemVariable);
         setResultType(Constant.STEM_TYPE);
         setEvaluated(true);

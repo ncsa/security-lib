@@ -44,14 +44,20 @@ public class QDLWorkspace implements Serializable {
         int lineNumber = -1;
         int colNumber = -1;
         String errorStatement = "";
-        if (t instanceof QDLStatementExecutionException) {
-            QDLStatementExecutionException qq = (QDLStatementExecutionException) t;
-            if (qq.getStatement().hasTokenPosition()) {
-                errorStatement = getErrorCoordinates(qq);
+        if (t instanceof QDLExceptionWithTrace) {
+            QDLExceptionWithTrace qq = (QDLExceptionWithTrace) t;
+            if(qq.hasStatement()) {
+                if (qq.getStatement().hasTokenPosition()) {
+                    errorStatement = getErrorCoordinates(qq);
+                }
+                if (t.getCause() != null) {
+                    t = qq.getCause();
+                }
             }
-            if (t.getCause() != null) {
-                t = qq.getCause();
-            }
+        }
+        if( t instanceof UnknownSymbolException){
+            workspaceCommands.say("unknown symbol:" + t.getMessage() + errorStatement);
+            return;
         }
         if (t instanceof StackOverflowError) {
             workspaceCommands.say("Error: Stack overflow" + errorStatement);
@@ -107,7 +113,7 @@ public class QDLWorkspace implements Serializable {
         }
     }
 
-    protected String getErrorCoordinates(QDLStatementExecutionException qq) {
+    protected String getErrorCoordinates(QDLExceptionWithTrace qq) {
         Statement statement = qq.getStatement();
         if (!statement.hasTokenPosition()) {
             return "";

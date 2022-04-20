@@ -3,12 +3,10 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.FunctionArgException;
 import edu.uiuc.ncsa.qdl.exceptions.UndefinedFunctionException;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
+import edu.uiuc.ncsa.qdl.state.NamespaceAwareState;
 import edu.uiuc.ncsa.qdl.state.State;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * This is charged with managing the build-in functions as well as any that the
@@ -33,7 +31,25 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
      */
     public static MetaEvaluator getInstance() {
         if (metaEvaluator == null) {
-            metaEvaluator = new MetaEvaluator();                // NS base value. Must be distinct for new evaluators
+            metaEvaluator = new MetaEvaluator();
+            // NS base value. Must be distinct for new evaluators
+            addE(new StringEvaluator());
+            addE( new StringEvaluator());  //  3000
+            addE( new StemEvaluator());    //  2000
+            addE( new ListEvaluator());    // 10000
+            addE( new IOEvaluator());      //  4000
+            addE( new SystemEvaluator());  //  5000
+            addE( new MathEvaluator());    //  1000
+            addE( new TMathEvaluator());   //  7000
+           // addE(new FunctionEvaluator()); // 6000*//*
+            FunctionEvaluator functionEvaluator = new FunctionEvaluator();
+            metaEvaluator.addEvaluator(functionEvaluator); // 6000*//*
+            systemNamespaces.add(functionEvaluator.FUNCTION_NAMESPACE);
+            lookupByNS.put(functionEvaluator.getNamespace(), functionEvaluator);
+
+
+/*
+
             metaEvaluator.addEvaluator(0, new StringEvaluator());  //  3000
             metaEvaluator.addEvaluator(0, new StemEvaluator());    //  2000
             metaEvaluator.addEvaluator(0, new ListEvaluator());    // 10000
@@ -41,8 +57,11 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             metaEvaluator.addEvaluator(0, new SystemEvaluator());  //  5000
             metaEvaluator.addEvaluator(0, new MathEvaluator());    //  1000
             metaEvaluator.addEvaluator(0, new TMathEvaluator());   //  7000
-           /* // must be last always to resolve user defined functions.
-            metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000*/
+           */
+/* // must be last always to resolve user defined functions.
+            metaEvaluator.addEvaluator(new FunctionEvaluator()); // 6000*//*
+
+
             systemNamespaces.add(StringEvaluator.STRING_NAMESPACE);
             systemNamespaces.add(IOEvaluator.IO_NAMESPACE);
             systemNamespaces.add(StemEvaluator.STEM_NAMESPACE);
@@ -50,10 +69,17 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             systemNamespaces.add(MathEvaluator.MATH_NAMESPACE);
             systemNamespaces.add(TMathEvaluator.TMATH_NAMESPACE);
             systemNamespaces.add(FunctionEvaluator.FUNCTION_NAMESPACE);
+*/
+
         }
         return metaEvaluator;
     }
-
+    static protected void addE(AbstractFunctionEvaluator evaluator){
+        metaEvaluator.addEvaluator(0, evaluator);  //  3000
+        lookupByNS.put(evaluator.getNamespace(), evaluator);
+        systemNamespaces.add(evaluator.getNamespace());
+    }
+    static Map<String, AbstractFunctionEvaluator> lookupByNS = new HashMap<>();
     /**
      * Given the name of a built in function, find the number of possible arguments it
      * can take. This is needed for resolving function references.
@@ -62,9 +88,21 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
      * @return
      */
     public int[] getArgCount(String name) {
+        int ndx = name.indexOf(NamespaceAwareState.NS_DELIMITER);
+        String ns= null;
+        if(0 < ndx){
+            // This is a fully qualified name.
+            ns = name.substring(0,ndx);
+            name = name.substring(ndx+1);
+
+        }
         Polyad polyad = new Polyad(name);
         polyad.setSizeQuery(true);
-        evaluate(polyad, null);
+        if(0<ndx){
+            lookupByNS.get(ns).evaluate(polyad, null);
+        }else {
+            evaluate(polyad, null);
+        }
         return (int[]) polyad.getResult();
     }
 
@@ -156,7 +194,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
 
         }
 
-        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'", polyad);
     }
 
     public boolean evaluateOLD(Polyad polyad, State state) {
@@ -167,7 +205,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
             return true;
         }
 
-        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'", polyad);
     }
 
     public boolean evaluate(String alias, Polyad polyad, State state) {
@@ -175,7 +213,7 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
         for (AbstractFunctionEvaluator evaluator : evaluators) {
             if (evaluator.evaluate(alias, polyad, state)) return true;
         }
-        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'.");
+        throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'", polyad);
     }
 
     public TreeSet<String> listFunctions(boolean listFQ) {

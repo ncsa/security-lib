@@ -1,22 +1,25 @@
 package edu.uiuc.ncsa.qdl.exceptions;
 
+import edu.uiuc.ncsa.qdl.statements.Statement;
+
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 9/26/21 at  6:54 AM
  */
-public class IntrinsicViolation extends QDLException{
-    public IntrinsicViolation() {
+public class IntrinsicViolation extends QDLExceptionWithTrace{
+    public IntrinsicViolation(Statement statement) {
+        super(statement);
     }
 
-    public IntrinsicViolation(Throwable cause) {
-        super(cause);
+    public IntrinsicViolation(Throwable cause, Statement statement) {
+        super(cause, statement);
     }
 
-    public IntrinsicViolation(String message) {
-        super(message);
+    public IntrinsicViolation(String message, Statement statement) {
+        super(message, statement);
     }
 
-    public IntrinsicViolation(String message, Throwable cause) {
-        super(message, cause);
+    public IntrinsicViolation(String message, Throwable cause, Statement statement) {
+        super(message, cause, statement);
     }
 }

@@ -9,7 +9,10 @@ import edu.uiuc.ncsa.qdl.statements.Statement;
  * <p>Created by Jeff Gaynor<br>
  * on 11/3/21 at  4:08 PM
  */
-public class QDLStatementExecutionException extends QDLException{
+public class QDLExceptionWithTrace extends QDLException{
+    public boolean hasStatement(){
+        return statement != null;
+    }
     public Statement getStatement() {
         return statement;
     }
@@ -20,19 +23,19 @@ public class QDLStatementExecutionException extends QDLException{
 
     Statement statement;
 
-    public QDLStatementExecutionException(Statement statement) {
+    public QDLExceptionWithTrace(Statement statement) {
         this.statement = statement;
     }
 
-    public QDLStatementExecutionException(Throwable cause, Statement statement) {
+    public QDLExceptionWithTrace(Throwable cause, Statement statement) {
         super(cause);
         this.statement = statement;    }
 
-    public QDLStatementExecutionException(String message, Statement statement) {
+    public QDLExceptionWithTrace(String message, Statement statement) {
         super(message);
         this.statement = statement;    }
 
-    public QDLStatementExecutionException(String message, Throwable cause, Statement statement) {
+    public QDLExceptionWithTrace(String message, Throwable cause, Statement statement) {
         super(message, cause);
         this.statement = statement;    }
     boolean script = false;

@@ -49,7 +49,8 @@ public class ModuleExpression extends ExpressionImpl {
                 return getResult();
             }
             if (getExpression() instanceof VariableNode) {
-                throw new UnknownSymbolException("variable not found");
+                VariableNode vvv = (VariableNode) getExpression();
+                throw new UnknownSymbolException("'" + vvv.getVariableReference() + "'   not found", vvv);
             }
             if (getExpression() instanceof Polyad) {
                 state.getMetaEvaluator().evaluate(getAlias(), (Polyad) getExpression(), state);
@@ -65,7 +66,7 @@ public class ModuleExpression extends ExpressionImpl {
             return getResult();
         }
         if (state.getMInstances().isEmpty()) {
-            throw new ImportException("module '" + getAlias() + "' not found");
+            throw new ImportException("module '" + getAlias() + "' not found", this);
         }
         Object result;
         // no module state means to look at global state to find the module state.
@@ -155,7 +156,7 @@ public class ModuleExpression extends ExpressionImpl {
             String variableName = vNode.getVariableReference();
             if (state.isIntrinsic(variableName) && !getModuleState(state).isDefined(variableName)) {
                 // check that if this is private
-                throw new IntrinsicViolation("cannot set an intrinsic variable");
+                throw new IntrinsicViolation("cannot set an intrinsic variable", getExpression());
             }
             if (getModuleState(state).isDefined(variableName)) {
                 getModuleState(state).setValue(variableName, newValue);

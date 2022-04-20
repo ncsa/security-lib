@@ -161,7 +161,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }

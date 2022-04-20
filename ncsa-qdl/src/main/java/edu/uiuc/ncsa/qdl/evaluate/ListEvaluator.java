@@ -63,7 +63,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -294,8 +294,13 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
     protected boolean doPickSubset(Polyad polyad, State state) {
         FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
         Object arg1 = polyad.evalArg(1, state);
-        ExpressionImpl f = getOperator(state, frn, 1); // single argument
-
+        ExpressionImpl f = null;
+        try {
+            f = getOperator(state, frn, 1); // single argument
+        }catch (UndefinedFunctionException ufx){
+            ufx.setStatement(polyad.getArgAt(0));
+            throw ufx;
+        }
         // 3 cases
         if (isSet(arg1)) {
             QDLSet result = new QDLSet();

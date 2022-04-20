@@ -99,18 +99,18 @@ public abstract class VariableState extends NamespaceAwareState {
             // Don't allow assignments of wrong type, but do let them set a stem to null.
             if (w.isStem()) {
                 if (!(value instanceof StemVariable) && !(value instanceof QDLNull)) {
-                    throw new IndexError("Error: You cannot set a scalar value to a stem variable");
+                    throw new IndexError("Error: You cannot set a scalar value to a stem variable", null);
                 }
             } else {
                 if (value instanceof StemVariable) {
-                    throw new IndexError("Error: You cannot set a scalar variable to a stem value");
+                    throw new IndexError("Error: You cannot set a scalar variable to a stem value", null);
                 }
             }
             gsrNSStemOp(w, OP_SET, value, new HashSet<>());
             return;
         }
         if (value instanceof StemVariable) {
-            throw new IndexError("Error: You cannot set a scalar variable to a stem value");
+            throw new IndexError("Error: You cannot set a scalar variable to a stem value",null);
         }
 
         gsrNSScalarOp(variableName, OP_SET, value, checkedAliases);
@@ -156,7 +156,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 StemMultiIndex ww = new StemMultiIndex(w, i);
                 Object v = gsrNSStemOp(ww, OP_GET, null, new HashSet<>());
                 if (v == null) {
-                    throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value");
+                    throw new IndexError("Error: The stem in the index \"" + ww.getName() + "\" did not resolve to a value", null);
                 }
                 StringTokenizer st = new StringTokenizer(v.toString(), ".");
                 ArrayList<String> newIndices = new ArrayList<>();
@@ -295,7 +295,7 @@ public abstract class VariableState extends NamespaceAwareState {
                 return null;
             case OP_REMOVE:
                 if (stem == null && !isQDLNull) {
-                    throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.");
+                    throw new UnknownSymbolException("error: The stem variable \"" + variableName + "\" does not exist, so cannot remove a value from it.", null);
                 }
                 if (w.isEmpty()) {
                     if(isExtrinsic(variableName)){

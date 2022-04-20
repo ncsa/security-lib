@@ -695,7 +695,7 @@ a
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException iv) {
+        } catch (QDLExceptionWithTrace iv) {
             bad = !(iv.getCause() instanceof UndefinedFunctionException);
         }
         if (bad) {
@@ -837,7 +837,7 @@ cannot access '__a'
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException iv) {
+        } catch (QDLExceptionWithTrace iv) {
             bad = !(iv.getCause() instanceof UndefinedFunctionException);
         }
         if (bad) {

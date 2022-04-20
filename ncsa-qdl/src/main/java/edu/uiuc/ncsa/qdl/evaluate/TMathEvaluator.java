@@ -137,7 +137,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -478,7 +478,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 bd = ch.obermuhlner.math.big.BigDecimalMath.atanh(x, mathContext);
                 break;
             default:
-                throw new UndefinedFunctionException("The function " + op + " is undefined");
+                throw new UndefinedFunctionException("The function " + op + " is undefined", null);
         }
         // later may want to start setting scale for Big decimals...
         return bd;
@@ -540,6 +540,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 return r;
             }
         };
-        process1(polyad, pointer, op, state);
+        try {
+            process1(polyad, pointer, op, state);
+        }catch (UndefinedFunctionException udx){
+            udx.setStatement(polyad);
+            throw udx;
+        }
     }
 }

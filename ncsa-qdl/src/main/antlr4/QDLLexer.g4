@@ -151,7 +151,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
 fragment AllOps :
      Times | Divide | Plus | Minus | LessThan | LessEquals | GreaterThan | Exponentiation |
      LessEquals | MoreEquals | Equals | NotEquals | And | Or | Percent | Tilde | TildeRight |
-     LogicalNot | RegexMatches;
+     LogicalNot | RegexMatches | Floor | Ceiling;
 
 fragment FUNCTION_NAME :
      [a-zA-Z_$\u03b1-\u03c9\u0391-\u03a9\u03d1\u03d6\u03f0\u03f1][a-zA-Z_$0-9\u03b1-\u03c9\u0391-\u03a9\u03d1]*;

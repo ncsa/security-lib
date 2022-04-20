@@ -118,7 +118,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, polyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, polyad);
             throw qq;
         }
     }
@@ -165,7 +165,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (state.isServerMode()) {
-            throw new QDLRuntimeException("scan is not allowed in server mode.");
+            throw new QDLServerModeException("scan is not allowed in server mode.");
         }
 
         if (1 < polyad.getArgCount()) {
@@ -355,8 +355,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         } else {
             // So its just a file.
             if (state.isServerMode()) {
-                state.getLogger().error("in " + MKDIR + ", in server mode, file ops not allowed.");
-
                 throw new QDLServerModeException("File system operations not permitted in server mode.");
             }
             File f = new File(fileName);
@@ -588,9 +586,6 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (state.isServerMode()) {
-            throw new QDLServerModeException("File operations are not permitted in server mode");
-        }
 
         if (polyad.getArgCount() < 2) {
             throw new MissingArgException(WRITE_FILE + " requires at least 2 arguments");
@@ -665,6 +660,10 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 throw new QDLException("Could not write file to store." + t.getMessage());
             }
         } else {
+            if (state.isServerMode()) {
+                throw new QDLServerModeException("File operations are not permitted in server mode");
+            }
+
             try {
                 switch (fileType) {
                     case FILE_OP_BINARY:

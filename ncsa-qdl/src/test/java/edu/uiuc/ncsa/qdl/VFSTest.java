@@ -1,6 +1,11 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.IOEvaluator;
+import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.QDLIOException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLServerModeException;
+import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
+import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.vfs.*;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPool;
@@ -99,7 +104,7 @@ public class VFSTest extends AbstractQDLTester {
             } catch (QDLIOException q) {
                 bad = false;
             }
-            if(bad){
+            if (bad) {
                 assert false : "Error: Could create directory in not writeable VFS";
             }
             bad = true;
@@ -109,21 +114,21 @@ public class VFSTest extends AbstractQDLTester {
             } catch (QDLIOException q) {
                 bad = false;
             }
-            if(bad){
+            if (bad) {
                 assert false : "Error: Could remove directory in not writeable VFS";
             }
-           bad = true; 
-            
+            bad = true;
+
             try {
                 vfs.rm(testHeadPath + "a/foo");
                 assert false : "Error: Could remove file in not writeable VFS";
             } catch (QDLIOException q) {
                 bad = false;
             }
-            if(bad){
+            if (bad) {
                 assert false : "Was able to make an assignment with = not :=";
             }
-            
+
 
             return;
         }
@@ -147,31 +152,31 @@ public class VFSTest extends AbstractQDLTester {
         String testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         String testFileName = "foo.txt";
         String p = testHeadPath + testFileName;
-          boolean bad = true;
+        boolean bad = true;
         try {
             vfs.get(p, FILE_OP_AUTO);
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "Was able to read from a non-readable store";
         }
- bad = true;
+        bad = true;
         try {
             vfs.contains(p);
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "Was able to read from a non-readable store";
         }
-bad = true;
+        bad = true;
         try {
             vfs.dir(p);
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "Was able to read from a non-readable store";
         }
 
@@ -199,25 +204,25 @@ bad = true;
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : " Was able to write to a not writeable vfs";
         }
-         bad = true;
+        bad = true;
         try {
             vfs.put(p, fileEntry);
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : " Was able to write to a not writeable vfs";
         }
-bad = true;
+        bad = true;
         try {
             vfs.delete(p);
         } catch (QDLIOException q) {
             bad = false;
         }
-        if(bad){
+        if (bad) {
             assert false : "Was able to delete from a not writeable vfs";
         }
 
@@ -275,7 +280,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p,FILE_OP_AUTO);
+        entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -299,7 +304,7 @@ bad = true;
 
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        VFSEntry entry = vfs.get(p,FILE_OP_AUTO);
+        VFSEntry entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -312,7 +317,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p,FILE_OP_AUTO);
+        entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -341,7 +346,7 @@ bad = true;
 
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        VFSEntry entry = vfs.get(p,FILE_OP_AUTO);
+        VFSEntry entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -353,7 +358,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p) : "Could not get file at \"" + p + "\"";
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p,FILE_OP_AUTO);
+        entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -365,7 +370,7 @@ bad = true;
         // rerun the tests above because they have to work no matter how the vfs is configured
         assert vfs.contains(p);
         assert !vfs.contains(p + "1"); // show that not every file is in store.
-        entry = vfs.get(p,FILE_OP_AUTO);
+        entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
@@ -374,7 +379,7 @@ bad = true;
         assert !vfs.contains(p) : "Could not delete file from store";
     }
 
-     
+
     public void testFilePassThrough() throws Throwable {
         String rootDir = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources";
         VFSPassThruFileProvider vfs = new VFSPassThruFileProvider(
@@ -397,7 +402,7 @@ bad = true;
 
     }
 
-     
+
     public void testMemoryStoreVFS() throws Throwable {
         VFSMemoryFileProvider vfs = new VFSMemoryFileProvider(
                 "qdl-vfs", "/", true, true
@@ -473,7 +478,7 @@ bad = true;
 
     XProperties xp;
 
-     
+
     public void testMySQLVFS() throws Throwable {
         MySQLConnectionParameters params;
         String tableName = "qdl_vfs"; // default;
@@ -528,7 +533,7 @@ bad = true;
      *
      * @throws Throwable
      */
-     
+
     public void testZipVFS() throws Throwable {
 
         String pathToZip = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources/vfs-test/vfs-test.zip";
@@ -565,9 +570,120 @@ bad = true;
         assert dir[0].equals("root/");
 
         assert vfs.contains(storeRoot + fileInZip);
-        VFSEntry e = vfs.get(storeRoot + fileInZip,FILE_OP_AUTO);
+        VFSEntry e = vfs.get(storeRoot + fileInZip, FILE_OP_AUTO);
 
         assert e.getText().equals("2+2 =4\n"); // contains a single line of text.
         testMkdir(vfs);
     }
+
+    public void testServerMode() throws Throwable {
+        String rootDir = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "    cfg.type := 'pass_through';");
+        addLine(script, "  cfg.scheme := 'vfs';");
+        addLine(script, "  cfg.access := 'rw';");
+        addLine(script, "cfg.root_dir := '" + rootDir + "';");
+        addLine(script, "cfg.mount_point := '/';");
+        addLine(script, "vfs_mount(cfg.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        // now try to do a few things in server mode
+        state.setServerMode(true);
+        script = new StringBuffer();
+        // should work.
+        addLine(script, "readme := file_read('vfs#/vfs-test/readme.txt');");
+        interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+    }
+
+    public void testServerModeBad() throws Throwable {
+        String rootDir = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        state.setServerMode(true);
+        // should not work.
+        addLine(script, "readme := file_read('" + rootDir + "/vfs-test/readme.txt');");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean good = false;
+        try {
+            interpreter.execute(script.toString());
+        } catch (QDLServerModeException smx) {
+            good = true;
+        }
+        assert good : "was able to access file in server mode.";
+    }
+    boolean testServerCall(StringBuffer script, State state) throws Throwable{
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        boolean good = false;
+        try {
+            interpreter.execute(script.toString());
+        } catch (QDLServerModeException smx) {
+            good = true;
+        }
+        return good;
+
+    }
+
+    /**
+     * There are many places where server mode should prohibit access. This is a list
+     * of them for regression testing, since having this contract change without warning
+     * could be very bad  indeed for any servers.
+     * @throws Throwable
+     */
+    public void testServerModes() throws Throwable{
+        String rootDir = "/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/test/resources";
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        state.setServerMode(true);
+
+        // idea is to try all of the calls that fail in server mode.
+        addLine(script, IOEvaluator.VFS_UNMOUNT + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.VFS_UNMOUNT + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.SCAN_FUNCTION + "('foo');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.SCAN_FUNCTION + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.RMDIR + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.RMDIR + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.RM_FILE + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.RM_FILE + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.MKDIR + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.MKDIR + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.DIR + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.DIR + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, IOEvaluator.WRITE_FILE + "('abc', 'pqr');");
+        assert testServerCall(script, state) : " was able to call " + IOEvaluator.WRITE_FILE + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, SystemEvaluator.CLIPBOARD_COPY + "();");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.CLIPBOARD_COPY + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, SystemEvaluator.CLIPBOARD_PASTE + "('abc');");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.CLIPBOARD_PASTE + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, SystemEvaluator.HAS_CLIPBOARD + "();");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.HAS_CLIPBOARD + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, SystemEvaluator.OS_ENV + "();");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.OS_ENV + " in server mode";
+
+        script = new StringBuffer();
+        addLine(script, SystemEvaluator.MODULE_LOAD + "();");
+        assert testServerCall(script, state) : " was able to call " + SystemEvaluator.MODULE_LOAD + " in server mode";
+    }
+
 }

@@ -29,7 +29,7 @@ public class IndexList extends ArrayList {
 
     public IndexList(StemVariable stemVariable) {
         if (!stemVariable.isList()) {
-            throw new IndexError("generic stem not supported as index");
+            throw new IndexError("generic stem not supported as index", null);
         }
       for(long i = 0; i < stemVariable.size(); i++){
           add(stemVariable.get(i));

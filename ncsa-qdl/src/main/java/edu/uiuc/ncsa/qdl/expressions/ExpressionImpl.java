@@ -90,15 +90,13 @@ public abstract class ExpressionImpl implements ExpressionNode {
     public Object evalArg(int index, State state) {
         try {
             return getArguments().get(index).evaluate(state);
-        }catch(QDLStatementExecutionException qq){
-            throw qq;
         }catch(QDLException returnException){
             // These should be passed back, since they are needed for the internal operation of QDL
             // E.g. IndexError, NamespaceError, ReturnException,...
              throw returnException;
         }catch(Throwable t){
             // Generate a bonafide error if there is a non-QDL one.
-            throw new QDLStatementExecutionException(t, this);
+            throw new QDLExceptionWithTrace(t, this);
         }
     }
 

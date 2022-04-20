@@ -2,7 +2,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 
 
 import edu.uiuc.ncsa.qdl.exceptions.QDLException;
-import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.*;
@@ -26,10 +26,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String AND2 = "⋀"; // unicode 22c0
     public static final String AND3 = "∧"; // unicode 2227
     public static final String ASSIGNMENT = ":=";
+    public static final String CEILING = "⌈";  // unicode 2308
     public static final String DIVIDE = "/";
     public static final String DIVIDE2 = "÷"; // unicode f7
     public static final String EQUALS = "==";
     public static final String EQUALS2 = "≡";  // unicode 2261
+    public static final String FLOOR = "⌊";  // unicode 230a
     public static final String INTEGER_DIVIDE = "%";
     public static final String SYMMETRIC_DIFFERENCE = "∆"; // unicode 2206
     public static final String LESS_THAN = "<";
@@ -92,10 +94,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int REGEX_MATCH_VALUE = 216;
     public static final int UNION_VALUE = 217;
     public static final int INTERSECTION_VALUE = 218;
+    public static final int FLOOR_VALUE = 219;
+    public static final int CEILING_VALUE = 220;
+
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
+            FLOOR, CEILING,
             UNION, UNION_2, INTERSECTION, INTERSECTION_2,
             POWER,
             TILDE, TILDE_STILE, TILDE_STILE2,
@@ -127,7 +133,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             NOT, NOT2, MINUS, MINUS2, PLUS, PLUS2, TILDE, PLUS_PLUS, MINUS_MINUS
     }));
     public static ArrayList<String> ONLY_MONADS = new ArrayList<>(Arrays.asList(new String[]{
-            NOT, NOT2, PLUS_PLUS, MINUS_MINUS
+            NOT, NOT2, PLUS_PLUS, MINUS_MINUS, FLOOR, CEILING
     }));
     int[] monadOnlyArg = new int[]{1};
     int[] dyadOnlyArg = new int[]{2};
@@ -140,6 +146,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      * @return
      */
     public int[] getArgCount(String name) {
+        // special case floor and ceiling since the parser intercepts them and replaces them with
+        // their function.
         if (ONLY_MONADS.contains(name)) {
             return monadOnlyArg;
         }
@@ -209,6 +217,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     public int getType(String oo) {
         switch (oo) {
+            case FLOOR:
+                return FLOOR_VALUE;
+            case CEILING:
+                return CEILING_VALUE;
             case UNION:
             case UNION_2:
                 return UNION_VALUE;
@@ -286,7 +298,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, dyad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, dyad);
             throw qq;
         }
     }
@@ -1000,7 +1012,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         } catch (QDLException q) {
             throw q;
         } catch (Throwable t) {
-            QDLStatementExecutionException qq = new QDLStatementExecutionException(t, monad);
+            QDLExceptionWithTrace qq = new QDLExceptionWithTrace(t, monad);
             throw qq;
         }
     }
@@ -1008,6 +1020,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public void evaluate2(Monad monad, State state) {
 
         switch (monad.getOperatorType()) {
+            case CEILING_VALUE:
+                doFloorOrCeiling(monad, state, false);
+                return;
+            case FLOOR_VALUE:
+                doFloorOrCeiling(monad, state, true);
+                return;
+
             case NOT_VALUE:
                 doMonadNot(monad, state);
                 return;
@@ -1027,6 +1046,23 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             default:
                 throw new NotImplementedException("Unknown monadic operator");
         }
+
+    }
+
+    private void doFloorOrCeiling(Monad monad, State state, boolean isFloor) {
+        Polyad polyad;
+        if (isFloor) {
+            polyad = new Polyad(TMathEvaluator.FLOOR);
+        } else {
+            polyad = new Polyad(TMathEvaluator.CEILING);
+        }
+        polyad.addArgument(monad.getArgument());
+        polyad.setSourceCode(monad.getSourceCode());
+        polyad.setTokenPosition(monad.getTokenPosition());
+        state.getMetaEvaluator().evaluate(polyad, state);
+        monad.setResult(polyad.getResult());
+        monad.setResultType(polyad.getResultType());
+        monad.setEvaluated(polyad.isEvaluated());
 
     }
 

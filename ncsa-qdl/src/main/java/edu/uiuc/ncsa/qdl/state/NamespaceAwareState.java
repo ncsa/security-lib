@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl.state;
 
 import edu.uiuc.ncsa.qdl.evaluate.*;
-import edu.uiuc.ncsa.qdl.exceptions.ImportException;
 import edu.uiuc.ncsa.qdl.module.MIStack;
 import edu.uiuc.ncsa.qdl.module.MTStack;
 import edu.uiuc.ncsa.qdl.variables.VStack;
@@ -50,14 +49,14 @@ public abstract class NamespaceAwareState extends ModuleState {
      * "math" the system should reject it.
      * @param alias
      */
-    public void checkReservedAlias(String alias) {
+/*    public void checkReservedAlias(String alias) {
         if (alias == null || alias.isEmpty()) {
             throw new ImportException("the alias is empty or null.");
         }
         if(RESERVED_NAMESPACE.contains(alias)){
             throw new ImportException("the alias \"" + alias + "\" is reserved for system use.");
         }
-    }
+    }*/
 
     /**
      * This assumes that there is an alias, so it us not a local name, e.g. #name or unqualified.

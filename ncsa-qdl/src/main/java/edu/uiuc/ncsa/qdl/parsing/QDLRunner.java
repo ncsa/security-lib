@@ -8,7 +8,10 @@ import edu.uiuc.ncsa.qdl.statements.Element;
 import edu.uiuc.ncsa.qdl.statements.ModuleStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
-import edu.uiuc.ncsa.qdl.variables.*;
+import edu.uiuc.ncsa.qdl.variables.Constant;
+import edu.uiuc.ncsa.qdl.variables.QDLSetNode;
+import edu.uiuc.ncsa.qdl.variables.StemListNode;
+import edu.uiuc.ncsa.qdl.variables.StemVariableNode;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -110,7 +113,7 @@ public class QDLRunner implements Serializable {
                         // Checking for expression nodes allows for printing things like
                         // (((2+2)))
                         // correctly
-                        if (( (stmt instanceof ExpressionNode)&& !(stmt instanceof ANode2))) {
+                        if (((stmt instanceof ExpressionNode) && !(stmt instanceof ANode2))) {
                             ExpressionNode expression = (ExpressionNode) stmt;
                             if (expression instanceof Polyad) {
                                 // so if this is already a print statement, don't wrap it in one
@@ -142,7 +145,7 @@ public class QDLRunner implements Serializable {
                     try {
                         stmt.evaluate(currentState);
                     } catch (InterruptException ix) {
-                        if(!ix.getSiEntry().initialized) {
+                        if (!ix.getSiEntry().initialized) {
                             // if it was set up, pass it up the stack
                             ix.getSiEntry().qdlRunner = this;
                             ix.getSiEntry().lineNumber = i; // number where this happened.

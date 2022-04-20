@@ -3,7 +3,7 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.evaluate.ListEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
-import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -387,8 +387,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
         boolean passed = false;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException qdlStatementExecutionException) {
-            passed = (qdlStatementExecutionException.getCause() instanceof IllegalArgumentException);
+        } catch (QDLExceptionWithTrace QDlExceptionWithTrace) {
+            passed = (QDlExceptionWithTrace.getCause() instanceof IllegalArgumentException);
         }
         assert passed : "was able to rename keys in a destructive way";
     }

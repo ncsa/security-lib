@@ -1,5 +1,7 @@
 package edu.uiuc.ncsa.qdl.variables;
 
+import edu.uiuc.ncsa.qdl.exceptions.UnknownSymbolException;
+import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.statements.TokenPosition;
@@ -68,6 +70,9 @@ public class QDLSetNode implements StatementWithResultInterface {
         long i = 0;
         for (StatementWithResultInterface stmt : statements) {
             stmt.evaluate(state);
+            if(stmt.getResult() == null && stmt instanceof VariableNode){
+                     throw new UnknownSymbolException("\'" + ((VariableNode)stmt).getVariableReference() + "' not found for set value", stmt);
+                 }
             stmt.setEvaluated(true);
             stmt.setResultType(Constant.getType(stmt.getResult()));
             result.add(stmt.getResult());

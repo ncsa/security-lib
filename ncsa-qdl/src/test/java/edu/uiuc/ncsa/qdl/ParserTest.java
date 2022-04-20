@@ -1,7 +1,7 @@
 package edu.uiuc.ncsa.qdl;
 
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
-import edu.uiuc.ncsa.qdl.exceptions.QDLStatementExecutionException;
+import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
@@ -1203,7 +1203,7 @@ public class ParserTest extends AbstractQDLTester {
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException ix) {
+        } catch (QDLExceptionWithTrace ix) {
             bad = !(ix.getCause() instanceof IllegalArgumentException);
         }
         if (bad) {
@@ -1223,7 +1223,7 @@ public class ParserTest extends AbstractQDLTester {
         boolean bad = true;
         try {
             interpreter.execute(script.toString());
-        } catch (QDLStatementExecutionException ix) {
+        } catch (QDLExceptionWithTrace ix) {
             bad = !(ix.getCause() instanceof IllegalArgumentException);
         }
         if (bad) {
@@ -2857,5 +2857,21 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
+
+    /**
+     * Trick here is that a monadic operator passed by reference has to be
+     * resolved with the right airity. Mostly this is a regression test for
+     * a bug that might be otherwise very odd to track down.
+     * @throws Throwable
+     */
+    public void testMonadicFunctionReference() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := reduce(@&&, for_each(@⌊,[;11]/7) ==  ⌊[;11]/7);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
 }
 

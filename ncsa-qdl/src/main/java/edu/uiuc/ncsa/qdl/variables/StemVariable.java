@@ -238,7 +238,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
+                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER, null);
             }
             currentStem = nextStem;
         }
@@ -287,7 +287,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = w.getComponents().get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER);
+                throw new IndexError("could not find the given index \"" + name + "\" in this stem \"" + w.getName() + STEM_INDEX_MARKER, null);
             }
             currentStem = nextStem;
         }
@@ -558,7 +558,7 @@ public class StemVariable extends HashMap<String, Object> {
                         localSL.add(stemEntry);
                     } else {
                         throw new IndexError("The stem contains a list element '" + newKey + "' " +
-                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object");
+                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object", null);
                     }
                 } else {
                     json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON(escapeNames));
@@ -631,7 +631,7 @@ public class StemVariable extends HashMap<String, Object> {
                         localSL.add(stemEntry);
                     } else {
                         throw new IndexError("the stem contains a list element '" + newKey + "' " +
-                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object");
+                                "and a stem entry '" + key + "'. This is not convertible to a JSON Object",null);
                     }
                 } else {
                     json.put(escapeNames ? codec.decode(newKey) : newKey, x.toJSON());
@@ -1361,7 +1361,7 @@ public class StemVariable extends HashMap<String, Object> {
         for (long i = startIndex; i < startIndex + length; i++) {
             Object obj = sSL.get(i);
             if (obj == null) {
-                throw new IndexError("argument out of bounds for index " + i + ", object has size " + sSL.size());
+                throw new IndexError("argument out of bounds for index " + i + ", object has size " + sSL.size(), null);
             }
             outSL.append(obj);
         }
@@ -1522,58 +1522,6 @@ public class StemVariable extends HashMap<String, Object> {
         //   return oldGet(indexList);
     }
 
-    /*  testing allowing lists as stem indices with the . operator:
-
-                    a. := n(2,3,4,n(24))
-                    nn. := n(2,3,4)
-                    nn.[1,2,3]
-                    a.1.2.nn.[1,2,3]
-              // should return a.1.2.3 == 23
-              // Test that this fails, since it resolves to a.1.(nn.[1,2,3].0) = a.1.messy_stem
-                    a.1.nn.[1,2,2].0
-              Index error
-                    a.1.(nn.[1,2,2]).0
-              20
-                    a.1.nn.1.2.2.0
-              20
-                    a.(nn.[1,2,1]).2.0
-              20
-                    a.nn.1.2.1.2.0
-              20
-
-            p. := [2,0,1]
-               b.shuffle([0,1,2],p.) := a.[0,1,2]
-
-
-      */
-    public IndexList oldGet(IndexList indexList) {
-        IndexList rc = new IndexList();
-        StemVariable currentStem = this;
-        boolean gotOne = false;
-        Object obj = null;
-        for (int i = 0; i < indexList.size(); i++) {
-            if (gotOne) {
-                rc.add(indexList.get(i));
-                continue;
-            }
-            obj = currentStem.get(indexList.get(i));
-            if (obj == null) {
-                throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
-            }
-
-            if (obj instanceof StemVariable) {
-                currentStem = (StemVariable) obj;
-            } else {
-                rc.add(obj); // 0th entry is returned value
-                gotOne = true;
-            }
-            if ((i == indexList.size() - 1) && !gotOne) {
-                rc.add(currentStem); // result is a stem
-            }
-        }
-        return rc;
-
-    }
 
     public boolean remove(IndexList indexList) {
         StemVariable currentStem = this;
@@ -1581,7 +1529,7 @@ public class StemVariable extends HashMap<String, Object> {
             String name = indexList.get(i) + STEM_INDEX_MARKER;
             StemVariable nextStem = (StemVariable) currentStem.get(name);
             if (nextStem == null) {
-                throw new IndexError("could not find the given index '" + name + "' in this stem");
+                throw new IndexError("could not find the given index '" + name + "' in this stem", null);
             }
             currentStem = nextStem;
         }
@@ -1599,9 +1547,9 @@ public class StemVariable extends HashMap<String, Object> {
         return false;
     }
 
-    public IndexList newGet(IndexList indexList) {
+/*    public IndexList newGet(IndexList indexList) {
         return newGet(indexList, true);
-    }
+    }*/
 
     /**
      * Strict matching is used at the last resolution of the stem. It means that left over scalars
@@ -1623,13 +1571,13 @@ public class StemVariable extends HashMap<String, Object> {
             for (int i = 0; i < stemList.size(); i++) {
                 obj = lastStem.get(ndx.get(i));
                 if (obj == null) {
-                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem", null);
                 }
                 if (obj instanceof StemVariable) {
                     lastStem = (StemVariable) obj;
                 } else {
                     if (i != stemList.size() - 1) {
-                        throw new IndexError(" index depth error '" + obj + "' is not a stem.");
+                        throw new IndexError(" index depth error '" + obj + "' is not a stem.",null);
 
                     }
                 }
@@ -1652,7 +1600,7 @@ public class StemVariable extends HashMap<String, Object> {
                 if (hasDefaultValue()) {
                     obj = getDefaultValue();
                 } else {
-                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
+                    throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem",null);
                 }
             }
 
@@ -1660,7 +1608,7 @@ public class StemVariable extends HashMap<String, Object> {
                 currentStem = (StemVariable) obj;
             } else {
                 if (strictMatching && i != indexList.size() - 1) {
-                    throw new IndexError("no such stem at this multi-index.");
+                    throw new IndexError("no such stem at this multi-index.", null);
                 }
                 rc.add(obj); // 0th entry is returned value
                 gotOne = true;
@@ -1674,23 +1622,6 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
 
-    /*
-    Old get -- does not return partial results, but nice and simple
-     */
-    public Object oldGet2(IndexList indexList) {
-        StemVariable currentStem = this;
-        for (int i = 0; i < indexList.size(); i++) {
-            Object obj = currentStem.get(indexList.get(i));
-            if (i == indexList.size() - 1) {
-                return obj;
-            }
-            if (!(obj instanceof StemVariable)) {
-                throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem");
-            }
-            currentStem = (StemVariable) obj;
-        }
-        return currentStem;
-    }
 
     public void set(IndexList indexList, Object value) {
         StemVariable currentStem = this;
@@ -1741,7 +1672,7 @@ public class StemVariable extends HashMap<String, Object> {
             put(bd.longValueExact(), value);
             return;
         }
-        throw new IndexError("Unknown index type for \"" + index + "\"");
+        throw new IndexError("Unknown index type for \"" + index + "\"",null);
     }
 
     public StemVariable indices(Long axis) {
