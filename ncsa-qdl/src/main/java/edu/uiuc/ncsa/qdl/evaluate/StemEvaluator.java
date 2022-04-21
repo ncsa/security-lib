@@ -16,6 +16,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -372,7 +373,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() < 2) {
             throw new MissingArgException(REMAP + " requires  two or three arguments");
         }
-        if(3 < polyad.getArgCount()){
+        if (3 < polyad.getArgCount()) {
             throw new ExtraArgException(REMAP + " takes at most 3 arguments");
         }
         Object arg1 = polyad.evalArg(0, state);
@@ -873,7 +874,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 if (isSet(rightArg)) {
                     QDLSet rSet = (QDLSet) rightArg;
                     for (String key : lStem.keySet()) {
-                        result.put(key, rSet.contains(lStem.get(key)));
+                        Object ooo = lStem.get(key);
+                        if (ooo instanceof BigDecimal) {
+                            result.put(key, Boolean.FALSE);
+                            for (Object element : rSet) {
+                                if (element instanceof BigDecimal) {
+                                    boolean tempB = bdEquals((BigDecimal) ooo, (BigDecimal) element);
+                                    if (tempB) {
+                                        result.put(key, Boolean.TRUE);
+                                        break;
+                                    }
+                                }
+                            }
+
+                        } else {
+                            result.put(key, rSet.contains(ooo));
+                        }
                     }
                 } else {
                     // check if each element in the left stem matches the value of the right arg.
@@ -898,7 +914,22 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 }
             } else {
                 if (isSet(rightArg)) {
-                    result = ((QDLSet) rightArg).contains(leftArg);
+                    if (leftArg instanceof BigDecimal) {
+                        // much slower, but there is no other way to compare big decimals.
+                        QDLSet qdlSet = (QDLSet) rightArg;
+                        result = false;
+                        for (Object element : qdlSet) {
+                            if (element instanceof BigDecimal) {
+                                boolean tempB = bdEquals((BigDecimal) leftArg, (BigDecimal) element);
+                                if (tempB) {
+                                    result = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        result = ((QDLSet) rightArg).contains(leftArg);
+                    }
                 } else {
                     result = leftArg.equals(rightArg);
                 }
@@ -1779,9 +1810,9 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             // value at index 0 in the result.
             try {
                 output.set(newIndex, stem.get(oldIndex, true).get(0));
-            }catch(IndexError indexError){
+            } catch (IndexError indexError) {
                 indexError.setStatement(polyad);// not great but it works.
-                throw   indexError;
+                throw indexError;
 
             }
         }

@@ -700,6 +700,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code toSet}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterToSet(QDLParserParser.ToSetContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code toSet}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitToSet(QDLParserParser.ToSetContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code powerExpression}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree

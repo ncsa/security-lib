@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeSet;
 
+import static edu.uiuc.ncsa.qdl.variables.Constant.*;
+
 /**
  * Class charged with evaluating algebraic expressions.
  * <p>Created by Jeff Gaynor<br>
@@ -68,6 +70,8 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String DOT = ".";
     public static final String REGEX_MATCH = "=~";
     public static final String REGEX_MATCH2 = "≈";
+    public static final String TO_SET = "⊢";
+    public static final String TO_SET2 = "|-";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -96,11 +100,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int INTERSECTION_VALUE = 218;
     public static final int FLOOR_VALUE = 219;
     public static final int CEILING_VALUE = 220;
+    public static final int TO_SET_VALUE = 221;
 
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
+            TO_SET, TO_SET2,
             FLOOR, CEILING,
             UNION, UNION_2, INTERSECTION, INTERSECTION_2,
             POWER,
@@ -133,7 +139,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             NOT, NOT2, MINUS, MINUS2, PLUS, PLUS2, TILDE, PLUS_PLUS, MINUS_MINUS
     }));
     public static ArrayList<String> ONLY_MONADS = new ArrayList<>(Arrays.asList(new String[]{
-            NOT, NOT2, PLUS_PLUS, MINUS_MINUS, FLOOR, CEILING
+            NOT, NOT2, PLUS_PLUS, MINUS_MINUS, FLOOR, CEILING, TO_SET, TO_SET2
     }));
     int[] monadOnlyArg = new int[]{1};
     int[] dyadOnlyArg = new int[]{2};
@@ -217,6 +223,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     public int getType(String oo) {
         switch (oo) {
+            case TO_SET:
+            case TO_SET2:
+                return TO_SET_VALUE;
             case FLOOR:
                 return FLOOR_VALUE;
             case CEILING:
@@ -377,7 +386,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 String regex = objects[0].toString();
                 String ob = objects[1].toString();
                 r.result = new Boolean(ob.matches(regex));
-                r.resultType = Constant.BOOLEAN_TYPE;
+                r.resultType = BOOLEAN_TYPE;
                 return r;
             }
         };
@@ -388,7 +397,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         Polyad joinPolyad = new Polyad(StemEvaluator.JOIN);
         joinPolyad.getArguments().add(dyad.getLeftArgument());
         joinPolyad.getArguments().add(dyad.getRightArgument());
-        joinPolyad.getArguments().add(new ConstantNode(-1L, Constant.LONG_TYPE));
+        joinPolyad.getArguments().add(new ConstantNode(-1L, LONG_TYPE));
         state.getMetaEvaluator().evaluate(joinPolyad, state);
         dyad.setResult(joinPolyad.getResult());
         dyad.setResultType(joinPolyad.getResultType());
@@ -404,7 +413,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             // ignored.
             if (dyad.isUnary()) {
                 dyad.setResult(set.toStem());
-                dyad.setResultType(Constant.STEM_TYPE);
+                dyad.setResultType(STEM_TYPE);
                 dyad.setEvaluated(true);
                 return;
 
@@ -433,7 +442,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
             outStem.getStemList().add(newEntry);
             dyad.setResult(outStem);
-            dyad.setResultType(Constant.STEM_TYPE);
+            dyad.setResultType(STEM_TYPE);
             dyad.setEvaluated(true);
             return;
         }
@@ -465,7 +474,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         //       stem1 = (StemVariable)stem1.clone();
         StemVariable newStem = stem0.union(stem1);
         dyad.setResult(newStem);
-        dyad.setResultType(Constant.STEM_TYPE);
+        dyad.setResultType(STEM_TYPE);
         dyad.setEvaluated(true);
     }
 
@@ -478,7 +487,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
                     r.result = leftSet.symmetricDifference(rightSet);
-                    r.resultType = Constant.SET_TYPE;
+                    r.resultType = SET_TYPE;
                     return r;
                 }
                 if (!areAllNumbers(objects)) {
@@ -486,7 +495,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 }
                 if (areAllLongs(objects)) {
                     r.result = (Long) objects[0] / (Long) objects[1];
-                    r.resultType = Constant.LONG_TYPE;
+                    r.resultType = LONG_TYPE;
                 } else {
                     BigDecimal left = toBD(objects[0]);
                     BigDecimal right = toBD(objects[1]);
@@ -498,13 +507,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     }
                     try {
                         r.result = rr.longValueExact();
-                        r.resultType = Constant.LONG_TYPE;
+                        r.resultType = LONG_TYPE;
                         return r;
                     } catch (ArithmeticException ax) {
 
                     }
                     r.result = rr;
-                    r.resultType = Constant.DECIMAL_TYPE;
+                    r.resultType = DECIMAL_TYPE;
                 }
                 return r;
             }
@@ -532,13 +541,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     if (!doBigD) {
                         try {
                             r.result = result.longValueExact();
-                            r.resultType = Constant.LONG_TYPE;
+                            r.resultType = LONG_TYPE;
                             return r;
                         } catch (ArithmeticException ax) {
                         }
                     }
                     r.result = result;
-                    r.resultType = Constant.DECIMAL_TYPE;
+                    r.resultType = DECIMAL_TYPE;
 
                 } else {
                     throw new IllegalArgumentException("Exponentiation requires a int or decimal be raised to an int power");
@@ -562,19 +571,19 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     switch (dyad.getOperatorType()) {
                         case LESS_THAN_VALUE:
                             r.result = leftSet.isSubsetOf(rightSet) && (leftSet.size() != rightSet.size());
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                         case LESS_THAN_EQUAL_VALUE:
                             r.result = leftSet.isSubsetOf(rightSet);
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                         case MORE_THAN_VALUE:
                             r.result = rightSet.isSubsetOf(leftSet) && (leftSet.size() != rightSet.size());
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                         case MORE_THAN_EQUAL_VALUE:
                             r.result = rightSet.isSubsetOf(leftSet);
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                     }
                     return r;
@@ -601,7 +610,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         break;
                 }
                 r.result = result;
-                r.resultType = Constant.BOOLEAN_TYPE;
+                r.resultType = BOOLEAN_TYPE;
 
                 return r;
             }
@@ -643,19 +652,19 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             break;
                     }
 
-                    r.resultType = Constant.BOOLEAN_TYPE;
+                    r.resultType = BOOLEAN_TYPE;
                     return r;
                 }
                 if (isSet(objects[0])) {
                     QDLSet leftSet = (QDLSet) objects[0];
                     r.result = leftSet.contains(objects[1]);
-                    r.resultType = Constant.BOOLEAN_TYPE;
+                    r.resultType = BOOLEAN_TYPE;
                     return r;
                 }
                 if (isSet(objects[1])) {
                     QDLSet set = (QDLSet) objects[1];
                     r.result = set.contains(objects[0]);
-                    r.resultType = Constant.BOOLEAN_TYPE;
+                    r.resultType = BOOLEAN_TYPE;
                     return r;
                 }
 
@@ -675,7 +684,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                                 r.result = Boolean.TRUE;
                                 break;
                         }
-                        r.resultType = Constant.BOOLEAN_TYPE;
+                        r.resultType = BOOLEAN_TYPE;
                         return r;
                     }
                     switch (dyad.getOperatorType()) {
@@ -710,7 +719,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             break;
                     }//end switch
                 }
-                r.resultType = Constant.BOOLEAN_TYPE;
+                r.resultType = BOOLEAN_TYPE;
                 return r;
             }
         };
@@ -732,11 +741,11 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 switch (dyad.getOperatorType()) {
                     case INTERSECTION_VALUE:
                         r.result = leftSet.intersection(rightSet);
-                        r.resultType = Constant.SET_TYPE;
+                        r.resultType = SET_TYPE;
                         break;
                     case UNION_VALUE:
                         r.result = leftSet.union(rightSet);
-                        r.resultType = Constant.SET_TYPE;
+                        r.resultType = SET_TYPE;
                         break;
                 }
                 return r;
@@ -767,21 +776,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
                     switch (dyad.getOperatorType()) {
-/*                        case AND_VALUE:
-                            r.result = leftSet.intersection(rightSet);
-                            r.resultType = Constant.SET_TYPE;
-                            break;
-                        case OR_VALUE:
-                            r.result = leftSet.union(rightSet);
-                            r.resultType = Constant.SET_TYPE;
-                            break;*/
                         case EQUALS_VALUE:
                             r.result = leftSet.isEqualTo(rightSet);
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                         case NOT_EQUAL_VALUE:
                             r.result = !leftSet.isEqualTo(rightSet);
-                            r.resultType = Constant.BOOLEAN_TYPE;
+                            r.resultType = BOOLEAN_TYPE;
                             break;
                     }
                     return r;
@@ -807,7 +808,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.result = left != right;
                         break;
                 }
-                r.resultType = Constant.BOOLEAN_TYPE;
+                r.resultType = BOOLEAN_TYPE;
                 return r;
 
             }
@@ -843,7 +844,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     if (areAllLongs(objects)) {
                         try {
                             r.result = Math.subtractExact((Long) objects[0], (Long) objects[1]);
-                            r.resultType = Constant.LONG_TYPE;
+                            r.resultType = LONG_TYPE;
                             return r;
                         } catch (ArithmeticException arithmeticException) {
                             // fall through to big decimal case
@@ -853,7 +854,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     BigDecimal left = toBD(objects[0]);
                     BigDecimal right = toBD(objects[1]);
                     r.result = left.subtract(right);
-                    r.resultType = Constant.DECIMAL_TYPE;
+                    r.resultType = DECIMAL_TYPE;
                 } else {
                     if (!areAllStrings(objects)) {
                         throw new IllegalArgumentException("cannot perform " + MINUS + " on mixed argument types.");
@@ -866,7 +867,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         ndx = lString.indexOf(rString);
                     }
                     r.result = lString;
-                    r.resultType = Constant.STRING_TYPE;
+                    r.resultType = STRING_TYPE;
                 }
                 return r;
             }
@@ -886,7 +887,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
                     r.result = leftSet.difference(rightSet);
-                    r.resultType = Constant.SET_TYPE;
+                    r.resultType = SET_TYPE;
                     return r;
                 }
                 if (areAllNumbers(objects)) {
@@ -894,7 +895,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         if (areAllLongs(objects)) {
                             try {
                                 r.result = Math.multiplyExact((Long) objects[0], (Long) objects[1]);
-                                r.resultType = Constant.LONG_TYPE;
+                                r.resultType = LONG_TYPE;
                                 return r;
                             } catch (ArithmeticException arithmeticException) {
                                 // fall through to BD case
@@ -905,11 +906,11 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         BigDecimal rr = left.multiply(right);
                         try {
                             r.result = rr.longValueExact();
-                            r.resultType = Constant.LONG_TYPE;
+                            r.resultType = LONG_TYPE;
 
                         } catch (ArithmeticException arithmeticException) {
                             r.result = rr;
-                            r.resultType = Constant.DECIMAL_TYPE;
+                            r.resultType = DECIMAL_TYPE;
                         }
                         return r;
                     } else {
@@ -920,7 +921,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                             // try to turn it into an integer
                             try {
                                 r.result = res.longValueExact();
-                                r.resultType = Constant.LONG_TYPE;
+                                r.resultType = LONG_TYPE;
                                 return r;
                             } catch (ArithmeticException arithmeticException) {
                                 // so it cannot eb turned into a long value for whatever reason
@@ -929,7 +930,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.result = res;
                     }
 
-                    r.resultType = Constant.DECIMAL_TYPE;
+                    r.resultType = DECIMAL_TYPE;
                     return r;
 
                 } else {
@@ -947,15 +948,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
         }
     }
 
-    /*
-
-      join0(x., y.)->[z.:=null;z.:=x.~y.;return(z.);]
-      join1(x., y.)->[z.:=null;while[for_keys(i0,x.)][z.i0. := x.i0~y.i0;];return(z.);]
-      join2(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][z.i0.i1.:=x.i0.i1~y.i0.i1;];];return(z.);]
-      join3(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][z.i0.i1.i2.:=x.i0.i1.i2~y.i0.i1.i2;];];];return(z.);]
-      join4(x., y.)->[z.:=null;while[for_keys(i0,x.)][while[for_keys(i1, x.i0)][while[for_keys(i2, x.i0.i1)][while[for_keys(i3, x.i0.i1)][z.i0.i1.i2.i3.:=x.i0.i1.i2.i3~y.i0.i1.i2.i3;];];];];return(z.);]
-
-    */
 
     // maximum long value is 9223372036854775807
     // almost max is 9223372036854775806
@@ -979,7 +971,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     if (areAllLongs(objects)) {
                         try {
                             r.result = Math.addExact((Long) objects[0], (Long) objects[1]);
-                            r.resultType = Constant.LONG_TYPE;
+                            r.resultType = LONG_TYPE;
                             return r;
                         } catch (ArithmeticException arithmeticException) {
                             // fall through
@@ -989,13 +981,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     BigDecimal left = toBD(objects[0]);
                     BigDecimal right = toBD(objects[1]);
                     r.result = left.add(right);
-                    r.resultType = Constant.DECIMAL_TYPE;
+                    r.resultType = DECIMAL_TYPE;
                     return r;
                 }
 
                 if (!isStem(objects[1])) {
                     r.result = objects[0].toString() + objects[1].toString();
-                    r.resultType = Constant.STRING_TYPE;
+                    r.resultType = STRING_TYPE;
                     return r;
                 }
                 // This is a stem
@@ -1020,6 +1012,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public void evaluate2(Monad monad, State state) {
 
         switch (monad.getOperatorType()) {
+            case TO_SET_VALUE:
+                doToSet(monad, state);
+                return;
+
             case CEILING_VALUE:
                 doFloorOrCeiling(monad, state, false);
                 return;
@@ -1046,6 +1042,38 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             default:
                 throw new NotImplementedException("Unknown monadic operator");
         }
+
+    }
+
+    private void doToSet(Monad monad, State state) {
+        Object r = monad.getArgument().evaluate(state);
+        switch(Constant.getType(r)){
+            case BOOLEAN_TYPE:
+            case STRING_TYPE:
+            case DECIMAL_TYPE:
+            case LONG_TYPE:
+            case NULL_TYPE:
+                QDLSet set = new QDLSet();
+                set.add(r);
+                monad.setEvaluated(true);
+                monad.setResultType(SET_TYPE);
+                monad.setResult(set);
+                return;
+            case SET_TYPE:
+                monad.setEvaluated(true);
+                monad.setResultType(SET_TYPE);
+                monad.setResult(r);
+                return;
+            case STEM_TYPE:
+                Polyad p = new Polyad(SystemEvaluator.TO_SET);
+                p.addArgument(monad.getArgument());
+                state.getMetaEvaluator().evaluate(p, state);
+                monad.setResult(p.getResult());
+                monad.setResultType(p.getResultType());
+                monad.setEvaluated(p.isEvaluated());
+                return;
+        }
+        throw new QDLExceptionWithTrace("unknown type", monad.getArgument());
 
     }
 
@@ -1090,12 +1118,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             } else {
                 resultValue = x - 1L;
             }
-            monad.setResultType(Constant.LONG_TYPE); // should be redundant
+            monad.setResultType(LONG_TYPE); // should be redundant
 
         }
         if (isBigDecimal(obj)) {
             gotOne = true;
-            monad.setResultType(Constant.DECIMAL_TYPE); // should be redundant
+            monad.setResultType(DECIMAL_TYPE); // should be redundant
             BigDecimal bd = (BigDecimal) obj;
             BigDecimal one = new BigDecimal("1.0");
             if (isPlusPlus) {
@@ -1103,7 +1131,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             } else {
                 resultValue = bd.subtract(one);
             }
-            monad.setResultType(Constant.DECIMAL_TYPE); // should be redundant
+            monad.setResultType(DECIMAL_TYPE); // should be redundant
         }
         if (!gotOne) {
             throw new IllegalArgumentException("" + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires a number value");
@@ -1127,7 +1155,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     throw new IllegalArgumentException("negation requires a strictly boolean argument not '" + objects[0] + "'");
                 }
                 r.result = !(Boolean) objects[0];
-                r.resultType = Constant.BOOLEAN_TYPE;
+                r.resultType = BOOLEAN_TYPE;
                 return r;
             }
         };
@@ -1150,22 +1178,22 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 switch (Constant.getType(objects[0])) {
-                    case Constant.LONG_TYPE:
+                    case LONG_TYPE:
                         r.result = sign * (Long) objects[0];
-                        r.resultType = Constant.LONG_TYPE;
+                        r.resultType = LONG_TYPE;
                         break;
-                    case Constant.DECIMAL_TYPE:
+                    case DECIMAL_TYPE:
                         BigDecimal x = toBD(objects[0]);
                         r.result = sign < 0 ? x.negate() : x;
-                        r.resultType = Constant.DECIMAL_TYPE;
+                        r.resultType = DECIMAL_TYPE;
                         break;
-                    case Constant.STRING_TYPE:
+                    case STRING_TYPE:
                         if (sign > 0) {
                             r.result = objects[0];
                         } else {
                             r.result = "";
                         }
-                        r.resultType = Constant.STRING_TYPE;
+                        r.resultType = STRING_TYPE;
                         break;
                     default:
                         throw new IllegalArgumentException("You can only take the negative of a number or string");

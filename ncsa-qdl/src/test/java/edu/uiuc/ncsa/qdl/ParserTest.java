@@ -54,7 +54,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "];");
         QDLInterpreter interpreter;
         if (testXML) {
-            state = roundTripStateSerialization(state, script);
+            state = roundTripXMLSerialization(state, script);
             interpreter = new QDLInterpreter(null, state); // round trip the state, create local interpret for check
         } else {
             interpreter = new QDLInterpreter(null, state);
@@ -66,7 +66,7 @@ public class ParserTest extends AbstractQDLTester {
                 // test to really beat the daylights out of serialization -- each instance of the loop tests it,
                 // so if there are odd artifacts or some such that are creeping in, these get caught.
                 // This emulates someone saving and relading their workspace over the course of saveral sessions.
-                state = roundTripStateSerialization(state, script);
+                state = roundTripXMLSerialization(state, script);
                 interpreter = new QDLInterpreter(null, state); // round trip the state, create local interpret for check
             }
             script = new StringBuffer();
@@ -249,7 +249,7 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "-" + cf2 + ";"); // so f should be zero.
         QDLInterpreter interpreter;
         if (testXML) {
-            state = roundTripStateSerialization(state, script);
+            state = roundTripXMLSerialization(state, script);
             interpreter = new QDLInterpreter(null, state); // round trip the state, create local interpret for check
         } else {
             interpreter = new QDLInterpreter(null, state);
@@ -260,7 +260,7 @@ public class ParserTest extends AbstractQDLTester {
         // really works
         for (int i = 1; i < 11; i++) {
             if (testXML) {
-                state = roundTripStateSerialization(state, script);
+                state = roundTripXMLSerialization(state, script);
                 interpreter = new QDLInterpreter(null, state); // round trip the state, create local interpret for check
             }
             script = new StringBuffer();
@@ -323,11 +323,13 @@ public class ParserTest extends AbstractQDLTester {
      */
 
     public void testCalledFunctions() throws Throwable {
-        testCalledFunctions(false);
-        testCalledFunctions(true);
+        testCalledFunctions(0);
+        testCalledFunctions(1);
+        testCalledFunctions(2);
+        testCalledFunctions(3);
     }
 
-    public void testCalledFunctions(boolean testXML) throws Throwable {
+    public void testCalledFunctions(int testCase) throws Throwable {
         BigDecimal[] results = {
                 new BigDecimal("0.224684095740375"),
                 new BigDecimal("0.542433484968442"),
@@ -349,15 +351,31 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, g_x);
         addLine(script, h_y);
         addLine(script, f_xy);
-        QDLInterpreter interpreter;
-        if (testXML) {
-            state = roundTripStateSerialization(state, script);
-            interpreter = new QDLInterpreter(null, state);
-        } else {
-            interpreter = new QDLInterpreter(null, state);
-            interpreter.execute(script.toString());
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        switch (testCase) {
+            case 1:
+                // XML
+                state = roundTripXMLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 2:
+                //QDL
+                state = roundTripQDLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 3:
+                //java
+                state = roundTripJavaSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            default:
+                // Do no serialization.
         }
         // now verify the results
+         interpreter = new QDLInterpreter(null, state);
+
         for (int i = 1; i < 1 + results.length; i++) {
             script = new StringBuffer();
             addLine(script, "x :=-3/" + i + ";");
@@ -873,11 +891,13 @@ public class ParserTest extends AbstractQDLTester {
      */
 
     public void testComparisons() throws Throwable {
-        testComparisons(false);
-        testComparisons(true);
+        testComparisons(0);
+        testComparisons(1);
+        testComparisons(2);
+        testComparisons(3);
     }
 
-    public void testComparisons(boolean testXML) throws Throwable {
+    public void testComparisons(int testCase) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a := 5;");
@@ -896,11 +916,26 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "a.18 := a" + EQUALS2 + "a;"); //T
         addLine(script, "a.9 := a!=a;"); //F
         addLine(script, "a.19 := a" + NOT_EQUAL2 + "a;"); //F
-        if (testXML) {
-            state = roundTripStateSerialization(state, script);
-            // no new sctring buffer needed. This is just checking that a boatload of variables
-            // all get stashed in the state then can get recovered.
+        switch (testCase) {
+            case 1:
+                // XML
+                state = roundTripXMLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 2:
+                //QDL
+                state = roundTripQDLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 3:
+                //java
+                state = roundTripJavaSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            default:
+                // Do no serialization.
         }
+
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("a.1", state);
@@ -2194,7 +2229,7 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert !getBooleanValue("x", state);
         assert !getBooleanValue("y", state);
-        assert !getBooleanValue("z", state);
+        assert getBooleanValue("z", state);
         assert getLongValue("w", state).equals(4L);
     }
 
@@ -2219,13 +2254,15 @@ public class ParserTest extends AbstractQDLTester {
         addLine(script, "q(x)->x^3;");
         addLine(script, "if[a][q(x)->x^3;]else[q(x)->x^2;];");
         addLine(script, "z := is_function(q,1);");
+        addLine(script, "noz := !is_function(q,11);");
         addLine(script, "w := q(2);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true
         assert !getBooleanValue("x", state);
         assert !getBooleanValue("y", state);
-        assert !getBooleanValue("z", state);
+        assert getBooleanValue("z", state);
+        assert getBooleanValue("noz", state);
         assert getLongValue("w", state).equals(4L);
     }
 

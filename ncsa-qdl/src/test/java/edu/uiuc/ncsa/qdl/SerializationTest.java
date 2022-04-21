@@ -29,7 +29,7 @@ public class SerializationTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
 
-        state = pickleState(state);
+        state = pickleXMLState(state);
         script = new StringBuffer();
 
         addLine(script, "oka := a == 3;");
@@ -59,7 +59,7 @@ public class SerializationTest extends AbstractQDLTester {
         // The state has been created and populated. Now we serialize it, then deserialize it.
 
         // Serialize the workspace
-        state = pickleState(state);
+        state = pickleXMLState(state);
 
         // Test that the things we set are faithfully recreated
         script = new StringBuffer();
@@ -118,7 +118,7 @@ public class SerializationTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // The state has been created and populated. Now we serialize it, then deserialize it.
-        state = pickleState(state);
+        state = pickleXMLState(state);
 
         script = new StringBuffer();
         addLine(script, "ok := 4 == X#get_private();");
@@ -144,7 +144,7 @@ public class SerializationTest extends AbstractQDLTester {
         addLine(script, "d := 'woof]]>';"); // close tag of XML CDATA section
         addLine(script, "f(x)->'<![CDATA[[' + x + ']]>';");
         addLine(script, "module['a:a','A'][f(x)->'<![CDATA[[' + x + '2]]>';];");
-        state = roundTripStateSerialization(state, script);
+        state = roundTripXMLSerialization(state, script);
         script = new StringBuffer();
         addLine(script, "okf := f('foo') == '<![CDATA[[foo]]>';");
         addLine(script, "oka := a=='<foo>bar</bar>';");

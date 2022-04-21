@@ -372,7 +372,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "    return( fib(n - 1) + fib(n - 2));");
         addLine(script, "];");
         if(testXML){
-            state = roundTripStateSerialization(state, script);
+            state = roundTripXMLSerialization(state, script);
             script = new StringBuffer();
         }
         addLine(script, "x := fib(20);"); // should return 6765
@@ -449,7 +449,7 @@ public class MathFunctionsTest extends AbstractQDLTester {
         addLine(script, "numeric_digits(100);");
         if(testXML){
             // check that numeric digits this gets serialized correctly
-            state = roundTripStateSerialization(state, script);
+            state = roundTripXMLSerialization(state, script);
             script = new StringBuffer();
         }
         addLine(script, "ok1 := mod(498723987945689378498579456, 1009) == 556;");

@@ -187,7 +187,7 @@ public class QDLVariableTest extends AbstractQDLTester {
         addLine(script, "a.epe. := {'a':'b','b':'c'};");
         addLine(script, "b := 'foo';");
         if(testXML){
-            state=roundTripStateSerialization(state,script);
+            state= roundTripXMLSerialization(state,script);
             script = new StringBuffer();
         }
         addLine(script, "ok0 := is_defined(a.epe) && is_defined(a.epe.);"); // should handle both cases of trailing . or not

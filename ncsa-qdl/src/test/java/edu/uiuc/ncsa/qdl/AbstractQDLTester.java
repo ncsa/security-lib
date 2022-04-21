@@ -22,7 +22,7 @@ import java.util.Random;
  */
 public class AbstractQDLTester extends TestBase {
 
-   protected TestUtils testUtils = TestUtils.newInstance();
+    protected TestUtils testUtils = TestUtils.newInstance();
 
     /*
     Convenience getters for testing
@@ -65,6 +65,7 @@ public class AbstractQDLTester extends TestBase {
     /**
      * Tests that two {@link BigDecimal} numbers are with {@link #comparisonTolerance}
      * of each other.
+     *
      * @param x
      * @param y
      * @return
@@ -85,7 +86,7 @@ public class AbstractQDLTester extends TestBase {
         if (stem1.size() != stem2.size()) return false;
         for (String key1 : stem1.keySet()) {
             Object v1 = null;
-            Object v2  = null;
+            Object v2 = null;
             if (stem1.isLongIndex(key1)) {
                 Long k1 = Long.parseLong(key1);
                 if (!stem2.containsKey(k1)) return false;
@@ -96,13 +97,13 @@ public class AbstractQDLTester extends TestBase {
                 v1 = stem1.get(key1);
                 v2 = stem2.get(key1);
             }
-            if(v1 == null){
-                if(v2 != null) return false;
-            }else{
-                if(v2 == null){
+            if (v1 == null) {
+                if (v2 != null) return false;
+            } else {
+                if (v2 == null) {
                     return false;
-                }else{
-                    if(!v1.equals(v2)) return false;
+                } else {
+                    if (!v1.equals(v2)) return false;
                 }
             }
         }
@@ -230,21 +231,24 @@ public class AbstractQDLTester extends TestBase {
 
     /**
      * Tests that the variable has the given value in the {@link edu.uiuc.ncsa.qdl.variables.VStack}
-      * @param variableName
+     *
+     * @param variableName
      * @param newValue
      * @param state
      * @return
      */
-    protected boolean checkVThing(String variableName, Object newValue, State state){
-        return ((VThing)state.getVStack().get(new XKey(variableName))).getValue().equals(newValue);
+    protected boolean checkVThing(String variableName, Object newValue, State state) {
+        return ((VThing) state.getVStack().get(new XKey(variableName))).getValue().equals(newValue);
     }
+
     /**
      * Takes the current state, serializes, deserializes it then returns a new workspace
+     *
      * @param state
      * @return
      * @throws Throwable
      */
-    protected State pickleState(State state) throws Throwable {
+    protected State pickleXMLState(State state) throws Throwable {
         // Serialize the workspace
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xsw = createXSW(stringWriter);
@@ -255,7 +259,7 @@ public class AbstractQDLTester extends TestBase {
         // Deserialize the workspace
         // Need pretty print. This takes the place or writing it to a file, then reading it.
         String pp = XMLUtils.prettyPrint(stringWriter.toString());
-      //  System.out.println("XML:\n" + pp);
+        //  System.out.println("XML:\n" + pp);
         StringReader reader = new StringReader(pp);
         XMLEventReader xer = createXER(reader);
         workspaceCommands.fromXML(xer, false);
@@ -271,10 +275,37 @@ public class AbstractQDLTester extends TestBase {
 
         // Deserialize the workspace
         // Need pretty print. This takes the place or writing it to a file, then reading it.
-      //  System.out.println("XML:\n" + pp);
+        //  System.out.println("XML:\n" + pp);
         ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
         workspaceCommands.javaLoad(bais);
         return workspaceCommands.getInterpreter().getState();
+    }
+
+    /**
+     * Sort of a test for QDL dump. Note that a dump is <b>not</b> a full save
+     * of a workspace. This test is for simple cases mostly for regression
+     * in common use cases (simple workspace, pickle it, reload later).
+     * @param state
+     * @return
+     * @throws Throwable
+     */
+    protected State pickleQDLState(State state) throws Throwable {
+        // Serialize the workspace
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        OutputStreamWriter osw = new OutputStreamWriter(baos);
+        WorkspaceCommands workspaceCommands = new WorkspaceCommands();
+        workspaceCommands.setState(state);
+        workspaceCommands.qdlSave(osw);
+        //System.out.println(new String(baos.toByteArray()));
+
+        // Deserialize the workspace
+        // Need pretty print. This takes the place or writing it to a file, then reading it.
+        //  System.out.println("XML:\n" + pp);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        InputStreamReader inputStreamReader = new InputStreamReader(bais);
+        QDLInterpreter qdlInterpreter  = new QDLInterpreter(null, state.newCleanState());
+        workspaceCommands.qdlLoad(qdlInterpreter, inputStreamReader);
+        return qdlInterpreter.getState();
     }
 
     /**
@@ -294,15 +325,28 @@ public class AbstractQDLTester extends TestBase {
      *     // ... <i>Put in any checks you would do on the previously created state</i>
      * </pre>
      * This replaces the state with its roundtripped version and restarts the script
+     *
      * @param oldState
      * @param script
      * @return
      * @throws Throwable
      */
-    protected State roundTripStateSerialization(State oldState, StringBuffer script) throws Throwable{
-            QDLInterpreter interpreter = new QDLInterpreter(null, oldState);
-            interpreter.execute(script.toString());
-            return pickleState(oldState);
+    protected State roundTripXMLSerialization(State oldState, StringBuffer script) throws Throwable {
+        QDLInterpreter interpreter = new QDLInterpreter(null, oldState);
+        interpreter.execute(script.toString());
+        return pickleXMLState(oldState);
+    }
+
+    protected State roundTripQDLSerialization(State oldState, StringBuffer script) throws Throwable {
+        QDLInterpreter interpreter = new QDLInterpreter(null, oldState);
+        interpreter.execute(script.toString());
+        return pickleQDLState(oldState);
+    }
+
+    protected State roundTripJavaSerialization(State oldState, StringBuffer script) throws Throwable {
+        QDLInterpreter interpreter = new QDLInterpreter(null, oldState);
+        interpreter.execute(script.toString());
+        return pickleJavaState(oldState);
     }
 
     /**

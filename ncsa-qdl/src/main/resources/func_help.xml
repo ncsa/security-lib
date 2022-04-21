@@ -2456,6 +2456,7 @@ assert[][]     ⊨       A    \u22a8         assert
 |]             ⟧       }    \u27e7         right closed slice bracket
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
+|-             ⊢       s    \u22a2         operator form of to_set
 transpose      τ       t    \u03c4         alias for the transpose function.
 pi             π       p    \u03c0         Greek letter pi.
 
@@ -3726,7 +3727,7 @@ E.g.
   to_set(3*[;5]+2)
 {2, 5, 8, 11, 14}
 
-See also: ∈ or has_value, && (intersection)
+See also: ∈ or has_value, && (intersection), ⊢, |-
                 ]]>
         </body>
     </entry>
@@ -3966,8 +3967,36 @@ See also: slice, sets
                 ]]>
         </body>
     </entry>
+    <entry id="⊢">
+            <body>
+                <![CDATA[
+Unicode 22a2
 
+An operator for the to_set function.
+|- is the ascii digraph.
 
+E.g.
+   ⊢3
+{3}
+   ⊢[;5]
+{01,2,3,4}
+
+See also: to_set
+                ]]>
+            </body>
+        </entry>
+
+    <entry id="|-">
+            <body>
+                <![CDATA[
+Ascii digraph for the operator of the to_set function.
+
+   |-false
+{false}
+See also: ⊢ (\u22a2), to_set
+                ]]>
+            </body>
+        </entry>
     <!--
         entry template
     -->

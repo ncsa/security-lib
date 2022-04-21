@@ -585,7 +585,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         VStack vStack = state.getVStack();
 
-
         StemVariable sourceStem = new StemVariable();
         StemVariable keys = new StemVariable();
         int count = 5;
@@ -946,32 +945,6 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StemList<StemEntry> result = stem2.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, .3, .4, .5, .6, .7};
-        for (int i = 0; i < expectedValues.length; i++) {
-            assert result.get(i).equals(expectedValues[i]);
-        }
-    }
-
-
-    public void oldTestListInsert() throws Throwable {
-        StemList<StemEntry> stemList1 = new StemList();
-        StemList<StemEntry> stemList2 = new StemList();
-        long count1 = 10L;
-        long count2 = 5L;
-        for (long i = 0L; i < count1; i++) {
-            stemList1.add(new StemEntry(i, i / 10.0));
-        }
-        for (long i = 0L; i < count2; i++) {
-            stemList2.add(new StemEntry(i, i * i));
-        }
-        StemVariable stem1 = new StemVariable();
-        StemVariable stem2 = new StemVariable();
-        stem1.setStemList(stemList1);
-        stem2.setStemList(stemList2);
-        stem1.oldListInsertAt(stem2, 4, 5);
-        StemList<StemEntry> result = stem1.getStemList();
-        // should return sorted set
-        Object expectedValues[] = new Object[]{.0, .1, .2, .3, 0L, 1L, 4L, 9L, 16L, .4, .5, .6, .7, .8, .9};
-        assert result.size() == count1 + count2;
         for (int i = 0; i < expectedValues.length; i++) {
             assert result.get(i).equals(expectedValues[i]);
         }

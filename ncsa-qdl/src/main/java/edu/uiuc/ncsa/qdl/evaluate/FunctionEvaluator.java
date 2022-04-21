@@ -61,36 +61,18 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     public boolean evaluate(String alias, Polyad polyad, State state) {
         switch (polyad.getName()) {
             case IS_FUNCTION:
-                if(polyad.isSizeQuery()){
-                         polyad.setResult(new int[]{1,2});
-                         polyad.setEvaluated(true);
-                         return true;
-                     }
-                 if (polyad.getArgCount() < 1) {
-                     throw new MissingArgException(IS_FUNCTION + " requires at least 1 argument");
-                 }
-         
-                 if (2 < polyad.getArgCount()) {
-                     throw new ExtraArgException(IS_FUNCTION + " requires at most 2 argument");
-                 }
-                
-                if (polyad.getArguments().get(0) instanceof VariableNode) {
-                    // they either are asking about a variable or it does not exist and by default, the parser thinks
-                    // it was one
+                if (polyad.isSizeQuery()) {
+                    polyad.setResult(new int[]{1, 2});
                     polyad.setEvaluated(true);
-                    polyad.setResultType(Constant.BOOLEAN_TYPE);
-                    polyad.setResult(false);
                     return true;
                 }
-                Object object = polyad.evalArg(0, state);
+                if (polyad.getArgCount() < 1) {
+                    throw new MissingArgException(IS_FUNCTION + " requires at least 1 argument");
+                }
 
-                if (object == null) {
-                    throw new BadArgException(" You must supply an argument for the " + IS_FUNCTION + " command.");
+                if (2 < polyad.getArgCount()) {
+                    throw new ExtraArgException(IS_FUNCTION + " requires at most 2 argument");
                 }
-                if (!isString(object)) {
-                    throw new BadArgException(" the " + IS_FUNCTION + " command requires a string as its first argument.");
-                }
-                String name = object.toString();
                 int argCount = -1; // default -- get any
                 if (polyad.getArgCount() == 2) {
                     Object object2 = polyad.evalArg(1, state);
@@ -100,9 +82,47 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     argCount = ((Long) object2).intValue();
                 }
 
-                polyad.setResult(state.resolveFunction(name, argCount, true).functionRecord != null);
-                polyad.setResultType(Constant.BOOLEAN_TYPE);
+                if (polyad.getArgAt(0) instanceof ModuleExpression) {
+                    ModuleExpression me = (ModuleExpression) polyad.getArgAt(0);
+                    State lastState = me.getModuleState(state);
+                    ModuleExpression lastME = me;
+                    while (lastME.getExpression() instanceof ModuleExpression) {
+                        lastME = (ModuleExpression) lastME.getExpression();
+                        lastState = lastME.getModuleState(lastState);
+                    }
+                    Polyad pp = new Polyad(IS_FUNCTION);
+                    pp.addArgument(lastME.getExpression());
+                    if (polyad.getArgCount() == 2) {
+                        pp.addArgument(polyad.getArgAt(1));
+                    }
+                    lastState.getMetaEvaluator().evaluate(pp, lastState);
+                    polyad.setResult(pp.getResult());
+                    polyad.setResultType(pp.getResultType());
+                    polyad.setEvaluated(true);
+                    return true;
+
+                }
+                if (polyad.getArgAt(0) instanceof VariableNode) {
+                    // they either are asking about a variable or it does not exist and by default, the parser thinks
+                    // it was one
+                    VariableNode vNode = (VariableNode) polyad.getArgAt(0);
+
+                    try {
+                        if (argCount < 0) {
+                            polyad.setResult(state.getFTStack().containsKey(new FKey(vNode.getVariableReference(), argCount)));
+                        } else {
+                            polyad.setResult(state.resolveFunction(vNode.getVariableReference(), argCount, true).functionRecord != null);
+                        }
+                    } catch (UndefinedFunctionException ufx) {
+                        polyad.setResult(Boolean.FALSE);
+                    }
+                    polyad.setResultType(Constant.BOOLEAN_TYPE);
+                    polyad.setEvaluated(true);
+                    return true;
+                }
                 polyad.setEvaluated(true);
+                polyad.setResultType(Constant.BOOLEAN_TYPE);
+                polyad.setResult(false);
                 return true;
         }
         try {
@@ -121,6 +141,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
     }
 
     /*
+
+
+    
+
       m := '/home/ncsa/dev/ncsa-git/security-lib/ncsa-qdl/src/main/resources/modules/test.mdl'
   q :=module_load(m)
   )ws set debug on

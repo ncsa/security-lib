@@ -17,6 +17,26 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
+
+    public void testOperator() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := {3} == ⊢3;");
+        addLine(script, "ok1 := {false} == ⊢false;");
+        addLine(script, "ok2 := {2.3} == ⊢2.3;");
+        addLine(script, "ok3 := {null} == ⊢null;");
+        addLine(script, "ok4 := {0,1,2,3} == |-[;4];"); // use ASCII digraph
+        addLine(script, "ok5 := {'b','e'} == |-{'a':'b','d':'e'};"); // use ASCII digraph
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state);
+        assert getBooleanValue("ok1", state);
+        assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok3", state);
+        assert getBooleanValue("ok4", state);
+        assert getBooleanValue("ok5", state);
+    }
+    
     public void testSetToList() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -93,20 +113,38 @@ public class SetTest extends AbstractQDLTester {
      * @throws Throwable
      */
     public void testDifference() throws Throwable {
-        testDifference(false);
-        testDifference(true);
+        testDifference(0);
+        testDifference(1);
+        testDifference(2);
+        testDifference(3);
     }
 
-    protected void testDifference(boolean testXML) throws Throwable {
+    protected void testDifference(int testCase) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a := {0,1,2,3,4};");
         addLine(script, "b := {2,4,6};");
         QDLInterpreter interpreter;
-        if (testXML) {
-            state = roundTripStateSerialization(state, script);
-            script = new StringBuffer();
+        switch (testCase) {
+            case 1:
+                // XML
+                state = roundTripXMLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 2:
+                //QDL
+                state = roundTripQDLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 3:
+                //java
+                state = roundTripJavaSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            default:
+                // Do no serialization.
         }
+
         addLine(script, "ok := {0,1,3}==(a/b);");
         addLine(script, "ok1 := {6}==(b/a);");
 
@@ -182,9 +220,27 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
+    /**
+     * Checking if big decimals are involved takes a specific test (since they are
+     * compared with both value and scale). This checks that that works
+     * @throws Throwable
+     */
+    public void testBDMembership() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok := reduce(@&&, [0.25, 1.25, 2] ∈ ⊢ [1;10]/4);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+  
+
     public void testNested() throws Throwable {
-        testNested(false);
-        testNested(true);
+        testNested(0);
+        testNested(1);
+        testNested(2);
+        testNested(3);
     }
 
     /**
@@ -194,7 +250,7 @@ public class SetTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    protected void testNested(boolean testXML) throws Throwable {
+    protected void testNested(int testCase) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a := {{1,2},{3,4}};");
@@ -204,10 +260,26 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "ok1 := a==b;"); //false
         addLine(script, "ok2 := a != b;"); //true
         addLine(script, "ok3 := {{1,2}} == (a/b);");
-        if (testXML) {
-            state = roundTripStateSerialization(state, script);
-            script = new StringBuffer();
+        switch (testCase) {
+            case 1:
+                // XML
+                state = roundTripXMLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 2:
+                //QDL
+                state = roundTripQDLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 3:
+                //java
+                state = roundTripJavaSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            default:
+                // Do no serialization.
         }
+
         addLine(script, "ok4 := {{1,3},{2,4}} == (b/a);");
         addLine(script, "ok5 := {{1,2},{1,3},{2,4}} == a%b;");//true
         addLine(script, "ok5a := {{1,2},{1,3},{2,4}} < a%b;");//false -- inclusion is strict
@@ -243,18 +315,22 @@ public class SetTest extends AbstractQDLTester {
         String B = makeSuperSet(A);
         String C = makeSuperSet(A);
 
-        testIdentities(false, A, B, C);
-        testIdentities(true, A, B, C);
+        testIdentities(0, A, B, C);
+        testIdentities(1, A, B, C);
+        testIdentities(2, A, B, C);
+        testIdentities(3, A, B, C);
 
         //nested sets
         A = makeNestedTestSet(12, 3);
         B = makeSuperSet(A);
         C = makeSuperSet(A);
-        testIdentities(false, A, B, C);
-        testIdentities(true, A, B, C);
+        testIdentities(0, A, B, C);
+        testIdentities(1, A, B, C);
+        testIdentities(2, A, B, C);
+        testIdentities(3, A, B, C);
     }
 
-    protected void testIdentities(boolean testXML,
+    protected void testIdentities(int testCase,
                                   String A, String B, String C) throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -267,10 +343,26 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "A0 := subset(A1, 3);");
 
         //boatload of standard set identities.
-        if (testXML) {
-            state = roundTripStateSerialization(state, script);
-            script = new StringBuffer();
+        switch (testCase) {
+            case 1:
+                // XML
+                state = roundTripXMLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 2:
+                //QDL
+                state = roundTripQDLSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            case 3:
+                //java
+                state = roundTripJavaSerialization(state, script);
+                script = new StringBuffer();
+                break;
+            default:
+                // Do no serialization.
         }
+
 
         addLine(script, "ok0 := A0 < A1 < A;");
         addLine(script, "ok1 := (A/B)/(B/C) == A/B;");

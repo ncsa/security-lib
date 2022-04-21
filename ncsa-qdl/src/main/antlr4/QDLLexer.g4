@@ -11,8 +11,8 @@ lexer grammar QDLLexer;
 
          ASSERT : 'assert'; 
         ASSERT2 : '⊨'; // unicode 22a8
-     BOOL_FALSE : 'false'  ; //  | '⊥'unicode 22a5
-      BOOL_TRUE : 'true'  ; //  | '⊤' unicode 22a4
+     BOOL_FALSE : 'false';
+      BOOL_TRUE : 'true';
           BLOCK : 'block';
           LOCAL : 'local';
            BODY : 'body';
@@ -34,7 +34,7 @@ lexer grammar QDLLexer;
       Integer : [0-9]+;
 
 // § 3 Decimals, scientific notations
-//      Decimal : (Integer '.' Integer) | ('.' Integer);
+
 // Note you might be inclined to set this to
 // Decimal : Integer? '.' Integer
 // to  get numbers like .23, BUT, it will then misparse all stems like
@@ -105,9 +105,7 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
     
     // Note that the extra characters for && and || are there because certain unicode aware keyboards
     // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
-//               And : '&&' | '⋀' | '∧' | '∩' ; // unicode 22c0, 2227 2229
                And : '&&' | '⋀' | '∧'  ; // unicode 22c0, 2227 2229
-//                Or : '||' | '⋁' | '∨' | '∪' ; // unicode 22c2, 2228 222a
                 Or : '||' | '⋁' | '∨'  ; // unicode 22c2, 2228 222a
           Backtick : '`';
            Percent : '%' | '∆'; // \u2206 -- laplace operatos

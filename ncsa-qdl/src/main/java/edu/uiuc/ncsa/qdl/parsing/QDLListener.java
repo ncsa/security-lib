@@ -2090,7 +2090,19 @@ illegal argument:no module named "b" was  imported at (1, 67)
         finish(dyad, ctx);
     }
 
+    @Override
+    public void enterToSet(QDLParserParser.ToSetContext ctx) {
 
+    }
+
+    @Override
+    public void exitToSet(QDLParserParser.ToSetContext ctx) {
+
+        stash(ctx, new Monad(OpEvaluator.TO_SET_VALUE, false));// automatically prefix
+        Monad monad = (Monad) parsingMap.getStatementFromContext(ctx);
+        monad.setTokenPosition(tp(ctx));
+        finish(monad, ctx);
+    }
 }
 
 

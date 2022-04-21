@@ -231,8 +231,6 @@ public class State extends FunctionState implements QDLConstants {
         characters.put("2261", OpEvaluator.EQUALS2);
         characters.put("2264", OpEvaluator.LESS_THAN_EQUAL3);
         characters.put("2265", OpEvaluator.MORE_THAN_EQUAL3);
-        //characters.put("22a4", "⊤");
-        //characters.put("22a5", "⊥");
         characters.put("22a8", "⊨");
         characters.put("2241", "≁");
         characters.put("2297", "⊗");
@@ -240,6 +238,7 @@ public class State extends FunctionState implements QDLConstants {
         characters.put("230a", "⌊");
         characters.put("27e6", "⟦");
         characters.put("27e7", "⟧");
+        characters.put("22a2", OpEvaluator.TO_SET);
         characters.put("03c4", StemEvaluator.TRANSPOSE2);
         characters.put("03c0", TMathEvaluator.PI2);
         characters.put("22c0", OpEvaluator.AND2);

@@ -3921,8 +3921,28 @@ public class WorkspaceCommands implements Logable, Serializable {
     public static final String DEFAULT_JAVA_SERIALIZATION_FILE_EXTENSION = ".wsj";
     public static final String ALTERNATE_JAVA_SERIALIZATION_FILE_EXTENSION = ".ser"; // for reads
 
-    private void _doQDLDump(File target) throws Throwable {
-        FileWriter fileWriter = new FileWriter(target);
+    /**
+     * Just loads and runs a {@link Reader}. This is mostly used in serialization tests.
+     *
+     * @param reader
+     * @throws Throwable
+     */
+    public void qdlLoad(QDLInterpreter qdlInterpreter, Reader reader) throws Throwable {
+        // Don't barf out everything to the command line when it loads.
+        boolean pp = qdlInterpreter.isPrettyPrint();
+        boolean echo = qdlInterpreter.isEchoModeOn();
+        qdlInterpreter.setPrettyPrint(false);
+        qdlInterpreter.setEchoModeOn(false);
+        qdlInterpreter.execute(reader);
+        setPrettyPrint(pp);
+        setEchoModeOn(echo);
+        setDebugOn(debugOn);
+        qdlInterpreter.setEchoModeOn(echo);
+        qdlInterpreter.setPrettyPrint(pp);
+        qdlInterpreter.setDebugOn(debugOn);
+    }
+
+    public void qdlSave(Writer fileWriter) throws Throwable {
         fileWriter.write("// QDL workspace " + (isTrivial(getWSID()) ? "" : getWSID()) + " dump, saved on " + (new Date()) + "\n");
         fileWriter.write("\n/* ** module definitions ** */\n");
 
@@ -3934,8 +3954,38 @@ public class WorkspaceCommands implements Logable, Serializable {
                         + "' ,'" + SystemEvaluator.MODULE_TYPE_JAVA + "');";
             }
             fileWriter.write(output + "\n");
-
         }
+
+        /*
+          Order matters. The imports are done after the variables and functions since they may
+          refer to them. 
+         */
+        /**
+           * Have to be careful in listing only what is in the actual state, not
+           * stuff in modules too since that is saved elsewhere and both bloats
+           * the output and can make for NS conflicts on reload.
+           */
+          fileWriter.write("\n/* ** global variables ** */\n");
+          for (Object varName : state.getExtrinsicVars().listVariables()) {
+              String output = inputFormVar((String) varName, 2, state);
+              fileWriter.write(varName + " := " + output + ";\n");
+          }
+
+          fileWriter.write("\n/* ** user defined variables ** */\n");
+          for (Object varName : state.getVStack().listVariables()) {
+              String output = inputFormVar((String) varName, 2, state);
+              fileWriter.write(varName + " := " + output + ";\n");
+          }
+
+          fileWriter.write("\n/* ** user defined functions ** */\n");
+
+          for (XKey key : state.getFTStack().keySet()) {
+              String output = inputForm((FunctionRecord) state.getFTStack().get(key));
+              if (output != null && !output.startsWith(JAVA_CLASS_MARKER)) {
+                  // Do not write java functions as they live in a module.
+                  fileWriter.write(output + "\n");
+              }
+          }
         // now do the imports
         fileWriter.write("\n/* ** module imports ** */\n");
 
@@ -3949,28 +3999,18 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
         }
 
-        /**
-         * Have to be careful in listing only what is in the actual state, not
-         * stuff in modules too since that is saved elsewhere and both bloats
-         * the output and can make for NS conflicts on reload.
-         */
-        fileWriter.write("\n/* ** user defined variables ** */\n");
-        for (Object varName : state.getVStack().listVariables()) {
-            String output = inputFormVar((String) varName, 2, state);
-            fileWriter.write(varName + " := " + output + ";\n");
-        }
+        // Todo -- Should at some point crawl through the module's state and make a table of variables.
+        // These would have to be FQ (so a#b#c#d := 3) and done after all imports.
 
-        fileWriter.write("\n/* ** user defined functions ** */\n");
 
-        for (XKey key : state.getFTStack().keySet()) {
-            String output = inputForm((FunctionRecord) state.getFTStack().get(key));
-            if (output != null && !output.startsWith(JAVA_CLASS_MARKER)) {
-                // Do not write java functions as they live in a module.
-                fileWriter.write(output + "\n");
-            }
-        }
         fileWriter.flush();
         fileWriter.close();
+
+    }
+
+    private void _doQDLDump(File target) throws Throwable {
+        FileWriter fileWriter = new FileWriter(target);
+        qdlSave(fileWriter);
     }
 
     private long _xmlSave(File f, boolean compressSerialization, boolean showIt) throws Throwable {
@@ -4018,6 +4058,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         logger.info("saving workspace '" + target.getAbsolutePath() + "'");
         javaSave(new FileOutputStream(target));
     }
+
 
     public void javaSave(OutputStream fos) throws IOException {
         WSInternals wsInternals = new WSInternals();

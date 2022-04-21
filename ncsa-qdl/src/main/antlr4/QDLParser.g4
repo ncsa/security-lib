@@ -65,7 +65,6 @@ assertStatement2:
   ASSERT2 expression (':' expression)?;
 
     statementBlock : LeftBracket (statement ';')* RightBracket;
-        //localBlock : LeftBracket (statement ';')* RightBracket;
  docStatementBlock : LeftBracket fdoc* (statement ';')+ RightBracket;
    expressionBlock : LeftBracket expression ';' ( expression ';')+ RightBracket;
   conditionalBlock : LeftBracket expression RightBracket;
@@ -134,6 +133,7 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
+ | ('⊢' | '|-') expression                                                     #toSet
 // | expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile

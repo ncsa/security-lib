@@ -514,10 +514,32 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         if (1 < polyad.getArgCount()) {
             throw new ExtraArgException(TO_SET + " requires at most 1 argument");
         }
-
+        Object r = polyad.evalArg(0, state);
+        switch (Constant.getType(r)) {
+            case Constant.BOOLEAN_TYPE:
+            case Constant.STRING_TYPE:
+            case Constant.NULL_TYPE:
+            case Constant.LONG_TYPE:
+            case Constant.DECIMAL_TYPE:
+                QDLSet set = new QDLSet();
+                set.add(r);
+                polyad.setResult(set);
+                polyad.setResultType(Constant.SET_TYPE);
+                polyad.setEvaluated(true);
+                return true;
+            case Constant.SET_TYPE:
+                polyad.setResult(r);
+                polyad.setResultType(Constant.SET_TYPE);
+                polyad.setEvaluated(true);
+                return true;
+            case Constant.UNKNOWN_TYPE:
+                throw new QDLExceptionWithTrace("unknown argument ", polyad.getArgAt(0));
+        }
+        // At this point, all that is left is a stem.
         Polyad v = new Polyad(StemEvaluator.UNIQUE_VALUES);
         v.setArguments(polyad.getArguments());
         v.evaluate(state);
+
         StemVariable stemVariable = (StemVariable) v.getResult(); // as per contract
         QDLSet set = new QDLSet();
         set.addAll(stemVariable.getStemList().values());
@@ -793,7 +815,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             ExpressionImpl f;
             try {
                 f = getOperator(state, frn, 2);
-            }catch(UndefinedFunctionException ufx){
+            } catch (UndefinedFunctionException ufx) {
                 ufx.setStatement(polyad.getArgAt(0));
                 throw ufx;
             }
@@ -833,8 +855,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             ExpressionImpl f;
             try {
                 f = getOperator(state, frn, 2);
-            }catch(UndefinedFunctionException ufx){
-                        ufx.setStatement(polyad.getArgAt(0));
+            } catch (UndefinedFunctionException ufx) {
+                ufx.setStatement(polyad.getArgAt(0));
                 throw ufx;
             }
             Object lastResult = null;
@@ -909,7 +931,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             } else {
                 axisWalker = this.new AxisExpand(getOperator(state, frn, 2), state);
             }
-        }catch(UndefinedFunctionException ufx){
+        } catch (UndefinedFunctionException ufx) {
             ufx.setStatement(polyad.getArgAt(0));
             throw ufx;
         }
@@ -1163,7 +1185,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             QDLRunner runner = new QDLRunner(driver.parse(r));
         } catch (ParseCancellationException pc) {
             message = pc.getMessage();
-        }catch (Throwable t) {
+        } catch (Throwable t) {
             message = "non-syntax error:" + t.getMessage();
 
         }
