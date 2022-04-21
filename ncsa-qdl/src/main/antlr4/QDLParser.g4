@@ -133,7 +133,7 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
- | ('⊢' | '|-') expression                                                     #toSet
+ | ('⊢' | '|>') expression                                                     #toSet
 // | expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile

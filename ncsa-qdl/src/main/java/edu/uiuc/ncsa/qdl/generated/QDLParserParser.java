@@ -60,7 +60,7 @@ public class QDLParserParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'{'", "'}'", "')'", "'('", "'\\/'", "'\u2229'", "'/\\'", "'\u222A'", 
-			"'?'", "'\u22A2'", "'|-'", null, "'assert'", "'\u22A8'", "'false'", "'true'", 
+			"'?'", "'\u22A2'", "'|>'", null, "'assert'", "'\u22A8'", "'false'", "'true'", 
 			"'block'", "'local'", "'body'", "'catch'", "'I'", "'define'", "'do'", 
 			"'else'", "'if'", "'module'", "'null'", "'\u2205'", "'switch'", "'then'", 
 			"'try'", "'while'", null, null, null, null, null, "'['", "']'", "','", 

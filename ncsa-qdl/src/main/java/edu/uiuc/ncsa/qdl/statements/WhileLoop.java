@@ -1,9 +1,11 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.BreakException;
 import edu.uiuc.ncsa.qdl.exceptions.ContinueException;
 import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
+import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
@@ -64,6 +66,12 @@ public class WhileLoop implements Statement {
     public Object evaluate(State state) {
         State localState = state.newLocalState();
         //State localState = state.new;
+        if(conditional instanceof Dyad){
+            Dyad d = (Dyad) conditional;
+            if(d.getOperatorType() == OpEvaluator.EPSILON_VALUE){
+                return forKeysLoop(localState);
+            }
+        }
         if (conditional instanceof Polyad) {
             Polyad p = (Polyad) conditional;
             if (p.isBuiltIn()) {

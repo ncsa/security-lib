@@ -22,7 +22,9 @@ import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_AUTO;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
-/**
+/** Large and complex text of the VFS (Virtual File System). This repeats the
+ * same tests on several different store types, including databases, zip files
+ * and the underlying file system.
  * <p>Created by Jeff Gaynor<br>
  * on 3/4/20 at  8:57 AM
  */

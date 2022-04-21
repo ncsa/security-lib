@@ -1,7 +1,6 @@
 package edu.uiuc.ncsa.qdl.parsing;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
-import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.SystemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IntrinsicViolation;
 import edu.uiuc.ncsa.qdl.exceptions.ParsingException;
@@ -85,7 +84,7 @@ public class QDLListener implements QDLParserListener {
     public void exitVariable(QDLParserParser.VariableContext ctx) {
         StatementRecord p = (StatementRecord) parsingMap.get(IDUtils.createIdentifier(ctx));
         if (ctx.getText().equals(QDLConstants.RESERVED_TRUE) ||
-                ctx.getText().equals(QDLConstants.RESERVED_FALSE) ) {
+                ctx.getText().equals(QDLConstants.RESERVED_FALSE)) {
             // SPECIAL CASE. The parse recognizes true and false, but does not know what to do with them.
             // We are here because it lumps them together with the variable values.
             ConstantNode cnode = new ConstantNode(new Boolean(ctx.getText().equals(QDLConstants.RESERVED_TRUE)), Constant.BOOLEAN_TYPE);
@@ -1911,7 +1910,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
 
     @Override
     public void exitFloorOrCeilingExpression(QDLParserParser.FloorOrCeilingExpressionContext ctx) {
-        boolean isFloor = ctx.children.get(0).getText().equals(OpEvaluator.FLOOR) ;
+        boolean isFloor = ctx.children.get(0).getText().equals(OpEvaluator.FLOOR);
         Monad monad = new Monad(isFloor ? OpEvaluator.FLOOR_VALUE : OpEvaluator.CEILING_VALUE, false);
         monad.setSourceCode(getSource(ctx));
         monad.setTokenPosition(tp(ctx));
@@ -1966,13 +1965,13 @@ illegal argument:no module named "b" was  imported at (1, 67)
         if (statement instanceof FunctionDefinitionStatement) {
             throw new IntrinsicViolation("cannot define function in an existing module", statement);
         }
-        if(statement instanceof VariableNode){
-            if(State.isIntrinsic(((VariableNode)statement).getVariableReference())){
+        if (statement instanceof VariableNode) {
+            if (State.isIntrinsic(((VariableNode) statement).getVariableReference())) {
                 throw new IntrinsicViolation("cannot access intrinsic variable outside of module.", statement);
             }
         }
-        if(statement instanceof Polyad){
-            if(State.isIntrinsic(((Polyad)statement).getName())){
+        if (statement instanceof Polyad) {
+            if (State.isIntrinsic(((Polyad) statement).getName())) {
                 throw new IntrinsicViolation("cannot access intrinsic function outside of module.", statement);
             }
         }
@@ -1989,7 +1988,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         }
         moduleExpression.setAlias(((VariableNode) var).getVariableReference());
 
-               moduleExpression.setExpression((StatementWithResultInterface) statement);
+        moduleExpression.setExpression((StatementWithResultInterface) statement);
 
     }
 
@@ -2032,23 +2031,18 @@ illegal argument:no module named "b" was  imported at (1, 67)
 
     @Override
     public void exitEpsilon(QDLParserParser.EpsilonContext ctx) {
-        Polyad dyad;
-        dyad = new Polyad(StemEvaluator.HAS_VALUE);
-        dyad.setTokenPosition(tp(ctx));
-        dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(0)));
-        dyad.addArgument((StatementWithResultInterface) resolveChild(ctx.expression(1)));
-        List<String> source = new ArrayList<>();
-        source.add(ctx.getText());
-        if (ctx.op.getText().equals("∉")) {
-            Monad monad = new Monad(OpEvaluator.NOT_VALUE, false);
-            monad.setArgument(dyad);
-            monad.setTokenPosition(tp(ctx));
-            monad.setSourceCode(source);
-            stash(ctx, monad);
+        String x = ctx.getChild(1).getText();
+        Dyad dyad;
+        if (x.equals(OpEvaluator.EPSILON)) {
+            dyad = new Dyad(OpEvaluator.EPSILON_VALUE);
         } else {
-            stash(ctx, dyad);
-            dyad.setSourceCode(source);
+            dyad = new Dyad(OpEvaluator.EPSILON_NOT_VALUE);
         }
+        dyad.setTokenPosition(tp(ctx));
+        stash(ctx, dyad);
+        finish(dyad, ctx);
+
+
     }
 
     @Override
@@ -2103,6 +2097,7 @@ illegal argument:no module named "b" was  imported at (1, 67)
         monad.setTokenPosition(tp(ctx));
         finish(monad, ctx);
     }
+
 }
 
 

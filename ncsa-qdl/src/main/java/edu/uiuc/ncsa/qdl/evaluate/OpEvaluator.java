@@ -71,7 +71,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String REGEX_MATCH = "=~";
     public static final String REGEX_MATCH2 = "≈";
     public static final String TO_SET = "⊢";
-    public static final String TO_SET2 = "|-";
+    public static final String TO_SET2 = "|>";
+    public static final String EPSILON = "∈";
+    public static final String EPSILON_NOT = "∉";
 
 
     public static final int ASSIGNMENT_VALUE = 10;
@@ -101,11 +103,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final int FLOOR_VALUE = 219;
     public static final int CEILING_VALUE = 220;
     public static final int TO_SET_VALUE = 221;
+    public static final int EPSILON_VALUE = 222;
+    public static final int EPSILON_NOT_VALUE = 223;
 
     /**
      * All Math operators. These are used in function references.
      */
     public static String[] ALL_MATH_OPS = new String[]{
+            EPSILON, EPSILON_NOT,
             TO_SET, TO_SET2,
             FLOOR, CEILING,
             UNION, UNION_2, INTERSECTION, INTERSECTION_2,
@@ -223,6 +228,10 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     public int getType(String oo) {
         switch (oo) {
+            case EPSILON:
+                return EPSILON_VALUE;
+            case EPSILON_NOT:
+                return EPSILON_NOT_VALUE;
             case TO_SET:
             case TO_SET2:
                 return TO_SET_VALUE;
@@ -314,6 +323,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     public void evaluate2(Dyad dyad, State state) {
         switch (dyad.getOperatorType()) {
+            case EPSILON_VALUE:
+                doMembership(dyad, state, true);
+                return;
+            case EPSILON_NOT_VALUE:
+                doMembership(dyad, state, false);
+                return;
             case UNION_VALUE:
             case INTERSECTION_VALUE:
                 doSetUnionOrInteresection(dyad, state);
@@ -363,6 +378,31 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 throw new NotImplementedException("Unknown dyadic operator " + dyad.getOperatorType());
         }
     }
+
+    private void doMembership(Dyad dyad, State state, boolean isMember) {
+        Polyad polyad;
+        polyad = new Polyad(StemEvaluator.HAS_VALUE);
+        polyad.setTokenPosition(dyad.getTokenPosition());
+        polyad.setSourceCode(dyad.getSourceCode());
+        polyad.addArgument(dyad.getLeftArgument());
+        polyad.addArgument(dyad.getRightArgument());
+        if (!isMember) {
+            Monad monad = new Monad(OpEvaluator.NOT_VALUE, false);
+            monad.setArgument(polyad);
+            monad.setTokenPosition(polyad.getTokenPosition());
+            monad.setSourceCode(polyad.getSourceCode());
+            state.getOpEvaluator().evaluate(monad, state);
+            dyad.setResult(monad.getResult());
+            dyad.setResultType(monad.getResultType());
+            dyad.setEvaluated(monad.isEvaluated());
+            return;
+        }
+         state.getMetaEvaluator().evaluate(polyad, state);
+        dyad.setResult(polyad.getResult());
+        dyad.setResultType(polyad.getResultType());
+        dyad.setEvaluated(polyad.isEvaluated());
+    }
+
     // '[a-zA-Z]{3}' =~ 'aBc'
 
     /**
@@ -1047,7 +1087,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
     private void doToSet(Monad monad, State state) {
         Object r = monad.getArgument().evaluate(state);
-        switch(Constant.getType(r)){
+        switch (Constant.getType(r)) {
             case BOOLEAN_TYPE:
             case STRING_TYPE:
             case DECIMAL_TYPE:

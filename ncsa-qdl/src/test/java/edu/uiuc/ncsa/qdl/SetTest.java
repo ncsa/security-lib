@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl;
 
+import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 
@@ -25,8 +26,8 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "ok1 := {false} == ⊢false;");
         addLine(script, "ok2 := {2.3} == ⊢2.3;");
         addLine(script, "ok3 := {null} == ⊢null;");
-        addLine(script, "ok4 := {0,1,2,3} == |-[;4];"); // use ASCII digraph
-        addLine(script, "ok5 := {'b','e'} == |-{'a':'b','d':'e'};"); // use ASCII digraph
+        addLine(script, "ok4 := {0,1,2,3} == " + OpEvaluator.TO_SET2 +"[;4];"); // use ASCII digraph
+        addLine(script, "ok5 := {'b','e'} == " + OpEvaluator.TO_SET2 + "{'a':'b','d':'e'};"); // use ASCII digraph
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok0", state);
@@ -234,6 +235,21 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
+    /**
+     * tests that membership can be used in a reference.
+     * @throws Throwable
+     */
+    public void testForEachMembership() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a. := for_each(@∈, ['a'], ['a', 'b']);"); // return [[true,false]]
+        addLine(script, "ok := a.0.0;");
+        addLine(script, "ok1 := !a.0.1;");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
   
 
     public void testNested() throws Throwable {

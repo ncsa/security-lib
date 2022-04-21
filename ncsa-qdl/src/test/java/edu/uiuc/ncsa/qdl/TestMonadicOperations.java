@@ -33,12 +33,9 @@ public class TestMonadicOperations extends AbstractQDLTester {
         assert myMonad.getResult().equals(initialValue);
         assert checkVThing(variableReference, newValue, state);
 
-//        assert vStack.get(new XKey(variableReference)).equals(newValue);
         myMonad.evaluate(state);
         myMonad.evaluate(state);
         assert checkVThing(variableReference, newValue+2L, state);
-        //assert vStack.get(new XKey(variableReference)).equals(newValue+2L);
-
     }
 
      
@@ -56,8 +53,6 @@ public class TestMonadicOperations extends AbstractQDLTester {
 
         assert myMonad.getResult().equals(initialValue);
         assert checkVThing(variableReference, newValue, state);
-
-//        assert vStack.get(new XKey(variableReference)).equals(newValue);
     }
 
      

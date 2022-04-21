@@ -1016,7 +1016,7 @@ public class ParserTest extends AbstractQDLTester {
         String slash = "\\";
         addLine(script, "a:='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\\n" + //alphanumeric
                 "  ~`!@#$%^&*()[]{}<>\\\\/\\'\"-_=+|;:,.?\\n" + // other ASCII symbols
-                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊨⌈⌊⟦⟧≁⊗∈∉∩∪∆\\n" + // unicode
+                "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊨⌈⌊⟦⟧≁⊗⊢∈∉∩∪∆\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );
         addLine(script, "say('printing all base characters with say:\\n');");
@@ -1176,35 +1176,6 @@ public class ParserTest extends AbstractQDLTester {
         assert !state.isDefined("qqq") : "Check parser in exitAssignment call.";
         assert !state.isDefined("'qqq'") : "Check parser in exitAssignment call.";
     }
-
-     
-/*    public void testListAppend() throws Throwable {
-        State state = testUtils.getNewState();
-        StringBuffer script = new StringBuffer();
-        String phrase = "This is my stem " + getRandomString();
-        addLine(script, "my_stem.help := '" + phrase + "';");
-        addLine(script, "b. := 10 + n(5);");
-        addLine(script, "b.foo := 'bar';");
-        addLine(script, "x. := list_append(my_stem., b.);");
-
-        QDLInterpreter interpreter = new QDLInterpreter(null, state);
-        interpreter.execute(script.toString());
-        // original unchanged
-        StemVariable stem = getStemValue("my_stem.", state);
-        assert stem.size() == 1;
-        assert stem.getString("help").equals(phrase);
-
-        // result has elements
-        StemVariable xstem = getStemValue("x.", state);
-        assert xstem.getLong("0") == 10L;
-        assert xstem.getLong("1") == 11L;
-        assert xstem.getLong("2") == 12L;
-        assert xstem.getLong("3") == 13L;
-        assert xstem.getLong("4") == 14L;
-
-        assert xstem.containsKey("help");
-        assert !xstem.containsKey("foo");
-    }*/
 
 
     public void testSafeUnboxWithBadVariable() throws Throwable {
@@ -1503,27 +1474,6 @@ public class ParserTest extends AbstractQDLTester {
      */
 
     public void testJSONInvariance() throws Throwable {
-     /*  Used tot est with this but it fails now that string support has improved.
-         probably because of embedded control characters. QDL strings do nto allow
-         for embedded control characters (at least at this point).
-         String rawJSON = "{" +
-                "\"sub\": \"jeff\"," +
-                "\"aud\": \"ashigaru:command.line2\"," +
-                "\"Jäger-Groß\": \"test value\",\n" +
-                " \"你浣\": \"test value2\",\n" +
-                " \"uid\": \"jgaynor\",\n" +
-                " \"uidNumber\": \"25939\",\n" +
-                " \"isMemberOf\":  [\n" +
-                "    {\n" +
-                "   \"name\": \"org_ici\",\n" +
-                "   \"id\": 1282\n" +
-                "  },\n" +
-                "    {\n" +
-                "   \"name\": \"list_apcs\",\n" +
-                "   \"id\": 1898\n" +
-                "  }\n" +
-                " ]\n" +
-                "}\n";*/
         String rawJSON = "{" +
                 "\"sub\": \"jeff\"," +
                 "\"aud\": \"ashigaru:command.line2\"," +
@@ -1603,32 +1553,7 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
-    /*
-    Possible switch test?
 
-    a.0 := 42;
-    a.1. := random(3);
-    a.2 := 'foo';
-    a.4 := true;
-    a.5 := -34555.554345;
-    a.6 := null;
-
-    while[
-      for_keys(j, a.)
-    ]do[
-       type := var_type(a.j);
-       switch[
-         if[type == -1]then[say('undefined');];
-         if[type == 0]then[say('null');];
-         if[type == 1]then[say('boolean:' + a.j);];
-         if[type == 2]then[say('integer:' + a.j);];
-         if[type == 3]then[say('string:' + a.j);];
-         if[type == 4]then[say('stem:' + a.j);];
-         if[type == 5]then[say('decimal:' + a.j);];
-
-        ]; //end switch
-    ]; // end do
-     */
 
     /**
      * Common construction is to set a variable null (allocate where it is in which scope)

@@ -698,16 +698,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getBooleanValue("z", state);
 
     }
-    /*
-       diff('abcde', 'ab')
-2
-   diff('abcd','abcd')
--1
-   diff(['abcd','efghij'],['abq','efgp'])
-[2,3]
-  diff(['abcde','abed'], 'abcq')
-[3,2]
-     */
+
      
     public void testDiff() throws Throwable{
         // π
