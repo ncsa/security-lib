@@ -115,7 +115,9 @@ public class FTable<K extends FKey, V extends FunctionRecord>  extends XTable<K,
         }
         TreeSet<String> names = new TreeSet<>();
         for(String key : fAndArgs.keySet()){
-            names.add(key + "(" + fAndArgs.get(key) + ")");
+            String args = fAndArgs.get(key).toString();
+            args = args.replace(" ", ""); // no blanks in arg list. Makes regexes easier
+            names.add(key + "(" + args + ")");
         }
         return names;
     }

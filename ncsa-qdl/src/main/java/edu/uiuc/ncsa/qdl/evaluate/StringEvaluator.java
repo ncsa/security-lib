@@ -5,6 +5,7 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
+import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.StringUtils;
 
@@ -540,6 +541,9 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         }
         String result = "";
 
+        if(isSet(leftArg)){
+            leftArg = ((QDLSet)leftArg).toStem();
+        }
         if (isStem(leftArg)) {
             StemVariable leftStem = (StemVariable) leftArg;
             int lsize = leftStem.size();

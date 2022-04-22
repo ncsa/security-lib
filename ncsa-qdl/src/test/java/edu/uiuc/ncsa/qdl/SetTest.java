@@ -448,10 +448,37 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok1", state);
     }
 
+
     /**
-     * By far the simplest way to makes ets in QDL is to make sets in QDL and
-     * schlepp them around in input form.
-     *
+     * Test that for_each applies to the ⊢ (to_set) operator. This turns a matrix
+     * into a set whose elements are rows.
+     * @throws Throwable
+     */
+    public void testToSetForEach() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok ≔ {{0,1,2,3},{4,5,6,7},{8,9,10,11}} ≡  ⊢for_each(⊗⊢, n(3,4,n(12)));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /**
+     * Checks that the to set operator sits at the top of the order of operations chart.
+     * If this changes, a lot of stuff breaks.
+     * @throws Throwable
+     */
+    public void testToSetOOO() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok ≔ ⊢[;5] ≡  to_set([;5]);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+    /**
+     * One of the simplest ways to makes sets in QDL is to make them
+     * in input form.
      * @param n
      * @return
      * @throws Throwable

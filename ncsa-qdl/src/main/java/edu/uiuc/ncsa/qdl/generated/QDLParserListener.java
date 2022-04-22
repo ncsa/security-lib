@@ -688,18 +688,6 @@ public interface QDLParserListener extends ParseTreeListener {
 	 */
 	void exitOrExpression(QDLParserParser.OrExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code unaryMinusExpression}
-	 * labeled alternative in {@link QDLParserParser#expression}.
-	 * @param ctx the parse tree
-	 */
-	void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code unaryMinusExpression}
-	 * labeled alternative in {@link QDLParserParser#expression}.
-	 * @param ctx the parse tree
-	 */
-	void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code toSet}
 	 * labeled alternative in {@link QDLParserParser#expression}.
 	 * @param ctx the parse tree
@@ -711,6 +699,18 @@ public interface QDLParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitToSet(QDLParserParser.ToSetContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code unaryMinusExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code unaryMinusExpression}
+	 * labeled alternative in {@link QDLParserParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code powerExpression}
 	 * labeled alternative in {@link QDLParserParser#expression}.

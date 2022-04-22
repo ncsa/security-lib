@@ -2479,7 +2479,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             return printList(inputLine, treeSet);
         }
-        if (name.equals("-online")) {
+        if (name.equals("online")) {
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(onlineHelp.keySet());
             if (treeSet.isEmpty()) {

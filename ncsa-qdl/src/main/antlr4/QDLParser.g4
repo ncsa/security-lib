@@ -112,6 +112,7 @@ expression
  | set                                                                         #setThing
  | rInterval                                                                   #realInterval
  | iInterval                                                                   #intInterval
+ | To_Set expression                                                           #toSet
  | expression (Tilde | TildeRight ) expression                                 #tildeExpression
  | expression postfix=(PlusPlus | MinusMinus)                                  #postfix
  | prefix=(PlusPlus | MinusMinus) expression                                   #prefix
@@ -133,7 +134,6 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
- | ('⊢' | '|>') expression                                                     #toSet
 // | expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile

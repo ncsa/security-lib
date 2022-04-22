@@ -27,7 +27,6 @@ import static edu.uiuc.ncsa.qdl.xml.XMLConstants.MODULE_TAG;
  * on 12/14/21 at  12:22 PM
  */
 public class MTTable<K extends MTKey, V extends Module>  extends   XTable<K, V> {
-    // class MITable2<K extends XKey, V extends MIWrapper> extends   XTable<K, V>
     @Override
     public V put(XThing value) {
         MTKey mtKey = ((Module) value).getMTKey();

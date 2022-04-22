@@ -46,7 +46,7 @@ public class QDLWorkspace implements Serializable {
         String errorStatement = "";
         if (t instanceof QDLExceptionWithTrace) {
             QDLExceptionWithTrace qq = (QDLExceptionWithTrace) t;
-            if(qq.hasStatement()) {
+            if (qq.hasStatement()) {
                 if (qq.getStatement().hasTokenPosition()) {
                     errorStatement = getErrorCoordinates(qq);
                 }
@@ -55,7 +55,18 @@ public class QDLWorkspace implements Serializable {
                 }
             }
         }
-        if( t instanceof UnknownSymbolException){
+        if (t instanceof ContinueException) {
+            return; // ignore it
+        }
+        if (t instanceof BreakException) {
+            return;//ignore it
+        }
+        if(t instanceof ReturnException){
+            // Can only get one here if the user enters it on the command line
+            workspaceCommands.say(((ReturnException)t).result.toString());
+            return;
+        }
+        if (t instanceof UnknownSymbolException) {
             workspaceCommands.say("unknown symbol:" + t.getMessage() + errorStatement);
             return;
         }

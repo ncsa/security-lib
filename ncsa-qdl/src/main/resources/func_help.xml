@@ -1567,7 +1567,8 @@ E.g.
 0|1|2|3
 
 omits the trailing |.
-See also: truncate, constants (which contains the option values for reference)
+
+See also: tokenize, constants (which contains the option values for reference)
 
 ]]>
         </body>
@@ -2524,6 +2525,14 @@ This creates a table over the region of the plane for -1 <= x <= 1
 and 0 <= y < 3. There are 15 total points in the x direction and
 the y direction is done in increments of 0.25, resulting in 12 values,
 so the result is a 15 x 12 array, with z evaluated at each point.
+
+To get the xy grid, use ~ to stick the x and y coordinates together:
+
+   xy. := for_each(@~, [|-1;1;15|],[0;3;0.25])
+   dim(xy.)
+[15,12,2]
+
+and z.i.j is the value of z() at xy.i.j, i.e. z.i.j == z(xy.i.j.0, xy.i.j.1)
 ]]>
         </body>
     </entry>
@@ -3891,7 +3900,7 @@ can be recursive structures, highly nested etc.) can
 be slow and very difficult. On the other hand, sets may
 be entries in stems with no issues.
 
-See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, to_set, subset(@pick, arg)
+See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>, to_set, subset(@pick, arg)
 ]]>
         </body>
     </entry>

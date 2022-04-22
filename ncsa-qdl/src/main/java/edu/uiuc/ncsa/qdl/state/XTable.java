@@ -96,7 +96,6 @@ public abstract class XTable<K extends XKey, V extends XThing> extends HashMap<K
      */
     public abstract V deserializeElement(XMLEventReader xer, XMLSerializationState XMLSerializationState, QDLInterpreter qi) throws XMLStreamException;
 
-    //public abstract void fromXML(XMLEventReader xer, SerializationObjects serializationObjects) throws XMLStreamException;
 
     UUID uuid = UUID.randomUUID();
 

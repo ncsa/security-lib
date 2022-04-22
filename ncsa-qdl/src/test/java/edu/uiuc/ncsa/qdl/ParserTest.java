@@ -1019,7 +1019,7 @@ public class ParserTest extends AbstractQDLTester {
                 "  ¬¯·×÷⁺→∅∧∨≈≔≕≠≡≤≥⊨⌈⌊⟦⟧≁⊗⊢∈∉∩∪∆\\n" + // unicode
                 "  ΑαΒβΓγΔδΕεΖζΗηΘθϑΙιΚκϰΛλΜμΝνΞξΟοΠπϖΡρϱΣσςΤτΥυΦφΧχΨψΩω';" // Greek
         );
-        addLine(script, "say('printing all base characters with say:\\n');");
+        addLine(script, "say('\\nprinting all base characters with say:');");
         addLine(script, "say(a);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());

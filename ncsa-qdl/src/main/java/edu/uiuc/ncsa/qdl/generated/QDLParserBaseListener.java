@@ -760,18 +760,6 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterToSet(QDLParserParser.ToSetContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -779,6 +767,18 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitToSet(QDLParserParser.ToSetContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryMinusExpression(QDLParserParser.UnaryMinusExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
