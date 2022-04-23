@@ -643,12 +643,12 @@ public class ParserTest extends AbstractQDLTester {
         // if the evaluation is attempted.
         addLine(script, "b := 0 < a ||  d.2 == 5;"); // true
         addLine(script, "c := a < 1 &&  d.2 == 5;"); // false
-        addLine(script, "d := 2 < 3 && (0 < a ⋁ d.2 == 5);"); //true
-        addLine(script, "e := 3 < 2 ⋁ (a < 1 ⋀ d.2 ≡ 5);"); //false
+        addLine(script, "d := 2 < 3 && (0 < a ∨ d.2 == 5);"); //true
+        addLine(script, "e := 3 < 2 ∨ (a < 1 ∧ d.2 ≡ 5);"); //false
         addLine(script, "f := 2 < 3 &&  1 < 3 && 4 < 3;"); //false
         addLine(script, "g := 2 < 3 &&  4 < 3 && 1 < 3;"); //false
-        addLine(script, "h := 4 < 3 ⋀  1 < 3 && 1 < 3;"); //false
-        addLine(script, "i := 0 < 3 ⋀  1 < 3 && 2 < 3;"); //true
+        addLine(script, "h := 4 < 3 ∧  1 < 3 && 1 < 3;"); //false
+        addLine(script, "i := 0 < 3 ∧  1 < 3 && 2 < 3;"); //true
         addLine(script, "j := false ||  true || d.5 == 5;"); //true
         addLine(script, "k := true ||  false || d.5 == 5;"); //true
         addLine(script, "l := is_defined(d.) && d.3 ≤ 5 ;"); //false -- d. undefined
@@ -1995,7 +1995,7 @@ public class ParserTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := [1,3,5,7];");
         addLine(script, "b. := [1,3,6,7];");
-        addLine(script, "x := reduce(@⋁, a. == b.);");
+        addLine(script, "x := reduce(@∨, a. == b.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         // returns true if any elements are true

@@ -656,7 +656,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         // delimiters are space , .
         addLine(script, "x. := tokenize('a d, m, i.n','\\\\s+|,\\\\s*|\\\\.\\\\s*' ,true);"); // rest of string starting at 2
-        addLine(script, "y := reduce(@⋀, x. == ['a','d','m','i','n']);");
+        addLine(script, "y := reduce(@∧, x. == ['a','d','m','i','n']);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("y", state);

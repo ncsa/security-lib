@@ -105,11 +105,11 @@ SCIENTIFIC_NUMBER : Decimal (E SIGN? Integer)?;
     Exponentiation : '^';
     
     // Note that the extra characters for && and || are there because certain unicode aware keyboards
-    // have them rather than the correct one. \u2227 \u2228 are for n-ary expressions properly
-               And : '&&' | '⋀' | '∧'  ; // unicode 22c0, 2227 2229
-                Or : '||' | '⋁' | '∨'  ; // unicode 22c2, 2228 222a
+    // have them rather than the correct one. \u22c0 \u22c1 are for n-ary expressions properly
+               And : '&&'  | '∧'  ; // unicode  2227
+                Or : '||'  | '∨'  ; // unicode  2228
           Backtick : '`';
-           Percent : '%' | '∆'; // \u2206 -- laplace operatos
+           Percent : '%' | '∆'; // \u2206 -- laplace or symm diff operator
              Tilde : '~';
          Backslash : '\\';
               Hash : '#';

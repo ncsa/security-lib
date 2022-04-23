@@ -25,8 +25,7 @@ import static edu.uiuc.ncsa.qdl.variables.Constant.*;
 public class OpEvaluator extends AbstractFunctionEvaluator {
     // reference for unicode and other characters: https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode
     public static final String AND = "&&";
-    public static final String AND2 = "⋀"; // unicode 22c0
-    public static final String AND3 = "∧"; // unicode 2227
+    public static final String AND2 = "∧"; // unicode 2227
     public static final String ASSIGNMENT = ":=";
     public static final String CEILING = "⌈";  // unicode 2308
     public static final String DIVIDE = "/";
@@ -52,8 +51,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
     public static final String NOT_EQUAL = "!=";
     public static final String NOT_EQUAL2 = "≠"; // unicode 2260
     public static final String OR = "||";
-    public static final String OR2 = "⋁"; // unicode 22c1
-    public static final String OR3 = "∨"; // unicode 2228
+    public static final String OR2 = "∨"; // unicode 2228
     public static final String PLUS = "+";
     public static final String PLUS2 = "⁺"; // unciode 207a unary plus
     public static final String PLUS_PLUS = "++";
@@ -123,9 +121,9 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             INTEGER_DIVIDE, SYMMETRIC_DIFFERENCE,
             PLUS, PLUS2,
             MINUS, MINUS2,
-            AND, AND2, AND3,
+            AND, AND2,
             OR,
-            OR2, OR3,
+            OR2,
             EQUALS,
             EQUALS2,
             NOT_EQUAL,
@@ -249,7 +247,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return ASSIGNMENT_VALUE;
             case AND:
             case AND2:
-            case AND3:
                 return AND_VALUE;
             case EQUALS:
             case EQUALS2:
@@ -274,7 +271,6 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 return NOT_EQUAL_VALUE;
             case OR:
             case OR2:
-            case OR3:
                 return OR_VALUE;
             case PLUS:
             case PLUS2:

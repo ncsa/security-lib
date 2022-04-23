@@ -253,7 +253,9 @@ public class MailUtil implements Logable {
                     info("(" + key + "," + replacements.get(key.toString()) + ")");
                 }
             }
-            throwable.printStackTrace();
+            if(DebugUtil.isEnabled()) {
+                throwable.printStackTrace();
+            }
             error("Sending mail failed. Continuing & message reads \"" + throwable.getMessage() + "\"");
             return false;
             //throw new GeneralException("Error", throwable);
