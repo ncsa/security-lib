@@ -143,4 +143,32 @@ public class GenericStoreUtils {
             return a.getCreationTS().compareTo(b.getCreationTS());
         }
     }
+
+    /**
+     * Convert an identifiable object to an {@link XMLMap}. This is useful for serializing
+     * objects in the store, backing them up, etc.
+     * @param store
+     * @param identifiable
+     * @return
+     */
+    public static XMLMap toXML(Store store, Identifiable identifiable) {
+        XMLMap map = new XMLMap();
+        store.getXMLConverter().toMap(identifiable, map);
+        return map;
+    }
+
+    /**
+     * This will convert a map into an object. You must issue a save separately or
+     * if you prefer, {@link #fromXMLAndSave(Store, XMLMap)}.
+     * @param store
+     * @param map
+     * @return
+     */
+    public static Identifiable fromXML(Store store, XMLMap map) {
+        return store.getXMLConverter().fromMap(map, null);
+    }
+
+    public static void fromXMLAndSave(Store store, XMLMap map){
+        store.save(fromXML(store, map));
+    }
 }

@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.delegation.servlet;
 
 import edu.uiuc.ncsa.security.delegation.storage.impl.BasicTransaction;
+import edu.uiuc.ncsa.security.storage.XMLMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,11 +21,13 @@ public class TransactionState {
     public TransactionState(HttpServletRequest request,
                             HttpServletResponse response,
                             Map<String, String> parameters,
-                            BasicTransaction transaction) {
+                            BasicTransaction transaction,
+                            XMLMap backup) {
         this.request = request;
         this.response = response;
         this.parameters = parameters;
         this.transaction = transaction;
+        this.backup = backup;
     }
 
     public HttpServletRequest getRequest() {
@@ -57,4 +60,24 @@ public class TransactionState {
     }
 
     boolean rfc8628 = false;
+
+    /**
+     * Backup of the original transaction before any checks are done. This may be null.
+     * This allows returning the state of the transaction to whatever was there before
+     * the user tried and is intended for allowing a graceful recovery from system
+     * errors. It should never be the case that a user's tokens are invalidated because
+     * of an internal error (e.g their LDAP server is down). Given them a change to fix it
+     * and try again.
+     * @return
+     */
+    // CIL-1268
+    public XMLMap getBackup() {
+        return backup;
+    }
+
+    public void setBackup(XMLMap backup) {
+        this.backup = backup;
+    }
+
+    protected XMLMap backup;
 }
