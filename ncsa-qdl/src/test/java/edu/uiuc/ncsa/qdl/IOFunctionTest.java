@@ -33,10 +33,10 @@ public class IOFunctionTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         Polyad polyad = new Polyad(SystemEvaluator.SAY_FUNCTION);
         String testString = "These are not the droids you are looking for";
+        System.out.println("Check that the phrase \"" + testString + "\" is printed:");
         ConstantNode prompt = new ConstantNode(testString, Constant.STRING_TYPE);
         polyad.getArguments().add(prompt);
         polyad.evaluate(state);
-        System.out.println("Check that the phrase \"" + testString + "\" was printed");
     }
 
     public void testIniFileRead() throws Throwable {

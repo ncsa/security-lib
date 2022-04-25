@@ -93,7 +93,7 @@ public class BasicTransactionConverter<V extends BasicTransaction> extends MapCo
             data.put(getBTKeys().authGrant(), value.getAuthorizationGrant().getToken());
         }
         if (value.hasAccessToken()) {
-            data.put(getBTKeys().accessToken(), value.getAccessToken().getToken());
+            data.put(getBTKeys().accessToken(), value.getAccessToken().getJti().toString());
         }
         if (value.hasVerifier()) {
             data.put(getBTKeys().verifier(), value.getVerifier().getToken());
