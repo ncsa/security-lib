@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9fdd0c4a-20be-4be4-802c-6391237ac776" name="Changes" comment="Removed extra character from parser. Changed MailUtil so it won't barf out stack traces for everything.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/buildNumber.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/IOFunctionTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-qdl/src/test/java/edu/uiuc/ncsa/qdl/IOFunctionTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/cache/Cleanup.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/DebugUtil.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader$MyLoggerProvider.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-core/target/classes/edu/uiuc/ncsa/security/core/util/LoggingConfigLoader$MyLoggerProvider.class" afterDir="false" />
@@ -28,7 +26,6 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/surefire-reports/TEST-edu.uiuc.ncsa.security.util.cache.CacheTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-common/ncsa-security-util/target/test-classes/edu/uiuc/ncsa/security/util/cache/CacheTest.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-client/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.java" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/src/main/java/edu/uiuc/ncsa/security/delegation/storage/impl/BasicTransactionConverter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.FileStoreTest.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-common/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.storage.TransactionCacheTest.xml" afterDir="false" />
@@ -37,6 +34,7 @@
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-delegation-server/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/maven-archiver/pom.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/TEST-edu.uiuc.ncsa.security.delegation.EndToEndTest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-1.0a/target/surefire-reports/edu.uiuc.ncsa.security.delegation.EndToEndTest.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/ncsa-security-delegation/ncsa-security-oauth-2.0/target/maven-archiver/pom.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -107,6 +105,7 @@
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.tabs" />
   </component>
   <component name="RecentsManager">
     <key name="MoveMembersDialog.RECENTS_KEY">
@@ -307,7 +306,7 @@
       <workItem from="1648057789620" duration="97915000" />
       <workItem from="1648869336699" duration="334601000" />
       <workItem from="1650491699361" duration="53607000" />
-      <workItem from="1650665769242" duration="18204000" />
+      <workItem from="1650665769242" duration="47064000" />
     </task>
     <task id="LOCAL-00001" summary="Parameter was being ignored in certain cases, now it's not.">
       <created>1643141922613</created>
@@ -638,7 +637,14 @@
       <option name="project" value="LOCAL" />
       <updated>1650802911542</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Found &amp; fixed tiny edge case for converting transactions.">
+      <created>1650925152448</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1650925152448</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -648,7 +654,6 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.mdl" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="5.2.5 final checkin. Updated online help. Found an edge case where formatting a string lost a few linefeeds." />
     <MESSAGE value="Creating 5.2.5" />
     <MESSAGE value="Bad version number in QDL pom.xml." />
     <MESSAGE value="Merge from 5.2.5 branch. CIL-1225" />
@@ -673,7 +678,8 @@
     <MESSAGE value="Changed order of operations, so yet another parser rebuild. Changed some formatting, tweaked a few tests. Updated manuals." />
     <MESSAGE value="Removed extra character from parser. Changed MailUtil so it won't barf out stack traces for everything." />
     <MESSAGE value="CIL-1268. Added tracking original state so certain errors can be backed out of generally across all components. No internal server errors, e.g., should ever invalidated tokens." />
-    <option name="LAST_COMMIT_MESSAGE" value="CIL-1268. Added tracking original state so certain errors can be backed out of generally across all components. No internal server errors, e.g., should ever invalidated tokens." />
+    <MESSAGE value="Found &amp; fixed tiny edge case for converting transactions." />
+    <option name="LAST_COMMIT_MESSAGE" value="Found &amp; fixed tiny edge case for converting transactions." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
   </component>
   <component name="XDebuggerManager">
