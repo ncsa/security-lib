@@ -128,25 +128,25 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 5) {
-             throw new MissingArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments");
+             throw new MissingArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad);
          }
 
          if (5 < polyad.getArgCount()) {
-             throw new ExtraArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments");
+             throw new ExtraArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad.getArgAt(5));
          }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
-            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires a stem as its first argument");
+            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires a stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable souorceStem = (StemVariable) arg1;
 
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
         if (!isLong(arg2)) {
-            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its second argument");
+            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its second argument", polyad.getArgAt(1));
         }
         Long startIndex = (Long) arg2;
 
@@ -154,7 +154,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg3, polyad.getArgAt(2));
 
         if (!isLong(arg3)) {
-            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its third argument");
+            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its third argument", polyad.getArgAt(2));
         }
         Long length = (Long) arg3;
 
@@ -169,7 +169,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             checkNull(obj, polyad.getArgAt(3));
 
             if (!isStem(obj)) {
-                throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fifth argument");
+                throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fourth argument", polyad.getArgAt(3));
             }
             targetStem = (StemVariable) obj;
         }
@@ -178,8 +178,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg5, polyad.getArgAt(4));
 
         if (!isLong(arg5)) {
-            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fifth argument");
-        }
+            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fifth argument", polyad.getArgAt(4));        }
         Long targetIndex = (Long) arg5;
 
         if (doInsert) {
@@ -210,11 +209,11 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  return true;
              }
          if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(LIST_SUBSET + " requires at least 2 arguments");
+             throw new MissingArgException(LIST_SUBSET + " requires at least 2 arguments", polyad);
          }
 
          if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(LIST_SUBSET + " requires at most 3 arguments");
+             throw new ExtraArgException(LIST_SUBSET + " requires at most 3 arguments", polyad.getArgAt(3));
          }
 
         // Another case if subset(@f, arg) will pick elements of arg and return them
@@ -226,12 +225,12 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
         if (isScalar(arg1)) {
-            throw new BadArgException(LIST_SUBSET + " requires stem or set as its first argument");
+            throw new BadArgException(LIST_SUBSET + " requires stem or set as its first argument", polyad.getArgAt(0));
         }
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
         if (!isLong(arg2)) {
-            throw new BadArgException(LIST_SUBSET + " requires an integer as its second argument");
+            throw new BadArgException(LIST_SUBSET + " requires an integer as its second argument", polyad.getArgAt(1));
         }
         Long endIndex = 0L;
         StemVariable stem = null;
@@ -270,7 +269,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             checkNull(arg3, polyad.getArgAt(2));
 
             if (!isLong(arg3)) {
-                throw new BadArgException(LIST_SUBSET + " requires an integer as its third argument");
+                throw new BadArgException(LIST_SUBSET + " requires an integer as its third argument", polyad.getArgAt(2));
             }
             endIndex = (Long) arg3;
         }
@@ -378,10 +377,10 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
         if (polyad.getArgCount()<2) {
-            throw new MissingArgException(LIST_STARTS_WITH + " requires 2 arguments");
+            throw new MissingArgException(LIST_STARTS_WITH + " requires 2 arguments", polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(LIST_STARTS_WITH + " requires 2 arguments");
+            throw new ExtraArgException(LIST_STARTS_WITH + " requires 2 arguments", polyad.getArgAt(2));
          }
 
         Object leftArg = polyad.evalArg(0, state);
@@ -396,7 +395,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             if (isStem(leftArg)) {
                 leftStem = (StemVariable) leftArg;
             } else {
-                throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the left argument.");
+                throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the left argument.", polyad.getArgAt(0));
             }
         }
 
@@ -413,14 +412,9 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                 rightStem = (StemVariable) rightArg;
 
             } else {
-                throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the right argument.");
+                throw new BadArgException(LIST_STARTS_WITH + " requires a stem for the right argument.", polyad.getArgAt(1));
             }
         }
-        /*
-          g. := ['wlcg.groups', 'wlcg.groups:/cms/uscms', 'wlcg.groups:/cms/ALARM','wlcg.groups:/cms/users']
-   w := 'wlcg.groups'
-   s. := 'openid' ~ 'email' ~ 'profile' ~ g.
-         */
         StemVariable output = new StemVariable();
         for (long i = 0; i < leftStem.size(); i++) {
             boolean gotOne = false;
@@ -447,18 +441,18 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount()<1) {
-             throw new MissingArgException(LIST_REVERSE + " requires at least 1 argument");
+             throw new MissingArgException(LIST_REVERSE + " requires at least 1 argument", polyad);
          }
 
          if (2<polyad.getArgCount()) {
-             throw new ExtraArgException(LIST_REVERSE + " requires at most 2 arguments");
+             throw new ExtraArgException(LIST_REVERSE + " requires at most 2 arguments", polyad.getArgAt(2));
          }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
-            throw new BadArgException(LIST_REVERSE + " requires a stem as its argument.");
+            throw new BadArgException(LIST_REVERSE + " requires a stem as its argument.", polyad.getArgAt(0));
         }
         int axis = 0;
         if (polyad.getArgCount() == 2) {
@@ -466,7 +460,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             checkNull(arg2, polyad.getArgAt(1));
 
             if (!isLong(arg2)) {
-                throw new BadArgException(LIST_REVERSE + " an integer as its axis.");
+                throw new BadArgException(LIST_REVERSE + " an integer as its axis.", polyad.getArgAt(1));
             }
             axis = ((Long) arg2).intValue();
         }

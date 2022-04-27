@@ -61,6 +61,7 @@ public interface QDLConstants {
 
     String SYS_ERROR_CODES = "error_codes.";
     String SYS_ERROR_CODE_SYSTEM_ERROR = "system_error";
+    String SYS_ASSERT_CODE_SYSTEM_ERROR = "assert_error_code";
     String SYS_ERROR_CODE_DEFAULT_USER_ERROR = "default_user_error";
 
     String SYS_FILE_TYPES = "file_types.";

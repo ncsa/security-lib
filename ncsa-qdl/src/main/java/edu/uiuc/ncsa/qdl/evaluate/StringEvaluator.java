@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLCodec;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
@@ -235,11 +236,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(TAIL + " requires 2 arguments");
+            throw new MissingArgException(TAIL + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(TAIL + " requires 2 arguments");
+            throw new ExtraArgException(TAIL + " requires at most 3 arguments", polyad.getArgAt(3));
         }
 
         fPointer pointer = new fPointer() {
@@ -250,7 +251,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 boolean isRegEx = false;
                 if (objects.length == 3) {
                     if (!(objects[2] instanceof Boolean)) {
-                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.");
+                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.", polyad.getArgAt(2));
                     }
                     isRegEx = (Boolean) objects[2];
                 }
@@ -290,11 +291,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(DIFF + " requires 2 arguments");
+            throw new MissingArgException(DIFF + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(DIFF + " requires 2 arguments");
+            throw new ExtraArgException(DIFF + " requires 2 arguments", polyad.getArgAt(2));
         }
 
         fPointer pointer = new fPointer() {
@@ -331,7 +332,8 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = Constant.LONG_TYPE;
                     return r;
                 }
-                throw new BadArgException(DIFF + " requires both argument be strings.");
+                Statement s = isString(objects[0])?polyad.getArgAt(0) : polyad.getArgAt(1);
+                throw new BadArgException(DIFF + " requires both argument be strings.", s);
             }
         };
         process2(polyad, pointer, DIFF, state, false);
@@ -344,11 +346,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(CAPUT + " requires 2 arguments");
+            throw new MissingArgException(CAPUT + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(CAPUT + " requires at most 3 arguments");
+            throw new ExtraArgException(CAPUT + " requires at most 3 arguments", polyad.getArgAt(3));
         }
 
         fPointer pointer = new fPointer() {
@@ -359,7 +361,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 boolean isRegEx = false;
                 if (objects.length == 3) {
                     if (!(objects[2] instanceof Boolean)) {
-                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.");
+                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.", polyad.getArgAt(2));
                     }
                     isRegEx = (Boolean) objects[2];
                 }
@@ -401,16 +403,16 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(FROM_URI + " requires at least 1 argument");
+            throw new MissingArgException(FROM_URI + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(FROM_URI + " requires at most 1 argument");
+            throw new ExtraArgException(FROM_URI + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         Object object = polyad.evalArg(0, state);
         if (!isStem(object)) {
-            throw new BadArgException(FROM_URI + " requires a stem as its argument");
+            throw new BadArgException(FROM_URI + " requires a stem as its argument", polyad.getArgAt(0));
         }
 
         StemVariable s = (StemVariable) object;
@@ -445,15 +447,15 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(TO_URI + " requires at least 1 argument");
+            throw new MissingArgException(TO_URI + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(TO_URI + " requires at most 1 argument");
+            throw new ExtraArgException(TO_URI + " requires at most 1 argument", polyad.getArgAt(1));
         }
         Object object = polyad.evalArg(0, state);
         if (!isString(object)) {
-            throw new BadArgException(TO_URI + " requires a string as its argument");
+            throw new BadArgException(TO_URI + " requires a string as its argument", polyad.getArgAt(0));
         }
         try {
             URI uri = URI.create(object.toString());
@@ -472,7 +474,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(Boolean.TRUE);
             return;
         } catch (Throwable t) {
-            throw new IllegalArgumentException("'" + object + "' is not a valid uri: " + t.getMessage());
+            throw new BadArgException("'" + object + "' is not a valid uri: " + t.getMessage(), polyad.getArgAt(0));
         }
 
     }
@@ -499,11 +501,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(DETOKENIZE + " requires at least 2 arguments");
+            throw new MissingArgException(DETOKENIZE + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(DETOKENIZE + " requires at most 3 argument2");
+            throw new ExtraArgException(DETOKENIZE + " requires at most 3 arguments", polyad.getArgAt(3));
         }
 
         Object leftArg = polyad.evalArg(0, state);
@@ -513,7 +515,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
         if (polyad.getArgCount() == 3) {
             Object prepend = polyad.evalArg(2, state);
             if (!isLong(prepend)) {
-                throw new BadArgException("the third argument for " + DETOKENIZE + " must be a n integer. You supplied '" + prepend + "'");
+                throw new BadArgException("the third argument for " + DETOKENIZE + " must be a n integer. You supplied '" + prepend + "'", polyad.getArgAt(2));
             }
             int options = ((Long) prepend).intValue();
             switch (options) {
@@ -600,7 +602,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
 
         } else {
             if (isStem(rightArg)) {
-                throw new IllegalArgumentException("a stem of delimiters cannot be applied to a scalar.");
+                throw new BadArgException("a stem of delimiters cannot be applied to a scalar.", polyad.getArgAt(1));
             }
             if (omitDanglingDelimiter) {
                 result = leftArg.toString();
@@ -626,11 +628,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(DECODE + " requires at least 1 argument");
+            throw new MissingArgException(DECODE + " requires at least 1 argument",polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(DECODE + " requires at most 1 argument");
+            throw new ExtraArgException(DECODE + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         QDLCodec codec = new QDLCodec();
@@ -659,11 +661,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(ENCODE + " requires at least 1 argument");
+            throw new MissingArgException(ENCODE + " requires at least 1 argument",polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(ENCODE + " requires at most 1 argument");
+            throw new ExtraArgException(ENCODE + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         QDLCodec codec = new QDLCodec();
@@ -692,11 +694,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             return;
         }
          if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(SUBSTRING + " requires at least 1 argument");
+             throw new MissingArgException(SUBSTRING + " requires at least 1 argument",polyad);
          }
 
          if (4 < polyad.getArgCount()) {
-             throw new ExtraArgException(SUBSTRING + " requires at most 4 arguments");
+             throw new ExtraArgException(SUBSTRING + " requires at most 4 arguments", polyad.getArgAt(4));
          }
 
         fPointer pointer = new fPointer() {
@@ -704,24 +706,24 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult result = new fpResult();
                 if (!isString(objects[0])) {
-                    throw new BadArgException("The first argument to " + SUBSTRING + " must be a string.");
+                    throw new BadArgException("The first argument to " + SUBSTRING + " must be a string.", polyad.getArgAt(0));
                 }
                 String arg = objects[0].toString();
                 if (!isLong(objects[1])) {
-                    throw new BadArgException("The second argument to " + SUBSTRING + " must be an integer.");
+                    throw new BadArgException("The second argument to " + SUBSTRING + " must be an integer.", polyad.getArgAt(1));
                 }
                 int n = ((Long) objects[1]).intValue();
                 int length = arg.length(); // default
                 String padding = null;
                 if (2 < objects.length) {
                     if (!isLong(objects[2])) {
-                        throw new BadArgException("The third argument to " + SUBSTRING + " must be an integer.");
+                        throw new BadArgException("The third argument to " + SUBSTRING + " must be an integer.", polyad.getArgAt(2));
                     }
                     length = ((Long) objects[2]).intValue();
                 }
                 if (3 < objects.length) {
                     if (!isString(objects[3])) {
-                        throw new BadArgException("The fourth argument to " + SUBSTRING + " must be a string.");
+                        throw new BadArgException("The fourth argument to " + SUBSTRING + " must be a string.", polyad.getArgAt(3));
                     }
                     padding = objects[3].toString();
                 }
@@ -756,11 +758,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 1) {
-             throw new MissingArgException(TRIM + " requires at least 1 argument");
+             throw new MissingArgException(TRIM + " requires at least 1 argument",polyad);
          }
 
          if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException(TRIM + " requires at most 1 argument");
+             throw new ExtraArgException(TRIM + " requires at most 1 argument", polyad.getArgAt(1));
          }
 
         fPointer pointer = new fPointer() {
@@ -787,11 +789,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(INDEX_OF + " requires at least 2 arguments");
+             throw new MissingArgException(INDEX_OF + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
          }
 
          if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(INDEX_OF + " requires at most 3 arguments");
+             throw new ExtraArgException(INDEX_OF + " requires at most 3 arguments", polyad.getArgAt(3));
          }
 
         fPointer pointer = new fPointer() {
@@ -802,7 +804,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 boolean caseSensitive = true;
                 if (objects.length == 3) {
                     if (!(objects[2] instanceof Boolean)) {
-                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.");
+                        throw new BadArgException("if the 3rd argument is given, it must be a boolean.", polyad.getArgAt(2));
                     }
                     caseSensitive = (Boolean) objects[2];
                 }
@@ -832,11 +834,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(CONTAINS + " requires at least 2 arguments");
+             throw new MissingArgException(CONTAINS + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
          }
 
          if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(CONTAINS + " requires at most 3 arguments");
+             throw new ExtraArgException(CONTAINS + " requires at most 3 arguments", polyad.getArgAt(3));
          }
 
         fPointer pointer = new fPointer() {
@@ -847,7 +849,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                     boolean caseSensitive = true;
                     if (objects.length == 3) {
                         if (!(objects[2] instanceof Boolean)) {
-                            throw new BadArgException("if the 3rd argument is given, it must be a boolean.");
+                            throw new BadArgException("if the 3rd argument is given, it must be a boolean.", polyad.getArgAt(2));
                         }
                         caseSensitive = (Boolean) objects[2];
                     }
@@ -877,11 +879,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 1) {
-             throw new MissingArgException((isLower?TO_LOWER:TO_UPPER) + " requires at least 1 argument");
+             throw new MissingArgException((isLower?TO_LOWER:TO_UPPER) + " requires at least 1 argument", polyad);
          }
 
          if (1 < polyad.getArgCount()) {
-             throw new ExtraArgException((isLower?TO_LOWER:TO_UPPER) + " requires at most 1 argument");
+             throw new ExtraArgException((isLower?TO_LOWER:TO_UPPER) + " requires at most 1 argument", polyad.getArgAt(1));
          }
 
         fPointer pointer = new fPointer() {
@@ -912,11 +914,23 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 3) {
-             throw new MissingArgException(REPLACE + " requires at least 3 arguments");
+             Statement s =polyad;
+             switch (polyad.getArgCount()){
+                 case 0:
+                     s = polyad;
+                     break;
+                 case 1:
+                     s = polyad.getArgAt(0);
+                     break;
+                 case 2:
+                     s = polyad.getArgAt(1);
+                     break;
+             }
+             throw new MissingArgException(REPLACE + " requires at least 3 arguments", s);
          }
 
          if (4 < polyad.getArgCount()) {
-             throw new ExtraArgException(REPLACE + " requires at most 4 arguments");
+             throw new ExtraArgException(REPLACE + " requires at most 4 arguments", polyad.getArgAt(4));
          }
 
         fPointer pointer = new fPointer() {
@@ -926,7 +940,7 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                 boolean doregex = false;
                 if (objects.length == 4) {
                     if (!isBoolean(objects[3])) {
-                        throw new BadArgException("error. replace requires a boolean as its 4th argument");
+                        throw new BadArgException("error. replace requires a boolean as its 4th argument", polyad.getArgAt(3));
                     }
                     doregex = (Boolean) objects[3];
                 }
@@ -954,11 +968,20 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 3) {
-             throw new MissingArgException(INSERT + " requires at least 3 arguments");
+             Statement s = polyad;
+             switch (polyad.getArgCount()){
+                 case 1:
+                     s = polyad.getArgAt(0);
+                     break;
+                 case 2:
+                     s = polyad.getArgAt(1);
+                     break;
+             }
+             throw new MissingArgException(INSERT + " requires at least 3 arguments", s);
          }
 
          if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(INSERT + " requires at most 3 arguments");
+             throw new ExtraArgException(INSERT + " requires at most 3 arguments", polyad.getArgAt(3));
          }
 
         fPointer pointer = new fPointer() {
@@ -988,11 +1011,11 @@ public class StringEvaluator extends AbstractFunctionEvaluator {
                  return;
              }
          if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(TOKENIZE + " requires at least 2 arguments");
+             throw new MissingArgException(TOKENIZE + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
          }
 
          if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(TOKENIZE + " requires at most 3 arguments");
+             throw new ExtraArgException(TOKENIZE + " requires at most 3 arguments", polyad.getArgAt(3));
          }
 
         // contract is tokenize(string, delimiter) returns stem of tokens

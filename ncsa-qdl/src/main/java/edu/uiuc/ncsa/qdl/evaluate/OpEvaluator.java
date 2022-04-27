@@ -393,7 +393,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             dyad.setEvaluated(monad.isEvaluated());
             return;
         }
-         state.getMetaEvaluator().evaluate(polyad, state);
+        state.getMetaEvaluator().evaluate(polyad, state);
         dyad.setResult(polyad.getResult());
         dyad.setResultType(polyad.getResultType());
         dyad.setEvaluated(polyad.isEvaluated());
@@ -413,11 +413,11 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAllSets(objects)) {
-                    throw new IllegalArgumentException(REGEX_MATCH + " not defined on sets.");
+                    throw new QDLExceptionWithTrace(REGEX_MATCH + " not defined on sets.", dyad.getLeftArgument());
                 }
 
                 if (!isString(objects[0])) {
-                    throw new IllegalArgumentException(REGEX_MATCH + " requires a regular expression as its left argument");
+                    throw new QDLExceptionWithTrace(REGEX_MATCH + " requires a regular expression as its left argument", dyad.getLeftArgument());
                 }
                 String regex = objects[0].toString();
                 String ob = objects[1].toString();
@@ -457,8 +457,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             // so they are trying to append the list to an existing stem.
             // In that case it becomes another entry
             Object obj0 = dyad.evalArg(0, state);
-            if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
-                throw new IllegalArgumentException("cannot do a union a null");
+            if ((obj0 instanceof QDLNull) ) {
+                throw new QDLExceptionWithTrace("cannot do a union a null", dyad.getLeftArgument());
+
+            }
+            if ((obj1 instanceof QDLNull)) {
+                throw new QDLExceptionWithTrace("cannot do a union a null", dyad.getRightArgument());
             }
             StemVariable stem0;
             if (obj0 instanceof StemVariable) {
@@ -483,8 +487,14 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         Object obj0 = dyad.evalArg(0, state);
-        if ((obj0 instanceof QDLNull) || (obj1 instanceof QDLNull)) {
-            throw new IllegalArgumentException("cannot do a union a null");
+        if ((obj0 instanceof QDLNull)) {
+            throw new QDLExceptionWithTrace("cannot do union on a null", dyad.getLeftArgument());
+
+        }
+        if ((obj0 instanceof QDLNull)) {
+           // throw new IllegalArgumentException("cannot do a union a null");
+            throw new QDLExceptionWithTrace("cannot do union on a null", dyad.getRightArgument());
+
         }
 
         StemVariable stem0 = null;
@@ -527,7 +537,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     return r;
                 }
                 if (!areAllNumbers(objects)) {
-                    throw new IllegalArgumentException("operation is not defined for  non-numeric types");
+                    throw new QDLExceptionWithTrace("operation is not defined for  non-numeric types", dyad.getLeftArgument());
                 }
                 if (areAllLongs(objects)) {
                     r.result = (Long) objects[0] / (Long) objects[1];
@@ -539,7 +549,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     try {
                         rr = left.divideToIntegralValue(right, OpEvaluator.getMathContext());
                     } catch (ArithmeticException ax0) {
-                        throw new IllegalArgumentException("Insufficient precision to divide. Please increase " + MathEvaluator.NUMERIC_DIGITS);
+                        throw new QDLExceptionWithTrace("Insufficient precision to divide. Please increase " + MathEvaluator.NUMERIC_DIGITS, dyad.getRightArgument());
                     }
                     try {
                         r.result = rr.longValueExact();
@@ -563,7 +573,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAllSets(objects)) {
-                    throw new IllegalArgumentException(POWER + " not defined for sets.");
+                    throw new QDLExceptionWithTrace(POWER + " not defined for sets.", dyad);
                 }
                 if (areAllNumbers(objects)) {
                     boolean doBigD = isBigDecimal(objects[0]) || isBigDecimal(objects[1]);
@@ -586,7 +596,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = DECIMAL_TYPE;
 
                 } else {
-                    throw new IllegalArgumentException("Exponentiation requires a int or decimal be raised to an int power");
+                    throw new QDLExceptionWithTrace("Exponentiation requires a int or decimal be raised to an int power", dyad.getLeftArgument());
                 }
                 return r;
             }
@@ -624,8 +634,29 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     }
                     return r;
                 }
+                if (areAllStrings(objects)) {
+                    String left = (String) objects[0];
+                    String right = (String) objects[1];
+                    r.resultType = BOOLEAN_TYPE;
+
+                    switch (dyad.getOperatorType()) {
+                        case LESS_THAN_VALUE:
+                            r.result = -1 < right.indexOf(left) && left.length() < right.length();
+                            break;
+                        case LESS_THAN_EQUAL_VALUE:
+                            r.result = -1 < right.indexOf(left);
+                            break;
+                        case MORE_THAN_VALUE:
+                            r.result = -1 < left.indexOf(right) && right.length() < left.length();
+                            break;
+                        case MORE_THAN_EQUAL_VALUE:
+                            r.result = -1 < left.indexOf(right);
+                            break;
+                    }
+                    return r;
+                }
                 if (!areAllNumbers(objects)) {
-                    throw new IllegalArgumentException("only numbers may be compared");
+                    throw new QDLExceptionWithTrace("only numbers may be compared", dyad.getLeftArgument());
                 }
                 BigDecimal left = toBD(objects[0]);
                 BigDecimal right = toBD(objects[1]);
@@ -770,7 +801,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!areAllSets(objects)) {
-                    throw new IllegalArgumentException("Set operations require only sets");
+                    throw new QDLExceptionWithTrace("Set operations require only sets", dyad.getLeftArgument());
                 }
                 QDLSet leftSet = (QDLSet) objects[0];
                 QDLSet rightSet = (QDLSet) objects[1];
@@ -825,7 +856,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
                 }
                 if (!areAllBoolean(objects)) {
-                    throw new IllegalArgumentException("arguments must be boolean for logical operations");
+                    throw new QDLExceptionWithTrace("arguments must be boolean for logical operations", dyad.getLeftArgument());
                 }
                 Boolean left = (Boolean) objects[0];
                 Boolean right = (Boolean) objects[1];
@@ -874,7 +905,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (areAllSets(objects)) {
-                    throw new IllegalArgumentException(MINUS + " not defined on sets. Did you mean difference (" + DIVIDE + ")?");
+                    throw new QDLExceptionWithTrace(MINUS + " not defined on sets. Did you mean difference (" + DIVIDE + ")?", dyad);
                 }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
@@ -893,7 +924,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = DECIMAL_TYPE;
                 } else {
                     if (!areAllStrings(objects)) {
-                        throw new IllegalArgumentException("cannot perform " + MINUS + " on mixed argument types.");
+                        throw new QDLExceptionWithTrace("cannot perform " + MINUS + " on mixed argument types.", dyad.getLeftArgument());
                     }
                     String lString = objects[0].toString();
                     String rString = objects[1].toString();
@@ -918,7 +949,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 fpResult r = new fpResult();
                 if (areAllSets(objects)) {
                     if (doTimes) {
-                        throw new IllegalArgumentException(TIMES + " not defined on sets.");
+                        throw new QDLExceptionWithTrace(TIMES + " not defined on sets.", dyad.getLeftArgument());
                     }
                     QDLSet leftSet = (QDLSet) objects[0];
                     QDLSet rightSet = (QDLSet) objects[1];
@@ -970,7 +1001,40 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     return r;
 
                 } else {
-                    throw new IllegalArgumentException("operation is not defined for  non-numeric types");
+                    long count = 0;
+                    String arg = "";
+                    String tempOutput = "";
+                    boolean gotOne = false;
+                    if (doTimes && isLong(objects[0]) && isString(objects[1])) {
+                        count = (Long) objects[0];
+                        arg = (String) objects[1];
+                        if(count <0){
+                            throw new QDLExceptionWithTrace("multiplication is not defined for strings and  negative integers",dyad.getLeftArgument());
+                        }
+                        gotOne = 0 <= count;
+                    }
+                    if (doTimes && isLong(objects[1]) && isString(objects[0])) {
+                        arg = (String) objects[0];
+                        count = (Long) objects[1];
+                        if(count <0){
+                            throw new QDLExceptionWithTrace("multiplication is not defined for strings and  negative integers",dyad.getRightArgument());
+                        }
+                        gotOne = 0 <= count;
+                    }
+
+                    if (gotOne) {
+                        r.resultType = STRING_TYPE;
+                        if (count == 0) {
+                            r.result = "";
+                            return r;
+                        }
+                        for (long i = 0; i < count; i++) {
+                            tempOutput = tempOutput + arg;
+                        }
+                        r.result = tempOutput;
+                        return r;
+                    }
+                    throw new QDLExceptionWithTrace("operation is not defined for  non-numeric types", dyad);
                 }
             }
         };
@@ -1001,7 +1065,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 // At this point, only scalars should ever get passed here as arguments.
                 fpResult r = new fpResult();
                 if (areAllSets(objects)) {
-                    throw new IllegalArgumentException(PLUS + " not defined on sets. Did you mean union (" + AND + ")?");
+                    throw new QDLExceptionWithTrace(PLUS + " not defined on sets. Did you mean union (" + AND + ")?", dyad);
                 }
                 if (areAllNumbers(objects)) {
                     if (areAllLongs(objects)) {
@@ -1027,7 +1091,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     return r;
                 }
                 // This is a stem
-                throw new IllegalArgumentException("stem encountered in scalar operation");
+                throw new QDLExceptionWithTrace("stem encountered in scalar operation", dyad);
             }
         };
         process2(dyad, pointer, PLUS, state);
@@ -1140,7 +1204,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
      */
     protected void doMonadIncOrDec(Monad monad, State state, boolean isPlusPlus) {
         if (!(monad.getArgument() instanceof VariableNode)) {
-            throw new IllegalArgumentException("You can only " + (isPlusPlus ? "increment" : "decrement") + " a variable.");
+            throw new QDLExceptionWithTrace("You can only " + (isPlusPlus ? "increment" : "decrement") + " a variable.", monad.getArgument());
         }
         VariableNode var = (VariableNode) monad.getArgument();
         Object obj = var.evaluate(state);
@@ -1170,7 +1234,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             monad.setResultType(DECIMAL_TYPE); // should be redundant
         }
         if (!gotOne) {
-            throw new IllegalArgumentException("" + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires a number value");
+            throw new QDLExceptionWithTrace("" + (isPlusPlus ? PLUS_PLUS : MINUS_MINUS) + " requires a number value", monad.getArgument());
         }
         if (monad.isPostFix()) {
             monad.setResult(obj); // so the returned result is NOT incremented for postfixes.
@@ -1188,7 +1252,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             public fpResult process(Object... objects) {
                 fpResult r = new fpResult();
                 if (!isBoolean(objects[0])) {
-                    throw new IllegalArgumentException("negation requires a strictly boolean argument not '" + objects[0] + "'");
+                    throw new QDLExceptionWithTrace("negation requires a strictly boolean argument not '" + objects[0] + "'", monad.getArgument());
                 }
                 r.result = !(Boolean) objects[0];
                 r.resultType = BOOLEAN_TYPE;
@@ -1232,7 +1296,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.resultType = STRING_TYPE;
                         break;
                     default:
-                        throw new IllegalArgumentException("You can only take the negative of a number or string");
+                        throw new QDLExceptionWithTrace("You can only take the negative of a number or string", monad.getArgument());
 
                 }
                 return r;

@@ -1,5 +1,6 @@
 package edu.uiuc.ncsa.qdl.statements;
 
+import edu.uiuc.ncsa.qdl.exceptions.AssertionException;
 import edu.uiuc.ncsa.qdl.exceptions.RaiseErrorException;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
@@ -22,7 +23,8 @@ public class TryCatch implements Statement {
 
     @Override
     public boolean hasTokenPosition() {return tokenPosition!=null;}
-    public static final Long RESERVED_ERROR_CODE = -1L;
+    public static final Long RESERVED_SYSTEM_ERROR_CODE = -1L;
+    public static final Long RESERVED_ASSERTION_CODE = -2L;
     public static final Long RESERVED_USER_ERROR_CODE = 0L;
 
     @Override
@@ -34,14 +36,6 @@ public class TryCatch implements Statement {
             }
         } catch (RaiseErrorException t) {
             // custom error handling
-/*
-            localState.getVStack().getLocalST().setValue("error_message", t.getPolyad().getArguments().get(0).getResult().toString());
-            if(t.getPolyad().getArgCount() ==2) {
-                localState.getVStack().getLocalST().setValue("error_code", (Long) t.getPolyad().getArguments().get(1).getResult());
-            }else{
-                localState.getVStack().getLocalST().setValue("error_code", RESERVED_USER_ERROR_CODE);
-            }
-*/
             localState.getVStack().localPut(new VThing(new XKey("error_message"), t.getPolyad().getArguments().get(0).getResult().toString()));
             if(t.getPolyad().getArgCount() ==2) {
                 localState.getVStack().localPut(new VThing(new XKey("error_code"), (Long) t.getPolyad().getArguments().get(1).getResult()));
@@ -54,12 +48,12 @@ public class TryCatch implements Statement {
             }
         } catch (Throwable otherT) {
             // everything else.
-/*
-            localState.getVStack().getLocalST().setValue("error_message", otherT.getMessage());
-            localState.getVStack().getLocalST().setValue("error_code", RESERVED_ERROR_CODE);
-*/
             localState.getVStack().localPut(new VThing(new XKey("error_message"), otherT.getMessage()));
-            localState.getVStack().localPut(new VThing(new XKey("error_code"), RESERVED_ERROR_CODE));
+            if(otherT instanceof AssertionException){
+                localState.getVStack().localPut(new VThing(new XKey("error_code"), RESERVED_ASSERTION_CODE));
+            }else{
+                localState.getVStack().localPut(new VThing(new XKey("error_code"), RESERVED_SYSTEM_ERROR_CODE));
+            }
 
             for (Statement c : catchStatements) {
                 c.evaluate(localState);

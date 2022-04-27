@@ -229,10 +229,10 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                             String name,
                             State state) {
         if(polyad.getArgCount() == 0){
-            throw new MissingArgException(name + " requires 1 argument");
+            throw new MissingArgException(name + " requires at least 1 argument", polyad);
         }
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(name + " requires 1 argument");
+            throw new ExtraArgException(name + " requires at most 1 argument", polyad.getArgAt(0));
         }
         Object arg1 = polyad.evalArg(0, state);
 

@@ -67,17 +67,17 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                     return true;
                 }
                 if (polyad.getArgCount() < 1) {
-                    throw new MissingArgException(IS_FUNCTION + " requires at least 1 argument");
+                    throw new MissingArgException(IS_FUNCTION + " requires at least 1 argument", polyad);
                 }
 
                 if (2 < polyad.getArgCount()) {
-                    throw new ExtraArgException(IS_FUNCTION + " requires at most 2 argument");
+                    throw new ExtraArgException(IS_FUNCTION + " requires at most 2 argument", polyad.getArgAt(1));
                 }
                 int argCount = -1; // default -- get any
                 if (polyad.getArgCount() == 2) {
                     Object object2 = polyad.evalArg(1, state);
                     if (!isLong(object2)) {
-                        throw new BadArgException(" The argument count must be a number.");
+                        throw new BadArgException(" The argument count must be a number.", polyad.getArgAt(1));
                     }
                     argCount = ((Long) object2).intValue();
                 }

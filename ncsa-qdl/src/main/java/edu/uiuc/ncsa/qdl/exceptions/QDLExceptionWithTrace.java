@@ -10,6 +10,7 @@ import edu.uiuc.ncsa.qdl.statements.Statement;
  * on 11/3/21 at  4:08 PM
  */
 public class QDLExceptionWithTrace extends QDLException{
+
     public boolean hasStatement(){
         return statement != null;
     }

@@ -265,7 +265,8 @@ public class State extends FunctionState implements QDLConstants {
         systemConstants.put(SYS_DETOKENIZE_TYPE, detokenizeTypes);
 
         StemVariable errorCodes = new StemVariable();
-        errorCodes.put(SYS_ERROR_CODE_SYSTEM_ERROR, TryCatch.RESERVED_ERROR_CODE);
+        errorCodes.put(SYS_ERROR_CODE_SYSTEM_ERROR, TryCatch.RESERVED_SYSTEM_ERROR_CODE);
+        errorCodes.put(SYS_ASSERT_CODE_SYSTEM_ERROR, TryCatch.RESERVED_ASSERTION_CODE);
         errorCodes.put(SYS_ERROR_CODE_DEFAULT_USER_ERROR, TryCatch.RESERVED_USER_ERROR_CODE);
         systemConstants.put(SYS_ERROR_CODES, errorCodes);
         StemVariable fileTypes = new StemVariable();

@@ -222,11 +222,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException((isFloor ? FLOOR : CEILING) + " requires at least 1 argument");
+            throw new MissingArgException((isFloor ? FLOOR : CEILING) + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException((isFloor ? FLOOR : CEILING) + " requires at most 1 argument");
+            throw new ExtraArgException((isFloor ? FLOOR : CEILING) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         fPointer pointer = new fPointer() {
@@ -244,7 +244,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 if (ob instanceof BigDecimal) {
                     bd = (BigDecimal) ob;
                 } else {
-                    throw new IllegalArgumentException((isFloor ? FLOOR : CEILING) + " is only defined for numbers");
+                    throw new BadArgException((isFloor ? FLOOR : CEILING) + " is only defined for numbers", polyad.getArgAt(0));
                 }
                 if (isFloor) {
                     r.result = bd.setScale(0, RoundingMode.FLOOR);
@@ -266,11 +266,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(N_ROOT + " requires 2 arguments");
+            throw new MissingArgException(N_ROOT + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(N_ROOT + " requires at most 2 arguments");
+            throw new ExtraArgException(N_ROOT + " requires at most 2 arguments", polyad.getArgAt(2));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -280,10 +280,10 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 Object arg1 = objects[0];
                 Object arg2 = objects[1];
                 if (isBoolean(arg1) || isString(arg1) || arg1 == QDLNull.getInstance()) {
-                    throw new IllegalArgumentException(N_ROOT + " requires a numeric argument as its base");
+                    throw new QDLExceptionWithTrace(N_ROOT + " requires a numeric argument as its base", polyad.getArgAt(0));
                 }
                 if (isBoolean(arg2) || isString(arg2) || arg2 == QDLNull.getInstance()) {
-                    throw new IllegalArgumentException(N_ROOT + " requires a numeric argument as its exponent");
+                    throw new QDLExceptionWithTrace(N_ROOT + " requires a numeric argument as its exponent", polyad.getArgAt(1));
                 }
 
                 BigDecimal base = null;
@@ -301,11 +301,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
 
 
                 if (isBigDecimal(arg2)) {
-                    throw new IllegalArgumentException(N_ROOT + " requires an integer second argument");
+                    throw new BadArgException(N_ROOT + " requires an integer second argument", polyad.getArgAt(1));
                 }
                 if (isLong(arg2)) {
                     if (0 == (Long) arg2) {
-                        throw new IllegalArgumentException(N_ROOT + " cannot extract the zero-th root");
+                        throw new BadArgException(N_ROOT + " cannot extract the zero-th root", polyad.getArgAt(1));
                     }
                     exponent = new BigDecimal((Long) arg2);
                     isExponentEven = (((Long) arg2) % 2) == 0;
@@ -319,7 +319,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                     r.resultType = polyad.getArgAt(0).getResultType();
                 }
                 if (!isBaseNonNegative && isExponentEven) {
-                    throw new IllegalArgumentException(N_ROOT + " requires a positive base if the exponent is even.");
+                    throw new BadArgException(N_ROOT + " requires a positive base if the exponent is even.", polyad.getArgAt(0));
                 }
                 MathContext mathContext = state.getOpEvaluator().getMathContext();
                 BigDecimal result = ch.obermuhlner.math.big.BigDecimalMath.root(base.abs(mathContext), exponent, state.getOpEvaluator().getMathContext());
@@ -345,7 +345,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(PI + " requires at most 1 argument");
+            throw new ExtraArgException(PI + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         Object exponent;
@@ -364,7 +364,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 rr = ch.obermuhlner.math.big.BigDecimalMath.pow(getPi(mathContext), (BigDecimal) exponent, mathContext);
             }
             if (rr == null) {
-                throw new BadArgException("argument must be a number");
+                throw new BadArgException("argument must be a number", polyad.getArgAt(0));
             }
             polyad.setResult(rr);
 
@@ -492,11 +492,11 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(op + " requires 1 argument");
+            throw new MissingArgException(op + " requires 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(op + " requires at most 1 argument");
+            throw new ExtraArgException(op + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         doTranscendentalMath(polyad, op, false, state);

@@ -15,6 +15,10 @@ import edu.uiuc.ncsa.qdl.variables.Constant;
 public class IOFunctionTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
+    /**
+     * Manual test for input. Cannot be run in normal testing. Use the CLIRunner class.
+     * @throws Exception
+     */
     public void scanExample() throws Exception {
         State state = testUtils.getNewState();
 

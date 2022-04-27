@@ -4,11 +4,11 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.Option;
-import com.mysql.cj.exceptions.WrongArgumentException;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.*;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.variables.*;
 import net.sf.json.JSON;
@@ -371,29 +371,29 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(REMAP + " requires  two or three arguments");
+            throw new MissingArgException(REMAP + " requires at least two arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(REMAP + " takes at most 3 arguments");
+            throw new ExtraArgException(REMAP + " takes at most 3 arguments", polyad.getArgAt(3));
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
         if (!isStem(arg1)) {
-            throw new WrongArgumentException(REMAP + " requires stem as its first argument");
+            throw new BadArgException(REMAP + " requires stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable stem = (StemVariable) arg1;
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
-            throw new WrongArgumentException(REMAP + " requires an stem or integer as its second argument");
+            throw new BadArgException(REMAP + " requires an stem or integer as its second argument", polyad.getArgAt(1));
         }
         StemVariable newIndices = null;
         if (polyad.getArgCount() == 3) {
             Object arg3 = polyad.evalArg(2, state);
             checkNull(arg3, polyad.getArgAt(2), state);
             if (!isStem(arg3)) {
-                throw new IllegalArgumentException(REMAP + " requires an stem or integer as its third argument");
+                throw new BadArgException(REMAP + " requires an stem or integer as its third argument", polyad.getArgAt(2));
             }
 
             newIndices = (StemVariable) arg3;
@@ -417,17 +417,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(ALL_KEYS + " requires at least one argument");
+            throw new MissingArgException(ALL_KEYS + " requires at least one argument", polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(ALL_KEYS + " requires at most two arguments");
+            throw new ExtraArgException(ALL_KEYS + " requires at most two arguments", polyad.getArgAt(2));
         }
 
         Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0), state);
         if (!isStem(arg0)) {
-            throw new WrongArgumentException(ALL_KEYS + " requires a stem as its first argument");
+            throw new BadArgException(ALL_KEYS + " requires a stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable stem = (StemVariable) arg0;
         boolean returnAll = true;
@@ -437,7 +437,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Object arg1 = polyad.evalArg(1, state);
             checkNull(arg1, polyad.getArgAt(1), state);
             if (!isLong(arg1)) {
-                throw new WrongArgumentException(ALL_KEYS + " requires the second argument be an integer if present.");
+                throw new BadArgException(ALL_KEYS + " requires the second argument be an integer if present.", polyad.getArgAt(1));
             }
             axis = (Long) arg1;
         }
@@ -454,7 +454,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() != 1) {
-            throw new WrongArgCountException(VALUES + " requires an argument");
+            throw new MissingArgException(VALUES + " requires an argument", polyad);
         }
         // create a list of values for a stem.
         StemVariable out = new StemVariable();
@@ -494,9 +494,12 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(FOR_EACH + " requires at least 2 arguments");
+            throw new MissingArgException(FOR_EACH + " requires at least 2 arguments", polyad);
+        }
+        FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
+        if (polyad.getArgCount() == 1) {
+            throw new MissingArgException(FOR_EACH + " requires at least 2 arguments", polyad.getArgAt(0));
         }
 
         StemVariable[] stems = new StemVariable[polyad.getArgCount() - 1];
@@ -519,7 +522,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
 */
             if (!isStem(arg)) {
-                throw new WrongArgumentException("All arguments to except the first must be stem. Argument " + i + " is not a stem.");
+                throw new BadArgException("All arguments to except the first must be stem. Argument " + i + " is not a stem.", polyad.getArgAt(i));
             }
             stems[i - 1] = (StemVariable) arg;
         }
@@ -593,46 +596,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
     }
 
-    /*
-     f(x)->x+2
-    for_each(@f, n(5))
-[2,3,4,5,6]
-  for_each(@size, n(4,5))
-
-  z(x,y)->x^2+y^2
-  for_each(@z, n(3),n(5))
-[
-   [0,1,4,9,16],
-   [1,2,5,10,17],
-   [4,5,8,13,20]
-]
-
-      w(x,y,z)->x^2+y^2+z^2
- for_each(@w, n(4), n(3), n(5))
- // yields a 4 x 3 x 5 array.
-[
- [
-   [0,1,4,9,16],
-   [1,2,5,10,17],
-   [4,5,8,13,20]
- ],
- [
-   [1,2,5,10,17],
-   [2,3,6,11,18],
-   [5,6,9,14,21]
- ],
- [
-    [4,5,8,13,20],
-    [5,6,9,14,21],
-    [8,9,12,17,24]
- ],
- [
-    [9,10,13,18,25],
-    [10,11,14,19,26],
-    [13,14,17,22,29]
- ]
-]
-     */
 
 
     protected void doJPathQuery(Polyad polyad, State state) {
@@ -642,23 +605,23 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(JSON_PATH_QUERY + " requries at least 2 arguments");
+            throw new MissingArgException(JSON_PATH_QUERY + " requries at least 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
         }
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(JSON_PATH_QUERY + " accepts at most 3 arguments");
+            throw new ExtraArgException(JSON_PATH_QUERY + " accepts at most 3 arguments", polyad.getArgAt(3));
         }
         Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0));
 
         if (!isStem(arg0)) {
-            throw new WrongArgumentException(JSON_PATH_QUERY + " requires a stem as its first argument");
+            throw new BadArgException(JSON_PATH_QUERY + " requires a stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable stemVariable = (StemVariable) arg0;
         Object arg1 = polyad.evalArg(1, state);
         checkNull(arg1, polyad.getArgAt(1));
 
         if (!isString(arg1)) {
-            throw new WrongArgumentException(JSON_PATH_QUERY + " requires a string as its second argument");
+            throw new BadArgException(JSON_PATH_QUERY + " requires a string as its second argument", polyad.getArgAt(1));
         }
 
         String query = (String) arg1;
@@ -669,7 +632,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             checkNull(arg2, polyad.getArgAt(2));
 
             if (!isBoolean(arg2)) {
-                throw new WrongArgumentException(JSON_PATH_QUERY + " requires a boolean as its third argument");
+                throw new BadArgException(JSON_PATH_QUERY + " requires a boolean as its third argument", polyad.getArgAt(2));
             }
             returnAsPaths = (Boolean) arg2;
             conf = Configuration.builder()
@@ -760,10 +723,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(RANK + " requires an argument");
+            throw new MissingArgException(RANK + " requires an argument", polyad);
         }
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(RANK + " requires a single argument");
+            throw new ExtraArgException(RANK + " requires a single argument", polyad.getArgAt(1));
         }
 
         if (!isStem(polyad.evalArg(0, state))) {
@@ -786,10 +749,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(DIMENSION + " requires an argument");
+            throw new MissingArgException(DIMENSION + " requires an argument",polyad);
         }
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(DIMENSION + " requires a single argument");
+            throw new ExtraArgException(DIMENSION + " requires a single argument", polyad.getArgAt(1));
         }
         if (!isStem(polyad.evalArg(0, state))) {
             polyad.setEvaluated(true);
@@ -846,7 +809,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() != 2) {
-            throw new WrongArgCountException(HAS_VALUE + " requires 2 arguments.");
+            throw new WrongArgCountException(HAS_VALUE + " requires 2 arguments.", polyad);
         }
         Object leftArg = polyad.evalArg(0, state);
         checkNull(leftArg, polyad.getArgAt(0));
@@ -949,16 +912,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(FROM_JSON + " requires an argument");
+            throw new MissingArgException(FROM_JSON + " requires an argument", polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(FROM_JSON + " takes at most two arguments");
+            throw new ExtraArgException(FROM_JSON + " takes at most two arguments", polyad.getArgAt(2));
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
 
         if (!isString(arg)) {
-            throw new BadArgException(FROM_JSON + " requires a string as its argument");
+            throw new BadArgException(FROM_JSON + " requires a string as its first argument", polyad.getArgAt(0));
         }
         boolean convertKeys = false;
 
@@ -966,7 +929,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Object arg2 = polyad.evalArg(1, state);
             checkNull(arg2, polyad.getArgAt(2));
             if (!isBoolean(arg2)) {
-                throw new BadArgException(FROM_JSON + " requires a boolean as its second argument if present.");
+                throw new BadArgException(FROM_JSON + " requires a boolean as its second argument if present.", polyad.getArgAt(1));
             }
             convertKeys = (Boolean) arg2;
         }
@@ -981,7 +944,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 output.fromJSON(array);
             } catch (Throwable tt) {
                 // ok, so this is not valid JSON.
-                throw new BadArgException(FROM_JSON + " could not parse the argument as valid JSON");
+                throw new BadArgException(FROM_JSON + " could not parse the argument as valid JSON", polyad.getArgAt(0));
             }
         }
         polyad.setResult(output);
@@ -997,16 +960,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException(TO_JSON + " requires an argument");
+            throw new MissingArgException(TO_JSON + " requires an argument", polyad);
         }
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(TO_JSON + " takes at most 3 arguments");
+            throw new ExtraArgException(TO_JSON + " takes at most 3 arguments", polyad.getArgAt(3));
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
 
         if (!isStem(arg1)) {
-            throw new BadArgException(TO_JSON + " requires a stem as its first argument");
+            throw new BadArgException(TO_JSON + " requires a stem as its first argument", polyad.getArgAt(0));
         }
         int indent = -1;
         boolean convertNames = false;
@@ -1029,7 +992,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
 
             }
             if (!argOK) {
-                throw new BadArgException(TO_JSON + " requires an integer or boolean as its second argument");
+                throw new BadArgException(TO_JSON + " requires an integer or boolean as its second argument", polyad.getArgAt(1));
             }
         }
         /*
@@ -1041,13 +1004,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (isBoolean(arg2)) {
                 convertNames = (Boolean) arg2;
             } else {
-                throw new BadArgException(TO_JSON + " with 3 arguments requires a boolean as its second argument");
+                throw new BadArgException(TO_JSON + " with 3 arguments requires a boolean as its second argument", polyad.getArgAt(1));
             }
 
             Object arg3 = polyad.evalArg(2, state);
             checkNull(arg3, polyad.getArgAt(2));
             if (!isLong(arg3)) {
-                throw new BadArgException(TO_JSON + " requires an integer as its third argument");
+                throw new BadArgException(TO_JSON + " requires an integer as its third argument", polyad.getArgAt(2));
             }
             Long argL = (Long) arg3;
             indent = argL.intValue(); // best we can do
@@ -1077,7 +1040,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException("the " + UNION + " function requires at least 1 argument");
+            throw new MissingArgException("the " + UNION + " function requires at least 1 argument", polyad);
         }
         StemVariable outStem = new StemVariable();
 
@@ -1085,7 +1048,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Object arg = polyad.evalArg(i, state);
             checkNull(arg, polyad.getArgAt(i));
             if (!isStem(arg)) {
-                throw new BadArgException(UNION + " only works on stems.");
+                throw new BadArgException(UNION + " only works on stems.", polyad.getArgAt(i));
             }
             outStem = outStem.union((StemVariable) arg);
         }
@@ -1101,11 +1064,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (0 == polyad.getArgCount()) {
-            throw new MissingArgException("the " + UNBOX + " function requires  at least 1 argument");
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException("the " + UNBOX + " function requires  at least 1 argument", polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(UNBOX + " takes at most two arguments");
+            throw new ExtraArgException(UNBOX + " takes at most two arguments", polyad.getArgAt(2));
         }
         Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0));
@@ -1118,7 +1081,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             checkNull(o, polyad.getArgAt(1));
 
             if (!isBoolean(o)) {
-                throw new BadArgException("The second argument of " + UNBOX + " must be a boolean.");
+                throw new BadArgException("The second argument of " + UNBOX + " must be a boolean.", polyad.getArgAt(1));
             }
             safeMode = (Boolean) o;
         }
@@ -1127,7 +1090,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             VariableNode vn = (VariableNode) polyad.getArgAt(0);
             varName = vn.getVariableReference();
             if (!(vn.getResult() instanceof StemVariable)) {
-                throw new BadArgException("You can only apply " + UNBOX + " to a stem.");
+                throw new BadArgException("You can only apply " + UNBOX + " to a stem.", polyad.getArgAt(0));
             }
             stem = (StemVariable) vn.getResult();
         }
@@ -1139,10 +1102,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             stem = (StemVariable) polyad.getArgAt(0);
         }
         if (stem == null) {
-            throw new BadArgException("You can only apply " + UNBOX + " to a stem.");
+            throw new BadArgException("You can only apply " + UNBOX + " to a stem.", polyad.getArgAt(0));
         }
         if (stem.getStemList().size() != 0) {
-            throw new BadArgException("You can only apply " + UNBOX + " to a stem without a list.");
+            throw new BadArgException("You can only apply " + UNBOX + " to a stem without a list.", polyad.getArgAt(0));
         }
         // Make a safe copy of the state to unpack this in case something bombs
         List<String> keys = new ArrayList<>();
@@ -1198,7 +1161,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException("the " + BOX + " function requires at least 1 argument");
+            throw new MissingArgException("the " + BOX + " function requires at least 1 argument", polyad);
         }
         ArrayList<String> varNames = new ArrayList<>();
         StemVariable stem = new StemVariable();
@@ -1206,7 +1169,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         for (int i = 0; i < polyad.getArgCount(); i++) {
             polyad.evalArg(i, state);
             if (!(polyad.getArgAt(i) instanceof VariableNode)) {
-                throw new BadArgException(BOX + " requires a list of variables.");
+                throw new BadArgException(BOX + " requires a list of variables.", polyad.getArgAt(i));
             }
             VariableNode vn = (VariableNode) polyad.getArgAt(i);
             varNames.add(vn.getVariableReference());
@@ -1226,11 +1189,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.getArgCount() == 0) {
-            throw new MissingArgException("the " + SIZE + " function requires 1 argument");
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException("the " + SIZE + " function requires 1 argument", polyad);
         }
-        if (polyad.getArgCount() != 1) {
-            throw new ExtraArgException("the " + SIZE + " function requires 1 argument");
+        if (1 < polyad.getArgCount() ) {
+            throw new ExtraArgException("the " + SIZE + " function requires 1 argument", polyad.getArgAt(1));
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
@@ -1268,10 +1231,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(LIST_KEYS + " requires at least one argument");
+            throw new MissingArgException(LIST_KEYS + " requires at least one argument", polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(LIST_KEYS + " takes at most 2 arguments");
+            throw new ExtraArgException(LIST_KEYS + " takes at most 2 arguments", polyad.getArgAt(2));
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
@@ -1296,7 +1259,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 Long arg2Long = (Long) arg2;
                 returnType = arg2Long.intValue();
             } else {
-                throw new BadArgException(LIST_KEYS + " second argument must be a boolean or integer if present.");
+                throw new BadArgException(LIST_KEYS + " second argument must be a boolean or integer if present.", polyad.getArgAt(1));
             }
         }
         long size = 0;
@@ -1380,7 +1343,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             throw new IllegalArgumentException(KEYS + " requires at least 1 argument");
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(KEYS + " takes at most two arguments");
+            throw new ExtraArgException(KEYS + " takes at most two arguments", polyad.getArgAt(2));
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
@@ -1410,7 +1373,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 Long arg2Long = (Long) arg2;
                 returnType = arg2Long.intValue();
             } else {
-                throw new BadArgException(LIST_KEYS + " second argument must be a boolean or integer if present.");
+                throw new BadArgException(LIST_KEYS + " second argument must be a boolean or integer if present.", polyad.getArgAt(1));
             }
         }
         StemVariable stemVariable = (StemVariable) arg;
@@ -1481,15 +1444,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(HAS_KEYS + " requires 2 arguments");
+            throw new MissingArgException(HAS_KEYS + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(HAS_KEYS + " requires 2 arguments");
+            throw new ExtraArgException(HAS_KEYS + " requires 2 arguments", polyad.getArgAt(2));
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
-            throw new BadArgException(HAS_KEYS + " command requires a stem as its first argument.");
+            throw new BadArgException(HAS_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
@@ -1516,7 +1479,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException(SHORT_MAKE_INDICES + " requires at least 1 argument");
+            throw new MissingArgException(SHORT_MAKE_INDICES + " requires at least 1 argument", polyad);
         }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
@@ -1526,7 +1489,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         boolean isStemArg = arg instanceof StemVariable;
 
         if (!(isLongArg || isStemArg)) {
-            throw new BadArgException(SHORT_MAKE_INDICES + " requires a non-negative integer argument or a stem as its first argument");
+            throw new BadArgException(SHORT_MAKE_INDICES + " requires a non-negative integer argument or a stem as its first argument", polyad.getArgAt(0));
         }
 
         int[] lengths = null;
@@ -1535,7 +1498,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             StemVariable argStem = (StemVariable) arg;
             JSON json = argStem.toJSON();
             if (!json.isArray()) {
-                throw new BadArgException("first argument must be a stem list in " + SHORT_MAKE_INDICES);
+                throw new BadArgException("first argument must be a stem list in " + SHORT_MAKE_INDICES, polyad.getArgAt(0));
 
             }
             JSONArray array = (JSONArray) json;
@@ -1558,7 +1521,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             } else {
                 StemVariable fillStem = (StemVariable) lastArg;
                 if (!fillStem.isList()) {
-                    throw new BadArgException("fill argument must be a list of scalars");
+                    throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount()-1)); // last arg is fill list
                 }
                 StemList stemList = fillStem.getStemList();
                 fill = stemList.toArray(true, false);
@@ -1608,7 +1571,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             for (int i = 0; i < lastArgIndex + 1; i++) {
                 Object obj = polyad.evalArg(i, state);
                 if (!isLong(obj)) {
-                    throw new BadArgException("argument " + i + " is not an integer. All dimensions must be positive integers.");
+                    throw new BadArgException("argument " + i + " is not an integer. All dimensions must be positive integers.", polyad.getArgAt(i));
                 }
                 lengths[i] = ((Long) obj).intValue();
                 // Any dimension of 0 returns an empty list
@@ -1619,7 +1582,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                     return;
                 }
                 if (lengths[i] < 0L) {
-                    throw new BadArgException("argument " + i + " is negative. All dimensions must be positive integers.");
+                    throw new BadArgException("argument " + i + " is negative. All dimensions must be positive integers.", polyad.getArgAt(i));
                 }
             }
 
@@ -1727,29 +1690,29 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
      * </pre>
      *
      * @param polyad
-     * @param stem
-     * @param arg2
+     * @param arg0
+     * @param arg1
      */
-    private void twoArgRemap(Polyad polyad, StemVariable stem, StemVariable arg2) {
-        StemVariable indices = arg2;
+    private void twoArgRemap(Polyad polyad, StemVariable arg0, StemVariable arg1) {
+        StemVariable indices1 = arg1;
         StemVariable output = new StemVariable();
-        for (Object key : indices.keySet()) {
-            Object v = indices.get(key);
+        for (Object key : indices1.keySet()) {
+            Object v = indices1.get(key);
             Object gotValue = null;
             if (v instanceof StemVariable) {
                 StemVariable ii = (StemVariable) v;
                 if (!ii.isList()) {
-                    throw new BadArgException("stem indices must be lists.");
+                    throw new BadArgException("stem index " + ii + " must be a list." , polyad.getArgAt(1));
                 }
                 IndexList indexList = new IndexList(ii);
-                IndexList returnedIL = stem.get(indexList, true);
+                IndexList returnedIL = arg0.get(indexList, true);
                 if (returnedIL.size() == 1) {
                     gotValue = returnedIL.get(0);
                 } else {
-                    throw new BadArgException("index does not resolve to a value.");
+                    throw new BadArgException("index does not resolve to a value.", polyad.getArgAt(1));
                 }
             } else {
-                gotValue = stem.get(v);
+                gotValue = arg0.get(v);
             }
             if (gotValue != null) {
                 if (key instanceof Long) {
@@ -1829,15 +1792,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException(IS_LIST + " requires an argument");
+            throw new MissingArgException(IS_LIST + " requires an argument", polyad);
         }
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(IS_LIST + " requires at most 1 argument");
+            throw new ExtraArgException(IS_LIST + " requires at most 1 argument", polyad.getArgAt(1));
         }
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
         if (!isStem(arg1)) {
-            throw new BadArgException(IS_LIST + " requires stem as its first argument");
+            throw new BadArgException(IS_LIST + " requires stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable stemVariable = (StemVariable) arg1;
         Boolean isList = stemVariable.isList();
@@ -1860,11 +1823,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (0 == polyad.getArgCount()) {
-            throw new MissingArgException(REMOVE + " requires 1 argument");
+            throw new MissingArgException(REMOVE + " requires 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(REMOVE + " requires 1 argument");
+            throw new ExtraArgException(REMOVE + " requires 1 argument", polyad.getArgAt(1));
         }
         try {
             polyad.evalArg(0, state);
@@ -1889,7 +1852,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             }
         }
         if (polyad.getArgAt(0) instanceof ConstantNode) {
-            throw new BadArgException(" cannot remove a constant");
+            throw new BadArgException(" cannot remove a constant", polyad.getArgAt(0));
         }
         if (polyad.getArgAt(0) instanceof ESN2) {
             ESN2 esn2 = (ESN2) polyad.getArgAt(0);
@@ -1914,18 +1877,18 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(INCLUDE_KEYS + " requires 2 argument");
+            throw new MissingArgException(INCLUDE_KEYS + " requires 2 argument", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(INCLUDE_KEYS + " requires 2 arguments");
+            throw new ExtraArgException(INCLUDE_KEYS + " requires 2 arguments", polyad.getArgAt(2));
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
         checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
-            throw new BadArgException("The " + INCLUDE_KEYS + " command requires a stem as its first argument.");
+            throw new BadArgException("The " + INCLUDE_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
@@ -1960,17 +1923,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (2 < polyad.getArgCount()) {
-            throw new MissingArgException(EXCLUDE_KEYS + " requires 2 arguments");
+            throw new MissingArgException(EXCLUDE_KEYS + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (polyad.getArgCount() < 2) {
-            throw new ExtraArgException(EXCLUDE_KEYS + " requires 2 arguments");
+            throw new ExtraArgException(EXCLUDE_KEYS + " requires 2 arguments", polyad.getArgAt(2));
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
         checkNull(arg, polyad.getArgAt(0));
         if (!isStem(arg)) {
-            throw new BadArgException("The " + EXCLUDE_KEYS + " command requires a stem as its first argument.");
+            throw new BadArgException("The " + EXCLUDE_KEYS + " command requires a stem as its first argument.", polyad.getArgAt(0));
         }
         StemVariable target = (StemVariable) arg;
         polyad.evalArg(1, state);
@@ -2021,11 +1984,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(SHUFFLE + " requires 2 arguments");
+            throw new MissingArgException(SHUFFLE + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(SHUFFLE + " requires 2 arguments");
+            throw new ExtraArgException(SHUFFLE + " requires 2 arguments", polyad.getArgAt(2));
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
@@ -2035,7 +1998,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Long argL = (Long) arg;
             int argInt = argL.intValue();
             if (argL < 0L) {
-                throw new BadArgException("the argument to" + SHUFFLE + " must be > 0");
+                throw new BadArgException("the argument to" + SHUFFLE + " must be > 0", polyad.getArgAt(0));
             }
             Long[] array = new Long[argInt];
             long j = 0L;
@@ -2053,14 +2016,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (!isStem(arg)) {
-            throw new BadArgException(SHUFFLE + " requires a stem as its first argument.");
+            throw new BadArgException(SHUFFLE + " requires a stem as its first argument.", polyad.getArgAt(0));
         }
 
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
-            throw new BadArgException(SHUFFLE + " requires a stem as its second argument.");
+            throw new BadArgException(SHUFFLE + " requires a stem as its second argument.", polyad.getArgAt(1));
         }
         StemVariable target = (StemVariable) arg;
         StemVariable newKeyStem = (StemVariable) arg2;
@@ -2125,17 +2088,17 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(RENAME_KEYS + " requires at least 2 arguments.");
+            throw new MissingArgException(RENAME_KEYS + " requires at least 2 arguments.", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(RENAME_KEYS + " takes at most 3 arguments");
+            throw new ExtraArgException(RENAME_KEYS + " takes at most 3 arguments", polyad.getArgAt(3));
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
         checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
-            throw new BadArgException(RENAME_KEYS + " requires a stem as its first argument.");
+            throw new BadArgException(RENAME_KEYS + " requires a stem as its first argument.", polyad.getArgAt(0));
         }
         polyad.evalArg(1, state);
 
@@ -2144,7 +2107,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
-            throw new BadArgException("The " + RENAME_KEYS + " command requires a stem as its second argument.");
+            throw new BadArgException("The " + RENAME_KEYS + " command requires a stem as its second argument.", polyad.getArgAt(1));
         }
 
         boolean overwriteKeys = false; //default
@@ -2157,7 +2120,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (arg3 instanceof Boolean) {
                 overwriteKeys = (Boolean) arg3;
             } else {
-                throw new BadArgException(RENAME_KEYS + " third argument, if present, must be a boolean");
+                throw new BadArgException(RENAME_KEYS + " third argument, if present, must be a boolean", polyad.getArgAt(2));
             }
 
         }
@@ -2182,18 +2145,18 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(COMMON_KEYS + " requires 2 arguments");
+            throw new MissingArgException(COMMON_KEYS + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(COMMON_KEYS + " function requires 2 arguments");
+            throw new ExtraArgException(COMMON_KEYS + " function requires 2 arguments", polyad.getArgAt(2));
         }
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
         checkNull(arg, polyad.getArgAt(0));
 
         if (!isStem(arg)) {
-            throw new BadArgException(COMMON_KEYS + " requires a stem as its first argument.");
+            throw new BadArgException(COMMON_KEYS + " requires a stem as its first argument.", polyad.getArgAt(0));
         }
         polyad.evalArg(1, state);
 
@@ -2201,7 +2164,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg2, polyad.getArgAt(1));
 
         if (!isStem(arg2)) {
-            throw new BadArgException(COMMON_KEYS + " requires a stem as its second argument.");
+            throw new BadArgException(COMMON_KEYS + " requires a stem as its second argument.", polyad.getArgAt(1));
         }
 
         StemVariable target = (StemVariable) arg;
@@ -2225,10 +2188,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (2 < polyad.getArgCount()) {
-            throw new MissingArgException(SET_DEFAULT + " requires 2 arguments");
+            throw new MissingArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(SET_DEFAULT + " requires 2 arguments");
+            throw new ExtraArgException(SET_DEFAULT + " requires 2 arguments", polyad.getArgAt(2));
         }
         StemVariable stemVariable = getOrCreateStem(polyad.getArgAt(0),
                 state,
@@ -2258,11 +2221,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(MASK + " requires 2 arguments");
+            throw new MissingArgException(MASK + " requires 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(MASK + " requires 2 arguments");
+            throw new ExtraArgException(MASK + " requires 2 arguments", polyad.getArgAt(2));
         }
         polyad.evalArg(0, state);
         polyad.evalArg(1, state);
@@ -2272,8 +2235,10 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         Object obj2 = polyad.getArgAt(1).getResult();
         checkNull(obj2, polyad.getArgAt(1));
 
+
         if (!areAllStems(obj1, obj2)) {
-            throw new BadArgException("the " + MASK + " requires both arguments be stem variables");
+            Statement s = isStem(obj1)?polyad.getArgAt(0):polyad.getArgAt(1);
+            throw new BadArgException("the " + MASK + " requires both arguments be stem variables", s);
         }
         StemVariable stem1 = (StemVariable) obj1;
         StemVariable stem2 = (StemVariable) obj2;
@@ -2369,10 +2334,10 @@ z. :=  join3(q.,w.)
         }
 
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(JOIN + " requires at least 2 arguments");
+            throw new MissingArgException(JOIN + " requires at least 2 arguments",polyad.getArgCount()==1?polyad.getArgAt(0):polyad);
         }
         if (3 < polyad.getArgCount()) {
-            throw new ExtraArgException(JOIN + " takes at most 3 arguments");
+            throw new ExtraArgException(JOIN + " takes at most 3 arguments", polyad.getArgAt(3));
         }
 
         Object[] args = new Object[polyad.getArgCount()];
@@ -2472,17 +2437,17 @@ z. :=  join3(q.,w.)
                    return(subset(x., new., old.));
          */
         if (polyad.getArgCount() == 0) {
-            throw new MissingArgException(TRANSPOSE + " requires at least one argument.");
+            throw new MissingArgException(TRANSPOSE + " requires at least one argument.", polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(TRANSPOSE + " takes at most two arguments.");
+            throw new ExtraArgException(TRANSPOSE + " takes at most two arguments.", polyad.getArgAt(2));
         }
 
         Object arg0 = polyad.evalArg(0, state);
         checkNull(arg0, polyad.getArgAt(0), state);
         if (!isStem(arg0)) {
-            throw new BadArgException(TRANSPOSE + " requires a stem as its first argument");
+            throw new BadArgException(TRANSPOSE + " requires a stem as its first argument", polyad.getArgAt(0));
         }
         StemVariable stem = (StemVariable) arg0;
 
@@ -2538,7 +2503,7 @@ z. :=  join3(q.,w.)
                 arg2ok = true;
             }
             if (!arg2ok) {
-                throw new BadArgException(TRANSPOSE + " requires an axis or stem of them as its second argument");
+                throw new BadArgException(TRANSPOSE + " requires an axis or stem of them as its second argument", polyad.getArgAt(1));
             }
             // If the second argument is p., then the new reshuffing is
             // p. ~ ~ exclude_keys([;rank], p.)

@@ -718,4 +718,51 @@ public class StringFunctionTests extends AbstractQDLTester {
 
     }
 
+    public void testStringMultiplication() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok ≔ 'aaa' == 3*'a';");
+        addLine(script, "ok1 ≔ 'bbbb' == 'b'*4;");
+        addLine(script, "ok2 ≔ '' == 0*'b';");
+        addLine(script, "ok3 ≔ 'arba'<3*'bar';");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "pre-multiplication failed for strings";
+        assert getBooleanValue("ok1", state) : "post-multiplication failed for strings";
+        assert getBooleanValue("ok2", state) : "multiplication by zero failed for strings";
+        assert getBooleanValue("ok3", state) : "substring check for multiplication of int * strings";
+    }
+    public void testStringComparisons() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok ≔ 'abc' < 'abcd';");
+        addLine(script, "ok1 ≔ 'abcd' <= 'abcd';");
+        addLine(script, "ok2 ≔ !('abd' <= 'abcd');");
+        addLine(script, "ok3 ≔ 'abcd'>'abc';");
+        addLine(script, "ok4 ≔ 'abcd'>='abc';");
+        addLine(script, "ok5 ≔ !('abcd'>='abcde');");
+
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) ;
+        assert getBooleanValue("ok1", state);
+        assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok3", state);
+        assert getBooleanValue("ok4", state);
+        assert getBooleanValue("ok5", state);
+    }
+
+     /*
+       'abc' < 'abcd'
+true
+  'abc' < 'abc'
+false
+  'abcd'>'abc'
+true
+  'abcd' <= 'abcd'
+true
+  'abcd' <= 'abc'
+false
+      */
 }

@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.evaluate;
 import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.state.State;
+import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.util.Iso8601;
@@ -231,11 +232,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at least 1 argument");
+            throw new MissingArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument");
+            throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -274,11 +275,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(IDENTITY_FUNCTION + " requires at least 1 argument");
+            throw new MissingArgException(IDENTITY_FUNCTION + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(IDENTITY_FUNCTION + " requires at most 1 argument");
+            throw new ExtraArgException(IDENTITY_FUNCTION + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         if (polyad.getArgCount() != 1) {
@@ -300,11 +301,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(ABS_VALUE + " requires at least 1 argument");
+            throw new MissingArgException(ABS_VALUE + " requires at least 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(ABS_VALUE + " requires at most 1 argument");
+            throw new ExtraArgException(ABS_VALUE + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -343,7 +344,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(RANDOM + " requires at most 1 argument");
+            throw new ExtraArgException(RANDOM + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         if (polyad.getArgCount() == 0) {
@@ -368,11 +369,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             resultType = Constant.STEM_TYPE;
         } else {
             // unknown type is ignored.
-            throw new BadArgException(RANDOM + " requires a integer as its argument if present");
-/*
-            result = secureRandom.nextLong();
-            resultType = Constant.LONG_TYPE;
-*/
+            throw new BadArgException(RANDOM + " requires a integer as its argument if present", polyad.getArgAt(0));
         }
         polyad.setResultType(resultType);
         polyad.setResult(result);
@@ -388,7 +385,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(NUMERIC_DIGITS + " requires at most 1 argument");
+            throw new ExtraArgException(NUMERIC_DIGITS + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         Long oldND = new Long((long) state.getOpEvaluator().getNumericDigits());
@@ -402,7 +399,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             checkNull(arg1, polyad.getArgAt(0));
 
             if (!isLong(arg1)) {
-                throw new BadArgException(NUMERIC_DIGITS + " requires an integer argument");
+                throw new BadArgException(NUMERIC_DIGITS + " requires an integer argument", polyad.getArgAt(0));
             }
             Long newND = (Long) arg1;
             state.getOpEvaluator().setNumericDigits(newND.intValue());
@@ -419,7 +416,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(RANDOM_STRING + " requires at most 2 arguments");
+            throw new ExtraArgException(RANDOM_STRING + " requires at most 2 arguments", polyad.getArgAt(2));
         }
 
         int length = 16;
@@ -432,7 +429,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             if (obj instanceof Long) {
                 length = ((Long) obj).intValue();
             } else {
-                throw new BadArgException(RANDOM_STRING + " takes an integer as its first argument");
+                throw new BadArgException(RANDOM_STRING + " takes an integer as its first argument", polyad.getArgAt(0));
 
             }
         }
@@ -444,7 +441,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             checkNull(obj, polyad.getArgAt(1));// re-used varaible obj for arg #1
 
             if (!isLong(obj)) {
-                throw new BadArgException(RANDOM_STRING + " takes an integer as its second argument.");
+                throw new BadArgException(RANDOM_STRING + " takes an integer as its second argument.", polyad.getArgAt(1));
             }
 
             if (obj instanceof Long) {
@@ -486,11 +483,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException(HASH + " requires 1 argument");
+            throw new MissingArgException(HASH + " requires 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException(HASH + " requires 1 argument");
+            throw new ExtraArgException(HASH + " requires 1 argument", polyad.getArgAt(1));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -517,11 +514,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires 1 argument");
+            throw new MissingArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument");
+            throw new ExtraArgException((isEncode ? ENCODE_B64 : DECODE_B64) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -552,11 +549,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 1) {
-            throw new MissingArgException((toHex ? ENCODE_B16 : DECODE_B16) + " requires  1 argument");
+            throw new MissingArgException((toHex ? ENCODE_B16 : DECODE_B16) + " requires 1 argument", polyad);
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException((toHex ? ENCODE_B16 : DECODE_B16) + " requires 1 argument");
+            throw new ExtraArgException((toHex ? ENCODE_B16 : DECODE_B16) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -599,11 +596,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException(MOD + " requires 2 arguments");
+            throw new MissingArgException(MOD + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException(MOD + " requires 2 arguments");
+            throw new ExtraArgException(MOD + " requires 2 arguments", polyad.getArgAt(2));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -620,7 +617,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 if (areAllLongs(objects)) {
                     long second = (Long) objects[1];
                     if (second == 0L) {
-                        throw new BadArgException(MOD + " requires non-zero second argument");
+                        throw new BadArgException(MOD + " requires non-zero second argument", polyad.getArgAt(1));
 
                     }
                     r.result = ((Long) objects[0]) % second;
@@ -633,7 +630,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
                 BigDecimal bd0 = b0 ? (BigDecimal) objects[0] : new BigDecimal((Long) objects[0]);
                 BigDecimal bd1 = b1 ? (BigDecimal) objects[1] : new BigDecimal((Long) objects[1]);
                 if (bd1.equals(BigDecimal.ZERO)) {
-                    throw new BadArgException(MOD + " requires non-zero second argument");
+                    throw new BadArgException(MOD + " requires non-zero second argument", polyad.getArgAt(1));
                 }
                 BigDecimal bdr = null;
                 try {
@@ -665,7 +662,7 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
         }
 
         if (1 < polyad.getArgCount()) {
-            throw new ExtraArgException((isInMillis ? DATE_MS : DATE_ISO) + " requires at most 1 argument");
+            throw new ExtraArgException((isInMillis ? DATE_MS : DATE_ISO) + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
         if (polyad.getArgCount() == 0) {
@@ -740,11 +737,11 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (polyad.getArgCount() < 2) {
-            throw new MissingArgException((isMax ? MAX : MIN) + " requires 2 arguments");
+            throw new MissingArgException((isMax ? MAX : MIN) + " requires 2 arguments", polyad.getArgCount()==1?polyad.getArgAt(0): polyad);
         }
 
         if (2 < polyad.getArgCount()) {
-            throw new ExtraArgException((isMax ? MAX : MIN) + " requires 2 arguments");
+            throw new ExtraArgException((isMax ? MAX : MIN) + " requires 2 arguments", polyad.getArgAt(2));
         }
 
         AbstractFunctionEvaluator.fPointer pointer = new AbstractFunctionEvaluator.fPointer() {
@@ -752,9 +749,15 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             public AbstractFunctionEvaluator.fpResult process(Object... objects) {
                 AbstractFunctionEvaluator.fpResult r = new AbstractFunctionEvaluator.fpResult();
                 if (!areAllNumbers(objects)) {
+                    Statement s = null;
+                    if(!isNumber(objects[0])){
+                        s = polyad.getArgAt(0);
+                    }else{
+                        s = polyad.getArgAt(1);
+                    }
                     // Contract is that if there are not numbers, just return the
                     // first argument unaltered.
-                    throw new BadArgException((isMax ? MAX : MIN) + " requires numeric arguments");
+                    throw new BadArgException((isMax ? MAX : MIN) + " requires numeric arguments", s);
                 }
                 if (areAllLongs(objects)) {
                     long first = (Long) objects[0];
