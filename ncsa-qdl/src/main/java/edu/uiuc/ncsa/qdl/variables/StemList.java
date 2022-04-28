@@ -329,8 +329,8 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         return new Long(getSize().size());
    }
 
-   public List values(){
-        List list = new ArrayList();
+   public ArrayList values(){
+        ArrayList list = new ArrayList();
         Iterator<? extends StemEntry> iterator = iterator();
         while(iterator.hasNext()){
             list.add(iterator.next().entry);

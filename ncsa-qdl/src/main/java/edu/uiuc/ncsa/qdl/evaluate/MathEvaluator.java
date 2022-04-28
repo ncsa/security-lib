@@ -282,9 +282,6 @@ public class MathEvaluator extends AbstractFunctionEvaluator {
             throw new ExtraArgException(IDENTITY_FUNCTION + " requires at most 1 argument", polyad.getArgAt(1));
         }
 
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException(IDENTITY_FUNCTION + " requires a single argument");
-        }
         Object arg = polyad.evalArg(0, state);
         checkNull(arg, polyad.getArgAt(0));
 

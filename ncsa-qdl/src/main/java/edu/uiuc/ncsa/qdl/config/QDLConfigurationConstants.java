@@ -13,6 +13,7 @@ public interface QDLConfigurationConstants {
     String CONFG_ATTR_ENABLED = "enabled";
     String CONFG_ATTR_DEBUG = "debug";
     String CONFG_ATTR_SERVER_MODE_ENABLED = "server_mode";
+    String CONFG_ATTR_OVERWRITE_BASE_FUNCTIONS_ENABLED = "overwrite_base_on";
     String CONFG_ATTR_RESTRICTED_IO_RESTRICTED = "restricted_io";
     String CONFG_ATTR_ASSERTIONS_ENABLED = "assertions_on";
     String CONFG_ATTR_NUMERIC_DIGITS = "numeric_digits";

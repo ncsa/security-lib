@@ -476,7 +476,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         }
         String mountPoint = (String) arg;
         if (!state.hasMountPoint(mountPoint)) {
-            throw new IllegalArgumentException("the mount point '" + mountPoint + "' is not valid.");
+            throw new BadArgException("the mount point '" + mountPoint + "' is not valid.", polyad.getArgAt(0));
         }
         state.removeVFSProvider(mountPoint);
 
@@ -620,7 +620,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                 switch (fileType) {
                     case FILE_OP_TEXT_INI:
                         if (!isStem(obj2)) {
-                            throw new IllegalArgumentException(WRITE_FILE + " requires a stem for ini output");
+                            throw new BadArgException(WRITE_FILE + " requires a stem for ini output", polyad.getArgAt(1));
                         }
                         xProperties.put(FileEntry.CONTENT_TYPE, FileEntry.TEXT_TYPE);
                         lines.add(convertToIni((StemVariable) obj2));
@@ -648,13 +648,13 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                             lines.add(obj2.toString());
                         }
                     default:
-                        throw new IllegalArgumentException("unknown file type '" + fileType + "'");
+                        throw new BadArgException("unknown file type '" + fileType + "'", polyad.getArgAt(2));
                 }
 
                 VFSEntry entry = new FileEntry(lines, xProperties);
                 vfs.put(fileName, entry);
             } catch (Throwable t) {
-                throw new QDLException("Could not write file to store." + t.getMessage());
+                throw new QDLExceptionWithTrace("Could not write file to store." + t.getMessage(), polyad);
             }
         } else {
             if (state.isServerMode()) {
@@ -668,7 +668,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         break;
                     case FILE_OP_TEXT_INI:
                         if (!isStem(obj2)) {
-                            throw new IllegalArgumentException(WRITE_FILE + " requires a stem for ini output");
+                            throw new BadArgException(WRITE_FILE + " requires a stem for ini output", polyad.getArgAt(1));
                         }
                         QDLFileUtil.writeStringToFile(fileName, convertToIni((StemVariable) obj2));
                         break;
@@ -682,7 +682,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                         }
                         break;
                     default:
-                        throw new IllegalArgumentException("unknown file type '" + fileType + "'");
+                        throw new BadArgException("unknown file type '" + fileType + "'", polyad.getArgAt(2));
                 }
             } catch (Throwable t) {
                 if (t instanceof QDLException) {
@@ -825,7 +825,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
                     polyad.setEvaluated(true);
                     return;
                 default:
-                    throw new IllegalArgumentException(" unknown file type '" + op + "'");
+                    throw new BadArgException(" unknown file type '" + op + "'", polyad.getArgAt(1));
                 case FILE_OP_TEXT_STRING:
                 case FILE_OP_AUTO:
                     // read it as a long string.

@@ -1323,7 +1323,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (length + startIndex > getStemList().size()) {
             throw new IllegalArgumentException("the source does not have enough elements to copy.");
         }
-        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), true, new StemEntry(startIndex + length), true);
+        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), true, new StemEntry(startIndex + length), false);
         long newIndex = 0L;
         StemList<StemEntry> targetList = target.getStemList();
         for (StemEntry s : sortedSet) {

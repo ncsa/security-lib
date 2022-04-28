@@ -176,6 +176,9 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return name;
     }
 
+    protected boolean isOverwriteBaseFunctionsOn() {
+        return getFirstBooleanValue(cn, CONFG_ATTR_OVERWRITE_BASE_FUNCTIONS_ENABLED, false);
+    }
 
     protected boolean isServerModeOn() {
         return getFirstBooleanValue(cn, CONFG_ATTR_SERVER_MODE_ENABLED, false);
@@ -185,9 +188,7 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
         return getFirstBooleanValue(cn, CONFG_ATTR_RESTRICTED_IO_RESTRICTED, false);
     }
 
-  /*  protected boolean areAssertionsEnabled() {
-        return getFirstBooleanValue(cn, CONFG_ATTR_ASSERTIONS_ENABLED, true);
-    }*/
+
 
     protected String getDebugLevel() {
         String level = getFirstAttribute(cn, CONFG_ATTR_DEBUG);
@@ -369,7 +370,8 @@ public class QDLConfigurationLoader<T extends QDLEnvironment> extends LoggingCon
                 getEditors(),
                 isEnableLibrarySupport(),
                 areAssertionsEnabled(),
-                getSaveDir());
+                getSaveDir(),
+                isOverwriteBaseFunctionsOn());
     }
 
     @Override

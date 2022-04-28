@@ -188,12 +188,14 @@ public class WorkspaceCommands implements Logable, Serializable {
         say(HELP_COMMAND + " syntax:");
         say(HELP_COMMAND + " - (no arg) print generic help for the workspace.");
         say(HELP_COMMAND + " * - print a short summary of help for every user defined function.");
-        say(HELP_COMMAND + " -online - print a list of all online help topics.");
-        say(HELP_COMMAND + " name - print short help for name. System functions will have a");
-        say("        summary printed (read the manual for more).");
-        say("        For user defined function, a summary of all calls with various argument counts will be shown.");
+        say(HELP_COMMAND + " " + ONLINE_HELP_COMMAND + " - print a list of all online help topics.");
+        say(HELP_COMMAND + " name ["+ONLINE_HELP_EXAMPLE_FLAG+"] - print short help for name. System functions will have a");
+        say("        summary printed (read the manual for more). The optional "+ONLINE_HELP_EXAMPLE_FLAG+" flag will print out examples if any");
         say(HELP_COMMAND + " name arg_count - print out detailed information for the user-defined function and the given number of arguments.");
-
+        say("\nExample. Show all the online help within a display with of 120 characters\n" );
+        say("   " + HELP_COMMAND + " " + ONLINE_HELP_COMMAND + " " + DISPLAY_WIDTH_SWITCH  + " 120 ");
+        say("Help is available for the following (231 topics):\n" +
+                "!                         dir                       mkdir                     then                      ⌊                         \n... more");
     }
 
     protected void showGeneralHelp() {
@@ -2445,7 +2447,8 @@ public class WorkspaceCommands implements Logable, Serializable {
                 showIntrinsic,
                 showExtrinsic));
     }
-
+     public static final String ONLINE_HELP_EXAMPLE_FLAG = "-ex";
+     public static final String ONLINE_HELP_COMMAND = "online";
     /**
      * Just print the general help
      * <pre>
@@ -2468,6 +2471,8 @@ public class WorkspaceCommands implements Logable, Serializable {
             showHelp4Help();
             return RC_CONTINUE;
         }
+        boolean doOnlineExample = inputLine.hasArg(ONLINE_HELP_EXAMPLE_FLAG);
+        inputLine.removeSwitch(ONLINE_HELP_EXAMPLE_FLAG);
         String name = inputLine.getArg(ACTION_INDEX);
         if (name.equals("*")) {
             // so they entered )funcs help Print off first lines of help
@@ -2479,7 +2484,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             }
             return printList(inputLine, treeSet);
         }
-        if (name.equals("online")) {
+        if (name.equals(ONLINE_HELP_COMMAND)) {
             TreeSet<String> treeSet = new TreeSet<>();
             treeSet.addAll(onlineHelp.keySet());
             if (treeSet.isEmpty()) {
@@ -2491,7 +2496,15 @@ public class WorkspaceCommands implements Logable, Serializable {
 
         }
         if (onlineHelp.containsKey(name)) {
-            say(onlineHelp.get(name));
+            if(doOnlineExample){
+                if(onlineExamples.containsKey(name)) {
+                    say(onlineExamples.get(name));
+                }else{
+                    say("no examples for " + name);
+                }
+            } else {
+                say(onlineHelp.get(name));
+            }
             return RC_CONTINUE;
         }
         if (name.endsWith(State.NS_DELIMITER)) {
@@ -2539,6 +2552,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
 
     HashMap<String, String> onlineHelp = new HashMap<>();
+    HashMap<String, String> onlineExamples = new HashMap<>();
 
     /**
      * Commands are:<br>
@@ -2861,6 +2875,9 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
 
         switch (inputLine.getArg(2)) {
+            case OVERWRITE_BASE_FUNCTIONS_ON:
+                say(onOrOff(getState().isAllowBaseFunctionOverrides()));
+                break;
             case PRETTY_PRINT:
             case PRETTY_PRINT_SHORT:
                 say(onOrOff(isPrettyPrint()));
@@ -2978,6 +2995,7 @@ public class WorkspaceCommands implements Logable, Serializable {
     public static final String ENABLE_LIBRARY_SUPPORT = "enable_library_support";
     public static final String ASSERTIONS_ON = "assertions_on";
     public static final String ANSI_MODE_ON = "ansi_mode";
+    public static final String OVERWRITE_BASE_FUNCTIONS_ON = "overwrite_base_functions";
 
     /**
      * This will either print out the information about a single workspace (if a file is given)
@@ -3448,6 +3466,10 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         String value = inputLine.getArg(3);
         switch (inputLine.getArg(2)) {
+            case OVERWRITE_BASE_FUNCTIONS_ON:
+                getState().setAllowBaseFunctionOverrides(isOnOrTrue(value));
+                say("overwriting QDL base functions on");
+                break;
             case PRETTY_PRINT:
             case PRETTY_PRINT_SHORT:
                 setPrettyPrint(isOnOrTrue(value));
@@ -3961,31 +3983,31 @@ public class WorkspaceCommands implements Logable, Serializable {
           refer to them. 
          */
         /**
-           * Have to be careful in listing only what is in the actual state, not
-           * stuff in modules too since that is saved elsewhere and both bloats
-           * the output and can make for NS conflicts on reload.
-           */
-          fileWriter.write("\n/* ** global variables ** */\n");
-          for (Object varName : state.getExtrinsicVars().listVariables()) {
-              String output = inputFormVar((String) varName, 2, state);
-              fileWriter.write(varName + " := " + output + ";\n");
-          }
+         * Have to be careful in listing only what is in the actual state, not
+         * stuff in modules too since that is saved elsewhere and both bloats
+         * the output and can make for NS conflicts on reload.
+         */
+        fileWriter.write("\n/* ** global variables ** */\n");
+        for (Object varName : state.getExtrinsicVars().listVariables()) {
+            String output = inputFormVar((String) varName, 2, state);
+            fileWriter.write(varName + " := " + output + ";\n");
+        }
 
-          fileWriter.write("\n/* ** user defined variables ** */\n");
-          for (Object varName : state.getVStack().listVariables()) {
-              String output = inputFormVar((String) varName, 2, state);
-              fileWriter.write(varName + " := " + output + ";\n");
-          }
+        fileWriter.write("\n/* ** user defined variables ** */\n");
+        for (Object varName : state.getVStack().listVariables()) {
+            String output = inputFormVar((String) varName, 2, state);
+            fileWriter.write(varName + " := " + output + ";\n");
+        }
 
-          fileWriter.write("\n/* ** user defined functions ** */\n");
+        fileWriter.write("\n/* ** user defined functions ** */\n");
 
-          for (XKey key : state.getFTStack().keySet()) {
-              String output = inputForm((FunctionRecord) state.getFTStack().get(key));
-              if (output != null && !output.startsWith(JAVA_CLASS_MARKER)) {
-                  // Do not write java functions as they live in a module.
-                  fileWriter.write(output + "\n");
-              }
-          }
+        for (XKey key : state.getFTStack().keySet()) {
+            String output = inputForm((FunctionRecord) state.getFTStack().get(key));
+            if (output != null && !output.startsWith(JAVA_CLASS_MARKER)) {
+                // Do not write java functions as they live in a module.
+                fileWriter.write(output + "\n");
+            }
+        }
         // now do the imports
         fileWriter.write("\n/* ** module imports ** */\n");
 
@@ -4618,6 +4640,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             runScriptPath = inputLine.getNextArgFor(CLA_RUN_SCRIPT_ON);
 
         }
+        state.setAllowBaseFunctionOverrides(qe.isAllowOverwriteBaseFunctions());
         boolean isVerbose = qe.isWSVerboseOn();
         showBanner = qe.isShowBanner();
         logger = qe.getMyLogger();
@@ -4815,6 +4838,16 @@ public class WorkspaceCommands implements Logable, Serializable {
                     CharacterData cd = (CharacterData) child;
                     if (cd != null && cd.getTextContent() != null) {
                         onlineHelp.put(name, cd.getTextContent());
+                    }
+                    // Process examples
+                    x = eElement.getElementsByTagName("example")
+                            .item(0);
+                    if(x != null){
+                        child = x.getFirstChild().getNextSibling();
+                        cd = (CharacterData) child;
+                        if (cd != null && cd.getTextContent() != null) {
+                            onlineExamples.put(name, cd.getTextContent());
+                        }
                     }
                 }
             }

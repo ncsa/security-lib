@@ -12,7 +12,7 @@ public class SetTest extends AbstractQDLTester {
     public void testSetCreate() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok := {0,1,2,3} == to_set([;4]);");
+        addLine(script, "ok := {0,3,1,2} == |>[;4];");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
@@ -471,7 +471,7 @@ public class SetTest extends AbstractQDLTester {
     public void testToSetOOO() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
-        addLine(script, "ok ≔ ⊢[;5] ≡  to_set([;5]);");
+        addLine(script, "ok ≔ ⊢[;5] ≡  |>[;5];");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
@@ -492,7 +492,7 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "count := n%3;"); // number per group
         addLine(script, "A. := random_string(6, count)~[0==date_ms()%2] ~(mod(random(count), p)+p);");
         addLine(script, "A. := A. ~ (mod(random(n-size(A.)), p)+p)/(3+p%4);"); // make some fractions
-        addLine(script, "A := input_form(to_set(A.));");
+        addLine(script, "A := input_form(|>A.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         return getStringValue("A", state);

@@ -7,10 +7,7 @@ import edu.uiuc.ncsa.qdl.expressions.VariableNode;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
-import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.StemVariable;
-import edu.uiuc.ncsa.qdl.variables.VStack;
-import edu.uiuc.ncsa.qdl.variables.VThing;
+import edu.uiuc.ncsa.qdl.variables.*;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -245,8 +242,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(left);
         polyad.addArgument(right);
         polyad.evaluate(state);
-        Long result = (Long) polyad.getResult();
-        assert result == 3L;
+        StemVariable result = (StemVariable) polyad.getResult();
+        //assert result == 3L;
+        assert result.getLong(0L) == 3L;
     }
 
      
@@ -272,10 +270,10 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.addArgument(right);
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
-        assert result.getLong("score") == 5L;
-        assert result.getLong("Four") == 0L;
-        assert result.getLong("7") == 15L;
-        assert result.getLong("ago") == -1L;
+        assert testOldIndexOf(result, "score",5L);
+        assert testOldIndexOf(result, "Four",0L);
+        assert testOldIndexOf(result, "7",15L);
+        assert testOldIndexOf(result, "ago", -1L);
     }
 
      
@@ -303,13 +301,31 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == 4;
-        assert result.getLong("rule") == 0L;
-        assert result.getLong("find") == 0L;
-        assert result.getLong("bind") == -1L;
-        assert result.getLong("bring") == 0L;
+        assert testOldIndexOf(result, "rule",0L);
+        assert testOldIndexOf(result, "find",0L);
+        assert testOldIndexOf(result, "bind",-1L);
+        assert testOldIndexOf(result, "bring", 0L);
+    }
+    private boolean testOldIndexOf(StemVariable result, String key, Long index){
+        // Really awkward not to do it in QDL
+        StemVariable stemVariable = (StemVariable) result.get(key);
+        Object obj1 = stemVariable.get(0L);
+            return index.equals(obj1);
+    }
+    public void testIndexOf() throws Throwable{
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "x. ≔ index_of('qwasdwerasdrrasdvvasderasd','asd') == [2,8,13,18,23];");
+        addLine(script, "y. ≔ index_of('aaaaaaa','a') == [0,1,2,3,4,5,6] ;");
+        addLine(script, "ok := reduce(@&&, x.);");
+        addLine(script, "ok1 := reduce(@&&, y.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+
     }
 
-     
     public void testIndexOfStemString_ignoreCase() throws Exception {
         State state = testUtils.getTestState();
         VStack vStack = state.getVStack();
@@ -327,7 +343,7 @@ public class StringFunctionTests extends AbstractQDLTester {
         Polyad polyad = new Polyad(StringEvaluator.INDEX_OF);
         VariableNode left = new VariableNode("sourceStem.");
         VariableNode right = new VariableNode("targetString");
-        ConstantNode ignoreCase = new ConstantNode(false, Constant.BOOLEAN_TYPE);
+        ConstantNode ignoreCase = new ConstantNode(Boolean.FALSE, Constant.BOOLEAN_TYPE);
 
         polyad.addArgument(left);
         polyad.addArgument(right);
@@ -335,10 +351,10 @@ public class StringFunctionTests extends AbstractQDLTester {
         polyad.evaluate(state);
         StemVariable result = (StemVariable) polyad.getResult();
         assert result.size() == 4;
-        assert result.getLong("rule") == 0L;
-        assert result.getLong("find") == 0L;
-        assert result.getLong("bind") == -1L;
-        assert result.getLong("bring") == 0L;
+        assert testOldIndexOf(result, "rule",0L);
+        assert testOldIndexOf(result, "find",0L);
+        assert testOldIndexOf(result, "bind",-1L);
+        assert testOldIndexOf(result, "bring", 0L);
     }
 
      
@@ -371,7 +387,9 @@ public class StringFunctionTests extends AbstractQDLTester {
         // The contract is that the answer is conformable to the left argument, so only keys from the left
         // argument appear in the result.
         assert result.size() == 1;
-        assert result.getLong("bind") == 11L;
+        //assert result.getLong("bind") == 11L;
+        assert testOldIndexOf(result, "bind", 11L);
+
     }
 
      
@@ -752,17 +770,21 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert getBooleanValue("ok4", state);
         assert getBooleanValue("ok5", state);
     }
+    public void testEncodeAndDecode() throws Throwable{
+        // π
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok1 ≔ vencode('foo &&*bar baz') == 'foo$20$26$26$2Abar$20baz';");
+        addLine(script, "ok2 ≔ vencode('foo &&*bar baz', true) == 'foo+%26%26*bar+baz';"); // URL encode
+        addLine(script, "ok3 ≔ vdecode('foo+%26%26*bar+baz', true) == 'foo &&*bar baz';");
+        addLine(script, "ok4 ≔ vdecode('foo$20$26$26$2Abar$20baz', false) == 'foo &&*bar baz';"); // redundant false, just to test
 
-     /*
-       'abc' < 'abcd'
-true
-  'abc' < 'abc'
-false
-  'abcd'>'abc'
-true
-  'abcd' <= 'abcd'
-true
-  'abcd' <= 'abc'
-false
-      */
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok1", state);
+        assert getBooleanValue("ok2", state);
+        assert getBooleanValue("ok3", state);
+        assert getBooleanValue("ok4", state);
+
+    }
 }

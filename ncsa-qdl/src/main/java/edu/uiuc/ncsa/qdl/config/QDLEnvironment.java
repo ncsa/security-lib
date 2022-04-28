@@ -51,7 +51,8 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
                           Editors qdlEditors,
                           boolean enableLibrarySupport,
                           boolean assertionsOn,
-                          String saveDir) {
+                          String saveDir,
+                          boolean allowOverwriteBaseFunctions) {
         super(myLogger);
         this.cfgFile = cfgFile;
         this.name = name;
@@ -82,7 +83,18 @@ public class QDLEnvironment extends AbstractEnvironment implements QDLConfigurat
         this.assertionsOn = assertionsOn;
         this.saveDir = saveDir;
         this.isRestrictedIO = isRestrictedIO;
+        this.allowOverwriteBaseFunctions = allowOverwriteBaseFunctions;
     }
+
+    public boolean isAllowOverwriteBaseFunctions() {
+        return allowOverwriteBaseFunctions;
+    }
+
+    public void setAllowOverwriteBaseFunctions(boolean allowOverwriteBaseFunctions) {
+        this.allowOverwriteBaseFunctions = allowOverwriteBaseFunctions;
+    }
+
+    boolean allowOverwriteBaseFunctions = false;
 
     boolean isRestrictedIO = false;
 

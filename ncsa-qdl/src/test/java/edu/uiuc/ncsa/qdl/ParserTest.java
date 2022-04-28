@@ -2057,8 +2057,6 @@ public class ParserTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         // returns true if any elements are true
         assert getBooleanValue("ok", state) : "passing multiple function references failed.";
-//        assert areEqual(getBDValue("y", state), new BigDecimal("5.0")) : "passing multiple function references failed.";
-
     }
 
     /**
@@ -2835,5 +2833,21 @@ public class ParserTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
+    public void testOverrideBaseQDLFunctions() throws Throwable {
+        State state = testUtils.getNewState();
+        state.setAllowBaseFunctionOverrides(true);
+        StringBuffer script = new StringBuffer();
+        addLine(script, "size(x,y)->stem#size(x)*y;");
+        addLine(script, "ok := 35 == size([;5], 7);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    /*
+      size(x,y)->stem#size(x)*y
+  size([;5], 7)
+35
+     */
 }
 

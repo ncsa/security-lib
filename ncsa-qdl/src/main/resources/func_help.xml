@@ -3,9 +3,14 @@
         <body>
  <![CDATA[
 abs(arg) - find the absolute value of a number or stem.
-E.g. abs(-2) yields 2.
             ]]>
         </body>
+        <example>
+            <![CDATA[
+E.g.
+abs(-2) yields 2.
+                        ]]>
+        </example>
     </entry>
     <!-- NOTE no blank elements -->
     <entry id="date_ms">
@@ -123,16 +128,20 @@ head(target, delim{,is_regex}) - Return up to delim in the
                  may be conformable stems. The result is always conformable to
                  target.
                  is_regex - if true splits using the second as a regex.
-E.g.
+See also: tail
+]]>
+        </body>
+        <example>
+           <![CDATA[
     head(['bob@foo', 'todd@foo', 'rolf!baz'], '@')
 [bob,todd,]
 
 Note that there is no match for the last element, so an empty string is
 returned.
 Equivalent to tokenize(target, delim, is_regex).0
-See also: tail
-]]>
-        </body>
+           ]]>
+                </example>
+
     </entry>
     <entry id="tail">
         <body>
@@ -143,7 +152,11 @@ tail(target, delim{,is_regex}) - Return from after the last
                  The result is always conformable to target.
                  is_regex - if true treats the second argument as
                  a regular expression
-E.g.
+See also: head
+]]>
+        </body>
+        <example>
+           <![CDATA[
       tail(['bob@psu.edu', 'todd@bsu.edi', 'rolf!baz'], '@')
 [psu.edu,bsu.edi,]
 
@@ -154,9 +167,9 @@ returned.
 i.n
 
 This is equivalent to returning tokenize(a,b,is_regex).(-1);
-See also: head
-]]>
-        </body>
+           ]]>
+                </example>
+
     </entry>
 
 
@@ -175,7 +188,7 @@ check_syntax(string) - This will take the (possibly very long) string and run
                        (characters on the line are counted from zero).
 E.g.
    check_syntax(file_read('/path/to/file/x.qdl'))
-syntax error:line 11:27 mismatched input '=' expecting {'^', '=<', '=>', ...
+syntax error:line 11:27 mismatched input '=' expecting {'^', '>=', '<=', ...
 
 Meaning that on line 11, position 27 there was an error in the file.
 
@@ -312,13 +325,16 @@ See also: list_keys
  <![CDATA[
 include_keys(target., key_list.) - returns a stem that is the subset of target,
                                    including only keys found in key_list.
-E.g.
-  include_keys([2,4,6,8],[1,2])
-{1:4,2:6}
-
 See also: exclude_keys
  ]]>
         </body>
+        <example>
+           <![CDATA[
+  include_keys([2,4,6,8],[1,2])
+{1:4,2:6}
+           ]]>
+                </example>
+
     </entry>
     <entry id="n">
         <body>
@@ -328,6 +344,10 @@ n(dim.{,value | values.}) - make a list with dimension dim.
 Note: This is extremely useful in certain looping constructs.
 See also: shuffle(n) which also creates the same list of integers, but in
           random order.
+ ]]>
+        </body>
+        <example>
+           <![CDATA[
 E.g.
     n([3,4],[;12])
 [
@@ -336,11 +356,11 @@ E.g.
   [8,9,10,11]
  ]
 
- This has dimension [3,4]. You could alos enter this as
+ This has dimension [3,4]. You could also enter this as
     n(3,4,[;12])
+           ]]>
+                </example>
 
- ]]>
-        </body>
     </entry>
 
     <entry id="identity">
@@ -361,22 +381,45 @@ A nickname for this function is i().
  input_form(variable) - The argument is a variable (not a string)
 input_form(f, arg_ct) - The arguments are a function (not a string) and the
                         number of arguments.
+
+Note that as an artifact of parsing, whitespace may be different. The result, however
+if interpreted,  will return the original argument.
 See also: execute();
  ]]>
         </body>
+        <example>
+           <![CDATA[
+  f(x)->x^2
+  input_form(f, 1)
+f(x)
+->
+x^2;
+
+Note that the whitespace is different.
+           ]]>
+                </example>
+
     </entry>
     <entry id="has_value">
         <body>
  <![CDATA[
-has_value(left_arg, right_arg) - returns a boolean result conformable to the
-         left_arg (so a scalar left arg returns a scalar, but a stem returns
-         a stem). This checks the the value of the left_arg is in the
+has_value(left_arg, right_arg) - returns a left conformable of booleans
+         (so a scalar left arg returns a scalar, but a stem returns a stem).
+         This checks the the value of the left_arg is in the
          right_arg. Note that unlike many other stem functions, the keys are
          ignored. The resulting key set will always be identical
          to the left_arg.
 See also: mask, ∈
             ]]>
         </body>
+        <example>
+           <![CDATA[
+  has_value([;3], {'a':2,'b':null});
+[false,false,true]
+// since only the value of 2 in the left_arg is in the right_arg
+           ]]>
+                </example>
+
     </entry>
     <entry id="is_list">
         <body>
@@ -403,17 +446,20 @@ Note: There is no canonical ordering of keys, so these are effectively random.
 See also: list_keys(), rename_keys(), var_type(), constants('var_type')
  ]]>
         </body>
+        <example>
+           <![CDATA[
+   constants().var_type; // list variable types
+{boolean:1, set:10, string:3, null:0, integer:2, decimal:5, stem:4, undefined:-1}
+   arg. := [2,-3/7,'abc', false, 'rst', pi()/11]
+   keys(arg., 3); // get keys of strings only
+ {2:2, 4:4}
+   keys(arg., 5); // get decimals only
+{1:1, 5:5}
+           ]]>
+                </example>
+
     </entry>
-    <!--    <entry id="append">
-            <body>
-<![CDATA[
-    append(list0., arg) - append arg to list0., adjusting the indices as
-                               needed.
-    Note: If arg is a scalar, the single value is appended. If arg is a list,
-          then the entire list is appended.
-     ]]>
-            </body>
-        </entry>-->
+
     <entry id="copy">
         <body>
  <![CDATA[
@@ -421,16 +467,23 @@ copy(source., start_index, length, target., target_index) -
                copy one list into another, overwriting old elements.
 
      source. = the stem that is the source of the copy.
- start_index = the index in the source where the copy starts
-      length = how many elements to copy
+ start_index = the index in source. where the copy starts
+      length = how many elements to copy from source.
      target. = the target stem of the copy
-target_index = the index in the target that will receive the copy. Note that
+target_index = the index  target. that will receive the copy. Note that
                any elements already in these locations will be replaced. If you
                need to insert elements, consider using the insert_at
                command.
 See also: insert_at
  ]]>
         </body>
+        <example>
+           <![CDATA[
+  copy([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
+  [10,11,12,2,3,4]
+           ]]>
+                </example>
+
     </entry>
     <entry id="insert_at">
         <body>
@@ -439,16 +492,24 @@ insert_at(source., start_index, length, target., target_index) -
                insert one list in another, moving the old elements.
 
      source. = the stem that is the source of the copy.
- start_index = the index in the source where the copy starts
-      length = how many elements to copy
+ start_index = the index in source. where the copy starts
+      length = how many elements in source. to copy
      target. = the target stem of the copy
-target_index = the index in the target that will receive the copy. Note that
+target_index = the index in target. that will receive the copy. Note that
                any elements already in these locations will be moved. If you
                intend to replace a section of this list, consider using the
                copy command.
             See also: copy
 ]]>
         </body>
+        <example>
+           <![CDATA[
+  insert_at([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
+[10,11,12,2,3,13,14,15]
+
+           ]]>
+                </example>
+
     </entry>
     <entry id="remap">
         <body>
@@ -478,23 +539,6 @@ Note that
   r.3 := source_list.7
   r.4 := source_list.9
 
-
-E.g: Turn an array into a flat list
-   a. := [;5]
-   a.'foo' := 'bar'
-  remap(a., indices(a.))
-[bar,0,1,2,3,4,5,6,7,8,9,10,11]
-
-E.g. Remapping the result to a non-list stem
-   r. := remap(3*[;15], {'foo':3,'bar':5,'baz':7})
-   r.
-{bar:15, foo:9, baz:21}
-
- Note that
-   r.'foo' := source_list.3
-   r.'bar' := source_list.5
-   r.'baz' := source_list.7
-
 Most general case
 remap(source_list., old_indices., new_indices) - returns the elements of source_list.
           as specified by (assuming out. is the returned result)
@@ -519,13 +563,6 @@ And
     r.1 := a.[1,1]
     r.2 := a.[2,3]
 
-Yes, you can use arbitrary indices to so
-   remap(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
-{bar:5, foo:1, baz:11}
-
-is fine, though, of course, in the general case of stems, there is no
-canonical ordering of keys...
-
 Note: If you need to re-roll one array (e.g.) into another, the right way to
 do it is using the n function:
    n(2,2, remap(a., [[0,1],[1,1],[2,3],[2,0]]))
@@ -534,6 +571,34 @@ do it is using the n function:
 It is vastly easier to do it this way than have some extremely complex remapping
 scheme for higher rank stems. You get back a (more or less) linear structure
 you can then recast as needed.
+
+ See also: transpose, n (function), rename_keys
+]]>
+        </body>
+        <example>
+           <![CDATA[
+E.g: Turn an array into a flat list
+   a. := [;5]
+   a.'foo' := 'bar'
+  remap(a., indices(a.))
+[bar,0,1,2,3,4,5,6,7,8,9,10,11]
+
+E.g. Remapping the result to a non-list stem
+   r. := remap(3*[;15], {'foo':3,'bar':5,'baz':7})
+   r.
+{bar:15, foo:9, baz:21}
+
+ Note that
+   r.'foo' := source_list.3
+   r.'bar' := source_list.5
+   r.'baz' := source_list.7
+
+Yes, you can use arbitrary indices to so
+   remap(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+{bar:5, foo:1, baz:11}
+
+is fine, though, of course, in the general case of stems, there is no
+canonical ordering of keys...
 
 Example: General case, getting the transpose of a stem.
 In linear algebra, a matrix A[i,j] is the transpose of B[i,j] if
@@ -564,9 +629,9 @@ So to get the transpose,
  ]
 
  Note that this works on any  higher order stems as well.
- See also: transpose, n (function), rename_keys
-]]>
-        </body>
+           ]]>
+                </example>
+
     </entry>
     <entry id="subset">
         <body>
@@ -594,7 +659,11 @@ Note: If n is omitted, then the rest of the list is returned from the start
 
 For general stems, also consider remap.
 
-E.g.
+See also: n(), remap
+]]>
+        </body>
+        <example>
+           <![CDATA[
   subset((x)->x<3, {-2,0,4,5}); // pick elements in a set < 3
 {0,-2}
 
@@ -604,13 +673,11 @@ E.g.
     subset([10;20],4); // get rest of list from index 4 on
 [14,15,16,17,18,19]
 
-
     subset([10;20],4,2); // start at index 4, give next 2 elements
 [14,15]
+           ]]>
+                </example>
 
-See also: n(), remap
-]]>
-        </body>
     </entry>
     <entry id="mask">
         <body>
@@ -623,10 +690,14 @@ Note: This operates generally on stems. Many operations return boolean stems
 If you need something similar for sets (which have no concept of addressing
 elements) use subset(@pick, set).
 
-E.g.
-Make a random list of numbers and get the negative then positive ones.
-Do note that the indices are not re-ordered (since mask applies to
-generic stems and that would be bad).
+See also: subset
+               ]]>
+        </body>
+        <example>
+           <![CDATA[
+Let's make a random list of numbers and get the negative then positive ones.
+Do note that the indices are not automatically re-ordered (since mask
+applies to generic stems and that would be bad).
 
   r. := mod(random(5),97)
   r.
@@ -634,12 +705,10 @@ generic stems and that would be bad).
   mask(r., r. < 0)
 {0:-93,3:-46}
 
-  mask(r., r. > 0)
-{1:77,2:56,4:67}
+  ~mask(r., r. > 0); // reorder the list with ~
+[77,56,67]           ]]>
+                </example>
 
-See also: subset
-               ]]>
-        </body>
     </entry>
     <entry id="rename_keys">
         <body>
@@ -793,16 +862,19 @@ See also: constants() for the field names, to_uri.
  <![CDATA[
 unique(list.) - Take a stem and return a list of the unique elements.
 
-E.g.
-  unique(['a',2,4,true]~[[['a','b',0,3,true]]])
-[0,a,2,b,3,4,true]
-
 This may be used on any stem and it will recurse the entire stem.
 There is never any implied order.
 
 See also: values
 ]]>
         </body>
+        <example>
+           <![CDATA[
+  unique(['a',2,4,true]~[[['a','b',0,3,true]]])
+[0,a,2,b,3,4,true]
+           ]]>
+                </example>
+
     </entry>
     <entry id="halt">
         <body>
@@ -908,6 +980,14 @@ scan([prompt]) - get user input. The prompt is optional, but will be printed.
                  the user hits enter.
 ]]>
         </body>
+        <example>
+           <![CDATA[
+  scan('say something>'); // The user types in 'The rain in Spain' at the prompt
+say something>The rain in Spain...
+The rain in Spain...
+           ]]>
+                </example>
+
     </entry>
     <entry id="vfs_mount">
         <body>
@@ -933,7 +1013,6 @@ file readme.txt in the VFS.
 
 You can mount VFS's when starting the workspace. See the configuration
 reference manual for details.
-Alias: io#mount
 See also: vfs_unmount
              ]]>
         </body>
@@ -955,7 +1034,6 @@ operations against it will fail henceforth, e.g.
    dir('vfs#/mysql/')
 null
 
-Alias: io#unmount
 See also: vfs_mount
 ]]>
         </body>
@@ -1019,6 +1097,12 @@ shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target.
                           Argument keys. must have the same keys as the target.
                           AND the values of keys. are (as a set) the same as
                           the keys. in the target.
+See also: indices, rename_keys, which lets you rename some of the keys in a
+          stem.
+               ]]>
+        </body>
+        <example>
+           <![CDATA[
 E.g.
    shuffle(7)
 [5,0,4,6,1,2,3]
@@ -1029,12 +1113,11 @@ E.g.
     shuffle(2+3*indices(4), [2,1,3,0])
 [8,5,11,2]
 
-     In this case, the left argument is [2,5,8,11] and the right argument
-     has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
-See also: indices, rename_keys, which lets you rename some of the keys in a
-          stem.
-               ]]>
-        </body>
+In this case, the left argument is [2,5,8,11] and the right argument
+has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
+           ]]>
+                </example>
+
     </entry>
     <entry id="execute">
         <body>
@@ -1043,6 +1126,13 @@ execute(arg) - take the argument which is a string and execute it as if it
                were typed in.
                ]]>
         </body>
+        <example>
+           <![CDATA[
+   execute('2+2');
+4
+           ]]>
+                </example>
+
     </entry>
     <entry id="script_args">
         <body>
@@ -1326,13 +1416,26 @@ See also: for_keys to loop over the keys in a stem.
     <entry id="index_of">
         <body>
  <![CDATA[
-index_of(source, snippets) - returns a conformable stem of integers giving the
+index_of(source, snippets) - returns a conformable stem of lists of integers giving the
                   location of the snippet or a -1 if the snippet is not found.
 index_of(source, snippets, case_sensitive) - if true (default) all comparisons
                   are case sensitive. If false, all are converted to lower
                   case first.
 ]]>
         </body>
+        <example>
+            <![CDATA[
+     // There is exactly on 'pp' in the argument
+     index_of('ragg mopp ragmop!', 'pp')
+[7]
+      index_of('The cow is of the bovine ilk; One end is moo, the other, milk', 'the', false)
+ [0,14,46,51]
+           index_of('The cow is of the bovine ilk; One end is moo, the other, milk', 'the')
+[14,46,51]
+
+]]>
+
+        </example>
     </entry>
     <entry id="module_import">
         <body>
@@ -1589,24 +1692,41 @@ from the ends.
     <entry id="vencode">
         <body>
  <![CDATA[
-vencode(arg) -  encode a string or stem of them.
+vencode(arg{, url_encode}) -  encode a string or stem of them.
 Note: This is supremely useful for non-western character sets that must be
       preserved.
-E.g.
-   vencode('你浣')
-$E4$BD$A0$E6$B5$A3
+      url_encode - (optional, default is false) if true the arg will be URL encoded
+      instead,
 See also: vdecode
 ]]>
-
         </body>
+        <example>
+           <![CDATA[
+   vencode('你浣')
+$E4$BD$A0$E6$B5$A3
+  vencode('你浣', true)
+%E4%BD%A0%E6%B5%A3
+           ]]>
+                </example>
+
     </entry>
     <entry id="vdecode">
         <body>
  <![CDATA[
-vdecode(arg) -  decode an encoded string or stem.
+vdecode(arg{,url_decode}) -  decode an encoded string or stem.
+         url_decode - (optional, default false) if true will
+           try to URL decode the argument.
 See also: vencode
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   // Decode a tamil proverb:heaven helps the helpless.
+  vdecode('%E0%AE%85%E0%AE%95%E0%AE%A4%E0%AE%BF%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81+%E0%AE%86%E0%AE%95%E0%AE%BE%E0%AE%9A%E0%AE%AE%E0%AF%87+%E0%AE%A4%E0%AF%81%E0%AE%A3%E0%AF%88',true)
+அகதிக்கு ஆகாசமே துணை
+            ]]>
+                </example>
+
     </entry>
 
     <!--
@@ -2177,6 +2297,11 @@ Returns a list.
 
 This allows you to query stems using the standard query language in JSON.
 You supply a stem and a query. Note that the query is a string since 
+
+]]>
+        </body>
+        <example>
+           <![CDATA[
 In section 2 of the above specification is a JSON object. If you import
 this into the workspace as the stem variable my_json., then here are
 a few examples:
@@ -2206,8 +2331,9 @@ E.g. 3: Using the indices
 Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/my_json.json
        and issue
        my_json. := from_json(file_read('/my/path/my_json.json'));
-]]>
-        </body>
+           ]]>
+                </example>
+
     </entry>
     <entry id="=~">
         <body>
@@ -2217,14 +2343,17 @@ Apply the given regex (which is a string) to match the string representation
 of the expression.
 Result is always a boolean.
 
-E.g.
-   '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
-true
-
 Note: ≈ (unicode 2248) is also used for this.
 See also: tokenize, replace.
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
+true
+           ]]>
+                </example>
+
     </entry>
 
     <entry id="⟦">
@@ -2239,6 +2368,15 @@ inclusive.
 See also: slice
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   ⟦-1/2; 1/pi(); 5⟧
+[-0.5,-0.295422528454052,-0.090845056908104,0.113732414637844,0.318309886183792]
+
+Yields 5 numbers from -1/2 to 1/pi inclusive.
+           ]]>
+                </example>
+
     </entry>
     <entry id="[|">
         <body>
@@ -2301,7 +2439,6 @@ which is not
 When in doubt, use parentheses. Again, the contract is that the entire
 RHS is evaluated and fed to the operator. Compare the tilde operator
 for lists or any of the other monadic operators.
-
 
 Equivalent to: unicode not ¬ or \u00ac
 ]]>
@@ -2377,7 +2514,8 @@ Equivalent to: {}, the null set.
         <body>
  <![CDATA[
 Unicode less than or equal to \u2264
-Equivalent to: <= or =<
+Equivalent to: <=
+See also: comparisons
 ]]>
         </body>
     </entry>
@@ -2385,7 +2523,8 @@ Equivalent to: <= or =<
         <body>
  <![CDATA[
 Unicode greater than or equal to \u2265
-Equivalent to: >= or =>
+Equivalent to: >=
+See also: comparisons
 ]]>
         </body>
     </entry>
@@ -2394,6 +2533,7 @@ Equivalent to: >= or =>
  <![CDATA[
 Unicode logical equality \u2261
 Equivalent to: ==
+See also: comparisons
 ]]>
         </body>
     </entry>
@@ -2402,6 +2542,7 @@ Equivalent to: ==
  <![CDATA[
 Unicode not equal to \u2260
 Equivalent to: !=
+See also: comparisons
 ]]>
         </body>
     </entry>
@@ -2449,7 +2590,7 @@ Standard    Unicode   ALT   escape code    What is it
 !=             ≠       \    \u2260         not equal to
 ==             ≡       =    \u2261         logical equality
 <=             ≤       <    \u2264         less than or equals
-=>             ≥       >    \u2265         greater than or equals
+>=             ≥       >    \u2265         greater than or equals
 ~|             ≁       ~    \u2241         last axis join
 @              ⊗       @    \u2297         function reference
 assert[][]     ⊨       A    \u22a8         assert
@@ -2457,7 +2598,7 @@ assert[][]     ⊨       A    \u22a8         assert
 |]             ⟧       }    \u27e7         right closed slice bracket
 ceiling        ⌈       k    \u2308         ceiling
 floor          ⌊       l    \u230a         floor
-|>             ⊢       s    \u22a2         operator form of to_set
+|>             ⊢       s    \u22a2         create a set
 transpose      τ       t    \u03c4         alias for the transpose function.
 pi             π       p    \u03c0         Greek letter pi.
 
@@ -2475,6 +2616,15 @@ E.g.
 would print the entry for the null set.
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   // How to use unicode in a string:
+   '\u03c4 is the Greek letter tau'
+τ is the Greek letter tau
+
+           ]]>
+                </example>
+
     </entry>
 
     <entry id="assert">
@@ -2548,15 +2698,22 @@ assert[ conditional ][ message]
 
 If the conditional is false, the message is returned.
 
+If an assertion is made in a try-catch statement, then an error is raised
+with reserved error_code of -2 and the message is propagated like
+any other error message.
+]]>
+        </body>
+        <example>
+           <![CDATA[
 E.g.
 ⊨ script_arg() ≡  2 : 'you must supply both a username and password';
 
 alternately
 
 assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
+           ]]>
+                </example>
 
-]]>
-        </body>
     </entry>
     <entry id="block">
         <body>
@@ -3581,9 +3738,13 @@ Refers to the chaining of comparisons like
 which is the same as
   (a<b)&&(b<=c)
 
-You may chain any of <, <=, =<, >, >=, =>, ==, != or =~.
+You may chain any of <, <=,  >, >=,  ==, != or =~.
 
-
+See intrinsic.
+ ]]>
+        </body>
+        <example>
+           <![CDATA[
 E.g.
    k := 0
    while[0<=k<=3][say(k++);]
@@ -3595,10 +3756,9 @@ E.g.
 E.g.
    if[2!=x<5][say(sqrt(5-x)/(x-2));];
 Meaning that (x!=2)&&(x<5), and if true, say what the value is
+           ]]>
+                </example>
 
-See intrinsic.
- ]]>
-        </body>
     </entry>
     <entry id="ws_macro">
         <body>
@@ -3614,7 +3774,10 @@ programs (use scripts) but to allow for customization of the
 workspace from inside QDL, e.g. in an __init() function,
 so the workspace can be initialized etc.
 As such, it should be used minimally and with discretion.
-
+  ]]>
+        </body>
+        <example>
+           <![CDATA[
 E.g.
   ws_macro(')ws get');
 ... prints all current variables
@@ -3622,8 +3785,9 @@ true
 
    ws_macro([')ws set pp on', ')ws set echo on', ')ws set external_editor nano'])
 true
-  ]]>
-        </body>
+           ]]>
+                </example>
+
     </entry>
 
     <entry id="cb_exists">
@@ -3665,12 +3829,18 @@ cb_write(arg | arg.) - write the argument as a string to the clipboard.
                false otherwise. Note that stems are converted to JSON
                first.
 
-E.g.
-   cb_write('mairzy doats')
-true
 See also: cb_exists, cb_read
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   cb_write('mairzy doats')
+true
+
+and the line 'mairzy doats' is now in the clipboard.
+           ]]>
+                </example>
+
     </entry>
 
     <entry id="clipboard">
@@ -3726,20 +3896,6 @@ configuration option for the workspace.
 ]]>
         </body>
     </entry>
-    <entry id="to_set">
-        <body>
- <![CDATA[
-to_set(list.)) - Convert a list to a set.
-
-There is no canonical ordering of elements in a set.
-E.g.
-  to_set(3*[;5]+2)
-{2, 5, 8, 11, 14}
-
-See also: ∈ or has_value, && (intersection), ⊢, |>
-]]>
-        </body>
-    </entry>
     <entry id="∈">
         <body>
  <![CDATA[
@@ -3748,19 +3904,21 @@ x ∈ y - return a left conformable boolean mask of all
    elements of x. that are in y.
    Note that both x and y may be stems.
 
-E.g.
+See also: ∉, intersection, has_value, subset(@pick arg).
+]]>
+        </body>
+        <example>
+           <![CDATA[
   a. := ['a','b','c']
   b := {'p','q','b','a'};
   a. ∈ b
 [true,true,false]
 
-This is useful with the mask function.
-E.g.
+    // This is useful with the mask function.
     mask(a., a. ∈ b)
 [a, b]
-See also: ∉, intersection, has_value, subset(@pick arg).
-]]>
-        </body>
+           ]]>
+                </example>
     </entry>
     <entry id="∉">
         <body>
@@ -3769,26 +3927,29 @@ Unicode 2209.
 x ∉ y - return a left conformable boolean mask of all
    elements of x. that *not* are in y. Note that x may be a stem.
 
-E.g.
-  a. := ['a','b','c']
-  b := {'p','q','b','a'};
-  a. ∉ b
-[false,false,true]
-
-This is useful with the mask function.
-    mask(a., a. ∉ b)
-{2:c}
-
 See also: ∈, intersection, has_value, subset(@pick arg).
 ]]>
         </body>
+        <example>
+           <![CDATA[
+  a. := ['a','b','c']
+  b := {'p','q','b','a'}
+  a. ∉ b
+[false,false,true]
+
+   // This is useful with the mask function.
+    mask(a., a. ∉ b)
+{2:c}
+           ]]>
+                </example>
+
     </entry>
 
     <entry id="/">
         <body>
  <![CDATA[
 Division (numbers) or difference (sets)
-E.g. you know, division
+You know, division
   17/91
 0.186813186813186
 
@@ -3807,14 +3968,17 @@ See also && (intersection), % (symmetric difference)
  <![CDATA[
 Ascii digraph for sets intersection. The result is a set
 whose elements are common to both arguments.
-E.g.
-    {0,2,3,5} /\ {4,2,1,0}
-{0,2}
-
 
 See also: \/ (set union), subset(@pick arg)
 ]]>
         </body>
+        <example>
+           <![CDATA[
+    {0,2,3,5} /\ {4,2,1,0}
+{0,2}
+           ]]>
+                </example>
+
     </entry>
     <entry id="\/">
         <body>
@@ -3837,6 +4001,13 @@ You can also used unicode ∪ (\u222a).
 See also: /\ (set intersection), ~, subset(@pick arg)
 ]]>
         </body>
+        <example>
+           <![CDATA[
+   {{1,2},{3,4}}\/{{1,2},{'a','b'}}
+{{1,2},{a,b},{3,4}}
+           ]]>
+                </example>
+
     </entry>
 
 
@@ -3844,17 +4015,26 @@ See also: /\ (set intersection), ~, subset(@pick arg)
         <body>
  <![CDATA[
 For scalars, returns a boolean if the values are the same.
+Strings must match including case. See =~ (regex matching) as well.
 
 For sets, checks that the elements of one set are identical to
 another.
-E.g.
-  z := to_set([;20]*3+2)
-  z == z
-true
 
-See also: ∈ (has_value), <, > (subset operations.), subset(@pick arg)
+See also: ∈ (has_value), comparisons, subset(@pick arg)
 ]]>
         </body>
+        <example>
+           <![CDATA[
+  z := |>[;20]*3+2
+  z == z
+true
+   'abcd' == 'Abcd'
+false
+    2/3 == 2/3
+true
+           ]]>
+                </example>
+
     </entry>
     <entry id="set">
         <body>
@@ -3900,7 +4080,7 @@ can be recursive structures, highly nested etc.) can
 be slow and very difficult. On the other hand, sets may
 be entries in stems with no issues.
 
-See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>, to_set, subset(@pick, arg)
+See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>,  subset(@pick, arg)
 ]]>
         </body>
     </entry>
@@ -3932,6 +4112,11 @@ local is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside it is local only
 to that block, and the block *does not* inherit the ambient state.
 
+See also: block
+]]>
+        </body>
+        <example>
+           <![CDATA[
 To get values from the local block, use return.
 E.g.
   f()->local[r :=5; return(r);]
@@ -3953,10 +4138,9 @@ E.g.
    block[a :=2;];
    a
 2
+           ]]>
+                </example>
 
-See also: block
-]]>
-        </body>
     </entry>
     <entry id="stem">
         <body>
@@ -3972,7 +4156,7 @@ is called a list.
 Stems are extremely flexible objects and can effectively provide any data
 structure you want. Sets are a convenience mostly since emulating sets
 with stems is a bit clunky.
-                                                                     FCle
+
 See also: slice, sets
 ]]>
         </body>
@@ -3982,40 +4166,192 @@ See also: slice, sets
 <![CDATA[
 Unicode 22a2
 
-An operator for the to_set function.
+Operator to convert its argument to a set
 |> is the ascii digraph.
 
+]]>
+            </body>
+        <example>
+           <![CDATA[
 E.g.
    ⊢3
 {3}
    ⊢[;5]
 {01,2,3,4}
+           ]]>
+                </example>
 
-See also: to_set
-]]>
-            </body>
         </entry>
 
     <entry id="|>">
             <body>
 <![CDATA[
-Ascii digraph for the operator of the to_set function.
+Ascii digraph for the operator to convert its argument to a set.
 
    |>false
 {false}
-See also: ⊢ (\u22a2), to_set
+See also: ⊢ (\u22a2)
 ]]>
             </body>
+        <example>
+            <![CDATA[
+   |>3; // convert a scalar to a set
+{3}
+   |>[2;7]; // convert the values of a list to a set
+{2,3,4,5,6}
+   |>{'a':2/3,'b':-3/pi()}; // convert the values of a stem to a set
+{0.666666666666666,-0.954929658551372}
+   |>keys({'a':2/3,'b':-3/pi()}); // convert the keys of a stem to a set
+{a,b}
+]]>
+
+        </example>
         </entry>
+
+    <entry id="overwrite_base_functions">
+       <body>
+<![CDATA[
+(WS variable)
+This allows for overwriting the base QDL functions. You may always access them
+as fully qualified. This means you can use QDL as a library to wrote your own
+language.
+
+The downside is speed. Things run a bit slower because native QDL function
+resolution is quite fast.
+E.g.
+   )ws set overwrite_base_functions on
+overwrite_base_functions is now on.
+
+    size(x,y)->stem#size(x)+stem#size(y)
+    size([;5], [;7])
+12
+The default is off. In that case, attempting to redefine a base QDL function
+throws an error, assuming that you did not mean to do that.
+]]>
+       </body>
+    </entry>
+    <entry id="sort">
+       <body>
+  <![CDATA[
+  sort(arg{,up}) - sort the elements of the argument.
+        if up is true (default) the sort is from lowest to highest
+        if up is false, the order is descending.
+        Always returns a list.
+
+This does sort non-homogenous data and scalars. Since strings and decimals,
+say are not comparable really, the result is sorted by type
+
+nulls, booleans, strings numbers, everything else
+
+Notes:
+1. mixed data is slower, so if speed is an issue,
+keep your data by type.
+
+2. non-scalars are not comparable and are simply stuck together
+
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   sort(mod(random(12),17), false); // These are random numbers.
+[15,8,4,1,0,0,-3,-5,-8,-8,-9,-10]
+    sort([2,6,-1,'a']); // Mixed data
+[a,-1,2,6]
+
+    sort([-3/7, 4==5, 'abc', 'SPQR', {3,4,5}]); // Mixed data
+[false,SPQR,abc,-0.428571428571428,{3,4,5}]
+
+    sort([-3/7, 4==5, 'abc', 'SPQR', {3,4,5}], false); // redo in descending order
+[{3,4,5},-0.428571428571428,abc,SPQR,false]
+
+   sort(2); //scalars are simply returned in a list.
+[2]
+
+   // sorting of non-scalars is not well-defined, so sort has no effect
+   // on them:
+  sort({{1,2},{3,4,5},{2,7}}); // sort set of sets
+[{1,2},{2,7},{3,4,5}]
+    sort({{1,2},{3,4,5},{2,7}}, false); // reversing the order does nothing
+[{1,2},{2,7},{3,4,5}]
+
+   ]]>
+        </example>
+    </entry>
+
+    <entry id="@">
+       <body>
+  <![CDATA[
+  A function reference. Functions may be passed as arguments by reference.
+  The @ functor (a functor is something that acts on functions).
+
+  You may use this on any operator (such as +, *, etc.) or function.
+
+  Ways to pass by reference.
+  Explicitly:
+     p(x)->x<4; // boolean valued
+     subset(@p, {2,-1,3,5,6})
+  {-1,2,3}
+
+  Implictly:
+     subset((x)->x<4, {2,-1,3,5,6})
+   {-1,2,3}
+
+  In the implicit case, the function is defined for you, then a reference is passed.
+
+  Note that you may use unicode \u2297 ⊗ for this.
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
+    <entry id="comparisons">
+       <body>
+  <![CDATA[
+  This encompasses all of the following:
+  < <= > >= == !=
+  Note that each of these operates in various contexts.
+ Numbers.
+  These are the standard comparisons.
+     2/3 < 3/7
+false
+
+Sets.
+These are for set inclusion. Note that < and > are strict
+   {1,2}<{1,2,3}
+true
+   {1,2,3}<{1,2,3}
+false
+
+Strings.
+These test for equality or substring. These are case sensitive tests.
+   'doat'<'mairzy doats and dozey doats'
+true
+
+You cannot compare stems, but these will work on the elements of stems:
+   [2/3, 'doats', {1,2}] < [3/7, 'mairzy doats', {1,2,3}]
+[false,true,true]
+  ]]>
+       </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
+    </entry>
     <!--
         entry template
     -->
     <!--
     <entry id="">
        <body>
-<![CDATA[
-]]>
+  <![CDATA[
+  ]]>
        </body>
+       <example>
+   <![CDATA[
+   ]]>
+        </example>
     </entry>
           -->
 </help>

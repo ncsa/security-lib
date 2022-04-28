@@ -8,7 +8,9 @@ import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static edu.uiuc.ncsa.qdl.state.NamespaceAwareState.NS_DELIMITER;
@@ -42,10 +44,15 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
     public static final String LIST_REVERSE2 = "list_reverse";
     public static final int LIST_REVERSE_TYPE = 7 + LIST_BASE_VALUE;
 
+    public static final String LIST_SORT = "sort";
+    public static final int LIST_SORT_TYPE = 8 + LIST_BASE_VALUE;
+
+
     @Override
     public String[] getFunctionNames() {
         if (fNames == null) {
             fNames = new String[]{
+                    LIST_SORT,
                     LIST_INSERT_AT,
                     LIST_SUBSET,
                     LIST_COPY,
@@ -70,6 +77,9 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
 
     public boolean evaluate2(Polyad polyad, State state) {
         switch (polyad.getName()) {
+            case LIST_SORT:
+                doListSort(polyad, state);
+                return true;
             case LIST_COPY:
             case LIST_COPY2:
                 doListCopyOrInsert(polyad, state, false);
@@ -93,9 +103,12 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         return false;
     }
 
+
     @Override
     public int getType(String name) {
         switch (name) {
+            case LIST_SORT:
+                return LIST_SORT_TYPE;
             case LIST_COPY:
             case LIST_COPY2:
                 return LIST_COPY_TYPE;
@@ -121,19 +134,145 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         return LIST_NAMESPACE;
     }
 
-    protected void doListCopyOrInsert(Polyad polyad, State state, boolean doInsert) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{5});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount() < 5) {
-             throw new MissingArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad);
-         }
+    /**
+     * Always returns a sorted list.
+     *
+     * @param polyad
+     * @param state
+     */
+    protected void doListSort(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(LIST_SORT + " requires at least 1 argument", polyad);
+        }
 
-         if (5 < polyad.getArgCount()) {
-             throw new ExtraArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad.getArgAt(5));
-         }
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(LIST_SORT + " requires at most 2 arguments", polyad.getArgAt(2));
+        }
+        // Contract is to take everything in a list sort it and return it.
+        Object arg0 = polyad.evalArg(0, state);
+        ArrayList list = null;
+        switch (Constant.getType(arg0)) {
+            case Constant.SET_TYPE:
+                list = new ArrayList();
+                list.addAll((QDLSet) arg0);
+                break;
+            case Constant.STEM_TYPE:
+                StemVariable inStem = (StemVariable) arg0;
+                if (inStem.isList()) {
+                    list = inStem.getStemList().values(); // fast
+                } else {
+                    list = new ArrayList();
+                    list.addAll(inStem.values());
+                }
+                break;
+            default:
+                StemVariable stemVariable = new StemVariable();
+                stemVariable.put(0, arg0);
+                polyad.setEvaluated(true);
+                polyad.setResult(stemVariable);
+                polyad.setResultType(Constant.getType(arg0));
+                return;
+        }
+        boolean sortUp = true;
+        if (polyad.getArgCount() == 2) {
+            Object arg1 = polyad.evalArg(1, state);
+            if (arg1 instanceof Boolean) {
+                sortUp = (Boolean) arg1;
+            } else {
+                throw new BadArgException(LIST_SORT + " requires a boolean as it second argument if present", polyad.getArgAt(1));
+            }
+        }
+        try {
+            doSorting(list, sortUp);
+            StemVariable output = new StemVariable((long) list.size(), list.toArray());
+            polyad.setEvaluated(true);
+            polyad.setResult(output);
+            polyad.setResultType(Constant.STEM_TYPE);
+            return;
+        } catch (ClassCastException classCastException) {
+
+        }
+        // So there is mixed information. we'll have to do this the hard way....
+        ArrayList numbers = new ArrayList();
+        ArrayList strings = new ArrayList();
+        ArrayList others = new ArrayList();
+        ArrayList booleans = new ArrayList();
+        ArrayList nulls = new ArrayList();
+        for (Object element : list) {
+            switch (Constant.getType(element)) {
+                case Constant.STRING_TYPE:
+                    strings.add(element);
+                    break;
+                case Constant.DECIMAL_TYPE:
+                    numbers.add(element);
+                    break;
+                case Constant.LONG_TYPE:
+                    // BigDecimals and longs are not comparable. Have to fudge it
+                    numbers.add(BigDecimal.valueOf((long) element));
+                    break;
+                case Constant.BOOLEAN_TYPE:
+                    booleans.add(element);
+                    break;
+                case Constant.NULL_TYPE:
+                    nulls.add(element);
+                    break;
+                default:
+                    others.add(element);
+                    break;
+            }
+        }
+        doSorting(nulls, sortUp);
+        doSorting(numbers, sortUp);
+        doSorting(strings, sortUp);
+        doSorting(booleans, sortUp);
+        list.clear();
+        if (sortUp) {
+            list.addAll(nulls);
+            list.addAll(booleans);
+            list.addAll(strings);
+            list.addAll(numbers);
+            list.addAll(others);
+        } else {
+            list.addAll(others);
+            list.addAll(numbers);
+            list.addAll(strings);
+            list.addAll(booleans);
+            list.addAll(nulls);
+
+        }
+        StemVariable output = new StemVariable((long) list.size(), list.toArray());
+        polyad.setEvaluated(true);
+        polyad.setResult(output);
+        polyad.setResultType(Constant.STEM_TYPE);
+
+    }
+
+    private void doSorting(ArrayList list, boolean sortUp) {
+        if (sortUp) {
+            Collections.sort(list);
+        } else {
+            Collections.sort(list, Collections.reverseOrder());
+        }
+    }
+
+    protected void doListCopyOrInsert(Polyad polyad, State state, boolean doInsert) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{5});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 5) {
+            throw new MissingArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad);
+        }
+
+        if (5 < polyad.getArgCount()) {
+            throw new ExtraArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires 5 arguments", polyad.getArgAt(5));
+        }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
@@ -178,7 +317,8 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         checkNull(arg5, polyad.getArgAt(4));
 
         if (!isLong(arg5)) {
-            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fifth argument", polyad.getArgAt(4));        }
+            throw new BadArgException((doInsert ? LIST_INSERT_AT : LIST_COPY) + " requires an integer as its fifth argument", polyad.getArgAt(4));
+        }
         Long targetIndex = (Long) arg5;
 
         if (doInsert) {
@@ -203,18 +343,18 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
       {bar:5, foo:1, baz:11}
        */
     protected boolean doListSubset(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{2,3});
-                 polyad.setEvaluated(true);
-                 return true;
-             }
-         if (polyad.getArgCount() < 2) {
-             throw new MissingArgException(LIST_SUBSET + " requires at least 2 arguments", polyad);
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2, 3});
+            polyad.setEvaluated(true);
+            return true;
+        }
+        if (polyad.getArgCount() < 2) {
+            throw new MissingArgException(LIST_SUBSET + " requires at least 2 arguments", polyad);
+        }
 
-         if (3 < polyad.getArgCount()) {
-             throw new ExtraArgException(LIST_SUBSET + " requires at most 3 arguments", polyad.getArgAt(3));
-         }
+        if (3 < polyad.getArgCount()) {
+            throw new ExtraArgException(LIST_SUBSET + " requires at most 3 arguments", polyad.getArgAt(3));
+        }
 
         // Another case if subset(@f, arg) will pick elements of arg and return them
         // based on the first boolean-valued function
@@ -296,7 +436,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         ExpressionImpl f = null;
         try {
             f = getOperator(state, frn, 1); // single argument
-        }catch (UndefinedFunctionException ufx){
+        } catch (UndefinedFunctionException ufx) {
             ufx.setStatement(polyad.getArgAt(0));
             throw ufx;
         }
@@ -371,17 +511,17 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
      */
     // list_starts_with(['a','qrs','pqr'],['a','p','s','t'])
     protected void doListStartsWith(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{2});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-        if (polyad.getArgCount()<2) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 2) {
             throw new MissingArgException(LIST_STARTS_WITH + " requires 2 arguments", polyad);
         }
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(LIST_STARTS_WITH + " requires 2 arguments", polyad.getArgAt(2));
-         }
+        }
 
         Object leftArg = polyad.evalArg(0, state);
         checkNull(leftArg, polyad.getArgAt(0));
@@ -435,18 +575,18 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
     }
 
     protected void doListReverse(Polyad polyad, State state) {
-        if(polyad.isSizeQuery()){
-                 polyad.setResult(new int[]{1,2});
-                 polyad.setEvaluated(true);
-                 return;
-             }
-         if (polyad.getArgCount()<1) {
-             throw new MissingArgException(LIST_REVERSE + " requires at least 1 argument", polyad);
-         }
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{1, 2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(LIST_REVERSE + " requires at least 1 argument", polyad);
+        }
 
-         if (2<polyad.getArgCount()) {
-             throw new ExtraArgException(LIST_REVERSE + " requires at most 2 arguments", polyad.getArgAt(2));
-         }
+        if (2 < polyad.getArgCount()) {
+            throw new ExtraArgException(LIST_REVERSE + " requires at most 2 arguments", polyad.getArgAt(2));
+        }
 
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));

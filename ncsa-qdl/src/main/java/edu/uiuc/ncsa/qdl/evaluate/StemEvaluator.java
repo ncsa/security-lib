@@ -37,7 +37,6 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         return STEM_NAMESPACE;
     }
 
-    public static final String STEM_FQ = STEM_NAMESPACE + State.NS_DELIMITER;
     public static final int STEM_FUNCTION_BASE_VALUE = 2000;
 
     public static final String SIZE = "size";
@@ -652,7 +651,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                     // Only way to check is to look at the message. 
                     outStem = new StemVariable();
                 } else {
-                    throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+                    throw new BadArgException("error processing query:" + jpe.getMessage(), polyad);
                 }
             }
         } else {
@@ -674,7 +673,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 }
 
             } catch (JsonPathException jpe) {
-                throw new IllegalArgumentException("error processing query:" + jpe.getMessage());
+                throw new BadArgException("error processing query:" + jpe.getMessage(), polyad);
             }
         }
         polyad.setResult(outStem);
@@ -774,9 +773,13 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (polyad.getArgCount() != 1) {
-            throw new IllegalArgumentException("the " + UNIQUE_VALUES + " function requires 1 argument");
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException("the " + UNIQUE_VALUES + " function requires 1 argument", polyad);
         }
+        if (1 < polyad.getArgCount() ) {
+            throw new ExtraArgException("the " + UNIQUE_VALUES + " function requires at most 1 argument", polyad.getArgAt(1));
+        }
+
         polyad.evalArg(0, state);
         Object arg = polyad.getArgAt(0).getResult();
         checkNull(arg, polyad.getArgAt(0));
@@ -1339,8 +1342,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             polyad.setEvaluated(true);
             return;
         }
-        if (0 == polyad.getArgCount()) {
-            throw new IllegalArgumentException(KEYS + " requires at least 1 argument");
+        if (polyad.getArgCount() < 1) {
+            throw new MissingArgException(KEYS + " requires at least 1 argument", polyad);
         }
         if (2 < polyad.getArgCount()) {
             throw new ExtraArgException(KEYS + " takes at most two arguments", polyad.getArgAt(2));
@@ -2035,7 +2038,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         Set<String> keys = target.keySet();
         // easy check is to count. If this fails, then we throw and exception.
         if (keys.size() != newKeys.size()) {
-            throw new IllegalArgumentException(" the supplied set of keys must match every key in the source stem.");
+            throw new BadArgException(" the supplied set of keys must match every key in the source stem.", polyad.getArgAt(0));
         }
 
         for (String key : keys) {
@@ -2045,11 +2048,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 Object vv = target.get(kk);
                 output.put(key, vv);
             } else {
-                throw new IllegalArgumentException("'" + key + "' is not a key in the second argument.");
+                throw new BadArgException("'" + key + "' is not a key in the second argument.", polyad.getArgAt(1));
             }
         }
         if (!usedKeys.isEmpty()) {
-            throw new IllegalArgumentException(" each key in the left argument must be used as a value in the second argument. This assures that all elements are shuffled.");
+            throw new BadArgException(" each key in the left argument must be used as a value in the second argument. This assures that all elements are shuffled.", polyad.getArgAt(1));
         }
 
         polyad.setResult(output);

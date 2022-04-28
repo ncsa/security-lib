@@ -457,7 +457,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             // so they are trying to append the list to an existing stem.
             // In that case it becomes another entry
             Object obj0 = dyad.evalArg(0, state);
-            if ((obj0 instanceof QDLNull) ) {
+            if ((obj0 instanceof QDLNull)) {
                 throw new QDLExceptionWithTrace("cannot do a union a null", dyad.getLeftArgument());
 
             }
@@ -492,9 +492,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
 
         }
         if ((obj0 instanceof QDLNull)) {
-           // throw new IllegalArgumentException("cannot do a union a null");
             throw new QDLExceptionWithTrace("cannot do union on a null", dyad.getRightArgument());
-
         }
 
         StemVariable stem0 = null;
@@ -537,7 +535,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     return r;
                 }
                 if (!areAllNumbers(objects)) {
-                    throw new QDLExceptionWithTrace("operation is not defined for  non-numeric types", dyad.getLeftArgument());
+                    throw new QDLExceptionWithTrace("division is not defined for  non-numeric types", dyad.getLeftArgument());
                 }
                 if (areAllLongs(objects)) {
                     r.result = (Long) objects[0] / (Long) objects[1];
@@ -1008,16 +1006,16 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                     if (doTimes && isLong(objects[0]) && isString(objects[1])) {
                         count = (Long) objects[0];
                         arg = (String) objects[1];
-                        if(count <0){
-                            throw new QDLExceptionWithTrace("multiplication is not defined for strings and  negative integers",dyad.getLeftArgument());
+                        if (count < 0) {
+                            throw new QDLExceptionWithTrace("multiplication is undefined for strings and  negative integers", dyad.getLeftArgument());
                         }
                         gotOne = 0 <= count;
                     }
                     if (doTimes && isLong(objects[1]) && isString(objects[0])) {
                         arg = (String) objects[0];
                         count = (Long) objects[1];
-                        if(count <0){
-                            throw new QDLExceptionWithTrace("multiplication is not defined for strings and  negative integers",dyad.getRightArgument());
+                        if (count < 0) {
+                            throw new QDLExceptionWithTrace("multiplication is undefined for strings and  negative integers", dyad.getRightArgument());
                         }
                         gotOne = 0 <= count;
                     }
@@ -1034,7 +1032,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                         r.result = tempOutput;
                         return r;
                     }
-                    throw new QDLExceptionWithTrace("operation is not defined for  non-numeric types", dyad);
+                    throw new QDLExceptionWithTrace((doTimes ? "multiplication" : "division") + " is undefined for  non-numeric types", dyad);
                 }
             }
         };
@@ -1165,16 +1163,19 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 monad.setResult(r);
                 return;
             case STEM_TYPE:
-                Polyad p = new Polyad(SystemEvaluator.TO_SET);
-                p.addArgument(monad.getArgument());
-                state.getMetaEvaluator().evaluate(p, state);
-                monad.setResult(p.getResult());
-                monad.setResultType(p.getResultType());
-                monad.setEvaluated(p.isEvaluated());
+                Polyad p = new Polyad(StemEvaluator.UNIQUE_VALUES);
+                p.setArguments(monad.getArguments());
+                p.evaluate(state);
+                StemVariable stemVariable = (StemVariable) p.getResult(); // as per contract
+                set = new QDLSet();
+                set.addAll(stemVariable.getStemList().values());
+
+                monad.setResult(set);
+                monad.setResultType(SET_TYPE);
+                monad.setEvaluated(true);
                 return;
         }
         throw new QDLExceptionWithTrace("unknown type", monad.getArgument());
-
     }
 
     private void doFloorOrCeiling(Monad monad, State state, boolean isFloor) {

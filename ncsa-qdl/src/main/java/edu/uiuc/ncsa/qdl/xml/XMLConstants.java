@@ -29,6 +29,7 @@ public interface XMLConstants {
     String EXTRINSIC_VARIABLES_TAG = "extrinsic_variables";
     String ENV_FILE = "env_file";
     String PRETTY_PRINT = "pretty_print";
+    String OVERWRITE_BASE_FUNCTIONS = "overwrite_base_functions";
     String BUFFER_DEFAULT_SAVE_PATH = "buffer_default_save_path";
     String ECHO_MODE = "echo_mode";
     String DEBUG_MODE = "debug_mode";

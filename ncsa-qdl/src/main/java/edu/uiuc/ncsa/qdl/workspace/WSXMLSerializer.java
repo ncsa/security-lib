@@ -172,7 +172,7 @@ public class WSXMLSerializer {
 
     private void processWSEnvNEW(WorkspaceCommands workspaceCommands, XMLStreamWriter xsw) throws XMLStreamException {
         JSONObject json = new JSONObject();
-        json.put(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
+       // json.put(PRETTY_PRINT, Boolean.toString(workspaceCommands.prettyPrint));
         String zzz = workspaceCommands.getBufferDefaultSavePath();
         if (zzz != null) {
             json.put(BUFFER_DEFAULT_SAVE_PATH, zzz);
@@ -188,6 +188,7 @@ public class WSXMLSerializer {
         json.put(ASSERTIONS_ON, workspaceCommands.isAssertionsOn());
         json.put(PRETTY_PRINT, workspaceCommands.isPrettyPrint());
         json.put(ENABLE_LIBRARY_SUPPORT, workspaceCommands.getState().isEnableLibrarySupport());
+        json.put(OVERWRITE_BASE_FUNCTIONS, workspaceCommands.getState().isAllowBaseFunctionOverrides());
         // ints
         json.put(CURRENT_PID, Integer.toString(workspaceCommands.currentPID));
         // longs
@@ -578,7 +579,7 @@ public class WSXMLSerializer {
         workspaceCommands.setUseExternalEditor(json.getBoolean(USE_EXTERNAL_EDITOR));
         workspaceCommands.setAssertionsOn(json.getBoolean(ASSERTIONS_ON));
         workspaceCommands.setPrettyPrint(json.getBoolean(PRETTY_PRINT));
-
+        workspaceCommands.getState().setAllowBaseFunctionOverrides(json.getBoolean(OVERWRITE_BASE_FUNCTIONS));
         // numbers
         workspaceCommands.setAutosaveInterval(json.getLong(AUTOSAVE_INTERVAL));
         workspaceCommands.currentPID = json.getInt(CURRENT_PID);
@@ -619,6 +620,9 @@ public class WSXMLSerializer {
             Attribute a = (Attribute) iterator.next();
             String v = a.getValue();
             switch (a.getName().getLocalPart()) {
+                case OVERWRITE_BASE_FUNCTIONS:
+                    testCommands.getState().setAllowBaseFunctionOverrides(Boolean.parseBoolean(v));
+                    break;
                 case PRETTY_PRINT:
                     testCommands.setPrettyPrint(Boolean.parseBoolean(v));
                     break;

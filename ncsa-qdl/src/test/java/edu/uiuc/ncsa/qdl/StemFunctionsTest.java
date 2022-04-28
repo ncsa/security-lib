@@ -410,6 +410,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
      * common use case in practice. In this case, it replaces an older sub claim and renames
      * the isMemberOf claim. There is an extra claim (eppn) to check that <code>rename_keys</code>
      * does not lose a claim.
+     *
      * @throws Throwable
      */
     public void testRenameKeysWithOverWrite2() throws Throwable {
@@ -1925,11 +1926,11 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "ϱ. := 'foo';"); // matrix
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         boolean isOk = false;
-        try{
+        boolean isOk = false;
+        try {
             interpreter.execute(script.toString());
-        }catch (IndexError ix){
-                isOk = true;
+        } catch (IndexError ix) {
+            isOk = true;
         }
         assert isOk : "could set stem variable to non-null scalar";
     }
@@ -1939,17 +1940,18 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "ϱ := [;5];"); // matrix
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
-         boolean isOk = false;
-        try{
+        boolean isOk = false;
+        try {
             interpreter.execute(script.toString());
-        }catch (IndexError ix){
-                isOk = true;
+        } catch (IndexError ix) {
+            isOk = true;
         }
         assert isOk : "could set scalar variable to stem value";
     }
 
     /**
      * Tests that the pick function works on stems
+     *
      * @throws Throwable
      */
     public void testSubset() throws Throwable {
@@ -1957,7 +1959,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := reduce(@&&, [-1,0,1] == subset((x)->x<2, [-1;5]));");
         addLine(script, "z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'};");
-        addLine(script, "q. := subset((x)->index_of(x, 'x_')==0, z.);");
+        addLine(script, "q. := subset((x)->index_of(x, 'x_').0==0, z.);");
         addLine(script, "ok1 := reduce(@&&, {'a':'x_baz', 'c':'x_bar'}==q.);");
         addLine(script, "");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -1971,6 +1973,43 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "z. := {'a':'x_baz', 'b':3, 'c':'x_bar', 'd':'woof'};");
         addLine(script, "ok := reduce(@&&, z.==z.);"); // result of == is stem with keys
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testSort() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "z. :=   sort([-3/5, 4==5, 'abc', 'SPQR', {3,4,5}]) == [false,'SPQR','abc',-0.6,{3,4,5}];");
+        addLine(script, "z1. :=   sort([-3/5, 4==5, 'abc', 'SPQR', {3,4,5}], false) == [{3,4,5},-0.6,'abc','SPQR',false];");
+        addLine(script, "ok := reduce(@&&, z.);"); // z. is boolean
+        addLine(script, "ok1 := reduce(@&&, z1.);"); // z1. is boolean
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
+
+    /*
+        copy([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
+    [10,11,12,2,3,15]
+     */
+    public void testCopy() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "z. :=   copy([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3) == [10,11,12,2,3,15];");
+        addLine(script, "ok := reduce(@&&, z.);"); // z. is boolean
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+    }
+
+    public void testInsertAt() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "z. :=   insert_at([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3) == [10,11,12,2,3,13,14,15];");
+        addLine(script, "ok := reduce(@&&, z.);"); // z. is boolean
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);

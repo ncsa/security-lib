@@ -532,7 +532,7 @@ public class TMathEvaluator extends AbstractFunctionEvaluator {
                 }
 
                 if (bd == null) {
-                    throw new IllegalArgumentException("error, " + op + "() got '" + ob + "', requires a number");
+                    throw new BadArgException("error, " + op + "() got '" + ob + "', requires a number", polyad.getArgAt(0));
                 }
 
                 r.result = evaluateBD(bd, OpEvaluator.getMathContext(), op);
