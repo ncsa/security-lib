@@ -81,7 +81,7 @@ public class AnotherJSONUtil {
         if (topNode.isArray()) {
             JSONArray a = (JSONArray) topNode;
             for (int i = 0; i < a.size(); i++) {
-                scripts.add(createScript(a.getJSONObject(i)));
+                scripts.add(createScript(a.getJSONObject(i).getJSONObject("qdl")));
             }
         } else {
             scripts.add(createScript((JSONObject) topNode));
@@ -217,7 +217,7 @@ public class AnotherJSONUtil {
     public static void main(String[] args) {
         try {
             JSONObject j = JSONObject.fromObject(test2);
-            System.out.println(j.toString(2));
+            System.out.println(j.toString(1));
             ScriptSet<QDLScript> scripts = createScripts((JSON) j.get("qdl"));
             System.out.println(scripts);
         } catch (Throwable t) {

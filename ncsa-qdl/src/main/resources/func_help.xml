@@ -2784,17 +2784,26 @@ differ_at(s0, s1) - find first index at which two strings differ. If the
                another, then the index is the length (i.e. this is the index in
                the longer string). You may also apply this to stems of strings.
 
-E.g.
+]]>
+        </body>
+<example>
+    <![CDATA[
    differ_at('abcde', 'ab')
 2
    differ_at('abcd','abcd')
 -1
-   differ_at(['abcd','efghij'],['abq','efgp'])
-[2,3]
   differ_at(['abcde','abed'], 'abcq')
 [3,2]
+   // A somewhat larger example.
+   q. := ['abcd','efghij']
+   s. := ['abq','efgp']
+   differ_at(q.,s.)
+[2,3]
+   // How to use this to get rid of the common parts of strings,
+  substring(q., differ_at(q.,s.))
+[cd,hij]
 ]]>
-        </body>
+</example>
     </entry>
 
     <entry id="version">
