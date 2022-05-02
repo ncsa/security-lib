@@ -286,7 +286,14 @@ public class JWTUtil2 {
         }
         boolean isOK = false;
         try {
-            isOK = verify(h, p, x[SIGNATURE_INDEX], webKeys.get(h.getString(KEY_ID)));
+            JSONWebKey wk =  webKeys.get(h.getString(KEY_ID));
+            if(wk == null){
+                throw new IllegalArgumentException("Web key with id " + KEY_ID + " not found. Allows keys are " + webKeys.keySet());
+            }
+            if(wk.publicKey == null){
+                throw new IllegalStateException("Web key with id " +  KEY_ID + " does not have a public key");
+            }
+            isOK = verify(h, p, x[SIGNATURE_INDEX], wk);
         } catch (Throwable t) {
             throw new InvalidSignatureException("Error: could not verify signature", t);
         }

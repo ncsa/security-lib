@@ -1,83 +1,68 @@
 <help>
     <entry id="abs">
         <body>
- <![CDATA[
-abs(arg) - find the absolute value of a number or stem.
-            ]]>
+ <![CDATA[abs(arg) - find the absolute value of a number or stem.]]>
         </body>
         <example>
-            <![CDATA[
-E.g.
-abs(-2) yields 2.
-                        ]]>
+<![CDATA[abs(-2) yields 2.]]>
         </example>
     </entry>
     <!-- NOTE no blank elements -->
     <entry id="date_ms">
         <body>
- <![CDATA[
-   date_ms() - current date in milliseconds
+ <![CDATA[date_ms() - current date in milliseconds
 date_ms(arg) - if arg is an integer, return it, if it is a string
                in ISO 8601 format.
-See also: date_iso
-            ]]>
+See also: date_iso]]>
         </body>
     </entry>
     <entry id="date_iso">
         <body>
- <![CDATA[
-   date_iso() - return the current date as an ISO 8601 formatted string
+ <![CDATA[date_iso() - return the current date as an ISO 8601 formatted string
 date_iso(arg) - if arg is an integer, convert it to an ISO string.
                 If it is an ISO string, return it.
-See also: date_ms
-            ]]>
+See also: date_ms]]>
         </body>
     </entry>
 
     <entry id="decode_b64">
         <body>
- <![CDATA[
-decode_b64(arg) - decode a base 64 encoded string or stem of strings to string(s).
+ <![CDATA[decode_b64(arg) - decode a base 64 encoded string or stem of strings to string(s).
                   Note that if the arg is encoded binary, you will get
                   gibberish back.
-See also: encode_b64
-            ]]>
+See also: encode_b64]]>
         </body>
     </entry>
 
     <entry id="encode_b64">
         <body>
- <![CDATA[
-encode_b64(arg) - encode a string or stem of string into base 64.
+<![CDATA[encode_b64(arg) - encode a string or stem of string into base 64.
 We follow RFC 4648, meaning that the result is not padded with
 things like ='s, and the character set is a-zA-Z0-9-_.
 This makes the result always URL safe.
 Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
-E.g.
-  encode_b64('foobar')
-Zm9vYmFy
 
-See also: decode_b64
-]]>
+See also: decode_b64]]>
         </body>
+<example>
+<![CDATA[  encode_b64('foobar')
+Zm9vYmFy]]>
+</example>
     </entry>
 
 
     <entry id="decode_b32">
         <body>
- <![CDATA[
-decode_b32(arg) - decode a base 32 encoded string or stem of strings to string(s).
+ <![CDATA[decode_b32(arg) - decode a base 32 encoded string or stem of strings to string(s).
                   Note that if the arg is encoded binary, you will get
                   gibberish back.
-See also: encode_b32
-            ]]>
+See also: encode_b32]]>
         </body>
     </entry>
 
     <entry id="encode_b32">
         <body>
- <![CDATA[
-encode_b32(arg) - encode a string or stem of string into base 32.
+ <![CDATA[encode_b32(arg) - encode a string or stem of string into base 32.
 We follow RFC 4648, meaning that the result is not padded with
 things like ='s, and the character set is A-Z2-7
 This makes the result always URL safe.
@@ -86,78 +71,71 @@ E.g.
   encode_b32('foobar')
 MZXW6YTBOI
 
-See also: decode_b32
-]]>
+See also: decode_b32]]>
         </body>
+<example>
+    <![CDATA[   encode_b32('foobar')
+    MZXW6YTBOI]]>
+</example>
     </entry>
 
     <entry id="decode_b16">
         <body>
- <![CDATA[
-decode_b16(arg) - decode a base 16 encoded string or stem of strings to string(s).
+ <![CDATA[decode_b16(arg) - decode a base 16 encoded string or stem of strings to string(s).
                   Note that if the arg is encoded binary, you will get
                   gibberish back.
-See also: encode_b16
-            ]]>
+See also: encode_b16]]>
         </body>
     </entry>
 
     <entry id="encode_b16">
         <body>
- <![CDATA[
-encode_b16(arg) - encode a string or stem of string into base 16.
+<![CDATA[encode_b16(arg) - encode a string or stem of string into base 16.
 We follow RFC 4648, meaning that the result is not padded with
 things like ='s, and the character set is a-f0-9
 This makes the result always URL safe.
 Full technical description: https://datatracker.ietf.org/doc/html/rfc4648
-E.g.
-  encode_b16('foobar')
-666f6f626172
 
-See also: decode_b16
-]]>
+See also: decode_b16]]>
         </body>
+<example>
+<![CDATA[   encode_b16('foobar')
+666f6f626172]]>
+</example>
     </entry>
 
 
     <entry id="head">
         <body>
- <![CDATA[
-head(target, delim{,is_regex}) - Return up to delim in the
+ <![CDATA[head(target, delim{,is_regex}) - Return up to delim in the
                  target. Both of the first arguments
                  may be conformable stems. The result is always conformable to
                  target.
                  is_regex - if true splits using the second as a regex.
-See also: tail
-]]>
+See also: tail]]>
         </body>
         <example>
-           <![CDATA[
-    head(['bob@foo', 'todd@foo', 'rolf!baz'], '@')
+<![CDATA[   head(['bob@foo', 'todd@foo', 'rolf!baz'], '@')
 [bob,todd,]
 
 Note that there is no match for the last element, so an empty string is
 returned.
-Equivalent to tokenize(target, delim, is_regex).0
-           ]]>
+Equivalent to tokenize(target, delim, is_regex).0]]>
                 </example>
 
     </entry>
     <entry id="tail">
         <body>
- <![CDATA[
-tail(target, delim{,is_regex}) - Return from after the last
+ <![CDATA[tail(target, delim{,is_regex}) - Return from after the last
                  delim in the target to the end of the string.
                  Both of the first arguments may be conformable stems.
                  The result is always conformable to target.
                  is_regex - if true treats the second argument as
                  a regular expression
-See also: head
-]]>
+See also: head]]>
         </body>
         <example>
-           <![CDATA[
-      tail(['bob@psu.edu', 'todd@bsu.edi', 'rolf!baz'], '@')
+<![CDATA[   tail(['bob@psu.edu', 'todd@bsu.edi', 'rolf!baz'], '@')
 [psu.edu,bsu.edi,]
 
 Note that there is no match for the last element, so an empty string is
@@ -166,8 +144,7 @@ returned.
       tail('a d, m,\ti.n','\\s+', true);    // uses whitespace
 i.n
 
-This is equivalent to returning tokenize(a,b,is_regex).(-1);
-           ]]>
+This is equivalent to returning tokenize(a,b,is_regex).(-1);]]>
                 </example>
 
     </entry>
@@ -175,8 +152,7 @@ This is equivalent to returning tokenize(a,b,is_regex).(-1);
 
     <entry id="check_syntax">
         <body>
- <![CDATA[
-check_syntax(string) - This will take the (possibly very long) string and run
+ <![CDATA[check_syntax(string) - This will take the (possibly very long) string and run
                        it through the parser checking for syntax errors. Note
                        that this does not run anything! Its use is to help
                        you track down errors like missing semi-colons, illegal
@@ -197,31 +173,25 @@ a shebang directive of #!) the shebang will cause this to fail. Simply
 comment out the first line to use the syntax check on it or otherwise
 prevent it from being checked. The shebang is used by the operating system
 and is not part of QDL.
-See also: execute
-]]>
+See also: execute]]>
         </body>
     </entry>
     <entry id="hash">
         <body>
- <![CDATA[
-hash(arg) - calculates the SHA-1 digest of a string or stem of strings.
+ <![CDATA[hash(arg) - calculates the SHA-1 digest of a string or stem of strings.
             The output is a hexadecimal string. Note that this has nothing to
-            do with converting to or from hex strings.
-]]>
+            do with converting to or from hex strings.]]>
         </body>
     </entry>
     <entry id="mod">
         <body>
- <![CDATA[
-mod(a,b) - compute the modulus, i.e., the remainder after long division, of two
-           integers. The arguments are either scalar or stems.
-]]>
+ <![CDATA[mod(a,b) - compute the modulus, i.e., the remainder after long division, of two
+           integers. The arguments are either scalar or stems.]]>
         </body>
     </entry>
     <entry id="numeric_digits">
         <body>
- <![CDATA[
-   numeric_digits() - display the current precision
+ <![CDATA[numeric_digits() - display the current precision
 numeric_digits(arg) - set the precision to the value of arg, which is a
                       positive integer.
                       The result displayed is the old precision.
@@ -231,73 +201,62 @@ Note: Precision refers to the total number of digits that are considered
       approximation. QDL will show values as accurately as possible,
       so if the value were 1.00000009 then QDL would display 1 as the
       value, since up to precision, they are the same.
-      See the reference manual for a more information.
-]]>
+      See the reference manual for a more information.]]>
         </body>
     </entry>
     <entry id="random">
         <body>
- <![CDATA[
- random() - return a random number
-random(n) - return n (an integer) random numbers as a stem list.
-]]>
+ <![CDATA[ random() - return a random number
+random(n) - return n (an integer) random numbers as a stem list.]]>
         </body>
     </entry>
     <entry id="random_string">
         <body>
- <![CDATA[
-    random_string() - return a random string of 16 bytes, base 64 encoded.
+ <![CDATA[random_string() - return a random string of 16 bytes, base 64 encoded.
    random_string(n) - return a random string of n bytes, base 64 encoded
 random_string(n, m) - return a list containing m entries with n bytes each,
                       base 64 encoded
-See also: encode_b64, decode_b64
-]]>
+See also: encode_b64, decode_b64]]>
         </body>
     </entry>
 
     <entry id="box">
         <body>
- <![CDATA[
-box(arg0, arg1, ...) - take any collection of variables and turn them into a
+ <![CDATA[box(arg0, arg1, ...) - take any collection of variables and turn them into a
                        single stem, their names becoming keys. They are removed
                        from the symbol table. There must be at least one
                        argument and the result is a boolean true if it
                        succeeded and false otherwise (so you can test
                        programatically if it worked).
-See also: unbox
-]]>
+See also: unbox]]>
         </body>
     </entry>
     <entry id="exclude_keys">
         <body>
- <![CDATA[
-exclude_keys(target., list.) - remove the list. of keys (and their values) from
+<![CDATA[exclude_keys(target., list.) - remove the list. of keys (and their values) from
                                target.
-E.g.
-  exclude_keys([2,4,6,8],[1,2])
-{0:2,3:8}
 
 Note: The result will be a subset of target. that contains none of the keys
-      listed in the list. argument.
-]]>
+      listed in the list. argument.]]>
         </body>
+<example>
+<![CDATA[ exclude_keys([2,4,6,8],[1,2])
+{0:2,3:8}]]>
+</example>
     </entry>
     <entry id="from_json">
         <body>
- <![CDATA[
-         from_json(arg) - takes the argument with is a string representation of
+ <![CDATA[from_json(arg) - takes the argument with is a string representation of
                           JSON and turns it into a stem.
 from_json(arg, convert) - as per single argument case, but allows a flag (true
                           or false) if vencode is to be applied to each key.
                           The default is false.
-See also: vencode, to_json
-]]>
+See also: vencode, to_json]]>
         </body>
     </entry>
     <entry id="list_keys">
         <body>
- <![CDATA[
-list_keys(arg.) - returns a list of the keys in the argument.
+ <![CDATA[list_keys(arg.) - returns a list of the keys in the argument.
 list_keys(arg., boolean) - returns a list of the keys in the argument.
                            which is a boolean that when true will
                            return only those keys whose values are
@@ -305,78 +264,63 @@ list_keys(arg., boolean) - returns a list of the keys in the argument.
 list_keys(arg., var_type)- returns a list of the keys in the argument.
                            for the given type (which is an integer).
 
-Note: Strings are scalars.
-See also: keys(), var_type(), constants('var_type')
-]]>
+Remember that strings are scalars.
+See also: keys(), var_type(), constants('var_type')]]>
         </body>
     </entry>
     <entry id="has_keys">
         <body>
- <![CDATA[
-has_keys(target., key_list.) - returns a boolean list that is the same size as
+ <![CDATA[has_keys(target., key_list.) - returns a boolean list that is the same size as
                                key_list. and has a true or false if that entry
                                is a key in target.
-See also: list_keys
-]]>
+See also: list_keys]]>
         </body>
     </entry>
     <entry id="include_keys">
         <body>
- <![CDATA[
-include_keys(target., key_list.) - returns a stem that is the subset of target,
+ <![CDATA[include_keys(target., key_list.) - returns a stem that is the subset of target,
                                    including only keys found in key_list.
-See also: exclude_keys
- ]]>
+See also: exclude_keys]]>
         </body>
         <example>
-           <![CDATA[
-  include_keys([2,4,6,8],[1,2])
-{1:4,2:6}
-           ]]>
+<![CDATA[  include_keys([2,4,6,8],[1,2])
+{1:4,2:6}]]>
                 </example>
 
     </entry>
     <entry id="n">
         <body>
- <![CDATA[
-n(n0,n1,...{, values.}) - make a stem list whose values are 0,..., n-1
+ <![CDATA[n(n0,n1,...{, values.}) - make a stem list whose values are 0,..., n-1
 n(dim.{,value | values.}) - make a list with dimension dim.
 Note: This is extremely useful in certain looping constructs.
 See also: shuffle(n) which also creates the same list of integers, but in
-          random order.
- ]]>
+          random order. ]]>
         </body>
         <example>
-           <![CDATA[
-E.g.
-    n([3,4],[;12])
+<![CDATA[  n([3,4],[;12])
 [
   [0,1,2,3],
   [4,5,6,7],
   [8,9,10,11]
  ]
 
- This has dimension [3,4]. You could also enter this as
-    n(3,4,[;12])
-           ]]>
+This has dimension [3,4]. You could also enter this as
+    n(3,4,[;12])]]>
                 </example>
 
     </entry>
 
     <entry id="identity">
         <body>
- <![CDATA[
-identity(x) - return x unchanged. This is useful for instance if you
+ <![CDATA[identity(x) - return x unchanged. This is useful for instance if you
               need a function to express a value rather than just the
               value itself.
-A nickname for this function is i().
- ]]>
+A nickname for this function is i(). ]]>
         </body>
     </entry>
     <entry id="input_form">
         <body>
- <![CDATA[
-   input_form(module) - The argument is a string with the name of the module
+ <![CDATA[input_form(module) - The argument is a string with the name of the module
                         or one of its aliases.
  input_form(variable) - The argument is a variable (not a string)
 input_form(f, arg_ct) - The arguments are a function (not a string) and the
@@ -384,55 +328,44 @@ input_form(f, arg_ct) - The arguments are a function (not a string) and the
 
 Note that as an artifact of parsing, whitespace may be different. The result, however
 if interpreted,  will return the original argument.
-See also: execute();
- ]]>
+See also: execute();]]>
         </body>
         <example>
-           <![CDATA[
-  f(x)->x^2
+<![CDATA[  f(x)->x^2
   input_form(f, 1)
 f(x)
 ->
 x^2;
 
-Note that the whitespace is different.
-           ]]>
+Note that the whitespace is different.]]>
                 </example>
 
     </entry>
     <entry id="has_value">
         <body>
- <![CDATA[
-has_value(left_arg, right_arg) - returns a left conformable of booleans
+ <![CDATA[has_value(left_arg, right_arg) - returns a left conformable of booleans
          (so a scalar left arg returns a scalar, but a stem returns a stem).
          This checks the the value of the left_arg is in the
          right_arg. Note that unlike many other stem functions, the keys are
          ignored. The resulting key set will always be identical
          to the left_arg.
-See also: mask, ∈
-            ]]>
+See also: mask, ∈]]>
         </body>
         <example>
-           <![CDATA[
-  has_value([;3], {'a':2,'b':null});
+<![CDATA[  has_value([;3], {'a':2,'b':null});
 [false,false,true]
-// since only the value of 2 in the left_arg is in the right_arg
-           ]]>
+// since only the value of 2 in the left_arg is in the right_arg]]>
                 </example>
-
     </entry>
     <entry id="is_list">
         <body>
- <![CDATA[
-is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are
-                 integers.
- ]]>
+ <![CDATA[is_list(stem.) - returns a true if the stem. is a list, i.e., the only keys are
+                 integers.]]>
         </body>
     </entry>
     <entry id="keys">
         <body>
- <![CDATA[
-keys(arg.) - returns a stem of all the keys in arg. Every key is returned and
+ <![CDATA[keys(arg.) - returns a stem of all the keys in arg. Every key is returned and
              the value is just the key itself
 keys(arg., boolean) - returns a stem of the keys in the argument.
                       If the boolean is true will return only those keys whose
@@ -443,27 +376,23 @@ This is extremely useful
 in conjunction with the rename_keys() call.
 If you supply and integer for the variable type, only
 Note: There is no canonical ordering of keys, so these are effectively random.
-See also: list_keys(), rename_keys(), var_type(), constants('var_type')
- ]]>
+See also: list_keys(), rename_keys(), var_type(), constants('var_type')]]>
         </body>
         <example>
-           <![CDATA[
-   constants().var_type; // list variable types
+<![CDATA[   constants().var_type; // list variable types
 {boolean:1, set:10, string:3, null:0, integer:2, decimal:5, stem:4, undefined:-1}
    arg. := [2,-3/7,'abc', false, 'rst', pi()/11]
    keys(arg., 3); // get keys of strings only
  {2:2, 4:4}
    keys(arg., 5); // get decimals only
-{1:1, 5:5}
-           ]]>
+{1:1, 5:5}]]>
                 </example>
 
     </entry>
 
     <entry id="copy">
         <body>
- <![CDATA[
-copy(source., start_index, length, target., target_index) -
+ <![CDATA[copy(source., start_index, length, target., target_index) -
                copy one list into another, overwriting old elements.
 
      source. = the stem that is the source of the copy.
@@ -474,21 +403,17 @@ target_index = the index  target. that will receive the copy. Note that
                any elements already in these locations will be replaced. If you
                need to insert elements, consider using the insert_at
                command.
-See also: insert_at
- ]]>
+See also: insert_at]]>
         </body>
         <example>
-           <![CDATA[
-  copy([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
-  [10,11,12,2,3,4]
-           ]]>
+<![CDATA[   copy([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
+[10,11,12,2,3,4]]]>
                 </example>
 
     </entry>
     <entry id="insert_at">
         <body>
- <![CDATA[
-insert_at(source., start_index, length, target., target_index) -
+ <![CDATA[insert_at(source., start_index, length, target., target_index) -
                insert one list in another, moving the old elements.
 
      source. = the stem that is the source of the copy.
@@ -499,22 +424,16 @@ target_index = the index in target. that will receive the copy. Note that
                any elements already in these locations will be moved. If you
                intend to replace a section of this list, consider using the
                copy command.
-            See also: copy
-]]>
+See also: copy]]>
         </body>
         <example>
-           <![CDATA[
-  insert_at([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
-[10,11,12,2,3,13,14,15]
-
-           ]]>
+<![CDATA[   insert_at([1,2,3,4,5,6],1,2,[10,11,12,13,14,15], 3)
+[10,11,12,2,3,13,14,15]]]>
                 </example>
-
     </entry>
     <entry id="remap">
         <body>
- <![CDATA[
-Take the elements in arg. and create a new stem. There are two cases:
+ <![CDATA[Take the elements in arg. and create a new stem. There are two cases:
 
 remap(source_list., index_list.) - returns the elements of source_list.
           as specified in index_list. The result is always a simple list.
@@ -572,12 +491,10 @@ It is vastly easier to do it this way than have some extremely complex remapping
 scheme for higher rank stems. You get back a (more or less) linear structure
 you can then recast as needed.
 
- See also: transpose, n (function), rename_keys
-]]>
+See also: transpose, n (function), rename_keys]]>
         </body>
         <example>
-           <![CDATA[
-E.g: Turn an array into a flat list
+<![CDATA[E.g: Turn an array into a flat list
    a. := [;5]
    a.'foo' := 'bar'
   remap(a., indices(a.))
@@ -635,8 +552,7 @@ So to get the transpose,
     </entry>
     <entry id="subset">
         <body>
- <![CDATA[
-Function to extract a subset from a list or set.
+ <![CDATA[Function to extract a subset from a list or set.
 
 subset(@pick, arg) - picks elements from arg based on the boolean @pick
           function. If arg is a stem or set, so is the result. If arg
@@ -659,30 +575,26 @@ Note: If n is omitted, then the rest of the list is returned from the start
 
 For general stems, also consider remap.
 
-See also: n(), remap
-]]>
+See also: n(), remap]]>
         </body>
         <example>
-           <![CDATA[
-  subset((x)->x<3, {-2,0,4,5}); // pick elements in a set < 3
+<![CDATA[  subset((x)->x<3, {-2,0,4,5}); // pick elements in a set < 3
 {0,-2}
 
   subset({'a', 2,1,3/7,'b'}, 2); grab 2 elements from the set
 {a,1}
 
-    subset([10;20],4); // get rest of list from index 4 on
+   subset([10;20],4); // get rest of list from index 4 on
 [14,15,16,17,18,19]
 
-    subset([10;20],4,2); // start at index 4, give next 2 elements
-[14,15]
-           ]]>
+   subset([10;20],4,2); // start at index 4, give next 2 elements
+[14,15]]]>
                 </example>
 
     </entry>
     <entry id="mask">
         <body>
- <![CDATA[
-mask(target., bit_mask.) - returns a subset of target. corresponding to each
+ <![CDATA[mask(target., bit_mask.) - returns a subset of target. corresponding to each
                            true value in the mask.
 Note: This operates generally on stems. Many operations return boolean stems
       which can be used with this function.
@@ -690,12 +602,10 @@ Note: This operates generally on stems. Many operations return boolean stems
 If you need something similar for sets (which have no concept of addressing
 elements) use subset(@pick, set).
 
-See also: subset
-               ]]>
+See also: subset]]>
         </body>
         <example>
-           <![CDATA[
-Let's make a random list of numbers and get the negative then positive ones.
+<![CDATA[Let's make a random list of numbers and get the negative then positive ones.
 Do note that the indices are not automatically re-ordered (since mask
 applies to generic stems and that would be bad).
 
@@ -706,14 +616,13 @@ applies to generic stems and that would be bad).
 {0:-93,3:-46}
 
   ~mask(r., r. > 0); // reorder the list with ~
-[77,56,67]           ]]>
+[77,56,67]]]>
                 </example>
 
     </entry>
     <entry id="rename_keys">
         <body>
- <![CDATA[
-rename_keys(target., new_names.{,overwrite}) - rename the keys in target. using new_names.
+ <![CDATA[rename_keys(target., new_names.{,overwrite}) - rename the keys in target. using new_names.
      new_names. is stem of the form
         {old0:new0, old1:new1,...}
             where old* are the current names of the keys in target.
@@ -725,7 +634,10 @@ rename_keys(target., new_names.{,overwrite}) - rename the keys in target. using 
                  Default is false.
 This function has relatively simple syntax and is a common idiom.
 
-E.g. Keys have a common prefix of 'x_' Remove the prefix.
+See also: remap]]>
+        </body>
+<example>
+<![CDATA[   //Keys have a common prefix of 'x_' Remove the prefix.
     a. := {'x_x':'A','x_y':'B'};
     rename_keys(a., keys(a.)-'x_');
 {x:A,y:B}
@@ -752,52 +664,45 @@ it will fail because c.x would be over written. You may force it with
 the given flag
 
      rename_keys(c., ndx., true);
-{x:Y}
-See also: remap
-]]>
-        </body>
+{x:Y}]]>
+</example>
     </entry>
 
     <entry id="set_default">
         <body>
- <![CDATA[
-set_default(arg., scalar | stem.) - sets the default value for arg. to the value
+ <![CDATA[set_default(arg., scalar | stem.) - sets the default value for arg. to the value
                              of scalar or stem.
 Note: The default value is not returned in any key operations, so setting the
       default for a new stem and using the keys() function on it returns an
       empty list, for instance.
 Returns the old default value (if any) or null.
 
-E.g.
-The following are equivalent
+]]>
+        </body>
+<example>
+<![CDATA[   The following are equivalent
   b. := {*:[2,4]};
-
-Or
 
   set_default(c., [2,4])
 null
 
 The first creates the variable b., the second creates the variable c. and
-tells you there was no previous default set.
-]]>
-        </body>
+tells you there was no previous default set.]]>
+</example>
     </entry>
     <entry id="size">
         <body>
- <![CDATA[
-size(arg) -  return the size of the argument.
+ <![CDATA[size(arg) -  return the size of the argument.
 
 arg is a stem - return the number of elements in the stem
 arg is a string - return the number of characters in the string, i.e., its
                 length
-args is a scalar - zero, since scalars (such as integers) have no size.
-            ]]>
+args is a scalar - zero, since scalars (such as integers) have no size.]]>
         </body>
     </entry>
     <entry id="to_json">
         <body>
- <![CDATA[
-                 to_json(stem.) - convert the stem to a JSON string.
+ <![CDATA[                 to_json(stem.) - convert the stem to a JSON string.
         to_json(stem., convert) - if convert is true, vencode all keys in the
                                   JSON for the stem
 to_json(stem., convert, indent) - (requires convert), indent is an integer
@@ -805,14 +710,12 @@ to_json(stem., convert, indent) - (requires convert), indent is an integer
                                   JSON string
 The default for convert is false.
 
-See also: from_json
-]]>
+See also: from_json]]>
         </body>
     </entry>
     <entry id="unbox">
         <body>
- <![CDATA[
-unbox(arg.{, safeModeOn}) - takes the argument (a stem) and turns each element
+ <![CDATA[unbox(arg.{, safeModeOn}) - takes the argument (a stem) and turns each element
                              by (non-integer) key into a variable.
                              safeModeOn (default is true) will NOT overwrite
                              any variables in the current workspace, AND it will
@@ -829,138 +732,116 @@ E.g.
 f$28x$29
 
 because 'f(x)' cannot be a legal variable name so it was vencoded.
-See also: box, vencode, vdecode
-]]>
+See also: box, vencode, vdecode]]>
         </body>
     </entry>
 
     <entry id="to_uri">
         <body>
- <![CDATA[
-to_uri(string) - Takes a string that is a valid URI and returns a stem variable
+ <![CDATA[to_uri(string) - Takes a string that is a valid URI and returns a stem variable
                  with all the parts (scheme, query, etc.) put into entries.
                  This is RFC 3986 compliant.
-See also: constants() for the field names, from_uri.
-]]>
+See also: constants() for the field names, from_uri.]]>
         </body>
     </entry>
 
     <entry id="from_uri">
         <body>
- <![CDATA[
-from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the
+ <![CDATA[from_uri(stem.) - Turn a stem into a uri. Typically if you have a uri in the
                   variable x, then
    x == from_uri(to_uri(x))
 should be true.
-See also: constants() for the field names, to_uri.
 
-]]>
+See also: constants() for the field names, to_uri.]]>
         </body>
     </entry>
     <entry id="unique">
         <body>
- <![CDATA[
-unique(list.) - Take a stem and return a list of the unique elements.
+ <![CDATA[unique(list.) - Take a stem and return a list of the unique elements.
 
 This may be used on any stem and it will recurse the entire stem.
 There is never any implied order.
 
-See also: values
-]]>
+See also: values]]>
         </body>
         <example>
-           <![CDATA[
-  unique(['a',2,4,true]~[[['a','b',0,3,true]]])
-[0,a,2,b,3,4,true]
-           ]]>
+<![CDATA[  unique(['a',2,4,true]~[[['a','b',0,3,true]]])
+[0,a,2,b,3,4,true]]]>
                 </example>
 
     </entry>
     <entry id="halt">
         <body>
- <![CDATA[
-  halt([message]]) - This will halt the system on this line and update the
+ <![CDATA[halt([message]]) - This will halt the system on this line and update the
                      workspace state indicator, passing along the message.
                      Note that this is properly a debugging tool.
-                     This is disabled in server mode.
-]]>
+
+This is disabled in server mode.]]>
         </body>
     </entry>
     <entry id="union">
         <body>
- <![CDATA[
-union(arg0., arg1., ...) - takes the union of all stems, returning a single
+ <![CDATA[union(arg0., arg1., ...) - takes the union of all stems, returning a single
                            stem all of whose keys-values are taken form the
                            arguments. Note that the stems are processed in
                            order and values may be over-written.
 
 Note that this is for stems. For sets, use \/ (or ∪).
-See also: sets, /\ or ∩.
-]]>
+
+See also: sets, /\ or ∩.]]>
         </body>
     </entry>
     <entry id="dir">
         <body>
- <![CDATA[
-dir(arg) - list the names of the files in a given location. Note that this
+ <![CDATA[dir(arg) - list the names of the files in a given location. Note that this
            is VFS aware.
 Note: Directory names will have a / appended to them. Also, if the directory is
 empty, the result will be an empty list. If the arg is not a directory, then
-the result is null.
-           ]]>
+the result is null.]]>
         </body>
     </entry>
     <entry id="mkdir">
         <body>
- <![CDATA[
-mkdir(arg) - make a directory. Note that if there are path components that do
+ <![CDATA[mkdir(arg) - make a directory. Note that if there are path components that do
              not exist, they will be created. This returns true if it worked.
 Note: One major reason for this to fail is that, e.g., a virtual file system
-      is mounted in read only mode.
-]]>
+      is mounted in read only mode.]]>
         </body>
     </entry>
     <entry id="rmdir">
         <body>
- <![CDATA[
-rmdir(path) - remove the last component of this path (which must be a
+ <![CDATA[rmdir(path) - remove the last component of this path (which must be a
               directory).
 Note that the directory must be empty first.
-See also: rm - remove a single file
-]]>
+
+See also: rm - remove a single file]]>
         </body>
     </entry>
     <entry id="rm">
         <body>
- <![CDATA[
-rm(file_name) - removes the given file.
-             ]]>
+ <![CDATA[rm(file_name) - removes the given file.]]>
         </body>
     </entry>
 
     <entry id="say">
         <body>
- <![CDATA[
-say(arg) - print anything.
+ <![CDATA[say(arg) - print anything.
 say(arg, pretty_print) - print anything, but make the format more vertical if
                          its a stem.
 Note: say returns the value of its argument so this can be used in statements
 for debugging too.
-See also: print
-]]>
+
+See also: print]]>
         </body>
     </entry>
     <entry id="print">
         <body>
- <![CDATA[
-print - this is a synonym for the say function, so read the help for that.
-]]>
+ <![CDATA[print - this is a synonym for the say function, so read the help for that.]]>
         </body>
     </entry>
     <entry id="file_read">
         <body>
- <![CDATA[
-file_read(file_name) - read a file in. The result is a single string of the
+ <![CDATA[file_read(file_name) - read a file in. The result is a single string of the
                        file contents
 file_read(file_name, type) - type is an integer that determines the result:
 -1 = as string (default)
@@ -968,35 +849,36 @@ file_read(file_name, type) - type is an integer that determines the result:
      string of the contents.
  1 = stem. A stem list whose entries are each line in the file.
  2 = ini(tialization) file format. See the entry under 'ini' in help
-See also: decode_64, ini
-]]>
+
+See also: decode_64, ini]]>
         </body>
     </entry>
     <entry id="scan">
         <body>
- <![CDATA[
-scan([prompt]) - get user input. The prompt is optional, but will be printed.
+ <![CDATA[scan([prompt]) - get user input. The prompt is optional, but will be printed.
                  Input from the console blocks until
-                 the user hits enter.
-]]>
+                 the user hits enter.]]>
         </body>
         <example>
-           <![CDATA[
-  scan('say something>'); // The user types in 'The rain in Spain' at the prompt
+<![CDATA[  scan('say something>'); // The user types in 'The rain in Spain' at the prompt
 say something>The rain in Spain...
-The rain in Spain...
-           ]]>
+The rain in Spain...]]>
                 </example>
 
     </entry>
     <entry id="vfs_mount">
         <body>
- <![CDATA[
-vfs_mount(cfg.) - mount a virtual file system.
+ <![CDATA[vfs_mount(cfg.) - mount a virtual file system.
 Note: The cfg. contains the configuration and is not trivial to describe.
       Read the reference manual for the details.
 
-E.g. mounting an in-memory VFS
+You can mount VFS's when starting the workspace. See the configuration
+reference manual for details.
+
+See also: vfs_unmount]]>
+        </body>
+<example>
+<![CDATA[E.g. mounting an in-memory VFS
 
    cfg.type :='memory';
    cfg.scheme := 'ram-disk';
@@ -1009,23 +891,22 @@ Now you can issue commands like
    file_write('ram-disk:#/vfs/cache/readme.txt', readme.);
 
 This will write the value of the variable readme. to the
-file readme.txt in the VFS.
+file readme.txt in the VFS.]]>
+</example>
 
-You can mount VFS's when starting the workspace. See the configuration
-reference manual for details.
-See also: vfs_unmount
-             ]]>
-        </body>
     </entry>
     <entry id="vfs_unmount">
         <body>
- <![CDATA[
-vfs_unmount(mount_point) - unmount the file system at the given mount_point
+ <![CDATA[vfs_unmount(mount_point) - unmount the file system at the given mount_point
 
 This does nothing to the mounted file system, it simply makes it inaccessible
 in the current environment. If the mount_point is invalid, an error is raised.
 Otherwise, a true is returned.
-E.g.
+
+See also: vfs_mount]]>
+        </body>
+<example>
+<![CDATA[E.g.
    vfs_unmount('vfs#/mysql/')
 true
 
@@ -1034,32 +915,42 @@ operations against it will fail henceforth, e.g.
    dir('vfs#/mysql/')
 null
 
-See also: vfs_mount
 ]]>
-        </body>
+</example>
     </entry>
 
 
     <entry id="file_write">
         <body>
- <![CDATA[
-file_write(file_name, contents) = write the contents to the given file.
+ <![CDATA[file_write(file_name, contents) = write the contents to the given file.
                                   contents can be a string or a list of strings
 file_write(file_name, contents, is_base_64) = same, but if is_base_64 is true,
                                   then the contents are decoded to binary
                                   before writing. The default is that this
                                   flag is false.
-See also: file_read, decode_b64, encode_b64
-]]>
+
+See also: file_read, decode_b64, encode_b64]]>
         </body>
     </entry>
     <entry id="starts_with">
         <body>
- <![CDATA[
-starts_with(x., y.) - returns a left conformable list that has the
+ <![CDATA[starts_with(x., y.) - returns a left conformable list that has the
                            indices of the right argument.  If there
                            is no such element, an index of -1 is returned.
-E.g.
+
+Is there and ends_with command? No. Use =~ instead, e.g. to check if a string
+in the variable x ends in '.xml'
+  '.*xml' =~ x
+
+If you need to find if a string begins with a set of characters, use index_of
+instead and test the location:
+   index_of('abc','a') == 0
+true
+
+See also: mask, =~, index_of]]>
+        </body>
+<example>
+<![CDATA[E.g.
   starts_with(['a','qrs','pqr'],['a','p','s','t'])
 [0,-1,1]
 How to read this: left element 0 starts with right element 0
@@ -1072,38 +963,24 @@ To get a list of these, use mask, e.g.
                                  ['a','p','s','t']));
 {0=a, 2=pqr}
 
-This returns a list (always) so that it works with mask and other functions.
+This returns a list (always) so that it works with mask and other functions.]]>
+</example>
 
-Is there and ends_with command? No. Use =~ instead, e.g. to check if a string
-in the variable x ends in '.xml'
-  '.*xml' =~ x
-
-If you need to find if a string begins with a set of characters, use index_of
-instead and test the location:
-   index_of('abc','a') == 0
-true
-
-See also: mask, =~, index_of
-               ]]>
-        </body>
     </entry>
 
     <entry id="shuffle">
         <body>
- <![CDATA[
-shuffle(n) - n is a positive integer, shuffle the first n integers randomly
+ <![CDATA[shuffle(n) - n is a positive integer, shuffle the first n integers randomly
 shuffle(target., keys.) - shuffle (i.e., permute) the keys in the target.
                           according to keys.
                           Argument keys. must have the same keys as the target.
                           AND the values of keys. are (as a set) the same as
                           the keys. in the target.
 See also: indices, rename_keys, which lets you rename some of the keys in a
-          stem.
-               ]]>
+          stem.]]>
         </body>
         <example>
-           <![CDATA[
-E.g.
+<![CDATA[E.g.
    shuffle(7)
 [5,0,4,6,1,2,3]
 Note that if you run this example, the result will be very probably be
@@ -1114,30 +991,24 @@ E.g.
 [8,5,11,2]
 
 In this case, the left argument is [2,5,8,11] and the right argument
-has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.
-           ]]>
+has 0->2, 1->1, 2->3, 3->0. This works generally with stems too.]]>
                 </example>
 
     </entry>
     <entry id="execute">
         <body>
- <![CDATA[
-execute(arg) - take the argument which is a string and execute it as if it
-               were typed in.
-               ]]>
+ <![CDATA[execute(arg) - take the argument which is a string and execute it as if it
+               were typed in.]]>
         </body>
         <example>
-           <![CDATA[
-   execute('2+2');
-4
-           ]]>
+<![CDATA[   execute('2+2');
+4]]>
                 </example>
 
     </entry>
     <entry id="script_args">
         <body>
- <![CDATA[
-  script_args() - return out the number of arguments to this script
+ <![CDATA[  script_args() - return out the number of arguments to this script
 script_args(-1) - returns the script arguments as a list.
  script_args(n) - return the nth argument (first argument is 0).
 
@@ -1150,80 +1021,69 @@ Note: This is specific to scripts and bridges communication between QDL
       (== -1) to get the result as a stem. If the script is called by QDL, then
       the argument types are preserved.
 
-See also: script_load, script_run
-]]>
+See also: script_load, script_run]]>
         </body>
     </entry>
     <entry id="script_load">
         <body>
- <![CDATA[
-script_load(file_name) - load the script and run it.
+ <![CDATA[script_load(file_name) - load the script and run it.
 script_load(file_name, arg0, arg1, ...) - load the script, passing in the given
                          arguments
 Note: Loading a script means to run it in the current session.
-See Also: script_run, script_args
-]]>
+See Also: script_run, script_args]]>
         </body>
     </entry>
     <entry id="script_run">
         <body>
- <![CDATA[
-script_run(file_name) - run the script
+ <![CDATA[script_run(file_name) - run the script
 script_run(file_name, arg0, arg1,...) - run the script, passing in the given
                         arguments
 Note: Running a script means that a new clean environment is created and the
       script is run there. Output and input, however, are done in the current
       console.
-See Also: script_load, script_run, scan, say, print
-]]>
+
+See Also: script_load, script_run, scan, say, print]]>
         </body>
     </entry>
 
     <entry id="info">
         <body>
- <![CDATA[
-info() -- a stem of all current information about the session
+ <![CDATA[info() -- a stem of all current information about the session
           such as load paths, memory and such.
 info(key) - key is a string. This returns the single value for the given key.
 E.g. info('user.home_dir') prints out the current user's home directory.
-See also: constants()
-]]>
+
+See also: constants()]]>
         </body>
     </entry>
     <entry id="constants">
         <body>
- <![CDATA[
-constants() - all constants associated with the system
+ <![CDATA[constants() - all constants associated with the system
 constants(key) - key is a string. This returns the value of a specific key.
 E.g.
      constants('file_type.binary')
 returns the integer that can be used in the file_read function.
-See also: info()
-]]>
+
+See also: info()]]>
         </body>
     </entry>
     <entry id="is_defined">
         <body>
- <![CDATA[
-is_defined(var) - a boolean-valued function that tells you if a given variable
+ <![CDATA[is_defined(var) - a boolean-valued function that tells you if a given variable
                   has been named.
-Note: the argument is not a string, it is the actual variable.
-]]>
+Note: the argument is not a string, it is the actual variable.]]>
         </body>
     </entry>
     <entry id="is_function">
         <body>
- <![CDATA[
-is_function(name) - checks if the value of name (it is a string) is defined.
+ <![CDATA[is_function(name) - checks if the value of name (it is a string) is defined.
 is_function(name, arg_count) checks if a function given in name with the number
-                    of arguments is defined.
-]]>
+                    of arguments is defined.]]>
         </body>
     </entry>
     <entry id="os_env">
         <body>
- <![CDATA[
-os_env() - return a stem of all operating system environment values currently
+ <![CDATA[os_env() - return a stem of all operating system environment values currently
            known by the system
 os_env(arg0, arg1, ...) = given a list of names (as strings) return a stem with
                           each name as a key. If a property
@@ -1233,24 +1093,21 @@ E.g: os_env('PATH') will give you the values of the PATH variable on most
 Note 1: If you set environment variables in a shell script that invokes QDL,
         you may recover them using this call.
 Note 2: This is always empty in server mode! Scripts have no access to the
-        underlying system.
-]]>
+        underlying system.]]>
         </body>
     </entry>
     <entry id="remove">
         <body>
- <![CDATA[
-remove(var) - remove a variable and its value from the symbol table.
+ <![CDATA[remove(var) - remove a variable and its value from the symbol table.
 Note: This expunges it from the session and any future attempts to access it
       will result in errors until it is set again.
-See also: is_defined
-]]>
+
+See also: is_defined]]>
         </body>
     </entry>
     <entry id="script_path">
         <body>
- <![CDATA[
-script_path() - returns the list of paths used to resolve scripts
+ <![CDATA[script_path() - returns the list of paths used to resolve scripts
 script_path(arg) - sets the script path. Either this is a string each of whose
                    paths are separated with a colon, e.g. 'path0:path1' or it
                    is a stem of paths.
@@ -1258,14 +1115,13 @@ Note: When invoking a script with an absolute path, that is run. If the path
       is relative, then the script paths are used to resolve it. Note that if
       relative path has a scheme for a VFS, then this restricts resolution to
       those paths. If the path is unqualified, every path is checked.
-See also: script_load, script_run
-]]>
+
+See also: script_load, script_run]]>
         </body>
     </entry>
     <entry id="module_path">
         <body>
- <![CDATA[
-   module_path() - returns the list of paths used to resolve loading modules
+ <![CDATA[   module_path() - returns the list of paths used to resolve loading modules
 module_path(arg) - sets the module path. Either this is a string each of whose
                    paths are separated with a colon, e.g. 'path0:path1' or it
                    is a stem of paths.
@@ -1273,80 +1129,65 @@ Note: When loading a module with an absolute path, that is run. If the path is
       relative, then the module paths are used to resolve it. Note that if
       relative path has a scheme for a VFS, then this restricts resolution to
       those paths. If the path is unqualified, every path is checked.
-See also: module_load
-]]>
+
+See also: module_load]]>
         </body>
     </entry>
     <entry id="to_number">
         <body>
- <![CDATA[
-to_number(arg) - convert a string or stem of strings to numbers. Each number
-                 must be a valid string representation.
-]]>
+ <![CDATA[to_number(arg) - convert a string or stem of strings to numbers. Each number
+                 must be a valid string representation.]]>
         </body>
     </entry>
     <entry id="to_string">
         <body>
- <![CDATA[
-to_string(arg) - arg is anything and the result is a string representation
+ <![CDATA[to_string(arg) - arg is anything and the result is a string representation
                  of it.
 to_string(arg, is_pretty_print) - attempt to put the result in to a nicer
                  format.
 Note: The print or say function effectively calls this and spits out the
-      result to the console.
-]]>
+      result to the console.]]>
         </body>
     </entry>
     <entry id="to_boolean">
         <body>
- <![CDATA[
-to_boolean(arg) - arg is anything and the result is a boolean representation.
+ <![CDATA[to_boolean(arg) - arg is anything and the result is a boolean representation.
                   Note that this means
                   strings - true is only returned if the value is 'true'
                   integers - true is only returned if the value is 1
                   decimals - true is only returned if the integer part is 1
                   booleans - returned unchanged.
-                  stems - applied to each element.
-]]>
+                  stems - applied to each element.]]>
         </body>
     </entry>
     <entry id="var_type">
         <body>
- <![CDATA[
-var_type(arg0, arg1,...) - returns a list of integers that show the type of
-                           each argument.
-               ]]>
+ <![CDATA[var_type(arg0, arg1,...) - returns a list of integers that show the type of
+                           each argument.]]>
         </body>
     </entry>
     <entry id="break">
         <body>
- <![CDATA[
-break() - immediately terminates a loop.
-See also: continue, return
-               ]]>
+ <![CDATA[break() - immediately terminates a loop.
+See also: continue, return]]>
         </body>
     </entry>
     <entry id="check_after">
         <body>
- <![CDATA[
-check_after(conditional) - in loops, this means that the conditional is checked
+ <![CDATA[check_after(conditional) - in loops, this means that the conditional is checked
                            at the end of an interation rather than before the
                            iteration. This effectively gives a post-positional
-                           loop.
-]]>
+                           loop.]]>
         </body>
     </entry>
     <entry id="common_keys">
         <body>
- <![CDATA[
-common_keys(stem1., stem2.) - returns a list of keys common to both stems.
-               ]]>
+ <![CDATA[common_keys(stem1., stem2.) - returns a list of keys common to both stems.]]>
         </body>
     </entry>
     <entry id="contains">
         <body>
- <![CDATA[
-contains(source, snippets) - returns a conformable result for any combination
+ <![CDATA[contains(source, snippets) - returns a conformable result for any combination
                              of stems and strings. If both arguments are
                              string, the result is a boolean. If source is a
                              stem and snippets is a string, then the result is
@@ -1356,36 +1197,32 @@ contains(source, snippets, case_sensitive) -- if case_sensitive is true, which
                              is the default, all testing is done preserving
                              case. If false, all arguments are converted to
                              lower case first.
-Note: Original arguments are never altered.
-]]>
+Note: Original arguments are never altered.]]>
         </body>
     </entry>
     <entry id="continue">
         <body>
- <![CDATA[
-continue() - jumps to the next iteration in a loop
-See also: break, return
-]]>
+ <![CDATA[continue() - jumps to the next iteration in a loop
+
+See also: break, return]]>
         </body>
     </entry>
     <entry id="for_keys">
         <body>
- <![CDATA[
-for_keys(var, stem.)
+ <![CDATA[for_keys(var, stem.)
 
   var - is a simple variable and will contain the current key during the loop.
         If it has already been defined, its values will be over-written.
 stem. - is a stem variable. The keys of this stem will be assigned to the var
         and may be accessed  in the loop.
 Note: This only operates inside of looping constructs.
-See also: for_next, to loop over values of the stem
-]]>
+
+See also: for_next, to loop over values of the stem]]>
         </body>
     </entry>
     <entry id="for_next">
         <body>
- <![CDATA[
-There are two versions. The first allows you to simply define the looping
+ <![CDATA[There are two versions. The first allows you to simply define the looping
 parameters with integers, the second lets you use any list and iterate
 over the values
 Meth0d #1:
@@ -1409,38 +1246,31 @@ for_next(var, arg.)
                assigned to var.
 
 Note: This only functions in looping constructs.
-See also: for_keys to loop over the keys in a stem.
-]]>
+
+See also: for_keys to loop over the keys in a stem.]]>
         </body>
     </entry>
     <entry id="index_of">
         <body>
- <![CDATA[
-index_of(source, snippets) - returns a conformable stem of lists of integers giving the
+<![CDATA[index_of(source, snippets) - returns a conformable stem of lists of integers giving the
                   location of the snippet or a -1 if the snippet is not found.
 index_of(source, snippets, case_sensitive) - if true (default) all comparisons
                   are case sensitive. If false, all are converted to lower
-                  case first.
-]]>
+                  case first.]]>
         </body>
         <example>
-            <![CDATA[
-     // There is exactly on 'pp' in the argument
+<![CDATA[     // There is exactly on 'pp' in the argument
      index_of('ragg mopp ragmop!', 'pp')
 [7]
       index_of('The cow is of the bovine ilk; One end is moo, the other, milk', 'the', false)
  [0,14,46,51]
            index_of('The cow is of the bovine ilk; One end is moo, the other, milk', 'the')
-[14,46,51]
-
-]]>
-
+[14,46,51]]]>
         </example>
     </entry>
     <entry id="module_import">
         <body>
- <![CDATA[
-module_import(urn)- import the given module using its default alias.
+ <![CDATA[module_import(urn)- import the given module using its default alias.
 module_import(urn, alias) - import the module, assigning it a different alias.
 module_import(arg.) - import a bunch of modules in a stem
 Note: A module must be loaded before it can be imported or the system does not
@@ -1454,23 +1284,19 @@ with the default alias, urn1 and urn2 are imported with the specified
 aliases.
 Returns:
   - null if nothing imported
-  - a list of aliases that were imported that corresponds to the input arg.
-]]>
+  - a list of aliases that were imported that corresponds to the input arg.]]>
         </body>
     </entry>
     <entry id="module_remove">
         <body>
- <![CDATA[
-module_remove(string | stem.) - remove the alias for the module from the
-    workspace. Attempts to access it later will result in an error.
-]]>
+ <![CDATA[module_remove(string | stem.) - remove the alias for the module from the
+    workspace. Attempts to access it later will result in an error.]]>
         </body>
     </entry>
 
     <entry id="module_load">
         <body>
- <![CDATA[
-module_load(path) - load the module into the current session from the given
+ <![CDATA[module_load(path) - load the module into the current session from the given
                     file. It cannot be used until it is imported.
 module_load(path, type) - load the module. If type is 'file' (default) then
                     this is assumed to be QDL and loaded. If the type is 'java'
@@ -1495,14 +1321,12 @@ This looks for the module named complex then complex.mdl in the module
 path and loads it. It then imports an instance using the default alias
 the result is the name of the module in the session.
 
-See also:module_import
-             ]]>
+See also:module_import]]>
         </body>
     </entry>
     <entry id="raise_error">
         <body>
- <![CDATA[
-raise_error(message) - raises an error and propagates the message in to the
+ <![CDATA[raise_error(message) - raises an error and propagates the message in to the
                        catch block
 raise_error(message, code) - add and option numeric code
 Note: This ONLY works inside a try[ ... ]catch[] block
@@ -1511,13 +1335,17 @@ Inside the catch block the message and code arguments are accsesible as
 error_message
 error_code
 
-The error_code of -1 is reserved by the system, so if there is system error
-you can catch that:
+The error_code of -1 is reserved by the system. If an assertion fails then
+that is treated like a system error with reserved value of -2.
 
+See also:try, catch]]>
+        </body>
+<example>
+<![CDATA[E.g. Catch an arithmetic error:
    try[3/0;]catch[if[error_code==-1]then[say(error_message);];];
 divide by zero
 
-Here is an example of how to handle mutliple conditions. we are simply
+E.g. How to handle mutliple conditions. we are simply
 echoing the error_message, but yo can have any processing at that point
 you need/want
 
@@ -1533,25 +1361,22 @@ try[
  ]; // end catch block
 41 not divisible by 3, R==2
 
-
-See also:try, catch
 ]]>
-        </body>
+</example>
+
     </entry>
     <entry id="return">
         <body>
- <![CDATA[
-return() - return from a function with no value.
+ <![CDATA[return() - return from a function with no value.
 return(value)  - return value from this function as the result
 Note: This only works for functions.
-See also: continue, break
-               ]]>
+
+See also: continue, break]]>
         </body>
     </entry>
     <entry id="replace">
         <body>
- <![CDATA[
-replace(source, old, new) - replaces all occurences of old with new in the
+ <![CDATA[replace(source, old, new) - replaces all occurences of old with new in the
                             source. These may be various combinations of stems
                             and strings.
 
@@ -1562,22 +1387,21 @@ replace(source, regex, new, is_regex) - when is_regex == true,
 If is_regex is false, then no regular expressions are used and matching is
 as simple strings.
 
-E.g
-   replace('abcde', 'cd', '23');
+See also: =~, tokenize]]>
+        </body>
+<example>
+<![CDATA[   replace('abcde', 'cd', '23');
 ab23e
 
-E.g. with a regex - replace all blanks with a single period.
+E.g. Use a regex - replace all blanks with a single period.
   replace('a b c  d e fgh', '\\s+', '.', true)
-a.b.c.d.e.fgh
+a.b.c.d.e.fgh]]>
+</example>
 
-See also: =~, tokenize
-]]>
-        </body>
     </entry>
     <entry id="substring">
         <body>
- <![CDATA[
-substring(arg, n) - take a substring of the arg starting at the given index, n,
+ <![CDATA[substring(arg, n) - take a substring of the arg starting at the given index, n,
                     and going to the rest of the string. This will also be
                     done on each element if arg is a stem.
 substring(arg, n,length) - start the substring at index n and continue for
@@ -1585,9 +1409,10 @@ substring(arg, n,length) - start the substring at index n and continue for
                     no padding, just return the rest of the string
 substring(arg, n ,length ,padding) - start at the index, retrieve length
                     characters and if there are not enough, cyclically pad the
-                    result with the string padding.
-E.g.
-   substring('abcdefg',3)
+                    result with the string padding.]]>
+        </body>
+<example>
+<![CDATA[   substring('abcdefg',3)
 defg
    substring('abcdefg',3,2)
 de
@@ -1596,33 +1421,29 @@ defg
   substring('abcdefg',3,11,'pqr'); // padding with string cyclically
 defgpqrpqrp
   substring(['abc','pqr'],1,5,'tuv'); // works on lists and stems
-[bctuv,qrtuv]
-]]>
-        </body>
+[bctuv,qrtuv]]]>
+</example>
+
     </entry>
     <entry id="to_lower">
         <body>
- <![CDATA[
-to_lower(arg) - convert a string or stem of strings to lower case. No effect
+ <![CDATA[to_lower(arg) - convert a string or stem of strings to lower case. No effect
                 on non-strings.
-See also: to_upper
-]]>
 
+See also: to_upper]]>
         </body>
     </entry>
     <entry id="to_upper">
         <body>
- <![CDATA[
-to_upper(arg) - convert a string or stem of strings to upper case. No effect
+ <![CDATA[to_upper(arg) - convert a string or stem of strings to upper case. No effect
                 on non-strings.
-See also: to_upper
-               ]]>
+
+See also: to_upper]]>
         </body>
     </entry>
     <entry id="tokenize">
         <body>
- <![CDATA[
-tokenize(arg, delimiter) - tokenize a string or stem of strings using
+ <![CDATA[tokenize(arg, delimiter) - tokenize a string or stem of strings using
                            the given delimeter.
        arg - the string to tokenize
        delimiter - either the delimiter or if the last argument is true,
@@ -1632,26 +1453,26 @@ tokenize(target, arg{, use_regex}) - tokenize a string or stem of strings
     target - the string to tokenize
        arg - either the delimiter (use_regex == false) or a regular expression
              (use_regex == true)
-     use_regex - flag to use regex.
-E.g.
+     use_regex - flag to use regex.]]>
+        </body>
+<example>
+<![CDATA[
    tokenize('abd:def:123', ':');
 [abd,def,123]
 
-E.g.
-   Tokenize a string with various delimters using a regular expression
+   // Tokenize a string with various delimters using a regular expression
 
    a := 'a d, m, i.n';
    r := '\\s+|,\\s*|\\.\\s*';
    tokenize(a,r,true);
-[a,d,m,i,n]
-]]>
-        </body>
+[a,d,m,i,n]]]>
+</example>
+
     </entry>
 
     <entry id="detokenize">
         <body>
- <![CDATA[
-detokenize(arg, delimiter) - converts  a string or stem of strings (tokens)
+ <![CDATA[detokenize(arg, delimiter) - converts  a string or stem of strings (tokens)
                              into a string using the delimiter between entries.
 detokenize(arg, delimiter, options) - options is an integer which is the sum of
           1 for prepend
@@ -1660,71 +1481,63 @@ So options = 0 means append, have a trailing delimiter
    options = 1 means prepend, "   "     leading "
    options = 2 means append, omit trailing delimiter
    options = 3 means prepend, omit first delimiter
-E.g.
-   detokenize([;4],'|')
+
+See also: tokenize, constants (which contains the option values for reference)]]>
+        </body>
+<example>
+<![CDATA[   detokenize([;4],'|')
 0|1|2|3|
 
-Note the trailing | added at the end.
-E.g.
+// Note the trailing | added at the end.
+
    detokenize([;4]], '|',2)
 0|1|2|3
 
-omits the trailing |.
+omits the trailing |.]]>
+</example>
 
-See also: tokenize, constants (which contains the option values for reference)
-
-]]>
-        </body>
     </entry>
     <entry id="trim">
         <body>
- <![CDATA[
-trim(arg) - remove all leading and trailing blanks from the arg. The argument
+ <![CDATA[trim(arg) - remove all leading and trailing blanks from the arg. The argument
             may also be a stem of strings.
 
-Remember that the "-" operator will remove characters as well. trim() just removes
-from the ends.
-]]>
+Remember that the "-" operator will remove characters in the middle as well
+while trim() just removes from the ends.]]>
         </body>
     </entry>
-
-
     <entry id="vencode">
         <body>
- <![CDATA[
-vencode(arg{, url_encode}) -  encode a string or stem of them.
+ <![CDATA[vencode(arg{, url_encode}) -  encode a string or stem of them.
 Note: This is supremely useful for non-western character sets that must be
       preserved.
       url_encode - (optional, default is false) if true the arg will be URL encoded
-      instead,
-See also: vdecode
-]]>
+      instead.
+
+See also: vdecode]]>
         </body>
         <example>
-           <![CDATA[
-   vencode('你浣')
+<![CDATA[   vencode('你浣')
 $E4$BD$A0$E6$B5$A3
   vencode('你浣', true)
-%E4%BD%A0%E6%B5%A3
-           ]]>
+%E4%BD%A0%E6%B5%A3]]>
                 </example>
 
     </entry>
     <entry id="vdecode">
         <body>
- <![CDATA[
-vdecode(arg{,url_decode}) -  decode an encoded string or stem.
+ <![CDATA[vdecode(arg{,url_decode}) -  decode an encoded string or stem.
          url_decode - (optional, default false) if true will
-           try to URL decode the argument.
-See also: vencode
-]]>
+         try to URL decode the argument.
+
+See also: vencode]]>
         </body>
         <example>
-           <![CDATA[
+<![CDATA[
    // Decode a tamil proverb:heaven helps the helpless.
   vdecode('%E0%AE%85%E0%AE%95%E0%AE%A4%E0%AE%BF%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81+%E0%AE%86%E0%AE%95%E0%AE%BE%E0%AE%9A%E0%AE%AE%E0%AF%87+%E0%AE%A4%E0%AF%81%E0%AE%A3%E0%AF%88',true)
 அகதிக்கு ஆகாசமே துணை
-            ]]>
+]]>
                 </example>
 
     </entry>
@@ -1734,49 +1547,42 @@ See also: vencode
     -->
     <entry id="pp">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 pp - short form for pretty_print.
-See pretty_print
-]]>
+
+See also: pretty_print]]>
         </body>
     </entry>
 
     <entry id="pretty_print">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 pretty_print - toggle printing stems on one line (off | false) or
                vertically (on | true).
-pp is the short form for this.
-]]>
+pp is the short form for this.]]>
         </body>
     </entry>
     <entry id="echo">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 echo - toggle echo mode in the workspace. If (on | true), this allows you to
        enter QDL commands without the final semi-colon (;) and the result is
-       printed to the console. The default is on.
-]]>
+       printed to the console. The default is on.]]>
         </body>
     </entry>
 
     <entry id="ws_id">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 ws_id - the internal identifier for this workspace. This is especially useful
         if the file name is munged or strange.
-See also: name, description
-]]>
+
+See also: name, description]]>
         </body>
     </entry>
     <entry id="description">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 description - A human readable description of this workspace. This is printed
               on load if present. It should tell the user what the workspace
               does for instance. Note that you can set it using a QDL variable
@@ -1785,14 +1591,12 @@ E.g.
     )ws set description >my_descr.
 
 Would set the contents of this to the list of strings given. Note that this
-will be turned into a single string with linefeeds after each entry.
-]]>
+will be turned into a single string with linefeeds after each entry.]]>
         </body>
     </entry>
     <entry id="debug">
         <body>
- <![CDATA[
-Either a workspace variable or the system command to manage debugging
+ <![CDATA[Either a workspace variable or the system command to manage debugging
 System command:
 debug([level , message])
      no args = print out current debug level
@@ -1805,25 +1609,21 @@ Workspace variable:
 debug - Toggle low-level debugging of the innards of the workspace and QDL.
         This is only useful if you are having a serious issue (such as
         writing a Java module and need to see stack traces). This may be
-        (on | true) or (off | false). Generally you do not need this.
-]]>
+        (on | true) or (off | false). Generally you do not need this.]]>
         </body>
     </entry>
 
     <entry id="start_ts">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 start_ts - The time stamp when this was first created. You *may* change this,
            but probably just want the system to manage. Set it using either
-           as an integer (in milliseconds) or as an ISO 8601 date.
-]]>
+           as an integer (in milliseconds) or as an ISO 8601 date.]]>
         </body>
     </entry>
     <entry id="root_dir">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 root_dir - The root directory for all relative file directories. If you attempt
            to save the workspace and the file name is relative (so does not
            e.g., start with a /) then it is assumed to reside in this
@@ -1833,31 +1633,26 @@ E.g.
 
 )save ws/var/my_ws.zml
 
-            would resolve this to root_dir/ws/var/my_ws.zml when saving it.
-]]>
+            would resolve this to root_dir/ws/var/my_ws.zml when saving it.]]>
         </body>
     </entry>
 
     <entry id="save_dir">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 save_dir - The default directory for saving and loading files. This is set
            at startup automatically This overrides relativizing the path
-           from the root_dir.
-]]>
+           from the root_dir.]]>
         </body>
     </entry>
 
     <entry id="autosave_on">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 autosave_on - Turn on automatically saving workspace. If on then every time the
               autosave_interval (measured in milliseconds) passes, the current
               workspace is saved.
-See also: autosave_messages_on, autosave_interval
-]]>
+See also: autosave_messages_on, autosave_interval]]>
         </body>
     </entry>
 
@@ -1868,15 +1663,14 @@ See also: autosave_messages_on, autosave_interval
 autosave_messages_on - Turn on notifications by the autosave system. If on then
              every time the workspace is automatically saved, the usual
              messages (size, time) are printed. If false, nothing is printed.
-See also: autosave_on, autosave_interval
-]]>
+
+See also: autosave_on, autosave_interval]]>
         </body>
     </entry>
 
     <entry id="autosave_interval">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 autosave_interval - The interval in either seconds or milliseconds that
                     determines how often the workspace is saved. The default
                     is 10 minutes or 600000 ms. You may enter this as
@@ -1885,38 +1679,33 @@ E.g.
    )ws set autosave_interval 900 sec.
 
              Would set the autosave interval to 900 seconds or 15 minutes.
-             See also: autosave_on, autosave_interval
-]]>
+             See also: autosave_on, autosave_interval]]>
         </body>
     </entry>
 
     <entry id="compress_xml">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 compress_xml - toggle compression of XML on WS save. Options are (on | true)
                or (off | false). Note that on loading workspaces, this not used
                 -- the workspace will figure out if it was saved with
                 compression and decompress it, so you don't have to worry about
-               the compression of stored workspaces.
-]]>
+               the compression of stored workspaces.]]>
         </body>
     </entry>
     <entry id="enable_library_support">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 enable_library_support - enable on the fly resolution of scripts as if they
                were functions. You must set the lib_path as well for
                this to work.
-See also: lib_path
-]]>
+
+See also: lib_path]]>
         </body>
     </entry>
     <entry id="lib_path">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 lib_path - the paths that are used in resolving library references. A library
            is a collection of QDL scripts, each ending with .qdl. If library
            support is enabled then calls to scripts are resolved dynamically.
@@ -1928,34 +1717,35 @@ E.g.
        sqrt(x)
    You could do this directly as
        script_run('/path/to/sqrt.qdl', x)
-See also: enable_library_support
-]]>
+
+See also: enable_library_support]]>
         </body>
     </entry>
     <entry id="ws_file">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 ws_file - the current file to save to/load from by default. If you save or load a file
           this is set to that value. You may then issue commands like
 
 )save
 
           (so no file argument) and the workspace is saved. Note that this is independent of the
-          save_dir, which used for resolving all relative path loads and saves.
-]]>
+          save_dir, which used for resolving all relative path loads and saves.]]>
         </body>
     </entry>
     <entry id="reduce">
         <body>
- <![CDATA[
-reduce(@f, arg) - Apply the function between all elements of the set
+ <![CDATA[reduce(@f, arg) - Apply the function between all elements of the set
     or generic (i.e. not a list) argument, stem, set or (trivially) scalar.
     The result is always a scalar.
 reduce(@f(), list. {,axis}) - Takes a dyadic function f and applied it between
              successive members of the list (i.e. in order).
              The final result is a scalar.
-E.g.
+
+See also: expand()]]>
+        </body>
+<example>
+<![CDATA[E.g.
 Are all elements of a boolean list true?
    a. := -1 < n(5); // list of boolean true values
    reduce(@&&, a.)
@@ -1983,16 +1773,13 @@ E.g. On a higher dimension list
   reduce(@+, q., 1); // apply to first axis, so sum the rows
 [6,
  22,
- 38]
+ 38]]]>
+</example>
 
-See also: expand()
-]]>
-        </body>
     </entry>
     <entry id="expand">
         <body>
- <![CDATA[
-expand(@f, list.) = apply the dyadic function f() pairwise and return the
+ <![CDATA[expand(@f, list.) = apply the dyadic function f() pairwise and return the
               intermediate results.
 
 
@@ -2008,153 +1795,138 @@ Note that it is not possible to apply expand to a set or a generic stem,
 (what would it mean to stash intermediate results in random keys??)
 so attempts to do so will result in an exception.
 
-See also: reduce
-]]>
+See also: reduce]]>
         </body>
     </entry>
     <entry id="sin">
         <body>
- <![CDATA[
-sin(x) - the sine of x
+ <![CDATA[sin(x) - the sine of x
 x can be any number.
-See also: asin()
-]]>
+
+See also: asin()]]>
         </body>
     </entry>
     <entry id="asin">
         <body>
- <![CDATA[
-asin(x) - the arc sine of x. The result in in radians.
+ <![CDATA[asin(x) - the arc sine of x. The result in in radians.
 -1 <= x <= 1.
-See also: sin()
-]]>
+
+See also: sin()]]>
         </body>
     </entry>
     <entry id="sinh">
         <body>
- <![CDATA[
-sinh(x) - the hyperbolic sine of x
+ <![CDATA[sinh(x) - the hyperbolic sine of x
 x can be any number.
-See also: asinh()
-]]>
+
+See also: asinh()]]>
         </body>
     </entry>
     <entry id="asinh">
         <body>
- <![CDATA[
-asin(x) - the inverse of sinh of x.
+ <![CDATA[asin(x) - the inverse of sinh of x.
 x can be any number
-See also: sinh()
-]]>
+
+See also: sinh()]]>
         </body>
     </entry>
 
     <entry id="cos">
         <body>
- <![CDATA[
-cos(x) - the cosine of x
+ <![CDATA[cos(x) - the cosine of x
 x can be any number.
-See also: acos()
-]]>
+
+See also: acos()]]>
         </body>
     </entry>
     <entry id="acos">
         <body>
- <![CDATA[
-acos(x) - the arc cosine of x. The result in in radians.
+ <![CDATA[acos(x) - the arc cosine of x. The result in in radians.
 -1 <= x <= 1.
-See also: cos()
-]]>
+
+See also: cos()]]>
         </body>
     </entry>
     <entry id="cosh">
         <body>
- <![CDATA[
-cosh(x) - the hyperbolic cosine of x
+ <![CDATA[cosh(x) - the hyperbolic cosine of x
 x can be any number.
-See also: acosh()
-]]>
+
+See also: acosh()]]>
         </body>
     </entry>
     <entry id="acosh">
         <body>
- <![CDATA[
-acosh(x) - the inverse of cosh of x.
+ <![CDATA[acosh(x) - the inverse of cosh of x.
 1 <= x
-See also: cosh()
-]]>
+
+See also: cosh()]]>
         </body>
     </entry>
 
     <entry id="tan">
         <body>
- <![CDATA[
-tan(x) - the tangent of x
+ <![CDATA[tan(x) - the tangent of x
 x can be any number.
-See also: atan()
-]]>
+
+See also: atan()]]>
         </body>
     </entry>
     <entry id="atan">
         <body>
- <![CDATA[
-atan(x) - the arc tangent of x. The result in in radians.
+ <![CDATA[atan(x) - the arc tangent of x. The result in in radians.
 x can be any number.
-See also: tan()
-]]>
+
+See also: tan()]]>
         </body>
     </entry>
     <entry id="tanh">
         <body>
- <![CDATA[
-tanh(x) - the hyperbolic tangent of x
+ <![CDATA[tanh(x) - the hyperbolic tangent of x
 x can be any number
-See also: atanh()
-]]>
+
+See also: atanh()]]>
         </body>
     </entry>
     <entry id="atanh">
         <body>
- <![CDATA[
-atanh(x) - the inverse of tanh of x.
+ <![CDATA[atanh(x) - the inverse of tanh of x.
 -1 < x < 1
-See also: tanh()
-]]>
+
+See also: tanh()]]>
         </body>
     </entry>
 
     <entry id="pi">
         <body>
- <![CDATA[
-The value of the constant pi in the current precision.
-]]>
+ <![CDATA[pi({n}) - the value of pi in the current precision
+       raised to the power n.
+
+ If n is omitted, then it is assumed to be 1.]]>
         </body>
     </entry>
     <entry id="exp">
         <body>
- <![CDATA[
- exp() - the value of  e, the base of the natural logarithm
+ <![CDATA[ exp() - the value of  e, the base of the natural logarithm
 exp(x) - the value of e^x
 
 x can be any number.
-See also: ln(), log()
-]]>
+
+See also: ln(), log()]]>
         </body>
     </entry>
     <entry id="ln">
         <body>
- <![CDATA[
-ln(x) - the natural logarithm of x
+ <![CDATA[ln(x) - the natural logarithm of x
 0 < x
-See also: exp(), log()
-]]>
+
+See also: exp(), log()]]>
         </body>
     </entry>
 
     <entry id="log">
         <body>
- <![CDATA[
-log(x) - the base 10 logarithm of x
+ <![CDATA[log(x) - the base 10 logarithm of x
 0 < x
 Note that QDL support arbitrary exponentiation, so unlike ln(x), there is no
 explicit inverse. The inverse is 10^x.
@@ -2163,24 +1935,21 @@ E.g.
   To get log base 2 of 8:
   log(8)/log(2)
 3.00000000001
-See also: ln(), exp()
-]]>
+See also: ln(), exp()]]>
         </body>
     </entry>
 
     <entry id="log_entry">
         <body>
- <![CDATA[
-log_entry(level, message) - put a message in the current log.
-See also: debug (system command)
-]]>
+ <![CDATA[log_entry(level, message) - put a message in the current log.
+
+See also: debug (system command)]]>
         </body>
     </entry>
 
     <entry id="nroot">
         <body>
- <![CDATA[
-nroot(x,n) - compute the n-th root of x.
+ <![CDATA[nroot(x,n) - compute the n-th root of x.
              n is an integer.
              If n is odd, x may be any number,
              If n is even, 0 <= 0
@@ -2194,19 +1963,25 @@ nroot(x,n) explicitly checks, so
    nroot(-5,3)
 -1.70997594667670
 works.
-See also: Reference manual on ^
-]]>
+
+See also: Reference manual on ^]]>
         </body>
     </entry>
     <entry id="join">
         <body>
- <![CDATA[
-join(x., y.{, axis}) - join two stems together along a given axis.
+ <![CDATA[join(x., y.{, axis}) - join two stems together along a given axis.
 See also: union or the ~ operator. Those are special cases of
 join(x., y., 0 ) == x.~y. == join(x., y.)
 Omitting axis means use axis 0. Join makes the axis bigger:
 
-E.g.
+There is also the laminate function in the extension module for pasting
+two stems together along a new axis.
+
+See also: ~. ~|
+]]>
+        </body>
+<example>
+<![CDATA[E.g.
    join(n(3,4,[;12]), n(3,5,[10;25]))
 [
   [0,1,2,3],
@@ -2229,20 +2004,17 @@ Compare to joining along the last axis
  ]
 
  Here the -1 (last) axis (which is also the 1-th axis or columns here)
- is augmented and the dimension is 3 x (4+5).
+ is augmented and the dimension is 3 x (4+5).]]>
+</example>
 
-There is also the laminate function in the extension module for pasting
-two stems together along a new axis.
-
-See also: ~. ~|
-]]>
-        </body>
     </entry>
     <entry id="reverse">
         <body>
  <![CDATA[
-reverse(list.) - reverse the elements of a list
-E.g.
+reverse(list.) - reverse the elements of a list]]>
+        </body>
+<example>
+<![CDATA[E.g.
   reverse(n(5))
 [4,3,2,1,0]
 Another example on a list of lists
@@ -2251,43 +2023,44 @@ Another example on a list of lists
 [[0,1,2], [0,1]]
   reverse(p.)
 [[0,1],[0,1,2]]
+
 ]]>
-        </body>
+</example>
+
     </entry>
     <entry id="dim">
         <body>
- <![CDATA[
-dim(list.) - The dimension of a list. This returns a list of the size of each
+ <![CDATA[dim(list.) - The dimension of a list. This returns a list of the size of each
              zeroth component. In the case of non-ragged lists, this is
              precisely the number of elements per entry.
-E.g.
+
+Note: This is only a partial result with ragged arrays, since there is no
+      good way to get a single canonical size.]]>
+        </body>
+<example>
+<![CDATA[E.g.
     dim(n(5))
 [5]
 Because this has a single index and it is 5 elements long.
      dim(n(3,4,5))
 [3,4,5]
-This is a list of the indices (three) with the counts in them.
-Note: This is only a partial result with ragged arrays, since there is no
-      good way to get a single canonical size.
-]]>
-        </body>
+This is a list of the indices (three) with the counts in them.]]>
+</example>
+
     </entry>
     <entry id="rank">
         <body>
- <![CDATA[
-rank(list.) - returns the number (a scalar) of independent indices,
+ <![CDATA[rank(list.) - returns the number (a scalar) of independent indices,
               i.e. size(dim(list.))
 E.g.
    rank(n(3,4,5))
 3
-This means there are three separate indices.
-]]>
+This means there are three separate indices.]]>
         </body>
     </entry>
     <entry id="query">
         <body>
- <![CDATA[
-query(arg., query_string{,return_indices}) -- do a query on a stem using
+ <![CDATA[query(arg., query_string{,return_indices}) -- do a query on a stem using
             JSON Path syntax.
           arg. - the stem to search
   query_string - a valid JSON Path query string as per
@@ -2296,8 +2069,7 @@ return_indices - (optional) return the indices of the result, not the result.
 Returns a list.
 
 This allows you to query stems using the standard query language in JSON.
-You supply a stem and a query. Note that the query is a string since 
-
+You supply a stem and a query. Note that the query is a string.
 ]]>
         </body>
         <example>
@@ -2335,7 +2107,8 @@ Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/m
                 </example>
 
     </entry>
-    <entry id="=~">
+    <entry id="=~" alt="≈">
+
         <body>
  <![CDATA[
 regex =~ expression
@@ -2343,9 +2116,7 @@ Apply the given regex (which is a string) to match the string representation
 of the expression.
 Result is always a boolean.
 
-Note: ≈ (unicode 2248) is also used for this.
-See also: tokenize, replace.
-]]>
+See also: tokenize, replace.]]>
         </body>
         <example>
            <![CDATA[
@@ -2356,17 +2127,15 @@ true
 
     </entry>
 
-    <entry id="⟦">
+    <entry id="[|" alt="⟦">
         <body>
- <![CDATA[
-Closed slice notation.
+ <![CDATA[Closed slice notation.
 Equivalent to: [|
 You may use ⟦ (\u27e6) or [| ,  ⟧ (\u27e7) or |].
 ⟦ start;stop;count ⟧
 will create the list with count elements evenly distributed between start and stop,
 inclusive.
-See also: slice
-]]>
+See also: slice]]>
         </body>
         <example>
            <![CDATA[
@@ -2378,51 +2147,15 @@ Yields 5 numbers from -1/2 to 1/pi inclusive.
                 </example>
 
     </entry>
-    <entry id="[|">
+    <entry id="|]" alt="⟧">
         <body>
- <![CDATA[
-Closed slice operator open bracket.
-See ⟦, slice
-]]>
-        </body>
-    </entry>
-    <entry id="⟧">
-        <body>
- <![CDATA[
-Unicode \u27e7. Part of a closed slice.
-Equivalent to: |]
-Please see help for ⟦
-See also: slice
-]]>
-        </body>
-    </entry>
-    <entry id="|]">
-        <body>
- <![CDATA[
-Closed slice operator close bracket.
-See ⟧, slice
-]]>
+ <![CDATA[Closed slice operator close bracket.
+See ⟧, slice]]>
         </body>
     </entry>
 
-    <entry id="→">
-        <body>
- <![CDATA[
-Unicode \u2192 which is a left arrow used in defining lambdas.
-Equivalent to: ->
-See also: ->
-]]>
-        </body>
-    </entry>
-    <entry id="¬">
-        <body>
- <![CDATA[
-Unicode logical not \u00ac.
-Equivalent to: !
-]]>
-        </body>
-    </entry>
-    <entry id="!">
+
+    <entry id="!" alt="¬">
         <body>
  <![CDATA[
 Unary negation. Note that this is a monadic operator (!).
@@ -2444,119 +2177,92 @@ Equivalent to: unicode not ¬ or \u00ac
 ]]>
         </body>
     </entry>
-    <entry id="×">
+    <entry id="*" alt="×">
         <body>
- <![CDATA[
-Unicode multiplication \u00d7
-Equivalent to: *
+ <![CDATA[a*b
+ For numbers, multiplication.
+ For strings, this will return b copies of a, or a copies of b
 ]]>
         </body>
-    </entry>
-    <entry id="÷">
-        <body>
- <![CDATA[
-Unicode division \u00f7
-Equivalent to: /
+<example>
+<![CDATA[   2*3
+6
+   4*'abc'
+abcabcabcabc
 ]]>
+</example>
+
+    </entry>
+    <entry id = "/" alt="÷">
+        <body>
+ <![CDATA[Division. You know, division
+   17/91
+ 0.186813186813186
+
+ For sets, A/B is all elements in A not in B:
+    {1,3,'a','b',7}/{'a','b','c','d'}
+ {1,3,7}
+
+ See also /\ (intersection), % (symmetric difference)]]>
         </body>
     </entry>
-    <entry id="≔">
+    <entry id=":=" alt="≔">
         <body>
- <![CDATA[
-Unicode assign left \u2254
-Equivalent to: :=
-]]>
+ <![CDATA[a := b - left assignment
+
+ a is assigned the value of b. Note that the colon goes next to the variable.]]>
         </body>
     </entry>
-    <entry id="≕">
+    <entry id="=:" alt="≕">
         <body>
- <![CDATA[
-Unicode assign right \u2255
-Equivalent to: =:
-]]>
+ <![CDATA[a =: b - right assignment
+
+b is assigned the value of a. Note that the colon goes next to the variable.]]>
         </body>
     </entry>
-    <entry id="∧">
+    <entry id="&amp;&amp;" alt="∧">
         <body>
- <![CDATA[
-Unicode logical and \u2227
-Equivalent to: &&
-]]>
+ <![CDATA[a && b - boolean and applied to a and b
+
+ Both a and b arguments must be booleans.]]>
         </body>
     </entry>
-    <entry id="∨">
+    <entry id = "||" alt="∨">
         <body>
- <![CDATA[
-Unicode logical or \u2228
-Equivalent to: ||
-]]>
-        </body>
-    </entry>
-    <entry id="∆">
-        <body>
- <![CDATA[
-Unicode symmetric difference operator \u2206
-Symmetric difference operator. Note that this not
-the same as upper case Greek delta, which  is \u0394
-Equivalent to: % for sets.
-]]>
-        </body>
-    </entry>
-    <entry id="∅">
-        <body>
- <![CDATA[
-Unicode null set \u2205
-Equivalent to: {}, the null set.
-]]>
-        </body>
-    </entry>
-    <entry id="≤">
-        <body>
- <![CDATA[
-Unicode less than or equal to \u2264
-Equivalent to: <=
-See also: comparisons
-]]>
-        </body>
-    </entry>
-    <entry id="≥">
-        <body>
- <![CDATA[
-Unicode greater than or equal to \u2265
-Equivalent to: >=
-See also: comparisons
-]]>
-        </body>
-    </entry>
-    <entry id="≡">
-        <body>
- <![CDATA[
-Unicode logical equality \u2261
-Equivalent to: ==
-See also: comparisons
-]]>
-        </body>
-    </entry>
-    <entry id="≠">
-        <body>
- <![CDATA[
-Unicode not equal to \u2260
-Equivalent to: !=
-See also: comparisons
-]]>
+ <![CDATA[a || b - logical or applied to a and b
+
+ Both a and b must be booleans.]]>
         </body>
     </entry>
 
-    <entry id="≈">
+    <entry id="{}" alt="∅">
         <body>
- <![CDATA[
-Unicode equivalent to \u2248
-Equivalent to: =~
-Used for regular expression matches
-See also: =~
+ <![CDATA[The empty or null set.]]>
+        </body>
+    </entry>
+    <entry id="&lt;=" alt="≤">
+        <body>
+ <![CDATA[a <= b - comparison of a less than or equal to b
+
+See also: comparisons]]>
+        </body>
+    </entry>
+    <entry id="&gt;=" alt="≥">
+        <body>
+ <![CDATA[a >= b - comparison for a greater than or equal to be.
+
+See also: comparisons
 ]]>
         </body>
     </entry>
+    <entry id="!=" alt="≠">
+        <body>
+ <![CDATA[a != b - a is not equal to b.
+
+See also: comparisons]]>
+        </body>
+    </entry>
+
 
     <entry id="unicode">
         <body>
@@ -2627,10 +2333,12 @@ would print the entry for the null set.
 
     </entry>
 
-    <entry id="assert">
+    <entry id="assert" alt="⊨">
         <body>
- <![CDATA[
-assert[boolean][expression]
+ <![CDATA[assert[boolean][expression]
+or
+⊨ boolean : expression
+
 is a directive that tells the system to fail if the boolean is false. The
 result will be an error returned with the expression evaluated (if possible)
 and turned into a string.
@@ -2640,16 +2348,26 @@ assert[ script_args() == 2 ]['You must supply both a username and password.'];
 This stops further processing and essentially allows you to introduce and
 unrecoverable error if needed.
 
+If an assertion is made in a try-catch statement, then an error is raised
+with reserved error_code of -2 and the message is propagated like
+any other error message.
+
 Assertions may be globally turned off and on with the assertions_on variable
 in the workspace, or as a configuration option. One common use is to have
-them on for development and off in production.
-]]>
+them on for development and off in production.]]>
         </body>
+        <example>
+<![CDATA[⊨ script_arg() ≡  2 : 'you must supply both a username and password';
+
+alternately
+
+assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];]]>
+        </example>
     </entry>
+
     <entry id="for_each">
         <body>
- <![CDATA[
-for_each(@f, arg_1., arg_2., ..., arg_n.) - Apply the n-adic function, f, to
+ <![CDATA[for_each(@f, arg_1., arg_2., ..., arg_n.) - Apply the n-adic function, f, to
            each element of the outer product of the arg_k.
 Simple example, making a multiplication table.
    a. := for_each(@*, 1+n(5), 1+n(6))
@@ -2686,35 +2404,6 @@ and z.i.j is the value of z() at xy.i.j, i.e. z.i.j == z(xy.i.j.0, xy.i.j.1)
 ]]>
         </body>
     </entry>
-    <entry id="⊨">
-        <body>
- <![CDATA[
-⊨
-unicode 22a8, aka assert is used to mark a conditional that, when false, should stop
-program execution immediately. There are two forms,one with a keyword, assert
-and the other with the unicode Math symbol for assertion, ⊨. The general forms are
-⊨ conditional : message
-assert[ conditional ][ message]
-
-If the conditional is false, the message is returned.
-
-If an assertion is made in a try-catch statement, then an error is raised
-with reserved error_code of -2 and the message is propagated like
-any other error message.
-]]>
-        </body>
-        <example>
-           <![CDATA[
-E.g.
-⊨ script_arg() ≡  2 : 'you must supply both a username and password';
-
-alternately
-
-assert[script_arg() ≡  2 ][ 'you must supply both a username and password'];
-           ]]>
-                </example>
-
-    </entry>
     <entry id="block">
         <body>
  <![CDATA[
@@ -2733,62 +2422,64 @@ baz
 a gets re-assigned to 'baz' inside the block, ok does not exist any place but the block.
 This is extremely useful in many places, such as scripts.
 
-See also: local
-]]>
+See also: local]]>
         </body>
     </entry>
 
     <entry id="slice">
         <body>
- <![CDATA[
-A slice is an list of numbers. There are two main types
+ <![CDATA[A slice is an list of numbers. There are two main types
 Open slice: [start;stop;step]
 which will produce the list
 [start, start+step, start +2*step, ... ]
 ending when stop < start + n*step.
 If start is omitted, it is assumed to be 0 (zero).
 If step is omitted, it is assumed to be 1.
-E.g. [;5]
-[0,1,2,3,4]
-E.g. using a slice in a loop
-  while[for_next(j, 1+2*[;6])][say(j);]
-prints 1, 3, 5, 7, 9, 11
-E.g. [2;5;0.7]
-[2,2.7,3.4,4.1,4.8]
-Note well: in an open slice, you do not necessarily know how
-           many elements are in the resulting list. Here there
-           are 5.
 
 Closed slice [|start;stop;count|]
 This will produce the list from
 [start, ... , stop] (inclusive)
 and will have exactly count element in it.
 If start is omitted, it is assumed to be 0 (zero).
-E.g. [|-pi()/4; pi()/3; 11 |]
+
+See also [|, |], ⟦, ⟧]]>
+        </body>
+        <example>
+<![CDATA[E.g. Open slice examples
+   [;5]
+[0,1,2,3,4]
+  //using a slice in a loop
+  while[for_next(j, 1+2*[;4])][say(j);]
+1
+3
+5
+7
+  [2;5;0.7]
+[2,2.7,3.4,4.1,4.8]
+Note well: in an open slice, you do not necessarily know how
+           many elements are in the resulting list. Here there
+           are 5.
+
+E.g. Closed slices example
+  [|-pi()/4; pi()/3; 11 |]
 [-0.785398163397447,-0.602138591938043, ... ,1.047197551196593]
 
 produces a list of 11 equally spaced numbers from -pi/4 to pi/3,
-including the endpoints.
-
-See also [|, |], ⟦, ⟧
-]]>
-        </body>
+including the endpoints.]]>
+        </example>
     </entry>
     <entry id="differ_at">
         <body>
- <![CDATA[
-differ_at(s0, s1) - find first index at which two strings differ. If the
+ <![CDATA[differ_at(s0, s1) - find first index at which two strings differ. If the
                strings are equal then a value of -1 is returned.
                Read: 's0 and s1 differ at index i'
                If one string is a substring of
-               another, then the index is the length (i.e. this is the index in
-               the longer string). You may also apply this to stems of strings.
-
-]]>
+               another, then the index is the length (i.e. this is the index
+               in the longer string). You may also apply this to stems
+               of strings.]]>
         </body>
 <example>
-    <![CDATA[
-   differ_at('abcde', 'ab')
+<![CDATA[   differ_at('abcde', 'ab')
 2
    differ_at('abcd','abcd')
 -1
@@ -2801,78 +2492,70 @@ differ_at(s0, s1) - find first index at which two strings differ. If the
 [2,3]
    // How to use this to get rid of the common parts of strings,
   substring(q., differ_at(q.,s.))
-[cd,hij]
-]]>
+[cd,hij]]]>
 </example>
     </entry>
 
     <entry id="version">
         <body>
- <![CDATA[
-The current version of QDL is 1.4-QDL-SNAPSHOT
-]]>
+ <![CDATA[The current version of QDL is 1.4-QDL-SNAPSHOT]]>
         </body>
     </entry>
     <entry id="if">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 Denotes a conditional statement:
 Basic conditional
    if[ boolean ][ (statement;)*];
 Conditional with an else clause
    if[ boolean ][ (statement;)*]else[ (statement;)*];
 
-See also: then, else, ?
-    ]]>
+Note there is no semi-colon after the conditional.
+
+See also: then, else, ?]]>
         </body>
     </entry>
     <entry id="?">
         <body>
- <![CDATA[
-Used in the ternary operator
+ <![CDATA[Used in the ternary operator
    boolean ? expression0 : expression1
 If boolean is true, then expression 0 is evaluated and returned. Otherwise
 expression1 is used.
 
     user_name := script_args() == 2 ? script_args(1) : 'guest';
 
-These may be used like any other algebraic expression, where the if conditional
+These may be used like any other algebraic expression, where the if statement
 cannot be.
-See also: if, then, else
-    ]]>
+See also: if, then, else]]>
         </body>
     </entry>
     <entry id="then">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 Optional connector in conditional statements. It may be ommitted or not.
 These are equivalent
    if[2 < 3][say('foo');];
    if[2 < 3]then[say('foo');];
 You may have space around the then keyword.
-See also: if, else, ?
-    ]]>
+
+See also: if, else, ?]]>
         </body>
     </entry>
     <entry id="else">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 This is used in conditional statements. It is optional in the sense that
 not every conditional needs one, but if you do, it must be included, unlike
 the then keyword.
    if[2<4][say('then');]else[say('else');];
-See also: if, then, ?
-]]>
+
+See also: if, then, ?]]>
         </body>
     </entry>
 
     <entry id="while">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 This is used for QDL's looping  construction:
    while[ boolean ][(statement;)*];
 or with the optional do keyword
@@ -2895,27 +2578,23 @@ All of these are the same:
 
 That said, you really should not need to loop much in QDL...
 
-See also: do, for_next, for_keys, has_value, ∈, ∉, return
-]]>
+See also: do, for_next, for_keys, has_value, ∈, ∉, return]]>
         </body>
     </entry>
     <entry id="do">
         <body>
- <![CDATA[
-Keyword
+ <![CDATA[Keyword
 Optional connector in while loops.  So these are the
 same
    while[condition][statements]
    while[condition]do[statements]
 
-See also: while
-]]>
+See also: while]]>
         </body>
     </entry>
     <entry id="module">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 This is for the QDLs modules which are self-contained units of code:
 module[uri, alias
   ][
@@ -2928,53 +2607,46 @@ variables and functions if they start with __ to hide them.
 To see the general comments for a module in the workspace type
    )modules uri|alias -help
 
-See also: body, module_load, module_import, intrinsic.
-]]>
+See also: body, module_load, module_import, intrinsic.]]>
         </body>
     </entry>
     <entry id="body">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 Optional keyword connecting clauses in define and module statements.
 E.g.
    define[f(x)][...
    define[f(x)]body[...
-See also: define, ->
-]]>
+
+See also: define, ->]]>
         </body>
     </entry>
-    <entry id="->">
+    <entry id="->" alt="→">
         <body>
- <![CDATA[
-Lambda function definition. A lambda function a user defined function:
+ <![CDATA[Lambda function definition. A lambda function a user defined function:
    f(x)->cos(x);
 would create a new function called f(x) which would evaluate the cosine
 and automatically return it.
 For multiple expressions, use [ ] and there is no automatic return:
    f(x)->[y:= x/2;return(cos(y));];
-See also: define
-]]>
+See also: define]]>
         </body>
     </entry>
     <entry id="keywords">
         <body>
- <![CDATA[
-The reserved keywords in QDL are
+ <![CDATA[The reserved keywords in QDL are
 
 true    if     while   try     module   define   block
 false   then   do      catch   body              local
 null    else   assert
 
-You may use the help facility for any of these.
-]]>
+You may use the help facility for any of these.]]>
         </body>
     </entry>
 
     <entry id="try">
         <body>
- <![CDATA[
-Keyword
+ <![CDATA[Keyword
 try denotes the QDLs exception handling statement.
 
    try[(statement;)*]catch[(statement;)*];
@@ -2989,42 +2661,36 @@ oops!
 The raise_error function lets you have much more fine-grained handling of
 errors.
 
-See also: raise_error
-]]>
+See also: raise_error]]>
         </body>
     </entry>
     <entry id="catch">
         <body>
- <![CDATA[
-Keyword
+ <![CDATA[Keyword
 Used as part of the try[ ... ] catch[ ... ] statement.
-See also: try
-]]>
+See also: try]]>
         </body>
     </entry>
     <entry id="true">
         <body>
- <![CDATA[
-Keyword
+ <![CDATA[Keyword
 Logical true.
-See also: false
-]]>
+
+See also: false]]>
         </body>
     </entry>
     <entry id="false">
         <body>
- <![CDATA[
-Keyword
+ <![CDATA[Keyword
 Logical false
-See also: true
-]]>
+
+See also: true]]>
         </body>
     </entry>
     <entry id="null">
         <body>
- <![CDATA[
-Keyword
-The null, (or unicode 2205, ∅) a special value that denotes that
+ <![CDATA[Keyword
+The null is a special value that denotes that
 no definite value has been assigned yet.
 A common use is to define a variable to null to put it
 in the correct scope for subsequent operations:
@@ -3034,28 +2700,14 @@ in the correct scope for subsequent operations:
 0
 Had a not been set to null first, then it would have only existed inside
 the conditional and attempts to access it would result in an error.
-See also: is_defined, null_set
-]]>
-        </body>
-    </entry>
 
-    <entry id="null_set">
-        <body>
- <![CDATA[
-Keyword
-The null_set, (or unicode 2205, ∅) is the empty set.
-
-The notation for the empty set, {}, is used to denote the
-(much more probably) case of an empty stem. 
-See also: is_defined, null_set, null
-]]>
+See also: is_defined]]>
         </body>
     </entry>
 
     <entry id="values">
         <body>
- <![CDATA[
-values(arg) - return the values of a stem as a flat list
+ <![CDATA[values(arg) - return the values of a stem as a flat list
 
 Note that if arg is a scalar, the result is a stem of the value only.
 
@@ -3063,7 +2715,11 @@ This is a compliment to list_keys(arg.) which returns the keys as a list.
 One caveat is that there is no general order and only unique values are
 returned. This does only processes a single dimension in a stem,  hence will
 not unpack embedded stems.
-E.g.
+
+See also: list_keys, keys, unique.]]>
+        </body>
+<example>
+<![CDATA[E.g.
     zeta.'A' := ['p','q'];zeta.'B' := 'r';zeta.'C' := 's'
     values(zeta.)
 [[p,q],r,s]
@@ -3073,21 +2729,15 @@ E.g.
 E.g. values returned are unique.
   arg.foo := 2; arg.bar := 2; arg.baz := 2
   values(arg.)
-[2]
+[2]]]>
+</example>
 
-See also: list_keys, keys, unique.
-]]>
-        </body>
     </entry>
-    <entry id="floor">
+    <entry id="floor" alt="⌊">
         <body>
  <![CDATA[
 floor(arg) - compute the mathematical floor of the argument.
              This is the greatest integer less than or equal to it argument
-
-E.g.
-   floor(3.4)
-3
 
 Compare with the floor operator, ⌊, which behaves identically, but is not a function
 
@@ -3096,55 +2746,40 @@ Compare with the floor operator, ⌊, which behaves identically, but is not a fu
 See also: ⌊, ceiling, ⌈
 ]]>
         </body>
-    </entry>
-    <entry id="⌊">
-        <body>
- <![CDATA[
-unicode 230a aka the floor operator. This behaves identically to the floor
-function, but is an operator:
-E.g.
+<example>
+<![CDATA[   floor(3.4)
+3
    ⌊-3.4
 -4
    ⌊[-2;3;0.7]
-[-2,-2,-1,0,0,1,2,2]
+[-2,-2,-1,0,0,1,2,2]]]>
+</example>
 
-See also: floor, ceiling, ⌈
-]]>
-        </body>
     </entry>
+
     <entry id="ceiling">
         <body>
  <![CDATA[
 ceiling(arg) - compute the ceiling of the argument.
                This is the least integer greater than or equal to arg.
 
-E.g.
+See also: floor
+]]>
+        </body>
+<example>
+<![CDATA[E.g.
    ceiling(4.5)
 5
    ceiling(-4.5)
 -4
-See also: floor, ⌊
-]]>
-        </body>
-    </entry>
-    <entry id="⌈">
-        <body>
- <![CDATA[
-
-unicode 2308 aka the ceiling operator. This behaves identically to the ceiling
-function, but is an operator.
-E.g.
   ⌈[-2;3;0.7]
-[-2,-1,0,1,1,2,3,3]
+[-2,-1,0,1,1,2,3,3]]]>
+</example>
 
-See also: ceiling, floor, ⌊
-]]>
-        </body>
     </entry>
-    <entry id="%">
+    <entry id="%" alt="∆">
         <body>
- <![CDATA[
-Integer division (numbers) or symmetric difference (sets).
+ <![CDATA[Integer division (numbers) or symmetric difference (sets).
 For numbers.
 -----------
 This is normal division, but the remainder is discarded.
@@ -3187,8 +2822,7 @@ See also: ∆ (\u2206)
     </entry>
     <entry id="define">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 This denotes a full function definition. Functions definitions are different
 from lambdas in that they may contain statements. So for instance, you may
 have an if[]then[] in a defined function, but have to use the ternary operator
@@ -3203,17 +2837,13 @@ define[
 
 Comments will be displayed in system help under
 
-)help name arg_count
-
-
-]]>
+)help name arg_count]]>
         </body>
     </entry>
 
     <entry id="~">
         <body>
- <![CDATA[
-The join operator. This is both monadic and dyadic operates only on lists.
+ <![CDATA[The join operator. This is both monadic and dyadic operates only on lists.
 
 The reason this only operates on lists is that if two stems share a common
 index, then it is unclear at all how to decide which to keep. Lists
@@ -3265,7 +2895,7 @@ See also: ~|, join
 ]]>
         </body>
     </entry>
-    <entry id="~|">
+    <entry id="~|" alt="≁">
         <body>
  <![CDATA[
 Join along last axis. Normal join, ~, operates along the zero-th
@@ -3309,23 +2939,14 @@ E.g. Making a table with headings. Make the table with ~| then stick
     ]]>
         </body>
     </entry>
-    <entry id="≁">
-        <body>
- <![CDATA[
-Unicode
-This is equivalent to ~|, join operator along last axis.
-
-See: ~|
-]]>
-        </body>
-    </entry>
     <entry id="indices">
         <body>
- <![CDATA[
-indices(args. ,[axis]) - return all the indices for either the entire stem
+ <![CDATA[indices(args. ,[axis]) - return all the indices for either the entire stem
             or for the given axis. The axis may be signed, so, e.g.
-            axis == -1 is the last axis.
-E.g.
+            axis == -1 is the last axis.]]>
+        </body>
+<example>
+<![CDATA[E.g.
     a. := [;5]~n(2,3, n(6))
     a.
 [0,1,2,3,4,[0,1,2],[3,4,5]]
@@ -3336,16 +2957,13 @@ E.g.
     a.[6,2]
 5
 
-Note that indices(a., 1) == indices(a., -1) in this case.
+Note that indices(a., 1) == indices(a., -1) in this case.]]>
+</example>
 
-]]>
-        </body>
     </entry>
-    <entry id="transpose">
+    <entry id="transpose" alt="τ">
         <body>
- <![CDATA[
-
-Restructure a higher dimension stem by transposing its axes.
+ <![CDATA[Restructure a higher dimension stem by transposing its axes.
 
 transpose(x.) - reverses dim(x.) an remaps the axes of x. If x. is a matrix,
            this is the standard matrix transpose
@@ -3390,28 +3008,13 @@ i.e. add horizontally? This is summation on the last axis:
  18
 ]
 
-An axis of -1 is always the last axis.
-
-Alias: τ (greek letter tau).
-This could be an operator in its own right, but is much easier to
-work with as a function in most contexts. The alternate Greek letter
-is supplied if you want to make it more terse.
-]]>
+An axis of -1 is always the last axis.]]>
         </body>
     </entry>
 
-    <entry id="τ">
-        <body>
- <![CDATA[
-Alias for the transpose function.
-See the entry for transpose for more.
-]]>
-        </body>
-    </entry>
     <entry id="greek">
         <body>
- <![CDATA[
-QDL supports Greek letters for function and variable names.
+ <![CDATA[QDL supports Greek letters for function and variable names.
 These are, of course, strictly a matter of taste.
 Table of Greek letters with unicode:
 
@@ -3460,15 +3063,12 @@ E.g.
 Note ∈ (\u2208) denotes set membership and while derived from epsilon, is
 not a greek letter.
 
-See also: unicode
-
-]]>
+See also: unicode]]>
         </body>
     </entry>
     <entry id="ansi_mode">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 ansi_mode - (read only) true if QDL is running in ANSI mode.
 
 QDL may be started in ANSI (American Standards National Institute) mode
@@ -3487,15 +3087,13 @@ https://cilogon.github.io/qdl/docs/iso6429.pdf
 
 Note that this does not persist through WS saves. If you are working
 in ANSI mode and the system is restarted in ASCII mode, that is
-what is available.
-]]>
+what is available.]]>
         </body>
     </entry>
 
     <entry id="insert">
         <body>
- <![CDATA[
-insert(source, snippet, index) - insert the snippet into the source string
+ <![CDATA[insert(source, snippet, index) - insert the snippet into the source string
      at the given index.
 
 E.g.
@@ -3503,14 +3101,12 @@ E.g.
 abfoocd
 
   insert('abcd', '....', differ_at('abcd','abq'))
-ab....cd
-]]>
+ab....cd]]>
         </body>
     </entry>
     <entry id="extrinsic">
         <body>
- <![CDATA[
-"Not part of the essential nature of someone or something; coming
+ <![CDATA["Not part of the essential nature of someone or something; coming
  or operating from outside"
 
 This refers to what are also called global variables in some languages.
@@ -3530,16 +3126,14 @@ In the final analysis, they are just variables
     <![CDATA[
 This is the marker for extrinsic variables.
 
-See also: extrinsic
-            ]]>
+See also: extrinsic            ]]>
                 </body>
             </entry>
         </body>
     </entry>
     <entry id="intrinsic">
         <body>
- <![CDATA[
-"Originating and included wholly within an organ or part."
+ <![CDATA["Originating and included wholly within an organ or part."
 This refers to variables and functions defined inside a module which are not
 visible outside of the module. To mark a function or variable as intrinsic
 you prefix the name with a '__' (double underscore).
@@ -3551,31 +3145,26 @@ __f(x)->x^2;
 
 Attempts to access __my_password or __f(x) outside of the module will fail.
 Many languages do something similar and refer to these are private elements.
-See also: module.
- ]]>
+
+See also: module.]]>
         </body>
     </entry>
 
     <entry id="private">
         <body>
- <![CDATA[
-See intrinsic.
- ]]>
+ <![CDATA[See intrinsic.]]>
         </body>
     </entry>
 
     <entry id="__">
         <body>
- <![CDATA[
-Double underscore. Prefix for intrinsic variables and functions in a module
-See also: module, intrinsic.
-]]>
+ <![CDATA[Double underscore. Prefix for intrinsic variables and functions in a module
+See also: module, intrinsic.]]>
         </body>
     </entry>
     <entry id="ini">
         <body>
- <![CDATA[
-QDL supports its own initialization file format.
+ <![CDATA[QDL supports its own initialization file format.
 Note that this file format is most emphatically not QDL!
 It is quite simple:
 
@@ -3627,14 +3216,12 @@ would be turned into the stem
 ini. :=  {'my_app':{'username':'bob', 'password':'εΖζΗηΘθϑΙιΚκ'}}
 
 
-See also: file_read
-]]>
+See also: file_read]]>
         </body>
     </entry>
     <entry id="laminate">
         <body>
- <![CDATA[
-(extensions module)
+ <![CDATA[(extensions module)
 laminate(x,y{,axis}) - paste together two conformable stems along the axis.
 If axis is omitted, then the operation occurs on the zeroth axis
 x - stem or scalar. If a scalar, it will be extended
@@ -3654,9 +3241,10 @@ If axis == dim(x.) (e.g. x. is rank 2, axis == 2), then a new last axis
 is created.
 
 This function can also augment a smaller stem and paste it to a large (by
-rank 1 only) one.
-
-E.g.
+rank 1 only) one.]]>
+        </body>
+<example>
+<![CDATA[E.g.
 paste together a 2x3 stem to a 2x4x3 along their 1st axis. This means
 to treat x. as a 2x1x3 stem and join. Result is a 2x5x3 stem.
    laminate(n(2,3,[;6]),n(2,4,3,[;24]),1);
@@ -3720,37 +3308,35 @@ laminate(x.,0)
     [0,0,0]
   ]
  ]
+
 ]]>
-        </body>
+</example>
+
     </entry>
     <entry id="min">
         <body>
- <![CDATA[
-min(a,b) - compute the minimum of two numbers or set of stems
-See also: max
-]]>
+ <![CDATA[min(a,b) - compute the minimum of two numbers or set of stems
+
+See also: max]]>
         </body>
     </entry>
     <entry id="max">
         <body>
- <![CDATA[
-max(a,b) - compute the minimum of two numbers or set of stems
-See also: min
-]]>
+ <![CDATA[max(a,b) - compute the minimum of two numbers or set of stems
+
+See also: min]]>
         </body>
     </entry>
     <entry id="chaining">
         <body>
- <![CDATA[
-Refers to the chaining of comparisons like
+ <![CDATA[Refers to the chaining of comparisons like
    a<b<=c
 which is the same as
   (a<b)&&(b<=c)
 
 You may chain any of <, <=,  >, >=,  ==, != or =~.
 
-See intrinsic.
- ]]>
+See comparisons, intrinsic.]]>
         </body>
         <example>
            <![CDATA[
@@ -3771,8 +3357,7 @@ Meaning that (x!=2)&&(x<5), and if true, say what the value is
     </entry>
     <entry id="ws_macro">
         <body>
- <![CDATA[
-ws_macro(arg | arg.) - run a set of workspace commands.
+ <![CDATA[ws_macro(arg | arg.) - run a set of workspace commands.
 arg - a string (possibly with line feeds to separate commands)
 arg. - a list of strings to be executed one at a time
 output - true if it succeeded, an error if it did not.
@@ -3782,37 +3367,32 @@ there is one active. The intent is not to let you write massive
 programs (use scripts) but to allow for customization of the
 workspace from inside QDL, e.g. in an __init() function,
 so the workspace can be initialized etc.
-As such, it should be used minimally and with discretion.
-  ]]>
+As such, it should be used minimally and with discretion.]]>
         </body>
         <example>
-           <![CDATA[
-E.g.
+<![CDATA[E.g.
   ws_macro(')ws get');
 ... prints all current variables
 true
 
    ws_macro([')ws set pp on', ')ws set echo on', ')ws set external_editor nano'])
-true
-           ]]>
+true]]>
                 </example>
 
     </entry>
 
     <entry id="cb_exists">
         <body>
- <![CDATA[
-cb_exists() - boolean valued function to see if the current Java
+ <![CDATA[cb_exists() - boolean valued function to see if the current Java
               environment supports clipboard operations.
               true if supported, false otherwise.
-See also: cb_read, cb_write
-]]>
+
+See also: cb_read, cb_write]]>
         </body>
     </entry>
     <entry id="cb_read">
         <body>
- <![CDATA[
-cb_read() - read the value of the clipboard as a string.
+ <![CDATA[cb_read() - read the value of the clipboard as a string.
             You must do any conversions you want afterwards.
 
 Note that this will trim any lead/trailing whitespace
@@ -3826,24 +3406,20 @@ E.g.
 mairzy doats
 
 This means that the string 'mairzy doats' was in the clipboard.
-See also: cb_exists, cb_write
-]]>
+See also: cb_exists, cb_write]]>
         </body>
     </entry>
     <entry id="cb_write">
         <body>
- <![CDATA[
-cb_write(arg | arg.) - write the argument as a string to the clipboard.
+ <![CDATA[cb_write(arg | arg.) - write the argument as a string to the clipboard.
                Returns a true if the operation succeeded and
                false otherwise. Note that stems are converted to JSON
                first.
 
-See also: cb_exists, cb_read
-]]>
+See also: cb_exists, cb_read]]>
         </body>
         <example>
-           <![CDATA[
-   cb_write('mairzy doats')
+           <![CDATA[   cb_write('mairzy doats')
 true
 
 and the line 'mairzy doats' is now in the clipboard.
@@ -3854,8 +3430,7 @@ and the line 'mairzy doats' is now in the clipboard.
 
     <entry id="clipboard">
         <body>
- <![CDATA[
-QDL does support clipboard operations with the provisio that the
+ <![CDATA[QDL does support clipboard operations with the provisio that the
 system supports them too. This is not always a given. The three main
 functions are
 cb_exists - boolean function to check if there is a system clipboard
@@ -3863,14 +3438,12 @@ cb_exists - boolean function to check if there is a system clipboard
  cb_write - write a string to the clipboard
 
  QDL is restricted to only reading/writing string since other data types
- may be very hard indeed to parse.
-]]>
+ may be very hard indeed to parse.]]>
         </body>
     </entry>
     <entry id="external_editor">
         <body>
- <![CDATA[
-(ws variable)
+ <![CDATA[(ws variable)
 external_editor the name of the editor to invoke for WS edit commands.
 
     )ws set external_editor nano
@@ -3880,41 +3453,36 @@ These are set in the configuration, so see the documentation for the
 workspace configuration. The line editor is built in and always
 available.
 
-See also: ee
-]]>
+See also: ee]]>
         </body>
     </entry>
     <entry id="ee">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 Short form of external_editor.
 
-See also: external_editor
-]]>
+See also: external_editor]]>
         </body>
     </entry>
     <entry id="assertions_on">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 Globally toggle assertions on or off. If off, then no
 assertions will be active. If assertions are off, then all
 assertions will be skipped at runtime. This is also a
-configuration option for the workspace.
-]]>
+configuration option for the workspace.]]>
         </body>
     </entry>
     <entry id="∈">
         <body>
- <![CDATA[
-Unicode 2208.
+ <![CDATA[Unicode 2208.
 x ∈ y - return a left conformable boolean mask of all
    elements of x. that are in y.
    Note that both x and y may be stems.
 
-See also: ∉, intersection, has_value, subset(@pick arg).
-]]>
+This may always be replaced by has_value(x,y)
+
+See also: ∉, intersection, has_value, subset(@pick arg).]]>
         </body>
         <example>
            <![CDATA[
@@ -3936,8 +3504,9 @@ Unicode 2209.
 x ∉ y - return a left conformable boolean mask of all
    elements of x. that *not* are in y. Note that x may be a stem.
 
-See also: ∈, intersection, has_value, subset(@pick arg).
-]]>
+This is equivalent to !has_value(x,y)
+
+See also: ∈, intersection, has_value, subset(@pick arg).]]>
         </body>
         <example>
            <![CDATA[
@@ -3954,45 +3523,26 @@ See also: ∈, intersection, has_value, subset(@pick arg).
 
     </entry>
 
-    <entry id="/">
+
+
+    <entry id="/\" alt="∩">
         <body>
  <![CDATA[
-Division (numbers) or difference (sets)
-You know, division
-  17/91
-0.186813186813186
-
-For sets, A/B is all elements in A not in B:
-   {1,3,'a','b',7}/{'a','b','c','d'}
-{1,3,7}
-
-See also && (intersection), % (symmetric difference)
-]]>
-        </body>
-    </entry>
-
-
-    <entry id="/\">
-        <body>
- <![CDATA[
-Ascii digraph for sets intersection. The result is a set
+Ascii digraph for set intersection. The result is a set
 whose elements are common to both arguments.
 
 See also: \/ (set union), subset(@pick arg)
 ]]>
         </body>
         <example>
-           <![CDATA[
-    {0,2,3,5} /\ {4,2,1,0}
-{0,2}
-           ]]>
+<![CDATA[    {0,2,3,5} /\ {4,2,1,0}
+{0,2}]]>
                 </example>
 
     </entry>
-    <entry id="\/">
+    <entry id="\/" alt="∪">
         <body>
- <![CDATA[
-Ascii digraph for set union, the result is a set whose
+ <![CDATA[Ascii digraph for set union, the result is a set whose
 elements are in either of
 the arguments.
 E.g.
@@ -4006,49 +3556,42 @@ not union!
    ~{3,4}
 [3,4]
 
-You can also used unicode ∪ (\u222a).
-See also: /\ (set intersection), ~, subset(@pick arg)
-]]>
+See also: /\ (set intersection), ~, subset(@pick arg)]]>
         </body>
         <example>
-           <![CDATA[
-   {{1,2},{3,4}}\/{{1,2},{'a','b'}}
-{{1,2},{a,b},{3,4}}
-           ]]>
+<![CDATA[   {{1,2},{3,4}}\/{{1,2},{'a','b'}}
+{{1,2},{a,b},{3,4}}]]>
                 </example>
 
     </entry>
 
 
-    <entry id="==">
+    <entry id="==" alt="≡">
         <body>
- <![CDATA[
-For scalars, returns a boolean if the values are the same.
+ <![CDATA[For scalars, returns a boolean if the values are the same.
 Strings must match including case. See =~ (regex matching) as well.
 
 For sets, checks that the elements of one set are identical to
 another.
 
-See also: ∈ (has_value), comparisons, subset(@pick arg)
-]]>
+See also: ∈ (has_value), comparisons, subset(@pick arg)]]>
         </body>
         <example>
-           <![CDATA[
-  z := |>[;20]*3+2
+<![CDATA[  z := |>[;20]*3+2
   z == z
 true
    'abcd' == 'Abcd'
 false
     2/3 == 2/3
 true
-           ]]>
+   {2,3,4}≡{2,3,5}
+false]]>
                 </example>
 
     </entry>
     <entry id="set">
         <body>
- <![CDATA[
-Often you will just need to do operations on aggregates
+ <![CDATA[Often you will just need to do operations on aggregates
 of elements  and really don't care about the internal
 structure. A set is collection of elements that are
 immutable, unique and unordered. Sets are written as elements
@@ -4089,49 +3632,24 @@ can be recursive structures, highly nested etc.) can
 be slow and very difficult. On the other hand, sets may
 be entries in stems with no issues.
 
-See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>,  subset(@pick, arg)
-]]>
-        </body>
-    </entry>
-    <entry id="∩">
-        <body>
- <![CDATA[
-Unicode \u2229
-Set intersection. This is an alternate to ascii digraph /\.
-
-See &&.
-]]>
-        </body>
-    </entry>
-    <entry id="∪">
-        <body>
- <![CDATA[
-Unicode \u222a
-Set union. This is an alternate to ascii digraph \/.
-
-See || .
-]]>
+See also: \/, /\, /, %, <, >, ==, ∈, ∉, ~, |>,  subset(@pick, arg)]]>
         </body>
     </entry>
     <entry id="local">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 local is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside it is local only
 to that block, and the block *does not* inherit the ambient state.
 
-See also: block
-]]>
+See also: block]]>
         </body>
         <example>
-           <![CDATA[
-To get values from the local block, use return.
+<![CDATA[To get values from the local block, use return.
 E.g.
   f()->local[r :=5; return(r);]
   f()
 5
-
 
 Let's compare local and block for how they affect the ambient state.
 
@@ -4146,15 +3664,12 @@ E.g.
    a:= 5;
    block[a :=2;];
    a
-2
-           ]]>
+2]]>
                 </example>
-
     </entry>
     <entry id="stem">
         <body>
- <![CDATA[
-An indexed aggregate. Compare with a set, which is an aggregate
+ <![CDATA[An indexed aggregate. Compare with a set, which is an aggregate
 with no distinguished way to access elements.
 Stems are notated as
 variable.
@@ -4166,45 +3681,19 @@ Stems are extremely flexible objects and can effectively provide any data
 structure you want. Sets are a convenience mostly since emulating sets
 with stems is a bit clunky.
 
-See also: slice, sets
-]]>
+See also: slice, sets]]>
         </body>
     </entry>
-    <entry id="⊢">
+    <entry id="|>" alt="⊢">
             <body>
-<![CDATA[
-Unicode 22a2
-
-Operator to convert its argument to a set
-|> is the ascii digraph.
-
-]]>
-            </body>
-        <example>
-           <![CDATA[
-E.g.
-   ⊢3
-{3}
-   ⊢[;5]
-{01,2,3,4}
-           ]]>
-                </example>
-
-        </entry>
-
-    <entry id="|>">
-            <body>
-<![CDATA[
-Ascii digraph for the operator to convert its argument to a set.
+<![CDATA[Ascii digraph for the operator to convert its argument to a set.
 
    |>false
 {false}
-See also: ⊢ (\u22a2)
-]]>
+See also: ⊢ (\u22a2)]]>
             </body>
         <example>
-            <![CDATA[
-   |>3; // convert a scalar to a set
+            <![CDATA[   |>3; // convert a scalar to a set
 {3}
    |>[2;7]; // convert the values of a list to a set
 {2,3,4,5,6}
@@ -4212,15 +3701,14 @@ See also: ⊢ (\u22a2)
 {0.666666666666666,-0.954929658551372}
    |>keys({'a':2/3,'b':-3/pi()}); // convert the keys of a stem to a set
 {a,b}
-]]>
-
+  ⊢[;5]; // use the other form of the operator
+{0,1,2,3,4}]]>
         </example>
         </entry>
 
     <entry id="overwrite_base_functions">
        <body>
-<![CDATA[
-(WS variable)
+<![CDATA[(WS variable)
 This allows for overwriting the base QDL functions. You may always access them
 as fully qualified. This means you can use QDL as a library to wrote your own
 language.
@@ -4235,14 +3723,12 @@ overwrite_base_functions is now on.
     size([;5], [;7])
 12
 The default is off. In that case, attempting to redefine a base QDL function
-throws an error, assuming that you did not mean to do that.
-]]>
+throws an error, assuming that you did not mean to do that.]]>
        </body>
     </entry>
     <entry id="sort">
        <body>
-  <![CDATA[
-  sort(arg{,up}) - sort the elements of the argument.
+  <![CDATA[  sort(arg{,up}) - sort the elements of the argument.
         if up is true (default) the sort is from lowest to highest
         if up is false, the order is descending.
         Always returns a list.
@@ -4256,13 +3742,10 @@ Notes:
 1. mixed data is slower, so if speed is an issue,
 keep your data by type.
 
-2. non-scalars are not comparable and are simply stuck together
-
-  ]]>
+2. non-scalars are not comparable and are simply stuck together]]>
        </body>
        <example>
-   <![CDATA[
-   sort(mod(random(12),17), false); // These are random numbers.
+<![CDATA[   sort(mod(random(12),17), false); // These are random numbers.
 [15,8,4,1,0,0,-3,-5,-8,-8,-9,-10]
     sort([2,6,-1,'a']); // Mixed data
 [a,-1,2,6]
@@ -4281,48 +3764,37 @@ keep your data by type.
   sort({{1,2},{3,4,5},{2,7}}); // sort set of sets
 [{1,2},{2,7},{3,4,5}]
     sort({{1,2},{3,4,5},{2,7}}, false); // reversing the order does nothing
-[{1,2},{2,7},{3,4,5}]
-
-   ]]>
+[{1,2},{2,7},{3,4,5}]]]>
         </example>
     </entry>
 
-    <entry id="@">
+    <entry id="@" alt="⊗">
        <body>
-  <![CDATA[
-  A function reference. Functions may be passed as arguments by reference.
-  The @ functor (a functor is something that acts on functions).
+  <![CDATA[A function reference. Functions may be passed as arguments by reference.
+The @ functor (a functor is something that acts on functions).
 
-  You may use this on any operator (such as +, *, etc.) or function.
+You may use this on any operator (such as +, *, etc.) or function.
 
-  Ways to pass by reference.
-  Explicitly:
-     p(x)->x<4; // boolean valued
-     subset(@p, {2,-1,3,5,6})
-  {-1,2,3}
+Ways to pass by reference.
+Explicitly:
+   p(x)->x<4; // boolean valued
+   subset(@p, {2,-1,3,5,6})
+{-1,2,3}
 
-  Implictly:
-     subset((x)->x<4, {2,-1,3,5,6})
-   {-1,2,3}
+Implictly:
+   subset((x)->x<4, {2,-1,3,5,6})
+ {-1,2,3}
 
-  In the implicit case, the function is defined for you, then a reference is passed.
-
-  Note that you may use unicode \u2297 ⊗ for this.
-  ]]>
+In the implicit case, the function is defined for you, then a reference is passed.]]>
        </body>
-       <example>
-   <![CDATA[
-   ]]>
-        </example>
     </entry>
     <entry id="comparisons">
        <body>
-  <![CDATA[
-  This encompasses all of the following:
+  <![CDATA[This encompasses all of the following:
   < <= > >= == !=
-  Note that each of these operates in various contexts.
- Numbers.
-  These are the standard comparisons.
+Note that each of these operates in various contexts.
+Numbers.
+These are the standard comparisons.
      2/3 < 3/7
 false
 
@@ -4338,15 +3810,10 @@ These test for equality or substring. These are case sensitive tests.
    'doat'<'mairzy doats and dozey doats'
 true
 
-You cannot compare stems, but these will work on the elements of stems:
+You cannot compare stems as aggregates, since these work on the elements:
    [2/3, 'doats', {1,2}] < [3/7, 'mairzy doats', {1,2,3}]
-[false,true,true]
-  ]]>
+[false,true,true]]]>
        </body>
-       <example>
-   <![CDATA[
-   ]]>
-        </example>
     </entry>
     <!--
         entry template

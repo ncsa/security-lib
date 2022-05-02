@@ -699,4 +699,20 @@ public class StringUtils {
 
         return output;
     }
+
+    /**
+     * Returns the unicode for a single character
+     * @param ch
+     * @return
+     */
+    public  static String toUnicode(char ch) {
+        return String.format("\\u%04x", (int) ch);
+    }
+    public static String toUnicode(String x){
+        char[] chars = x.toCharArray();
+        if(chars.length != 1){
+            throw new IllegalArgumentException(StringUtils.class.getSimpleName()+".toUnicode accepts a single character, not \"" + x + "\"");
+        }
+        return toUnicode(chars[0]);
+    }
 }

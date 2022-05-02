@@ -32,6 +32,8 @@ public interface PayloadHandler extends Serializable {
 
     /**
      * Marshall any resources this script needs to make a request.
+     * I.e., add specific state (if needed) from this handler
+     * to the {@link ScriptRunRequest}.
      * @return
      */
     void addRequestState(ScriptRunRequest req)  throws Throwable;

@@ -189,11 +189,11 @@ public class WorkspaceCommands implements Logable, Serializable {
         say(HELP_COMMAND + " - (no arg) print generic help for the workspace.");
         say(HELP_COMMAND + " * - print a short summary of help for every user defined function.");
         say(HELP_COMMAND + " " + ONLINE_HELP_COMMAND + " - print a list of all online help topics.");
-        say(HELP_COMMAND + " name ["+ONLINE_HELP_EXAMPLE_FLAG+"] - print short help for name. System functions will have a");
-        say("        summary printed (read the manual for more). The optional "+ONLINE_HELP_EXAMPLE_FLAG+" flag will print out examples if any");
+        say(HELP_COMMAND + " name [" + ONLINE_HELP_EXAMPLE_FLAG + "] - print short help for name. System functions will have a");
+        say("        summary printed (read the manual for more). The optional " + ONLINE_HELP_EXAMPLE_FLAG + " flag will print out examples if any");
         say(HELP_COMMAND + " name arg_count - print out detailed information for the user-defined function and the given number of arguments.");
-        say("\nExample. Show all the online help within a display with of 120 characters\n" );
-        say("   " + HELP_COMMAND + " " + ONLINE_HELP_COMMAND + " " + DISPLAY_WIDTH_SWITCH  + " 120 ");
+        say("\nExample. Show all the online help within a display with of 120 characters\n");
+        say("   " + HELP_COMMAND + " " + ONLINE_HELP_COMMAND + " " + DISPLAY_WIDTH_SWITCH + " 120 ");
         say("Help is available for the following (231 topics):\n" +
                 "!                         dir                       mkdir                     then                      ⌊                         \n... more");
     }
@@ -2447,8 +2447,10 @@ public class WorkspaceCommands implements Logable, Serializable {
                 showIntrinsic,
                 showExtrinsic));
     }
-     public static final String ONLINE_HELP_EXAMPLE_FLAG = "-ex";
-     public static final String ONLINE_HELP_COMMAND = "online";
+
+    public static final String ONLINE_HELP_EXAMPLE_FLAG = "-ex";
+    public static final String ONLINE_HELP_COMMAND = "online";
+
     /**
      * Just print the general help
      * <pre>
@@ -2486,7 +2488,16 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         if (name.equals(ONLINE_HELP_COMMAND)) {
             TreeSet<String> treeSet = new TreeSet<>();
-            treeSet.addAll(onlineHelp.keySet());
+            for (String key : onlineHelp.keySet()) {
+                if (altLookup.containsKey(key)) {
+                    treeSet.add(key + " (" + altLookup.get(key) + ")");
+
+                } else {
+                    treeSet.add(key);
+
+                }
+            }
+            //treeSet.addAll(onlineHelp.keySet());
             if (treeSet.isEmpty()) {
                 say("(no online help)");
                 return RC_CONTINUE;
@@ -2495,15 +2506,32 @@ public class WorkspaceCommands implements Logable, Serializable {
             return printList(inputLine, treeSet);
 
         }
-        if (onlineHelp.containsKey(name)) {
-            if(doOnlineExample){
-                if(onlineExamples.containsKey(name)) {
-                    say(onlineExamples.get(name));
-                }else{
+        if (onlineHelp.containsKey(name) || altLookup.getByValue(name)!=null) {
+            String realName = null;
+            String altName = null;
+            if(onlineHelp.containsKey(name)){
+                realName = name;
+                altName = altLookup.get(realName);
+            }else{
+                altName =name;
+                realName = altLookup.getByValue(name);
+            }
+
+            if (doOnlineExample) {
+                if (onlineExamples.containsKey(realName)) {
+                    say(onlineExamples.get(realName));
+
+                } else {
                     say("no examples for " + name);
                 }
             } else {
-                say(onlineHelp.get(name));
+                say(onlineHelp.get(realName));
+                if (altName != null) {
+                    say("Alt: " + altName + " (" + StringUtils.toUnicode(altName) + ")");
+                }
+                if(onlineExamples.containsKey(realName)){
+                    say("use -ex to see examples for this topic.");
+                }
             }
             return RC_CONTINUE;
         }
@@ -2553,6 +2581,7 @@ public class WorkspaceCommands implements Logable, Serializable {
 
     HashMap<String, String> onlineHelp = new HashMap<>();
     HashMap<String, String> onlineExamples = new HashMap<>();
+    DoubleHashMap<String, String> altLookup = new DoubleHashMap<>();
 
     /**
      * Commands are:<br>
@@ -4832,6 +4861,10 @@ public class WorkspaceCommands implements Logable, Serializable {
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element eElement = (Element) nNode;
                     String name = eElement.getAttribute("id");
+                    String altName = eElement.getAttribute("alt");
+                    if (!StringUtils.isTrivial(altName)) {
+                        altLookup.put(name, altName);
+                    }
                     Node x = eElement.getElementsByTagName("body")
                             .item(0);
                     Node child = x.getFirstChild().getNextSibling();
@@ -4842,7 +4875,7 @@ public class WorkspaceCommands implements Logable, Serializable {
                     // Process examples
                     x = eElement.getElementsByTagName("example")
                             .item(0);
-                    if(x != null){
+                    if (x != null) {
                         child = x.getFirstChild().getNextSibling();
                         cd = (CharacterData) child;
                         if (cd != null && cd.getTextContent() != null) {
