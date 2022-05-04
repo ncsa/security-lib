@@ -196,13 +196,21 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
     }
 
     public boolean evaluateOLD(Polyad polyad, State state) {
+        FunctionArgException farg = null;
         for (AbstractFunctionEvaluator evaluator : evaluators) {
-            if (evaluator.evaluate(polyad, state)) return true;
+            try {
+                if (evaluator.evaluate(polyad, state)) return true;
+            }catch(FunctionArgException functionArgException){
+                farg = functionArgException;
+            }
         }
         if (getFunctionEvaluator().evaluate(polyad, state)) {
             return true;
         }
 
+        if(farg != null){
+            throw farg;
+        }
         throw new UndefinedFunctionException("unknown function '" + polyad.getName() + "'", polyad);
     }
 

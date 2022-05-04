@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl.vfs;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 
+import java.io.Reader;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,4 +26,11 @@ public interface VFSEntry extends Serializable {
     StemVariable convertToStem();
     String getPath();
     void setPath(String newPath);
+
+    /**
+     * Special case for internal use. The file is processed and a reader is created
+     * for the content. This is used internally, e.g. the for_lines iterator.
+     * @return
+     */
+    Reader getReader();
 }

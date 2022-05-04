@@ -117,6 +117,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
     public static final String TO_BOOLEAN = "to_boolean";
     public static final int TO_BOOLEAN_TYPE = 21 + SYSTEM_BASE_VALUE;
 
+    public static final String FOR_LINES = "for_lines";
+    public static final int FOR_LINES_TYPE = 22 + SYSTEM_BASE_VALUE;
+
     // function stuff
     public static final String RETURN = "return";
     public static final int RETURN_TYPE = 100 + SYSTEM_BASE_VALUE;
@@ -218,6 +221,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                     INPUT_FORM,
                     FOR_KEYS,
                     FOR_NEXT,
+                    FOR_LINES,
                     CHECK_AFTER,
                     RETURN,
                     MODULE_IMPORT,
@@ -292,6 +296,8 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return FOR_KEYS_TYPE;
             case FOR_NEXT:
                 return FOR_NEXT_TYPE;
+            case FOR_LINES:
+                return FOR_LINES_TYPE;
             case CHECK_AFTER:
                 return CHECK_AFTER_TYPE;
             // Module stuff
@@ -333,6 +339,9 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
         boolean printIt = false;
 
         switch (polyad.getName()) {
+            case FOR_LINES:
+                doForLines(polyad, state);
+                return true;
             case FOR_NEXT:
                 doForNext(polyad, state);
                 return true;
@@ -464,6 +473,15 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
                 return true;
         }
         return false;
+    }
+
+    private void doForLines(Polyad polyad, State state) {
+        if (polyad.isSizeQuery()) {
+            polyad.setResult(new int[]{2});
+            polyad.setEvaluated(true);
+            return;
+        }
+        throw new NotImplementedException(FOR_LINES + " can only be executed in a loop");
     }
 
     private void doCheckAfter(Polyad polyad, State state) {

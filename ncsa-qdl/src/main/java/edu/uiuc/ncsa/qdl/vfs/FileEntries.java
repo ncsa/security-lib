@@ -1,6 +1,5 @@
 package edu.uiuc.ncsa.qdl.vfs;
 
-import edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator;
 import edu.uiuc.ncsa.qdl.util.QDLFileUtil;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
@@ -11,13 +10,16 @@ import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.*;
 import static edu.uiuc.ncsa.qdl.vfs.FileEntry.*;
 
 /**
@@ -56,6 +58,12 @@ public class FileEntries {
         File f = new File(zipEntry.getName());
         List<String> contents;
         int length = 0;
+        if(type == FILE_OP_READER){
+            xp.put(CONTENT_TYPE, READER_TYPE);
+            StringReader stringReader = new StringReader(new String(content));
+            xp.put(FileEntryConstants.LENGTH, content.length);
+            return new FileEntry(stringReader, xp);
+        }
         if (isBinary(f, type)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
             contents = new ArrayList<>();
@@ -76,15 +84,15 @@ public class FileEntries {
         return new FileEntry(contents, xp);
     }
 
+    public static FileEntry toEntryWithReader(String id, File f) throws Throwable {
+        XProperties xp = getXProperties(id, f);
+        return new FileEntry(new FileReader(f), xp);
+    }
+
     public static JSONObject toJSON(String id, File f, int type) throws Throwable {
-        XProperties xp = new XProperties();
-        Date ts = new Date();
-        ts.setTime(f.lastModified());
-        xp.put(FileEntryConstants.CREATE_TIME, Iso8601.date2String(ts));
-        xp.put(FileEntryConstants.LAST_MODIFIED, Iso8601.date2String(ts));
-        xp.put(FileEntryConstants.LENGTH, f.length());
-        xp.put(FileEntryConstants.ID, id);
+        XProperties xp = getXProperties(id, f);
         List<String> contents;
+
         if (isBinary(f, type)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
             contents = new ArrayList<>();
@@ -98,13 +106,26 @@ public class FileEntries {
 
     }
 
+    private static XProperties getXProperties(String id, File f) {
+        XProperties xp = new XProperties();
+        Date ts = new Date();
+        ts.setTime(f.lastModified());
+        xp.put(FileEntryConstants.CREATE_TIME, Iso8601.date2String(ts));
+        xp.put(FileEntryConstants.LAST_MODIFIED, Iso8601.date2String(ts));
+        xp.put(FileEntryConstants.LENGTH, f.length());
+        xp.put(FileEntryConstants.ID, id);
+        return xp;
+    }
+
     public static JSONObject toJSON(File f, int type) throws Throwable {
         return toJSON(f.getName(), f, type);
     }
 
     public static FileEntry fileToEntry(File file, int type) throws Throwable {
+        if(type == FILE_OP_READER){
+            return toEntryWithReader(file.getName(), file);
+        }
         return fromJSON(toJSON(file, type));
-
     }
 
     public static FileEntry fileToEntry(String path, int type) throws Throwable {
@@ -129,15 +150,15 @@ public class FileEntries {
     }
 
     public static boolean isBinary(File f, int type) throws IOException {
-        switch (type){
-            case AbstractFunctionEvaluator.FILE_OP_BINARY:
+        switch (type) {
+            case FILE_OP_BINARY:
                 return true;
-            case AbstractFunctionEvaluator.FILE_OP_TEXT_INI:
-            case AbstractFunctionEvaluator.FILE_OP_TEXT_STRING:
-            case AbstractFunctionEvaluator.FILE_OP_TEXT_STEM:
+            case FILE_OP_TEXT_INI:
+            case FILE_OP_TEXT_STRING:
+            case FILE_OP_TEXT_STEM:
                 return false;
-            case AbstractFunctionEvaluator.FILE_OP_AUTO:
-                    // pass through to system
+            case FILE_OP_AUTO:
+                // pass through to system
         }
         if (f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_FILE_EXTENSION)
                 || f.getCanonicalPath().endsWith(QDLVersion.DEFAULT_MODULE_FILE_EXTENSION)
@@ -147,7 +168,7 @@ public class FileEntries {
             return false;
         }
         String ftype = Files.probeContentType(f.toPath());
-        DebugUtil.trace(FileEntries.class,"returned file type of '" + ftype + "' for file '" + f.getCanonicalPath() + "'");
+        DebugUtil.trace(FileEntries.class, "returned file type of '" + ftype + "' for file '" + f.getCanonicalPath() + "'");
         if (ftype == null) return true; // just in case
         if (ftype.startsWith("text") ||
                 ftype.endsWith("/xml") ||
@@ -155,7 +176,7 @@ public class FileEntries {
                 ftype.endsWith("/javascript") ||
                 ftype.endsWith("/java") ||
                 ftype.endsWith("/html") ||
-                ftype.endsWith("/xhtml+xml") || 
+                ftype.endsWith("/xhtml+xml") ||
                 ftype.endsWith("/x-shellscript") ||
                 ftype.endsWith("/x-sh")
         ) return false;

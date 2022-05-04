@@ -844,18 +844,6 @@ public class QDLParserBaseListener implements QDLParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterStemVar(QDLParserParser.StemVarContext ctx) { }
 	/**
 	 * {@inheritDoc}

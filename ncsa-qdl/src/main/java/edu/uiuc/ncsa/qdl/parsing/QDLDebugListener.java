@@ -42,7 +42,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
         return "id:/" + component + "/" + decr();
     }
 
-    @Override
+/*    @Override
     public void enterSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
         say("enterSemi", ctx);
 
@@ -51,7 +51,7 @@ public class QDLDebugListener extends QDLParserBaseListener {
     @Override
     public void exitSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
         say("exitSemi", ctx);
-    }
+    }*/
 
     String indent = "  ";
 

@@ -134,7 +134,7 @@ expression
  | '(' expression ')'                                                          #association
  | expression '?' expression ':' expression                                    #altIFExpression
  | expression Backslash + expression                                           #restriction
-// | expression '&'+ expression                                                  #typeCheck
+//| expression '&'+ expression                                                  #typeCheck
 // | expression '`'+ expression                                                  #index
 // | expression '|'+ expression                                                  #stile
 // | prefix=',' expression                                                       #unravel
@@ -147,7 +147,7 @@ expression
  | Bool                                                                        #logical
  | Null                                                                        #null
  | expression  op=ASSIGN  expression                                           #assignment
- | ';'                                                                         #semi_for_empty_expressions
+ //| ';'                                                                         #semi_for_empty_expressions
  ;
                    
        variable : Identifier ;

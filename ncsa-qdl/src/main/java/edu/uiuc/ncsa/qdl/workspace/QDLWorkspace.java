@@ -67,7 +67,7 @@ public class QDLWorkspace implements Serializable {
             return;
         }
         if (t instanceof UnknownSymbolException) {
-            workspaceCommands.say("unknown symbol:" + t.getMessage() + errorStatement);
+            workspaceCommands.say(t.getMessage() + errorStatement);
             return;
         }
         if (t instanceof StackOverflowError) {

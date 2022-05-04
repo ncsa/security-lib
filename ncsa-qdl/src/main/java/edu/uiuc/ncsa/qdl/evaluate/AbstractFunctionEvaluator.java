@@ -750,7 +750,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
      * @param state
      * @return
      */
-    protected VFSEntry resolveResourceToFile(String resourceName, int type, State state) {
+    public VFSEntry resolveResourceToFile(String resourceName, int type, State state) {
         if (state.isVFSFile(resourceName)) {
             if (!state.hasVFSProviders()) {
                 throw new QDLException("unkonwn virtual file system for resource '" + resourceName + "'");
@@ -807,6 +807,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_INI = 2; //File is treated as an initialization file
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
+    public static final int FILE_OP_READER = -2; // File is returned as a Reader. This is for internal use only!
 
     /**
      * Create an unused name for a function. Note that this <i>cannot</i>

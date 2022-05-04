@@ -2,9 +2,7 @@ package edu.uiuc.ncsa.qdl.statements;
 
 import edu.uiuc.ncsa.qdl.evaluate.OpEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
-import edu.uiuc.ncsa.qdl.exceptions.BreakException;
-import edu.uiuc.ncsa.qdl.exceptions.ContinueException;
-import edu.uiuc.ncsa.qdl.exceptions.ReturnException;
+import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.Dyad;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -14,7 +12,12 @@ import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.QDLSet;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.variables.VThing;
+import edu.uiuc.ncsa.qdl.vfs.VFSEntry;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,9 +69,9 @@ public class WhileLoop implements Statement {
     public Object evaluate(State state) {
         State localState = state.newLocalState();
         //State localState = state.new;
-        if(conditional instanceof Dyad){
+        if (conditional instanceof Dyad) {
             Dyad d = (Dyad) conditional;
-            if(d.getOperatorType() == OpEvaluator.EPSILON_VALUE){
+            if (d.getOperatorType() == OpEvaluator.EPSILON_VALUE) {
                 return forKeysLoop(localState);
             }
         }
@@ -83,6 +86,8 @@ public class WhileLoop implements Statement {
                         return doForLoop(localState);
                     case CHECK_AFTER:
                         return doPostLoop(localState);
+                    case FOR_LINES:
+                        return doForLines(localState);
                 }
             }
         }
@@ -92,6 +97,92 @@ public class WhileLoop implements Statement {
         // Just evaluate it.
         return doBasicWhile(localState);
 
+    }
+
+    private Object doForLines(State localState) {
+        if (conditional.getArgCount() < 2) {
+            throw new MissingArgException(FOR_LINES + " requires two arguments", conditional.getArgCount() == 1 ? conditional.getArgAt(0) : conditional);
+        }
+        if (2 < conditional.getArgCount()) {
+            throw new ExtraArgException(FOR_LINES + " requires at most two arguments", conditional.getArgAt(2));
+
+        }
+        StatementWithResultInterface swri = conditional.getArgAt(0);
+        if (!(swri instanceof VariableNode)) {
+            throw new BadArgException(FOR_LINES + " requires a variable as its first argument", conditional.getArgAt(0));
+        }
+        VariableNode variableNode = (VariableNode) swri;
+        String loopArg = variableNode.getVariableReference();
+        Object arg2 = conditional.getArgAt(1).evaluate(localState);
+        if (!(arg2 instanceof String)) {
+            throw new BadArgException(FOR_LINES + " requires a string as its second argument", conditional.getArgAt(1));
+        }
+        String fileName = (String) arg2;
+        VFSEntry vfsEntry = null;
+        boolean hasVF = false;
+        if (localState.isVFSFile(fileName)) {
+            vfsEntry = localState.getMetaEvaluator().resolveResourceToFile(fileName, 1, localState);
+            if (vfsEntry == null) {
+                throw new QDLException("The resource '" + fileName + "' was not found in the virtual file system");
+            }
+            hasVF = true;
+        } else {
+            // Only allow for virtual file reads in server mode.
+            // If the file does not live in a VFS throw an exception.
+            if (localState.isServerMode()) {
+                throw new QDLServerModeException("File system operations not permitted in server mode.");
+            }
+        }
+        if (hasVF) {
+            /*
+             This is really bad -- it just reads it as a stem and iterates over that.
+             What should happen is that FileEntries have a case (probably op type that is
+             not available to the general public) that reads the file with a stream and
+             returns a Reader. For small files this is not important, but if this is to
+             scale up, this functionality needs to be added.
+            */
+            for (String lineIn : vfsEntry.getLines()) {
+                localState.setValue(loopArg, lineIn);
+                for (Statement statement : getStatements()) {
+                    try {
+                        statement.evaluate(localState);
+                    } catch (BreakException b) {
+                        return Boolean.TRUE;
+                    } catch (ContinueException cx) {
+                        // just continue.
+                    } catch (ReturnException rx) {
+                        return Boolean.TRUE;
+                    }
+                }
+            }
+        } else {
+            try {
+                FileReader fileReader = new FileReader(fileName);
+                BufferedReader bufferedReader = new BufferedReader(fileReader);
+                String lineIn = bufferedReader.readLine();
+                while (lineIn != null) {
+                    localState.setValue(loopArg, lineIn);
+                    for (Statement statement : getStatements()) {
+                        try {
+                            statement.evaluate(localState);
+                        } catch (BreakException b) {
+                            return Boolean.TRUE;
+                        } catch (ContinueException cx) {
+                            // just continue.
+                        } catch (ReturnException rx) {
+                            return Boolean.TRUE;
+                        }
+                    }
+                    lineIn = bufferedReader.readLine();
+                }
+                bufferedReader.close();
+            } catch (FileNotFoundException e) {
+                throw new BadArgException(FOR_LINES + " could not find file '" + fileName + "'", conditional.getArgAt(1));
+            } catch (IOException e) {
+                throw new BadArgException(FOR_LINES + " error reading file '" + fileName + "'", conditional.getArgAt(1));
+            }
+        }
+        return Boolean.TRUE;
     }
 
     protected Object doPostLoop(State localState) {
@@ -266,7 +357,7 @@ public class WhileLoop implements Statement {
         //   SymbolTable localST = localState.getVStack().getLocalST();
         // my.foo := 'bar'; my.a := 32; my.b := 'hi'; my.c := -0.432;
         //while[for_keys(j,my.)]do[say('key=' + j + ', value=' + my.j);];
-        if(isSet){
+        if (isSet) {
             for (Object element : qdlSet) {
                 localState.getVStack().localPut(new VThing(new XKey(loopVar), element));
                 for (Statement statement : getStatements()) {
@@ -282,7 +373,7 @@ public class WhileLoop implements Statement {
                 }
             }
 
-        }else{
+        } else {
             for (String key : stemVariable.keySet()) {
                 localState.getVStack().localPut(new VThing(new XKey(loopVar), key));
                 for (Statement statement : getStatements()) {

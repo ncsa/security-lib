@@ -4,6 +4,9 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +21,7 @@ public class FileEntry implements VFSEntry {
     public static String CONTENT_TYPE = "content_type";
     public static String TEXT_TYPE = "text";
     public static String BINARY_TYPE = "binary";
+    public static String READER_TYPE = "reader";
     public static String TYPE = "file";
     XProperties xp = new XProperties();
     String text;
@@ -38,6 +42,11 @@ public class FileEntry implements VFSEntry {
     public FileEntry(List<String> lines, XProperties xp) {
         this.xp = xp;
         this.lines = lines;
+    }
+
+    public FileEntry(Reader reader, XProperties xp) {
+        this.reader = reader;
+        this.xp = xp;
     }
 
     public void setLines(List<String> lines) {
@@ -141,4 +150,46 @@ public class FileEntry implements VFSEntry {
     }
 
     String path;
+
+    public void setReader(Reader reader) {
+        this.reader = reader;
+    }
+
+    Reader reader = null;
+    boolean createdReaderFromText = false;
+
+    /**
+     * In the case of actual files, the reader will be set to a {@link Reader}.
+     * In other cases (such as from a zip file or collection of lines
+     * in a memory VFS) about the best we can do is
+     * return a reader for iterating.
+     *
+     * @return
+     */
+    @Override
+    public Reader getReader() {
+        /*
+            Since readers created from sources other than files must be
+            emulated with a string, it is possible to close the reader
+            This forces the return of a valid reader in that case. If the
+            reader is from a file, then no such checks are done.
+          */
+        if (createdReaderFromText) {
+            try {
+                reader.ready();
+            } catch (IOException e) {
+                reader = new StringReader(getText());
+            }
+        }
+        if (reader == null) {
+            if (getText() == null || getText().isEmpty()) {
+                reader = new StringReader("");
+            } else {
+                reader = new StringReader(getText());
+            }
+            createdReaderFromText = true;
+        }
+
+        return reader;
+    }
 }

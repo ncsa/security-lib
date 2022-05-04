@@ -72,8 +72,9 @@ public interface PayloadHandler extends Serializable {
      */
     void finish(String execPhase)  throws Throwable;
     /**
-     * Called at the end of each block, this lets the handler save its state. E.g. if you are storing state
-     * in a database, this is where you make that call.
+     * Called at the end of each block, this lets the handler save its state. Note that for OA4MP,
+     * the state is saved in the transaction which is saved once after the handlers run. Only
+     * put actual save code in here if needed, since it is apt to get called a lot.
      */
 
     void saveState()  throws Throwable;

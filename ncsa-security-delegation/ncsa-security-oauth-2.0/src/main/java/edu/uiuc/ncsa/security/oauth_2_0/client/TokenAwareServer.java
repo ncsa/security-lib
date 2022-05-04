@@ -85,7 +85,7 @@ public abstract class TokenAwareServer extends ASImpl {
 
         JSONObject claims;
         if (!jsonObject.containsKey(ID_TOKEN)) {
-            throw new GeneralException("Error: Missing id token.");
+            throw new GeneralException("Error: ID Token not found.");
         }
         claims = JWTUtil.verifyAndReadJWT(jsonObject.getString(ID_TOKEN), keys);
         if (claims.isNullObject()) {
@@ -95,14 +95,14 @@ public abstract class TokenAwareServer extends ASImpl {
         }
         // Now we have to check claims.
         if(!claims.containsKey(AUDIENCE)){
-            throw new GeneralException("Error: Missing " + AUDIENCE + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException("Error: ID Token missing " + AUDIENCE + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
         if (!claims.getString(AUDIENCE).equals(atRequest.getClient().getIdentifierString())) {
-            throw new GeneralException("Error: Audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException("Error: ID Token audience is incorrect. Expected \"" + claims.getString(AUDIENCE) + "\", got \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         if(!claims.containsKey(ISSUER)){
-            throw new GeneralException("Error: Missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
+            throw new GeneralException("Error: ID Token missing " + ISSUER + " claim for \"" + atRequest.getClient().getIdentifierString() + "\"");
         }
 
         try {
@@ -111,18 +111,18 @@ public abstract class TokenAwareServer extends ASImpl {
             if (!host.getProtocol().equals(remoteHost.getProtocol()) ||
                     !host.getHost().equals(remoteHost.getHost()) ||
                     host.getPort() != remoteHost.getPort()) {
-                throw new GeneralException("Error: Issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
+                throw new GeneralException("Error: ID Token issuer is incorrect. Got \"" + remoteHost + "\", expected \"" + host + "\"");
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
         if (!claims.containsKey(EXPIRATION)) {
-            throw new GeneralException("Error: Claims failed to have required expiration");
+            throw new GeneralException("Error: ID Token claims failed to have required expiration");
         }
         long exp = Long.parseLong(claims.getString(EXPIRATION)) * 1000L; // convert to ms.
         if (exp <= System.currentTimeMillis()) {
-            throw new GeneralException("Error: expired claim.");
+            throw new GeneralException("Error: ID Token expired claims.");
         }
         return claims;
     }

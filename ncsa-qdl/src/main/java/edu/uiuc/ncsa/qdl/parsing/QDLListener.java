@@ -487,12 +487,8 @@ public class QDLListener implements QDLParserListener {
 
     @Override
     public void exitAddExpression(QDLParserParser.AddExpressionContext ctx) {
-        Dyad dyad;
-        if (ctx.Minus() != null) {
-            dyad = new Dyad(OpEvaluator.MINUS_VALUE, tp(ctx));
-        } else {
-            dyad = new Dyad(OpEvaluator.PLUS_VALUE, tp(ctx));
-        }
+        boolean isMinus = ctx.Minus() != null;
+        Dyad dyad = new Dyad(isMinus ? OpEvaluator.MINUS_VALUE : OpEvaluator.PLUS_VALUE, tp(ctx));
         stash(ctx, dyad);
         finish(dyad, ctx);
     }
@@ -530,7 +526,7 @@ public class QDLListener implements QDLParserListener {
     }
 
 
-    @Override
+/*    @Override
     public void enterSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
 
     }
@@ -539,7 +535,7 @@ public class QDLListener implements QDLParserListener {
     public void exitSemi_for_empty_expressions(QDLParserParser.Semi_for_empty_expressionsContext ctx) {
 
 
-    }
+    }*/
 
     @Override
     public void enterElement(QDLParserParser.ElementContext ctx) {

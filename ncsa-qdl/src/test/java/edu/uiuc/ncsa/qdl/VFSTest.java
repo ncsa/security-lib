@@ -13,12 +13,14 @@ import edu.uiuc.ncsa.security.storage.sql.derby.DerbyConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionParameters;
 import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_AUTO;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_READER;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
@@ -275,6 +277,13 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
+        // And now the reader
+        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
+        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
+
         vfs.setScheme("w00fity");
         testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
         assert testHeadPath.startsWith("w00fity" + SCHEME_DELIMITER);
@@ -285,6 +294,13 @@ public class VFSTest extends AbstractQDLTester {
         entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
+
+        // And now the reader
+         entry1 = vfs.get(p, FILE_OP_READER);
+         bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
 
         // clean up
         vfs.delete(p);
@@ -309,6 +325,12 @@ public class VFSTest extends AbstractQDLTester {
         VFSEntry entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
+        // And now the reader
+        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
+        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
 
         vfs.setScheme("fnord");
         vfs.setMountPoint("blarg");
@@ -323,6 +345,12 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
+        // And now the reader
+         entry1 = vfs.get(p, FILE_OP_READER);
+         bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
 
         // clean up
         vfs.delete(p);
@@ -351,7 +379,12 @@ public class VFSTest extends AbstractQDLTester {
         VFSEntry entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
-
+        // And now the reader
+        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
+        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
 
         vfs.setMountPoint(PATH_SEPARATOR + "w00f");
         testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
@@ -363,7 +396,12 @@ public class VFSTest extends AbstractQDLTester {
         entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
-
+        // And now the reader
+        entry1 = vfs.get(p, FILE_OP_READER);
+        bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
         // let's beat a dead horse and do it again
         vfs.setMountPoint("/onomatopoeia");
         testHeadPath = vfs.getScheme() + SCHEME_DELIMITER + vfs.getMountPoint();
@@ -375,7 +413,12 @@ public class VFSTest extends AbstractQDLTester {
         entry = vfs.get(p, FILE_OP_AUTO);
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
-
+        // And now the reader
+        entry1 = vfs.get(p, FILE_OP_READER);
+        bufferedReader = new BufferedReader(entry1.getReader());
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
+        assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
+        bufferedReader.close();
         // clean up
         vfs.delete(p);
         assert !vfs.contains(p) : "Could not delete file from store";

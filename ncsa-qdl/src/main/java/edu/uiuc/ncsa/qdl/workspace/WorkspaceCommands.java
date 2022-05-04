@@ -3700,6 +3700,7 @@ public class WorkspaceCommands implements Logable, Serializable {
             ECHO,
             ENABLE_LIBRARY_SUPPORT,
             EXTERNAL_EDITOR,
+            OVERWRITE_BASE_FUNCTIONS_ON,
             SHORT_EXTERNAL_EDITOR,
             LIB_PATH_TAG,
             PRETTY_PRINT,

@@ -13,6 +13,7 @@
  <![CDATA[date_ms() - current date in milliseconds
 date_ms(arg) - if arg is an integer, return it, if it is a string
                in ISO 8601 format.
+
 See also: date_iso]]>
         </body>
     </entry>
@@ -21,6 +22,7 @@ See also: date_iso]]>
  <![CDATA[date_iso() - return the current date as an ISO 8601 formatted string
 date_iso(arg) - if arg is an integer, convert it to an ISO string.
                 If it is an ISO string, return it.
+
 See also: date_ms]]>
         </body>
     </entry>
@@ -30,6 +32,7 @@ See also: date_ms]]>
  <![CDATA[decode_b64(arg) - decode a base 64 encoded string or stem of strings to string(s).
                   Note that if the arg is encoded binary, you will get
                   gibberish back.
+
 See also: encode_b64]]>
         </body>
     </entry>
@@ -2237,7 +2240,8 @@ b is assigned the value of a. Note that the colon goes next to the variable.]]>
 
     <entry id="{}" alt="∅">
         <body>
- <![CDATA[The empty or null set.]]>
+ <![CDATA[The empty or null set. This is the set with no elements. It is a proper
+subset of every set except itself.]]>
         </body>
     </entry>
     <entry id="&lt;=" alt="≤">
@@ -2281,6 +2285,7 @@ Standard    Unicode   ALT   escape code    What is it
 *              ×       *    \u00d7         multiplication
 /              ÷       /    \u00f7         division
 +              ⁺       +    \u207a         unary plus
+assert[][]     ⊨       a    \u22a8         assert
 ->             →       d    \u2192         lambda function
 %              ∆       D    \u2206         symmetric difference operator
                ∈       e    \u2208         is member of
@@ -2299,7 +2304,6 @@ Standard    Unicode   ALT   escape code    What is it
 >=             ≥       >    \u2265         greater than or equals
 ~|             ≁       ~    \u2241         last axis join
 @              ⊗       @    \u2297         function reference
-assert[][]     ⊨       A    \u22a8         assert
 [|             ⟦       {    \u27e6         left closed slice bracket
 |]             ⟧       }    \u27e7         right closed slice bracket
 ceiling        ⌈       k    \u2308         ceiling
@@ -2837,7 +2841,18 @@ define[
 
 Comments will be displayed in system help under
 
-)help name arg_count]]>
+)help name arg_count
+
+N.B. Using the define statement automatically encloses the state of any
+variables and other functions so they are not visible. Lambda functions
+however access the ambient state. So
+   a:=2;
+   f(x)->a*x^2;
+   f(3)
+18
+   define[g(x)][return(a*x^2);]
+   g(3)
+unknown symbol 'a' at (1, 20)]]>
         </body>
     </entry>
 
@@ -3812,9 +3827,71 @@ true
 
 You cannot compare stems as aggregates, since these work on the elements:
    [2/3, 'doats', {1,2}] < [3/7, 'mairzy doats', {1,2,3}]
-[false,true,true]]]>
+[false,true,true]
+
+each element uses < in a different way, to test as a number, substring and subset.]]>
        </body>
     </entry>
+    <entry id="for_lines">
+       <body>
+  <![CDATA[for_lines(var, file_path) - read lines one at a time.
+
+  This is available only in loops. It is intended for larger files to
+  allow line by line processing when reading the entire file into memory
+  as a stem or string is too expensive.
+  ]]>
+       </body>
+       <example>
+   <![CDATA[This example reads a simple file
+     while[for_lines(x, '/tmp/haiku.txt')][say(x);]
+From the Cat
+
+In the morning light,
+You sleep despite my meow.
+I stand on your face.]]>
+        </example>
+    </entry>
+    <entry id="keyboard">
+       <body>
+<![CDATA[This chart represents a standard US 101 keyboard with added characters
+for ANSI mode.
+It is done per row so for each row you have
+
+  shift
+  alt
+base
+alt
+
+And each key is separated by |'s
+
+ E.g.
+   alt + = yields ≡
+   alt + & == alt + shift + 7 yields ∧
+
+  ~ |  ! |  @ |  # |  $ |  % |  ^ |  & |  * |  ( |  ) |  _ |  + |
+  ≁ |  ¬ |  ⊗ |    |    |  ∆ |    |  ∧ |  × |    |    |    |  ⁺ |
+`   |1   |2   |3   |4   |5   |6   |7   |8   |9   |0   |-   |=   |
+    |    |    |    |    |    |    |    |    |    |    |¯   |≡   |
+
+  Q |  W |  E  |  R |  T |  Y |  U |  I |  O |  P |  { |  } |  | |
+    |    |  ∉  |    |    |    |    |    |    |    |    |    |  ∨ |
+q   |w   |e    |r   |t   |y   |u   |i   |o   |p   |[   |]   |\   |
+    |    |∈    |    |τ   |    |∪   |∩   |    |π   |⟦   |⟧   | ≠  |
+
+  A |  S |  D |  F |  G |  H |  J |  K |  L |  : |  " |
+    |    |    |    |    |    |    |    |    |  ≔ |  ≕ |
+a   |s   |d   |f   |g   |h   |j   |k   |l   |;   |'   |
+⊨   |⊢   |→   |    |    |    |    |⌈   |⌊   |    |    |
+
+  Z |  X |  C |  V |  B |  N |  M |  < |  > |  ? |
+    |    |    |    |    |    |    |  ≤ |  ≥ |  ≈ |
+z   |x   |c   |v   |b   |n   |m   |,   |.   |/   |
+    |    |    |    |    |∅   |    |    |    |    |
+See also: unicode, greek]]>
+       </body>
+
+    </entry>
+
     <!--
         entry template
     -->
@@ -3832,3 +3909,4 @@ You cannot compare stems as aggregates, since these work on the elements:
           -->
 </help>
 
+                                      

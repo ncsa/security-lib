@@ -48,7 +48,7 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('¯');
                     case '.':
                         return new KeyStroke('·');
-                    case 'A':
+                    case 'a':
                         return new KeyStroke('⊨');
                     case 't':
                         return new KeyStroke('τ');
@@ -62,8 +62,6 @@ public class QDLTerminal extends ISO6429Terminal {
                         return new KeyStroke('∉');
                     case 'i':
                         return new KeyStroke('∩');
-                 /*   case 'F':
-                        return new KeyStroke('⊥');*/
                     case 'l':
                         return new KeyStroke('⌊');
                     case 'k':
