@@ -15,12 +15,13 @@ import edu.uiuc.ncsa.security.storage.sql.mysql.MySQLConnectionPool;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_AUTO;
-import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_READER;
+import static edu.uiuc.ncsa.qdl.evaluate.AbstractFunctionEvaluator.FILE_OP_INPUT_STREAM;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.PATH_SEPARATOR;
 import static edu.uiuc.ncsa.qdl.vfs.VFSPaths.SCHEME_DELIMITER;
 
@@ -278,8 +279,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
         // And now the reader
-        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
-        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        VFSEntry entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -296,8 +297,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
         // And now the reader
-         entry1 = vfs.get(p, FILE_OP_READER);
-         bufferedReader = new BufferedReader(entry1.getReader());
+         entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -326,8 +327,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
         // And now the reader
-        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
-        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        VFSEntry entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -346,8 +347,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
 
         // And now the reader
-         entry1 = vfs.get(p, FILE_OP_READER);
-         bufferedReader = new BufferedReader(entry1.getReader());
+         entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -380,8 +381,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
         // And now the reader
-        VFSEntry entry1 = vfs.get(p, FILE_OP_READER);
-        BufferedReader bufferedReader = new BufferedReader(entry1.getReader());
+        VFSEntry entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -397,8 +398,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
         // And now the reader
-        entry1 = vfs.get(p, FILE_OP_READER);
-        bufferedReader = new BufferedReader(entry1.getReader());
+        entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();
@@ -414,8 +415,8 @@ public class VFSTest extends AbstractQDLTester {
         assert entry.getLines().get(0).equals(fileEntry.getLines().get(0));
         assert entry.getLines().get(1).equals(fileEntry.getLines().get(1));
         // And now the reader
-        entry1 = vfs.get(p, FILE_OP_READER);
-        bufferedReader = new BufferedReader(entry1.getReader());
+        entry1 = vfs.get(p, FILE_OP_INPUT_STREAM);
+        bufferedReader = new BufferedReader(new InputStreamReader(entry1.getInputStream()));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(0));
         assert bufferedReader.readLine().equals(fileEntry.getLines().get(1));
         bufferedReader.close();

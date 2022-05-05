@@ -807,7 +807,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     public static final int FILE_OP_TEXT_STEM = 1; //File is treated as a stem of lines
     public static final int FILE_OP_TEXT_INI = 2; //File is treated as an initialization file
     public static final int FILE_OP_TEXT_STRING = -1; // File is treated as one long string
-    public static final int FILE_OP_READER = -2; // File is returned as a Reader. This is for internal use only!
+    public static final int FILE_OP_INPUT_STREAM = -2; // File is returned as a Reader. This is for internal use only!
 
     /**
      * Create an unused name for a function. Note that this <i>cannot</i>

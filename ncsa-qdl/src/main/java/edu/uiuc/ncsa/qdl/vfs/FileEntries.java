@@ -9,10 +9,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,11 +55,11 @@ public class FileEntries {
         File f = new File(zipEntry.getName());
         List<String> contents;
         int length = 0;
-        if(type == FILE_OP_READER){
-            xp.put(CONTENT_TYPE, READER_TYPE);
-            StringReader stringReader = new StringReader(new String(content));
+        if(type == FILE_OP_INPUT_STREAM){
+            xp.put(CONTENT_TYPE, INPUT_STREAM_TYPE);
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(content);
             xp.put(FileEntryConstants.LENGTH, content.length);
-            return new FileEntry(stringReader, xp);
+            return new FileEntry(inputStream, xp);
         }
         if (isBinary(f, type)) {
             xp.put(CONTENT_TYPE, BINARY_TYPE);
@@ -84,9 +81,9 @@ public class FileEntries {
         return new FileEntry(contents, xp);
     }
 
-    public static FileEntry toEntryWithReader(String id, File f) throws Throwable {
+    public static FileEntry toEntryWithInputStream(String id, File f) throws Throwable {
         XProperties xp = getXProperties(id, f);
-        return new FileEntry(new FileReader(f), xp);
+        return new FileEntry(new FileInputStream(f), xp);
     }
 
     public static JSONObject toJSON(String id, File f, int type) throws Throwable {
@@ -122,8 +119,8 @@ public class FileEntries {
     }
 
     public static FileEntry fileToEntry(File file, int type) throws Throwable {
-        if(type == FILE_OP_READER){
-            return toEntryWithReader(file.getName(), file);
+        if(type == FILE_OP_INPUT_STREAM){
+            return toEntryWithInputStream(file.getName(), file);
         }
         return fromJSON(toJSON(file, type));
     }

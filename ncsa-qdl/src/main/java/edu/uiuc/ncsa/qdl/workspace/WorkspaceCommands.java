@@ -2488,6 +2488,7 @@ public class WorkspaceCommands implements Logable, Serializable {
         }
         if (name.equals(ONLINE_HELP_COMMAND)) {
             TreeSet<String> treeSet = new TreeSet<>();
+            // For display in full listing
             for (String key : onlineHelp.keySet()) {
                 if (altLookup.containsKey(key)) {
                     treeSet.add(key + " (" + altLookup.get(key) + ")");
@@ -2527,7 +2528,11 @@ public class WorkspaceCommands implements Logable, Serializable {
             } else {
                 say(onlineHelp.get(realName));
                 if (altName != null) {
-                    say("Alt: " + altName + " (" + StringUtils.toUnicode(altName) + ")");
+                    String altKey = null;
+                    if(QDLTerminal.getCharLookupMap().containsKey(altName)){
+                             altKey = QDLTerminal.getCharLookupMap().get(altName);
+                    }
+                    say("unicode: " + altName + " (" + StringUtils.toUnicode(altName) + ")" + (altKey==null?"":", alt + " + altKey));
                 }
                 if(onlineExamples.containsKey(realName)){
                     say("use -ex to see examples for this topic.");

@@ -4,9 +4,8 @@ import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import org.apache.commons.codec.binary.Base64;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class FileEntry implements VFSEntry {
     public static String CONTENT_TYPE = "content_type";
     public static String TEXT_TYPE = "text";
     public static String BINARY_TYPE = "binary";
-    public static String READER_TYPE = "reader";
+    public static String INPUT_STREAM_TYPE = "input_stream";
     public static String TYPE = "file";
     XProperties xp = new XProperties();
     String text;
@@ -44,8 +43,8 @@ public class FileEntry implements VFSEntry {
         this.lines = lines;
     }
 
-    public FileEntry(Reader reader, XProperties xp) {
-        this.reader = reader;
+    public FileEntry(InputStream inputStream, XProperties xp) {
+        this.inputStream = inputStream;
         this.xp = xp;
     }
 
@@ -151,45 +150,36 @@ public class FileEntry implements VFSEntry {
 
     String path;
 
-    public void setReader(Reader reader) {
-        this.reader = reader;
+    public void setInputStream(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    Reader reader = null;
-    boolean createdReaderFromText = false;
+    InputStream inputStream = null;
 
     /**
      * In the case of actual files, the reader will be set to a {@link Reader}.
      * In other cases (such as from a zip file or collection of lines
      * in a memory VFS) about the best we can do is
-     * return a reader for iterating.
+     * return a reader for iterating. Note that you should get this once
+     * and use it until you close it. This is because there are no well
+     * defined ways in Java to check if a generic {@link InputStream} has
+     * been closed without trying something (like reading some bytes) and
+     * seeing if it throws an exception. Therefore, this will take the backing
+     * set of lines and return a new byte array output stream every time.
      *
      * @return
      */
     @Override
-    public Reader getReader() {
-        /*
-            Since readers created from sources other than files must be
-            emulated with a string, it is possible to close the reader
-            This forces the return of a valid reader in that case. If the
-            reader is from a file, then no such checks are done.
-          */
-        if (createdReaderFromText) {
-            try {
-                reader.ready();
-            } catch (IOException e) {
-                reader = new StringReader(getText());
-            }
-        }
-        if (reader == null) {
+    public InputStream getInputStream() {
+
+        if (inputStream == null) {
             if (getText() == null || getText().isEmpty()) {
-                reader = new StringReader("");
+                return new ByteArrayInputStream(new byte[]{});
             } else {
-                reader = new StringReader(getText());
+                return new ByteArrayInputStream(getText().getBytes(StandardCharsets.UTF_8));
             }
-            createdReaderFromText = true;
         }
 
-        return reader;
+        return inputStream;
     }
 }
