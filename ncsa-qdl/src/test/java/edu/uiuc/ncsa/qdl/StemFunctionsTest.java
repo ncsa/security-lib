@@ -902,22 +902,22 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListAppend() throws Throwable {
-        StemList<StemEntry> stemList1 = new StemList();
-        StemList<StemEntry> stemList2 = new StemList();
+        QDLList<SparseEntry> qdlList1 = new QDLList();
+        QDLList<SparseEntry> qdlList2 = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
-            stemList1.add(new StemEntry(i, i / 10.0));
+            qdlList1.add(new SparseEntry(i, i / 10.0));
         }
         for (long i = 0L; i < count2; i++) {
-            stemList2.add(new StemEntry(i, i * i));
+            qdlList2.add(new SparseEntry(i, i * i));
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
-        stem1.setStemList(stemList1);
-        stem2.setStemList(stemList2);
+        stem1.setStemList(qdlList1);
+        stem2.setStemList(qdlList2);
         stem1.listAppend(stem2);
-        StemList<StemEntry> result = stem1.getStemList();
+        QDLList<SparseEntry> result = stem1.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0.0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 0L, 1L, 4L, 9L, 16L};
         assert stem1.size() == count1 + count2;
@@ -928,22 +928,22 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListCopy() throws Throwable {
-        StemList<StemEntry> stemList1 = new StemList();
-        StemList<StemEntry> stemList2 = new StemList();
+        QDLList<SparseEntry> qdlList1 = new QDLList();
+        QDLList<SparseEntry> qdlList2 = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
-            stemList1.add(new StemEntry(i, i / 10.0));
+            qdlList1.add(new SparseEntry(i, i / 10.0));
         }
         for (long i = 0L; i < count2; i++) {
-            stemList2.add(new StemEntry(i, i * i));
+            qdlList2.add(new SparseEntry(i, i * i));
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
-        stem1.setStemList(stemList1);
-        stem2.setStemList(stemList2);
+        stem1.setStemList(qdlList1);
+        stem2.setStemList(qdlList2);
         stem1.listCopy(3, 5, stem2, 2);
-        StemList<StemEntry> result = stem2.getStemList();
+        QDLList<SparseEntry> result = stem2.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, .3, .4, .5, .6, .7};
         for (int i = 0; i < expectedValues.length; i++) {
@@ -953,8 +953,8 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListInsert() throws Throwable {
-        StemList<StemEntry> sourceSL = new StemList();
-        StemList<StemEntry> targetSL = new StemList();
+        QDLList<SparseEntry> sourceSL = new QDLList();
+        QDLList<SparseEntry> targetSL = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
@@ -968,7 +968,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.setStemList(sourceSL);
         targetStem.setStemList(targetSL);
         sourceStem.listInsertAt(2, 5, targetStem, 3);
-        StemList<StemEntry> result = targetStem.getStemList();
+        QDLList<SparseEntry> result = targetStem.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, 4L, .2, .3, .4, .5, .6, 9L, 16L};
         assert result.size() == count2 + 5; // original plus number inserted
@@ -979,7 +979,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListSubset() throws Throwable {
-        StemList<StemEntry> sourceSL = new StemList();
+        QDLList<SparseEntry> sourceSL = new QDLList();
         long count1 = 10L;
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
@@ -987,7 +987,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StemVariable sourceStem = new StemVariable();
         sourceStem.setStemList(sourceSL);
         StemVariable targetStem = sourceStem.listSubset(2, 3);
-        StemList<StemEntry> result = targetStem.getStemList();
+        QDLList<SparseEntry> result = targetStem.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{22L, 23L, 24L};
         assert result.size() == 3; // original plus number inserted
@@ -998,7 +998,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListSubset2() throws Throwable {
-        StemList<StemEntry> sourceSL = new StemList();
+        QDLList<SparseEntry> sourceSL = new QDLList();
         long count1 = 10L;
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
@@ -1007,7 +1007,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.setStemList(sourceSL);
         // Test copying the tail of the list from the given index.
         StemVariable targetStem = sourceStem.listSubset(7);
-        StemList<StemEntry> result = targetStem.getStemList();
+        QDLList<SparseEntry> result = targetStem.getStemList();
         // should return sorted set
         Object expectedValues[] = new Object[]{27L, 28L, 29L};
         assert result.size() == 3; // original plus number inserted

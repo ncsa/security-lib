@@ -465,7 +465,7 @@ public class VFSTest extends AbstractQDLTester {
                     getXp().getString(DERBY + PASSWORD).trim(),
                     getXp().getString(DERBY + DATABASE).trim(),
                     getXp().getString(DERBY + SCHEMA).trim(),
-                    "locahost",
+                    "localhost",
                     1527,
                     "org.apache.derby.jdbc.EmbeddedDriver",
                     false,

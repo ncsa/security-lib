@@ -620,9 +620,9 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         @Override
         public Object action(StemVariable inStem) {
             StemVariable output = new StemVariable();
-            Iterator<StemEntry> iterator = inStem.getStemList().descendingIterator();
+            Iterator<SparseEntry> iterator = inStem.getStemList().descendingIterator();
             while (iterator.hasNext()) {
-                StemEntry s = iterator.next();
+                SparseEntry s = iterator.next();
                 output.listAppend(s.entry);
             }
             return output;

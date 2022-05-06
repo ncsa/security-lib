@@ -37,12 +37,12 @@ public class StemConverter {
      }
     public static StemVariable convert(JSONArray array) {
         StemVariable out = new StemVariable();
-        StemList<StemEntry> stemList = new StemList<>();
+        QDLList<SparseEntry> qdlList = new QDLList<>();
 
         for (int i = 0; i < array.size(); i++) {
-            stemList.append(new StemEntry(i, convert(array.get(i))));
+            qdlList.append(new SparseEntry(i, convert(array.get(i))));
         }
-        out.setStemList(stemList);
+        out.setStemList(qdlList);
         return out;
     }
     public static StemVariable convert(JSONObject object) {

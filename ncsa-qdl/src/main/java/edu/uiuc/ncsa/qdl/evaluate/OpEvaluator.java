@@ -473,12 +473,12 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             }
             outStem = outStem.union(stem0); // copy over elements
             long index = -1L;
-            StemEntry stemEntry;
+            SparseEntry sparseEntry;
             if (!outStem.getStemList().isEmpty()) {
-                stemEntry = outStem.getStemList().last();
-                index = stemEntry.index;
+                sparseEntry = outStem.getStemList().last();
+                index = sparseEntry.index;
             }
-            StemEntry newEntry = new StemEntry(index + 1, set);
+            SparseEntry newEntry = new SparseEntry(index + 1, set);
 
             outStem.getStemList().add(newEntry);
             dyad.setResult(outStem);

@@ -11,7 +11,7 @@ import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.variables.Constant;
 import edu.uiuc.ncsa.qdl.variables.QDLNull;
-import edu.uiuc.ncsa.qdl.variables.StemEntry;
+import edu.uiuc.ncsa.qdl.variables.SparseEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.security.core.configuration.XProperties;
 import edu.uiuc.ncsa.security.core.util.DebugUtil;
@@ -89,10 +89,10 @@ public class XMLUtils implements XMLConstants {
         xsw.writeEndElement();
     }
 
-    public static void write(XMLStreamWriter xsw, StemEntry stemEntry) throws XMLStreamException {
+    public static void write(XMLStreamWriter xsw, SparseEntry sparseEntry) throws XMLStreamException {
         xsw.writeStartElement(STEM_ENTRY_TAG);
-        xsw.writeAttribute(LIST_INDEX_ATTR, Long.toString(stemEntry.index));
-        write(xsw, stemEntry.entry);
+        xsw.writeAttribute(LIST_INDEX_ATTR, Long.toString(sparseEntry.index));
+        write(xsw, sparseEntry.entry);
         xsw.writeEndElement();
     }
 
@@ -326,8 +326,8 @@ public class XMLUtils implements XMLConstants {
     }
 
     public static void write(XMLStreamWriter xsw, Object obj) throws XMLStreamException {
-        if (obj instanceof StemEntry) {
-            write(xsw, (StemEntry) obj);
+        if (obj instanceof SparseEntry) {
+            write(xsw, (SparseEntry) obj);
             return;
         }
         switch (Constant.getType(obj)) {

@@ -1526,8 +1526,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 if (!fillStem.isList()) {
                     throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount()-1)); // last arg is fill list
                 }
-                StemList stemList = fillStem.getStemList();
-                fill = stemList.toArray(true, false);
+                QDLList qdlList = fillStem.getStemList();
+                fill = qdlList.toArray(true, false);
                 cyclicArgList = new CyclicArgList(fill);
 
                 hasFill = true;
@@ -1608,14 +1608,14 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (size < 0L) {
             throw new IndexError("negative index encountered", polyad);
         }
-        StemList stemList;
+        QDLList qdlList;
         if (hasFill) {
-            stemList = new StemList(size, cyclicArgList.next((int) size));
+            qdlList = new QDLList(size, cyclicArgList.next((int) size));
         } else {
-            stemList = new StemList(size);
+            qdlList = new QDLList(size);
         }
         StemVariable out = new StemVariable();
-        out.setStemList(stemList);
+        out.setStemList(qdlList);
         return out;
     }
 

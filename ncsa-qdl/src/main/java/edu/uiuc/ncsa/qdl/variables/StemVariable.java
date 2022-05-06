@@ -26,18 +26,18 @@ import static edu.uiuc.ncsa.qdl.variables.StemConverter.convert;
 public class StemVariable extends HashMap<String, Object> {
     public static final String STEM_INDEX_MARKER = ".";
 
-    public StemList<StemEntry> getStemList() {
-        if (stemList == null) {
-            stemList = new StemList();
+    public QDLList<SparseEntry> getStemList() {
+        if (qdlList == null) {
+            qdlList = new QDLList();
         }
-        return stemList;
+        return qdlList;
     }
 
-    public void setStemList(StemList<StemEntry> stemList) {
-        this.stemList = stemList;
+    public void setStemList(QDLList<SparseEntry> qdlList) {
+        this.qdlList = qdlList;
     }
 
-    StemList<StemEntry> stemList;
+    QDLList<SparseEntry> qdlList;
 
     // Convenience methods.
     public Long getLong(String key) {
@@ -190,7 +190,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public StemVariable(Long count, Object[] fillList) {
-        StemList s = new StemList(count, fillList);
+        QDLList s = new QDLList(count, fillList);
         setStemList(s);
     }
 
@@ -223,8 +223,8 @@ public class StemVariable extends HashMap<String, Object> {
             startIndex = getStemList().last().index;
         }
         for (int i = 0; i < list.size(); i++) {
-            StemEntry stemEntry = new StemEntry(i + startIndex + 1, list.get(i));
-            getStemList().add(stemEntry);
+            SparseEntry sparseEntry = new SparseEntry(i + startIndex + 1, list.get(i));
+            getStemList().add(sparseEntry);
         }
     }
 
@@ -533,7 +533,7 @@ public class StemVariable extends HashMap<String, Object> {
             // if it is just a list, return it asap.
             return getStemList().toJSON(escapeNames);
         }
-        StemList<StemEntry> localSL = new StemList<>();
+        QDLList<SparseEntry> localSL = new QDLList<>();
         localSL.addAll(getStemList());
         QDLCodec codec = new QDLCodec();
 
@@ -552,10 +552,10 @@ public class StemVariable extends HashMap<String, Object> {
                     newKey = key.substring(0, key.length() - 1);
                 }
                 if (isLongIndex(newKey)) {
-                    StemEntry stemEntry = new StemEntry(Long.parseLong(newKey));
-                    if (!localSL.contains(stemEntry)) {
-                        stemEntry.entry = x;
-                        localSL.add(stemEntry);
+                    SparseEntry sparseEntry = new SparseEntry(Long.parseLong(newKey));
+                    if (!localSL.contains(sparseEntry)) {
+                        sparseEntry.entry = x;
+                        localSL.add(sparseEntry);
                     } else {
                         throw new IndexError("The stem contains a list element '" + newKey + "' " +
                                 "and a stem entry '" + key + "'. This is not convertible to a JSON Object", null);
@@ -611,7 +611,7 @@ public class StemVariable extends HashMap<String, Object> {
             // if it is just a list, return it asap.
             return getStemList().toJSON();
         }
-        StemList<StemEntry> localSL = new StemList<>();
+        QDLList<SparseEntry> localSL = new QDLList<>();
         localSL.addAll(getStemList());
         QDLCodec codec = new QDLCodec();
 
@@ -625,10 +625,10 @@ public class StemVariable extends HashMap<String, Object> {
                 // compound object
                 String newKey = key.substring(0, key.length() - 1);
                 if (isLongIndex(newKey)) {
-                    StemEntry stemEntry = new StemEntry(Long.parseLong(newKey));
-                    if (!localSL.contains(stemEntry)) {
-                        stemEntry.entry = x;
-                        localSL.add(stemEntry);
+                    SparseEntry sparseEntry = new SparseEntry(Long.parseLong(newKey));
+                    if (!localSL.contains(sparseEntry)) {
+                        sparseEntry.entry = x;
+                        localSL.add(sparseEntry);
                     } else {
                         throw new IndexError("the stem contains a list element '" + newKey + "' " +
                                 "and a stem entry '" + key + "'. This is not convertible to a JSON Object",null);
@@ -747,7 +747,7 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     protected StemVariable oldfromJSON(JSONArray array) {
-        StemList<StemEntry> sl = new StemList<>();
+        QDLList<SparseEntry> sl = new QDLList<>();
         for (int i = 0; i < array.size(); i++) {
             Object v = array.get(i);
             if (v instanceof JSONObject) {
@@ -758,7 +758,7 @@ public class StemVariable extends HashMap<String, Object> {
                     StemVariable x = new StemVariable();
                     put(i + STEM_INDEX_MARKER, x.fromJSON((JSONArray) v));
                 } else {
-                    sl.add(new StemEntry(i, v));
+                    sl.add(new SparseEntry(i, v));
                 }
             }
         }
@@ -809,9 +809,9 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public Object put(Long index, Object value) {
-        StemEntry stemEntry = new StemEntry(index, value);
-        getStemList().remove(stemEntry);
-        getStemList().add(stemEntry);
+        SparseEntry sparseEntry = new SparseEntry(index, value);
+        getStemList().remove(sparseEntry);
+        getStemList().add(sparseEntry);
         return null;
     }
 
@@ -856,7 +856,7 @@ public class StemVariable extends HashMap<String, Object> {
                     return list;
                 }
             }
-        } catch (StemList.seGapException x) {
+        } catch (QDLList.seGapException x) {
             //rock on
         }
 //        String blanks = "                                                           ";
@@ -884,7 +884,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         if (list == null) {
             // now for any list
-            for (StemEntry entry : getStemList()) {
+            for (SparseEntry entry : getStemList()) {
                 if (isFirst) {
                     isFirst = false;
                 } else {
@@ -976,7 +976,7 @@ public class StemVariable extends HashMap<String, Object> {
                     return list;
                 }
             }
-        } catch (StemList.seGapException x) {
+        } catch (QDLList.seGapException x) {
             //rock on. Just means the list is sparse so use full notation.
         }
         if(isEmpty()){
@@ -1033,7 +1033,7 @@ public class StemVariable extends HashMap<String, Object> {
                     return list;
                 }
             }
-        } catch (StemList.seGapException x) {
+        } catch (QDLList.seGapException x) {
             //rock on. Just means the list is sparse so use full notation.
         }
 
@@ -1080,7 +1080,7 @@ public class StemVariable extends HashMap<String, Object> {
                     return list;
                 }
             }
-        } catch (StemList.seGapException x) {
+        } catch (QDLList.seGapException x) {
             //rock on
         }
         //        String blanks = "                                                           ";
@@ -1103,7 +1103,7 @@ public class StemVariable extends HashMap<String, Object> {
         }
         if (list == null) {
             // now for any list
-            for (StemEntry entry : getStemList()) {
+            for (SparseEntry entry : getStemList()) {
                 if (isFirst) {
                     isFirst = false;
                 } else {
@@ -1154,7 +1154,7 @@ public class StemVariable extends HashMap<String, Object> {
             return h;
         }
         if (super.keySet().isEmpty()) {
-            for (StemEntry s : getStemList()) {
+            for (SparseEntry s : getStemList()) {
                 h.add(Long.toString(s.index));
             }
             return h;
@@ -1176,7 +1176,7 @@ public class StemVariable extends HashMap<String, Object> {
             }
         }
 
-        for (StemEntry s : getStemList()) {
+        for (SparseEntry s : getStemList()) {
             OrderedIndexEntry orderedIndexEntry = new OrderedIndexEntry(s.index, false);
             if (stemKeys.contains(orderedIndexEntry)) {
                 OrderedIndexEntry oie = stemKeys.floor(orderedIndexEntry);
@@ -1245,13 +1245,13 @@ public class StemVariable extends HashMap<String, Object> {
     }
 
     public boolean containsKey(Long key) {
-        StemEntry s = new StemEntry(key);
+        SparseEntry s = new SparseEntry(key);
         return getStemList().contains(s);
     }
 
     public boolean containsKey(String key) {
         if (isLongIndex(key)) {
-            StemEntry s = new StemEntry(Long.parseLong(key));
+            SparseEntry s = new SparseEntry(Long.parseLong(key));
             boolean rc = getStemList().contains(s);
             return rc;
         }
@@ -1264,7 +1264,7 @@ public class StemVariable extends HashMap<String, Object> {
         if (super.containsValue(value)) return true;
         if (getStemList().isEmpty()) return false;
         // *sigh* have to look for it
-        for (StemEntry s : getStemList()) {
+        for (SparseEntry s : getStemList()) {
             // Have to check that values like '007' are checked first.
             if (s.entry.equals(value)) return true;
             if (isIntVar(value.toString())) {
@@ -1287,16 +1287,16 @@ public class StemVariable extends HashMap<String, Object> {
      * @param stemVariable
      */
     public void listAppend(StemVariable stemVariable) {
-        StemList<StemEntry> list = stemVariable.getStemList();
+        QDLList<SparseEntry> list = stemVariable.getStemList();
         if (list.isEmpty()) return;
         long startIndex = 0L;
 
         if (!getStemList().isEmpty()) {
-            StemEntry last = getStemList().last();
+            SparseEntry last = getStemList().last();
             startIndex = last.index + 1;
         }
-        for (StemEntry entry : list) {
-            getStemList().add(new StemEntry(startIndex++, entry.entry));
+        for (SparseEntry entry : list) {
+            getStemList().add(new SparseEntry(startIndex++, entry.entry));
         }
     }
 
@@ -1316,20 +1316,20 @@ public class StemVariable extends HashMap<String, Object> {
      */
     public void listCopy(long startIndex, long length, StemVariable target, long insertIndex) {
         if (length == 0L) return; // do nothing.
-        if (!target.getStemList().contains(new StemEntry(insertIndex))) {
+        if (!target.getStemList().contains(new SparseEntry(insertIndex))) {
             throw new IllegalArgumentException("the insertion index for the target of this copy does not exist.");
         }
 
         if (length + startIndex > getStemList().size()) {
             throw new IllegalArgumentException("the source does not have enough elements to copy.");
         }
-        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), true, new StemEntry(startIndex + length), false);
+        SortedSet<SparseEntry> sortedSet = getStemList().subSet(new SparseEntry(startIndex), true, new SparseEntry(startIndex + length), false);
         long newIndex = 0L;
-        StemList<StemEntry> targetList = target.getStemList();
-        for (StemEntry s : sortedSet) {
-            StemEntry stemEntry = new StemEntry(insertIndex + newIndex++, s.entry);
-            targetList.remove(stemEntry);
-            targetList.add(stemEntry);
+        QDLList<SparseEntry> targetList = target.getStemList();
+        for (SparseEntry s : sortedSet) {
+            SparseEntry sparseEntry = new SparseEntry(insertIndex + newIndex++, s.entry);
+            targetList.remove(sparseEntry);
+            targetList.add(sparseEntry);
         }
     }
 
@@ -1352,12 +1352,12 @@ public class StemVariable extends HashMap<String, Object> {
      * @param insertIndex
      */
     public void listInsertAt(long startIndex, long length, StemVariable target, long insertIndex) {
-        StemList<StemEntry> tSL = target.getStemList();
-        StemList<StemEntry> outSL = new StemList<>();
+        QDLList<SparseEntry> tSL = target.getStemList();
+        QDLList<SparseEntry> outSL = new QDLList<>();
         for (long i = 0; i < insertIndex; i++) {
             outSL.append(tSL.get(i));
         }
-        StemList<StemEntry> sSL = getStemList();
+        QDLList<SparseEntry> sSL = getStemList();
         for (long i = startIndex; i < startIndex + length; i++) {
             Object obj = sSL.get(i);
             if (obj == null) {
@@ -1383,17 +1383,17 @@ public class StemVariable extends HashMap<String, Object> {
             throw new IllegalArgumentException("the given list is not long enough. It has length " +
                     arg.getStemList().size() + " and you requested to copy " + length + " elements.");
         }
-        StemList<StemEntry> currentSL = getStemList();
-        StemList<StemEntry> argSL = arg.getStemList();
-        StemList<StemEntry> newSL = new StemList<>();
+        QDLList<SparseEntry> currentSL = getStemList();
+        QDLList<SparseEntry> argSL = arg.getStemList();
+        QDLList<SparseEntry> newSL = new QDLList<>();
         for (long i = 0; i < startIndex; i++) {
-            newSL.add(new StemEntry(i, currentSL.get(i)));
+            newSL.add(new SparseEntry(i, currentSL.get(i)));
         }
         for (long i = 0; i < length; i++) {
-            newSL.add(new StemEntry(i + startIndex, argSL.get(i)));
+            newSL.add(new SparseEntry(i + startIndex, argSL.get(i)));
         }
         for (long i = 0; i < currentSL.size() - startIndex; i++) {
-            newSL.add(new StemEntry(i + startIndex + length, currentSL.get(startIndex + i)));
+            newSL.add(new SparseEntry(i + startIndex + length, currentSL.get(startIndex + i)));
         }
         setStemList(newSL);
     }
@@ -1406,14 +1406,14 @@ public class StemVariable extends HashMap<String, Object> {
         StemVariable stemVariable = new StemVariable();
 
         if (getStemList().isEmpty()) return stemVariable;
-        SortedSet<StemEntry> sortedSet = getStemList().subSet(new StemEntry(startIndex), new StemEntry(startIndex + length));
-        StemList<StemEntry> newStemList = new StemList<>();
+        SortedSet<SparseEntry> sortedSet = getStemList().subSet(new SparseEntry(startIndex), new SparseEntry(startIndex + length));
+        QDLList<SparseEntry> newQDLList = new QDLList<>();
         long i = 0;
-        for (StemEntry s : sortedSet) {
+        for (SparseEntry s : sortedSet) {
             // Now we have to adjust the indices since the tree set function returns the indices in the set
-            newStemList.add(new StemEntry(i++, s.entry));
+            newQDLList.add(new SparseEntry(i++, s.entry));
         }
-        stemVariable.setStemList(newStemList);
+        stemVariable.setStemList(newQDLList);
         return stemVariable;
     }
 
@@ -1462,16 +1462,16 @@ public class StemVariable extends HashMap<String, Object> {
                 hashSet.add(value);
             }
         }
-        StemList stemList1 = new StemList();
+        QDLList qdlList1 = new QDLList();
         HashSet hashSet1 = new HashSet();
         for (Object obj : hashSet) {
             hashSet1.add(obj);
         }
 
         for (Object obj : hashSet) {
-            stemList1.append(obj);
+            qdlList1.append(obj);
         }
-        output.setStemList(stemList1);
+        output.setStemList(qdlList1);
         return output;
     }
 
@@ -1566,9 +1566,9 @@ public class StemVariable extends HashMap<String, Object> {
                 throw new IllegalArgumentException("stem index list must be a list");
             }
             Object obj = null;
-            StemList stemList = ndx.getStemList();
+            QDLList qdlList = ndx.getStemList();
             StemVariable lastStem = this;
-            for (int i = 0; i < stemList.size(); i++) {
+            for (int i = 0; i < qdlList.size(); i++) {
                 obj = lastStem.get(ndx.get(i));
                 if (obj == null) {
                     throw new IndexError("the index of \"" + indexList.get(i) + "\" was not found in this stem", null);
@@ -1576,7 +1576,7 @@ public class StemVariable extends HashMap<String, Object> {
                 if (obj instanceof StemVariable) {
                     lastStem = (StemVariable) obj;
                 } else {
-                    if (i != stemList.size() - 1) {
+                    if (i != qdlList.size() - 1) {
                         throw new IndexError(" index depth error '" + obj + "' is not a stem.",null);
 
                     }

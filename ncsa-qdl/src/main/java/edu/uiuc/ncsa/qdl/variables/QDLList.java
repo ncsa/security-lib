@@ -14,43 +14,43 @@ import java.util.*;
  * <p>Created by Jeff Gaynor<br>
  * on 2/20/20 at  8:39 AM
  */
-public class StemList<V extends StemEntry> extends TreeSet<V> {
-    public StemList() {
+public class QDLList<V extends SparseEntry> extends TreeSet<V> {
+    public QDLList() {
         super();
     }
 
-    public StemList(long size) {
+    public QDLList(long size) {
         for (long i = 0L; i < size; i++) {
-            StemEntry stemEntry = new StemEntry(i, i);
-            add((V) stemEntry);
+            SparseEntry sparseEntry = new SparseEntry(i, i);
+            add((V) sparseEntry);
         }
     }
 
-    public StemList(long size, Object[] fill) {
+    public QDLList(long size, Object[] fill) {
 
         int fillSize = -1;
         if (fill != null && fill.length!=0) {
             fillSize = fill.length;
         }
-        StemEntry stemEntry;
+        SparseEntry sparseEntry;
         for (long i = 0L; i < size; i++) {
             if (fill == null) {
-                stemEntry = new StemEntry(i, i);
+                sparseEntry = new SparseEntry(i, i);
             } else {
 
-                stemEntry = new StemEntry(i, fill[(int) i % fillSize]);
+                sparseEntry = new SparseEntry(i, fill[(int) i % fillSize]);
             }
-            add((V) stemEntry);
+            add((V) sparseEntry);
         }
     }
 
     /**
-     * Runs over <i>every</i> enetry in the stem list (including danglers).
+     * Runs over <i>every</i> entry in the stem list (including danglers).
      * result is a standard list (starts at 0, no gaps) of unique elements.
      *
      * @return
      */
-    public StemList unique() {
+    public QDLList unique() {
         Iterator<V> iterator = iterator();
         HashSet set = new HashSet();
         while (iterator.hasNext()) {
@@ -62,16 +62,16 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
                 set.add(obj);
             }
         }
-        StemList stemList1 = new StemList();
+        QDLList qdlList1 = new QDLList();
         HashSet hashSet1 = new HashSet();
            for (Object obj : set) {
                hashSet1.add(obj);
            }
 
         for (Object object : set) {
-            stemList1.append(object);
+            qdlList1.append(object);
         }
-        return stemList1;
+        return qdlList1;
     }
 
 
@@ -79,7 +79,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         if (index < 0L) {
             index = size() + index;
         }
-        V stemEntry = (V) new StemEntry(index);
+        V stemEntry = (V) new SparseEntry(index);
         if (!contains(stemEntry)) return null;
         return floor(stemEntry).entry;
     }
@@ -88,7 +88,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         if (index < 0L) {
             index = size() + index;
         }
-        V stemEntry = (V) new StemEntry(index);
+        V stemEntry = (V) new SparseEntry(index);
         return super.remove(stemEntry);
     }
 
@@ -99,17 +99,17 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
      */
     public void append(Object obj) {
         V newEntry;
-        if (obj instanceof StemEntry) {
+        if (obj instanceof SparseEntry) {
             // in this case, stem entries are being added directly, so don't wrap them in a stem entry.
 
-            newEntry = (V) new StemEntry(size(), ((StemEntry) obj).entry); // argh Java requires a cast. If StemEntry is ever extended, this will break.
+            newEntry = (V) new SparseEntry(size(), ((SparseEntry) obj).entry); // argh Java requires a cast. If StemEntry is ever extended, this will break.
 
         } else {
             if (isEmpty()) {
-                newEntry = (V) new StemEntry(0L, obj);
+                newEntry = (V) new SparseEntry(0L, obj);
             } else {
                 V stemEntry = last();
-                newEntry = (V) new StemEntry(stemEntry.index + 1, obj);
+                newEntry = (V) new SparseEntry(stemEntry.index + 1, obj);
             }
 
         }
@@ -121,13 +121,13 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
              index = last().index;
         }
         for(Object k : set){
-             add((V)new StemEntry(index++, k));
+             add((V)new SparseEntry(index++, k));
          }
     }
 
 
-    public void appendStem(StemList stemList){
-        Iterator<StemEntry> iterator = stemList.iterator();
+    public void appendStem(QDLList qdlist){
+        Iterator<SparseEntry> iterator = qdlist.iterator();
         while(iterator.hasNext()){
             Object v = iterator.next().entry;
             append(v);
@@ -218,7 +218,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
     }
     public JSONArray toJSON(boolean escapeNames) {
         JSONArray array = new JSONArray();
-        for (StemEntry s : this) {
+        for (SparseEntry s : this) {
             Object v = s.entry;
             if (v instanceof StemVariable) {
                 array.add(((StemVariable) v).toJSON(escapeNames));
@@ -300,15 +300,15 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
         }
         return r;
     }
-   public StemList getSize(){
-        StemList s = new StemList();
+   public QDLList getSize(){
+        QDLList s = new QDLList();
         if(isEmpty()){
             return s;
         }
         long index = 0L;
-        StemEntry stemEntry = new StemEntry(index++,new Long(size()));
-        s.add(stemEntry);
-        StemEntry currentEntry = first();
+        SparseEntry sparseEntry = new SparseEntry(index++,new Long(size()));
+        s.add(sparseEntry);
+        SparseEntry currentEntry = first();
         while(currentEntry != null){
                  Object obj = currentEntry.entry;
                  if(obj instanceof StemVariable){
@@ -316,8 +316,8 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
                      if(s1.getStemList().size() == 0){
                          break;
                      }
-                     stemEntry = new StemEntry(index++,new Long(s1.getStemList().size()));
-                     s.add(stemEntry);
+                     sparseEntry = new SparseEntry(index++,new Long(s1.getStemList().size()));
+                     s.add(sparseEntry);
                      currentEntry = s1.getStemList().first();
                  }else{
                      break;
@@ -331,7 +331,7 @@ public class StemList<V extends StemEntry> extends TreeSet<V> {
 
    public ArrayList values(){
         ArrayList list = new ArrayList();
-        Iterator<? extends StemEntry> iterator = iterator();
+        Iterator<? extends SparseEntry> iterator = iterator();
         while(iterator.hasNext()){
             list.add(iterator.next().entry);
         }

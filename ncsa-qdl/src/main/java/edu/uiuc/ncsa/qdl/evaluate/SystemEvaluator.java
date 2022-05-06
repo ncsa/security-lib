@@ -864,17 +864,17 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (stemVariable.size() == 1) {
-            StemEntry stemEntry = stemVariable.getStemList().iterator().next();
+            SparseEntry sparseEntry = stemVariable.getStemList().iterator().next();
             polyad.setEvaluated(true);
 
             if (doReduce) {
                 // return scalar of the value
-                polyad.setResult(stemEntry.entry);
-                polyad.setResultType(Constant.getType(stemEntry.entry));
+                polyad.setResult(sparseEntry.entry);
+                polyad.setResultType(Constant.getType(sparseEntry.entry));
 
             } else {
                 StemVariable output = new StemVariable();
-                output.listAppend(stemEntry.entry);
+                output.listAppend(sparseEntry.entry);
                 polyad.setResult(output);
                 polyad.setResultType(Constant.STEM_TYPE);
             }
@@ -916,7 +916,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             Object reduceOuput = null;
             // contract is that a single list is returned unaltered.
             // At this point, we know there are at least 2 entries.
-            Iterator<StemEntry> iterator = inStem.getStemList().iterator();
+            Iterator<SparseEntry> iterator = inStem.getStemList().iterator();
             Object lastValue = iterator.next().entry;
 
             while (iterator.hasNext()) {
@@ -1439,10 +1439,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             StemVariable stemVariable = (StemVariable) obj;
             // now we have to turn it in to list, tending to the semantics.
-            StemList stemList = stemVariable.getStemList();
+            QDLList qdlList = stemVariable.getStemList();
             List<String> sp = new ArrayList<>();
-            for (int i = 0; i < stemList.size(); i++) {
-                Object entry = stemList.get(i);
+            for (int i = 0; i < qdlList.size(); i++) {
+                Object entry = qdlList.get(i);
                 if (entry != null && !(entry instanceof QDLNull)) {
                     String newPath = entry.toString();
                     newPath = newPath + (newPath.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
@@ -1506,10 +1506,10 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             StemVariable stemVariable = (StemVariable) obj;
             // now we have to turn it in to list, tending to the semantics.
-            StemList stemList = stemVariable.getStemList();
+            QDLList qdlList = stemVariable.getStemList();
             List<String> sp = new ArrayList<>();
-            for (int i = 0; i < stemList.size(); i++) {
-                Object entry = stemList.get(i);
+            for (int i = 0; i < qdlList.size(); i++) {
+                Object entry = qdlList.get(i);
                 if (entry != null && !(entry instanceof QDLNull)) {
                     String newPath = entry.toString();
                     newPath = newPath + (newPath.endsWith(VFSPaths.PATH_SEPARATOR) ? "" : VFSPaths.PATH_SEPARATOR);
