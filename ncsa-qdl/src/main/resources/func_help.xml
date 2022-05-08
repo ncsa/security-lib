@@ -990,7 +990,7 @@ Note that if you run this example, the result will be very probably be
 different since the result is random.
 
 E.g.
-    shuffle(2+3*indices(4), [2,1,3,0])
+    shuffle(2+3*[;4]], [2,1,3,0])
 [8,5,11,2]
 
 In this case, the left argument is [2,5,8,11] and the right argument

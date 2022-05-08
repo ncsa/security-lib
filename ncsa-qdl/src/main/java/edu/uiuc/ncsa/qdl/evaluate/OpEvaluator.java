@@ -474,13 +474,13 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
             outStem = outStem.union(stem0); // copy over elements
             long index = -1L;
             SparseEntry sparseEntry;
-            if (!outStem.getStemList().isEmpty()) {
-                sparseEntry = outStem.getStemList().last();
+            if (!outStem.getQDLList().isEmpty()) {
+                sparseEntry = outStem.getQDLList().last();
                 index = sparseEntry.index;
             }
             SparseEntry newEntry = new SparseEntry(index + 1, set);
 
-            outStem.getStemList().add(newEntry);
+            outStem.getQDLList().add(newEntry);
             dyad.setResult(outStem);
             dyad.setResultType(STEM_TYPE);
             dyad.setEvaluated(true);
@@ -1168,7 +1168,7 @@ public class OpEvaluator extends AbstractFunctionEvaluator {
                 p.evaluate(state);
                 StemVariable stemVariable = (StemVariable) p.getResult(); // as per contract
                 set = new QDLSet();
-                set.addAll(stemVariable.getStemList().values());
+                set.addAll(stemVariable.getQDLList().values());
 
                 monad.setResult(set);
                 monad.setResultType(SET_TYPE);

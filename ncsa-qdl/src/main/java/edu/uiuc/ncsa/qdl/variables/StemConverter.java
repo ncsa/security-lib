@@ -37,6 +37,12 @@ public class StemConverter {
      }
     public static StemVariable convert(JSONArray array) {
         StemVariable out = new StemVariable();
+        QDLList qdlList = new QDLList();
+        qdlList.addAll(array);
+        out.setStemList(qdlList);
+        return out;
+
+/*
         QDLList<SparseEntry> qdlList = new QDLList<>();
 
         for (int i = 0; i < array.size(); i++) {
@@ -44,6 +50,7 @@ public class StemConverter {
         }
         out.setStemList(qdlList);
         return out;
+*/
     }
     public static StemVariable convert(JSONObject object) {
 

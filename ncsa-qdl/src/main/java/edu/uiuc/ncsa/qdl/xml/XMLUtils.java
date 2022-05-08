@@ -175,7 +175,7 @@ public class XMLUtils implements XMLConstants {
         if (!(obj instanceof StemVariable)) {
             throw new IllegalArgumentException("Error: expected a stem and got a " + obj.getClass().getSimpleName());
         }
-        return ((StemVariable) obj).getStemList().toJSON();
+        return ((StemVariable) obj).getQDLList().toJSON();
     }
 
     /**

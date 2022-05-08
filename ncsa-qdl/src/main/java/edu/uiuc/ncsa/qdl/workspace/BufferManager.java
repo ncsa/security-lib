@@ -7,7 +7,6 @@ import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.parsing.QDLInterpreter;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.Constant;
-import edu.uiuc.ncsa.qdl.variables.SparseEntry;
 import edu.uiuc.ncsa.qdl.variables.StemVariable;
 import edu.uiuc.ncsa.qdl.vfs.VFSPaths;
 import edu.uiuc.ncsa.qdl.xml.XMLUtilsV2;
@@ -262,8 +261,9 @@ public class BufferManager implements Serializable {
             return null;
         }
         ArrayList<String> response = new ArrayList<>();
-        for (SparseEntry se : stem.getStemList()) {
-            response.add(se.entry.toString());
+        Iterator iterator = stem.getQDLList().iterator(true);
+        while(iterator.hasNext()){
+            response.add(iterator.next().toString());
         }
         return response;
 

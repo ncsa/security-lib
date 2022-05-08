@@ -553,7 +553,7 @@ public class WSXMLSerializer {
                 case XMLEvent.END_ELEMENT:
                     if (xe.asEndElement().getName().getLocalPart().equals(tag)) {
                         if (stem != null) {
-                            return stem.getStemList().toJSON();
+                            return stem.getQDLList().toJSON();
                         }
                         return null;
                     }

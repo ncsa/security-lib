@@ -459,9 +459,11 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         StemVariable out = new StemVariable();
         Object object0 = polyad.evalArg(0, state);
         checkNull(object0, polyad.getArgAt(0));
-
+                                  QDLSet outSet;
         if (isStem(object0)) {
             StemVariable inStem = (StemVariable) object0;
+            outSet = inStem.valueSet();
+/*
             ArrayList values = new ArrayList();
             for (Object key : inStem.keySet()) {
                 Object obj = inStem.get(key);
@@ -470,13 +472,16 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 }
             }
             out.addList(values);
+*/
 
         } else {
-            out.put(0L, object0);
+            //out.put(0L, object0);
+            outSet = new QDLSet();
+            outSet.add(object0);
         }
 
-        polyad.setResult(out);
-        polyad.setResultType(STEM_TYPE);
+        polyad.setResult(outSet);
+        polyad.setResultType(SET_TYPE);
         polyad.setEvaluated(true);
 
     }
@@ -1107,7 +1112,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
         if (stem == null) {
             throw new BadArgException("You can only apply " + UNBOX + " to a stem.", polyad.getArgAt(0));
         }
-        if (stem.getStemList().size() != 0) {
+        if (stem.getQDLList().size() != 0) {
             throw new BadArgException("You can only apply " + UNBOX + " to a stem without a list.", polyad.getArgAt(0));
         }
         // Make a safe copy of the state to unpack this in case something bombs
@@ -1526,7 +1531,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                 if (!fillStem.isList()) {
                     throw new BadArgException("fill argument must be a list of scalars", polyad.getArgAt(polyad.getArgCount()-1)); // last arg is fill list
                 }
-                QDLList qdlList = fillStem.getStemList();
+                QDLList qdlList = fillStem.getQDLList();
                 fill = qdlList.toArray(true, false);
                 cyclicArgList = new CyclicArgList(fill);
 
@@ -2426,12 +2431,15 @@ z. :=  join3(q.,w.)
         }
         /*  Waaaay easier to do this in QDL, but this should be in base system
            not a module.
-         old. := all_keys(x., -1);
-         rank := size(old.0);
-         axis := (axis<0)?axis+rank:axis;
+           axis :=1
+          a. := n(3,4,5,n(60))
+           
+         old. := indices(a., axis);
+         rank := rank(old.);
+         axis := (axis<0)?axis+rank:axis; // if negative, fix it
          permute. := axis~[;axis]~[axis+1;rank];
          new. := for_each(@shuffle, old., [permute.]);
-         return(subset(x., new., old.));
+         return(remap(x., old., new.));
 
                            old. := indices(x., -1);
                    rank := size(old.0);

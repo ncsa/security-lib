@@ -3,6 +3,7 @@ package edu.uiuc.ncsa.qdl;
 import edu.uiuc.ncsa.qdl.evaluate.ListEvaluator;
 import edu.uiuc.ncsa.qdl.evaluate.StemEvaluator;
 import edu.uiuc.ncsa.qdl.exceptions.IndexError;
+import edu.uiuc.ncsa.qdl.exceptions.QDLException;
 import edu.uiuc.ncsa.qdl.exceptions.QDLExceptionWithTrace;
 import edu.uiuc.ncsa.qdl.expressions.ConstantNode;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
  * <p>Created by Jeff Gaynor<br>
  * on 1/17/20 at  12:51 PM
  */
-public class StemFunctionsTest extends AbstractQDLTester {
+public class StemTest extends AbstractQDLTester {
     TestUtils testUtils = TestUtils.newInstance();
 
 
@@ -902,24 +903,38 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListAppend() throws Throwable {
-        QDLList<SparseEntry> qdlList1 = new QDLList();
-        QDLList<SparseEntry> qdlList2 = new QDLList();
+        QDLList qdlList1 = new QDLList();
+        QDLList qdlList2 = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
+
         for (long i = 0L; i < count1; i++) {
-            qdlList1.add(new SparseEntry(i, i / 10.0));
+            //qdlList1.add(new SparseEntry(i, new BigDecimal("0." + i)));
+            qdlList1.add( new BigDecimal("0." + i));
         }
         for (long i = 0L; i < count2; i++) {
-            qdlList2.add(new SparseEntry(i, i * i));
+            //qdlList2.add(new SparseEntry(i, i * i));
+            qdlList2.add( i * i);
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
         stem1.setStemList(qdlList1);
         stem2.setStemList(qdlList2);
         stem1.listAppend(stem2);
-        QDLList<SparseEntry> result = stem1.getStemList();
+        QDLList result = stem1.getQDLList();
         // should return sorted set
-        Object expectedValues[] = new Object[]{0.0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 0L, 1L, 4L, 9L, 16L};
+        Object expectedValues[] = new Object[]{
+                new BigDecimal("0.0"),
+                new BigDecimal("0.1"),
+                new BigDecimal("0.2"),
+                new BigDecimal("0.3"),
+                new BigDecimal("0.4"),
+                new BigDecimal("0.5"),
+                new BigDecimal("0.6"),
+                new BigDecimal("0.7"),
+                new BigDecimal("0.8"),
+                new BigDecimal("0.9"),
+                0L, 1L, 4L, 9L, 16L};
         assert stem1.size() == count1 + count2;
         for (int i = 0; i < expectedValues.length; i++) {
             assert result.get(i).equals(expectedValues[i]);
@@ -928,22 +943,22 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListCopy() throws Throwable {
-        QDLList<SparseEntry> qdlList1 = new QDLList();
-        QDLList<SparseEntry> qdlList2 = new QDLList();
+        QDLList qdlList1 = new QDLList();
+        QDLList qdlList2 = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
-            qdlList1.add(new SparseEntry(i, i / 10.0));
+            qdlList1.add( i / 10.0);
         }
         for (long i = 0L; i < count2; i++) {
-            qdlList2.add(new SparseEntry(i, i * i));
+            qdlList2.add(i * i);
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
         stem1.setStemList(qdlList1);
         stem2.setStemList(qdlList2);
         stem1.listCopy(3, 5, stem2, 2);
-        QDLList<SparseEntry> result = stem2.getStemList();
+        QDLList result = stem2.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, .3, .4, .5, .6, .7};
         for (int i = 0; i < expectedValues.length; i++) {
@@ -951,10 +966,105 @@ public class StemFunctionsTest extends AbstractQDLTester {
         }
     }
 
+    /*
+    a.:=[;10];
+    remove(a.3)
+    b.:=[-10;0]
+    test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};
+    copy(b., 1,3,a., 5)
+     */
+    public void testSparseListCopy() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.:=[;10];");
+        addLine(script, "remove(a.3);"); // remove an element
+        addLine(script, "b.:=[-10;0];");
+        addLine(script, "test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};");
+        addLine(script, "copy(b., 1,3,a., 5);");
+        addLine(script, "ok := size(a.) == size(test.) && reduce(@&&, a. == test.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed to round trip JSON array with QDL nulls in it.";
+    }
+
+    public void testSparseListCopySourceFail() throws Throwable {
+        // The source is missing some entries, so this should fail with an index error
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.:=[;10];");
+        addLine(script, "remove(a.3);"); // remove an element
+        addLine(script, "b.:=[-10;0];");
+        addLine(script, "copy(a., 1,3,b., 5);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        try{
+            interpreter.execute(script.toString());
+            assert false : "Was able to copy over a gap in the source list";
+        }catch (QDLException x){
+            assert true;
+        }
+    }
+
+    /*
+    a.:=[;10];
+    remove(a.3)
+    b.:=[-10;0]
+    insert_at(b., 1,3,a., 5)
+    test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};
+     */
+/*        public void testSparseListInsert() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.:=[;10];");
+        addLine(script, "remove(a.3);"); // remove an element
+        addLine(script, "b.:=[-10;0];");
+        addLine(script, "test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};");
+        addLine(script, "insert_at(b., 1,3,a., 5);");
+        addLine(script, "ok := size(a.) == size(test.) && reduce(@&&, a. == test.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed sparse list insert_at.";
+    }*/
+    /*
+
+     */
+    public void testSparseListCopy2() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.2 := 1;");
+        addLine(script, "b.:=[-10;0];");
+        addLine(script, "test.:={2:1,100:-9,101:-8,102:-7};");
+        addLine(script, "copy(b., 1,3,a., 100);");
+        addLine(script, "ok := size(a.) == size(test.) && reduce(@&&, a. == test.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed to round trip JSON array with QDL nulls in it.";
+    }
+    /*
+          a.:=[;10];
+    remove(a.3)
+    remove(a.4)
+    b.:=[-10;0]
+    test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};
+    copy(b., 1,3,a., 2)
+     */
+    public void testSparseListCopySpanGap() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.:=[;10];");
+        addLine(script, "remove(a.3);"); // remove an element
+        addLine(script, "remove(a.4);"); // remove an element
+        addLine(script, "b.:=[-10;0];");
+        addLine(script, "test.:={0:0,1:1,2:-9,3:-8,4:-7, 5:5,6:6,7:7,8:8,9:9};");
+        addLine(script, "copy(b., 1,3, a., 2);");
+        addLine(script, "ok := size(a.) == size(test.) && reduce(@&&, a. == test.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed to span gap in copy.";
+    }
 
     public void testListInsert() throws Throwable {
-        QDLList<SparseEntry> sourceSL = new QDLList();
-        QDLList<SparseEntry> targetSL = new QDLList();
+        QDLList sourceSL = new QDLList();
+        QDLList targetSL = new QDLList();
         long count1 = 10L;
         long count2 = 5L;
         for (long i = 0L; i < count1; i++) {
@@ -968,7 +1078,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.setStemList(sourceSL);
         targetStem.setStemList(targetSL);
         sourceStem.listInsertAt(2, 5, targetStem, 3);
-        QDLList<SparseEntry> result = targetStem.getStemList();
+        QDLList result = targetStem.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{0L, 1L, 4L, .2, .3, .4, .5, .6, 9L, 16L};
         assert result.size() == count2 + 5; // original plus number inserted
@@ -979,7 +1089,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListSubset() throws Throwable {
-        QDLList<SparseEntry> sourceSL = new QDLList();
+        QDLList sourceSL = new QDLList();
         long count1 = 10L;
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
@@ -987,7 +1097,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StemVariable sourceStem = new StemVariable();
         sourceStem.setStemList(sourceSL);
         StemVariable targetStem = sourceStem.listSubset(2, 3);
-        QDLList<SparseEntry> result = targetStem.getStemList();
+        QDLList result = targetStem.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{22L, 23L, 24L};
         assert result.size() == 3; // original plus number inserted
@@ -998,7 +1108,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
 
 
     public void testListSubset2() throws Throwable {
-        QDLList<SparseEntry> sourceSL = new QDLList();
+        QDLList sourceSL = new QDLList();
         long count1 = 10L;
         for (long i = 0L; i < count1; i++) {
             sourceSL.append(i + 20);
@@ -1007,7 +1117,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         sourceStem.setStemList(sourceSL);
         // Test copying the tail of the list from the given index.
         StemVariable targetStem = sourceStem.listSubset(7);
-        QDLList<SparseEntry> result = targetStem.getStemList();
+        QDLList result = targetStem.getQDLList();
         // should return sorted set
         Object expectedValues[] = new Object[]{27L, 28L, 29L};
         assert result.size() == 3; // original plus number inserted
@@ -1040,11 +1150,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     public void testGenericSubset() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "r. := " + StemEvaluator.REMAP + "(3*[;15], {'foo':3,'bar':5,'baz':7});");
-        // trick. If two arbitrary stems are equal, then there is a single value of true from
-        // the values function. Can't do a reduce on an arbitrary stem (since it has an
-        // implicit assumption of value ordering), but this is the next best thing.
-        addLine(script, "test. := values(r. == {'bar':15, 'foo':9, 'baz':21});");
-        addLine(script, "ok := size(test.) == 1 && test.0;");
+        addLine(script, "ok := reduce(@&&, r. == {'bar':15, 'foo':9, 'baz':21});");
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -1068,11 +1174,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         StringBuffer script = new StringBuffer();
         addLine(script, "a. := n(3,4,n(12));");
         addLine(script, "r. := " + StemEvaluator.REMAP + "(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]});");
-        // trick. If two arbitrary stems are equal, then there is a single value of true from
-        // the values function. Can't do a reduce on an arbitrary stem (since it has an
-        // implicit assumption of value ordering), but this is the next best thing.
-        addLine(script, "test. := values(r. == {'bar':5, 'foo':1, 'baz':11});");
-        addLine(script, "ok := size(test.) == 1 && test.0;");
+        addLine(script, "ok := reduce(@&&, r. == {'bar':5, 'foo':1, 'baz':11});");
         State state = testUtils.getNewState();
 
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
@@ -1839,7 +1941,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
         addLine(script, "β. := indices(ξ.,1);"); // axis 1
         addLine(script, "γ. := indices(ξ.,-1);"); // axis 2 (here -- last axis)
         addLine(script, "ok0 := reduce(@∧,  [0,1,'a','s','d'] ≡ α.); ");
-        addLine(script, "ok1 := reduce(@∧,reduce(@∧, [['foo',0],['foo',1],['foo',2],['foo','tyu'],['foo','rty'],['foo','ghjjh']] ≡ β.)); ");
+        addLine(script, "ok1 := reduce(@∧,reduce(@∧, [['foo',0],['foo',1],['foo',2],['foo','tyu'],['foo','ghjjh'],['foo','rty']] ≡ β.)); ");
         addLine(script, "ok2 := reduce(@∧,reduce(@∧, [['foo','woof','a3tyu'],['foo','woof','a3rty'],['foo','woof','a3ghjjh']] ≡ γ.)); ");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
@@ -1876,6 +1978,7 @@ public class StemFunctionsTest extends AbstractQDLTester {
     }
 
     /*
+            a. := n(3,4,5,n(60))
             reduce(@+, axis(a., 2))
             reduce(@+, axis(a., 0))
             reduce(@+, axis(a., 1))
@@ -1885,9 +1988,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "ξ.  := n(3,4,5,n(60));");
-        addLine(script, "ξ0. := reduce(@+," + StemEvaluator.TRANSPOSE + "(ξ.,0));");
-        addLine(script, "ξ1. := reduce(@+," + StemEvaluator.TRANSPOSE + "(ξ.,1));");
-        addLine(script, "ξ2. := reduce(@+," + StemEvaluator.TRANSPOSE + "(ξ.,2));");
+        addLine(script, "ξ0. := reduce(@+," + StemEvaluator.TRANSPOSE2 + "(ξ.,0));");
+        addLine(script, "ξ1. := reduce(@+," + StemEvaluator.TRANSPOSE2 + "(ξ.,1));");
+        addLine(script, "ξ2. := reduce(@+," + StemEvaluator.TRANSPOSE2 + "(ξ.,2));");
         // Check against computed output. We break this up in statements or these get really long
         addLine(script, "η0. := [[60,63,66,69,72],[75,78,81,84,87],[90,93,96,99,102],[105,108,111,114,117]];");
         addLine(script, "η1. := [[30,34,38,42,46],[110,114,118,122,126],[190,194,198,202,206]];");
@@ -1899,9 +2002,9 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
-        assert getBooleanValue("ok0", state) : StemEvaluator.TRANSPOSE + " operator failed for axis = 0.";
-        assert getBooleanValue("ok1", state) : StemEvaluator.TRANSPOSE + " operator failed for axis = 1.";
-        assert getBooleanValue("ok2", state) : StemEvaluator.TRANSPOSE + " operator failed for axis = 2.";
+        assert getBooleanValue("ok0", state) : StemEvaluator.TRANSPOSE2 + " operator failed for axis = 0.";
+        assert getBooleanValue("ok1", state) : StemEvaluator.TRANSPOSE2 + " operator failed for axis = 1.";
+        assert getBooleanValue("ok2", state) : StemEvaluator.TRANSPOSE2 + " operator failed for axis = 2.";
     }
 
 /*
@@ -2013,6 +2116,15 @@ public class StemFunctionsTest extends AbstractQDLTester {
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
+    }
+    public void testRoundtripJSONWithNull() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "a.:=[null,null,null,1,-2,'q'];");
+        addLine(script, "ok := reduce(@&&, from_json(to_json(a.)) == a.);");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) : "failed to round trip JSON array with QDL nulls in it.";
     }
 
 }

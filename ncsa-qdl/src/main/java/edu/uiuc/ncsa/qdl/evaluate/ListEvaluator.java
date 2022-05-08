@@ -164,7 +164,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             case Constant.STEM_TYPE:
                 StemVariable inStem = (StemVariable) arg0;
                 if (inStem.isList()) {
-                    list = inStem.getStemList().values(); // fast
+                    list = inStem.getQDLList().values(); // fast
                 } else {
                     list = new ArrayList();
                     list.addAll(inStem.values());
@@ -377,7 +377,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         QDLSet set = null;
         if (isStem(arg1)) {
             stem = (StemVariable) arg1;
-            endIndex = (long) stem.getStemList().size();
+            endIndex = (long) stem.getQDLList().size();
         }
 
         if (isSet(arg1)) {
@@ -620,10 +620,9 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         @Override
         public Object action(StemVariable inStem) {
             StemVariable output = new StemVariable();
-            Iterator<SparseEntry> iterator = inStem.getStemList().descendingIterator();
+            Iterator iterator = inStem.getQDLList().descendingIterator(true);
             while (iterator.hasNext()) {
-                SparseEntry s = iterator.next();
-                output.listAppend(s.entry);
+             output.listAppend(iterator.next());
             }
             return output;
         }

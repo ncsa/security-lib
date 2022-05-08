@@ -442,7 +442,7 @@ public class IOEvaluator extends AbstractFunctionEvaluator {
         }
         StemVariable dir = new StemVariable();
         for (String x : entries) {
-            dir.getStemList().append(x);
+            dir.getQDLList().append(x);
         }
         polyad.setEvaluated(true);
         polyad.setResult(dir);

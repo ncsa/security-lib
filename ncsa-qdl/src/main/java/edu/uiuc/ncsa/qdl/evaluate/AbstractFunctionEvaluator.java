@@ -667,16 +667,22 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
     }
 
     protected Set<String> getCommonKeys(StemVariable... stems) {
-        Set<String> keys = null;
+        QDLSet keys = new QDLSet();
         // First find one that has some keys.
         for (StemVariable stem : stems) {
+            if(stem.hasDefaultValue()){
+                continue;
+            }
             if (!stem.isEmpty()) {
-                if (keys == null) {
-                    keys = stem.keySet();
+                if (keys.isEmpty()) {
+                    keys.addAll(stem.keySet());
+                }else{
+                    keys  = keys.intersection(new QDLSet(stem.keySet()));
                 }
-                break;
             }
         }
+        return keys;
+/*
         Set<String> foundKeys = new HashSet<>();
         // now look for common keys.
         if (keys == null) {
@@ -688,7 +694,7 @@ public abstract class AbstractFunctionEvaluator implements EvaluatorInterface {
                 foundKeys.add(key);
             }
         }
-        return foundKeys;
+        return foundKeys;*/
     }
 
     /**

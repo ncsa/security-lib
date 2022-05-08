@@ -396,7 +396,17 @@ public class StringFunctionTests extends AbstractQDLTester {
         assert testOldIndexOf(result, "bind", 11L);
 
     }
-
+       /*
+         q.'rule':='One Ring to rule them all'
+  q.'find' := 'One Ring to find them'
+  q.'bring' :='One Ring to bring them all'
+  q.'bind' := 'and in the darkness bind them'
+  z.'all' := 'all'
+  z.'One' := 'One';
+  z.'bind' := 'darkness'
+  z.7 := 'seven'
+  index_of(q., z.)
+        */
 
     public void testStringToUpper() throws Exception {
         State state = testUtils.getNewState();

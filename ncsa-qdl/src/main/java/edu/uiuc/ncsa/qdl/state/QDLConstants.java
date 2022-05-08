@@ -124,4 +124,6 @@ public interface QDLConstants {
 
     String STEM_PATH_MARKER = "`";
     String STEM_PATH_MARKER2 = "·";
+
+    String JSON_QDL_NULL = "$$$qdl_null$$$";
 }

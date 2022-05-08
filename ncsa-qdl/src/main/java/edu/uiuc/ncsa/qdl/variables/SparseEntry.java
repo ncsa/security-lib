@@ -26,6 +26,13 @@ public class SparseEntry implements Comparable, Serializable {
 
     @Override
     public int compareTo(Object o) {
+        if(o instanceof Long){
+            Long ll = (Long)o;
+            if (index < ll) return -1;
+            if (index == ll) return 0;
+            if (index > ll) return 1;
+
+        }
         if (o instanceof SparseEntry) {
             SparseEntry s = (SparseEntry) o;
             if (index < s.index) return -1;

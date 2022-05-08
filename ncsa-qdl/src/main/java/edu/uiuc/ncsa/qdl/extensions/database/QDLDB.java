@@ -159,7 +159,7 @@ public class QDLDB implements QDLModuleMetaClass {
                 if (objects[1] instanceof StemVariable) {
                     StemVariable stemVariable = (StemVariable) objects[1];
                     if (stemVariable.isList()) {
-                        args = stemVariable.getStemList().toJSON();
+                        args = stemVariable.getQDLList().toJSON();
                     } else {
                         throw new IllegalArgumentException(QUERY_COMMAND + " requires its second argument, if present to be a list");
                     }
@@ -352,7 +352,7 @@ public class QDLDB implements QDLModuleMetaClass {
                 if (objects[1] instanceof StemVariable) {
                     StemVariable stemVariable = (StemVariable) objects[1];
                     if (stemVariable.isList()) {
-                        args = stemVariable.getStemList().toJSON();
+                        args = stemVariable.getQDLList().toJSON();
                     } else {
                         throw new IllegalArgumentException(QUERY_COMMAND + " requires its second argument, if present to be a list");
                     }
@@ -491,7 +491,7 @@ public class QDLDB implements QDLModuleMetaClass {
             if (objects[1] instanceof StemVariable) {
                 StemVariable stemVariable = (StemVariable) objects[1];
                 if (stemVariable.isList()) {
-                    args = stemVariable.getStemList().toJSON();
+                    args = stemVariable.getQDLList().toJSON();
                 } else {
                     throw new IllegalArgumentException(name + " requires its second argument, if present to be a list");
                 }

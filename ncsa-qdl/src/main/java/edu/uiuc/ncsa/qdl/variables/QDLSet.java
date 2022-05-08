@@ -7,12 +7,25 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on 4/6/22 at  4:02 PM
  */
 public class QDLSet extends HashSet {
+    public QDLSet() {
+    }
+
+    /**
+     * Constructor to initialize a set from another non-QDL set. This adds every
+     * element of the argument, not just the argument.
+     * @param set
+     */
+    public QDLSet(Set set) {
+        addAll(set);
+    }
+
     /**
      * JSON does not have sets, so this is a bit klugy: It will take an array and
      * stick the values into a set. This is lossy.
@@ -23,7 +36,7 @@ public class QDLSet extends HashSet {
         StemVariable stemVariable = new StemVariable();
         stemVariable.fromJSON(array);
         clear();
-        addAll(stemVariable.getStemList().values());
+        addAll(stemVariable.getQDLList().values());
     }
 
     public JSONArray toJSON() {
@@ -58,6 +71,7 @@ public class QDLSet extends HashSet {
         }
         return out + "}";
     }
+
 
     public QDLSet intersection(QDLSet arg) {
         QDLSet outSet = new QDLSet();
@@ -147,7 +161,8 @@ public class QDLSet extends HashSet {
    }
     public StemVariable toStem(){
         StemVariable outStem = new StemVariable();
-        outStem.addList(convertToList());
+        outStem.getQDLList().addAll(this);
+//        outStem.addList(convertToList());
         return outStem;
     }
 }

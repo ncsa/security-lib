@@ -20,7 +20,7 @@ import org.junit.runners.Suite;
         IOFunctionTest.class,
         StringFunctionTests.class,
         MathFunctionsTest.class,
-        StemFunctionsTest.class,
+        StemTest.class,
         ParserTest.class,
         ModuleTest.class,
         GlomTest.class,

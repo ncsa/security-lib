@@ -864,7 +864,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             return;
         }
         if (stemVariable.size() == 1) {
-            SparseEntry sparseEntry = stemVariable.getStemList().iterator().next();
+            SparseEntry sparseEntry = stemVariable.getQDLList().first();
             polyad.setEvaluated(true);
 
             if (doReduce) {
@@ -916,11 +916,11 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             Object reduceOuput = null;
             // contract is that a single list is returned unaltered.
             // At this point, we know there are at least 2 entries.
-            Iterator<SparseEntry> iterator = inStem.getStemList().iterator();
-            Object lastValue = iterator.next().entry;
+            Iterator iterator = inStem.getQDLList().iterator(true);
+            Object lastValue = iterator.next();
 
             while (iterator.hasNext()) {
-                Object currentValue = iterator.next().entry;
+                Object currentValue = iterator.next();
                 ArrayList<StatementWithResultInterface> argList = new ArrayList<>();
                 argList.add(new ConstantNode(lastValue, Constant.getType(lastValue)));
                 argList.add(new ConstantNode(currentValue, Constant.getType(currentValue)));
@@ -1439,7 +1439,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             StemVariable stemVariable = (StemVariable) obj;
             // now we have to turn it in to list, tending to the semantics.
-            QDLList qdlList = stemVariable.getStemList();
+            QDLList qdlList = stemVariable.getQDLList();
             List<String> sp = new ArrayList<>();
             for (int i = 0; i < qdlList.size(); i++) {
                 Object entry = qdlList.get(i);
@@ -1506,7 +1506,7 @@ public class SystemEvaluator extends AbstractFunctionEvaluator {
             }
             StemVariable stemVariable = (StemVariable) obj;
             // now we have to turn it in to list, tending to the semantics.
-            QDLList qdlList = stemVariable.getStemList();
+            QDLList qdlList = stemVariable.getQDLList();
             List<String> sp = new ArrayList<>();
             for (int i = 0; i < qdlList.size(); i++) {
                 Object entry = qdlList.get(i);
