@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql.mysql;
 
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
+import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -34,6 +35,12 @@ public class MySQLConnectionPoolProvider extends ConnectionPoolProvider<MySQLCon
          host = "localhost";
     }
 
+    public MySQLConnectionPoolProvider(SQLConnectionImpl sqlConnection) {
+        super(sqlConnection);
+        driver = "com.mysql.cj.jdbc.Driver";
+        port = 3306;
+        host = "localhost";
+    }
 
     @Override
     public Object componentFound(CfgEvent configurationEvent) {

@@ -26,7 +26,7 @@ public class SetTest extends AbstractQDLTester {
         addLine(script, "ok1 := {false} == ⊢false;");
         addLine(script, "ok2 := {2.3} == ⊢2.3;");
         addLine(script, "ok3 := {null} == ⊢null;");
-        addLine(script, "ok4 := {0,1,2,3} == " + OpEvaluator.TO_SET2 +"[;4];"); // use ASCII digraph
+        addLine(script, "ok4 := {0,1,2,3} == " + OpEvaluator.TO_SET2 + "[;4];"); // use ASCII digraph
         addLine(script, "ok5 := {'b','e'} == " + OpEvaluator.TO_SET2 + "{'a':'b','d':'e'};"); // use ASCII digraph
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
@@ -37,7 +37,7 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok4", state);
         assert getBooleanValue("ok5", state);
     }
-    
+
     public void testSetToList() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -201,6 +201,23 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
     }
 
+    public void testSubsetContract() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        addLine(script, "ok0 := subset({1,2,3},7) == {1,2,3};");
+        addLine(script, "s := subset({1,2,3,4},3);");
+        addLine(script, "ok1 := s < {1,2,3,4} && size(s)==3;");
+        addLine(script, "r := subset({1,2,3,4},-3);");
+        addLine(script, "ok2 := r < {1,2,3,4} && size(r)==3;");
+        addLine(script, "ok3 := subset({1,2,3,4},0) == {};");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok0", state) : "requesting too many elements should return whole set";
+        assert getBooleanValue("ok1", state) : "Should return 3 element subset";
+        assert getBooleanValue("ok2", state) : "Should return 3 element subset for negative count";
+        assert getBooleanValue("ok3", state) : "requesting zero elements should return empty set.";
+    }
+
     public void testReduce() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
@@ -224,6 +241,7 @@ public class SetTest extends AbstractQDLTester {
     /**
      * Checking if big decimals are involved takes a specific test (since they are
      * compared with both value and scale). This checks that that works
+     *
      * @throws Throwable
      */
     public void testBDMembership() throws Throwable {
@@ -237,6 +255,7 @@ public class SetTest extends AbstractQDLTester {
 
     /**
      * tests that membership can be used in a reference.
+     *
      * @throws Throwable
      */
     public void testForEachMembership() throws Throwable {
@@ -250,7 +269,7 @@ public class SetTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok1", state);
     }
-  
+
 
     public void testNested() throws Throwable {
         testNested(0);
@@ -431,6 +450,7 @@ public class SetTest extends AbstractQDLTester {
      * Test order of operations on symmetric difference and intersection.
      * Runs with redundant parentheses and without and checkes results are same.
      * Then runs with difference parentheses to see if somehow that no longer works.
+     *
      * @throws Throwable
      */
     public void testOOO() throws Throwable {
@@ -452,6 +472,7 @@ public class SetTest extends AbstractQDLTester {
     /**
      * Test that for_each applies to the ⊢ (to_set) operator. This turns a matrix
      * into a set whose elements are rows.
+     *
      * @throws Throwable
      */
     public void testToSetForEach() throws Throwable {
@@ -466,6 +487,7 @@ public class SetTest extends AbstractQDLTester {
     /**
      * Checks that the to set operator sits at the top of the order of operations chart.
      * If this changes, a lot of stuff breaks.
+     *
      * @throws Throwable
      */
     public void testToSetOOO() throws Throwable {
@@ -476,9 +498,11 @@ public class SetTest extends AbstractQDLTester {
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state);
     }
+
     /**
      * One of the simplest ways to makes sets in QDL is to make them
      * in input form.
+     *
      * @param n
      * @return
      * @throws Throwable
@@ -502,23 +526,52 @@ public class SetTest extends AbstractQDLTester {
     /**
      * This will take a set (in input form), take a subset of it and add some random stuff.
      * This means that the resulting set willl contain part of A as a subset
+     *
      * @param A
      * @return
      */
-    protected String makeSuperSet(String A) throws Throwable{
-        int n= 6;  // number of elements to use
+    protected String makeSuperSet(String A) throws Throwable {
+        int n = 6;  // number of elements to use
         String B = makeTestSet(10);
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "A := " + A + ";");
         addLine(script, "B := " + B + ";");
-        addLine(script, "X := subset(B," + n + ")\\/subset(A," + n +");");
+        addLine(script, "X := subset(B," + n + ")\\/subset(A," + n + ");");
         addLine(script, "X := input_form(X);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         return getStringValue("X", state);
 
     }
+
+    /**
+     * Checks that looking inside a stem with the has_value aka ∈ works.
+     *
+     * @throws Throwable
+     */
+    public void testEpsilonOnStem() throws Throwable {
+        State state = testUtils.getNewState();
+        state.setAllowBaseFunctionOverrides(true);
+        StringBuffer script = new StringBuffer();
+        addLine(script, "q. := [[-14,-7,-14,5,-1],[-10,-10,10,-4,4,9,-2]];");
+        addLine(script, "ok := reduce(@&&, [-14,9]∈q.);");
+        addLine(script, "ok1 := reduce(@&&, [false,true,true] == ([-3,-7,-2]∈q.));");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
+    /*
+         q. := [[-14,-7,-14,5,-1],[-10,-10,10,-4,4,9,-2]]
+              has_value([-14,9], q.)
+    [true,true]
+      has_value([3,-7,-2], q.)
+    [false,true,true]
+           q. := [[-14,-7,-14,5,-1],[-10,-10,10,-4,4,9,-2]]
+              has_value([-14,9], q.)
+
+      */
 
     protected String makeSingleNestedTestSet(int n, String A) throws Throwable {
         String out = makeTestSet(n);

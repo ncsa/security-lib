@@ -1,12 +1,16 @@
 package edu.uiuc.ncsa.security.storage.sql.postgres;
 
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
+import net.sf.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on Jun 23, 2010 at  7:56:23 PM
  */
 public class PostgresConnectionParameters extends SQLConnectionImpl {
+    public PostgresConnectionParameters(JSONObject jsonObject) {
+        super(jsonObject);
+    }
 
     public PostgresConnectionParameters(
             String username,

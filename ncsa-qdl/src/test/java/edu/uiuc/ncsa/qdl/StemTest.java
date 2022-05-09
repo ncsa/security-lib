@@ -918,8 +918,8 @@ public class StemTest extends AbstractQDLTester {
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
-        stem1.setStemList(qdlList1);
-        stem2.setStemList(qdlList2);
+        stem1.setQDLList(qdlList1);
+        stem2.setQDLList(qdlList2);
         stem1.listAppend(stem2);
         QDLList result = stem1.getQDLList();
         // should return sorted set
@@ -955,8 +955,8 @@ public class StemTest extends AbstractQDLTester {
         }
         StemVariable stem1 = new StemVariable();
         StemVariable stem2 = new StemVariable();
-        stem1.setStemList(qdlList1);
-        stem2.setStemList(qdlList2);
+        stem1.setQDLList(qdlList1);
+        stem2.setQDLList(qdlList2);
         stem1.listCopy(3, 5, stem2, 2);
         QDLList result = stem2.getQDLList();
         // should return sorted set
@@ -1009,21 +1009,21 @@ public class StemTest extends AbstractQDLTester {
     remove(a.3)
     b.:=[-10;0]
     insert_at(b., 1,3,a., 5)
-    test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};
+    test.:={0:0, 1:1, 2:2, 4:4, 5:-9, 6:-8, 7:-7, 8:5, 9:6, 10:7, 11:8, 12:9};
      */
-/*        public void testSparseListInsert() throws Throwable {
+        public void testSparseListInsert() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "a.:=[;10];");
         addLine(script, "remove(a.3);"); // remove an element
         addLine(script, "b.:=[-10;0];");
-        addLine(script, "test.:={0:0,1:1,2:2,4:4,5:-9,6:-8,7:-7,8:8,9:9};");
+        addLine(script, "test.:={0:0, 1:1, 2:2, 4:4, 5:-9, 6:-8, 7:-7, 8:5, 9:6, 10:7, 11:8, 12:9};");
         addLine(script, "insert_at(b., 1,3,a., 5);");
         addLine(script, "ok := size(a.) == size(test.) && reduce(@&&, a. == test.);");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
         interpreter.execute(script.toString());
         assert getBooleanValue("ok", state) : "failed sparse list insert_at.";
-    }*/
+    }
     /*
 
      */
@@ -1075,8 +1075,8 @@ public class StemTest extends AbstractQDLTester {
         }
         StemVariable sourceStem = new StemVariable();
         StemVariable targetStem = new StemVariable();
-        sourceStem.setStemList(sourceSL);
-        targetStem.setStemList(targetSL);
+        sourceStem.setQDLList(sourceSL);
+        targetStem.setQDLList(targetSL);
         sourceStem.listInsertAt(2, 5, targetStem, 3);
         QDLList result = targetStem.getQDLList();
         // should return sorted set
@@ -1095,7 +1095,7 @@ public class StemTest extends AbstractQDLTester {
             sourceSL.append(i + 20);
         }
         StemVariable sourceStem = new StemVariable();
-        sourceStem.setStemList(sourceSL);
+        sourceStem.setQDLList(sourceSL);
         StemVariable targetStem = sourceStem.listSubset(2, 3);
         QDLList result = targetStem.getQDLList();
         // should return sorted set
@@ -1114,7 +1114,7 @@ public class StemTest extends AbstractQDLTester {
             sourceSL.append(i + 20);
         }
         StemVariable sourceStem = new StemVariable();
-        sourceStem.setStemList(sourceSL);
+        sourceStem.setQDLList(sourceSL);
         // Test copying the tail of the list from the given index.
         StemVariable targetStem = sourceStem.listSubset(7);
         QDLList result = targetStem.getQDLList();
@@ -1147,7 +1147,7 @@ public class StemTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    public void testGenericSubset() throws Throwable {
+    public void testGenericRemap() throws Throwable {
         StringBuffer script = new StringBuffer();
         addLine(script, "r. := " + StemEvaluator.REMAP + "(3*[;15], {'foo':3,'bar':5,'baz':7});");
         addLine(script, "ok := reduce(@&&, r. == {'bar':15, 'foo':9, 'baz':21});");
@@ -1159,9 +1159,9 @@ public class StemTest extends AbstractQDLTester {
     }
 
     /*
-           subset(a., [[0,1],[1,1],[2,3]])
+           remap(a., [[0,1],[1,1],[2,3]])
      [1,5,11]
-        subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+        remap(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
     {bar:5, foo:1, baz:11}
      */
 
@@ -2057,7 +2057,7 @@ public class StemTest extends AbstractQDLTester {
      *
      * @throws Throwable
      */
-    public void testSubset() throws Throwable {
+    public void testSubsetMonadicPick() throws Throwable {
         State state = testUtils.getNewState();
         StringBuffer script = new StringBuffer();
         addLine(script, "ok := reduce(@&&, [-1,0,1] == subset((x)->x<2, [-1;5]));");
@@ -2070,6 +2070,58 @@ public class StemTest extends AbstractQDLTester {
         assert getBooleanValue("ok", state);
         assert getBooleanValue("ok1", state);
     }
+
+    public void testSubsetDyadicPick() throws Throwable {
+        State state = testUtils.getNewState();
+        StringBuffer script = new StringBuffer();
+        // Get elements with even indices
+        addLine(script, "ok := reduce(@&&, {0:-4, 2:-2, 4:0, 6:2, 8:4} == subset((x,y)->mod(x,2)==0, [-4;5]));");
+        // get elements whose key + value is divisible by 3, showing both are passed along and available
+        addLine(script, "q. := subset((key,value)->mod(key+value,3)==0, [-4;5]);");
+        addLine(script, "ok1 := reduce(@&&, {2:-2, 5:1, 8:4}==q.);");
+        addLine(script, "my_f(x,y)->2<x;");
+        addLine(script, "");
+        QDLInterpreter interpreter = new QDLInterpreter(null, state);
+        interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state);
+        assert getBooleanValue("ok1", state);
+    }
+
+    // Managed to break subset doing a refactor, so these are the regression tests to detect that
+    // should something like it happen again.
+    public void testSubsetContract() throws Throwable {
+            State state = testUtils.getNewState();
+            StringBuffer script = new StringBuffer();
+            addLine(script, "ok0 := reduce(@&&, subset([;10],7) == [7,8,9]);");
+            addLine(script, "ok1 := reduce(@&&, subset([;10],2,4) == [2,3,4,5]);");
+            addLine(script, "ok2 := reduce(@&&, subset([;10],-3) == [7,8,9]);");
+            addLine(script, "ok3 := reduce(@&&, subset([;10],-3,2) == [7,8]);");
+            addLine(script, "ok4 := reduce(@&&, subset('a',-3,2) == ['a']);"); // scalars are just returned
+            addLine(script, "ok5 := size(subset([;10],-3,0)) == 0;");
+            QDLInterpreter interpreter = new QDLInterpreter(null, state);
+            interpreter.execute(script.toString());
+            assert getBooleanValue("ok0", state) : " reqesting tale of list failed";
+            assert getBooleanValue("ok1", state) : " requesting 4 elements from middle of list failed";
+            assert getBooleanValue("ok2", state) : "negative count should return tail";
+            assert getBooleanValue("ok3", state) : "negative start index failed";
+            assert getBooleanValue("ok4", state) : "subset of scalar should return list with single value ";
+            assert getBooleanValue("ok5", state) : "count of 0 should return empty list";
+        }
+    /*
+       subset((x,y)->2<x, [;10])
+ {3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
+   subset((x)->x<0, [-2;3])
+ [-2,-1]
+     subset((x)->x<0, [-2;3])
+ [-2,-1]
+   my_f(x,y)->2<x
+   subset(@my_f, [;10])
+ {3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
+   my_f(x)->x<0
+   subset(@my_f, [-2;5])
+     subset((x,y)->mod(x,2)==0, [-4;5])
+ {0:-4, 2:-2, 4:0, 6:2, 8:4}
+      */
 
     public void testGenericReduce() throws Throwable {
         State state = testUtils.getNewState();

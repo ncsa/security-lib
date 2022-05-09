@@ -1,6 +1,7 @@
 package edu.uiuc.ncsa.security.storage.sql.mysql;
 
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
+import net.sf.json.JSONObject;
 
 import java.util.TimeZone;
 
@@ -9,6 +10,10 @@ import java.util.TimeZone;
  * on May 19, 2011 at  12:40:13 PM
  */
 public class MySQLConnectionParameters extends SQLConnectionImpl {
+    public MySQLConnectionParameters(JSONObject jsonObject) {
+        super(jsonObject);
+    }
+
     public MySQLConnectionParameters(
             String username,
             String password,

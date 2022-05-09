@@ -70,7 +70,7 @@ public class SQLDatabase {
        * @throws SQLException
        */
 
-    protected ColumnMap rsToMap(ResultSet rs) throws SQLException {
+    public static ColumnMap rsToMap(ResultSet rs) throws SQLException {
         ColumnMap map = new ColumnMap();
         ResultSetMetaData rsmd = rs.getMetaData();
         int numberOfColumns = rsmd.getColumnCount();

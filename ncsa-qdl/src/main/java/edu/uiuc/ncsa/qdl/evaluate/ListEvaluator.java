@@ -4,14 +4,17 @@ import edu.uiuc.ncsa.qdl.exceptions.*;
 import edu.uiuc.ncsa.qdl.expressions.ExpressionImpl;
 import edu.uiuc.ncsa.qdl.expressions.Polyad;
 import edu.uiuc.ncsa.qdl.expressions.VariableNode;
+import edu.uiuc.ncsa.qdl.functions.FunctionRecord;
 import edu.uiuc.ncsa.qdl.functions.FunctionReferenceNode;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.variables.*;
+import edu.uiuc.ncsa.security.core.exceptions.NFWException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import static edu.uiuc.ncsa.qdl.state.NamespaceAwareState.NS_DELIMITER;
 import static edu.uiuc.ncsa.qdl.variables.StemUtility.axisWalker;
@@ -337,9 +340,9 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
           subset(3*[;15], {'foo':3,'bar':5,'baz':7})
           subset(3*[;15], 2*[;5]+1)
           a. := n(3,4,n(12))
-          subset(a., [[0,1],[1,1],[2,3]])
+          remap(a., [[0,1],[1,1],[2,3]])
        [1,5,11]
-          subset(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
+          remap(a., {'foo':[0,1],'bar':[1,1], 'baz':[2,3]})
       {bar:5, foo:1, baz:11}
        */
     protected boolean doListSubset(Polyad polyad, State state) {
@@ -365,57 +368,105 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         Object arg1 = polyad.evalArg(0, state);
         checkNull(arg1, polyad.getArgAt(0));
         if (isScalar(arg1)) {
-            throw new BadArgException(LIST_SUBSET + " requires stem or set as its first argument", polyad.getArgAt(0));
+            QDLList qdlList = new QDLList();
+            qdlList.add(arg1);
+            StemVariable stemVariable = new StemVariable();
+            stemVariable.setQDLList(qdlList);
+            polyad.setResult(stemVariable);
+            polyad.setResultType(Constant.STEM_TYPE);
+            polyad.setEvaluated(true);
+            return true;
         }
         Object arg2 = polyad.evalArg(1, state);
         checkNull(arg2, polyad.getArgAt(1));
         if (!isLong(arg2)) {
             throw new BadArgException(LIST_SUBSET + " requires an integer as its second argument", polyad.getArgAt(1));
         }
-        Long endIndex = 0L;
+        Object arg3 = null;
+        if (polyad.getArgCount() == 3) {
+            arg3 = polyad.evalArg(2, state);
+            checkNull(arg3, polyad.getArgAt(2));
+
+            if (!isLong(arg3)) {
+                throw new BadArgException(LIST_SUBSET + " requires an integer as its third argument", polyad.getArgAt(2));
+            }
+        }
         StemVariable stem = null;
         QDLSet set = null;
-        if (isStem(arg1)) {
-            stem = (StemVariable) arg1;
-            endIndex = (long) stem.getQDLList().size();
+
+        long startIndex = 0L;
+        Long count = 0L;
+
+        switch (Constant.getType(arg1)) {
+            case Constant.STEM_TYPE:
+                stem = (StemVariable) arg1;
+                if (!stem.isList()) {
+                    throw new BadArgException(LIST_SUBSET + " requires a list", polyad.getArgAt(0));
+                }
+                startIndex = (Long) arg2;
+
+                if (startIndex < 0) {
+                    startIndex = startIndex + stem.size();
+                }
+                if (polyad.getArgCount() == 2) {
+                    count = (long) stem.size() - startIndex;
+                } else {
+                    // must be 3
+                    count = (Long) arg3;
+                    if (count < 0) {
+                        throw new BadArgException(LIST_SUBSET + " requires that the number of elements be positive", polyad.getArgAt(2));
+                    }
+                    if(stem.size() < startIndex + count){
+                        count = stem.size() - startIndex; // run to end of list
+                    }
+                }
+
+                break;
+            case Constant.SET_TYPE:
+                if (polyad.getArgCount() == 3) {
+                    throw new ExtraArgException(LIST_SUBSET + " takes a single argument for a set", polyad.getArgAt(1));
+                }
+                set = (QDLSet) arg1;
+                count = (Long) arg2;
+                if (count < 0) {
+                    count = -count; // no wrap around possible for sets
+                }
+                if(set.size() < count){
+                    count = (long)set.size();
+                }
+                break;
+            default:
+                QDLList qdlList = new QDLList();
+                qdlList.add(arg1);
+                StemVariable stemVariable = new StemVariable();
+                stemVariable.setQDLList(qdlList);
+                polyad.setResult(stemVariable);
+                polyad.setResultType(Constant.STEM_TYPE);
+                polyad.setEvaluated(true);
+                return true;
         }
 
-        if (isSet(arg1)) {
-            set = (QDLSet) arg1;
-            endIndex = (long) set.size();
-        }
-
-        Long startIndex = (Long) arg2;
-        if (startIndex < 0) {
-            startIndex = startIndex + endIndex;
-        }
 
         if (set != null) {
             QDLSet outSet = new QDLSet();
             Iterator iterator = set.iterator();
 
-            for (long i = 0; i < startIndex; i++) {
+            for (long i = 0; i < count; i++) {
                 outSet.add(iterator.next());
             }
+
             polyad.setResult(outSet);
             polyad.setResultType(Constant.SET_TYPE);
             polyad.setEvaluated(true);
             return true;
         }
 
-
-        if (polyad.getArgCount() == 3) {
-            Object arg3 = polyad.evalArg(2, state);
-            checkNull(arg3, polyad.getArgAt(2));
-
-            if (!isLong(arg3)) {
-                throw new BadArgException(LIST_SUBSET + " requires an integer as its third argument", polyad.getArgAt(2));
-            }
-            endIndex = (Long) arg3;
+        StemVariable outStem;
+        if (count == 0) {
+            outStem = new StemVariable();
+        } else {
+            outStem = stem.listSubset(startIndex, count);
         }
-
-
-        StemVariable outStem = stem.listSubset(startIndex, endIndex);
         polyad.setResult(outStem);
         polyad.setResultType(Constant.STEM_TYPE);
         polyad.setEvaluated(true);
@@ -423,6 +474,21 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
 
     }
 
+    /*
+      subset((x,y)->2<x, [;10])
+{3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
+  subset((x)->x<0, [-2;3])
+[-2,-1]
+    subset((x)->x<0, [-2;3])
+[-2,-1]
+  my_f(x,y)->2<x
+  subset(@my_f, [;10])
+{3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
+  my_f(x)->x<0
+  subset(@my_f, [-2;5])
+    subset((x,y)->mod(x,2)==0, [-4;5])
+{0:-4, 2:-2, 4:0, 6:2, 8:4}
+     */
     /**
      * Pick elements based on a function that is supplied.
      *
@@ -434,14 +500,28 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
         FunctionReferenceNode frn = getFunctionReferenceNode(state, polyad.getArgAt(0), true);
         Object arg1 = polyad.evalArg(1, state);
         ExpressionImpl f = null;
+        int argCount = 1;
         try {
-            f = getOperator(state, frn, 1); // single argument
+            List<FunctionRecord> functionRecordList = state.getFTStack().getByAllName(frn.getFunctionName());
+            if(functionRecordList.isEmpty()){
+                throw new NFWException("no functions found for pick function at all. Did state management change?");
+            }
+            for(FunctionRecord fr: functionRecordList){
+                if(2 < fr.getArgCount()){
+                    continue;
+                }
+                argCount = Math.max(argCount, fr.getArgCount());
+            }
+            f = getOperator(state, frn, argCount); // single argument
         } catch (UndefinedFunctionException ufx) {
             ufx.setStatement(polyad.getArgAt(0));
             throw ufx;
         }
         // 3 cases
         if (isSet(arg1)) {
+            if(argCount != 1){
+                throw new BadArgException(LIST_SUBSET + " pick function for sets can only have a single argument", polyad.getArgAt(0));
+            }
             QDLSet result = new QDLSet();
             QDLSet argSet = (QDLSet) arg1;
             ArrayList<Object> rawArgs = new ArrayList<>();
@@ -469,6 +549,13 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             for (String key : stemArg.keySet()) {
                 rawArgs.clear();
                 Object value = stemArg.get(key);
+                if(argCount == 2){
+                    if(outStem.isLongIndex(key)){
+                         rawArgs.add(Long.parseLong(key));
+                    }else {
+                        rawArgs.add(key);
+                    }
+                }
                 rawArgs.add(stemArg.get(key));
                 f.setArguments(toConstants(rawArgs));
                 Object test = f.evaluate(state);
@@ -622,7 +709,7 @@ public class ListEvaluator extends AbstractFunctionEvaluator {
             StemVariable output = new StemVariable();
             Iterator iterator = inStem.getQDLList().descendingIterator(true);
             while (iterator.hasNext()) {
-             output.listAppend(iterator.next());
+                output.listAppend(iterator.next());
             }
             return output;
         }

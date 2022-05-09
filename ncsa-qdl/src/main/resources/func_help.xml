@@ -561,8 +561,13 @@ subset(@pick, arg) - picks elements from arg based on the boolean @pick
           function. If arg is a stem or set, so is the result. If arg
           is a scalar, so is the result. Note that for a scalar, if the
           arg fails the test,a null will be returned.
+          The number of allowed arguments for @pick is 1 or 2.
 
-subset(set, count) - get count elements (at random) from a list.
+          If a single argument, the value supplied is the value itself.
+          If two arguments are supplied, the values are (key, value).
+
+subset(set, count) - get count elements from a list. Since sets have no
+          order, no promises are made on which elements are returned.
 
 => Note that for the remaining calls, the arg is a list and the result is
 => *always* a rank 1 stem and this operates only on the zeroth axis.
@@ -572,17 +577,31 @@ subset(source_list., start_index) -
 subset(source_list., start_index, n) -
           return a subset of the source_list starting at the given index,
           but only return n elements.
-Note: If n is omitted, then the rest of the list is returned from the start
-      index on. The source is not altered and the resulting list has 0 as
-      its first index.
+Note: * If n is omitted, then the rest of the list is returned from
+        the start index on.
+      * If size(source_list.)<n, then the rest of the list is returned
+        from the start index on.
+      * The source is not altered and the resulting list has 0 as
+        its first index.
 
-For general stems, also consider remap.
+Q: How do I get back a subset for a specific set of indices?
+A: Use remap. Subset is specific to lists and sets.
+   E.g.
+      remap(a., [3,7,11]) returns exactly the list
+   [a.3, a.7, a.11]
 
 See also: n(), remap]]>
         </body>
         <example>
-<![CDATA[  subset((x)->x<3, {-2,0,4,5}); // pick elements in a set < 3
+<![CDATA[  subset((x)->x<3, {-2,0,4,5}); // pick elements in a set whose value < 3
 {0,-2}
+
+    subset((key,value)->mod(key,2)==0, [-4;5]); // get the elements with even indices
+{0:-4, 2:-2, 4:0, 6:2, 8:4}
+
+    // contrived example where key+value are divisible by 3:
+    subset((key,value)->mod(key+value,3)==0, [-4;5]);
+{2:-2, 5:1, 8:4}
 
   subset({'a', 2,1,3/7,'b'}, 2); grab 2 elements from the set
 {a,1}
@@ -590,8 +609,14 @@ See also: n(), remap]]>
    subset([10;20],4); // get rest of list from index 4 on
 [14,15,16,17,18,19]
 
+   subset([10;20],-4); // get tail of the list from index -4 on
+[16,17,18,19]
+
    subset([10;20],4,2); // start at index 4, give next 2 elements
-[14,15]]]>
+[14,15]
+
+   subset('a',1,3); // subset of a scalar is just the element in a list
+[a]]]>
                 </example>
 
     </entry>
@@ -2710,16 +2735,21 @@ See also: is_defined]]>
 
     <entry id="values">
         <body>
- <![CDATA[values(arg) - return the values of a stem as a flat list
+ <![CDATA[values(arg) - return the values of a stem as a set
 
-Note that if arg is a scalar, the result is a stem of the value only.
+Note that if arg is a scalar, the result is a set of the value only.
 
 This is a compliment to list_keys(arg.) which returns the keys as a list.
-One caveat is that there is no general order and only unique values are
-returned. This does only processes a single dimension in a stem,  hence will
-not unpack embedded stems.
+This will return *all* values in a stem, regardless of where they are.
 
-See also: list_keys, keys, unique.]]>
+To get all of their locations, use indices rather than keys since keys works
+shallowly (only on first axis).
+
+If you need to check that an element is in a list use has_value or ∈,
+since those can be faster than getting every element, than checking
+to see if one is in the set.
+
+See also: list_keys, keys, indices, ∈, has_value]]>
         </body>
 <example>
 <![CDATA[E.g.
@@ -2863,10 +2893,12 @@ can, however, always be extended, since it is clear how to make more
 indices.
 
 Dyadic operation.
-a. ~ b. will append the second list to the first, extending indices as needed,
+a. ~ b. will append the second list to the first, adjusting indices as needed,
 E.g.
   [3;7]~[4;11]
 [3,4,5,6,4,5,6,7,8,9,10]
+   [;5]~{12:12,{15:15}
+[0,1,2,3,4,12,15}
 
 E.g. Operation on higher rank lists
   n(4,5)~n(3,4)
@@ -2903,8 +2935,7 @@ list of lists.
 
 There is also the laminate function in the extension module for pasting
 two stems together along an axis.
-See also: ~|, join
-]]>
+See also: ~|, join, copy, insert_at]]>
         </body>
     </entry>
     <entry id="~|" alt="≁">

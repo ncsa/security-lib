@@ -202,6 +202,15 @@ public class MetaEvaluator extends AbstractFunctionEvaluator {
                 if (evaluator.evaluate(polyad, state)) return true;
             }catch(FunctionArgException functionArgException){
                 farg = functionArgException;
+                // So maybe its overloaded??? Check user defined function.
+                // If not then blow up for real
+                try{
+                    if (getFunctionEvaluator().evaluate(polyad, state)) {
+                        return true;
+                    }
+                }catch(Throwable t){
+                    throw farg;
+                }
             }
         }
         if (getFunctionEvaluator().evaluate(polyad, state)) {

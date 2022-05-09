@@ -1,6 +1,9 @@
 package edu.uiuc.ncsa.security.storage.sql;
 
 import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
+import net.sf.json.JSONObject;
+
+import static edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider.*;
 
 /**
  * General connection parameters object for a relational database. These properties are standard for every such
@@ -9,6 +12,9 @@ import edu.uiuc.ncsa.security.core.exceptions.MyConfigurationException;
  * on Jun 23, 2010 at  8:01:59 AM
  */
 abstract public class SQLConnectionImpl implements ConnectionParameters {
+    public SQLConnectionImpl(JSONObject jsonObject) {
+        fromJSON(jsonObject);
+    }
 
     protected SQLConnectionImpl(
             String username,
@@ -41,6 +47,7 @@ abstract public class SQLConnectionImpl implements ConnectionParameters {
      * <b>NOTE:</b> this method does not set the ssl connection parameter -- tjhat should be done before invoking this method
      * because that is very vendor specific. This method passes along whatever parameters to the driver the user needs or skips them
      * if there are none.
+     *
      * @param jdbcURL
      * @return
      */
@@ -149,4 +156,38 @@ abstract public class SQLConnectionImpl implements ConnectionParameters {
         if (useSSL != z.useSSL) return false;
         return true;
     }
+
+    /**
+     * Turn this configuration into a JSON object. This presupposed that this has been created already.
+     *
+     * @return
+     */
+    public JSONObject toJSON() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(PASSWORD, password);
+        jsonObject.put(USERNAME, username);
+        jsonObject.put(SCHEMA, schema);
+        jsonObject.put(DATABASE, databaseName);
+        jsonObject.put(HOST, host);
+        jsonObject.put(PORT, port);
+        jsonObject.put(PARAMETERS, parameters);
+        jsonObject.put(USE_SSL, useSSL);
+        return jsonObject;
+    }
+
+    /**
+     * Populate this from the JSON object. This will overwrite any existing values.
+     *
+     * @param json
+     */
+    public void fromJSON(JSONObject json) {
+        if(json.containsKey(PASSWORD)) password = json.getString(PASSWORD);
+        if(json.containsKey(USERNAME)) username = json.getString(USERNAME);
+        if(json.containsKey(SCHEMA)) schema = json.getString(SCHEMA);
+        if(json.containsKey(HOST)) host = json.getString(HOST);
+        if(json.containsKey(PORT)) port = json.getInt(PORT);
+        if(json.containsKey(PARAMETERS)) parameters = json.getString(PARAMETERS);
+        if(json.containsKey(USE_SSL)) useSSL = json.getBoolean(USE_SSL);
+    }
+
 }

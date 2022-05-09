@@ -1,12 +1,17 @@
 package edu.uiuc.ncsa.security.storage.sql.mariadb;
 
 import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
+import net.sf.json.JSONObject;
 
 /**
  * <p>Created by Jeff Gaynor<br>
  * on May 19, 2011 at  12:40:13 PM
  */
 public class MariaDBConnectionParameters extends SQLConnectionImpl {
+    public MariaDBConnectionParameters(JSONObject jsonObject) {
+        super(jsonObject);
+    }
+
     public MariaDBConnectionParameters(
             String username,
             String password,

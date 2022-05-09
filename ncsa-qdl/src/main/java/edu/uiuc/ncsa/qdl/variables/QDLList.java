@@ -85,29 +85,6 @@ public class QDLList implements List, Serializable {
         throw new NotImplementedException("need sublist support for sparse lists.");
     }
 
-    public void listInsertAt(long startIndex, long length, QDLList target, long insertIndex) {
-        listCopyOrInsertFrom(startIndex, length, target, insertIndex, false);
-
-      /*
-      QDLList tSL = target.getQDLList();
-              QDLList outSL = new QDLList();
-              for (long i = 0; i < insertIndex; i++) {
-                  outSL.append(tSL.get(i));
-              }
-              QDLList sSL = getQDLList();
-              for (long i = startIndex; i < startIndex + length; i++) {
-                  Object obj = sSL.get(i);
-                  if (obj == null) {
-                      throw new IndexError("argument out of bounds for index " + i + ", object has size " + sSL.size(), null);
-                  }
-                  outSL.append(obj);
-              }
-              for (long i = insertIndex; i < tSL.size(); i++) {
-                  outSL.append(tSL.get(i));
-              }
-              target.setStemList(outSL);
-       */
-    }
 
     public QDLList() {
         super();
@@ -120,13 +97,6 @@ public class QDLList implements List, Serializable {
         for (long i = 0L; i < size; i++) {
             arrayList.add(i);
         }
-
-/*
-        for (long i = 0L; i < size; i++) {
-            SparseEntry sparseEntry = new SparseEntry(i, i);
-            add((V) sparseEntry);
-        }
-*/
     }
 
 
@@ -165,17 +135,6 @@ public class QDLList implements List, Serializable {
             }
 
         }
-/*
-        while (iterator.hasNext()) {
-            Object obj = iterator.next().entry;
-            if (obj instanceof StemVariable) {
-                StemVariable ss = ((StemVariable) obj).almostUnique();
-                set.addAll(ss.getQDLList().unique());
-            } else {
-                set.add(obj);
-            }
-        }
-*/
         QDLList qdlList1 = new QDLList();
         HashSet hashSet1 = new HashSet();
         for (Object obj : set) {
@@ -479,21 +438,6 @@ public class QDLList implements List, Serializable {
             r[ii++] = sparseEntry.entry;
         }
         return r;
-/*
-        for (long i = 0L; i < size(); i++) {
-            Object o = get(i);
-            if (!allowStems && (o instanceof StemVariable)) {
-                throw new IllegalArgumentException("error: a stem is not allowed in this list");
-            }
-            if (o == null && noGaps) {
-                Object[] r2 = new Object[(int) i];
-                System.arraycopy(r, 0, r2, 0, (int) i);
-                return r2;
-            }
-            r[(int) i] = o;
-        }
-        return r;
-*/
     }
 
     /**
@@ -510,17 +454,8 @@ public class QDLList implements List, Serializable {
         long index = 0L;
         Object obj = get(0);
         s.add(new Long(size()));
-        StemVariable currentStem;
-/*        if (obj instanceof StemVariable) {
-            currentStem = (StemVariable) obj;
-
-            s.add(new Long(currentStem.getQDLList().size()));
-        }*/
-/*        SparseEntry sparseEntry = new SparseEntry(index++, new Long(size()));
-        s.add(sparseEntry.entry);*/
         Object currentEntry = obj;
         while (currentEntry != null) {
-            //currentEntry.entry;
             if (currentEntry instanceof StemVariable) {
                 StemVariable s1 = (StemVariable) currentEntry;
                 if (s1.getQDLList().size() == 0) {
@@ -641,8 +576,6 @@ public class QDLList implements List, Serializable {
                     return true;
                 case 15: //TTTT both, both
                     throw new NotImplementedException("Surgery needed");
-
-
             }
 
         }
@@ -687,45 +620,13 @@ public class QDLList implements List, Serializable {
             getArrayList().add(element); // tack it on the end
             return;
         }
-            /*if (hasSparseEntries()) {
-                List<SparseEntry> deleteList = new ArrayList<>();
-                SparseEntry first = getSparseEntries().first();
-                if (first.index == getArrayList().size()) {
-                    // now they match up after that addition.
-                    long lastIndex = first.index - 1;
-                    for (SparseEntry sparseEntry : getSparseEntries()) {
-                        if (lastIndex + 1 != sparseEntry.index) {
-                            break;
-                        }
-                        if (!isInt(sparseEntry.index)) {
-                            break;
-                        }
-                        deleteList.add(sparseEntry);
-                        getArrayList().add(sparseEntry.entry);
-                    }
-                    getSparseEntries().removeAll(deleteList);
-                }
-                return;
-            }*/
-        //}
         SparseEntry sparseEntry = new SparseEntry(index, element);
         getSparseEntries().remove(sparseEntry);
         getSparseEntries().add(sparseEntry); // TreeSet only adds if it does not exist. Have to remove first
     }
 
-    /**
-     * This list is the source of the copy.
-     *
-     * @param startIndex
-     * @param length
-     * @param source
-     * @param insertIndex
-     */
-    public void listCopyFrom(long startIndex, long length, QDLList source, long insertIndex) {
-        listCopyOrInsertFrom(startIndex, length, source, insertIndex, true);
-    }
-
-    public void listCopyOrInsertFrom(long startIndex, long length, QDLList source, long insertIndex, boolean doCopy) {
+    public void listInsertFrom(long startIndex, long length, QDLList source, long insertIndex) {
+// set up
         if (length == 0L) return; // do nothing.
 
         if (!source.hasIndex(startIndex)) {
@@ -752,110 +653,140 @@ public class QDLList implements List, Serializable {
                 }
             }
         }
-        // Done with source. Everything from here down applies to this list.
-        SparseEntry firstSE = null;
-        SparseEntry lastSE = null;
-        if(hasSparseEntries()){
-            firstSE = getSparseEntries().first();
-            lastSE = getSparseEntries().last();
+        if (insertIndex <= getArrayList().size()) {
+            if (insertIndex < getArrayList().size()) {
+                getArrayList().addAll((int) insertIndex, sourceList);
+            }
+            if (insertIndex == getArrayList().size()) {
+                getArrayList().addAll(sourceList);
+            }
+            long offset = startIndex + length;
+            if (hasSparseEntries()) {
+                for (SparseEntry sparseEntry : getSparseEntries().descendingSet()) {
+                    sparseEntry.index = sparseEntry.index + offset;
+                }
+            }
+            normalizeIndices();
+            return;
+        }
+        long offset = startIndex + length;
+        if (hasSparseEntries()) {
+            for (SparseEntry sparseEntry : getSparseEntries().descendingSet()) {
+                if (sparseEntry.index < insertIndex) {
+                    break;
+                }
+                sparseEntry.index = sparseEntry.index + offset - 1;
+            }
+            long index = insertIndex;
+            for (Object obj : sourceList) {
+                SparseEntry sparseEntry = new SparseEntry(index++, obj);
+                getSparseEntries().remove(sparseEntry);
+                getSparseEntries().add(sparseEntry);
+            }
+            normalizeIndices();
+        }
+    }
 
+    protected void normalizeIndices() {
+        if (!hasSparseEntries()) return;
+
+        long first = getSparseEntries().first().index;
+        List<SparseEntry> removeList = new ArrayList<>();
+        if (getArrayList().size() == first) {
+            long lastIndex = first;
+            for (SparseEntry sparseEntry : getSparseEntries()) {
+                if (lastIndex + 1 < sparseEntry.index) {
+                    break;
+                }
+                lastIndex++;
+                getArrayList().add(sparseEntry.entry);
+                removeList.add(sparseEntry);
+            }
+        }
+        for (SparseEntry sparseEntry : removeList) {
+            getSparseEntries().remove(sparseEntry);
+        }
+    }
+
+    /*
+  a. := [;10] ~{15:15, 16:16}
+       a. := [;10]
+       a.15 := 15;a.16 :=16;
+  b. := [-10;0]
+  insert_at(b., 1, 3, a., 5)
+     */
+    //  public void listCopyOrInsertFrom(long startIndex, long length, QDLList source, long insertIndex, boolean doCopy) {
+    public void listCopyFrom(long startIndex, long length, QDLList source, long insertIndex) {
+
+        if (length == 0L) return; // do nothing.
+
+        if (!source.hasIndex(startIndex)) {
+            throw new IllegalArgumentException("the start index in the source for this operation does not exist.");
+        }
+
+        if (length + startIndex > source.size()) {
+            throw new IllegalArgumentException("the source does not have enough elements for this operation.");
+        }
+
+        List sourceList = null;
+        if (startIndex < source.getArrayList().size()) {
+            sourceList = source.getArrayList().subList((int) startIndex, (int) (startIndex + length));
+        }
+        if (source.hasSparseEntries()) {
+            if (sourceList == null) {
+                SparseEntry fromIndex = new SparseEntry(startIndex);
+                SparseEntry toIndex = new SparseEntry(startIndex + length);
+
+                SortedSet<SparseEntry> sparseEntries = source.getSparseEntries().subSet(fromIndex, toIndex);
+                sourceList = new ArrayList();
+                for (SparseEntry sparseEntry : sparseEntries) {
+                    sourceList.add(sparseEntry.entry);
+                }
+            }
         }
 
         // now for surgery...
 
-        if (doCopy) {
-            int index = 0;
-            // No easy way to replace, just have to do it.
-            for (Object obj : sourceList) {
-                int nextIndex = (int) insertIndex + index++;
-                if(hasSparseEntries()) {
-                    SparseEntry nextSE = new SparseEntry(nextIndex, obj);
-                    if(hasArrayList()){
-                          // hard bit -- if this is overshooting the end of the array list
-                        if(getSparseEntries().contains(nextSE)){
-                            getSparseEntries().remove(nextSE);
-                            getSparseEntries().add(nextSE);
-                        }else{
-                            if (nextIndex < getArrayList().size()) {
-                                getArrayList().set(nextIndex, obj);
-                            } else {
-                                getArrayList().add(obj);
-                            }
-                        }
-
-                    }else{
-                        nextSE.entry = obj;
+        int index = 0;
+        // No easy way to replace, just have to do it.
+        for (Object obj : sourceList) {
+            int nextIndex = (int) insertIndex + index++;
+            if (hasSparseEntries()) {
+                SparseEntry nextSE = new SparseEntry(nextIndex, obj);
+                if (hasArrayList()) {
+                    // hard bit -- if this is overshooting the end of the array list
+                    if (getSparseEntries().contains(nextSE)) {
                         getSparseEntries().remove(nextSE);
                         getSparseEntries().add(nextSE);
-                    }
-                }else{
-                    if (nextIndex < getArrayList().size()) {
-                        getArrayList().set(nextIndex, obj);
                     } else {
-                        getArrayList().add(obj);
+                        if (nextIndex < getArrayList().size()) {
+                            getArrayList().set(nextIndex, obj);
+                        } else {
+                            getArrayList().add(obj);
+                        }
                     }
-                }
-            }
-        } else {
-            getArrayList().addAll((int) insertIndex, sourceList);
-        }
-    }
-
-    public void listCopyOrInsertOLD(long startIndex, long length, QDLList target, long insertIndex, boolean doCopy) {
-        if (length == 0L) return; // do nothing.
-
-        if (!hasIndex(startIndex)) {
-            throw new IllegalArgumentException("the start index for this copy does not exist.");
-        }
-
-        if (length + startIndex > size()) {
-            throw new IllegalArgumentException("the source does not have enough elements to copy.");
-        }
-
-        // if (!target.hasSparseEntries()) {
-        if (hasSparseEntries()) {
-            SparseEntry startSE = new SparseEntry(startIndex);
-            if (!getSparseEntries().contains(startSE)) {
-                throw new IllegalArgumentException("the start index for this copy does not exist.");
-            }
-            SparseEntry endSE = new SparseEntry(startIndex + length);
-            SortedSet<SparseEntry> sortedSet = getSparseEntries().subSet(startSE, true, endSE, false);
-            long i = insertIndex;
-            for (SparseEntry sparseEntry : sortedSet) {
-                target.set(sparseEntry);
-            }
-
-        } else {
-
-            List newEntries = getArrayList().subList((int) startIndex, (int) (startIndex + length));
-            if (doCopy) {
-                int index = 0;
-                // No easy way to replace, just have to do it.
-                for (Object obj : newEntries) {
-                    int nextIndex = (int) insertIndex + index++;
-                    if (nextIndex < target.getArrayList().size()) {
-                        target.getArrayList().set(nextIndex, obj);
-                    } else {
-                        target.getArrayList().add(obj);
-                    }
+                } else {
+                    nextSE.entry = obj;
+                    getSparseEntries().remove(nextSE);
+                    getSparseEntries().add(nextSE);
                 }
             } else {
-                target.getArrayList().addAll((int) insertIndex, newEntries);
+                if (nextIndex < getArrayList().size()) {
+                    getArrayList().set(nextIndex, obj);
+                } else {
+                    getArrayList().add(obj);
+                }
             }
-            //    }
         }
-        /*
-        SortedSet<SparseEntry> sortedSet = getQDLList().subset(startIndex, true, startIndex + length, false);
-        long newIndex = 0L;
-        QDLList targetList = target.getQDLList();
-        for (SparseEntry s : sortedSet) {
-            SparseEntry sparseEntry = new SparseEntry(insertIndex + newIndex++, s.entry);
-            targetList.remove(sparseEntry);
-            targetList.add(sparseEntry);
-        }
-
-         */
+        normalizeIndices();
     }
+   /*
+        a.:=[;10];
+    remove(a.3)
+    b.:=[-10;0]
+      copy(b., 2, 5, a., 1)
+
+    */
 
     /**
      * This iterates over the elements of this QDL list. It will do elements in the
@@ -1196,4 +1127,30 @@ public class QDLList implements List, Serializable {
         System.out.println(list.size());
     }
 
+    /**
+     * This is an internal method used by the IDE or debugging it is much harder
+     */
+    protected String otherToString() {
+        String x = getClass().getSimpleName() +
+                "{ array[" + (hasArrayList() ? 0 : arrayList.size()) + "]=" + (hasArrayList() ? arrayList.toString() : "[], ");
+        String se;
+        if (hasSparseEntries()) {
+            se = "sparseEntries[" + sparseEntries.size() + "]=";
+            String ll = "{";
+            boolean isFirst = true;
+            for (SparseEntry sparseEntry : sparseEntries) {
+                ll = ll + (isFirst ? "" : ",") + sparseEntry.index + ":" + sparseEntry.entry;
+                if (isFirst) {
+                    isFirst = false;
+                }
+            }
+            se = se + ll + "}";
+        } else {
+            se = "sparseEntries[0]=[]";
+        }
+        x = x + se;
+        x = x + "}";
+
+        return x;
+    }
 }

@@ -2,6 +2,7 @@ package edu.uiuc.ncsa.security.storage.sql.mariadb;
 
 import edu.uiuc.ncsa.security.core.configuration.provider.CfgEvent;
 import edu.uiuc.ncsa.security.storage.sql.ConnectionPoolProvider;
+import edu.uiuc.ncsa.security.storage.sql.SQLConnectionImpl;
 
 /**
  * <p>Created by Jeff Gaynor<br>
@@ -33,6 +34,12 @@ public class MariaDBConnectionPoolProvider extends ConnectionPoolProvider<MariaD
          host = "localhost";
     }
 
+    public MariaDBConnectionPoolProvider(SQLConnectionImpl sqlConnection) {
+        super(sqlConnection);
+        driver = "org.mariadb.jdbc.Driver";
+        port = 3306;
+        host = "localhost";
+    }
 
     @Override
     public Object componentFound(CfgEvent configurationEvent) {

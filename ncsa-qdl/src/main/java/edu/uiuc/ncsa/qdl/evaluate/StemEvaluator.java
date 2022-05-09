@@ -832,6 +832,8 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
                 for (String lkey : lStem.keySet()) {
+                    result.put(lkey, rStem.hasValue(lStem.get(lkey)));
+/*
                     Boolean rc = Boolean.FALSE;
                     for (String rKey : rStem.keySet()) {
                         if (lStem.get(lkey).equals(rStem.get(rKey))) {
@@ -840,6 +842,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
                         }
                     }
                     result.put(lkey, rc);
+*/
                 }
             } else {
                 if (isSet(rightArg)) {
@@ -877,12 +880,15 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             Boolean result = Boolean.FALSE;
             if (isStem(rightArg)) {
                 StemVariable rStem = (StemVariable) rightArg;
+                result = rStem.hasValue(leftArg);
+/*
                 for (String rKey : rStem.keySet()) {
                     if (leftArg.equals(rStem.get(rKey))) {
                         result = Boolean.TRUE;
                         break;
                     }
                 }
+*/
             } else {
                 if (isSet(rightArg)) {
                     if (leftArg instanceof BigDecimal) {
@@ -1620,7 +1626,7 @@ public class StemEvaluator extends AbstractFunctionEvaluator {
             qdlList = new QDLList(size);
         }
         StemVariable out = new StemVariable();
-        out.setStemList(qdlList);
+        out.setQDLList(qdlList);
         return out;
     }
 

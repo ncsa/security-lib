@@ -45,6 +45,23 @@ public class ConnectionRecord implements Identifiable {
 
     public Connection connection;
     Identifier identifier;
+
+    public long getLastAccessed() {
+        return lastAccessed;
+    }
+
+    public void setLastAccessed(long lastAccessed) {
+        this.lastAccessed = lastAccessed;
+    }
+
+    public boolean isClosed() {
+        return isClosed;
+    }
+
+    public void setClosed(boolean closed) {
+        isClosed = closed;
+    }
+
     long lastAccessed = 0L;
     boolean isClosed = true;
     @Override

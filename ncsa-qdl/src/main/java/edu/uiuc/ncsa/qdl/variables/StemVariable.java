@@ -34,7 +34,7 @@ public class StemVariable extends HashMap<String, Object> {
         return qdlList;
     }
 
-    public void setStemList(QDLList qdlList) {
+    public void setQDLList(QDLList qdlList) {
         this.qdlList = qdlList;
     }
 
@@ -192,7 +192,7 @@ public class StemVariable extends HashMap<String, Object> {
 
     public StemVariable(Long count, Object[] fillList) {
         QDLList s = new QDLList(count, fillList);
-        setStemList(s);
+        setQDLList(s);
     }
 
     public Object remove(String key) {
@@ -694,9 +694,9 @@ public class StemVariable extends HashMap<String, Object> {
                     } else if (v instanceof Double) {
                         put((long) i, new BigDecimal(Double.toString((Double) v)));
                     } else {
-                        if((v instanceof String) && QDLConstants.JSON_QDL_NULL.equals(v)){
-                            put((long)i, QDLNull.getInstance());
-                        }else {
+                        if ((v instanceof String) && QDLConstants.JSON_QDL_NULL.equals(v)) {
+                            put((long) i, QDLNull.getInstance());
+                        } else {
                             put((long) i, v);
                         }
                     }
@@ -1249,8 +1249,9 @@ public class StemVariable extends HashMap<String, Object> {
      */
     public void listAppend(StemVariable stemVariable) {
         getQDLList().appendAll(stemVariable.getQDLList().values());
-/*
-        QDLList list = stemVariable.getQDLList();
+
+   /*     QDLList list = stemVariable.getQDLList();
+
         if (list.isEmpty()) return;
         long startIndex = 0L;
 
@@ -1261,7 +1262,7 @@ public class StemVariable extends HashMap<String, Object> {
         for (SparseEntry entry : list) {
             getQDLList().add(new SparseEntry(startIndex++, entry.entry));
         }
-*/
+     */
     }
 
     public void listAppend(Object value) {
@@ -1293,7 +1294,7 @@ public class StemVariable extends HashMap<String, Object> {
      * @param insertIndex
      */
     public void listInsertAt(long startIndex, long length, StemVariable target, long insertIndex) {
-        target.getQDLList().listInsertAt(startIndex, length, getQDLList(), insertIndex);
+        target.getQDLList().listInsertFrom(startIndex, length, getQDLList(), insertIndex);
     }
 
     /**
@@ -1309,7 +1310,7 @@ public class StemVariable extends HashMap<String, Object> {
     public StemVariable listSubset(long startIndex, long length) {
 
         StemVariable stemVariable = new StemVariable();
-        stemVariable.setStemList(getQDLList().subset(startIndex, true, startIndex + length, false));
+        stemVariable.setQDLList(getQDLList().subset(startIndex, true, startIndex + length, false));
         return stemVariable;
     }
 
@@ -1345,7 +1346,7 @@ public class StemVariable extends HashMap<String, Object> {
     public StemVariable almostUnique() {
         StemVariable output = new StemVariable();
         if (isList()) {
-            output.setStemList(getQDLList().unique());
+            output.setQDLList(getQDLList().unique());
             return output;
         }
         HashSet hashSet = new HashSet();
@@ -1367,14 +1368,14 @@ public class StemVariable extends HashMap<String, Object> {
         for (Object obj : hashSet) {
             qdlList1.append(obj);
         }
-        output.setStemList(qdlList1);
+        output.setQDLList(qdlList1);
         return output;
     }
 
 
     public StemVariable dim() {
         StemVariable dim = new StemVariable();
-        dim.setStemList(getQDLList().dim());
+        dim.setQDLList(getQDLList().dim());
         return dim;
     }
 
@@ -1695,5 +1696,21 @@ public class StemVariable extends HashMap<String, Object> {
     @Override
     public Collection<Object> values() {
         return valueSet();
+    }
+
+    public boolean hasValue(Object x) {
+        for (String k : keySet()) {
+            Object v = get(k);
+            if (v instanceof StemVariable) {
+                if (((StemVariable) v).hasValue(x)) {
+                    return true;
+                }
+            } else {
+                if (v.equals(x)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

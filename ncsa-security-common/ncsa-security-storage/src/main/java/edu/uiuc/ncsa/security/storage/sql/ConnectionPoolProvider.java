@@ -59,6 +59,15 @@ public abstract class ConnectionPoolProvider<T extends ConnectionPool> extends H
     }
 
     /**
+     * this only sets the database name and the schema. Subclasses should set what they specifically need.
+     * @param sqlConnection
+     */
+    public ConnectionPoolProvider(SQLConnectionImpl sqlConnection) {
+          this.database =sqlConnection.databaseName;
+          this.schema = sqlConnection.schema;
+    }
+
+    /**
      * Called exactly once during {@link #get()} per (new) pool to set the parameters (max size etc.).
      *
      * @param pool

@@ -191,7 +191,7 @@ public abstract class SQLStore<V extends Identifiable> extends SQLDatabase imple
             for (ColumnDescriptorEntry cde : getTable().getColumnDescriptor()) {
                 // now we loop through the table and set each and every one of these
                 // OAUTH-148 fix: MariaDB driver does not accept longvarchar as a type in setObject (known bug for
-                // them. Workaround is to explicitly test for this and carry out a setString call instead.
+                // them. Workaround is to explicitly test for this and carry out a setString call instead.)
                 if (cde.getType() == Types.LONGVARCHAR) {
                     Object obj = map.get(cde.getName());
                     stmt.setString(i++, obj == null ? null : obj.toString());

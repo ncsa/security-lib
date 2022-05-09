@@ -39,7 +39,7 @@ public class StemConverter {
         StemVariable out = new StemVariable();
         QDLList qdlList = new QDLList();
         qdlList.addAll(array);
-        out.setStemList(qdlList);
+        out.setQDLList(qdlList);
         return out;
 
 /*

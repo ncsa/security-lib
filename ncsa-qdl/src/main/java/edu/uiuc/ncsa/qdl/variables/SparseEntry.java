@@ -47,4 +47,11 @@ public class SparseEntry implements Comparable, Serializable {
         return compareTo(obj) == 0;
     }
 
+    @Override
+    public String toString() {
+        return "SparseEntry{" +
+                "index=" + index +
+                ", entry=" + entry +
+                '}';
+    }
 }
