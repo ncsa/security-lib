@@ -1250,19 +1250,6 @@ public class StemVariable extends HashMap<String, Object> {
     public void listAppend(StemVariable stemVariable) {
         getQDLList().appendAll(stemVariable.getQDLList().values());
 
-   /*     QDLList list = stemVariable.getQDLList();
-
-        if (list.isEmpty()) return;
-        long startIndex = 0L;
-
-        if (!getQDLList().isEmpty()) {
-            SparseEntry last = getQDLList().last();
-            startIndex = last.index + 1;
-        }
-        for (SparseEntry entry : list) {
-            getQDLList().add(new SparseEntry(startIndex++, entry.entry));
-        }
-     */
     }
 
     public void listAppend(Object value) {
@@ -1590,13 +1577,14 @@ public class StemVariable extends HashMap<String, Object> {
 
     public StemVariable indices() {
         KeyRankMap keysByRank = allKeys2();
-        StemVariable rc = new StemVariable();
         // really simple case of a basic list with no structure. Just return the elements in a stem
         if (keysByRank.size() == 1 && keysByRank.keySet().iterator().next() == 1) {
-            List indices = keysByRank.get(1);
-            rc.addList(indices);
-            return rc;
+            //List indices = keysByRank.get(1);
+            return convertKeyByRank(keysByRank.get(1));
+            //rc.addList(indices);
+            //return rc;
         }
+        StemVariable rc = new StemVariable();
         for (Integer i : keysByRank.keySet()) {
             StemVariable stemVariable = convertKeyByRank(keysByRank.get(i));
             for (Object key : stemVariable.keySet()) {

@@ -379,7 +379,7 @@ This is extremely useful
 in conjunction with the rename_keys() call.
 If you supply and integer for the variable type, only
 Note: There is no canonical ordering of keys, so these are effectively random.
-See also: list_keys(), rename_keys(), var_type(), constants('var_type')]]>
+See also: list_keys(), indices, rename_keys(), var_type(), constants('var_type')]]>
         </body>
         <example>
 <![CDATA[   constants().var_type; // list variable types
@@ -388,9 +388,17 @@ See also: list_keys(), rename_keys(), var_type(), constants('var_type')]]>
    keys(arg., 3); // get keys of strings only
  {2:2, 4:4}
    keys(arg., 5); // get decimals only
-{1:1, 5:5}]]>
+{1:1, 5:5}
+   // Let's compare this with indices
+  keys(arg.)
+[0,1,2,3,4,5]
+  // since this returns a stem of integer values keyed by integer, it is a list.
+  indices(arg.)
+[[0],[1],[2],[3],[4],[5]]
+  // Each of these is a list and is the complete path inside the stem to the element.
+  arg.keys(arg.).0 == 2 == arg.indices(arg.).0
+true]]>
                 </example>
-
     </entry>
 
     <entry id="copy">
@@ -548,8 +556,7 @@ So to get the transpose,
   [4,9,14]
  ]
 
- Note that this works on any  higher order stems as well.
-           ]]>
+ Note that this works on any  higher order stems as well.]]>
                 </example>
 
     </entry>
@@ -1484,8 +1491,7 @@ tokenize(target, arg{, use_regex}) - tokenize a string or stem of strings
      use_regex - flag to use regex.]]>
         </body>
 <example>
-<![CDATA[
-   tokenize('abd:def:123', ':');
+<![CDATA[   tokenize('abd:def:123', ':');
 [abd,def,123]
 
    // Tokenize a string with various delimters using a regular expression
@@ -1561,11 +1567,9 @@ $E4$BD$A0$E6$B5$A3
 See also: vencode]]>
         </body>
         <example>
-<![CDATA[
-   // Decode a tamil proverb:heaven helps the helpless.
+<![CDATA[   // Decode a tamil proverb:heaven helps the helpless.
   vdecode('%E0%AE%85%E0%AE%95%E0%AE%A4%E0%AE%BF%E0%AE%95%E0%AF%8D%E0%AE%95%E0%AF%81+%E0%AE%86%E0%AE%95%E0%AE%BE%E0%AE%9A%E0%AE%AE%E0%AF%87+%E0%AE%A4%E0%AF%81%E0%AE%A3%E0%AF%88',true)
-அகதிக்கு ஆகாசமே துணை
-]]>
+அகதிக்கு ஆகாசமே துணை]]>
                 </example>
 
     </entry>
@@ -1686,8 +1690,7 @@ See also: autosave_messages_on, autosave_interval]]>
 
     <entry id="autosave_messages_on">
         <body>
- <![CDATA[
-(workspace variable)
+ <![CDATA[(workspace variable)
 autosave_messages_on - Turn on notifications by the autosave system. If on then
              every time the workspace is automatically saved, the usual
              messages (size, time) are printed. If false, nothing is printed.
@@ -2038,8 +2041,7 @@ Compare to joining along the last axis
     </entry>
     <entry id="reverse">
         <body>
- <![CDATA[
-reverse(list.) - reverse the elements of a list]]>
+ <![CDATA[reverse(list.) - reverse the elements of a list]]>
         </body>
 <example>
 <![CDATA[E.g.
@@ -2050,9 +2052,7 @@ Another example on a list of lists
   p.
 [[0,1,2], [0,1]]
   reverse(p.)
-[[0,1],[0,1,2]]
-
-]]>
+[[0,1],[0,1,2]]]]>
 </example>
 
     </entry>
@@ -2101,8 +2101,7 @@ You supply a stem and a query. Note that the query is a string.
 ]]>
         </body>
         <example>
-           <![CDATA[
-In section 2 of the above specification is a JSON object. If you import
+           <![CDATA[In section 2 of the above specification is a JSON object. If you import
 this into the workspace as the stem variable my_json., then here are
 a few examples:
 
@@ -2130,16 +2129,14 @@ E.g. 3: Using the indices
 
 Hint: Easy way to import the JSON is to cut and paste it to a file at /my/path/my_json.json
        and issue
-       my_json. := from_json(file_read('/my/path/my_json.json'));
-           ]]>
+       my_json. := from_json(file_read('/my/path/my_json.json'));]]>
                 </example>
 
     </entry>
     <entry id="=~" alt="≈">
 
         <body>
- <![CDATA[
-regex =~ expression
+ <![CDATA[regex =~ expression
 Apply the given regex (which is a string) to match the string representation
 of the expression.
 Result is always a boolean.
@@ -2147,8 +2144,7 @@ Result is always a boolean.
 See also: tokenize, replace.]]>
         </body>
         <example>
-           <![CDATA[
-   '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
+           <![CDATA[   '[a-zA-Z]{3}' =~ 'aBc'; // Checks if the argument has 3 letters
 true
            ]]>
                 </example>
@@ -2166,12 +2162,10 @@ inclusive.
 See also: slice]]>
         </body>
         <example>
-           <![CDATA[
-   ⟦-1/2; 1/pi(); 5⟧
+           <![CDATA[   ⟦-1/2; 1/pi(); 5⟧
 [-0.5,-0.295422528454052,-0.090845056908104,0.113732414637844,0.318309886183792]
 
-Yields 5 numbers from -1/2 to 1/pi inclusive.
-           ]]>
+Yields 5 numbers from -1/2 to 1/pi inclusive.]]>
                 </example>
 
     </entry>
@@ -2185,8 +2179,7 @@ See slice]]>
 
     <entry id="!" alt="¬">
         <body>
- <![CDATA[
-Unary negation. Note that this is a monadic operator (!).
+ <![CDATA[Unary negation. Note that this is a monadic operator (!).
 That means that it negates it right hand argument, so the order
 of operations using this is a wee bit different from what you might
 expect. For instance
@@ -2201,8 +2194,7 @@ When in doubt, use parentheses. Again, the contract is that the entire
 RHS is evaluated and fed to the operator. Compare the tilde operator
 for lists or any of the other monadic operators.
 
-Equivalent to: unicode not ¬ or \u00ac
-]]>
+Equivalent to: unicode not ¬ or \u00ac]]>
         </body>
     </entry>
     <entry id="*" alt="×">
@@ -2216,8 +2208,7 @@ Equivalent to: unicode not ¬ or \u00ac
 <![CDATA[   2*3
 6
    4*'abc'
-abcabcabcabc
-]]>
+abcabcabcabc]]>
 </example>
 
     </entry>
@@ -2295,8 +2286,7 @@ See also: comparisons]]>
 
     <entry id="unicode">
         <body>
- <![CDATA[
-Unicode characters may be put in strings if they are escaped.
+ <![CDATA[Unicode characters may be put in strings if they are escaped.
 QDL also supports several directly as operators. Typing them is, however
 dependant on your keyboard layout. Generally every unicode character has
 an ASCII version (usually a digraph).
@@ -2348,16 +2338,12 @@ You can request help on any QDL symbol by typing
 E.g.
     )help ∅
     
-would print the entry for the null set.
-]]>
+would print the entry for the null set.]]>
         </body>
         <example>
-           <![CDATA[
-   // How to use unicode in a string:
+           <![CDATA[   // How to use unicode in a string:
    '\u03c4 is the Greek letter tau'
-τ is the Greek letter tau
-
-           ]]>
+τ is the Greek letter tau]]>
                 </example>
 
     </entry>
@@ -2434,8 +2420,7 @@ and z.i.j is the value of z() at xy.i.j, i.e. z.i.j == z(xy.i.j.0, xy.i.j.1)]]>
     </entry>
     <entry id="block">
         <body>
- <![CDATA[
-Keyword.
+ <![CDATA[Keyword.
 block is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside the block is local only
 to that block, but the block inherits the ambient state.
@@ -2450,7 +2435,7 @@ baz
 a gets re-assigned to 'baz' inside the block, ok does not exist any place but the block.
 This is extremely useful in many places, such as scripts.
 
-See also: local]]>
+See also: local, visibility]]>
         </body>
     </entry>
 
@@ -2755,14 +2740,12 @@ See also: list_keys, keys, indices, ∈, has_value]]>
 <![CDATA[E.g.
     zeta.'A' := ['p','q'];zeta.'B' := 'r';zeta.'C' := 's'
     values(zeta.)
-[[p,q],r,s]
-    reduce(@~, values(mask(zeta., {'A':true,'B':false,'C':true})))
-[p,q,s]
+{p,q,r,s}
 
 E.g. values returned are unique.
   arg.foo := 2; arg.bar := 2; arg.baz := 2
   values(arg.)
-[2]]]>
+{2}]]>
 </example>
 
     </entry>
@@ -2940,8 +2923,7 @@ See also: ~|, join, copy, insert_at]]>
     </entry>
     <entry id="~|" alt="≁">
         <body>
- <![CDATA[
-Join along last axis. Normal join, ~, operates along the zero-th
+ <![CDATA[Join along last axis. Normal join, ~, operates along the zero-th
 axis.
     a. ~| b. == join(a., b., -1)
 
@@ -2978,8 +2960,7 @@ E.g. Making a table with headings. Make the table with ~| then stick
  ]
 
 
- See also: ~, join
-    ]]>
+ See also: ~, join]]>
         </body>
     </entry>
     <entry id="indices">
@@ -3155,21 +3136,25 @@ ab....cd]]>
 This refers to what are also called global variables in some languages.
 These are simply variables prefixed with a single ampersand, &, and are
 always available regardless of scope to every module or function.
-To list them in the workspace use the -extrinsic command:
+To list them in the workspace use the -extrinsic command. So in
+some worksapce you might be able to do this:
 
 )vars -extrinsic
-  a   &Avogadro &ANSI.
+   &Avogadro  &Planck
 
-None are pre-defined. You may access them by simply using them
-like any other variables (including removing them).
-In the final analysis, they are just variables
-]]>
+   &Planck
+6.62607015E-34
+
+None are pre-defined in QDL. You may access extrinsic variables
+by simply using them like any other variables (including removing them).
+In the final analysis, they are just variables. You should
+use them for values that should be global. A variable
+like &temp would be a ghastly thing!]]>
             <entry id="&amp;">
                 <body>
-    <![CDATA[
-This is the marker for extrinsic variables.
+    <![CDATA[This is the marker for extrinsic variables.
 
-See also: extrinsic            ]]>
+See also: extrinsic]]>
                 </body>
             </entry>
         </body>
@@ -3382,8 +3367,7 @@ You may chain any of <, <=,  >, >=,  ==, != or =~.
 See comparisons, intrinsic.]]>
         </body>
         <example>
-           <![CDATA[
-E.g.
+           <![CDATA[E.g.
    k := 0
    while[0<=k<=3][say(k++);]
 0
@@ -3393,8 +3377,7 @@ E.g.
 
 E.g.
    if[2!=x<5][say(sqrt(5-x)/(x-2));];
-Meaning that (x!=2)&&(x<5), and if true, say what the value is
-           ]]>
+Meaning that (x!=2)&&(x<5), and if true, say what the value is.]]>
                 </example>
 
     </entry>
@@ -3465,8 +3448,7 @@ See also: cb_exists, cb_read]]>
            <![CDATA[   cb_write('mairzy doats')
 true
 
-and the line 'mairzy doats' is now in the clipboard.
-           ]]>
+and the line 'mairzy doats' is now in the clipboard.]]>
                 </example>
 
     </entry>
@@ -3528,8 +3510,7 @@ This may always be replaced by has_value(x,y)
 See also: ∉, intersection, has_value, subset(@pick arg).]]>
         </body>
         <example>
-           <![CDATA[
-  a. := ['a','b','c']
+           <![CDATA[  a. := ['a','b','c']
   b := {'p','q','b','a'};
   a. ∈ b
 [true,true,false]
@@ -3537,13 +3518,13 @@ See also: ∉, intersection, has_value, subset(@pick arg).]]>
     // This is useful with the mask function.
     mask(a., a. ∈ b)
 [a, b]
-           ]]>
+    // And is fine with loops, so this is a good statement:
+    while[α ∈ (A ∩ B) ∆ C][process(α);]]]>
                 </example>
     </entry>
     <entry id="∉">
         <body>
- <![CDATA[
-Unicode 2209.
+ <![CDATA[Unicode 2209.
 x ∉ y - return a left conformable boolean mask of all
    elements of x. that *not* are in y. Note that x may be a stem.
 
@@ -3552,30 +3533,23 @@ This is equivalent to !has_value(x,y)
 See also: ∈, intersection, has_value, subset(@pick arg).]]>
         </body>
         <example>
-           <![CDATA[
-  a. := ['a','b','c']
+           <![CDATA[  a. := ['a','b','c']
   b := {'p','q','b','a'}
   a. ∉ b
 [false,false,true]
 
    // This is useful with the mask function.
     mask(a., a. ∉ b)
-{2:c}
-           ]]>
+{2:c}]]>
                 </example>
 
     </entry>
-
-
-
     <entry id="/\" alt="∩">
         <body>
- <![CDATA[
-Ascii digraph for set intersection. The result is a set
+ <![CDATA[Ascii digraph for set intersection. The result is a set
 whose elements are common to both arguments.
 
-See also: \/ (set union), subset(@pick arg)
-]]>
+See also: \/ (set union), subset(@pick arg)]]>
         </body>
         <example>
 <![CDATA[    {0,2,3,5} /\ {4,2,1,0}
@@ -3685,7 +3659,7 @@ local is a reserved work to denote the beginning of a local environment.
 It is set off with []. Anything defined inside it is local only
 to that block, and the block *does not* inherit the ambient state.
 
-See also: block]]>
+See also: block, visibility]]>
         </body>
         <example>
 <![CDATA[To get values from the local block, use return.
@@ -3929,8 +3903,92 @@ See also: stem, slice]]>
        <example>
    <![CDATA[   [2,3,-1,5]; //Enter elements
 [2,3,-1,5]
-    [-1;4]; // use a slice
-[-1,0,1,2,3]
+    a.:=[-1;4]; // use a slice
+    a.
+[-1,0,1,2,3]]]>
+        </example>
+    </entry>
+    <entry id="visibility">
+       <body>
+  <![CDATA[Visibility of variables and functions is managed in several ways.
+The initial state that QDL starts in is the ambient space. All other states
+inherit from that unless otherwise stated. Block statements (local, block
+keywords) allow you to manage state.
+
+Why have these? Because you may want to keep state very separate.
+Consider the case that you are writing a library of functions.
+You would want all the internal workings separate from the ambient
+environment so that the user does not have their variables and other
+functions redefined seemingly at random.
+
+Functions should be easily available but there is a collision with
+Church's Lambda Calculus ("everything is a function!") is the
+reality of state management on a computer. So we have the define keyword
+which is more computer sciencey and is what you normally want when
+writing libraries (and include auto documentation)and lambda
+expressions (with a ->) for on the fly function defintions.
+
+Global variables are prefaced with a & and are always available,
+and should be used for truly global things.
+
+The define keyword.
+This restricts visibility to only imported modules
+
+These are defined to illustrate the examples.
+  a := 4;
+  s(x)->x^2
+  &my_global := 5;
+
+  define[f(x)][return(a*x);]
+  f(2)
+unknown symbol 'a' at (1, 20)
+
+but global variables are always there
+
+  define[g(x)][return(&my_global*x);]
+  f(2)
+10
+
+Lambdas.
+Using lamdas there is a hierarchy for blocks
+
+ local  - only arguments passed in are visible
+  block - ambient is visible, but new definitions stay local
+ambient - new functions and variables are available everywhere
+
+Local block examples. This gives the least visibility of all the options
+
+  h(@f, x)->local[return(f(x));]
+  h(@s, 2)
+4
+
+  hh(@f, x)->local[return(&my_global*f(x));]
+  hh(@s, 3)
+45
+
+Block examples. A block statement with a lambda gives more visibility
+than a define statement.
+
+   b(@f, x)->block[y:=x/2;return(a*y);]
+   b(@s, 3)
+6
+   is_defined(y)
+false
+
+Lambdas are normally completely ambient, but .
+  zz(x)->y:=x^2;
+  zz(4)
+16
+  is_defined(y)
+false
+
+  ]]>
+       </body>
+       <example>
+   <![CDATA[   f(x,y,z) -> block[q:=x; q:=q+y ; q:= q+z ; return(q);];
+   f(3,2,1)
+6
+
    ]]>
         </example>
     </entry>

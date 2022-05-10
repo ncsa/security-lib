@@ -1940,12 +1940,16 @@ public class StemTest extends AbstractQDLTester {
         addLine(script, "α. := indices(ξ.,0);"); // axis 0
         addLine(script, "β. := indices(ξ.,1);"); // axis 1
         addLine(script, "γ. := indices(ξ.,-1);"); // axis 2 (here -- last axis)
+        // Next line is a simple regression test that the keys and indices coincide with the rank 1 case.
+        // A change to how QDL lists were handled silently broke this at one point so this was added
+        addLine(script, "ok := ξ.keys(ξ.).0 == 'foo' == ξ.indices(ξ.).0;");
         addLine(script, "ok0 := reduce(@∧,  [0,1,'a','s','d'] ≡ α.); ");
         addLine(script, "ok1 := reduce(@∧,reduce(@∧, [['foo',0],['foo',1],['foo',2],['foo','tyu'],['foo','ghjjh'],['foo','rty']] ≡ β.)); ");
         addLine(script, "ok2 := reduce(@∧,reduce(@∧, [['foo','woof','a3tyu'],['foo','woof','a3rty'],['foo','woof','a3ghjjh']] ≡ γ.)); ");
         QDLInterpreter interpreter = new QDLInterpreter(null, state);
 
         interpreter.execute(script.toString());
+        assert getBooleanValue("ok", state) :  StemEvaluator.ALL_KEYS + " and " + StemEvaluator.KEYS + " check failed";
         assert getBooleanValue("ok0", state) : StemEvaluator.ALL_KEYS + " on axis 0 failed";
         assert getBooleanValue("ok1", state) : StemEvaluator.ALL_KEYS + " on axis 1 failed";
         assert getBooleanValue("ok2", state) : StemEvaluator.ALL_KEYS + " on axis -1 failed";

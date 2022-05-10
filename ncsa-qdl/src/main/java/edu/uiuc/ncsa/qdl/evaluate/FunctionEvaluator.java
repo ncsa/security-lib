@@ -7,6 +7,7 @@ import edu.uiuc.ncsa.qdl.functions.*;
 import edu.uiuc.ncsa.qdl.state.State;
 import edu.uiuc.ncsa.qdl.state.XKey;
 import edu.uiuc.ncsa.qdl.state.XThing;
+import edu.uiuc.ncsa.qdl.statements.LocalBlockStatement;
 import edu.uiuc.ncsa.qdl.statements.Statement;
 import edu.uiuc.ncsa.qdl.statements.StatementWithResultInterface;
 import edu.uiuc.ncsa.qdl.util.QDLVersion;
@@ -298,7 +299,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
         There may be lots of overloaded functions. These are then systematically added to the
         states later. This is not the argument list passed in to the function -- that is not changed.
          */
-        resolveArguments(functionRecord, polyad, state, localState);
+        ArrayList<XThing> foundParameters = resolveArguments(functionRecord, polyad, state, localState);
 
 
         if (functionRecord.isFuncRef) {
@@ -343,6 +344,10 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 ((StatementWithResultInterface) statement).setAlias(polyad.getAlias());
             }
             try {
+                if(statement instanceof LocalBlockStatement){
+                    // Can't tell when you get a function block, so have to do this
+                    ((LocalBlockStatement)statement).setFunctionParameters(foundParameters);
+                }
                 statement.evaluate(localState);
             } catch (ReturnException rx) {
                 polyad.setResult(rx.result);
@@ -372,13 +377,13 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
      * @param state
      * @param localState
      */
-    protected void resolveArguments(FunctionRecord functionRecord,
+    protected ArrayList<XThing> resolveArguments(FunctionRecord functionRecord,
                                     Polyad polyad,
                                     State state,
                                     State localState) {
         ArrayList<XThing> paramList = new ArrayList<>();
         if (functionRecord.isFuncRef) {
-            return;// implicit parameter list since this is an operator or built in function.
+            return paramList;// implicit parameter list since this is an operator or built in function.
         }
 
         HashMap<UUID, UUID> localStateLookup = new HashMap<>();
@@ -464,7 +469,7 @@ public class FunctionEvaluator extends AbstractFunctionEvaluator {
                 }
             }
         }
-        return;
+        return paramList;
     }
 
     /*
